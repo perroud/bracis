@@ -1,0 +1,136 @@
+id: cip-007-r5
+family: cip-007
+title: "System Access Control"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes to enforce authentication and manage access on BES
+    Cyber Systems that include the applicable requirement parts.
+  parts:
+    - id: cip-007-r5.1
+      label: "5.1"
+      prose: >-
+        Have a method(s) to enforce authentication of interactive
+        user access, where technically feasible.
+    - id: cip-007-r5.2
+      label: "5.2"
+      prose: >-
+        Identify and inventory all known enabled default or other
+        generic account types, either by system, by groups of
+        systems, by location, or by system type(s).
+    - id: cip-007-r5.3
+      label: "5.3"
+      prose: >-
+        Identify individuals who have authorized access to shared
+        accounts.
+    - id: cip-007-r5.4
+      label: "5.4"
+      prose: >-
+        Change known default passwords, per Cyber Asset capability.
+    - id: cip-007-r5.5
+      label: "5.5"
+      prose: >-
+        For password-only authenticated access, either technically
+        or procedurally enforce password parameters that include:
+        password length of at least eight characters, minimum
+        password complexity of three or more different types of
+        characters, and password changes at least once every 15
+        calendar months.
+    - id: cip-007-r5.6
+      label: "5.6"
+      prose: >-
+        Where technically feasible, for password-only authenticated
+        access to BES Cyber Systems, either limit the number of
+        unsuccessful authentication attempts or generate alerts
+        after a threshold of unsuccessful authentication attempts.
+    - id: cip-007-r5.7
+      label: "5.7"
+      prose: >-
+        Where technically feasible, generate alerts after a defined
+        number of unsuccessful login attempts, or implement account
+        lockout.
+
+guidance:
+  prose: >-
+    CIP-007 R5 addresses system-level access control on BES Cyber
+    Systems. The requirements cover authentication enforcement,
+    default account management, shared account tracking, default
+    password changes, password complexity, and brute-force protection.
+    In OT environments, these requirements must be balanced against
+    operational needs — account lockout on a SCADA system could have
+    reliability implications, so alerting is an alternative to lockout.
+    Default and generic accounts are a significant risk in OT
+    environments where vendor-supplied credentials are common. Entities
+    must inventory all such accounts and track which individuals have
+    access to shared credentials. The 15-month password rotation
+    requirement applies to password-only authentication; MFA-protected
+    systems may have different requirements.
+
+references:
+  - citation: "NERC CIP-007-6 — System Security Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-007-6.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized authentication for BES Cyber Systems
+      through an identity provider (IdP) with enforced MFA where
+      technically feasible. Deploy secrets management (Vault) for
+      default and shared account credential rotation. Maintain an
+      automated inventory of all enabled accounts including default
+      and generic accounts per BES Cyber System. Enforce password
+      policies (length, complexity, rotation) through IdP and local
+      security policies. Implement account lockout or alerting for
+      failed authentication attempts. Deploy privileged access
+      management (PAM) for high-risk BES Cyber System accounts.
+    tools:
+      - keycloak
+      - vault
+      - cyberark
+      - terraform
+      - grafana
+
+  devsecops:
+    prose: >-
+      Implement credential scanning in CI pipelines to detect
+      hardcoded default passwords and credentials. Store access
+      control configurations as version-controlled code with
+      mandatory approval. Create automated compliance checks that
+      verify password policy enforcement across BES Cyber Systems.
+      Implement pipeline gates that prevent deployment of containers
+      or VMs with known default credentials. Automate default
+      account inventory reconciliation through infrastructure
+      scanning.
+    tools:
+      - gitlab-ci
+      - scanner_secret_detection
+      - vault
+      - checkov
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor authentication events across all BES Cyber Systems.
+      Alert on excessive failed login attempts, use of default
+      accounts, and authentication from unexpected sources. Track
+      password age across all accounts and alert on passwords
+      approaching the 15-month rotation deadline. Correlate
+      authentication anomalies with other security events for
+      threat detection. Generate audit reports showing account
+      inventory, password compliance, and authentication event
+      statistics.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-7", "IA-2", "IA-5"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.3.3", "3-3-5.7"]
+    relationship: supports

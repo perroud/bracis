@@ -1,0 +1,135 @@
+id: art-4
+family: cap-2
+title: "Electronic Document Issuance, Delivery and Availability"
+class: CNSP-408
+baselines: [seguradoras-digitais]
+statement:
+  prose: |
+    Art. 4º. É permitido o uso de meios remotos para emissão, envio e disponibilização,
+    conforme o caso, de documentos relativos à contratação do produto, tais como
+    propostas, documentos contratuais, documentos de cobrança, notificações, extratos,
+    condições contratuais, regulamentos, materiais informativos e comunicados.
+
+    § 1º. A utilização de meios remotos na emissão de documentos contratuais deverá
+    garantir a possibilidade de impressão ou download do documento pelo cliente.
+
+    § 2º. Os documentos contratuais emitidos por meios remotos devem conter informação
+    de data e hora de sua emissão.
+guidance:
+  prose: |
+    Article 4 authorizes the use of remote means for the entire spectrum of documents
+    related to insurance product contracting, and establishes specific requirements for
+    contractual documents.
+
+    **Scope of authorized documents (caput):**
+    The article provides an illustrative (not exhaustive) list of documents that can be
+    issued, sent, and made available through remote means:
+    - Propostas (proposals/applications)
+    - Documentos contratuais (policies, certificates, endorsements)
+    - Documentos de cobrança (billing documents, premium notices)
+    - Notificações (notifications, notices)
+    - Extratos (statements, account summaries)
+    - Condições contratuais (general and special conditions)
+    - Regulamentos (regulations, plan rules)
+    - Materiais informativos (informational materials)
+    - Comunicados (communications, announcements)
+
+    **Print/download requirement (§ 1):**
+    Contractual documents issued electronically must allow the client to print or
+    download them. This ensures the client retains a permanent copy independent of
+    the supervised entity's systems. The requirement applies specifically to
+    "documentos contratuais" (policies, certificates, endorsements) — not to all
+    documents listed in the caput.
+
+    **Timestamp requirement (§ 2):**
+    Contractual documents must contain date and time of issuance. This is critical
+    for determining the start of coverage, grace periods, cooling-off periods, and
+    statute of limitations. The timestamp must be embedded in the document itself,
+    not just in the delivery metadata.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Electronic document management system:**
+      1. Implement a document generation engine capable of producing all document
+         types listed in Art. 4 in electronic format (PDF/A for long-term archival).
+      2. Document template management system with version control and regulatory
+         compliance validation.
+      3. Multi-channel document delivery: email with attachment, secure portal
+         download, in-app delivery, API-based delivery.
+      4. Document storage with immutable audit trail (creation, delivery, access,
+         download events).
+
+      **Print and download capability (§ 1):**
+      5. All contractual documents must be generated in a printable format (PDF/A).
+      6. Download endpoint with proper authentication and authorization.
+      7. Document expiration policy: contractual documents must remain available
+         for download for the entire contract duration plus retention period.
+      8. Offline access capability for mobile apps (cached documents).
+
+      **Timestamp embedding (§ 2):**
+      9. Trusted timestamp service integration (TSA — Time Stamp Authority)
+         for contractual documents.
+      10. Timestamp embedded in document metadata (PDF metadata) and visible
+          in the document body (human-readable date/time).
+      11. Timestamp format: ISO 8601 with timezone (America/Sao_Paulo).
+      12. Timestamp verification endpoint for clients and auditors.
+    tools:
+      - document-management
+      - pdf-generation
+      - tsa-timestamp
+      - object-storage
+      - cdn
+  devsecops:
+    prose: |
+      **Document generation validation:**
+      1. Automated tests verifying that every contractual document template
+         includes a timestamp field and generates printable output (PDF/A compliance).
+      2. Regression tests for document download functionality across all
+         supported browsers and mobile platforms.
+      3. PDF/A validation in the CI/CD pipeline for all document templates.
+      4. Accessibility testing (WCAG 2.1) for electronic documents.
+
+      **Security controls:**
+      5. Document signing verification in the pipeline — all contractual
+         documents must be digitally signed before delivery.
+      6. SAST checks for document generation code (injection vulnerabilities,
+         template manipulation risks).
+      7. Performance testing for document generation under load (batch issuance
+         scenarios).
+    tools:
+      - gitlab-ci
+      - pdf-validator
+      - lighthouse
+      - load-testing
+      - sast-scanner
+  secops:
+    prose: |
+      **Document compliance monitoring:**
+      1. Monitor document generation for timestamp completeness — every
+         contractual document must have date and time of issuance.
+      2. Track download availability: alert when contractual documents
+         become inaccessible (storage failure, expired links, etc.).
+      3. Audit document retention: verify that documents are available for
+         the required retention period.
+      4. Monitor document integrity: periodic hash verification of stored
+         documents.
+
+      **Client experience monitoring:**
+      5. Track document download success rates per channel and device type.
+      6. Monitor client complaints related to document access, printing, or
+         downloading issues.
+      7. Periodic usability review of document access flows.
+      8. Incident response for document delivery failures affecting
+         regulatory-mandated communications.
+    tools:
+      - monitoring-alerting
+      - grc-platform
+      - document-management
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-9", "art-18"]
+    relationship: complements
+  - framework_id: susep-638
+    articles: ["art-3"]
+    relationship: complements

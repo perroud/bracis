@@ -1,0 +1,86 @@
+id: art-1
+family: cap-1
+title: "Purpose, Scope, and Applicability"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 1. Este Decreto regulamenta o tratamento de informação classificada
+    em qualquer grau de sigilo no âmbito do Poder Executivo federal.
+
+    Parágrafo único. O tratamento de informação classificada relativa a
+    projetos de pesquisa e desenvolvimento científico ou tecnológico cujo
+    sigilo seja imprescindível à segurança da sociedade e do Estado
+    observará legislação específica.
+guidance:
+  prose: |
+    Article 1 establishes the scope of Decreto 7.845/2012 as the primary
+    regulation governing the handling of classified information within the
+    Brazilian federal executive branch.
+
+    **Key scope boundaries:**
+    - Applies exclusively to the federal executive branch (Poder Executivo federal)
+    - Covers all classification levels: reservado, secreto, and ultrassecreto
+    - Scientific and technological R&D projects with classification may follow
+      specific legislation, but this decree still provides the baseline
+
+    **Relationship with LAI:**
+    This decree operationalizes articles 23-25 of Lei 12.527/2011 (LAI),
+    which define the classification levels and their maximum durations.
+    The LAI establishes the right to information; this decree establishes
+    how classified exceptions are operationally managed.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Information classification infrastructure:**
+      1. Implement a mandatory metadata schema for all documents and data
+         assets that includes a classification field with allowed values:
+         nao-classificado, reservado, secreto, ultrassecreto.
+      2. Deploy data labeling services that tag all data at rest and in
+         transit with their classification level.
+      3. Enforce classification inheritance: child objects inherit the
+         highest classification level of their parent unless explicitly
+         downgraded through declassification workflow.
+      4. Integrate classification metadata with IAM and access control
+         policies to enforce need-to-know automatically.
+    tools:
+      - data-classification
+      - metadata-management
+      - opa-gatekeeper
+      - iam-platform
+  devsecops:
+    prose: |
+      **Pipeline classification enforcement:**
+      1. Add pre-commit hooks that reject commits containing data markers
+         for secreto or ultrassecreto in repositories without appropriate
+         classification labels.
+      2. Implement CI/CD gates that verify classification metadata is
+         present on all artifacts before deployment.
+      3. Scan repositories for inadvertent classified content using
+         pattern-matching rules aligned with classification markers.
+    tools:
+      - pre-commit
+      - gitlab-ci
+      - secret-detection
+      - compliance-pipeline
+  secops:
+    prose: |
+      **Classification governance program:**
+      1. Maintain a registry of all systems that process, store, or
+         transmit classified information, categorized by classification level.
+      2. Conduct quarterly audits to verify that classified information
+         is handled in compliance with this decree.
+      3. Designate a classification management officer responsible for
+         overseeing the correct application of classification markings.
+      4. Establish procedures for classification disputes and appeals.
+    tools:
+      - grc-platform
+      - asset-inventory
+      - audit-management
+legal_references:
+  - framework_id: lai
+    articles: ["art-23", "art-24", "art-25"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "SC-16"]
+    relationship: mapped

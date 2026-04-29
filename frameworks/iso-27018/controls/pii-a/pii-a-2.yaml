@@ -1,0 +1,90 @@
+id: pii-a.2
+family: pii-a
+title: "Obligation to cooperate regarding PII principals' rights"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor should provide tools and interfaces to support
+    the cloud service customer in managing PII principals' rights, including the
+    right to access, rectify, erase, or restrict the processing of their PII. The
+    public cloud PII processor should inform the cloud service customer of any
+    request received directly from a PII principal without responding to that
+    request itself, unless it has been authorized to do so.
+
+guidance:
+  prose: >-
+    Cloud processors frequently receive direct requests from PII principals (data
+    subjects) who may not understand the controller-processor relationship. This
+    control requires the processor to redirect such requests to the cloud service
+    customer rather than acting unilaterally. The processor must also provide the
+    customer with self-service capabilities to fulfill data subject rights at scale.
+    This includes APIs for data export, deletion, rectification, and processing
+    restriction. The processor should document the maximum timeframes for completing
+    these operations and provide status tracking. For multi-tenant environments, the
+    processor must ensure that rights exercised by one PII principal do not affect
+    the PII of other principals.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.1.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build self-service PII management APIs that customers can invoke to fulfill
+      data subject requests. Implement data subject request (DSR) orchestration
+      services that can locate, export, rectify, and delete PII across all storage
+      systems (databases, object stores, caches, backups, logs). Provide SLA-backed
+      response times for DSR operations. Build tenant isolation verification that
+      confirms DSR operations target only the requesting principal's data. Implement
+      cascading deletion that propagates across all derived data, replicas, and
+      backup systems with auditable confirmation. Expose DSR status endpoints so
+      customers can track completion.
+    tools:
+      - dsr-orchestration-api
+      - data-discovery-service
+      - cascading-delete-engine
+      - tenant-isolation-framework
+      - audit-trail-service
+
+  devsecops:
+    prose: >-
+      Require DSR compatibility for all new data stores and services. CI pipeline
+      gates must validate that any new PII storage location is registered in the
+      data inventory and reachable by the DSR orchestration service. Static analysis
+      should flag PII writes to locations not covered by the DSR system. Build
+      integration tests that exercise the full DSR lifecycle: request, locate,
+      action, verify, confirm. Code reviews must verify that new features do not
+      create PII silos unreachable by the deletion or export services.
+    tools:
+      - gitlab-ci
+      - data-inventory-validator
+      - dsr-integration-tests
+      - semgrep
+      - pii-storage-scanner
+
+  secops:
+    prose: >-
+      Monitor DSR request volumes, completion rates, and SLA compliance. Alert
+      on DSR failures, timeouts, or partial completions. Track direct PII principal
+      requests received by the processor and verify they are forwarded to the
+      customer within the contractual timeframe. Audit DSR completeness by sampling
+      completed requests and verifying PII removal across all storage systems.
+      Monitor for PII re-emergence after deletion (e.g., through cache repopulation
+      or backup restoration). Generate DSR compliance dashboards for customer
+      reporting.
+    tools:
+      - splunk
+      - elastic-siem
+      - dsr-monitoring-dashboard
+      - pii-residue-scanner
+      - sla-tracking
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-15", "art-16", "art-17", "art-28"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.3.1", "a-7.3.2"]
+    relationship: complements

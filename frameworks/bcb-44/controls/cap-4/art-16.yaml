@@ -1,0 +1,98 @@
+id: art-16
+family: cap-4
+title: "Registro de Operacoes de Alto Valor"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 16. Independentemente de qualquer análise de suspeita, as instituições de
+    pagamento devem registrar e manter disponível ao Banco Central do Brasil e ao COAF
+    informações sobre:
+
+    I - operações de depósito, aporte, transferência ou qualquer forma de carga
+    em conta de pagamento com valor igual ou superior a R$ 2.000,00 (dois mil reais),
+    realizadas em espécie;
+
+    II - operações de saque ou retirada em espécie de conta de pagamento com valor
+    igual ou superior a R$ 2.000,00 (dois mil reais);
+
+    III - transferências internacionais de e para o país com valor igual ou superior
+    a R$ 10.000,00 (dez mil reais).
+
+    Parágrafo único. O registro de que trata este artigo deve conter a identificação
+    completa do cliente, o valor, a data, a hora e o local da operação, bem como
+    a identificação do funcionário ou agente que a processou, quando aplicável.
+guidance:
+  prose: |
+    O art. 16 estabelece obrigacoes de registro AUTOMATICO para operacoes acima
+    de limiares fixos -- independente de qualquer suspeita. E a "net de seguranca"
+    para transacoes em especie e internacionais.
+
+    **Por que especie e tao problematica:**
+    Operacoes em especie sao o instrumento classico de lavagem de dinheiro na
+    fase de "placement" (introducao do dinheiro sujo no sistema). O limiar de
+    R$ 2.000,00 e relativamente baixo, capturando a maioria das operacoes
+    significativas em especie.
+
+    **Aplicacao para IPs (especificidade):**
+    Para a maioria das fintechs, as operacoes de especie sao raras (carga via
+    deposito bancario). Porem, se a IP tem terminais fisicos ou ATMs, ou
+    correspondes bancarios que realizam operacoes em especie, este artigo e
+    altamente relevante.
+
+    **Transferencias internacionais (inciso III):**
+    Especialmente relevante para IPs que operam remessas internacionais. O
+    limiar de R$ 10.000,00 exige registro automatico independente de suspeita.
+
+    **Prazo de manutencao:**
+    Os registros do art. 16 seguem o mesmo prazo do art. 15: 10 anos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Deteccao e registro automatico:**
+      1. Trigger automatico no core de pagamentos para operacoes acima dos
+         limiares do art. 16: registrar em tabela especifica de "operacoes
+         de alto valor" com todos os campos do paragrafo unico.
+      2. Para operacoes em especie (se aplicavel): capturar dados do terminal,
+         funcionario/agente, localizacao geografica.
+      3. Para transferencias internacionais: capturar pais de origem/destino,
+         banco correspondente, dados do beneficiario no exterior.
+      4. Dashboard de operacoes de alto valor com filtros por tipo, valor,
+         periodo e cliente -- para facilitar acesso do BCB/COAF.
+      5. API de export segura: resposta a solicitacoes regulatorias com
+         autenticacao forte e log de cada acesso.
+    tools:
+      - payment-core
+      - data-warehouse
+      - audit-logging
+      - pix-monitoring
+  devsecops:
+    prose: |
+      **Garantias de captura:**
+      1. Testes automatizados: verificar que toda operacao >= R$ 2.000 em especie
+         e >= R$ 10.000 em transferencia internacional gera registro.
+      2. Alertas de monitoramento: se nenhum registro de alto valor e gerado em
+         periodo suspeito de inatividade, verificar se o trigger esta funcionando.
+      3. Reconciliacao diaria: comparar registros de alto valor com transacoes
+         no core de pagamentos para detectar lacunas.
+    tools:
+      - gitlab-ci
+      - data-reconciliation
+      - monitoring-alerting
+  secops:
+    prose: |
+      **Supervisao dos registros:**
+      1. Relatorio diario de operacoes de alto valor registradas.
+      2. Verificacao de completude: todos os campos obrigatorios preenchidos.
+      3. Monitoramento de clientes com alta frequencia de operacoes no limiar
+         (ex: varios depositos de exatamente R$ 1.900,00 -- possivel fragmentacao).
+      4. Procedimento de resposta a solicitacao de acesso do BCB/COAF dentro
+         do prazo regulatorio.
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-19", "art-20"]
+    relationship: equivalent-to

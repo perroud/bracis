@@ -1,0 +1,94 @@
+id: art-23
+family: rules
+title: "Consent and obligations for third-party sharing"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 23: Where a personal information processor entrusts the processing of personal information
+    to another party, it shall agree with the entrusted party on the purpose of the entrusted processing,
+    the time limit, the processing method, the categories of personal information, the protection
+    measures, and the rights and obligations of both parties, and shall supervise the processing
+    activities of the entrusted party. The entrusted party shall process personal information in
+    accordance with the agreement and shall not process personal information beyond the agreed-upon
+    purpose of processing, processing method, or other matters. Where the entrustment contract is
+    not in effect, has been invalidated, or has been revoked or terminated, the entrusted party
+    shall return the personal information to the personal information processor or delete it, and
+    shall not retain such information. Without the consent of the personal information processor,
+    the entrusted party shall not sub-entrust the processing of personal information to another party.
+    Article 24: Where a personal information processor needs to provide personal information to another
+    personal information processor, it shall inform the individual of the name or personal name of the
+    receiving party, the contact information, the processing purpose, the processing method, and the
+    categories of personal information, and shall obtain the separate consent of the individual. The
+    receiving party shall process personal information within the scope of the above-mentioned processing
+    purpose, processing method, categories of personal information, and other matters. Where the
+    receiving party changes the original processing purpose or processing method, it shall re-obtain
+    the consent of the individual in accordance with the provisions of this Law.
+
+guidance:
+  prose: >-
+    Articles 23 and 24 govern data sharing with third parties. Article 23 addresses the processor-
+    sub-processor relationship (comparable to GDPR Article 28), requiring a written agreement
+    specifying purpose, time limit, method, data categories, and security measures. Sub-processing
+    is prohibited without the original processor's consent. Upon contract termination, data must
+    be returned or deleted. Article 24 addresses the provision of personal information to another
+    controller, which requires separate consent from the individual. This is stricter than GDPR,
+    which allows controller-to-controller sharing under various lawful bases. Under PIPL, sharing
+    personal information with another processor always requires the individual's separate consent,
+    along with disclosure of the receiving party's identity and processing parameters.
+
+references:
+  - citation: "PIPL, Articles 23–24"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a third-party data sharing registry that tracks all outbound personal information
+      flows with contractual parameters (purpose, time limit, method, categories, security
+      measures). Implement API-level controls that enforce sharing agreements: block data
+      transfers to third parties not registered in the sharing registry. Build consent collection
+      workflows that specifically request separate consent for each third-party recipient,
+      disclosing the recipient's identity and processing parameters. Implement data lifecycle
+      management for shared data, including automated return/deletion triggers on contract
+      termination. Deploy sub-processing tracking to prevent unauthorized re-sharing.
+    tools:
+      - "Third-party data sharing registry (custom or OneTrust Vendorpedia)"
+      - "API gateway with outbound data flow enforcement (Kong, Envoy)"
+      - "Separate consent collection for third-party sharing"
+      - "Contract lifecycle management integration"
+      - "Data return/deletion automation on contract events"
+  devsecops:
+    prose: >-
+      Pipeline checks must verify that any third-party integration involving personal information
+      has a registered sharing agreement. Code reviews must flag new third-party data transfers
+      and verify corresponding consent collection. Automated tests must validate that separate
+      consent is collected before sharing with identified third parties. Integration tests must
+      verify data return/deletion on contract termination. Dependency scanning should identify
+      third-party SDKs that transmit personal information.
+    tools:
+      - "Third-party integration audit in CI/CD"
+      - "SDK analysis for data transmission (Semgrep, custom rules)"
+      - "Separate consent flow testing"
+      - "Contract termination data lifecycle tests"
+  secops:
+    prose: >-
+      Monitor outbound data flows for unauthorized third-party sharing. Alert when personal
+      information is transmitted to unregistered recipients. Track contract status and trigger
+      alerts when sharing continues after contract termination. Monitor sub-processing chains
+      for unauthorized delegation. Conduct periodic audits of third-party compliance with
+      sharing agreements.
+    tools:
+      - "DLP with outbound flow monitoring (Nightfall, Forcepoint)"
+      - "Third-party risk monitoring (BitSight, SecurityScorecard)"
+      - "Contract expiration alerting"
+      - "Data flow auditing tools"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33"]
+    relationship: equivalent-to

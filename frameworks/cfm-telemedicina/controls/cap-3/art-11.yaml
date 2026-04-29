@@ -1,0 +1,118 @@
+id: art-11
+family: cap-3
+title: "Criptografia e Protecao de Dados em Transito"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 11. Toda comunicação de dados de saúde em plataformas de
+    telemedicina deve ser protegida por criptografia fim-a-fim,
+    garantindo confidencialidade e integridade das informações
+    transmitidas.
+
+    Parágrafo 1. As plataformas de telemedicina devem utilizar
+    protocolos de criptografia reconhecidos internacionalmente
+    e atualizados conforme estado da arte da segurança da
+    informação.
+
+    Parágrafo 2. É vedada a transmissão de dados de saúde por
+    canais de comunicação não criptografados ou por plataformas
+    de mensageria genérica que não atendam requisitos de
+    segurança e privacidade.
+
+    Parágrafo 3. As chaves criptográficas devem ser gerenciadas
+    de forma segura, com rotação periódica e armazenamento
+    protegido.
+guidance:
+  prose: |
+    O art. 11 estabelece a criptografia como requisito obrigatorio
+    para toda comunicacao de dados de saude em telemedicina. A
+    vedacao de plataformas genericas (paragrafo 2) implica que
+    WhatsApp, Telegram, SMS e email nao criptografado sao
+    inadequados para transmissao de dados clinicos.
+
+    **Requisitos tecnicos minimos:**
+    - TLS 1.3 para comunicacao em transito (TLS 1.2 como fallback
+      minimo aceitavel, com cipher suites fortes)
+    - Criptografia fim-a-fim (E2EE) para videoconferencias e
+      mensageria medica
+    - Protocolos recomendados: SRTP para media, DTLS para
+      sinalizacao WebRTC
+    - Cipher suites minimos: AES-256-GCM, ChaCha20-Poly1305
+
+    **Gestao de chaves (paragrafo 3):**
+    - Rotacao de chaves de sessao a cada sessao de teleconsulta
+    - Chaves de armazenamento com rotacao trimestral no minimo
+    - HSM (Hardware Security Module) para armazenamento de
+      chaves raiz e chaves de assinatura
+    - Key escrow proibido, exceto por ordem judicial
+
+    **Vedacao de plataformas genericas (paragrafo 2):**
+    Mesmo que WhatsApp utilize criptografia fim-a-fim, nao atende
+    os requisitos de auditoria, retencao e integracao com prontuario
+    eletronico exigidos pela resolucao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de criptografia:**
+      1. Configurar TLS 1.3 como protocolo padrao em todas as
+         comunicacoes, com TLS 1.2 como fallback minimo e
+         desabilitacao de versoes anteriores.
+      2. Implementar criptografia fim-a-fim (E2EE) para
+         videoconferencias medicas usando SRTP com DTLS-SRTP
+         key exchange.
+      3. Utilizar HSM (Hardware Security Module) ou servico
+         equivalente em nuvem (AWS CloudHSM, Azure Dedicated HSM)
+         para gerenciamento de chaves raiz.
+      4. Implementar rotacao automatica de chaves com politica
+         definida: chaves de sessao por sessao, chaves de
+         armazenamento trimestral, chaves raiz anual.
+      5. Bloquear conexoes que nao atendam cipher suites minimos
+         (AES-256-GCM ou ChaCha20-Poly1305).
+    tools:
+      - tls-termination
+      - hsm
+      - key-management
+      - certificate-management
+  devsecops:
+    prose: |
+      **Verificacao de criptografia no pipeline:**
+      1. Implementar scan automatico de configuracao TLS em todas
+         as aplicacoes, rejeitando configuracoes com protocolos
+         ou cipher suites fracos.
+      2. Testar criptografia fim-a-fim em fluxos de teleconsulta,
+         validando que dados nao sao acessiveis em pontos
+         intermediarios.
+      3. Verificar que chaves criptograficas nao estao hardcoded
+         no codigo-fonte (secret detection).
+      4. Implementar teste de renovacao de certificados TLS como
+         parte do pipeline de infraestrutura.
+    tools:
+      - gitlab-ci
+      - tls-scanning
+      - secret-detection
+      - certificate-testing
+  secops:
+    prose: |
+      **Monitoramento de criptografia:**
+      1. Monitorar validade de certificados TLS com alerta 30 dias
+         antes da expiracao.
+      2. Auditar que toda comunicacao de dados de saude utiliza
+         canais criptografados (DLP para detectar transmissao
+         em claro).
+      3. Verificar que plataformas de mensageria generica nao
+         sao utilizadas para transmissao de dados clinicos.
+      4. Manter inventario de chaves criptograficas com registro
+         de rotacoes e acessos.
+    tools:
+      - certificate-monitoring
+      - dlp
+      - network-monitoring
+      - key-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-2-iv", "164.312-e-2-ii"]
+    relationship: mapped

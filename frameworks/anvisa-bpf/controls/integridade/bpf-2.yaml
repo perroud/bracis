@@ -1,0 +1,110 @@
+id: bpf-2
+family: integridade
+title: "Raw Data Management and True Copies"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    Os dados brutos (raw data) gerados por equipamentos e sistemas
+    computadorizados durante a fabricação de medicamentos devem ser preservados
+    em seu formato original e não devem ser sobrescritos, substituídos ou
+    descartados sem autorização formal e registro documentado.
+
+    Cópias fiéis (true copies) de dados brutos devem ser verificáveis contra
+    o registro original por meio de comparação automatizada (checksums,
+    hashes criptográficos) ou processo documentado de certificação. A cópia
+    fiel deve preservar o conteúdo completo, incluindo metadados, trilha de
+    auditoria e contexto do dado original.
+
+    O fabricante deve manter procedimento documentado para a gestão do ciclo
+    de vida dos dados brutos, incluindo geração, processamento, revisão,
+    armazenamento, arquivamento, migração e descarte, assegurando a
+    integridade durante cada fase.
+guidance:
+  prose: |
+    Raw data in pharmaceutical manufacturing includes primary records from
+    instruments (chromatography data, spectra, weighing records), process
+    parameters from SCADA/DCS systems, environmental monitoring readings,
+    and electronic batch record entries.
+
+    Key requirements for raw data management:
+    - Raw data must be stored in its original format (not only as processed
+      results or PDF exports)
+    - Dynamic data must remain dynamic (ability to reprocess, zoom, expand
+      chromatographic peaks)
+    - Static data (printouts, PDF) are acceptable only when the dynamic
+      record is also preserved
+    - True copies must include all metadata and audit trail entries
+    - Data migration between systems must be validated with documented
+      evidence of completeness and accuracy
+
+    Common regulatory findings include: overwriting raw data with reprocessed
+    results, retaining only PDF summaries instead of original dynamic data,
+    failing to include audit trail in data migrations, and lack of verified
+    true copy procedures.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement write-once storage for raw data from analytical
+         instruments, process control systems, and manufacturing equipment.
+         Configure storage policies that prevent overwrite and require
+         formal approval workflow for any data archival or migration.
+      2. Deploy automated true copy verification using cryptographic
+         hashes (SHA-256 minimum). Generate hash at source, verify at
+         destination, and store hash comparison results as part of the
+         transfer record.
+      3. Configure storage tiering that maintains raw data in its native
+         format on primary storage with automated archival to long-term
+         storage preserving format fidelity and metadata.
+      4. Implement data lifecycle management automation covering retention
+         periods, archival schedules, migration validation, and regulated
+         disposal with documented evidence.
+    tools:
+      - worm-storage
+      - cryptographic-hashing
+      - data-lifecycle-management
+      - storage-tiering
+      - archive-management
+  devsecops:
+    prose: |
+      1. Build pipeline validations that verify raw data preservation:
+         test that original instrument files are stored alongside any
+         processed or summarized outputs.
+      2. Implement automated true copy verification tests comparing
+         source and destination checksums after every data transfer,
+         backup, or migration operation.
+      3. Create integration tests validating that data format fidelity
+         is maintained during system upgrades and data migrations
+         (dynamic data remains dynamic, metadata is preserved).
+      4. Add regression tests ensuring that raw data deletion or
+         overwrite operations are blocked unless executed through the
+         approved workflow with documented justification.
+    tools:
+      - gitlab-ci
+      - checksum-testing
+      - data-migration-validation
+      - format-fidelity-testing
+  secops:
+    prose: |
+      1. Define and enforce a raw data management SOP covering
+         generation, storage, access, review, archival, migration,
+         and disposal for each data type and system category.
+      2. Conduct periodic audits verifying that raw data is preserved
+         in original format, true copies are validated, and no
+         unauthorized deletions or overwrites have occurred.
+      3. Monitor storage systems for unauthorized raw data modifications
+         using file integrity monitoring with real-time alerting.
+      4. Include raw data management and true copy procedures in the
+         annual data integrity assessment program.
+    tools:
+      - grc-platform
+      - file-integrity-monitoring
+      - quality-management-system
+      - audit-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23", "art-25"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-10"]
+    relationship: mapped

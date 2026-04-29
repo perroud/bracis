@@ -1,0 +1,140 @@
+id: art-6
+family: cap-3
+title: "Prazo e Obrigacao de Notificacao Inicial ao BCB"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 6. A notificação inicial ao BCB deve ser realizada no prazo máximo de
+    24 (vinte e quatro) horas contadas a partir da detecção do incidente de
+    segurança cibernética que atenda aos limiares de materialidade estabelecidos
+    no art. 4.
+
+    § 1. O prazo de que trata o caput é contado a partir do momento em que a
+    instituição toma conhecimento do incidente, independentemente do nível de
+    informação disponível naquele momento.
+
+    § 2. O desconhecimento de informações sobre o incidente no momento da
+    detecção não exime a instituição da obrigação de notificação no prazo
+    estabelecido, devendo a notificação inicial ser realizada com as informações
+    disponíveis.
+
+    § 3. A insuficiência de informações na notificação inicial deve ser
+    explicitamente declarada, com indicação das informações pendentes e do
+    prazo estimado para sua obtenção.
+
+    § 4. Para fins de cômputo do prazo, considera-se detecção o momento em que
+    qualquer colaborador, sistema automatizado ou prestador de serviços da
+    instituição toma conhecimento do evento adverso.
+guidance:
+  prose: |
+    O art. 6 e o coração operacional da IN 291: define o prazo (24 horas) e
+    esclarece inequivocamente que a incompletude das informacoes nao justifica
+    atraso na notificacao.
+
+    **Prazo de 24 horas (caput):**
+    24 horas corridas, nao uteis. Um incidente detectado as 23h de sexta-feira
+    deve ser notificado ate as 23h de sabado. O BCB nao aceita "incidente foi
+    detectado fora do horario comercial" como justificativa para atraso.
+
+    **Inicio do prazo (ss 1 e ss 4):**
+    O prazo comeca com qualquer tomada de conhecimento, incluindo:
+    - Alerta automatico do SIEM
+    - Relato de usuario ou cliente
+    - Comunicacao de terceiro (prestador, outra IF, CERT.br)
+    - Noticia na midia sobre o incidente (mesmo antes da confirmacao interna)
+    O inicio do prazo nao e o momento da confirmacao ou da classificacao, e o
+    momento do primeiro conhecimento.
+
+    **Notificacao com informacoes incompletas (ss 2 e ss 3):**
+    Esta e a licenca regulatoria mais importante da IN: o BCB explicitamente
+    autoriza notificacao preliminar com dados parciais, desde que:
+    1. A incompletude seja declarada
+    2. As informacoes pendentes sejam identificadas
+    3. O prazo estimado para completar as informacoes seja indicado
+
+    **Implicacoes praticas do ss 4:**
+    Se um analista junior detecta o incidente as 10h mas nao escala ate as 14h,
+    o prazo de 24h comecou as 10h, nao as 14h. Por isso e fundamental que qualquer
+    colaborador que detecte um potencial incidente o registre imediatamente no
+    sistema de incidentes, mesmo sem confirmar a classificacao.
+
+    **Tolerancia zero para atraso por qualidade:**
+    Instituicoes que aguardam concluir a investigacao para notificar "com informacoes
+    completas" incorrem em violacao regulatoria. Uma notificacao parcial a tempo e
+    sempre preferivel a uma notificacao completa apos o prazo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Cronometro automatico de notificacao:**
+      1. O sistema de gestao de incidentes inicia automaticamente o cronometro
+         de 24h no momento do registro do incidente (timestamp imutavel).
+      2. Alertas escalonados para notificacao ao BCB:
+         - T+4h: lembrete para CISO e compliance
+         - T+8h: escalacao para diretoria se notificacao nao iniciada
+         - T+12h: alerta critico (metade do prazo consumida)
+         - T+18h: alerta de emergencia (75% do prazo consumida)
+         - T+22h: alerta final (2h restantes)
+      3. Sistema de notificacao ao BCB com campos de status de completude:
+         campos "informacao_pendente" e "prazo_estimado_complementacao"
+         obrigatorios quando a notificacao e enviada com dados incompletos.
+      4. Auto-registro de deteccao: qualquer alerta do SIEM classificado como
+         potencial incidente de notificacao gera automaticamente um ticket com
+         timestamp, sem necessidade de acao humana.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - notification-system
+      - monitoring-alerting
+  devsecops:
+    prose: |
+      **Deteccao rapida para maximizar janela de 24h:**
+      1. MTTD (Mean Time to Detect) target < 2h para incidentes de nivel 1,
+         com monitoring automatizado e alerting em tempo real.
+      2. Runbooks de deteccao para cada categoria de incidente do art. 2,
+         com decisao de notificacao embutida na arvore de decisao.
+      3. On-call rotation 24x7 com SLA de resposta a alertas de seguranca:
+         < 15 minutos para incidentes Tier 1.
+      4. Reducao de falsos positivos via machine learning para que alertas
+         de seguranca sejam confiados e investigados prontamente.
+    tools:
+      - siem
+      - alerting-platform
+      - on-call-management
+      - runbook-automation
+  secops:
+    prose: |
+      **Processo de notificacao no prazo:**
+      1. Processo de notificacao ao BCB com maximo de 5 passos, todos executaveis
+         em < 2 horas:
+         Passo 1 (30min): Triagem e classificacao de materialidade
+         Passo 2 (30min): Preenchimento do formulario com dados disponiveis
+         Passo 3 (20min): Revisao CISO + compliance
+         Passo 4 (10min): Aprovacao de diretoria (por e-mail ou sistema)
+         Passo 5 (10min): Envio ao BCB via canal oficial
+      2. Template de notificacao preliminar pre-preenchido para uso emergencial:
+         permite notificacao em < 30 minutos com dados minimos.
+      3. Contato de plantao do BCB documentado e verificado trimestralmente.
+      4. Simulacao semestral de notificacao de emergencia fora do horario comercial
+         para garantir que o processo funciona 24/7.
+      5. Registro de timestamp de cada passo do processo para evidenciar
+         cumprimento do prazo ao BCB.
+    tools:
+      - incident-management
+      - grc-platform
+      - communication-tools
+      - soar
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-3", "art-4"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6", "IR-7"]
+    relationship: supports

@@ -1,0 +1,102 @@
+id: art-15
+family: cap-4
+title: "Mutual TLS (mTLS) e Certificados Digitais ICP-Brasil"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 15. Toda comunicação entre participantes do Open Finance deve ser
+    protegida por Mutual TLS (mTLS), utilizando certificados digitais emitidos
+    no âmbito da Infraestrutura de Chaves Públicas Brasileira (ICP-Brasil).
+
+    Parágrafo 1. Os participantes devem utilizar:
+    I - certificado de transporte (BRSEAL) para autenticação mútua nas
+    comunicações entre servidores;
+    II - certificado de assinatura (BRCAC) para assinatura de mensagens
+    e request objects;
+    III - certificados emitidos por autoridade certificadora credenciada
+    pelo diretório de participantes.
+
+    Parágrafo 2. Os certificados devem conter os atributos obrigatórios
+    definidos nas especificações técnicas, incluindo o identificador do
+    participante no diretório (organizationIdentifier).
+
+    Parágrafo 3. É vedada a utilização de certificados auto-assinados ou
+    emitidos por autoridades certificadoras não credenciadas.
+guidance:
+  prose: |
+    O art. 15 define a camada de seguranca de transporte:
+
+    **mTLS (Mutual TLS):**
+    Diferente do TLS convencional (onde apenas o servidor se autentica),
+    no mTLS ambas as partes apresentam certificados:
+    - Servidor apresenta certificado ao cliente
+    - Cliente apresenta certificado ao servidor
+    - Ambos validam mutuamente a identidade
+
+    **Tipos de certificados ICP-Brasil para Open Finance:**
+    - BRSEAL (certificado de transporte): autenticacao mTLS
+    - BRCAC (certificado de assinatura): assinatura digital de payloads
+    - Ambos devem ser emitidos por ACs credenciadas no diretorio
+
+    **Atributos obrigatorios no certificado:**
+    - organizationIdentifier: ID do participante no diretorio
+    - serialNumber: CNPJ do participante
+    - commonName: identificacao do software statement
+    - UID: software statement ID no diretorio
+
+    **Vedacoes:**
+    - Certificados auto-assinados (self-signed)
+    - Certificados de ACs nao credenciadas
+    - Certificados expirados ou revogados
+    - Certificados sem atributos obrigatorios
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de certificados:**
+      1. Adquirir certificados BRSEAL e BRCAC de AC credenciada
+         pelo diretorio (ex: Serasa, CertiSign, Soluti).
+      2. Configurar HSM (Hardware Security Module) para armazenamento
+         seguro de chaves privadas.
+      3. Configurar API gateway para validar certificado do cliente
+         em cada requisicao (mTLS termination).
+      4. Implementar validacao de cadeia de certificados (chain validation)
+         com CRL/OCSP para verificacao de revogacao.
+      5. Configurar rotacao automatica de certificados antes da expiracao.
+    tools:
+      - hsm
+      - certificate-manager
+      - nginx
+      - envoy
+      - api-gateway
+  devsecops:
+    prose: |
+      **Validacao de certificados em pipeline:**
+      1. Verificar validade e atributos de certificados em cada deploy.
+      2. Testar conexao mTLS entre ambientes (sandbox e producao).
+      3. Validar que certificados auto-assinados NAO sao aceitos.
+      4. Automatizar alertas de expiracao (30, 15, 7 dias).
+    tools:
+      - cert-manager
+      - ssl-test
+      - openssl
+      - gitlab-ci
+  secops:
+    prose: |
+      **Gestao de ciclo de vida de certificados:**
+      1. Manter inventario centralizado de todos os certificados.
+      2. Monitorar CRL/OCSP para revogacoes de parceiros.
+      3. Alertar sobre certificados proximos da expiracao.
+      4. Auditar que apenas ACs credenciadas sao aceitas na truststore.
+      5. Investigar tentativas de conexao com certificados invalidos.
+    tools:
+      - certificate-monitoring
+      - pki-management
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

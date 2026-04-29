@@ -1,0 +1,88 @@
+id: art-10
+family: cap-3
+title: "Custodia Segregada e Controles de Movimentacao"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 10. A prestadora que realize custódia de ativos virtuais de terceiros deve:
+    I - manter controles que assegurem a identificação individual dos ativos virtuais
+    de cada cliente;
+    II - implementar mecanismos de autorização multi-nível para movimentação de ativos
+    virtuais custodiados;
+    III - manter registros detalhados e auditáveis de todas as movimentações de
+    ativos custodiados;
+    IV - realizar reconciliação periódica entre os registros internos e os saldos
+    nas redes de registro distribuído;
+    V - adotar procedimentos de contingência para garantir o acesso dos clientes a
+    seus ativos em situações de indisponibilidade ou descontinuidade dos serviços.
+guidance:
+  prose: |
+    O art. 10 detalha controles operacionais especificos para custodia.
+
+    **Cinco controles obrigatorios:**
+    1. Identificacao individual: cada cliente deve ter seu saldo rastreavel
+       individualmente (nao basta saldo global)
+    2. Multi-level authorization: nenhuma movimentacao de ativo custodiado sem
+       aprovacao em multiplos niveis
+    3. Registros auditaveis: trilha de auditoria completa de toda movimentacao
+    4. Reconciliacao: ledger interno vs. blockchain, periodicamente
+    5. Contingencia: clientes devem conseguir acessar ativos mesmo em caso de
+       problemas operacionais da VASP
+
+    **Multi-sig como controle:**
+    O mecanismo de autorizacao multi-nivel pode ser implementado via multi-signature
+    wallets (multi-sig), threshold signatures (TSS) ou MPC (multi-party computation).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de custodia:**
+      1. Ledger de custodia com saldo individual por cliente, por ativo, por
+         carteira (hot/cold), com historico completo de movimentacoes.
+      2. Multi-sig ou MPC (multi-party computation) para autorizacao de saques
+         com quorum configuravel (ex: 2 de 3, 3 de 5).
+      3. Workflow de aprovacao: cliente solicita -> sistema valida ->
+         compliance verifica -> operador autoriza -> multi-sig executa.
+      4. Reconciliacao automatizada on-chain vs. ledger com frequencia minima
+         horaria para hot wallets e diaria para cold storage.
+      5. Plano de contingencia tecnico: backup de chaves em HSM geograficamente
+         distribuido, procedimento de recuperacao documentado.
+    tools:
+      - custody-engine
+      - mpc-signer
+      - reconciliation-engine
+      - hsm-management
+      - approval-workflow
+  devsecops:
+    prose: |
+      **Validacao de custodia:**
+      1. Testes de integracao do fluxo completo de custodia: deposito -> custodia
+         -> saque, validando saldos em cada etapa.
+      2. Testes de multi-sig/MPC com cenarios de quorum insuficiente (deve rejeitar).
+      3. Testes de reconciliacao com cenarios de divergencia (deve alertar).
+      4. Pen testing especifico para fluxos de custodia e assinatura.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - pen-testing
+      - mpc-testing
+  secops:
+    prose: |
+      **Operacoes de custodia:**
+      1. Monitoramento 24/7 de movimentacoes em carteiras de custodia.
+      2. Alertas em tempo real para movimentacoes acima de threshold.
+      3. Reconciliacao manual periodica por equipe independente.
+      4. Teste periodico do plano de contingencia (DR drill).
+      5. Relatorio mensal de custodia ao diretor responsavel.
+    tools:
+      - custody-monitoring
+      - alerting-system
+      - dr-testing
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-20"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-9"]
+    relationship: complements

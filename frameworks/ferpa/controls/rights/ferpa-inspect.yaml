@@ -1,0 +1,108 @@
+id: ferpa-inspect
+family: rights
+title: "Right to Inspect and Review Education Records"
+class: FERPA
+
+statement:
+  prose: >-
+    Each eligible student or parent of a student has the right to inspect and review
+    the student's education records maintained by the educational agency or institution.
+    The institution must comply with a request to inspect and review records within a
+    reasonable period of time, but not more than 45 days after the request is received.
+  parts:
+    - id: ferpa-inspect-1
+      label: "34 CFR § 99.10(a)"
+      prose: >-
+        An educational agency or institution shall comply with a request for access to
+        records within a reasonable period of time, but not more than 45 days after it
+        has received the request.
+    - id: ferpa-inspect-2
+      label: "34 CFR § 99.10(b)"
+      prose: >-
+        The educational agency or institution shall respond to reasonable requests for
+        explanations and interpretations of the records.
+    - id: ferpa-inspect-3
+      label: "34 CFR § 99.11"
+      prose: >-
+        If the education records of a student contain information on more than one
+        student, the parent or eligible student may inspect and review or be informed
+        of only the specific information about that student.
+
+guidance:
+  prose: >-
+    The right to inspect and review is the foundational right under FERPA. Institutions
+    must have a clear, documented process for receiving and fulfilling records access
+    requests. The 45-day deadline is a maximum — institutions should aim to respond
+    significantly faster. Records must be presented in a form intelligible to the
+    requester, with explanations provided as needed. When records contain information
+    about multiple students, the institution must redact or segregate other students'
+    information before providing access. This right extends to all education records,
+    regardless of format (paper, electronic, audio, video). Institutions cannot charge
+    a fee for searching or retrieving records, but may charge for copies if the fee
+    does not effectively prevent access.
+
+references:
+  - citation: "34 CFR § 99.10 - Right to inspect and review education records"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-B/section-99.10"
+  - citation: "34 CFR § 99.11 - Right to inspect and review: specific information"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-B/section-99.11"
+  - citation: "FPCO FERPA General Guidance"
+    url: "https://studentprivacy.ed.gov/resources/ferpa-general-guidance-students"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a self-service student records portal that provides authenticated
+      students and authorized parents direct access to their education records.
+      Build record retrieval APIs with response time SLAs to meet the 45-day
+      statutory requirement. Implement role-based access control (RBAC) ensuring
+      students can only view their own records. Deploy data masking and redaction
+      capabilities to automatically remove other students' information from shared
+      records. Implement audit logging for all records access requests and
+      fulfillment activities. Build export functionality supporting multiple
+      formats (PDF, CSV) for record copies.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - vault
+      - postgresql
+      - elasticsearch
+
+  devsecops:
+    prose: >-
+      Implement automated testing to verify that records access controls correctly
+      restrict access to only the requesting student's records. Include integration
+      tests that validate redaction of multi-student records. Scan for authorization
+      bypass vulnerabilities (IDOR) that could expose other students' records.
+      Enforce that all records access APIs require proper authentication and
+      authorization. Test response time SLAs in CI/CD pipelines to ensure the
+      45-day compliance window is achievable.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - owasp-zap
+      - checkov
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor records access request queues and alert when requests approach the
+      45-day deadline. Track and audit all access to education records systems.
+      Detect unauthorized access attempts to student records. Monitor for bulk
+      data access patterns that could indicate data exfiltration. Generate
+      compliance reports showing average and maximum fulfillment times. Alert on
+      access attempts where a user tries to view another student's records.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-6", "AU-2", "AU-3"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.12", "A5.33", "A8.3"]
+    relationship: supports

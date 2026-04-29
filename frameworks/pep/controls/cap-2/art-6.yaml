@@ -1,0 +1,119 @@
+id: art-6
+family: cap-2
+title: "Nivel de Garantia de Seguranca 2 -- NGS2"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 6. O Nível de Garantia de Segurança 2 (NGS2) compreende,
+    além de todos os requisitos do NGS1, a obrigatoriedade de:
+
+    I - utilização de certificado digital emitido no âmbito da
+    Infraestrutura de Chaves Públicas Brasileira (ICP-Brasil) para
+    assinatura de todos os registros clínicos;
+
+    II - assinatura digital de cada entrada no prontuário pelo
+    profissional responsável, no momento do registro;
+
+    III - carimbo de tempo (timestamp) emitido por Autoridade de
+    Carimbo de Tempo (ACT) credenciada na ICP-Brasil para garantir
+    a tempestividade dos registros;
+
+    IV - impossibilidade de alteração de registros após assinatura
+    digital, garantindo a imutabilidade do documento assinado.
+
+    Parágrafo único. Somente sistemas que atendam ao NGS2 autorizam
+    a eliminação do prontuário em papel e a tramitação eletrônica
+    de documentos médicos com plena validade jurídica.
+guidance:
+  prose: |
+    O art. 6 define o NGS2 como o nivel que confere plena validade
+    juridica ao PEP. E o ponto de virada: com NGS2, o eletronico
+    substitui o papel completamente.
+
+    **Certificado ICP-Brasil (inciso I):**
+    Profissionais de saude devem possuir certificado digital valido.
+    Para medicos, o CRM oferece certificado e-Saude (parceria
+    ICP-Brasil). Tipos aceitos: A1 (software, validade 1 ano) ou
+    A3 (token/smartcard, validade 3 anos).
+
+    **Assinatura no momento do registro (inciso II):**
+    Cada evolucao, prescricao ou anotacao deve ser assinada
+    digitalmente PELO profissional que a realizou, NO momento do
+    registro. Assinatura em lote ou retroativa compromete a
+    validade juridica.
+
+    **Carimbo de tempo (inciso III):**
+    O timestamp ICP-Brasil prova QUANDO o documento foi assinado,
+    protegendo contra antedatacao. Mesmo que o certificado digital
+    expire ou seja revogado, o carimbo de tempo preserva a validade
+    da assinatura feita na data original.
+
+    **Imutabilidade (inciso IV):**
+    Apos assinatura digital, o registro e selado. Qualquer modificacao
+    invalida a assinatura. Correcoes devem ser feitas como novo
+    registro vinculado ao original.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura NGS2 -- assinatura digital e carimbo de tempo:**
+      1. Integrar com SDK de assinatura digital ICP-Brasil (ex.:
+         Lacuna PKI, BRy Signer, Certisign SDK) no backend do PEP.
+      2. Implementar modulo de assinatura que suporte tokens A3
+         (via PKCS#11/smartcard) e certificados A1 (via PKCS#12).
+      3. Integrar com Autoridade de Carimbo de Tempo (ACT)
+         credenciada na ICP-Brasil para emissao de timestamps
+         em cada registro assinado.
+      4. Implementar storage imutavel para registros assinados
+         (write-once) com verificacao de integridade da assinatura
+         em cada leitura.
+      5. Provisionar HSM para operacoes criptograficas criticas
+         em ambiente de producao.
+    tools:
+      - icp-brasil-sdk
+      - pkcs11-integration
+      - timestamp-authority
+      - hsm
+      - immutable-storage
+  devsecops:
+    prose: |
+      **Validacao de assinatura digital no pipeline:**
+      1. Criar testes automatizados que validem a cadeia de
+         confianca ICP-Brasil em cada assinatura gerada.
+      2. Testar cenarios de certificado expirado, revogado e
+         cadeia invalida para garantir rejeicao correta.
+      3. Validar que registros assinados sao imutaveis: qualquer
+         tentativa de alteracao deve falhar e ser logada.
+      4. Verificar integracao com ACT em ambiente de homologacao,
+         validando formato do carimbo de tempo (RFC 3161).
+    tools:
+      - gitlab-ci
+      - signature-validation-tests
+      - timestamp-validator
+      - immutability-tests
+  secops:
+    prose: |
+      **Operacao NGS2:**
+      1. Gerenciar ciclo de vida dos certificados digitais de
+         todos os profissionais de saude (emissao, renovacao,
+         revogacao), com alerta de vencimento automatico.
+      2. Monitorar disponibilidade da ACT e ter plano de
+         contingencia para indisponibilidade do servico de
+         carimbo de tempo.
+      3. Auditar mensalmente amostra de registros assinados,
+         verificando validade da assinatura e presenca de
+         carimbo de tempo.
+      4. Manter procedimento de revogacao imediata de certificado
+         em caso de comprometimento ou desligamento de profissional.
+    tools:
+      - certificate-lifecycle
+      - timestamp-monitoring
+      - signature-audit
+      - incident-response
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-c", "164.312-e"]
+    relationship: mapped

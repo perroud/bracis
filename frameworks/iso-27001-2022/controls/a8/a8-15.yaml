@@ -1,0 +1,106 @@
+id: a8.15
+family: a8
+title: "Logging"
+class: ISO27001
+
+statement:
+  prose: >-
+    Logs that record activities, exceptions, faults and other relevant
+    events shall be produced, stored, protected and analysed.
+
+guidance:
+  prose: >-
+    Event logs should include, when relevant: user IDs; system activities;
+    dates, times and details of key events (e.g., log-on, log-off);
+    device identity or location if possible and system identifier;
+    records of successful and rejected system access attempts;
+    records of successful and rejected data and other resource access
+    attempts; changes to system configuration; use of privileges;
+    use of system utilities and applications; files accessed and the
+    kind of access; network addresses and protocols; alarms raised
+    by the access control system; activation and deactivation of
+    protection systems such as anti-virus and intrusion detection
+    systems; records of transactions executed by users in applications.
+    Log storage should be managed to ensure availability while
+    optimizing storage resources. Logs should be protected against
+    unauthorized changes and operational problems including the
+    storage medium being exhausted, failure to record events, and
+    overwriting past events. The organization should ensure that
+    system clocks are synchronized to a single reference time source.
+
+references:
+  - citation: "ISO/IEC 27002:2022, 8.15"
+    url: "https://www.iso.org/standard/75652.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized logging as a platform capability available
+      to all workloads. Deploy a log aggregation stack (ELK, Loki,
+      Datadog) that automatically collects logs from all platform
+      components: Kubernetes audit logs, cloud provider API logs,
+      service mesh access logs, and application logs. Enforce
+      structured logging formats (JSON) across all services through
+      platform-provided logging libraries and sidecar containers.
+      Implement log retention policies aligned with compliance
+      requirements (minimum 1 year for security events). Ensure
+      log immutability using write-once storage or append-only
+      log streams. Synchronize all system clocks via NTP to
+      enable accurate event correlation.
+    tools:
+      - elastic-stack
+      - grafana-loki
+      - fluentd
+      - fluentbit
+      - prometheus
+      - open-telemetry
+      - vector
+
+  devsecops:
+    prose: >-
+      Ensure CI/CD pipeline activities are fully logged: build
+      triggers, test results, artifact publications, deployment
+      events, and approval decisions. Store pipeline logs with
+      immutable retention for audit purposes. Implement audit
+      logging for repository events: merge requests, branch
+      protection changes, permission modifications, and secret
+      rotations. Include structured logging in application code
+      standards and validate log format compliance in code reviews
+      and automated checks. Ensure pipeline logs do not contain
+      secrets by implementing log sanitization.
+    tools:
+      - gitlab-ci
+      - open-telemetry
+      - fluentd
+      - elastic-stack
+
+  secops:
+    prose: >-
+      Configure the SIEM to ingest logs from all critical sources:
+      authentication systems, firewalls, IDS/IPS, endpoint agents,
+      cloud APIs, applications, and databases. Implement real-time
+      correlation rules that detect security events across multiple
+      log sources. Ensure log integrity with cryptographic checksums
+      or chain-of-custody mechanisms. Define and enforce log retention
+      policies: security events minimum 1 year, authentication logs
+      minimum 90 days, with extended retention for regulated data.
+      Monitor log pipeline health and alert when log sources stop
+      sending data (indicating potential tampering or failure).
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - chronicle
+      - datadog
+      - sumo-logic
+
+legal_references:
+  - framework_id: nist-800-53
+    articles: ["AU-2", "AU-3", "AU-4", "AU-6", "AU-8", "AU-9", "AU-12"]
+    relationship: equivalent-to
+  - framework_id: gdpr
+    articles: ["art-30", "art-33"]
+    relationship: supports
+  - framework_id: soc-2
+    articles: ["CC7.2", "CC7.3"]
+    relationship: equivalent-to

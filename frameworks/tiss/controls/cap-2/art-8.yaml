@@ -1,0 +1,105 @@
+id: art-8
+family: cap-2
+title: "Componente de Comunicacao"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 8. O componente de comunicação do Padrão TISS define o padrão
+    tecnológico para transmissão de mensagens eletrônicas entre sistemas
+    de operadoras e prestadores de serviços de saúde.
+
+    Parágrafo 1. A comunicação entre sistemas deve utilizar:
+    I - Protocolo HTTPS (HTTP sobre TLS) para transporte seguro;
+    II - Web services baseados em SOAP ou REST para troca de mensagens;
+    III - XML como formato de representação de dados conforme schemas
+    XSD publicados pela ANS;
+    IV - Certificação digital ICP-Brasil para autenticação de endpoints.
+
+    Parágrafo 2. As operadoras devem disponibilizar endpoints de web
+    services em conformidade com os padrões técnicos definidos pela ANS,
+    com disponibilidade mínima de 99% em horário comercial.
+guidance:
+  prose: |
+    O componente de comunicacao define a infraestrutura tecnica sobre
+    a qual as transacoes TISS trafegam.
+
+    **Protocolos obrigatorios:**
+    - HTTPS com TLS 1.2 ou superior
+    - SOAP 1.1/1.2 ou REST (JSON/XML) conforme versao TISS
+    - XML encoding UTF-8
+
+    **Web services TISS:**
+    - WSDL publicado pela operadora para integracao SOAP
+    - OpenAPI/Swagger para integracao REST (versoes mais recentes)
+    - Endpoints dedicados por tipo de transacao (autorizacao, cobranca,
+      elegibilidade)
+
+    **Disponibilidade:**
+    - 99% em horario comercial (8h-18h, dias uteis)
+    - Degradacao graceful fora do horario comercial
+    - Tempo de resposta maximo: 30 segundos para transacoes sinicronas
+    - Reprocessamento automatico de transacoes assincronas
+
+    **Certificacao digital:**
+    - ICP-Brasil e-CNPJ para autenticacao de pessoa juridica
+    - Mutual TLS (mTLS) para autenticacao bidirecional
+    - Certificados A1 ou A3 conforme infraestrutura do participante
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de comunicacao TISS:**
+      1. Implementar API gateway dedicado ao trafego TISS com
+         terminacao TLS, rate limiting e circuit breaker.
+      2. Configurar mutual TLS (mTLS) com certificados ICP-Brasil
+         para autenticacao bidirecional entre operadoras e prestadores.
+      3. Implementar endpoints SOAP e/ou REST conforme versao TISS,
+         com WSDL/OpenAPI spec publicados e versionados.
+      4. Monitorar disponibilidade (SLA 99%) e tempo de resposta
+         dos endpoints TISS com alertas automaticos.
+      5. Implementar retry com exponential backoff para transacoes
+         assincronas e dead-letter queue para falhas persistentes.
+    tools:
+      - api-gateway
+      - mtls
+      - soap-server
+      - uptime-monitoring
+  devsecops:
+    prose: |
+      **Validacao de comunicacao no pipeline:**
+      1. Implementar contract testing (PACT) entre servicos TISS
+         para garantir compatibilidade de API entre versoes.
+      2. Incluir testes de performance que validem tempo de resposta
+         dentro do limite de 30 segundos por transacao.
+      3. Automatizar renovacao de certificados ICP-Brasil com alertas
+         60 dias antes do vencimento.
+      4. Testar cenarios de falha: timeout, endpoint indisponivel,
+         certificado invalido, XML malformado.
+    tools:
+      - contract-testing
+      - performance-testing
+      - certificate-management
+      - fault-injection
+  secops:
+    prose: |
+      **Monitoramento de comunicacao e disponibilidade:**
+      1. Implementar monitoramento 24x7 de endpoints TISS com
+         verificacao de certificados e disponibilidade.
+      2. Manter SLA tracking por operadora/prestador com relatorios
+         mensais de disponibilidade e tempo de resposta.
+      3. Auditar configuracao TLS periodicamente (cipher suites,
+         versoes de protocolo, validade de certificados).
+      4. Documentar e testar procedimentos de failover e disaster
+         recovery para infraestrutura TISS.
+    tools:
+      - uptime-monitoring
+      - sla-tracking
+      - tls-audit
+      - dr-documentation
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312"]
+    relationship: mapped

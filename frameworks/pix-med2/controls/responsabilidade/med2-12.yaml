@@ -1,0 +1,105 @@
+id: med2-12
+family: responsabilidade
+title: "Shared Liability and Accountability Framework"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O MED 2.0 estabelece regime de responsabilidade compartilhada entre os PSPs participantes
+    do Pix. O PSP pagador é responsável por implementar mecanismos de prevenção à fraude e por
+    acionar o MED tempestivamente quando identificada fundada suspeita. O PSP recebedor é
+    responsável por executar os bloqueios e devoluções dentro dos prazos regulamentares e por
+    monitorar suas contas contra utilização como contas-mula. O PSP que descumprir suas
+    obrigações no processo do MED poderá ser responsabilizado pelos prejuízos causados ao
+    usuário vítima de fraude, conforme critérios de apuração de responsabilidade definidos pelo
+    BCB. A responsabilidade é aferida considerando: a tempestividade das ações do PSP; a
+    adequação dos mecanismos antifraude implementados; o cumprimento dos procedimentos do MED;
+    e a diligência na identificação e bloqueio de contas utilizadas para fraude.
+guidance:
+  prose: |
+    **Shared Liability Model:**
+    MED 2.0 creates a clear accountability framework where both payer and receiver PSPs
+    share responsibility for the outcome of fraud cases.
+
+    **Liability triggers:**
+    1. **Payer PSP liability:**
+       - Failed to implement adequate anti-fraud measures (weak fraud engine).
+       - Delayed MED activation despite clear fraud indicators.
+       - Inadequate user warning systems for high-risk transactions.
+    2. **Receiver PSP liability:**
+       - Failed to block within the 30-minute window.
+       - Did not initiate cascade blocking when funds were forwarded.
+       - Maintained accounts with clear mule patterns without action.
+       - Delayed merit analysis beyond the 7-day window.
+    3. **Shared liability:**
+       - When both PSPs contributed to the failure to prevent or recover funds.
+
+    **Assessment criteria (BCB):**
+    - Timeliness of actions at each stage.
+    - Quality and adequacy of anti-fraud systems.
+    - Compliance with MED procedures.
+    - Due diligence in mule account identification.
+
+    **Financial impact:** A PSP found liable may be required to reimburse the victim
+    from its own funds when the original fraudulent funds are unrecoverable.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement comprehensive audit logging for every MED action: timestamps,
+         actor, action, outcome — this is the primary evidence in liability assessments.
+      2. Build a compliance scorecard service that tracks the PSP's performance against
+         all MED 2.0 obligations: blocking times, analysis times, return times, cascade
+         effectiveness, anti-fraud engine accuracy.
+      3. Implement automated evidence collection for liability disputes: aggregate all
+         relevant data (notifications, blocks, analysis records, communications) into a
+         structured case file.
+      4. Build a financial provisioning module that estimates potential liability
+         exposure based on pending MED cases and historical outcomes.
+      5. Implement a regulatory reporting API that generates the reports required by
+         BCB for liability assessment.
+    tools:
+      - audit-logging
+      - compliance-scorecard
+      - document-management
+      - financial-engine
+      - reporting-platform
+  devsecops:
+    prose: |
+      1. Test audit logging completeness: verify every MED action (block, unblock,
+         notify, analyze, decide, return) generates a complete audit record.
+      2. Test compliance scorecard calculations: inject known performance data and
+         verify scores are calculated correctly.
+      3. Test evidence collection: simulate a liability dispute and verify all relevant
+         data is aggregated correctly.
+      4. Test financial provisioning: verify liability exposure calculations with
+         various scenarios (full recovery, partial recovery, zero recovery).
+      5. Test regulatory reporting: verify output format matches BCB specifications.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - data-validation
+      - financial-testing
+  secops:
+    prose: |
+      1. Monitor the PSP's compliance scorecard daily: identify areas below target
+         and trigger corrective actions.
+      2. Track liability exposure: total pending cases, estimated financial exposure,
+         and trend analysis.
+      3. Prepare for BCB audits: ensure all audit logs and evidence are readily
+         accessible and complete.
+      4. Conduct quarterly liability risk assessments: identify systemic weaknesses
+         and recommend improvements.
+      5. Coordinate with legal team on liability disputes: provide evidence packages
+         and technical analysis.
+    tools:
+      - compliance-dashboard
+      - risk-management
+      - audit-readiness
+      - legal-coordination
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20", "pix-21", "pix-22"]
+    relationship: extends
+  - framework_id: bcb-85
+    articles: ["art-1"]
+    relationship: complements

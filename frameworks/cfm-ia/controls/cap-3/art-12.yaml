@@ -1,0 +1,114 @@
+id: art-12
+family: cap-3
+title: "Transparencia Algoritmica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 12. Os desenvolvedores e operadores de sistemas de IA médica devem
+    assegurar transparência algorítmica mediante:
+
+    I - disponibilização ao médico de informações sobre o tipo de modelo,
+    dados utilizados no treinamento (incluindo fonte, volume e período),
+    métricas de validação e limitações conhecidas do sistema;
+
+    II - informação clara ao paciente de que sistema de inteligência
+    artificial está sendo utilizado em seu atendimento, incluindo a
+    finalidade específica do sistema e a natureza das informações
+    geradas;
+
+    III - publicação de model card ou documento equivalente contendo
+    descrição do modelo, métricas de performance por subgrupo,
+    limitações identificadas, cenários de uso recomendados e cenários
+    contraindicados;
+
+    IV - notificação proativa ao médico e à instituição sobre atualizações,
+    mudanças de performance ou novos riscos identificados no sistema.
+guidance:
+  prose: |
+    O art. 12 distingue transparencia de explicabilidade. Enquanto o
+    art. 11 trata da explicacao de inferencias individuais, o art. 12
+    trata da transparencia sobre o sistema como um todo.
+
+    **Transparencia para o medico (inciso I):**
+    O medico deve ter acesso a informacoes que permitam avaliar a
+    confiabilidade geral do sistema: que tipo de dados foram usados
+    no treinamento? Quais sao as metricas validadas? Quais sao as
+    limitacoes? Isso permite "calibracao de confianca" pelo medico.
+
+    **Transparencia para o paciente (inciso II):**
+    O paciente nao precisa entender o algoritmo, mas deve saber que
+    IA esta sendo usada. A informacao deve incluir: "Este exame sera
+    analisado por sistema de inteligencia artificial que auxilia o
+    medico na deteccao de lesoes. O medico e o responsavel final
+    pelo diagnostico."
+
+    **Model cards (inciso III):**
+    Conceito originado no Google, formalizado pela Resolucao. A model
+    card deve incluir metricas desagregadas por subgrupo (idade, sexo,
+    etnia, quando clinicamente relevante), cenarios de uso adequados
+    e cenarios em que o modelo nao deve ser usado.
+
+    **Notificacao proativa (inciso IV):**
+    Similar ao conceito de tech notice em dispositivos medicos. O
+    desenvolvedor deve notificar usuarios quando detectar degradacao,
+    atualizar o modelo ou identificar novos riscos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de transparencia:**
+      1. Implementar sistema de model cards centralizado com template
+         padronizado conforme art. 12: modelo, dados, metricas por
+         subgrupo, limitacoes, cenarios de uso e contraindicacoes.
+      2. Criar portal de transparencia para medicos com acesso a model
+         cards, relatorios de performance e historico de atualizacoes
+         de cada sistema de IA em operacao.
+      3. Implementar mecanismo de notificacao push para medicos e
+         instituicoes quando houver atualizacoes relevantes em
+         sistemas de IA (mudanca de versao, alerta de performance).
+      4. Configurar integracao com PEP/EMR para exibir informacao
+         ao paciente sobre uso de IA no momento do atendimento.
+    tools:
+      - model-cards
+      - transparency-portal
+      - notification-service
+      - emr-integration
+  devsecops:
+    prose: |
+      **Transparencia integrada ao pipeline:**
+      1. Automatizar geracao de model card como artefato obrigatorio
+         do pipeline de ML, bloqueando deploy sem model card completa.
+      2. Implementar validacao automatica de completude da model card:
+         todos os campos obrigatorios do art. 12 devem estar preenchidos.
+      3. Automatizar calculo de metricas por subgrupo como parte do
+         pipeline de validacao, alimentando model card automaticamente.
+      4. Implementar diff de model card entre versoes, gerando notificacao
+         automatica quando metricas mudarem significativamente.
+    tools:
+      - gitlab-ci
+      - model-cards
+      - metrics-pipeline
+      - notification-automation
+  secops:
+    prose: |
+      **Governanca de transparencia:**
+      1. Auditar periodicamente completude e acuracia das model cards,
+         verificando se refletem o estado real dos modelos em producao.
+      2. Verificar que pacientes estao sendo informados sobre uso de IA
+         conforme inciso II: amostragem de prontuarios e pesquisa.
+      3. Manter registro de notificacoes enviadas a medicos e instituicoes
+         conforme inciso IV, com evidencia de recebimento.
+      4. Realizar pesquisa periodica com medicos sobre qualidade e
+         utilidade das informacoes de transparencia fornecidas.
+    tools:
+      - grc-platform
+      - audit-tools
+      - patient-survey
+      - notification-tracking
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-13", "art-52"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-6", "art-20"]
+    relationship: complements

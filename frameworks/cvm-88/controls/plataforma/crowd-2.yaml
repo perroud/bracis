@@ -1,0 +1,121 @@
+id: crowd-2
+family: plataforma
+title: "Platform Operational Obligations and Duties"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 4º. São deveres da plataforma eletrônica de investimento
+    participativo: I — atuar de forma diligente, leal e transparente em
+    relação aos investidores e às sociedades empresárias emissoras;
+    II — manter estrutura administrativa, tecnológica e de controles
+    internos compatível com a natureza, o porte e a complexidade de suas
+    atividades; III — zelar pelo cumprimento das normas aplicáveis ao
+    mercado de valores mobiliários; IV — manter sigilo sobre informações
+    confidênciais de investidores e emissores.
+
+    § 1º A plataforma deve dispor de profissionais qualificados e em
+    quantidade suficiente para o exercício de suas atividades.
+
+    § 2º A plataforma deve manter, pelo prazo mínimo de 5 (cinco) anos,
+    todos os documentos e informações relativos às ofertas realizadas,
+    investidores e sociedades empresárias emissoras.
+guidance:
+  prose: |
+    Article 4 defines the core operational duties of crowdfunding platforms.
+    These obligations form the foundation of platform governance and must
+    be embedded in every aspect of platform operations.
+
+    **Fiduciary-like duties:**
+    Platforms must act with diligence, loyalty, and transparency toward both
+    investors and issuers. This creates a quasi-fiduciary standard similar
+    to broker-dealer obligations.
+
+    **Proportional structure:**
+    Administrative, technological, and internal control structures must be
+    proportional to the platform's activities. A platform handling R$50M
+    in annual offerings needs significantly more robust infrastructure than
+    one handling R$5M.
+
+    **Mandatory retention:**
+    All documents and information related to offerings, investors, and
+    issuers must be retained for a minimum of 5 years. This includes
+    transaction records, KYC documents, communications, and offering
+    materials.
+
+    **Confidentiality:**
+    Platforms must maintain strict confidentiality of investor and issuer
+    information, creating a clear need for robust access controls and
+    data protection measures.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infrastructure for operational obligations:**
+      1. Implement data retention policies with automated lifecycle
+         management ensuring 5-year minimum retention for all offering
+         data, investor records, and issuer documents.
+      2. Deploy object storage (S3-compatible) with versioning and
+         immutable retention locks for regulatory documents.
+      3. Implement RBAC with least-privilege access to ensure
+         confidentiality of investor and issuer data.
+
+      **Scalable structure:**
+      4. Design infrastructure to scale with platform activity volume,
+         using auto-scaling groups and horizontal scaling.
+      5. Implement backup and disaster recovery with RPO/RTO aligned to
+         CVM expectations (RPO < 1h, RTO < 4h).
+      6. Deploy encrypted storage at rest and in transit for all
+         sensitive data.
+    tools:
+      - aws-s3
+      - minio
+      - vault
+      - terraform
+      - kubernetes
+  devsecops:
+    prose: |
+      **Development practices for operational compliance:**
+      1. Enforce code review policies requiring minimum 2 approvals for
+         changes to data handling, retention, and access control modules.
+      2. Implement automated tests validating data retention policies
+         (e.g., verify records cannot be deleted before 5-year period).
+      3. Run SAST and secret detection on every commit to prevent
+         accidental exposure of confidential data.
+
+      **Audit trail:**
+      4. Log all data access and modifications with immutable audit
+         trails (who, what, when, why).
+      5. Implement pipeline gates that block deployments if retention
+         policies or access controls are misconfigured.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - sonarqube
+  secops:
+    prose: |
+      **Security operations for platform duties:**
+      1. Monitor access to investor and issuer data with real-time
+         alerting for anomalous access patterns.
+      2. Conduct quarterly access reviews to ensure least-privilege
+         compliance and remove stale permissions.
+      3. Implement DLP (Data Loss Prevention) controls to detect and
+         block unauthorized data exfiltration.
+
+      **Compliance evidence:**
+      4. Generate monthly compliance dashboards showing retention
+         compliance, access control metrics, and incident counts.
+      5. Maintain evidence of qualified personnel (certifications,
+         training records) for CVM review.
+    tools:
+      - siem
+      - dlp-solution
+      - grc-platform
+      - iam-platform
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

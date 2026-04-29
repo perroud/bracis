@@ -1,0 +1,110 @@
+id: art-5
+family: cap-2
+title: "Teleconsulta -- Requisitos e Procedimentos"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 5. A teleconsulta é a consulta médica não presencial, realizada
+    em tempo real por meio de tecnologia de comunicação audiovisual, na
+    qual médico e paciente estão em locais geográficos distintos.
+
+    Parágrafo 1. A teleconsulta deve ser realizada preferencialmente por
+    videoconferência, garantindo comunicação audiovisual bidirecional em
+    tempo real com qualidade suficiente para avaliação clínica.
+
+    Parágrafo 2. Na teleconsulta, o médico deve:
+    I - identificar-se ao paciente, informando nome completo e número
+    de registro no CRM;
+    II - obter consentimento informado do paciente para atendimento
+    por telemedicina;
+    III - registrar o atendimento no prontuário eletrônico;
+    IV - garantir ambiente adequado com privacidade para ambas as partes.
+
+    Parágrafo 3. A primeira consulta pode ser realizada por telemedicina,
+    desde que o médico julgue adequado para o caso clínico em questão.
+guidance:
+  prose: |
+    O art. 5 detalha a modalidade mais comum de telemedicina: a teleconsulta.
+    A videoconferencia em tempo real e o canal preferencial, embora nao
+    exclusivo.
+
+    **Qualidade de comunicacao audiovisual:**
+    A resolucao exige qualidade "suficiente para avaliacao clinica". Na
+    pratica, isso significa:
+    - Video com resolucao minima de 720p para avaliacao visual de
+      lesoes, coloracao de pele e expressoes do paciente
+    - Audio com cancelamento de eco e reducao de ruido
+    - Latencia maxima de 500ms para manter fluxo natural da conversa
+    - Largura de banda minima recomendada de 2 Mbps por participante
+
+    **Consentimento informado (inciso II):**
+    O consentimento deve ser obtido ANTES do inicio do atendimento,
+    registrado eletronicamente e armazenado junto ao prontuario. Deve
+    incluir informacoes sobre limitacoes da telemedicina e direito
+    de solicitar atendimento presencial.
+
+    **Primeira consulta por telemedicina (paragrafo 3):**
+    A Resolucao 2.314/2022 permite primeira consulta por telemedicina,
+    diferentemente da resolucao anterior (1.643/2002) que a restringia.
+    Porem, a decisao e do medico, baseada em julgamento clinico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de teleconsulta:**
+      1. Implementar videoconferencia com WebRTC ou protocolo
+         equivalente que suporte comunicacao audiovisual bidirecional
+         em tempo real com criptografia fim-a-fim.
+      2. Garantir resolucao minima de 720p, latencia < 500ms e
+         largura de banda adaptativa com fallback gracioso.
+      3. Implementar mecanismo de identificacao automatica do medico
+         na interface do paciente (nome + CRM visivel).
+      4. Criar modulo de consentimento informado digital integrado
+         ao fluxo da teleconsulta, com registro timestamped.
+      5. Implementar verificacao de qualidade de conexao pre-consulta
+         para ambas as partes, com alerta quando abaixo do minimo.
+    tools:
+      - webrtc
+      - media-server
+      - consent-management
+      - quality-monitoring
+  devsecops:
+    prose: |
+      **Pipeline de qualidade para teleconsulta:**
+      1. Implementar testes de carga que validem capacidade da
+         plataforma de teleconsulta sob demanda de pico.
+      2. Criar testes automatizados do fluxo de consentimento,
+         incluindo cenarios de recusa e revogacao.
+      3. Validar que metricas de qualidade (resolucao, latencia,
+         largura de banda) sao coletadas e armazenadas para
+         auditoria.
+      4. Testar mecanismo de fallback quando qualidade de video
+         cai abaixo do limiar clinico aceitavel.
+    tools:
+      - gitlab-ci
+      - load-testing
+      - quality-assurance
+      - performance-monitoring
+  secops:
+    prose: |
+      **Operacao de teleconsulta:**
+      1. Monitorar em tempo real a qualidade das sessoes de
+         teleconsulta (latencia, perda de pacotes, resolucao).
+      2. Manter registro auditavel de todos os consentimentos
+         informados obtidos e suas revogacoes.
+      3. Auditar que todos os atendimentos por teleconsulta
+         possuem registro em prontuario eletronico.
+      4. Verificar periodicamente que medicos identificam-se
+         corretamente ao paciente no inicio da teleconsulta.
+    tools:
+      - session-monitoring
+      - audit-trail
+      - compliance-dashboard
+      - quality-reporting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-1", "164.312-e-1"]
+    relationship: mapped

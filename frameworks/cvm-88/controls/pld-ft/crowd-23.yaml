@@ -1,0 +1,137 @@
+id: crowd-23
+family: pld-ft
+title: "Know Your Customer — Investor and Issuer Identification"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 53. A plataforma deve adotar procedimentos de identificação e
+    qualificação de seus clientes (KYC) que contemplem, no mínimo:
+    I — para investidores pessoas físicas: nome completo, CPF, data de
+    nascimento, endereço, profissão, renda ou patrimônio declarado;
+    II — para investidores pessoas jurídicas: razão social, CNPJ,
+    endereço, atividade principal, identificação dos representantes
+    legais e do beneficiário final; III — para sociedades empresárias
+    emissoras: razão social, CNPJ, endereço, objeto social, composição
+    societária completa, identificação dos administradores e do
+    beneficiário final.
+
+    § 1º A plataforma deve verificar as informações prestadas pelo
+    cliente por meio de consulta a fontes independentes e confiáveis.
+
+    § 2º A plataforma deve manter os cadastros atualizados, realizando
+    revisão periódica das informações em prazo não superior a 2 (dois)
+    anos para clientes de risco normal e 1 (um) ano para clientes de
+    risco elevado.
+
+    § 3º A plataforma deve adotar procedimentos reforçados de
+    identificação para pessoas politicamente expostas (PEP) e seus
+    relacionados.
+
+    § 4º Os registros cadastrais devem ser mantidos pelo prazo mínimo
+    de 5 (cinco) anos após o encerramento do relacionamento com o cliente.
+guidance:
+  prose: |
+    Article 53 establishes detailed KYC requirements for all platform
+    clients — investors (individuals and legal entities) and issuers.
+
+    **Individual investor KYC:**
+    Full name, CPF (tax ID), date of birth, address, profession,
+    declared income or net worth.
+
+    **Corporate investor KYC:**
+    Company name, CNPJ (tax ID), address, main activity, legal
+    representatives, and ultimate beneficial owner (UBO).
+
+    **Issuer KYC:**
+    Company name, CNPJ, address, business purpose, complete ownership
+    structure, management identification, and UBO.
+
+    **Verification obligation:**
+    Information must be verified through independent, reliable sources
+    (not just self-declaration). This typically means database cross-
+    referencing (Receita Federal, credit bureaus, etc.).
+
+    **Ongoing monitoring:**
+    - Standard risk clients: KYC review every 2 years
+    - High risk clients: KYC review annually
+    - PEP enhanced due diligence procedures
+
+    **Retention:**
+    5 years after the end of the client relationship.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **KYC system architecture:**
+      1. Build a multi-tier KYC onboarding workflow with different data
+         collection forms for individual investors, corporate investors,
+         and issuers.
+      2. Integrate with identity verification providers: CPF/CNPJ
+         validation via Receita Federal, document OCR, facial
+         recognition biometrics.
+      3. Implement UBO (Ultimate Beneficial Owner) discovery module
+         that traverses corporate ownership structures to identify
+         natural persons with significant control.
+
+      **Ongoing KYC management:**
+      4. Deploy automated KYC refresh scheduler: 2-year cycle for
+         standard clients, 1-year for high-risk, with email reminders
+         and account restrictions for non-compliant clients.
+      5. Implement PEP screening integration with real-time and batch
+         PEP database checks (Brazil and international lists).
+      6. Build KYC data retention lifecycle manager: 5-year post-
+         relationship retention with automated archival and deletion.
+    tools:
+      - kyc-service
+      - postgresql
+      - redis
+      - api-gateway
+      - cron-scheduler
+      - kubernetes
+  devsecops:
+    prose: |
+      **KYC system integrity:**
+      1. Extensive testing for KYC validation rules: CPF/CNPJ format
+         and check digit validation, age verification, address
+         verification.
+      2. Secret detection to prevent PII from leaking into logs,
+         error messages, or monitoring systems.
+      3. SAST scanning for KYC processing code focusing on injection
+         vulnerabilities and data handling.
+
+      **Privacy by design:**
+      4. Data masking for KYC data in non-production environments.
+      5. Automated tests verifying KYC data access controls are
+         properly enforced at the API level.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - jest
+  secops:
+    prose: |
+      **KYC compliance monitoring:**
+      1. Dashboard tracking KYC status for all clients: completed,
+         pending refresh, expired, non-compliant.
+      2. Monitor KYC bypass attempts (accounts trying to invest
+         without completing KYC, document fraud indicators).
+      3. PEP monitoring: real-time alerts when existing clients
+         become PEP or PEP-related.
+
+      **Regulatory reporting:**
+      4. Generate KYC compliance metrics for CVM: onboarding
+         completion rates, refresh compliance rates, PEP portfolio.
+      5. Maintain KYC audit trail: who verified what, when, using
+         which source, and verification result.
+    tools:
+      - grc-platform
+      - kyc-monitoring
+      - siem
+      - case-management
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-7", "art-9"]
+    relationship: implements
+  - framework_id: bcb-3978
+    articles: ["art-10"]
+    relationship: complements

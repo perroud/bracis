@@ -1,0 +1,113 @@
+id: req-1.1
+family: req-1
+title: "Install and Maintain Network Security Controls"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for installing and maintaining network security controls are
+    defined and understood. Network security controls (NSCs) are configured and maintained
+    to protect the cardholder data environment (CDE) from unauthorized access from
+    untrusted networks. All traffic into and out of the CDE is controlled, and
+    NSC configurations are reviewed at least once every six months to confirm they
+    remain relevant and effective.
+  parts:
+    - id: req-1.1.a
+      label: "1.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 1
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-1.1.b
+      label: "1.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 1 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Network security controls (NSCs) serve as the first line of defense between trusted
+    and untrusted networks. Firewalls, cloud security groups, WAFs, virtual network
+    appliances, and similar technologies provide this enforcement. Organizations must
+    define clear policies governing NSC configuration, change management, and review
+    processes. The policies should specify what traffic is permitted and denied, how
+    changes to NSC rulesets are authorized and tested, and how reviews are conducted
+    to ensure configurations remain aligned with business requirements and security
+    objectives. Regular reviews (at least every six months) catch rule drift, orphaned
+    rules, and misconfigurations that accumulate over time.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 1"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "NIST SP 800-41 Rev. 1 - Guidelines on Firewalls and Firewall Policy"
+    url: "https://doi.org/10.6028/NIST.SP.800-41r1"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define network security controls as infrastructure-as-code using Terraform,
+      Pulumi, or CloudFormation. Store all security group, firewall rule, and WAF
+      configuration definitions in version-controlled repositories. Use network
+      policies in Kubernetes (Calico, Cilium) to enforce micro-segmentation of the
+      CDE from non-CDE workloads. Implement a dedicated network segment or namespace
+      for cardholder data processing with explicit ingress/egress rules. Use a
+      service mesh (Istio, Linkerd) to enforce mTLS between all services handling
+      card data. Automate NSC configuration drift detection by comparing live state
+      against the declared IaC state in CI/CD pipelines.
+    tools:
+      - terraform
+      - pulumi
+      - calico
+      - cilium
+      - istio
+      - aws-security-groups
+      - azure-nsg
+      - gcp-vpc-firewall
+      - palo-alto-prisma
+      - cloudflare-waf
+
+  devsecops:
+    prose: >-
+      Integrate network policy validation into CI/CD pipelines. Use tools like
+      Checkov, tfsec, or Bridgecrew to scan IaC templates for overly permissive
+      security group rules before deployment. Enforce that no merge request modifying
+      NSC configurations can be merged without approval from the network security
+      team. Implement automated tests that validate network segmentation by
+      attempting cross-segment communication from test pods and asserting connection
+      failures. Schedule pipeline jobs for bi-annual NSC rule review that generate
+      reports of all active rules with their justifications and last-modified dates.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - bridgecrew
+      - conftest
+      - opa
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor NSC logs in real time via SIEM integration. Create detection rules
+      for unauthorized configuration changes to firewalls and security groups.
+      Establish alerting for any traffic flows that should not traverse NSC
+      boundaries (east-west traffic between CDE and non-CDE segments). Conduct
+      bi-annual NSC rule reviews using automated compliance scanning and manual
+      validation. Maintain an audit trail of all NSC changes with change tickets
+      linked to business justification. Use network flow analysis tools to identify
+      and remove unused or overly broad firewall rules.
+    tools:
+      - splunk
+      - elastic-siem
+      - palo-alto-cortex
+      - aws-vpc-flow-logs
+      - azure-network-watcher
+      - gcp-flow-logs
+      - firemon
+      - tufin
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-8", "CA-3"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.21", "A8.22"]
+    relationship: supports

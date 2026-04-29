@@ -1,0 +1,115 @@
+id: art-26
+family: cap-6
+title: "Comunicacao Automatica de Operacoes em Especie"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 26. As instituições mencionadas no art. 1 devem comunicar ao COAF as operações
+    realizadas em espécie, de depósito ou de saque, de valor igual ou superior a
+    R$ 50.000,00 (cinquenta mil reais).
+
+    Parágrafo único. A comunicação de que trata o caput deve ser efetuada até o vigésimo
+    quarto dia útil seguinte ao da ocorrência da operação.
+guidance:
+  prose: |
+    O art. 26 estabelece a obrigacao de comunicacao automatica (nao dependente
+    de suspeita) de operacoes em especie de alto valor.
+
+    **Diferenca entre comunicacao automatica e por suspeita:**
+    - Art. 25: comunicacao de operacoes SUSPEITAS (subjetiva, depende de analise)
+    - Art. 26: comunicacao de operacoes em especie >= R$ 50.000 (objetiva, automatica)
+
+    **Threshold de R$ 50.000:**
+    Valor por operacao individual. A comunicacao e obrigatoria independentemente
+    de haver suspeita ou nao. E um mecanismo de inteligencia: o COAF recebe
+    todas essas operacoes para analise propria.
+
+    **Prazo:**
+    24 dias uteis apos a ocorrencia da operacao (nao apos analise, pois
+    nao depende de analise de suspeita).
+
+    **Operacoes em especie:**
+    Depositos e saques em dinheiro fisico (cedulas e moedas). Nao inclui
+    transferencias eletronicas, PIX, TED ou DOC.
+
+    **Implicacao pratica:**
+    Este controle e 100% automatizavel. Deve ser integrado ao pipeline de
+    registro de operacoes (art. 18-19) para gerar comunicacao automatica
+    quando o threshold e atingido.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Comunicacao automatica:**
+      1. Trigger automatico quando operacao em especie >= R$ 50.000 e registrada.
+      2. Geracao automatica da comunicacao no formato SISCOAF com dados
+         extraidos do registro da operacao.
+      3. Fila de comunicacoes automaticas com envio batch diario ou semanal.
+      4. Validacao automatica de completude dos dados antes do envio.
+
+      **Monitoramento de threshold:**
+      5. Regra de monitoramento que detecta acumulado mensal >= R$ 50.000
+         (multiplas operacoes em especie do mesmo cliente).
+      6. Alerta de estruturacao (smurfing): multiplas operacoes em especie
+         abaixo de R$ 50.000 que somam acima.
+      7. Dashboard de operacoes em especie com filtro por valor, agencia,
+         cliente.
+
+      **Reconciliacao:**
+      8. Reconciliacao automatica entre operacoes em especie >= threshold
+         e comunicacoes geradas.
+      9. Alerta quando operacao qualificante nao tem comunicacao associada.
+      10. Relatorio de gaps para revisao do compliance officer.
+    tools:
+      - coaf-reporting
+      - transaction-monitoring
+      - aml-platform
+      - reconciliation-engine
+  devsecops:
+    prose: |
+      **Testes de comunicacao automatica:**
+      1. Testes de threshold (49.999, 50.000, 50.001).
+      2. Testes de formato SISCOAF (validacao de campos, tamanhos, formatos).
+      3. Testes de reconciliacao (todas as operacoes qualificantes geram
+         comunicacao).
+      4. Testes de prazo (comunicacao gerada dentro de 24 dias uteis).
+
+      **Automacao:**
+      5. Pipeline de envio automatico com retry em caso de falha.
+      6. Testes de integracao com SISCOAF.
+      7. Monitoramento de filas de envio.
+      8. Alertas de falha de envio.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - monitoring
+      - coaf-reporting
+  secops:
+    prose: |
+      **Controle de qualidade:**
+      1. Verificacao diaria de que todas as operacoes em especie >= R$ 50.000
+         tem comunicacao gerada.
+      2. Reconciliacao mensal entre operacoes e comunicacoes.
+      3. Investigacao de discrepancias.
+      4. Relatorio mensal de comunicacoes automaticas ao diretor.
+
+      **Deteccao de evasao:**
+      5. Monitoramento de operacoes em especie logo abaixo do threshold
+         (R$ 45.000-49.999) por mesmo cliente.
+      6. Analise de fragmentacao intencional para evitar comunicacao.
+      7. Comunicacao por suspeita (art. 25) quando estruturacao e detectada.
+      8. Treinamento de caixas e atendentes sobre obrigacao de registro.
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - reporting-dashboard
+      - training-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "IR-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.31"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-23"]
+    relationship: complements

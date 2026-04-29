@@ -1,0 +1,98 @@
+id: art-5
+family: cap-1
+title: "Decision to Classify and Mandatory Metadata"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 5. A decisão de classificação, desclassificação ou reclassificação
+    de informação classificada em qualquer grau de sigilo deverá constar de
+    Termo de Classificação de Informação — TCI, conforme modelo contido no
+    Anexo, que conterá, no mínimo, os seguintes elementos:
+
+    I - o grau de sigilo;
+    II - o assunto sobre o qual versa a informação;
+    III - o fundamento da classificação, observados os critérios
+    estabelecidos no art. 25 da Lei nº 12.527, de 2011;
+    IV - a indicação do prazo de sigilo, contado em anos, meses ou dias,
+    ou do evento que defina o seu termo final, conforme limites previstos
+    no art. 24 da Lei nº 12.527, de 2011;
+    V - a identificação da autoridade que a classificou.
+
+    Parágrafo único. O TCI seguirá anexo à informação classificada.
+guidance:
+  prose: |
+    Article 5 mandates the Termo de Classificação de Informação (TCI) —
+    the formal classification decision record that must accompany every
+    classified document.
+
+    **Mandatory TCI fields:**
+    1. Classification level (grau de sigilo)
+    2. Subject matter
+    3. Legal justification (referencing LAI art. 25 criteria)
+    4. Duration or triggering event
+    5. Classifying authority identity
+
+    **Compliance requirement:**
+    The TCI must be physically or digitally attached to the classified
+    information. Information classified without a TCI is non-compliant.
+
+    **Digital implementation:**
+    For digital systems, the TCI translates to mandatory metadata fields
+    that must be populated at the time of classification. The metadata
+    schema must enforce completeness — no field can be left blank.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Digital TCI (Termo de Classificação de Informação):**
+      1. Implement a mandatory TCI metadata schema for all digital assets:
+         - classification_level: enum (reservado, secreto, ultrassecreto)
+         - subject: string (required, non-empty)
+         - legal_justification: reference to LAI art. 25 criteria
+         - duration_years/duration_event: at least one required
+         - classifying_authority: linked to authority registry
+         - classification_date: auto-populated timestamp
+      2. Enforce schema validation: reject any document storage or
+         transmission without a complete TCI.
+      3. Implement version control for TCI records to track
+         reclassification and declassification history.
+      4. Generate TCI in both machine-readable (YAML/JSON) and
+         human-readable (PDF) formats for audit purposes.
+    tools:
+      - document-management
+      - metadata-validation
+      - schema-registry
+      - pdf-generator
+  devsecops:
+    prose: |
+      **TCI validation in pipelines:**
+      1. Add CI/CD validation step that verifies all classified artifacts
+         have associated TCI metadata before deployment.
+      2. Implement pre-commit hooks that check for TCI completeness
+         when files with classification markers are modified.
+      3. Automate TCI generation templates for common classification
+         scenarios in development workflows.
+    tools:
+      - gitlab-ci
+      - pre-commit
+      - template-engine
+  secops:
+    prose: |
+      **TCI compliance monitoring:**
+      1. Audit all classified information quarterly to verify each has
+         a valid, complete TCI attached.
+      2. Track TCI creation, modification, and archival in the GRC platform.
+      3. Report on TCI completeness rates and non-compliance instances.
+      4. Maintain TCI templates aligned with the decree's Annex model
+         for use by all classifying authorities.
+    tools:
+      - grc-platform
+      - audit-management
+      - document-tracking
+legal_references:
+  - framework_id: lai
+    articles: ["art-25", "art-28"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "RA-3"]
+    relationship: mapped

@@ -1,0 +1,102 @@
+id: art-39
+family: cap-6
+title: "Confidencialidade das Comunicacoes ao COAF"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 39. As comunicações ao COAF são sigilosas, sendo vedado:
+
+    I - revelar ao cliente ou a qualquer terceiro que uma comunicação ao
+    COAF foi realizada ou está sendo considerada;
+    II - revelar o conteúdo da comunicação realizada;
+    III - revelar que o participante está sendo fiscalizado em razão de
+    comunicações realizadas; e
+    IV - facilitar que terceiros tomem conhecimento de informações que
+    possam comprometer investigações em curso.
+
+    Parágrafo único. A violação do sigilo previsto no caput pode
+    configurar o crime de "tipping-off" previsto na legislação de PLD/FT
+    e sujeitar o responsável a sanções administrativas e criminais.
+guidance:
+  prose: |
+    O sigilo das comunicacoes ao COAF e um principio fundamental do sistema
+    de PLD/FT. Sem sigilo, lavadores de dinheiro seriam avisados das
+    comunicacoes e poderiam destruir evidencias ou fugir antes de uma
+    investigacao ser iniciada.
+
+    **O crime de tipping-off:**
+    No Brasil, o tipping-off — avisar ao alvo que esta sendo investigado por
+    PLD/FT — e uma violacao grave que pode configurar participacao no crime
+    de lavagem de dinheiro (art. 1, ss 2, inciso II da Lei 9.613/1998) e
+    obstrucao da justica.
+
+    **Situacoes de risco de tipping-off involuntario:**
+    - Solicitar documentos adicionais ao cliente apos gerar uma comunicacao
+      ao COAF sobre ele (pode alertar o cliente)
+    - Encerrar a conta do cliente imediatamente apos a comunicacao
+    - Fazer perguntas incomuns sobre operacoes especificas
+    - Deixar o sistema de case management acessivel para pessoas nao autorizadas
+
+    **A tensao com os direitos do cliente:**
+    O cliente tem o direito (LGPD e Codigo do Consumidor) de saber que dados
+    seus estao sendo tratados, mas o sigilo de PLD/FT prevalece sobre esses
+    direitos quando uma investigacao esta em curso. O participante pode
+    responder a solicitacoes de acesso a dados sem revelar a comunicacao ao COAF.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles de sigilo:**
+      1. Dados de comunicacoes ao COAF armazenados em segmento separado do
+         sistema com controles de acesso mais restritivos.
+      2. Lista de autorizados para acesso a comunicacoes ao COAF: apenas
+         compliance officer, analistas de PLD/FT, diretoria e auditores
+         internos com funcao especifica.
+      3. Sistema de notificacoes: qualquer tentativa de acesso a comunicacoes
+         ao COAF por usuario nao autorizado gera alerta imediato.
+      4. Controle de exportacao: dados de comunicacoes ao COAF nao podem
+         ser exportados para formatos nao controlados (ex: planilha nao criptografada).
+
+      **Prevencao de tipping-off via sistema:**
+      5. Durante o periodo de investigacao, bloqueio de edicoes no perfil
+         do cliente que possam alertá-lo sobre revisao em curso.
+      6. Comunicacoes ao cliente (extratos, notificacoes) nao podem ser
+         alteradas para refletir suspeita — devem ser as comunicacoes normais.
+    tools:
+      - access-control
+      - data-classification
+      - audit-trail
+      - identity-management
+  devsecops:
+    prose: |
+      **Controles de acesso a dados sigilosos:**
+      1. Testes de que acesso a comunicacoes ao COAF e negado para usuarios
+         sem permissao especifica.
+      2. Testes de que exportacao de dados de comunicacoes ao COAF e bloqueada
+         para formatos nao controlados.
+      3. Testes de que o sistema de PLD/FT nao vaza informacoes em respostas
+         de API publicas ou semi-publicas.
+    tools:
+      - security-testing
+      - access-control-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Gestao do sigilo:**
+      1. Treinamento obrigatorio sobre tipping-off para todos os colaboradores
+         com acesso ao sistema de PLD/FT.
+      2. Revisao de logs de acesso a comunicacoes ao COAF mensalmente.
+      3. Procedimento para lidar com solicitacoes de acesso a dados do cliente
+         (LGPD) quando ha comunicacao ao COAF ativa — como responder sem
+         revelar a comunicacao.
+    tools:
+      - training-platform
+      - access-review
+      - legal-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-29"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18", "art-23"]
+    relationship: complements

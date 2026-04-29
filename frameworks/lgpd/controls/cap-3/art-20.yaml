@@ -1,0 +1,123 @@
+id: art-20
+family: cap-3
+title: "Revisão de Decisões Automatizadas"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 20. O titular dos dados tem direito a solicitar a revisão de decisões tomadas
+    unicamente com base em tratamento automatizado de dados pessoais que afetem seus
+    interesses, incluídas as decisões destinadas a definir o seu perfil pessoal,
+    profissional, de consumo e de crédito ou os aspectos de sua personalidade.
+  additional:
+    - id: art-20-p1
+      label: "§ 1º"
+      prose: |
+        O controlador deverá fornecer, sempre que solicitadas, informações claras e
+        adequadas a respeito dos critérios e dos procedimentos utilizados para a decisão
+        automatizada, observados os segredos comercial e industrial.
+    - id: art-20-p2
+      label: "§ 2º"
+      prose: |
+        Em caso de não oferecimento de informações de que trata o § 1º deste artigo
+        baseado na observância de segredo comercial e industrial, a autoridade nacional
+        poderá realizar auditoria para verificação de aspectos discriminatórios em
+        tratamento automatizado de dados pessoais.
+    - id: art-20-p3
+      label: "§ 3º"
+      prose: |
+        A revisão de que trata o caput deste artigo deverá ser realizada por pessoa
+        natural, conforme previsto em regulamentação da autoridade nacional, que levará
+        em consideração a natureza e o porte da entidade ou o volume de operações de
+        tratamento.
+guidance:
+  prose: |
+    O art. 20 é o artigo da LGPD sobre inteligência artificial, machine learning e
+    decisões algorítmicas. Ele garante ao titular o direito de contestar decisões
+    tomadas exclusivamente por algoritmos.
+
+    **Escopo de aplicação:**
+    Decisões automatizadas que "afetem interesses" do titular, incluindo:
+    - Perfil de crédito (score de crédito, aprovação de empréstimo)
+    - Perfil de consumo (precificação dinâmica, segmentação)
+    - Perfil profissional (triagem de currículos por IA, decisões de RH)
+    - Aspectos de personalidade (profiling comportamental)
+
+    **§ 1º — Explicabilidade:**
+    O controlador deve fornecer informações sobre critérios e procedimentos da decisão
+    automatizada. Isso exige algum grau de explicabilidade do algoritmo (explainable AI).
+    O segredo comercial pode limitar, mas não eliminar, a obrigação de transparência.
+
+    **§ 2º — Auditoria pela ANPD:**
+    Quando o controlador invocar segredo comercial para não explicar o algoritmo, a ANPD
+    pode realizar auditoria para verificar discriminação algorítmica. Isso é relevante
+    para sistemas de IA que possam discriminar por raça, gênero, idade, etc.
+
+    **§ 3º — Revisão humana:**
+    A revisão deve ser feita por pessoa natural (human-in-the-loop). A ANPD pode
+    regulamentar exceções considerando porte da entidade e volume de operações.
+
+    **Diferença em relação ao GDPR (art. 22):**
+    O GDPR limita o direito a decisões com "efeitos jurídicos significativos". A LGPD
+    usa "afetem seus interesses", que é mais amplo. Além disso, a LGPD inclui
+    explicitamente perfis de crédito e consumo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar human-in-the-loop para decisões automatizadas que afetem
+         interesses do titular (aprovação de crédito, precificação, triagem).
+      2. Criar mecanismo de explicabilidade (explainable AI) que gere justificativas
+         compreensíveis para cada decisão automatizada.
+      3. Implementar canal para o titular solicitar revisão de decisões automatizadas
+         integrado ao Privacy Portal.
+      4. Registrar log de todas as decisões automatizadas com: input, output, modelo
+         utilizado, versão, timestamp.
+      5. Implementar feature flags para desabilitar decisões automatizadas e ativar
+         fluxo manual quando necessário.
+      6. Criar dashboard de monitoramento de viés algorítmico com métricas de
+         fairness por grupo demográfico.
+    tools:
+      - explainable-ai-framework
+      - ml-model-registry
+      - feature-store
+      - bias-detection
+      - privacy-portal
+      - workflow-engine
+  devsecops:
+    prose: |
+      1. Implementar testes de viés algorítmico no pipeline de treinamento e deploy
+         de modelos (fairness testing).
+      2. Validar que todo modelo de ML que toma decisões automatizadas tem
+         mecanismo de explicabilidade implementado.
+      3. Testar que o fluxo de revisão humana funciona corretamente e é acessível
+         ao titular.
+      4. Implementar model cards documentando propósito, dados de treinamento,
+         limitações e métricas de fairness para cada modelo.
+      5. Validar que logs de decisão são completos e auditáveis.
+    tools:
+      - ml-pipeline-testing
+      - fairness-testing
+      - model-validation
+      - compliance-as-code
+      - mlflow
+  secops:
+    prose: |
+      1. Monitorar métricas de fairness em produção para detectar viés emergente.
+      2. Auditar decisões automatizadas periodicamente para verificar
+         discriminação por raça, gênero, idade, localidade.
+      3. Monitorar requisições de revisão de decisões automatizadas e garantir
+         atendimento.
+      4. Alertar sobre anomalias em taxas de aprovação/rejeição que possam indicar
+         viés algorítmico.
+    tools:
+      - model-monitoring
+      - fairness-dashboard
+      - siem
+      - compliance-audit
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 22"]
+    relationship: equivalent-to
+  - framework_id: nist-ai-rmf
+    articles: ["GOVERN", "MAP", "MEASURE", "MANAGE"]
+    relationship: supports

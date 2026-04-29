@@ -1,0 +1,94 @@
+id: pix-02
+family: disp-gerais
+title: "Definicoes e Terminologia do Arranjo"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O regulamento do Pix estabelece definições técnicas e operacionais essenciais para a
+    operação do arranjo, incluindo: SPI (Sistema de Pagamentos Instantâneos), DICT
+    (Diretório de Identificadores de Contas Transacionais), PSP (Prestador de Serviços de
+    Pagamento), chave Pix, QR Code estático e dinâmico, Pix Copia e Cola, conta
+    transacional, participante direto, participante indireto, liquidante especial, e
+    demais termos técnicos e operacionais necessários à operação do ecossistema.
+guidance:
+  prose: |
+    **Definicoes criticas para seguranca:**
+
+    - **SPI (Sistema de Pagamentos Instantaneos):** Infraestrutura centralizada operada
+      pelo BCB para liquidacao das transacoes Pix em tempo real. Toda mensagem trafega
+      pela RSFN com criptografia e assinatura digital.
+
+    - **DICT (Diretorio de Identificadores de Contas Transacionais):** Base de dados
+      centralizada no BCB que armazena o vinculo entre chaves Pix e contas transacionais.
+      Dados sensiveis (CPF/CNPJ, e-mail, telefone) sao armazenados com protecao criptografica.
+
+    - **PSP (Prestador de Servicos de Pagamento):** Instituicao participante do arranjo
+      Pix que oferece servicos de pagamento ao usuario final. Pode ser participante direto
+      ou indireto.
+
+    - **Chave Pix:** Identificador unico que vincula o usuario a sua conta transacional.
+      Tipos permitidos: CPF/CNPJ, e-mail, telefone celular, chave aleatoria (EVP).
+
+    - **Conta transacional:** Conta de deposito a vista, conta de pagamento pre-paga ou
+      conta de pagamento pos-paga que aceita transacoes Pix.
+
+    - **QR Code estatico:** Gerado uma vez, reutilizavel para multiplas transacoes.
+      Pode ou nao conter valor predefinido.
+
+    - **QR Code dinamico:** Gerado para cada transacao, com informacoes especificas
+      (valor, identificador, dados do recebedor). Pode incluir juros, multas e descontos.
+
+    - **Pix Copia e Cola:** Representacao textual (string) do payload do QR Code para
+      uso em ambientes onde a camera nao esta disponivel.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelagem de dados:**
+      1. Schema de dados alinhado as definicoes oficiais do BCB para evitar ambiguidades.
+      2. Tabelas e campos nomeados conforme terminologia do regulamento (chave_pix,
+         conta_transacional, tipo_participante).
+      3. Enumeracoes (enums) para tipos de chave, tipos de participante, status de transacao
+         conforme catalogo do BCB.
+
+      **Integracao com infraestrutura BCB:**
+      4. Conectividade com DICT para consulta e registro de chaves Pix.
+      5. Conectividade com SPI para envio e recebimento de ordens de pagamento.
+      6. Cache local do DICT com invalidacao por eventos (DICT-sync).
+      7. Tratamento de todos os tipos de chave nos fluxos de consulta e vinculacao.
+    tools:
+      - database-schema
+      - api-gateway
+      - cache-layer
+      - message-queue
+  devsecops:
+    prose: |
+      **Validacao de dados:**
+      1. Validadores de formato para cada tipo de chave Pix (CPF, CNPJ, e-mail, telefone, EVP).
+      2. Testes unitarios para todos os fluxos de chave (registro, exclusao, portabilidade,
+         reivindicacao).
+      3. Contract tests contra API do DICT em ambiente de homologacao.
+      4. Linting e validacao de mensagens ISO 20022 no pipeline.
+    tools:
+      - json-schema-validator
+      - contract-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Gestao de chaves e identidades:**
+      1. Auditoria de registros de chaves Pix para detectar vinculos suspeitos.
+      2. Monitoramento de portabilidade e reivindicacao de chaves para detectar fraudes.
+      3. Alerta para tentativas de registro de chaves com dados inconsistentes.
+      4. Classificacao de dados conforme terminologia do regulamento para aplicacao de
+         controles de protecao proporcionais.
+    tools:
+      - siem
+      - fraud-detection
+      - data-classification
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-3", "art-4"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-5", "art-7"]
+    relationship: complements

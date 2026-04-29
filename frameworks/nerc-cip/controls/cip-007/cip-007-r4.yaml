@@ -1,0 +1,121 @@
+id: cip-007-r4
+family: cip-007
+title: "Security Event Monitoring"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes to log events and monitor BES Cyber Systems for
+    security events that include the applicable requirement parts.
+  parts:
+    - id: cip-007-r4.1
+      label: "4.1"
+      prose: >-
+        Log events at the BES Cyber System level (per BES Cyber
+        System capability) or at the Cyber Asset level (per Cyber
+        Asset capability) for identification of, and after-the-fact
+        investigations of, Cyber Security Incidents that includes,
+        at a minimum: successful login attempts; failed access
+        attempts and failed login attempts; and detected malicious
+        code.
+    - id: cip-007-r4.2
+      label: "4.2"
+      prose: >-
+        Generate alerts for security events that the Responsible
+        Entity determines necessitate an alert, that includes, at a
+        minimum, detected malicious code from part 3.1 and detected
+        failure of part 4.1 event logging.
+    - id: cip-007-r4.3
+      label: "4.3"
+      prose: >-
+        Where technically feasible, retain applicable event logs
+        identified in part 4.1 for at least 90 consecutive
+        calendar days except under CIP Exceptional Circumstances.
+    - id: cip-007-r4.4
+      label: "4.4"
+      prose: >-
+        Review a summarization or sampling of logged events as
+        determined by the Responsible Entity at intervals no greater
+        than every 15 calendar days to identify undetected Cyber
+        Security Incidents.
+
+guidance:
+  prose: >-
+    CIP-007 R4 establishes the security monitoring foundation for BES
+    Cyber Systems. The minimum logging requirements (successful logins,
+    failed attempts, malicious code) provide the baseline visibility
+    needed for incident detection and forensic investigation. The 90-day
+    log retention requirement ensures sufficient data for after-the-fact
+    investigation. The 15-day log review cycle means entities must
+    actively analyze security events, not just collect them. Alerting
+    must be configured for critical events (malicious code detection,
+    logging failures) to enable timely response. In OT environments,
+    log collection may require specialized approaches (syslog, protocol-
+    specific log extraction) due to limited capabilities of legacy devices.
+
+references:
+  - citation: "NERC CIP-007-6 — System Security Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-007-6.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized log aggregation infrastructure (SIEM) capable
+      of ingesting logs from both IT and OT BES Cyber Systems. Configure
+      automated log collection from all BES Cyber Assets including
+      servers, network devices, firewalls, and OT equipment. Implement
+      90-day log retention with automated lifecycle management. Deploy
+      dashboards showing log collection status, event volumes, and
+      alert rates per BES Cyber System. Implement log integrity
+      verification (hashing, write-once storage) to ensure forensic
+      reliability. Configure automated alerting for logging failures
+      to detect monitoring gaps.
+    tools:
+      - grafana
+      - elasticsearch
+      - fluentd
+      - prometheus
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement logging configuration as code, ensuring all BES Cyber
+      System applications emit the required minimum event types. Create
+      CI pipeline validation that verifies application logging
+      configurations meet CIP-007 R4 requirements before deployment.
+      Store alerting rules and log retention policies as version-
+      controlled artifacts. Automate the deployment of log collection
+      agents and SIEM integrations through Infrastructure-as-Code.
+      Create automated tests that verify log events are properly
+      generated for security-relevant actions.
+    tools:
+      - gitlab-ci
+      - conftest
+      - terraform
+      - fluentd
+
+  secops:
+    prose: >-
+      Implement real-time security event monitoring with automated
+      alerting for malicious code detection, failed access attempts
+      exceeding thresholds, and logging failures. Conduct log reviews
+      at least every 15 calendar days using automated summarization
+      tools and manual sampling. Correlate security events across
+      BES Cyber Systems to identify attack patterns. Monitor log
+      retention compliance and alert when logs approach the 90-day
+      retention threshold. Generate audit evidence for log review
+      activities including reviewer, date, scope, and findings.
+    tools:
+      - splunk
+      - elastic-siem
+      - qradar
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-11", "SI-4"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.6"]
+    relationship: supports

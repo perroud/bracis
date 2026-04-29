@@ -1,0 +1,110 @@
+id: stig-cat3-banners
+family: cat-iii
+title: "Login Warning Banners and Legal Notices"
+class: DISA-STIG
+
+baselines: [cat-iii]
+
+statement:
+  prose: >-
+    The system must display a DoD-approved warning banner before granting
+    access to the system. The warning banner must be displayed at every login
+    interface including graphical login screens, SSH sessions, web application
+    login pages, and administrative console interfaces. The banner must include
+    the following elements: notice that the system is a U.S. Government system;
+    that system usage may be monitored, recorded, and subject to audit; that
+    unauthorized use is prohibited and subject to criminal and civil penalties;
+    and that use constitutes consent to monitoring. The banner must remain visible
+    until acknowledged by the user. The system must not display any other messages
+    that could provide information useful to an adversary (such as the operating
+    system version, hostname, or system purpose) before authentication.
+
+guidance:
+  prose: >-
+    Warning banners serve a legal function: they establish that users have been
+    informed of monitoring activities and have consented to them, which is required
+    by law before monitoring communications or stored data. Without an adequate
+    banner, evidence obtained through system monitoring may be inadmissible in
+    legal or disciplinary proceedings.
+
+    This is a CAT III finding because it does not directly enable system compromise,
+    but its absence has legal implications and indicates inattention to baseline
+    security configuration. STIG reviewers verify the banner text against the
+    approved DoD standard (found in DoDM 8570.01-M and successor documents),
+    confirm the banner appears before authentication (not after), and verify
+    that it is displayed across all access methods including SSH, web, and
+    console access.
+
+    A common finding is that some access paths (such as the serial console,
+    API access, or management interfaces) display banners while others do not.
+    All access paths must consistently display the approved banner.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AC-8"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DoDM 8570.01-M — Information Assurance Workforce Improvement Program"
+    url: "https://public.cyber.mil/policy-guidance/dod-approved-8570-baseline-certifications/"
+  - citation: "18 U.S.C. § 2510 — Wire and Electronic Communications Interception"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure the DoD-approved warning banner in all platform access paths:
+      set the MOTD (message of the day) and SSH banner in OS configuration
+      management templates applied to all nodes; configure the Kubernetes API
+      server to display the banner in kubeconfig contexts where feasible;
+      configure IdP login pages (Keycloak login theme) to display the banner
+      before the login form; configure VPN pre-login banners. Enforce banner
+      configuration through Ansible or Terraform templates that include the
+      banner text as a variable, ensuring consistency and easy updates when
+      the DoD-approved text is revised. Validate banner presence in SCAP
+      content scans.
+    tools:
+      - ansible
+      - terraform
+      - keycloak-themes
+      - openscap
+
+  devsecops:
+    prose: >-
+      Include banner configuration validation in CI/CD pipeline SCAP scans
+      of infrastructure-as-code templates. Verify that web application builds
+      include the required banner on all login pages, validated by automated
+      UI testing (Selenium, Playwright) that checks for required banner text
+      before the authentication form. Implement policy-as-code checks (Conftest)
+      that verify SSH configurations in Ansible playbooks and Terraform modules
+      include the required banner settings. Add banner verification to the
+      deployment smoke test suite for web applications.
+    tools:
+      - ansible
+      - conftest
+      - playwright
+      - selenium
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Include banner verification in periodic SCAP/STIG compliance scans.
+      Validate banner presence across all access paths during ATO assessment,
+      including access paths that may not be routinely tested (serial console,
+      backup administrative interfaces, emergency access credentials). Verify
+      banner text matches the current DoD-approved standard after any STIG
+      update that modifies the required text. Document banner configuration
+      in the SSP with the approved text and a list of all access paths where
+      it is displayed.
+    tools:
+      - openscap
+      - tenable-sc
+      - qualys
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-8"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["AC.L2-3.1.9"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["ac-8"]
+    relationship: equivalent-to

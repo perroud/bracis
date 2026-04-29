@@ -1,0 +1,95 @@
+id: dpd-1
+family: dpd
+title: "Ensure That Personal Data Is Secure"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Where personal data is processed on the basis of the consumer's consent, this
+    consent shall be obtained in a valid way. The consumer shall be provided with
+    functionality so that their consent can be withdrawn. Personal data shall be
+    processed and stored securely by the consumer IoT device and its associated services.
+    If the device or a service processes personal data, it shall do so in accordance
+    with applicable data protection law, such as the General Data Protection Regulation
+    (GDPR).
+
+guidance:
+  prose: >-
+    Consumer IoT devices collect vast amounts of personal data — voice recordings, video
+    feeds, location data, health metrics, behavioral patterns, and environmental telemetry.
+    This provision bridges IoT security requirements with data protection obligations.
+    Processing personal data requires a lawful basis (typically consent for consumer devices),
+    and that consent must be freely given, specific, informed, and unambiguous. The device
+    and its cloud services must implement appropriate technical measures to protect personal
+    data both at rest and in transit. Data minimization applies: collect only what is
+    necessary for the stated purpose. The device must provide clear mechanisms for users to
+    view, export, and withdraw consent for data processing.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.8-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a consent management framework that captures and stores user consent with
+      timestamps, scope, and version information. Provide clear privacy settings in the
+      device's companion application and web portal. Implement data classification and
+      encryption at rest for all personal data stored on the device and in cloud services.
+      Design data flows to minimize personal data collection and retention. Implement data
+      anonymization or pseudonymization where full personal data is not required for device
+      functionality. Provide APIs for data export in portable formats (JSON, CSV) to support
+      data portability rights. Implement data retention policies with automated purging of
+      expired data.
+    tools:
+      - vault
+      - encryption-at-rest
+      - consent-management-platform
+      - data-loss-prevention
+      - mobile-companion-app
+
+  devsecops:
+    prose: >-
+      Implement automated privacy impact assessment checks in the CI/CD pipeline. Use static
+      analysis to identify code paths that process personal data and verify appropriate
+      encryption is applied. Include data flow diagrams in the documentation and validate
+      them against the actual implementation. Test consent withdrawal flows to ensure data
+      processing stops and stored data is removed. Implement integration tests that verify
+      personal data is encrypted in transit and at rest. Scan for accidental personal data
+      exposure in logs, error messages, and debug output.
+    tools:
+      - semgrep
+      - sonarqube
+      - gitlab-sast
+      - data-flow-analyzer
+      - log-scanner
+
+  secops:
+    prose: >-
+      Monitor for unauthorized access to personal data stores. Implement anomaly detection
+      on data access patterns to identify potential data breaches. Conduct periodic data
+      protection audits verifying that consent records match actual data processing activities.
+      Maintain a data breach response plan specific to the IoT product. Track data subject
+      access requests (DSARs) and ensure they are fulfilled within regulatory timelines.
+      Monitor third-party data processors for compliance with data processing agreements.
+    tools:
+      - splunk
+      - elastic-siem
+      - onetrust
+      - bigid
+      - data-loss-prevention
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-4.1", "SR-4.3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-28", "SI-12", "PT-3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.34", "A.8.11", "A.8.24"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V8.1.1", "V8.3.4"]
+    relationship: complements

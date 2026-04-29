@@ -1,0 +1,82 @@
+id: ct-p.02
+family: ct-p
+title: "Data Processing Management — Data Minimization"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    Data are managed consistent with the organization's risk strategy to protect
+    individuals' privacy, including limiting the collection, use, and sharing of data
+    to what is necessary for the identified purpose.
+
+guidance:
+  prose: >-
+    Data minimization is a foundational privacy principle requiring organizations to
+    limit personal data collection and processing to what is strictly necessary for
+    the declared purpose. This includes minimizing the volume of data collected, the
+    scope of processing activities, the duration of data retention, and the number of
+    parties with access. Organizations should implement technical measures that enforce
+    minimization by default — collecting only required fields, anonymizing data when
+    full identity is unnecessary, aggregating data for analytics instead of using
+    individual records, and automatically purging data when the processing purpose
+    has been fulfilled.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, CT.DM-P1 through CT.DM-P10"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build data minimization into platform infrastructure by default. Implement API
+      schemas that only expose the minimum required data fields for each endpoint.
+      Deploy data masking and tokenization at the platform layer so downstream services
+      receive pseudonymized data unless they have explicit need for identifiable data.
+      Implement automated data retention enforcement — schedule deletion jobs based on
+      defined retention periods per data category. Build platform-level data aggregation
+      services that provide analytics capabilities without exposing individual records.
+    tools:
+      - vault
+      - api-gateway
+      - data-masking
+      - kubernetes
+      - terraform
+
+  devsecops:
+    prose: >-
+      Enforce data minimization through development practices. Implement linting rules
+      that flag over-collection of data in API request schemas. Use schema validation
+      in CI/CD to verify that database schemas do not include unnecessary PII columns.
+      Require justification for each personal data field in data models. Implement
+      automated tests that verify data minimization — for example, testing that API
+      responses do not include fields beyond what the consumer needs.
+    tools:
+      - gitlab-ci
+      - schema-validation
+      - custom-linters
+      - api-testing
+      - sast
+
+  secops:
+    prose: >-
+      Monitor for data minimization violations across systems. Detect excessive data
+      collection patterns through log analysis. Identify data stores that retain data
+      beyond approved retention periods. Alert on data sharing that exceeds the scope
+      defined in data processing agreements. Conduct periodic data minimization audits
+      that review actual data collected against declared purposes.
+    tools:
+      - dlp-tools
+      - siem
+      - data-discovery
+      - grc-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5", "art-25"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-8", "PM-25"]
+    relationship: derived-from
+  - framework_id: iso-27701
+    articles: ["A.7.4.1"]
+    relationship: mapped

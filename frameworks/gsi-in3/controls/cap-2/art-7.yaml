@@ -1,0 +1,78 @@
+id: art-7
+family: cap-2
+title: "Descarte Seguro de Ativos de Informacao"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 7. O descarte de ativos de informação deve assegurar a destruição
+    irreversível dos dados contidos, observando:
+
+    I - sanitização de mídias de armazenamento antes do descarte ou reutilização;
+    II - destruição física de mídias quando a sanitização lógica não for suficiente;
+    III - registro formal do descarte, incluindo data, responsável e método utilizado;
+    IV - cumprimento dos prazos de retenção legais antes do descarte.
+guidance:
+  prose: |
+    O art. 7 estabelece o descarte seguro como etapa final do ciclo de vida dos
+    ativos, evitando vazamento de informacoes classificadas.
+
+    **Metodos de sanitizacao por tipo de midia:**
+    - HDD: sobrescrita 3+ passes (NIST 800-88) ou desmagnetizacao
+    - SSD: comando ATA Secure Erase + destruicao fisica
+    - Papel: fragmentacao cruzada (DIN 66399 nivel P-4 ou superior)
+    - Nuvem: crypto-shredding (destruir chave de criptografia)
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.7.14 (Secure disposal or re-use of equipment)
+    - NIST 800-53 rev5: MP-6 (Media Sanitization)
+    - NIST SP 800-88 (Guidelines for Media Sanitization)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Descarte seguro automatizado:**
+      1. Crypto-shredding para dados em nuvem: criptografar com chave unica e
+         destruir a chave ao fim do ciclo de vida.
+      2. Automacao de lifecycle policies em object storage (S3 Lifecycle, GCS Lifecycle).
+      3. Rotacao automatica de chaves de criptografia com destruicao das anteriores.
+      4. Wipe automatizado de volumes EBS/discos ao terminar instancias.
+    tools:
+      - crypto-shredding
+      - lifecycle-policies
+      - key-rotation
+      - volume-wipe
+  devsecops:
+    prose: |
+      **Descarte em pipelines:**
+      1. Cleanup automatico de artefatos de build apos periodo de retencao.
+      2. Expiracao automatica de ambientes de review/staging.
+      3. Limpeza de caches que possam conter dados classificados.
+      4. Pipeline de deprovisioning que sanitiza ambientes descontinuados.
+    tools:
+      - artifact-cleanup
+      - environment-lifecycle
+      - cache-sanitization
+  secops:
+    prose: |
+      **Processo de descarte:**
+      1. Formulario de solicitacao de descarte com aprovacao do custodiante.
+      2. Registro de descarte em livro/sistema de controle (data, metodo, responsavel).
+      3. Certificado de destruicao para midias fisicas.
+      4. Auditoria anual de descarte vs. retencao legal.
+    tools:
+      - disposal-management
+      - certificate-of-destruction
+      - retention-calendar
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-10"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.7.14", "A.8.10"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-6", "MP-6(1)"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: complements

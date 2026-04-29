@@ -1,0 +1,122 @@
+id: p2pe-key-2
+family: p2pe-key
+title: "Key Loading and Injection Security"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    Cryptographic keys shall be loaded into POI devices using secure
+    methods that prevent cleartext key exposure. Key injection shall occur
+    within a PCI-approved Key Injection Facility (KIF) or through remote
+    key loading using PCI-approved methods (TR-34 or equivalent). Key
+    injection facilities shall enforce dual control and split knowledge
+    for all key loading operations. The key injection process shall be
+    logged with sufficient detail to establish an audit trail from key
+    generation through device loading, including the identities of all
+    personnel involved, device serial numbers, and key identifiers.
+  parts:
+    - id: p2pe-key-2.a
+      label: "Domain 4, 4C"
+      prose: >-
+        Key injection occurs in a PCI-approved Key Injection Facility or
+        via PCI-approved remote key loading methods, with dual control
+        and split knowledge enforced throughout the process.
+    - id: p2pe-key-2.b
+      label: "Domain 4, 4D"
+      prose: >-
+        A complete audit trail links key generation to device loading,
+        including personnel identities, device serial numbers, key
+        identifiers, and timestamps.
+
+guidance:
+  prose: >-
+    Key injection is one of the most sensitive operations in the P2PE
+    lifecycle because it involves transferring cryptographic keys into POI
+    devices. Traditional key injection requires a physically secured Key
+    Injection Facility (KIF) where devices are connected to HSMs and keys
+    are loaded through direct encrypted channels. PCI SSC maintains a list
+    of approved KIFs. Remote key loading (RKL) using TR-34 enables key
+    distribution over network connections using asymmetric cryptography to
+    protect the symmetric keys during transfer. RKL reduces the need for
+    physical device shipping to a KIF and enables faster deployment and
+    re-keying. Regardless of method, the key must never exist in cleartext
+    outside of a secure cryptographic device boundary. The audit trail is
+    critical for incident investigation — if a key compromise is suspected,
+    the organization must be able to identify all devices loaded with the
+    affected key.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 4 — Key Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI PIN Security Requirements v3.1 — Key Injection"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "ANSI TR-34 — Interoperable Method for Distribution of Symmetric Keys Using Asymmetric Techniques"
+    url: "https://webstore.ansi.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized key management system that orchestrates the
+      full injection workflow: key selection, HSM-to-device transfer, and
+      audit logging. For physical KIF operations, implement barcode/RFID
+      scanning of device serial numbers to automate the audit trail.
+      For remote key loading, deploy TR-34 host infrastructure with
+      certificate-based device authentication. Implement key injection
+      status tracking so that each device's current key state (injected,
+      active, expired, revoked) is queryable in real time. Build automated
+      alerts for devices that have not completed key injection within the
+      expected timeframe.
+    tools:
+      - thales-payshield
+      - futurex-vectera
+      - key-management-system
+      - device-management-platform
+      - tr-34-host
+      - asset-inventory-cmdb
+
+  devsecops:
+    prose: >-
+      Test key injection workflows in a staging environment using test
+      HSMs and test POI devices. Validate that the audit trail correctly
+      captures all required data points (personnel, device serial, key
+      ID, timestamp, result). Automate post-injection verification that
+      decrypts a test transaction from the newly-keyed device. Scan key
+      management application code for any path where key material could
+      be logged, cached, or written to non-volatile storage outside the
+      HSM.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - custom-kif-integration-tests
+      - test-hsm-emulator
+      - postman
+
+  secops:
+    prose: >-
+      Monitor key injection operations in real time. Alert on injection
+      attempts outside of scheduled windows, by unauthorized personnel,
+      or for devices not in the approved inventory. Track the complete
+      chain of custody for every key from generation through injection.
+      Conduct quarterly audits of KIF access logs, comparing against key
+      injection records. Investigate any discrepancy between the number of
+      keys generated and the number of successful injections.
+    tools:
+      - splunk
+      - elastic-siem
+      - key-management-system
+      - physical-access-control-system
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-crypto-3", "pin-device-1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-12(2)", "SC-12(3)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A5.10"]
+    relationship: supports

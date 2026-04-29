@@ -1,0 +1,105 @@
+id: art-31
+family: cap-5
+title: "Requisitos para Camaras de Compensacao e Liquidacao"
+class: CVM-135
+baselines: [infraestruturas-mercado]
+statement:
+  prose: |
+    Art. 31. As câmaras e prestadores de serviços de compensação e liquidação de
+    operações com valores mobiliários devem:
+    I - assegurar a certeza da liquidação das operações aceitas, atuando como
+    contraparte central (CCP) quando aplicável;
+    II - manter sistema de gestão de garantias que cubra as exposições de
+    crédito e de mercado dos participantes;
+    III - implementar modelo de gerenciamento de risco que considere riscos
+    de crédito, liquidez, operacional, de mercado e sistêmico;
+    IV - manter recursos financeiros próprios suficientes para cobrir perdas
+    em cenários de estresse, incluindo inadimplência do maior participante;
+    V - estabelecer regras claras de aceitação, rejeição e prioridade de
+    liquidação de operações; e
+    VI - garantir a finalidade (finality) da liquidação, tornando as
+    operações liquidadas irrevogáveis e oponíveis a terceiros.
+
+    Parágrafo único. A câmara deve manter plano de recuperação e resolução
+    (recovery and resolution plan) aprovado pela CVM, contemplando cenários
+    extremos de inadimplência e estresse sistêmico.
+guidance:
+  prose: |
+    O art. 31 regula as camaras de compensacao e liquidacao (CCPs), que sao
+    as infraestruturas mais criticas do mercado de capitais.
+
+    **Contraparte central (CCP):**
+    A CCP interpoe-se entre comprador e vendedor, assumindo o risco de
+    contraparte de ambos os lados. Isso reduz o risco sistemico mas
+    concentra risco na CCP, que deve ser extremamente robusta.
+
+    **Modelo de risco:**
+    O modelo de risco de uma CCP deve cobrir:
+    1. Risco de credito: inadimplencia de participantes
+    2. Risco de liquidez: incapacidade de honrar obrigacoes no prazo
+    3. Risco de mercado: variacao de preco das garantias
+    4. Risco operacional: falhas de sistemas ou processos
+    5. Risco sistemico: efeito cascata de inadimplencias
+
+    **Cover 1 / Cover 2:**
+    Os principios PFMI exigem que CCPs mantenham recursos para cobrir
+    a inadimplencia do maior participante (Cover 1) ou dos dois maiores
+    (Cover 2), conforme o perfil de risco sistemico.
+
+    **Finalidade da liquidacao:**
+    A finality garante que uma operacao liquidada nao pode ser revertida,
+    o que e essencial para a seguranca juridica do mercado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de clearing e risk management:**
+      1. Implementar sistema de clearing com motor de novacao (CCP) que
+         assuma posicao de contraparte central apos aceitacao da operacao.
+      2. Motor de calculo de margem em tempo real com modelos de risco
+         (VaR, stress testing, SPAN ou similar) e chamadas de margem
+         intraday quando necessario.
+      3. Sistema de gestao de garantias com avaliacao de colateral,
+         haircuts e substituicao de garantias.
+
+      **Finalidade e irrevogabilidade:**
+      4. Implementar mecanismo de settlement finality com timestamp
+         de liquidacao final e status irrevogavel.
+    tools:
+      - clearing-platform
+      - risk-engine
+      - collateral-management
+      - settlement-engine
+  devsecops:
+    prose: |
+      **Testes de robustez do clearing:**
+      1. Testes de estresse automatizados que simulem inadimplencia do
+         maior participante (Cover 1) e dos dois maiores (Cover 2).
+      2. Testes de regressao para motor de calculo de margem apos
+         qualquer alteracao de parametros ou modelos.
+      3. Pipeline de validacao de integridade de dados de liquidacao
+         com reconciliacao contra registros e custodia.
+    tools:
+      - gitlab-ci
+      - stress-testing
+      - model-validation
+      - reconciliation-testing
+  secops:
+    prose: |
+      **Supervisao de risco do clearing:**
+      1. Monitoramento em tempo real de exposicoes por participante
+         com alertas para violacao de limites.
+      2. Teste semestral do plano de recuperacao e resolucao com
+         simulacao de cenarios extremos.
+      3. Relatorio diario de adequacao de garantias e recursos
+         financeiros proprios para a alta administracao e CVM.
+    tools:
+      - risk-monitoring
+      - recovery-plan-testing
+      - regulatory-reporting
+legal_references:
+  - framework_id: bcb-304
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: cvm-35
+    articles: ["art-9"]
+    relationship: complements

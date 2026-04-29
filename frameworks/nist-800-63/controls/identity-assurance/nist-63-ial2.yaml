@@ -1,0 +1,123 @@
+id: nist-63-ial2
+family: identity-assurance
+title: "IAL2 — Remote Identity Proofing"
+class: SP800-63A
+
+baselines: [ial2, ial3, aal2, aal3, fal2, fal3]
+
+statement:
+  prose: >-
+    IAL2 requires identity evidence validation and verification. The CSP shall
+    collect the appropriate identity evidence. The identity evidence collected
+    by the CSP shall be validated to ensure that it is genuine, authentic, and
+    accurate. The applicant's binding to the claimed identity shall be verified
+    by comparing the applicant's biometric characteristics with those on the
+    validated identity evidence or by knowledge-based verification using
+    information obtained during the proofing process. IAL2 supports remote
+    identity proofing using trusted referee(s), automated identity verification
+    systems, or in-person processes. A minimum of one piece of SUPERIOR or
+    STRONG evidence shall be validated or two pieces of MODERATE evidence.
+    The identity proofing session shall be conducted in a supervised, non-coercive
+    environment.
+
+guidance:
+  prose: >-
+    IAL2 is the most common assurance level for government-facing digital services
+    that require identity verification but can be completed remotely. It is
+    appropriate for applications such as tax filing, benefits enrollment, healthcare
+    portals, and financial services onboarding. The CSP must use an accredited
+    identity proofing service or implement in-house processes meeting the 800-63A
+    requirements. Evidence validation must confirm document authenticity using
+    forensic analysis, optical character recognition, and chip verification (for
+    NFC-enabled documents). Biometric comparison must use a certified biometric
+    system with a False Match Rate (FMR) no higher than 1 in 1,000 for IAL2.
+    Organizations must perform address confirmation via a record check against an
+    authoritative source or by sending a notification to a verified address. Privacy
+    notice and consent must be obtained before collecting and processing PII during
+    the proofing session.
+
+references:
+  - citation: "NIST SP 800-63A Section 4.2 — Identity Assurance Level 2"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 5 — Identity Resolution, Validation, and Verification"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 4.4 — Verifying Identity Evidence"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 5.3.2 — Biometric Comparison"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+
+related_controls:
+  - id: nist-63-ial1
+    relationship: extends
+    description: "IAL2 builds on IAL1 by adding mandatory identity proofing requirements."
+  - id: nist-63-enrollment
+    relationship: implements
+    description: "The enrollment process at IAL2 must follow the proofing requirements defined in the enrollment control."
+  - id: nist-63-biometrics
+    relationship: complements
+    description: "Biometric collection and comparison may be used at IAL2 for identity binding."
+  - id: nist-63-privacy-proofing
+    relationship: implements
+    description: "IAL2 proofing sessions must adhere to privacy requirements including notice and consent."
+  - id: nist-63-aal2
+    relationship: complements
+    description: "Systems requiring IAL2 typically require at least AAL2 for authentication after enrollment."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate a NIST 800-63A-compliant identity proofing provider (such as
+      ID.me, Socure, Jumio, or an equivalent) into the platform's identity
+      lifecycle management system. Implement an IAL2 proofing workflow that
+      collects government-issued photo ID (passport, driver's license), performs
+      document liveness detection, and executes biometric facial comparison.
+      Store proofing evidence references (not full copies unless legally required)
+      in a tamper-evident audit log. Implement address confirmation by sending
+      a one-time enrollment code to the verified address on the identity document.
+      Integrate the IAL2 enrollment outcome with the downstream identity provider
+      (Keycloak, Okta, Azure AD) to set the verified identity attribute on the
+      account. Enforce that IAL2-required services check the assurance level claim
+      in the identity token before granting access.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - id.me
+      - socure
+      - jumio
+
+  devsecops:
+    prose: >-
+      Implement pipeline gates that validate identity proofing integration exists
+      in any service tagged as IAL2. Scan service configurations for proper
+      assertion of the acr (Authentication Context Class Reference) claim in
+      OIDC tokens to ensure IAL2 is correctly propagated through the federation
+      layer. Include automated test cases that verify the proofing callback
+      endpoint validates the proofing result correctly before granting IAL2
+      status to an account. Enforce immutable audit logging of all proofing
+      events in CI/CD artifact storage. Validate that PII collected during
+      proofing flows is encrypted at rest and in transit per the privacy
+      requirements of 800-63A.
+    tools:
+      - gitlab-ci
+      - vault
+      - open-policy-agent
+      - checkov
+
+  secops:
+    prose: >-
+      Monitor identity proofing sessions for fraud signals including document
+      injection attacks (submitting manipulated images), presentation attacks
+      (using photos or masks during biometric capture), and synthetic identity
+      creation (combining real data with fabricated elements). Implement SOAR
+      playbooks that automatically flag and quarantine accounts where proofing
+      anomalies are detected. Alert on unusually high failure rates in proofing
+      sessions, which may indicate an adversarial campaign. Correlate proofing
+      events with threat intelligence on compromised identity document templates.
+      Conduct periodic audits of the proofing service provider's accreditation
+      status and audit logs.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - pagerduty

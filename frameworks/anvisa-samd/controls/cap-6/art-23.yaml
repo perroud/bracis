@@ -1,0 +1,135 @@
+id: art-23
+family: cap-6
+title: "Requisitos Especificos para SaMD com Inteligencia Artificial"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 23. SaMD que utiliza algoritmos de inteligência artificial (IA)
+    ou aprendizado de máquina (ML) como parte de sua funcionalidade
+    clínica deve atender, além dos requisitos gerais desta Resolução,
+    os seguintes requisitos específicos:
+
+    I - documentação completa do modelo de IA/ML, incluindo: tipo de
+    algoritmo, arquitetura do modelo, dados de treinamento (descrição,
+    fonte, tamanho, distribuição), processo de treinamento, métricas
+    de desempenho e limitações conhecidas;
+    II - descrição dos dados de treinamento com detalhamento suficiente
+    para avaliar representatividade em relação à população alvo
+    brasileira e potencial de vieses;
+    III - definição clara do papel do SaMD com IA/ML no fluxo clínico:
+    se atua como ferramenta de suporte à decisão (com supervisão humana)
+    ou como sistema autônomo;
+    IV - quando o SaMD operar como sistema autônomo sem supervisão
+    direta de profissional de saúde, o nível de evidência clínica
+    exigido será correspondente ao risco adicional;
+    V - plano de predetermined change control que defina o envelope
+    de mudanças esperadas do modelo e os critérios para determinar
+    se uma alteração está dentro do envelope aprovado.
+
+    Parágrafo único. O fabricante deve declarar na rotulagem que o
+    SaMD utiliza IA/ML, descrevendo de forma acessível ao usuário
+    pretendido o papel do algoritmo na saída clínica.
+guidance:
+  prose: |
+    O art. 23 estabelece requisitos especificos para SaMD com IA/ML,
+    refletindo os desafios regulatorios unicos de algoritmos adaptativos
+    em contexto clinico.
+
+    **Tipos de SaMD com IA/ML:**
+    1. Locked algorithm: modelo fixo, nao muda apos deploy
+       -> Processo regulatorio padrao com documentacao de modelo
+    2. Adaptive algorithm: modelo atualizado periodicamente com dados novos
+       -> Exige predetermined change control plan (PCCP)
+    3. Continuously learning: modelo atualiza em tempo real
+       -> Maior exigencia regulatoria, supervisao continua
+
+    **Predetermined Change Control Plan (PCCP):**
+    Conceito adotado do FDA AI/ML framework. O PCCP define:
+    - Que tipos de mudancas sao esperados (retrain, fine-tune, feature add)
+    - Criterios de aceitacao para modelo atualizado
+    - Processo de validacao para cada tipo de mudanca
+    - Envelope de desempenho aceitavel (limites de metricas)
+    - Gatilhos para reclassificacao regulatoria
+
+    **Documentacao de dados de treinamento:**
+    O fabricante deve descrever:
+    - Fonte dos dados (hospitais, estudos, bancos publicos)
+    - Tamanho e distribuicao demografica
+    - Processo de anotacao e qualidade dos rotulos
+    - Limitacoes e vieses conhecidos
+    - Representatividade para populacao brasileira
+
+    **Supervisao humana vs. autonomia:**
+    A RDC 657 diferencia SaMD com IA que opera sob supervisao humana
+    (profissional valida saida antes de decisao clinica) daquele que
+    opera autonomamente (saida clinica diretamente ao paciente).
+    A autonomia implica maior risco e maior exigencia de evidencia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para SaMD com IA/ML:**
+      1. Implementar MLOps pipeline completo com rastreabilidade de
+         experimentos: dados de treino, hiperparametros, metricas,
+         artefatos de modelo, tudo versionado e reproduzivel.
+      2. Configurar model registry com metadados regulatorios: tipo
+         de algoritmo, dados de treino (hash + descricao), metricas
+         de desempenho, status regulatorio, PCCP associado.
+      3. Implementar sistema de versionamento de dados de treinamento
+         (DVC, LakeFS) com rastreabilidade de procedencia e controle
+         de acesso.
+      4. Provisionar infraestrutura de retraining controlado: ambiente
+         isolado, validacao automatica de modelo retreinado contra
+         criterios do PCCP, aprovacao antes de deploy.
+    tools:
+      - mlflow
+      - model-registry
+      - dvc
+      - mlops-pipeline
+  devsecops:
+    prose: |
+      **Pipeline MLOps regulatorio:**
+      1. Implementar pipeline de treinamento reproduzivel: dados
+         versionados + codigo versionado + ambiente reproducivel =
+         modelo reproduzivel com hash verificavel.
+      2. Criar gate de validacao de modelo que verifica: metricas de
+         desempenho global, metricas por subgrupo (fairness), metricas
+         de robustez (adversarial), tudo contra limiares do PCCP.
+      3. Automatizar geracao de model card como artefato de pipeline:
+         tipo de modelo, dados de treino, metricas, limitacoes, vieses,
+         uso pretendido, conforme template regulatorio.
+      4. Implementar verificacao automatica de envelope PCCP: comparar
+         metricas do modelo retreinado com envelope aprovado, bloquear
+         deploy se fora do envelope e escalar para avaliacao regulatoria.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - model-card-generator
+      - pccp-validator
+  secops:
+    prose: |
+      **Governanca de IA/ML em SaMD:**
+      1. Manter documentacao de modelo de IA/ML conforme art. 23,
+         incluindo: algoritmo, dados, treinamento, metricas, limitacoes,
+         vieses, papel clinico, nivel de autonomia.
+      2. Implementar PCCP documentado e aprovado para cada SaMD com
+         IA/ML adaptativo, com revisao anual e apos mudancas
+         significativas no modelo ou nos dados.
+      3. Garantir transparencia na rotulagem: declaracao clara de uso
+         de IA/ML, descricao acessivel do papel do algoritmo, limitacoes
+         comunicadas ao usuario pretendido.
+      4. Monitorar evolucao regulatoria de IA em saude (FDA PCCP,
+         EU AI Act, IMDRF guidance) e atualizar processos internos
+         conforme novas diretrizes.
+    tools:
+      - grc-platform
+      - model-documentation
+      - regulatory-intelligence
+      - labeling-management
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-6", "art-9", "art-11", "annex-III"]
+    relationship: mapped
+  - framework_id: cfm-ia
+    articles: ["art-3", "art-5"]
+    relationship: complements

@@ -1,0 +1,87 @@
+id: pin-15
+family: pin-ops
+title: "Personnel Security for PIN Operations"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Personnel with access to PIN processing systems, cryptographic keys, or security-
+    sensitive functions must be subject to background verification, security awareness
+    training, and formal authorization procedures. All personnel involved in key management
+    functions must be formally designated as key custodians, with their roles and
+    responsibilities documented. Dual control must be enforced for all sensitive operations
+    involving PIN keys, meaning that no single individual can perform a complete key
+    management operation alone. Split knowledge must be maintained such that no single
+    individual possesses or has access to the complete value of any cryptographic key. Key
+    custodians must acknowledge in writing their understanding of the security responsibilities
+    associated with their role.
+
+guidance:
+  prose: >-
+    Personnel security is a critical but often underestimated control in PIN security.
+    Insider threats — whether from malicious intent or social engineering — represent a
+    significant attack vector because personnel with key custodian roles have direct access
+    to the cryptographic material that protects PINs. Dual control ensures that collusion
+    between at least two trusted individuals is required for any key compromise, raising
+    the barrier for insider attacks. Background verification should include criminal history
+    checks, financial integrity checks (to identify individuals vulnerable to bribery), and
+    verification of employment history. Security awareness training must cover specific PIN
+    security threats including social engineering attacks targeting key custodians.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 5"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) for all PIN processing systems with
+      least-privilege enforcement. Configure HSM access controls to require multi-party
+      authentication (e.g., M-of-N smart card authentication) for administrative
+      operations. Deploy privileged access management (PAM) solutions to control and
+      monitor access to PIN processing infrastructure. Implement automated enforcement
+      of separation of duties in key management workflows, preventing single-user
+      completion of key generation, distribution, or destruction operations.
+    tools:
+      - cyberark
+      - hashicorp-vault-enterprise
+      - okta
+      - active-directory
+      - hsm-access-control
+  devsecops:
+    prose: >-
+      Implement access control tests in CI/CD pipelines that verify RBAC enforcement
+      on PIN processing APIs. Scan IAM configurations for overly permissive roles or
+      policy exceptions. Test dual-control enforcement by simulating single-user key
+      management attempts and verifying they are rejected. Automate review of user
+      provisioning workflows for PIN systems.
+    tools:
+      - gitlab-sast
+      - scanner-iac-scanning
+      - checkov
+      - opa-conftest
+  secops:
+    prose: >-
+      Monitor privileged access to PIN processing systems using PAM session recording.
+      Audit key custodian rosters quarterly and verify all custodians have current
+      background checks and signed acknowledgments. Review access logs for PIN systems
+      to detect unauthorized access attempts or privilege escalation. Conduct annual
+      security awareness testing (phishing simulations, social engineering tests)
+      targeting personnel with PIN operations access.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark
+      - knowbe4
+      - sailpoint
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-7.1", "req-8.1", "req-12.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PS-3", "PS-4", "PS-6", "AC-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.6.1", "A.6.2", "A.6.4", "A.6.5"]
+    relationship: mapped

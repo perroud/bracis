@@ -1,0 +1,105 @@
+id: bpf-4
+family: integridade
+title: "Electronic Signatures for Manufacturing Records"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    Assinaturas eletrônicas utilizadas em registros de fabricação de
+    medicamentos devem ser equivalentes em confiabilidade e rastreabilidade
+    às assinaturas manuscritas que substituem. Cada assinatura eletrônica
+    deve ser vinculada de forma inequívoca ao signatário e ao registro
+    assinado, sendo única para cada indivíduo e intransferível.
+
+    O sistema de assinatura eletrônica deve exigir autenticação do signatário
+    no momento da assinatura, incluindo no mínimo a combinação de
+    identificação do usuário e senha individual. Para operações críticas
+    (liberação de lote, aprovação de desvios, aprovação de mudanças), a
+    autenticação deve incluir fator adicional de verificação.
+
+    As assinaturas eletrônicas devem incluir: identidade do signatário,
+    data e hora da assinatura, e o significado da assinatura (aprovação,
+    revisão, verificação, rejeição). Assinaturas não devem ser copiáveis,
+    reutilizáveis ou transferíveis entre registros.
+guidance:
+  prose: |
+    Electronic signatures in GMP manufacturing must comply with both
+    RDC 658/2022 and the principles established in 21 CFR Part 11 and
+    EU Annex 11, which serve as international benchmarks.
+
+    Key requirements for electronic signatures:
+    - Each signature event requires active authentication (no cached
+      credentials or auto-signing)
+    - Signature meaning must be captured (what action is being authorized)
+    - Signatures must be permanently linked to the signed record
+    - Failed signature attempts must be logged
+    - Administrator functions must not allow signature reassignment
+    - Signature policy must define which operations require electronic
+      signatures and the required authority level
+
+    Critical operations requiring electronic signatures include:
+    batch release, deviation approval, change control approval, OOS
+    investigation closure, reprocessing authorization, and quality
+    review sign-off.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement electronic signature service with cryptographic binding
+         between the signature, the signer identity, and the signed record
+         content. Use digital signatures (PKI-based) for critical operations.
+      2. Configure multi-factor authentication for electronic signatures
+         on critical operations: combine user ID + password with a second
+         factor (token, biometric, or certificate).
+      3. Deploy signature verification service that validates signature
+         integrity and detects any post-signature modification of the
+         signed record.
+      4. Implement signature audit logging capturing: signer identity,
+         timestamp, signature meaning, record identifier, authentication
+         method used, and any failed attempts.
+    tools:
+      - pki-infrastructure
+      - mfa-service
+      - digital-signature-platform
+      - signature-audit-logging
+  devsecops:
+    prose: |
+      1. Test electronic signature binding: verify that signed records
+         cannot be modified without invalidating the signature and
+         triggering an alert.
+      2. Validate that signature authentication enforces real-time
+         credential verification (no cached or pre-authorized signatures).
+      3. Test signature non-repudiation: verify that signatures cannot
+         be copied, reassigned, or transferred between records.
+      4. Include electronic signature validation in the CI pipeline
+         for every release of systems that implement signing workflows.
+    tools:
+      - gitlab-ci
+      - signature-testing
+      - authentication-testing
+      - security-testing
+  secops:
+    prose: |
+      1. Define electronic signature policy specifying which manufacturing
+         operations require signatures, the authority levels needed, and
+         the authentication requirements for each signature type.
+      2. Conduct periodic audits of electronic signature usage: verify
+         signatures are authentic, review failed signature attempts, and
+         check for shared credential incidents.
+      3. Manage signer credentials lifecycle: provisioning, periodic
+         renewal, suspension for inactive users, and immediate revocation
+         upon role change or termination.
+      4. Investigate and document any electronic signature anomalies
+         (failed attempts, unusual timing, proxy signing) as potential
+         data integrity incidents.
+    tools:
+      - grc-platform
+      - identity-management
+      - signature-audit-review
+      - incident-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-21", "art-22"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-17", "controle-A-8-5"]
+    relationship: mapped

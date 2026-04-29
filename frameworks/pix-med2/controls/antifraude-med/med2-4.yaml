@@ -1,0 +1,95 @@
+id: med2-4
+family: antifraude-med
+title: "Well-Founded Suspicion of Fraud Criteria"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP pagador deve estabelecer critérios objetivos e documentados para a avaliação de fundada
+    suspeita de fraude que justifique a abertura de notificação de infração no DICT e o consequente
+    acionamento do MED. Os critérios devem considerar, no mínimo: a manifestação do usuário
+    pagador relatando a fraude; a análise do contexto da transação pelo motor antifraude do PSP;
+    o histórico transacional do usuário pagador; a verificação de marcações prévias de fraude no
+    DICT associadas à chave Pix ou à conta do recebedor; e quaisquer outros elementos que
+    permitam ao PSP formar convicção fundamentada sobre a ocorrência de fraude. O PSP deve
+    documentar a análise realizada e os fundamentos da decisão de acionar ou não o MED.
+guidance:
+  prose: |
+    **Well-Founded Suspicion:**
+    MED 2.0 raises the bar for what constitutes actionable fraud suspicion. PSPs cannot
+    trigger MED casually — each activation must be supported by documented evidence.
+
+    **Minimum Criteria:**
+    1. **User report:** The payer must have reported the transaction as fraudulent.
+       Self-reported fraud is necessary but not sufficient.
+    2. **Anti-fraud engine analysis:** The PSP's fraud detection system must have
+       evaluated the transaction context (device, location, amount, timing).
+    3. **Transaction history:** Comparison with the payer's normal transaction patterns.
+    4. **DICT markers:** Check whether the receiver's Pix key or account has prior
+       fraud markers in the DICT.
+    5. **Additional signals:** Device compromise indicators, social engineering patterns,
+       account takeover indicators.
+
+    **Documentation requirement:** Every MED activation decision (positive or negative)
+    must be recorded with the evidence considered and the reasoning applied. This audit
+    trail is critical for BCB supervision and dispute resolution.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a MED triage service that aggregates signals from multiple sources: user
+         complaint, anti-fraud engine score, DICT fraud markers, transaction history
+         analytics.
+      2. Implement a decision engine with configurable rules that evaluates the aggregated
+         signals against the well-founded suspicion threshold. The threshold should be
+         tunable to balance fraud prevention vs. false positives.
+      3. Create a structured decision record for each MED evaluation: input signals,
+         rule evaluations, final decision, timestamp, analyst (if manual review).
+      4. Integrate with the DICT API to query fraud markers in real-time during the
+         triage process.
+      5. Build an admin interface for compliance teams to review and audit MED activation
+         decisions.
+    tools:
+      - rules-engine
+      - fraud-scoring-engine
+      - dict-api-client
+      - audit-logging
+      - admin-portal
+  devsecops:
+    prose: |
+      1. Test the decision engine with a labeled dataset of known fraud and non-fraud
+         cases — verify accuracy meets internal targets.
+      2. Test DICT marker integration: accounts with and without prior fraud markers.
+      3. Validate that every MED decision (activate or reject) produces a complete audit
+         record with all required fields.
+      4. Test edge cases: user reports fraud on a legitimate transaction, user reports
+         fraud after 24+ hours, multiple users report the same receiver.
+      5. Regression tests to ensure threshold changes do not inadvertently alter
+         decisions on historical cases.
+    tools:
+      - gitlab-ci
+      - ml-testing
+      - integration-testing
+      - data-validation
+  secops:
+    prose: |
+      1. Review a sample of MED activation decisions weekly to ensure criteria are
+         applied consistently and documentation is complete.
+      2. Track false positive rate: MED activations that result in an improcedente
+         (unfounded) verdict, and investigate root causes.
+      3. Monitor for MED abuse patterns: users repeatedly reporting legitimate
+         transactions as fraud (friendly fraud).
+      4. Maintain metrics: MED activations per day, approval rate, average time to
+         decision, false positive rate.
+      5. Report well-founded suspicion criteria effectiveness to BCB as required.
+    tools:
+      - quality-assurance
+      - analytics-dashboard
+      - case-management
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-17", "pix-19"]
+    relationship: extends
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: complements

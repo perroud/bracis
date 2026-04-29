@@ -1,0 +1,102 @@
+id: tds-ops-2
+family: tds-ops
+title: "Change Management and Secure Development for 3DS Systems"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    A formal change management process must be established for all changes
+    to 3DS system components, including infrastructure, application code,
+    and configurations. All changes must be documented, tested in a
+    non-production environment, approved by authorized personnel, and
+    include rollback procedures before deployment to production. Custom
+    software developed for the 3DS environment must follow secure
+    development practices including secure coding guidelines, code review
+    by personnel other than the author, and security testing prior to
+    release. Development, testing, and production environments must be
+    separated, and production data must not be used in development or
+    testing environments.
+
+guidance:
+  prose: >-
+    Uncontrolled changes are a primary cause of security incidents and
+    service disruptions. Formal change management ensures that every
+    modification to the 3DS environment is deliberate, tested, and
+    reversible. Secure development practices address the risk of
+    introducing vulnerabilities through custom code. Code review by
+    independent reviewers catches defects and security issues that the
+    author may overlook. Environment separation prevents data leakage
+    and ensures that development activities cannot affect production
+    security. Rollback procedures are essential for rapid recovery when
+    changes cause unexpected issues.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 6 — Change Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 6.2 — Secure Development and Change Control"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps workflows where all 3DS infrastructure and
+      configuration changes are made through version-controlled merge
+      requests. Require approvals from designated reviewers before any
+      change can be merged and deployed. Maintain separate Kubernetes
+      namespaces or cloud accounts for development, staging, and
+      production 3DS environments. Implement automated rollback
+      capabilities using blue-green or canary deployment strategies.
+      Enforce data masking or synthetic data generation for non-production
+      environments.
+    tools:
+      - gitlab
+      - argocd
+      - flux
+      - terraform
+      - kubernetes
+      - helm
+
+  devsecops:
+    prose: >-
+      Enforce mandatory code review through branch protection rules
+      requiring at least two approvals including one from a security-
+      qualified reviewer. Integrate SAST, SCA, and secret scanning into
+      merge request pipelines. Implement automated security testing gates
+      that must pass before deployment. Use container image signing to
+      ensure only reviewed and approved images are deployed to 3DS
+      production. Maintain secure coding guidelines as a living document
+      updated with new vulnerability patterns.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - semgrep
+      - snyk
+      - cosign
+      - trivy
+
+  secops:
+    prose: >-
+      Review change management logs to verify all production changes
+      followed the approved process. Monitor for unauthorized changes
+      through file integrity monitoring and configuration drift detection.
+      Investigate any emergency changes and ensure retroactive
+      documentation and approval. Conduct periodic assessments of the
+      change management process effectiveness. Verify environment
+      separation through periodic testing.
+    tools:
+      - servicenow
+      - jira
+      - splunk
+      - wazuh
+      - ossec
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6", "req-12"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "SA-11", "SA-15"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.25", "A8.31"]
+    relationship: mapped

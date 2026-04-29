@@ -1,0 +1,94 @@
+id: cry-2
+family: cry
+title: "Encryption of Data at Rest and in Transit"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall encrypt cloud customer data at rest using
+    state-of-the-art encryption methods. Data in transit between the
+    cloud customer and the cloud service, as well as data in transit
+    between data centres of the cloud provider, shall be encrypted
+    using secure transport protocols. The cloud provider shall
+    document and make transparent to the cloud customer which
+    encryption methods and key lengths are used.
+
+guidance:
+  prose: >-
+    Encryption of data at rest protects against unauthorized access to
+    stored data, including scenarios involving physical media theft or
+    unauthorized administrative access. Encryption of data in transit
+    protects against interception and eavesdropping. The cloud provider
+    must use current state-of-the-art methods — AES-256 is the current
+    standard for data at rest, and TLS 1.2 or higher for data in
+    transit. The encryption implementation must be transparent to
+    customers, who need to understand what is encrypted, with what
+    algorithms, and who controls the keys, in order to meet their own
+    compliance obligations.
+
+references:
+  - citation: "C5:2020, CRY-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enable encryption at rest by default for all storage services
+      (block storage, object storage, databases, file systems) using
+      AES-256 with platform-managed or customer-managed keys. Configure
+      TLS 1.2+ enforcement on all load balancers, API gateways, and
+      service meshes. Implement mutual TLS (mTLS) for service-to-service
+      communication within the platform. Use infrastructure-as-code
+      to enforce encryption configurations and prevent deployment of
+      unencrypted resources. Document encryption configurations in the
+      service catalog for customer transparency.
+    tools:
+      - terraform
+      - vault
+      - cert-manager
+      - istio
+      - linkerd
+      - aws-kms
+      - azure-key-vault
+
+  devsecops:
+    prose: >-
+      Enforce encryption-at-rest and encryption-in-transit requirements
+      as mandatory CI/CD pipeline checks. Block deployments that create
+      unencrypted storage resources or expose services without TLS.
+      Validate TLS certificate configurations, cipher suite selections,
+      and protocol versions in deployment manifests. Include encryption
+      validation in integration test suites.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - trivy
+      - testssl
+
+  secops:
+    prose: >-
+      Continuously scan the environment for unencrypted storage resources
+      and unencrypted communication channels. Alert on TLS configuration
+      degradation (e.g., fallback to TLS 1.0/1.1, weak cipher suites).
+      Monitor certificate lifecycle events and alert on approaching
+      expirations. Generate encryption coverage reports for compliance
+      evidence and customer transparency.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys
+      - aws-config
+      - azure-policy
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.24"]
+    relationship: mapped
+  - framework_id: nist-800-53
+    articles: ["SC-8", "SC-28"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["CEK-03", "DSP-05"]
+    relationship: mapped

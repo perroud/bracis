@@ -1,0 +1,118 @@
+id: art-6
+family: cap-2
+title: "Publicacao e Comunicacao da Politica"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 6. Os agentes do setor elétrico devem garantir que a política de segurança
+    cibernética seja comunicada a todos os colaboradores, prestadores de serviço e
+    terceiros com acesso a sistemas críticos, de forma clara e adequada ao nível de
+    responsabilidade de cada parte.
+
+    Parágrafo 1. A política deve estar disponível para consulta da ANEEL a qualquer
+    momento, podendo ser solicitada em processos de fiscalização e auditoria.
+
+    Parágrafo 2. As partes com acesso a sistemas de controle industrial do agente
+    devem receber treinamento específico sobre os riscos cibernéticos e suas
+    responsabilidades conforme a política.
+guidance:
+  prose: |
+    O art. 6 trata da dimensao humana da seguranca cibernetica, reconhecendo que
+    a tecnologia sozinha nao e suficiente. O fator humano e frequentemente o vetor
+    de entrada em incidentes ciberneticos no setor eletrico.
+
+    **Segmentacao de publico:**
+    A comunicacao eficaz requer adaptacao ao perfil de cada publico:
+    - Alta administracao: impacto de negocio, responsabilidade regulatoria, riscos reputacionais
+    - Equipes IT: controles tecnicos, procedimentos de incidente, gestao de patches
+    - Equipes OT (engenheiros de campo, operadores SCADA): riscos especificos de ICS,
+      procedimentos de acesso seguro, relato de anomalias
+    - Terceiros e fornecedores: requisitos contratuais, procedimentos de acesso remoto,
+      obrigacoes de reporte
+
+    **Treinamento especifico para OT:**
+    O paragrafo 2 exige treinamento especifico para quem acessa sistemas ICS.
+    Esse treinamento deve cobrir:
+    - Riscos de seguranca em ambientes OT (diferentes de IT)
+    - Procedimentos de acesso seguro (uso de jump servers, proibicao de USB)
+    - Reconhecimento de comportamentos anomalos em sistemas SCADA
+    - Procedimentos de relato de incidentes e anomalias
+    - Consequencias de violacoes de seguranca (para o SIN e para o individuo)
+
+    **Disponibilidade para a ANEEL:**
+    A ANEEL pode requisitar a politica a qualquer tempo. O agente deve ser capaz
+    de fornecer imediatamente a versao vigente e demonstrar que e efetivamente
+    comunicada e implementada (nao apenas um documento de gaveta).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Construir infraestrutura tecnica para suporte ao programa de conscientizacao:
+
+      1. Portal de politicas e documentacao tecnica (Confluence, Notion, GitLab Wiki)
+         com controle de acesso baseado em perfil (colaboradores, terceiros, fornecedores)
+      2. Sistema de Learning Management (LMS) com trilhas de treinamento diferenciadas
+         por perfil (IT, OT, admin, terceiros)
+      3. Modulo de treinamento especifico para operadores SCADA e engenheiros de campo,
+         com simulacoes de cenarios de ataque ICS (phishing industrial, USB drop, etc.)
+      4. Dashboard de conformidade de treinamento: percentual de conclusao por
+         departamento, alertas para vencimentos, relatorio para auditoria ANEEL
+      5. Gestao de identidade de terceiros: portal de onboarding de fornecedores
+         com obrigatoriedade de conclusao de treinamento antes da concessao de acesso
+    tools:
+      - gitlab-wiki
+      - confluence
+      - moodle
+      - successfactors
+      - servicenow-hrsd
+  devsecops:
+    prose: |
+      Automatizar o controle de comunicacao e treinamento como prerequisito de acesso:
+
+      1. Pipeline de onboarding: bloquear provisionamento de acesso a sistemas OT
+         para usuarios que nao completaram o treinamento obrigatorio
+      2. Integracao LMS + IAM: acesso automaticamente revogado quando treinamento
+         vence (anual ou conforme politica)
+      3. Registro imutavel de conclusao de treinamento (logs auditaveis para ANEEL)
+      4. Gestao de fornecedores via portal: assinatura digital dos termos de uso
+         da politica como prerequisito de acesso remoto a sistemas OT
+
+      Manter versao da politica em repositorio Git publico interno com historico
+      completo de todas as versoes e aprovacoes para demonstrar evolucao ao longo
+      do tempo em auditorias.
+    tools:
+      - gitlab
+      - gitlab-ci
+      - okta
+      - azure-ad
+      - docusign
+  secops:
+    prose: |
+      Gerenciar programa de conscientizacao e demonstrar conformidade para a ANEEL:
+
+      1. Matriz de treinamento: mapear quais treinamentos sao obrigatorios para
+         cada perfil (com diferencas entre IT, OT, admins, terceiros)
+      2. Metricas de conformidade: % de conclusao por departamento, tempo medio
+         de conclusao, taxas de reprovacao
+      3. Simulacoes de phishing especificas para o setor eletrico: simular
+         ataques direcionados (spear phishing para operadores SCADA, emails
+         simulando ANEEL, ONS, fornecedores de SCADA)
+      4. Processo de aprovacao de acesso de terceiros: verificacao de treinamento
+         antes de emitir credenciais de acesso
+      5. Relatorio anual de conformidade de treinamento para apresentar a ANEEL
+         em caso de fiscalizacao
+    tools:
+      - knowbe4
+      - proofpoint-security-awareness
+      - grc-platform
+      - servicenow-grc
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-004-R1", "CIP-004-R2"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.6.3", "A.6.6"]
+    relationship: supports

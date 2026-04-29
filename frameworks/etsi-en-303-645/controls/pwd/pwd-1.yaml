@@ -1,0 +1,90 @@
+id: pwd-1
+family: pwd
+title: "No Universal Default Passwords"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Where passwords are used and in any state other than the factory default, all consumer
+    IoT device passwords shall be unique per device or defined by the user. Where
+    pre-installed unique per device passwords are used, these shall be generated with a
+    mechanism that reduces the risk of automated attacks against a class or type of device.
+
+guidance:
+  prose: >-
+    Universal default passwords are one of the most prevalent security weaknesses in consumer
+    IoT products. Attackers exploit well-known factory credentials to compromise entire product
+    lines at scale, as demonstrated by the Mirai botnet. This provision mandates that every
+    device either ships with a cryptographically generated unique password or requires the user
+    to set one during initial setup. The password generation mechanism must produce sufficient
+    entropy to resist brute-force and dictionary attacks. Passwords such as "admin/admin" or
+    "12345678" shared across all units of a product are explicitly prohibited.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.1-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design the device provisioning pipeline to generate unique, high-entropy passwords for
+      each unit during manufacturing. Integrate a hardware security module (HSM) or secure
+      element into the manufacturing line to produce cryptographically random credentials.
+      Store the per-device password in a secure, write-once memory area. Provide a secure
+      enrollment API that allows the user to change the factory-assigned password during
+      initial setup. Implement password complexity requirements in the device firmware that
+      reject weak user-defined passwords. Maintain an audit trail of credential provisioning
+      in the manufacturing execution system.
+    tools:
+      - hsm
+      - secure-element
+      - vault
+      - manufacturing-execution-system
+      - firmware-build-system
+
+  devsecops:
+    prose: >-
+      Implement static analysis rules that detect hardcoded credentials in firmware source
+      code. Add CI/CD pipeline checks that scan firmware images for known default password
+      patterns and fail the build if found. Use secret scanning tools to ensure passwords and
+      keys are never committed to source control. Test the password generation mechanism for
+      sufficient entropy using automated randomness tests. Include credential uniqueness
+      verification in integration test suites that validate no two test devices share the
+      same factory password.
+    tools:
+      - semgrep
+      - gitlab-secret-detection
+      - bandit
+      - firmware-analysis-toolkit
+      - binwalk
+
+  secops:
+    prose: >-
+      Monitor for brute-force login attempts against device management interfaces and
+      alert on patterns indicating default credential exploitation. Scan deployed device
+      fleets for units still using factory default passwords and flag them for remediation.
+      Integrate device credential status into the vulnerability management dashboard. Conduct
+      periodic penetration tests that specifically target default and weak credential
+      scenarios. Maintain a threat intelligence feed for known default credentials associated
+      with the product line.
+    tools:
+      - nessus
+      - shodan
+      - splunk
+      - elastic-siem
+      - rapid7-insightvm
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-1.1", "SR-1.3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "IA-5(1)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.17", "A.8.5"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V2.1.1", "V2.1.7"]
+    relationship: complements

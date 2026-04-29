@@ -1,0 +1,108 @@
+id: art-7
+family: cap-2
+title: "Telediagnostico -- Emissao de Laudos a Distancia"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 7. O telediagnóstico consiste na emissão de laudo ou parecer
+    médico a distância, baseado em dados e imagens transmitidos
+    eletronicamente por meio de tecnologia de comunicação.
+
+    Parágrafo 1. O médico emissor do laudo a distância deve ter
+    competência técnica e habilitação legal para emissão do laudo
+    na especialidade em questão.
+
+    Parágrafo 2. Os dados e imagens transmitidos para telediagnóstico
+    devem preservar a qualidade necessária para análise diagnóstica
+    fidedigna, sendo vedada a emissão de laudo com base em dados
+    ou imagens de qualidade insuficiente.
+
+    Parágrafo 3. O laudo emitido por telediagnóstico deve conter
+    identificação do médico emissor, número de registro no CRM,
+    data e hora da emissão e assinatura digital.
+guidance:
+  prose: |
+    O art. 7 regula a emissao de laudos medicos a distancia, pratica
+    comum em radiologia, cardiologia, patologia e outras especialidades
+    diagnosticas.
+
+    **Qualidade de dados transmitidos (paragrafo 2):**
+    A vedacao de laudos com dados insuficientes implica que sistemas
+    de telediagnostico devem:
+    - Validar qualidade de imagem antes de permitir transmissao
+    - Manter formato DICOM para imagens medicas com todos os metadados
+    - Garantir compressao sem perda (lossless) para imagens diagnosticas
+    - Verificar integridade de dados apos transmissao (checksum)
+
+    **Assinatura digital (paragrafo 3):**
+    Laudos emitidos por telediagnostico devem possuir assinatura
+    digital com certificado ICP-Brasil, garantindo autenticidade,
+    integridade e nao repudio. Assinaturas eletronicas simples nao
+    atendem este requisito.
+
+    **Habilitacao do medico (paragrafo 1):**
+    O sistema deve verificar que o medico possui titulo de especialista
+    ou residencia medica na area do laudo emitido, alem de CRM ativo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de telediagnostico:**
+      1. Implementar transmissao de imagens DICOM com compressao
+         lossless, validacao de qualidade automatica e verificacao
+         de integridade pos-transmissao (hash SHA-256).
+      2. Integrar sistema de assinatura digital ICP-Brasil para
+         laudos medicos, com verificacao automatica de validade
+         do certificado do medico.
+      3. Implementar verificacao automatica de habilitacao do
+         medico na especialidade do laudo solicitado.
+      4. Criar repositorio seguro de laudos com versionamento,
+         rastreabilidade e backup georedundante.
+      5. Implementar validacao de qualidade de imagem pre-envio
+         que alerte operador quando resolucao ou contraste estao
+         abaixo do limiar diagnostico.
+    tools:
+      - dicom-server
+      - pacs-integration
+      - digital-signature-icp
+      - image-quality-validation
+  devsecops:
+    prose: |
+      **Pipeline de qualidade para telediagnostico:**
+      1. Testar integridade de imagens DICOM apos transmissao,
+         comparando hash de origem e destino.
+      2. Validar que assinatura digital ICP-Brasil e aplicada
+         corretamente em todos os laudos gerados pela plataforma.
+      3. Implementar testes de carga para transmissao de imagens
+         de alta resolucao (mamografias, tomografias).
+      4. Verificar que metadados DICOM sao preservados durante
+         todo o fluxo de transmissao e armazenamento.
+    tools:
+      - gitlab-ci
+      - dicom-testing
+      - digital-signature-testing
+      - data-integrity-testing
+  secops:
+    prose: |
+      **Operacao de telediagnostico:**
+      1. Auditar que todos os laudos emitidos possuem assinatura
+         digital ICP-Brasil valida e identificacao completa do
+         medico emissor.
+      2. Monitorar qualidade de imagens transmitidas e rejeicao
+         automatica de imagens abaixo do limiar diagnostico.
+      3. Verificar periodicamente que medicos emissores possuem
+         habilitacao na especialidade dos laudos emitidos.
+      4. Manter registro de tempo entre solicitacao e emissao de
+         laudo para monitoramento de SLA clinico.
+    tools:
+      - audit-trail
+      - image-quality-monitoring
+      - credential-verification
+      - sla-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-c-1", "164.312-e-1"]
+    relationship: mapped

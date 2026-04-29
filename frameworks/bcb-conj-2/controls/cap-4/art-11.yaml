@@ -1,0 +1,205 @@
+id: art-11
+family: cap-4
+title: "Testes de Resiliencia Cibernetica"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 11. As instituições referidas no art. 1 devem realizar, periodicamente,
+    testes de resiliência cibernética, com o objetivo de avaliar a capacidade da
+    instituição de prevenir, detectar, responder e recuperar-se de incidentes de
+    segurança.
+
+    § 1º Os testes de que trata o caput devem incluir, no mínimo:
+    I - simulações de incidentes de segurança, incluindo cenários de ataques
+    cibernéticos;
+    II - avaliação da eficácia dos controles de segurança implementados;
+    III - avaliação da capacidade de resposta da equipe responsável pelo
+    gerenciamento de incidentes.
+
+    § 2º Os resultados dos testes devem ser documentados e apresentados à
+    diretoria da instituição, acompanhados de plano de ação para correção das
+    deficiências identificadas.
+guidance:
+  prose: |
+    O art. 11 exige testes periodicos de resiliencia cibernetica que validem
+    toda a cadeia de resposta a incidentes. Os testes devem cobrir as quatro
+    funcoes do ciclo de seguranca: prevenir, detectar, responder e recuperar.
+
+    **Tipos de teste recomendados:**
+
+    **I - Simulacoes de incidentes:**
+    - Tabletop exercises: exercicios de mesa com cenario narrado, sem impacto
+      em producao. Envolvem decisores e equipe tecnica discutindo respostas.
+    - Exercicios tecnicos: simulacoes em ambiente controlado com atividades
+      reais (ex: simular DDoS em staging, testar failover).
+    - Red team engagements: testes ofensivos realistas com equipe interna ou
+      contratada tentando comprometer sistemas.
+    - Purple team: red team + blue team trabalhando colaborativamente.
+    - Exercicios setoriais: coordenados pelo BCB ou FEBRABAN, envolvendo
+      multiplas instituicoes.
+
+    Cenarios recomendados:
+    - Ransomware em sistemas criticos
+    - DDoS em canais digitais
+    - Vazamento massivo de dados de clientes
+    - Comprometimento de credenciais de administradores
+    - Supply chain attack via fornecedor critico
+    - Insider threat com acesso privilegiado
+    - Ataque ao PIX/SPB
+
+    **II - Eficacia dos controles:**
+    Avaliar se os controles tecnicos e organizacionais funcionam como esperado:
+    - Firewall e WAF bloqueiam ataques simulados?
+    - SIEM detecta atividade maliciosa?
+    - EDR contem malware simulado?
+    - Backups permitem recuperacao?
+    - Segmentacao de rede impede movimentacao lateral?
+    - MFA resiste a ataques de credential stuffing?
+
+    **III - Capacidade da equipe:**
+    Avaliar a equipe de resposta em condicoes reais ou simuladas:
+    - Tempo de deteccao (MTTD) dentro do aceitavel?
+    - Tempo de contencao adequado?
+    - Comunicacao interna e externa fluida?
+    - Decisoes tomadas corretamente sob pressao?
+    - Escalacao funcionou conforme previsto?
+    - Notificacao ao BCB dentro do prazo de 24h?
+
+    **Documentacao e plano de acao (ss 2):**
+    Relatorio de testes deve conter:
+    - Metodologia utilizada
+    - Cenarios executados
+    - Resultados detalhados por cenario
+    - Gap analysis: o que funcionou vs. o que falhou
+    - Plano de acao com prazos e responsaveis para cada deficiencia
+    - Comparacao com testes anteriores (evolucao)
+    Apresentacao obrigatoria a diretoria para aprovacao do plano de acao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para testes de resiliencia:**
+      1. Ambiente isolado de testes (staging/sandbox) que replica producao para
+         simulacoes sem impacto em servicos reais.
+      2. Chaos engineering framework configurado (Chaos Monkey, Litmus, Gremlin)
+         para injetar falhas controladas.
+      3. Ferramentas de simulacao de ataque (Atomic Red Team, CALDERA, Infection
+         Monkey) integradas ao ambiente de teste.
+
+      **Automacao de testes de controle (inciso II):**
+      4. Testes automatizados de controles:
+         - Validacao de regras de firewall/WAF contra payloads de teste
+         - Verificacao de deteccao do SIEM contra eventos simulados
+         - Teste de bloqueio do EDR contra samples de malware de teste
+         - Validacao de backup e restore (RTO/RPO)
+         - Teste de failover automatico
+      5. Dashboard de resultados de testes com historico de evolucao.
+      6. Integracao com pipeline: testes de resiliencia executados periodicamente
+         como jobs agendados.
+
+      **Metricas de resiliencia:**
+      7. MTTD (Mean Time to Detect): tempo medio para detectar incidente simulado.
+      8. MTTC (Mean Time to Contain): tempo medio para conter incidente.
+      9. MTTR (Mean Time to Recover): tempo medio para recuperar operacoes.
+      10. Recovery success rate: percentual de testes de recuperacao bem-sucedidos.
+      11. Detection coverage: percentual de cenarios detectados pelo SIEM.
+    tools:
+      - chaos-engineering
+      - red-team-tools
+      - siem
+      - soar
+      - monitoring-alerting
+      - backup-recovery
+      - incident-management
+  devsecops:
+    prose: |
+      **Testes de resiliencia integrados ao pipeline:**
+      1. Security regression tests executados em CI para validar que controles
+         de seguranca permanecem eficazes apos cada mudanca.
+      2. Chaos tests em staging: injecao de falhas de rede, latencia e recursos
+         para validar resiliencia da aplicacao.
+      3. Fault injection tests para validar circuit breakers e fallbacks.
+      4. Canary analysis automatizada: comparar metricas de canary vs. producao
+         para detectar degradacoes sutis.
+
+      **Exercicios de resposta para desenvolvedores:**
+      5. Game days trimestrais envolvendo equipe de desenvolvimento.
+      6. Simulacao de rollback em producao para medir tempo de recuperacao.
+      7. Exercicio de hotfix: cenario de vulnerabilidade critica com pipeline
+         de emergencia.
+
+      **Documentacao de resultados no repositorio:**
+      8. Resultados de testes de resiliencia versionados no repositorio.
+      9. Gap analysis como issues no backlog com prioridade.
+      10. Metricas de resiliencia como parte do SLO do servico.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - canary-deployment
+      - feature-flags
+      - monitoring-alerting
+  secops:
+    prose: |
+      **Programa anual de testes de resiliencia:**
+      1. Calendario anual aprovado pela diretoria com tipos de teste por periodo:
+         - Trimestral: tabletop exercise com cenario diferente a cada vez
+         - Semestral: exercicio tecnico com equipe operacional
+         - Anual: red team engagement com escopo abrangente
+         - Ad-hoc: exercicio setorial quando convocado pelo BCB/FEBRABAN
+      2. Cenarios planejados cobrindo as ameacas mais relevantes ao setor:
+         - Ransomware, DDoS, data breach, credential compromise,
+           supply chain, insider, ataque ao SFN/PIX
+
+      **Execucao de simulacoes (inciso I):**
+      3. Tabletop exercises:
+         - Participantes: CSIRT, CISO, diretoria, juridico, comunicacao
+         - Duracao: 2-4 horas
+         - Cenario narrado com inject de novas informacoes
+         - Avaliacao de decisoes, comunicacao e coordenacao
+      4. Exercicios tecnicos:
+         - Equipe de SOC executa acoes de deteccao, contencao e recuperacao
+         - Tempo cronometrado para medir MTTD, MTTC, MTTR
+         - Avaliacao de uso de playbooks e ferramentas
+      5. Red team engagements:
+         - Escopo definido e aprovado pela diretoria
+         - Rules of engagement documentados
+         - Debrief conjunto (red team + blue team)
+
+      **Avaliacao de controles (inciso II):**
+      6. Checklist de controles a serem validados em cada teste.
+      7. Scoring de eficacia: cada controle recebe nota (eficaz/parcial/ineficaz).
+      8. Comparacao com teste anterior para medir evolucao.
+
+      **Avaliacao da equipe (inciso III):**
+      9. Criterios de avaliacao da equipe:
+         - Tempo de resposta vs. SLA
+         - Qualidade das decisoes
+         - Eficacia da comunicacao
+         - Aderencia aos playbooks
+         - Capacidade de improvisacao
+      10. Feedback individual e coletivo pos-exercicio.
+
+      **Relatorio e plano de acao (ss 2):**
+      11. Relatorio formal com metodologia, resultados e gap analysis.
+      12. Plano de acao com deficiencias priorizadas por risco.
+      13. Apresentacao a diretoria com recomendacoes.
+      14. Follow-up de implementacao das acoes corretivas.
+      15. Retencao de relatorios por minimo de 5 anos para auditoria.
+    tools:
+      - red-team-tools
+      - incident-management
+      - soar
+      - siem
+      - edr-xdr
+      - grc-platform
+      - forensic-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-8", "IR-3", "CP-4", "SI-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30"]
+    relationship: supports

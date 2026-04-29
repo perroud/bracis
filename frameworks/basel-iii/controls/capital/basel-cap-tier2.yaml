@@ -1,0 +1,103 @@
+id: basel-cap-tier2
+family: capital
+title: "Tier 2 Capital and Total Capital Adequacy Ratio"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain a minimum Total Capital ratio of 8% of risk-weighted assets (RWA),
+    composed of at least 6% Tier 1 capital (of which 4.5% must be CET1) and up to 2%
+    Tier 2 capital. Tier 2 capital includes subordinated debt with an original maturity of
+    at least five years, certain loan loss provisions (up to 1.25% of credit RWA under the
+    standardised approach), and instruments that absorb losses on a gone-concern basis. Tier
+    2 instruments must be contractually subordinated to depositors and general creditors,
+    must not be secured or covered by a guarantee of the issuer, and must not have
+    credit-sensitive dividend features. Tier 2 instruments are amortised on a straight-line
+    basis during the five years prior to maturity for the purpose of calculating eligible
+    Tier 2 capital. Additional Tier 1 (AT1) instruments — including contingent convertible
+    bonds (CoCos) with a CET1 trigger of at least 5.125% — bridge the gap between CET1 and
+    the 6% Tier 1 minimum.
+
+guidance:
+  prose: >-
+    Tier 2 capital serves as a second layer of protection to depositors and senior creditors
+    in a gone-concern resolution scenario. Issuers must assess the tax treatment of Tier 2
+    instruments in each jurisdiction and consider the regulatory phase-out schedule for
+    instruments that do not meet Basel III criteria. The inclusion of general provisions in
+    Tier 2 is capped at 1.25% of credit RWA under the standardised approach and at the
+    expected loss amount under the internal ratings-based (IRB) approach. Hybrid instruments
+    that previously counted as Tier 1 under Basel II are subject to grandfather provisions
+    and phase-out from 2013 to 2022. AT1 instruments, which absorb losses on a going-concern
+    basis through conversion to equity or write-down, must have the trigger and conversion/
+    write-down mechanism clearly specified in the terms and conditions. Supervisors in many
+    jurisdictions also require banks to maintain a minimum leverage ratio and MREL/TLAC
+    requirements that interact with the Tier 2 capital structure.
+
+references:
+  - citation: "BCBS, Basel III: A global regulatory framework for more resilient banks and banking systems, December 2010 (revised June 2011), Section 2"
+    url: "https://www.bis.org/publ/bcbs189.htm"
+  - citation: "BCBS, Criteria for identifying simple, transparent and comparable securitisations, July 2015"
+    url: "https://www.bis.org/bcbs/publ/d332.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a centralised capital instruments registry that records every Tier 1, AT1,
+      and Tier 2 instrument issued by the group, including ISIN, original nominal, issue
+      date, maturity, trigger levels, and amortisation schedule. Automate the calculation
+      of eligible Tier 2 after applying the five-year amortisation haircut and any
+      supervisory deductions. Integrate with bond administration and treasury management
+      systems (TMS) via APIs so that changes in outstanding notional are reflected
+      immediately in capital reporting dashboards. Build alerts that fire 12 months and 6
+      months before Tier 2 instruments fall below the five-year residual maturity threshold
+      so Treasury can plan refinancing.
+    tools:
+      - postgresql
+      - apache-kafka
+      - grafana
+      - terraform
+      - vault
+
+  devsecops:
+    prose: >-
+      Store capital instrument eligibility assessment models and eligibility criteria as
+      code in version-controlled repositories. Implement automated tests that validate
+      each instrument against Basel III eligibility criteria (subordination, maturity,
+      amortisation, discretionary distributions) whenever criteria or instrument parameters
+      are updated. Use CI/CD pipelines to promote capital calculation libraries through
+      development, UAT, and production environments with mandatory regression testing at
+      each stage. Require signed commits and protected main branches for all capital model
+      code to ensure immutability and auditability.
+    tools:
+      - gitlab-ci
+      - pytest
+      - sonarqube
+      - signed-commits
+      - opa-conftest
+
+  secops:
+    prose: >-
+      Implement strict segregation of duties between the teams that manage capital
+      instrument issuances and those that calculate regulatory capital ratios. Maintain
+      an immutable audit trail of all changes to the instruments registry, with mandatory
+      dual-control approval for any modification. Monitor access to capital instruments
+      data and alert on anomalous patterns. Conduct annual independent reviews of the
+      eligibility assessment process to validate that no ineligible instruments are included
+      in the capital base.
+    tools:
+      - splunk
+      - cyberark
+      - hashicorp-vault
+      - sentinel
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-5", "art-6"]
+    relationship: complements
+  - framework_id: sox
+    articles: ["sec-302", "sec-404"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-5", "AU-2", "AU-9"]
+    relationship: mapped

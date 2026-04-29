@@ -1,0 +1,109 @@
+id: owasp-a01-path-traversal
+family: a01
+title: "A01:2021 — Path Traversal (Directory Traversal)"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Path traversal (also known as directory traversal) is an access control vulnerability where
+    an attacker manipulates file path references supplied to the application to access files and
+    directories stored outside the intended directory. By including path traversal sequences such
+    as "../" (dot-dot-slash) in file path parameters, attackers can traverse the filesystem and
+    access configuration files, credential stores, source code, log files, and other sensitive
+    resources outside the application's intended scope. Variations include absolute path injection,
+    null byte injection to bypass extension filters, URL-encoded traversal sequences (%2e%2e%2f),
+    and double-encoded sequences (%252e%252e%252f) designed to evade naive input filters.
+
+guidance:
+  prose: >-
+    Path traversal vulnerabilities arise when an application uses user-supplied input to construct
+    file system paths and accesses the file at that path without canonicalizing the path first and
+    validating it against an allowlist of permitted locations. Modern frameworks provide safe file
+    access APIs that prevent traversal; direct use of low-level file I/O with user input is the
+    primary root cause. The defense requires canonicalizing the resolved path (resolving all
+    "..", ".", and symlinks) and verifying that the canonical path starts with the intended base
+    directory before opening any file. Input validation alone (filtering "../") is insufficient
+    because of the many encoding bypasses available to attackers. Applications should operate under
+    the principle of least privilege — the process should have filesystem access only to the
+    directories it legitimately needs.
+
+references:
+  - citation: "OWASP Path Traversal"
+    url: "https://owasp.org/www-community/attacks/Path_Traversal"
+  - citation: "OWASP File Path Traversal Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+  - citation: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory"
+    url: "https://cwe.mitre.org/data/definitions/22.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Store user-accessible files in an isolated object store (S3, GCS, Azure Blob) separate from
+      the application filesystem, accessed via the cloud provider SDK rather than local file paths.
+      When local filesystem access is unavoidable, use chroot jails or container filesystem isolation
+      to restrict the process to its working directory. Implement a file access service that maps
+      logical file identifiers to storage locations server-side, never exposing actual paths to
+      clients. Run application processes with a non-root user having read access only to required
+      directories. Use security policies (AppArmor, seccomp, SELinux) to restrict which filesystem
+      paths the application process can access at the OS level. Enforce file upload restrictions to
+      object storage with content-type validation and virus scanning on inbound files.
+    tools:
+      - aws-s3
+      - hashicorp-vault
+      - apparmor
+      - selinux
+      - opa
+      - kubernetes-security-context
+      - falco
+
+  devsecops:
+    prose: >-
+      Add SAST rules to detect string concatenation of user input with file path operations
+      (open(), fopen(), File(), readFile(), etc.) without prior canonicalization and allowlist
+      validation. Semgrep maintains a comprehensive ruleset for path traversal across major
+      languages (Python, Java, Go, Ruby, PHP, Node.js). Include path traversal payloads in
+      DAST scan configurations for all file download, file upload, and file access endpoints.
+      Test with URL-encoded, double-URL-encoded, and Unicode-encoded traversal sequences to
+      verify the application's defenses. Add integration tests that submit traversal payloads
+      to every endpoint accepting a filename or path parameter and assert a safe response
+      (no file returned, 400/403 status).
+    tools:
+      - semgrep
+      - gitlab-sast
+      - burp-suite
+      - owasp-zap
+      - nuclei
+      - checkov
+
+  secops:
+    prose: >-
+      Enable WAF rules for path traversal detection — all major WAFs (Cloudflare, AWS WAF,
+      ModSecurity) include path traversal rulesets in their managed rule groups. Configure
+      WAF rules in block mode for traversal patterns, not just detection mode. Monitor
+      application logs for requests containing "../", "%2e%2e", "%252e", or null bytes (%00)
+      in any parameter. Alert on file access errors (permission denied, file not found) from
+      paths outside the expected application directory. Review container and host filesystem
+      audit logs for unexpected file reads in sensitive directories (/etc, /proc, /var/log).
+      Implement file integrity monitoring (FIM) on critical configuration files to detect
+      unauthorized access or modification.
+    tools:
+      - cloudflare-waf
+      - aws-waf
+      - modsecurity
+      - falco
+      - wazuh
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "AC-3", "SC-28"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V12.3.1", "V12.3.2"]
+    relationship: mapped

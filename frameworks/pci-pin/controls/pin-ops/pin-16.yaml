@@ -1,0 +1,88 @@
+id: pin-16
+family: pin-ops
+title: "Physical Security of PIN Processing Facilities"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Facilities housing PIN processing systems, HSMs, key injection equipment, or PIN mailer
+    production equipment must implement physical security controls commensurate with the
+    sensitivity of the operations performed. Access to these facilities must be restricted
+    to authorized personnel using multi-factor physical access controls (e.g., access
+    badge plus biometric). All entry and exit events must be logged and monitored. Visitors
+    must be escorted at all times and their access recorded. HSM rooms must be
+    additionally protected with intrusion detection systems, CCTV surveillance, and
+    environmental monitoring. Key ceremonies must be conducted in designated secure rooms
+    with controlled access, surveillance recording, and no unauthorized electronic devices.
+    PIN mailer production facilities must implement controls to prevent unauthorized removal
+    of PIN data.
+
+guidance:
+  prose: >-
+    Physical security of PIN processing facilities prevents direct physical attacks on
+    the cryptographic infrastructure. An attacker with physical access to an HSM could
+    attempt hardware-level key extraction, firmware manipulation, or device substitution.
+    The layered physical security approach — perimeter security, facility access control,
+    room-level access control, and equipment-level tamper protection — creates multiple
+    barriers that an attacker must overcome. Key ceremony rooms deserve special attention
+    because they are the locations where cleartext key components may temporarily exist
+    on paper or within smart cards. Organizations must ensure that ceremony rooms have
+    no network connectivity, no windows, and no electronic devices capable of recording
+    or transmitting data.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 5, Facility Security"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy multi-factor physical access control systems (badge + biometric) for all
+      PIN processing facility entry points. Implement mantrap/interlock entry systems
+      for HSM rooms to prevent tailgating. Deploy CCTV with 90-day retention covering
+      all entry points, corridors, and equipment areas. Implement environmental
+      monitoring (temperature, humidity, water detection, smoke detection) with
+      automated alerting for HSM rooms. Configure intrusion detection systems with
+      24/7 monitoring and immediate response protocols. Deploy equipment racks with
+      individual lock mechanisms for HSMs.
+    tools:
+      - physical-access-control-system
+      - cctv-management
+      - intrusion-detection-system
+      - environmental-monitoring
+      - rack-security
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code templates for physical security tagging of cloud
+      resources hosting PIN processing workloads (dedicated hosts, placement groups).
+      Validate that cloud-based HSM deployments (CloudHSM) are configured in
+      compliant regions and dedicated tenancy. Test access control API integrations
+      for the physical security management system.
+    tools:
+      - scanner-iac-scanning
+      - checkov
+      - terraform-compliance
+  secops:
+    prose: >-
+      Review physical access logs daily for anomalous access patterns (after-hours
+      entry, unfamiliar badge IDs, repeated failed attempts). Monitor CCTV footage
+      of HSM rooms during and after any maintenance activity. Conduct unannounced
+      physical security audits quarterly. Verify visitor logs against authorized
+      visitor requests. Test intrusion detection systems monthly with simulated
+      breach scenarios.
+    tools:
+      - physical-access-control-system
+      - cctv-analytics
+      - splunk
+      - service-now
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-2", "PE-3", "PE-6", "PE-8"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.7.1", "A.7.2", "A.7.3", "A.7.4"]
+    relationship: mapped

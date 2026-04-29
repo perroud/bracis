@@ -1,0 +1,136 @@
+id: glba-sfg-access-controls
+family: safeguards
+title: "Access Controls"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall implement and periodically review access controls,
+    including technical and physical controls, to limit access to customer information
+    to authorized individuals whose access is necessary to perform their job functions.
+    Access shall be granted based on the principle of least privilege, periodically
+    reviewed for continued appropriateness, and promptly revoked upon personnel
+    termination or change in job responsibilities.
+  parts:
+    - id: glba-sfg-access-controls.1
+      label: "(1)"
+      prose: >-
+        The institution shall implement technical access controls that authenticate
+        and permit access only to authorized users. Access to customer information
+        systems shall require unique user identification and authentication.
+    - id: glba-sfg-access-controls.2
+      label: "(2)"
+      prose: >-
+        Access shall be granted based on the principle of least privilege — users
+        shall have access only to the customer information and systems necessary to
+        perform their job functions, and no more.
+    - id: glba-sfg-access-controls.3
+      label: "(3)"
+      prose: >-
+        The institution shall periodically review access rights to ensure they remain
+        appropriate. Access reviews shall be conducted at least annually and shall
+        include validation by management that each user's access is justified by
+        current business need.
+    - id: glba-sfg-access-controls.4
+      label: "(4)"
+      prose: >-
+        Access shall be promptly revoked or modified when an employee is terminated,
+        transferred, or experiences a change in job responsibilities that no longer
+        requires the previously granted access level.
+    - id: glba-sfg-access-controls.5
+      label: "(5)"
+      prose: >-
+        Physical access controls shall restrict access to facilities and systems
+        containing customer information to authorized personnel only.
+
+guidance:
+  prose: >-
+    Access controls are a core element of the Safeguards Rule and one of the most
+    frequently examined areas. The 2023 amendment explicitly requires access controls
+    as a standalone requirement, separate from the MFA requirement. Examiners evaluate
+    whether access controls are effective across all layers: application, database,
+    operating system, network, and physical. Common findings include: excessive access
+    (users with more access than needed), stale accounts (terminated employees with
+    active access), lack of periodic access reviews, shared accounts that prevent
+    individual accountability, and inadequate physical access controls to server rooms
+    or data centers. The access control program should cover all systems that store,
+    process, or transmit customer information, including cloud services, third-party
+    applications, and backup systems.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(1)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "FFIEC IT Examination Handbook — Access Controls"
+    url: "https://ithandbook.ffiec.gov/it-booklets/information-security/ii-information-security-program-management/ii-c-risk-mitigation/ii-c-9-access-controls.aspx"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management through a single identity provider (IdP)
+      with SAML/OIDC federation to all systems handling customer information. Enforce
+      unique user identification — eliminate shared accounts and implement credential
+      rotation for service accounts. Deploy role-based access control (RBAC) with
+      predefined role templates mapped to job functions, enforcing least privilege by
+      design. Implement automated provisioning and deprovisioning through SCIM integration
+      between HR systems and the IdP to ensure timely access changes on hire, transfer,
+      and termination. Deploy just-in-time (JIT) privileged access that grants elevated
+      permissions only for a defined time window with documented justification. Implement
+      automated access certification campaigns on a quarterly cadence requiring managers
+      to validate their direct reports' access. Enforce network segmentation to isolate
+      systems containing customer information from general-purpose networks.
+    tools:
+      - okta
+      - azure-ad
+      - vault
+      - kubernetes-rbac
+      - open-policy-agent
+      - terraform
+      - backstage
+  devsecops:
+    prose: >-
+      Enforce access controls within the CI/CD pipeline by implementing protected
+      branches, merge request approval rules, and environment-level access restrictions
+      for systems handling customer information. Configure pipelines to prevent developers
+      from deploying their own code to production (segregation of duties). Implement
+      automated access reviews for repository permissions and deployment credentials.
+      Use infrastructure-as-code to manage access control configurations with version
+      control, peer review, and audit trails. Deploy automated scanning that detects
+      overly permissive access configurations (wildcard permissions, disabled
+      authentication, public exposure of NPI systems).
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - vault
+      - checkov
+      - tfsec
+      - open-policy-agent
+  secops:
+    prose: >-
+      Operate quarterly access reviews across all systems handling customer information,
+      generating review packages that list each user, their roles, last access date, and
+      authorizing manager. Monitor authentication and authorization logs to detect
+      anomalous access patterns (unusual locations, off-hours access, privilege escalation
+      attempts, brute force attacks). Implement automated alerts for high-risk access
+      events (new privileged accounts, access to NPI databases by non-authorized users,
+      service account anomalies). Track access provisioning and revocation timeliness
+      metrics. Generate monthly access management reports showing review completion
+      rates, exceptions, remediation timelines, and trend analysis.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - saviynt
+      - grc-platform
+      - servicenow
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-5", "AC-6", "AC-17", "PE-2", "PE-3"]
+    relationship: supports
+  - framework_id: sox
+    articles: ["itgc-access"]
+    relationship: complements
+  - framework_id: pci-dss-v4
+    articles: ["7.1", "7.2", "7.3", "8.1", "8.2", "8.3"]
+    relationship: complements

@@ -1,0 +1,159 @@
+id: art-11
+family: cap-3
+title: "Cenarios de Incidentes Ciberneticos"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 11. A entidade deve elaborar e manter plano de resposta a incidentes
+    cibernéticos que contenha, no mínimo:
+    I - classificação dos incidentes cibernéticos de acordo com a relevância
+    e o impacto para as atividades da entidade e para os investidores;
+    II - procedimentos de resposta para cada tipo de incidente classificado,
+    incluindo contenção, erradicação e recuperação;
+    III - procedimentos de comunicação e escalação internos e externos;
+    IV - cenários de testes de resposta a incidentes cibernéticos.
+guidance:
+  prose: |
+    O art. 11 exige um plano formal de resposta a incidentes (IRP — Incident
+    Response Plan) com quatro componentes obrigatorios.
+
+    **I — Classificacao de incidentes:**
+    A entidade deve ter taxonomia propria de incidentes, com niveis de
+    severidade baseados em impacto operacional e impacto em investidores.
+    Exemplos:
+    - Critico: comprometimento de sistemas de negociacao, vazamento massivo
+      de dados de investidores, ransomware em producao.
+    - Alto: acesso nao autorizado a dados confidenciais, DDoS em servicos
+      ao investidor, malware em endpoints criticos.
+    - Medio: tentativa de intrusao bloqueada, vulnerabilidade critica
+      descoberta, phishing com credenciais comprometidas.
+    - Baixo: scan de portas, spam, tentativas de phishing sem sucesso.
+
+    **II — Procedimentos de resposta (playbooks):**
+    Para cada tipo de incidente, deve haver procedimento documentado:
+    - Contencao: isolar o incidente para evitar propagacao.
+    - Erradicacao: remover a causa raiz (malware, acesso nao autorizado).
+    - Recuperacao: restaurar sistemas ao estado normal de operacao.
+    - Licoes aprendidas: analise pos-incidente para melhoria.
+
+    **III — Comunicacao e escalacao:**
+    Matriz de comunicacao definindo:
+    - Quem e notificado em cada nivel de severidade.
+    - Prazos de escalacao (ex: critico -> diretoria em 1 hora, CVM conforme art. 12).
+    - Canais de comunicacao (fora de banda para incidentes graves).
+    - Comunicacao com investidores se houver impacto.
+
+    **IV — Cenarios de testes:**
+    Exercicios de tabletop e simulacoes praticas para validar o plano.
+    Detalhado no art. 14.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificacao de incidentes (I):**
+      1. Taxonomia de incidentes documentada e integrada ao sistema de
+         ticketing (ServiceNow, Jira, PagerDuty).
+      2. Severidade automatica baseada em asset criticality e tipo de ataque.
+      3. Tags de impacto: operacional, dados de investidores, reputacional,
+         regulatorio.
+
+      **Playbooks automatizados (II):**
+      4. SOAR (Security Orchestration, Automation and Response) com playbooks
+         para incidentes comuns:
+         - Ransomware: isolamento de rede, snapshot de sistemas, ativacao de DR.
+         - DDoS: ativacao de mitigacao automatica (CDN, WAF rules).
+         - Credential compromise: desabilitacao de conta, revogacao de tokens.
+         - Data breach: isolamento de sistema, preservacao de evidencias.
+      5. Runbooks de recuperacao vinculados a cada playbook.
+      6. Ambiente de DR pre-configurado para ativacao rapida.
+
+      **Comunicacao (III):**
+      7. Sistema de notificacao automatica por severidade (PagerDuty, OpsGenie).
+      8. Canal de comunicacao out-of-band para incidentes graves (nao depender
+         de infraestrutura potencialmente comprometida).
+      9. Templates de comunicacao pre-aprovados para cada tipo de incidente.
+
+      **Cenarios de teste (IV):**
+      10. Infraestrutura de teste isolada para simulacoes de incidentes.
+      11. Automacao de cenarios de teste via chaos engineering.
+    tools:
+      - soar
+      - pagerduty
+      - siem
+      - ticketing-system
+      - dr-solution
+      - chaos-engineering
+  devsecops:
+    prose: |
+      **Integracao com desenvolvimento:**
+      1. Playbook para vulnerabilidade critica em producao: rollback automatizado,
+         hotfix pipeline, comunicacao a equipes afetadas.
+      2. Playbook para supply chain compromise: lockdown de dependencias,
+         scanning retroativo, rebuild de artefatos.
+      3. Playbook para secret leak: rotacao automatica de credenciais via
+         pipeline, revogacao de tokens, audit de uso.
+
+      **Ferramentas de resposta no pipeline:**
+      4. Feature flags para desabilitar funcionalidades comprometidas sem
+         deploy completo.
+      5. Canary rollback automatico se metricas de seguranca degradam.
+      6. Pipeline de emergencia (hotfix) com gates reduzidos para resposta
+         rapida a incidentes criticos.
+
+      **Rastreabilidade:**
+      7. Correlacao de incidentes com commits, deploys e alteracoes recentes.
+      8. Timeline automatica de eventos (deploy -> incidente -> contencao).
+    tools:
+      - gitlab-ci
+      - feature-flags
+      - gitlab-incident-management
+      - gitlab-audit-events
+  secops:
+    prose: |
+      **Operacao do plano de resposta:**
+      1. CSIRT (Computer Security Incident Response Team) designado com
+         papeis claros: coordinator, analyst, communicator, legal.
+      2. Runbooks operacionais validados e acessiveis em repositorio offline.
+      3. Kit de forense pronto (ferramentas, procedimentos de coleta de
+         evidencias, cadeia de custodia).
+
+      **Classificacao operacional (I):**
+      4. Triagem de alertas do SIEM com classificacao automatica.
+      5. Criterios de escalacao claros por severidade.
+      6. Registro de todos os incidentes em sistema centralizado.
+
+      **Resposta operacional (II):**
+      7. Contencao em menos de 1 hora para incidentes criticos.
+      8. Documentacao em tempo real durante resposta (war room log).
+      9. Analise pos-incidente (PIR) obrigatoria para incidentes medios e acima.
+      10. Atualizacao de playbooks baseada em licoes aprendidas.
+
+      **Comunicacao (III):**
+      11. Matriz de escalacao revisada semestralmente.
+      12. Comunicacao com CVM conforme art. 12 para incidentes relevantes.
+      13. Comunicacao com investidores via canais pre-definidos.
+
+      **Testes (IV):**
+      14. Tabletop exercise trimestral com cenarios variados.
+      15. Simulacao completa anual (full-scale exercise).
+      16. Avaliacao pos-exercicio com plano de melhoria.
+    tools:
+      - soar
+      - siem
+      - edr-xdr
+      - forensic-toolkit
+      - ticketing-system
+      - grc-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-6", "art-9", "art-10"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-4", "IR-5", "IR-6", "IR-8"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26", "A.5.27", "A.6.8"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements

@@ -1,0 +1,123 @@
+id: art-23
+family: cap-5
+title: "Validacao Clinica de Sistemas de IA"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 23. Todo sistema de IA médica deve ser submetido a validação clínica
+    antes de sua utilização em atividades médicas:
+
+    I - a validação clínica deve demonstrar que o sistema atinge performance
+    aceitável na tarefa clínica pretendida, utilizando métricas apropriadas
+    à finalidade (sensibilidade, especificidade, valor preditivo positivo,
+    valor preditivo negativo, AUC-ROC, entre outras);
+
+    II - a validação deve ser realizada com dataset independente do dataset
+    de treinamento, representativo da população brasileira e do contexto
+    clínico de uso pretendido;
+
+    III - os resultados de validação devem ser desagregados por subgrupos
+    clinicamente relevantes, incluindo faixa etária, sexo, etnia e
+    comorbidades prevalentes;
+
+    IV - para sistemas de risco alto e muito alto, a validação clínica
+    deve incluir estudo prospectivo em ambiente clínico real, com
+    comparação contra padrão de referência (gold standard) ou prática
+    clínica vigente;
+
+    V - a validação clínica deve ser repetida após qualquer alteração
+    significativa no modelo, nos dados de treinamento ou no contexto
+    de uso.
+guidance:
+  prose: |
+    O art. 23 estabelece requisitos de validacao clinica que vao alem
+    da validacao tecnica de modelos de ML.
+
+    **Validacao tecnica vs validacao clinica:**
+    Validacao tecnica (metricas de ML) e necessaria mas nao suficiente.
+    Validacao clinica exige demonstracao de que o modelo funciona na
+    pratica clinica real, com pacientes reais, no contexto brasileiro.
+
+    **Dataset representativo (inciso II):**
+    Datasets internacionais podem nao representar a populacao brasileira.
+    Diferencias etnicamente condicionadas (ex: prevalencia de doencas,
+    manifestacoes clinicas em diferentes tons de pele) exigem validacao
+    local. O dataset deve refletir a diversidade demografica brasileira.
+
+    **Desagregacao por subgrupo (inciso III):**
+    Performance media mascara disparidades. Um modelo com AUC de 0.95
+    na media pode ter AUC de 0.70 em subgrupo especifico. A desagregacao
+    e obrigatoria para detectar essas disparidades.
+
+    **Estudo prospectivo (inciso IV):**
+    Para risco alto/muito alto, nao basta validacao retrospectiva.
+    Exige-se estudo prospectivo: o modelo e usado em tempo real e
+    seus resultados sao comparados com o padrao de referencia.
+
+    **Revalidacao (inciso V):**
+    Qualquer mudanca significativa (retreinamento, novos dados, nova
+    populacao) invalida a validacao anterior. Revalidacao e obrigatoria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de validacao clinica:**
+      1. Implementar pipeline de validacao clinica automatizado:
+         separacao de datasets (treino/validacao/teste), calculo de
+         metricas por subgrupo, geracao de relatorio de validacao.
+      2. Manter banco de datasets de validacao representativos da
+         populacao brasileira, curados e versionados, segregados
+         dos dados de treinamento.
+      3. Implementar framework de comparacao contra baseline clinico
+         para estudos prospectivos: registro de predicoes, comparacao
+         com desfecho real, calculo de metricas temporais.
+      4. Automatizar deteccao de necessidade de revalidacao quando
+         modelo ou dados de treinamento forem alterados.
+    tools:
+      - ml-validation
+      - dataset-management
+      - clinical-study
+      - model-monitoring
+  devsecops:
+    prose: |
+      **Validacao clinica integrada ao pipeline:**
+      1. Implementar gate de validacao clinica no CI/CD: nenhum
+         modelo passa para producao sem relatorio de validacao
+         com metricas minimas aceitas para cada metrica.
+      2. Automatizar calculo de metricas desagregadas por subgrupo
+         como parte obrigatoria do pipeline de teste.
+      3. Implementar teste de regressao clinica: verificar que
+         atualizacoes de modelo nao degradam performance em nenhum
+         subgrupo.
+      4. Bloquear deploy quando metricas de validacao estiverem
+         abaixo de limiares definidos pelo comite clinico.
+    tools:
+      - gitlab-ci
+      - ml-testing
+      - subgroup-analysis
+      - regression-tests
+  secops:
+    prose: |
+      **Governanca de validacao clinica:**
+      1. Definir limiares minimos de performance para cada tipo de
+         sistema de IA (diagnostico, triagem, etc.), aprovados pelo
+         comite clinico.
+      2. Auditar que validacoes clinicas foram realizadas conforme
+         protocolo: dataset independente, representatividade,
+         desagregacao.
+      3. Manter registro de todas as validacoes realizadas com
+         resultados, incluindo historico de revalidacoes.
+      4. Coordenar estudos prospectivos para sistemas de risco
+         alto/muito alto com equipe clinica e pesquisa.
+    tools:
+      - grc-platform
+      - clinical-study-management
+      - validation-registry
+      - audit-tools
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-10"]
+    relationship: mapped
+  - framework_id: anvisa-samd
+    articles: ["art-7", "art-8"]
+    relationship: complements

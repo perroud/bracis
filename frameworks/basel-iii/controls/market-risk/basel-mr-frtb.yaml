@@ -1,0 +1,115 @@
+id: basel-mr-frtb
+family: market-risk
+title: "Fundamental Review of the Trading Book (FRTB — Basel IV)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks with trading book activities must calculate minimum capital requirements for
+    market risk under the Fundamental Review of the Trading Book (FRTB) framework, which
+    replaces the 1996 Basel II.5 market risk framework and became mandatory from January
+    2025 in most jurisdictions (phased in to January 2028 for reporting only vs. binding
+    minimum capital). The FRTB introduces a revised boundary between the trading book
+    and banking book based on trading intent and demonstrated ability to trade, with
+    specific instruments presumed to be in the trading book (e.g., instruments held for
+    short-term resale, positions arising from client market-making). Transfers between
+    books are strictly restricted and require supervisory approval. Banks may use either
+    the FRTB Standardised Approach (FRTB-SA) or the FRTB Internal Models Approach (FRTB-
+    IMA) subject to supervisory approval at the trading desk level. The IMA requires
+    back-testing and Profit and Loss Attribution (PLA) testing at desk level; desks failing
+    PLA or back-testing revert to SA. Banks must include all positions in the trading book
+    and banking book (including non-linear instruments such as options) in their market
+    risk capital calculations, with explicit treatment of curvature, vega, and delta risks.
+
+guidance:
+  prose: >-
+    The FRTB represents the most fundamental redesign of the market risk capital framework
+    since 1996. Its key innovations are: (1) a more objective trading book / banking book
+    boundary to prevent regulatory capital arbitrage; (2) replacement of Value-at-Risk
+    (VaR) with Expected Shortfall (ES) as the risk measure, capturing tail risk more
+    accurately; (3) calibration of ES to a stressed period (the worst 12-month period in
+    the preceding 10 years) combined with a one-year liquidity horizon adjustment based
+    on each risk factor's liquidity horizon; (4) non-modellable risk factor (NMRF) surcharges
+    for risk factors that cannot be calibrated from 24 real price observations per year;
+    (5) standardised approach risk classes (GIRR, CSR, equity, commodity, FX) with delta,
+    vega, and curvature sensitivities; and (6) PLA testing to validate that desk-level IMA
+    models accurately explain actual trading desk P&L. Banks must invest heavily in data
+    infrastructure to satisfy the real price observation requirement for NMRF testing and
+    the daily back-testing requirement at desk level.
+
+references:
+  - citation: "BCBS, Minimum capital requirements for market risk (FRTB), January 2019 (revised February 2019)"
+    url: "https://www.bis.org/bcbs/publ/d457.htm"
+  - citation: "BCBS, Calculation of RWA for market risk (MAR), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/MAR/01.htm"
+  - citation: "BCBS, Frequently asked questions on the FRTB, December 2017, 2022"
+    url: "https://www.bis.org/bcbs/publ/d422.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build an FRTB-capable risk data platform that: (a) feeds all trading book and
+      banking book positions into a unified risk engine; (b) computes ES with liquidity
+      horizon scaling across the six liquidity horizons (10, 20, 40, 60, 120 days) for
+      each risk factor; (c) calculates FRTB-SA sensitivities (delta, vega, curvature)
+      for all instruments including options using an approved sensitivity methodology;
+      (d) performs NMRF identification by scanning the real price observation database for
+      each risk factor and applying the 24-observations-per-year test; and (e) generates
+      daily VaR and ES back-testing reports at desk level for PLA testing. The platform
+      must process millions of risk factors and positions within the overnight batch
+      window. Invest in in-memory computing and distributed processing for the FRTB-SA
+      aggregation step.
+    tools:
+      - apache-spark
+      - redis
+      - apache-kafka
+      - quantlib
+      - postgresql
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain FRTB risk factor classification rules, bucket definitions, risk weights,
+      and correlation parameters as versioned configuration files, with automated tests
+      validating each configuration against the Basel Framework MAR chapters. Implement
+      automated desk-level back-testing pipelines that compute hypothetical and actual
+      P&L, apply the traffic-light test, and generate desk classification reports (green/
+      amber/red) for supervisor submission. Build CI/CD workflows that enforce the full
+      FRTB calculation chain — position load → pricing → sensitivity → aggregation → back-
+      testing → capital output — with automated reconciliation at each stage.
+    tools:
+      - gitlab-ci
+      - apache-spark
+      - pytest
+      - dbt
+      - sonarqube
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Classify FRTB model code and real-price observation databases as critical financial
+      assets requiring the highest access controls. Implement separation of duties between
+      the risk technology team (who builds the FRTB engine), the quant team (who calibrates
+      risk factors), and the risk management team (who reviews outputs). Enable comprehensive
+      audit logging for all FRTB capital calculation runs and alert on any deviation from
+      the approved calculation chain. Retain all back-testing data and NMRF observation
+      records for at least 10 years.
+    tools:
+      - cyberark
+      - hashicorp-vault
+      - splunk
+      - sentinel
+      - aws-s3-object-lock
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12", "BAI08"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AU-9", "AC-5"]
+    relationship: mapped

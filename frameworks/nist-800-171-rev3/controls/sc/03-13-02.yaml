@@ -1,0 +1,83 @@
+id: 03.13.02
+family: sc
+title: "Cryptographic Protection"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [sc-8, sc-12, sc-13, sc-28]
+  - cmmc-v2: [sc.l2-3.13.8, sc.l2-3.13.10, sc.l2-3.13.11]
+statement:
+  prose: >-
+    a. Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI
+       during transmission and while in storage.
+    b. Employ FIPS-validated cryptography when used to protect the confidentiality of CUI.
+    c. Establish and manage cryptographic keys when cryptography is employed within the
+       system using key management processes and procedures.
+guidance:
+  prose: >-
+    Cryptographic protections apply to data in transit and data at rest. The strength of
+    the cryptographic mechanism is commensurate with the security category or classification
+    of the information. Organizations use FIPS-validated cryptographic modules (FIPS 140-2
+    or FIPS 140-3 validated) to protect CUI. Cryptographic mechanisms used for protection
+    of CUI include TLS 1.2 or later for data in transit and AES-256 for data at rest.
+    Key management includes key generation, distribution, storage, access, rotation,
+    and destruction. Organizations establish key management infrastructure that supports
+    the cryptographic operations required for CUI protection. The use of non-validated
+    cryptography is permitted only for non-CUI data or where a waiver has been granted.
+    All CUI must be encrypted both in transit and at rest using FIPS-validated mechanisms.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ for all network communications with strong cipher suites (AES-256-GCM,
+      CHACHA20-POLY1305). Deploy service mesh with mandatory mTLS for all internal
+      service-to-service communication. Implement transparent encryption at rest for all
+      storage layers: cloud managed encryption (AWS KMS, GCP CMEK, Azure Key Vault),
+      Kubernetes Secrets encryption at rest using KMS providers, and database-level
+      encryption (TDE). Deploy cert-manager for automated certificate lifecycle management
+      with automatic renewal. Use FIPS 140-3 validated crypto modules in all CUI-processing
+      environments. Implement key management through a dedicated KMS with automatic key
+      rotation policies. Encrypt all backup data and ensure encryption keys are managed
+      separately from encrypted data.
+    tools:
+      - "Cloud KMS (AWS KMS, GCP CMEK, Azure Key Vault)"
+      - "HashiCorp Vault (key management)"
+      - "cert-manager (certificate lifecycle)"
+      - "Service mesh mTLS (Istio, Linkerd)"
+      - "FIPS 140-3 validated modules"
+      - "Kubernetes Secrets encryption (KMS provider)"
+  devsecops:
+    prose: >-
+      Scan for weak cryptographic configurations in IaC: unencrypted storage, TLS
+      versions below 1.2, weak cipher suites, and hardcoded encryption keys. Implement
+      CI checks that validate encryption-at-rest is enabled for all storage resources.
+      Enforce that applications use approved cryptographic libraries and algorithms.
+      Scan container images for vulnerable cryptographic library versions. Validate
+      certificate configurations in deployment manifests. Implement secret scanning
+      to prevent cryptographic keys from being committed to repositories.
+    tools:
+      - "Checkov / tfsec (encryption validation)"
+      - "Trivy (crypto library scanning)"
+      - "TLS configuration scanning (testssl.sh)"
+      - "Secret scanning (GitLeaks, TruffleHog)"
+      - "SAST (crypto usage analysis)"
+  secops:
+    prose: >-
+      Monitor for unencrypted data transmission and storage violations. Track certificate
+      expiration dates and alert before expiry. Monitor for weak cipher suite usage
+      across the environment. Conduct periodic cryptographic assessments to verify
+      FIPS compliance. Track key rotation compliance and alert on overdue rotations.
+      Monitor for unauthorized key access attempts. Generate compliance reports
+      demonstrating encryption coverage for all CUI data at rest and in transit.
+    tools:
+      - "Certificate monitoring (Keychest, Venafi)"
+      - "CSPM (encryption compliance)"
+      - "Network monitoring (weak cipher detection)"
+      - "Key management audit logs"
+      - "Cryptographic compliance reporting"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — SC-8, SC-12, SC-13, SC-28"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FIPS 140-3"
+    url: "https://csrc.nist.gov/publications/detail/fips/140/3/final"
+  - citation: "NIST SP 800-175B"
+    url: "https://doi.org/10.6028/NIST.SP.800-175Br1"

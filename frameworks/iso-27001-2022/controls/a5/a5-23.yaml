@@ -1,0 +1,103 @@
+id: a5.23
+family: a5
+title: "Information security for use of cloud services"
+class: ISO27001
+
+statement:
+  prose: >-
+    Processes for acquisition, use, management and exit from cloud services
+    shall be established in accordance with the organization's information
+    security requirements.
+
+guidance:
+  prose: >-
+    The organization should establish and communicate a topic-specific policy
+    on the use of cloud services to all relevant stakeholders. The organization
+    should define and communicate how it intends to manage information security
+    risks associated with the use of cloud services. This should include
+    defining the criteria for selecting cloud services and cloud service
+    providers, determining the roles and responsibilities related to the
+    use of cloud services, determining which information security controls
+    are managed by the cloud service provider and which by the organization
+    as cloud customer, determining how to obtain and manage information
+    security capabilities provided by the cloud service provider, managing
+    changes to cloud service risks when cloud services are discontinued or
+    transferred, and incident management procedures related to cloud
+    services.
+
+references:
+  - citation: "ISO/IEC 27002:2022, 5.23"
+    url: "https://www.iso.org/standard/75652.html"
+  - citation: "ISO/IEC 27017:2015"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a cloud governance layer using infrastructure-as-code
+      guardrails that enforce organizational cloud security policies
+      automatically. Use landing zone patterns with pre-approved
+      configurations for each cloud provider. Deploy cloud security
+      posture management (CSPM) tools to continuously validate cloud
+      resource configurations against security baselines. Implement
+      service control policies (SCPs) or organization policies that
+      prevent deployment of non-compliant cloud resources. Maintain
+      a registry of approved cloud services and enforce usage through
+      admission controllers and IaC policy checks. Define and automate
+      exit strategies including data export, encryption key management,
+      and service portability for each cloud dependency.
+    tools:
+      - terraform
+      - crossplane
+      - open-policy-agent
+      - cloud-custodian
+      - prowler
+      - checkov
+      - backstage
+
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code templates in CI pipelines for cloud
+      security misconfigurations before deployment. Enforce that all
+      cloud resources are provisioned through code, not manual console
+      actions. Validate that cloud service configurations meet
+      organization security baselines using tools like Checkov, tfsec,
+      or KICS. Implement drift detection to identify manual changes
+      to cloud resources that deviate from the code-defined state.
+      Include cloud-specific security tests in the pipeline such as
+      checking for public S3 buckets, unencrypted storage, and
+      overly permissive IAM roles.
+    tools:
+      - checkov
+      - tfsec
+      - kics
+      - trivy
+      - gitlab-ci
+      - prowler
+
+  secops:
+    prose: >-
+      Integrate cloud provider audit logs (AWS CloudTrail, Azure Activity
+      Log, GCP Cloud Audit Logs) into the centralized SIEM. Configure
+      detection rules for cloud-specific threats: unauthorized API calls,
+      resource exposure changes, privilege escalation through IAM, and
+      data exfiltration patterns. Monitor cloud service usage against
+      the approved service catalog and alert on shadow IT. Implement
+      cloud-native threat detection services alongside third-party
+      monitoring for defense in depth.
+    tools:
+      - splunk
+      - elastic-siem
+      - prowler
+      - cloud-custodian
+      - aws-guardduty
+      - azure-defender
+      - chronicle
+
+legal_references:
+  - framework_id: nist-800-53
+    articles: ["SA-9", "AC-20"]
+    relationship: equivalent-to
+  - framework_id: gdpr
+    articles: ["art-28", "art-32"]
+    relationship: supports

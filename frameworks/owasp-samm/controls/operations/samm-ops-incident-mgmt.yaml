@@ -1,0 +1,110 @@
+id: samm-ops-incident-mgmt
+family: operations
+title: "Incident Management"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Establish and maintain a software security incident management process that enables
+    rapid detection, response, containment, eradication, and recovery from security
+    incidents affecting software systems. Ensure development and operations teams are
+    prepared to respond to application-layer security incidents, and that lessons learned
+    from incidents are systematically fed back into the software development lifecycle
+    to prevent recurrence.
+  parts:
+    - id: samm-ops-incident-mgmt_smt.a
+      label: "Stream A — Incident Detection"
+      prose: >-
+        Implement logging, monitoring, and alerting for software security events at the
+        application and infrastructure layers. Define security event categories and
+        alert thresholds relevant to software systems — authentication failures, authorization
+        violations, injection attack patterns, anomalous data access, and API abuse.
+        Ensure logs are centralized, tamper-protected, and retained for a period sufficient
+        for forensic investigation. Establish alert triage procedures that route security
+        alerts to appropriate responders within defined time windows.
+    - id: samm-ops-incident-mgmt_smt.b
+      label: "Stream B — Incident Response"
+      prose: >-
+        Define and maintain security incident response procedures specific to software
+        system incidents, covering application compromise, data breach, API abuse,
+        and supply chain attacks. Assign incident response roles and responsibilities,
+        including application security specialists who can analyze and contain software-layer
+        attacks. Conduct tabletop exercises and simulation drills for common software
+        security incident scenarios. Perform post-incident reviews (blameless postmortems)
+        for all significant security incidents, identifying root causes and driving
+        remediation of contributing vulnerabilities.
+
+guidance:
+  prose: >-
+    Most organizations have infrastructure incident response procedures but lack
+    application-specific incident response capabilities. Software security incidents —
+    exploited vulnerabilities, compromised APIs, account takeover at scale — require
+    different skills and procedures than network or endpoint incidents. At maturity level 1,
+    the organization has basic security logging and a general incident response procedure
+    that covers software incidents. At level 2, application-layer security monitoring
+    is deployed, software security incident procedures are specific and tested, and
+    incident responders have access to application security expertise. At level 3,
+    incident detection is automated with ML-based anomaly detection; response playbooks
+    are codified as runbooks; post-incident review findings are systematically tracked
+    to product backlog items.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Operations: Incident Management"
+    url: "https://owaspsamm.org/model/operations/incident-management/"
+  - citation: "OWASP Incident Response Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html"
+  - citation: "NIST SP 800-61 — Computer Security Incident Handling Guide"
+    url: "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized, structured application logging as a platform service,
+      providing standardized logging libraries and configurations for all supported
+      languages and frameworks. Enforce log shipping to a central SIEM as a platform
+      default, ensuring no application can bypass centralized logging. Provide
+      platform-managed alerting templates for common application security events,
+      configurable by teams without requiring SIEM expertise. Implement distributed
+      tracing (OpenTelemetry) integrated with security event correlation to provide
+      full request context during incident investigation. Maintain runbook templates
+      in the IDP for common software security incident types.
+    tools:
+      - "OpenTelemetry (distributed tracing)"
+      - "Fluentd / Vector (log shipping)"
+      - "Grafana / Loki (log aggregation)"
+      - "PagerDuty (incident alerting)"
+      - "Backstage (runbook catalog)"
+  devsecops:
+    prose: >-
+      Integrate security event generation into application code through security-aware
+      logging frameworks that automatically emit structured events for authentication
+      events, authorization decisions, and input validation failures. Use pipeline
+      tooling to enforce logging standards: SAST rules detecting hardcoded credentials
+      in log statements, log sanitization checks preventing PII exposure in logs. Implement
+      automated incident simulation in staging environments — injecting synthetic
+      attack patterns to validate that alerting and detection capabilities are working.
+      Maintain deployment runbooks in version control alongside application code, ensuring
+      incident responders always have current rollback and containment procedures.
+    tools:
+      - "Structured logging libraries (Zap, Logrus, Winston)"
+      - "GitLab CI/CD (log standard enforcement)"
+      - "Semgrep (log security rules)"
+      - "Graylog / Elastic Stack"
+      - "AWS CloudWatch / GCP Cloud Logging"
+  secops:
+    prose: >-
+      Operate a 24/7 security operations capability with application security expertise
+      capable of investigating and containing software-layer attacks. Maintain application-
+      specific incident response playbooks covering the OWASP Top 10 exploitation scenarios,
+      API abuse, and supply chain compromise. Integrate SIEM with application logs, WAF
+      events, and CDN data to provide comprehensive attack surface visibility. Conduct
+      quarterly incident response drills covering software security scenarios with
+      application development teams participating. Ensure all significant application
+      security incidents result in formal postmortem reports with tracked action items.
+    tools:
+      - "Splunk SIEM / Elastic Security"
+      - "Cortex XSOAR / Splunk SOAR (incident automation)"
+      - "AWS WAF / Cloudflare WAF"
+      - "Falco (container runtime security)"
+      - "PagerDuty / OpsGenie (on-call management)"

@@ -1,0 +1,129 @@
+id: isa-3.1
+family: ch-3
+title: "Physical Security"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall define security perimeters and implement
+    physical entry controls to protect areas containing information
+    and information processing facilities. Physical security for
+    offices, rooms, and facilities shall be designed and applied.
+    Protection against physical and environmental threats shall be
+    implemented. Secure areas shall have additional controls for
+    working within them. Delivery and loading areas shall be
+    controlled. Equipment shall be sited and protected to reduce
+    risks from environmental threats and unauthorized access.
+    Equipment shall be maintained correctly to ensure continued
+    availability and integrity.
+
+guidance:
+  prose: >-
+    Physical security in the automotive context extends beyond
+    traditional office security to include production floors,
+    engineering labs, test tracks, prototype storage facilities,
+    and supplier premises. VDA ISA requires a zone-based security
+    model with increasing restriction levels. At minimum: public
+    areas, internal areas, restricted areas, and high-security
+    areas (for prototypes). Each zone must have defined access
+    controls, monitoring, and logging. For AL3 assessments,
+    auditors perform physical walkthroughs verifying that access
+    control mechanisms function correctly, CCTV systems are
+    operational with adequate retention periods, visitor management
+    processes are enforced, and clean desk policies are observed.
+    Data center and server room physical security must include
+    environmental controls (fire suppression, climate control,
+    water detection, uninterruptible power supply). Prototype
+    areas require additional measures: opaque windows or blinds,
+    camera-free zones (no personal devices), locked storage, and
+    dual-control access for the most sensitive prototypes.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of physical security perimeters and controls."
+  al2:
+    applicability: required
+    notes: "Auditor reviews physical security documentation and access logs remotely."
+  al3:
+    applicability: required
+    notes: "On-site walkthrough verifying all physical controls, CCTV, access systems, and zone enforcement."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 3"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.7.1, A.7.2, A.7.3, A.7.4, A.7.5, A.7.6, A.7.7, A.7.8"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate physical access control systems (PACS) with the
+      identity management platform to ensure consistent provisioning
+      and de-provisioning of physical and logical access. Implement
+      infrastructure-as-code for data center and server room
+      configurations, including environmental monitoring thresholds
+      and alerting rules. Use IoT sensor data pipelines to feed
+      environmental monitoring (temperature, humidity, power) into
+      the platform observability stack. Automate the correlation
+      of physical access events with logical access events to
+      detect anomalies (e.g., VPN login from a location while
+      badge shows the user is not on-site). Maintain a
+      machine-readable asset inventory mapping physical locations
+      to hosted services and data classifications.
+    tools:
+      - terraform
+      - kubernetes
+      - prometheus
+      - grafana
+      - backstage
+      - vault
+
+  devsecops:
+    prose: >-
+      Enforce environment-specific deployment controls that align
+      with physical security zones. Production deployments should
+      only originate from hardened build environments within
+      controlled physical perimeters. Implement pipeline controls
+      that verify the physical security classification of target
+      deployment environments before allowing releases. For
+      on-premises build infrastructure, ensure CI/CD runners are
+      hosted in physically secured server rooms with access logging.
+      Generate deployment attestations that include the physical
+      location of build and deployment infrastructure for audit
+      evidence.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - tekton
+      - vault
+      - cosign
+
+  secops:
+    prose: >-
+      Integrate physical access control system (PACS) logs into
+      the SIEM for unified monitoring. Create correlation rules
+      that detect impossible travel (physical badge-in at location A
+      while logical login from location B within an impossible
+      time window). Monitor CCTV system health and alert on camera
+      failures or tampering. Implement automated alerting for
+      after-hours physical access to restricted zones. Generate
+      compliance reports showing physical access patterns,
+      visitor logs, and environmental monitoring status. Maintain
+      incident response playbooks that include physical security
+      scenarios (tailgating, unauthorized access, environmental
+      events).
+    tools:
+      - splunk
+      - elastic-siem
+      - genetec
+      - milestone-xprotect
+      - pagerduty
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.7.1", "A.7.2", "A.7.3", "A.7.4", "A.7.5", "A.7.6"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-1", "PE-2", "PE-3", "PE-4", "PE-5", "PE-6", "PE-8"]
+    relationship: mapped

@@ -1,0 +1,110 @@
+id: cscf-4.2
+family: obj-3
+title: "Multi-Factor Authentication"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Enforce multi-factor authentication (MFA) for all interactive access
+    to SWIFT-related applications and systems. MFA must combine at least
+    two independent authentication factors: something the user knows
+    (password), something the user has (token, smart card), or something
+    the user is (biometric). Single-factor authentication is insufficient
+    for SWIFT operations.
+  parts:
+    - id: cscf-4.2.a
+      label: "4.2.a"
+      prose: >-
+        Multi-factor authentication is enforced for all operator access
+        to SWIFT messaging interfaces, communication interfaces, and
+        related applications.
+    - id: cscf-4.2.b
+      label: "4.2.b"
+      prose: >-
+        Multi-factor authentication is enforced for all administrative
+        and privileged access to systems within the SWIFT secure zone,
+        including operating systems, databases, and network devices.
+    - id: cscf-4.2.c
+      label: "4.2.c"
+      prose: >-
+        MFA tokens or devices are individually assigned, not shared, and
+        managed through a controlled lifecycle including provisioning,
+        replacement, and revocation.
+
+guidance:
+  prose: >-
+    MFA is a critical control for preventing unauthorized access even when
+    credentials are compromised. SWIFT mandates MFA for all interactive
+    access to the SWIFT-related secure zone. Hardware tokens (FIDO2 security
+    keys, smart cards) provide stronger assurance than software-based OTP.
+    SMS-based OTP is discouraged due to SIM-swapping risks. Organizations
+    should implement MFA at the application layer (SWIFT Alliance applications)
+    and at the infrastructure layer (OS login, VPN, bastion hosts). Break-glass
+    procedures must exist for MFA system failures but should be tightly
+    controlled and audited.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 4.2"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-63B — Digital Identity Guidelines: Authentication and Lifecycle Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy FIDO2 security keys (YubiKey, SoloKeys) as the primary MFA
+      factor for SWIFT operators. Implement a centralized identity provider
+      (Okta, Azure AD, Duo) that enforces MFA policies across all SWIFT
+      applications and infrastructure. Configure RADIUS or SAML integration
+      for network devices and SWIFT applications. Deploy smart card
+      authentication for Windows-based operator PCs. Maintain a hardware
+      token inventory with assignment tracking.
+    tools:
+      - yubikey
+      - okta
+      - azure-ad-mfa
+      - duo-security
+      - rsa-securid
+      - radius
+      - fido2
+
+  devsecops:
+    prose: >-
+      Validate MFA enforcement in infrastructure configurations through
+      CI/CD checks. Verify that all VPN, bastion, and remote access
+      configurations require MFA. Automate testing of MFA enrollment
+      workflows. Alert on any infrastructure change that removes MFA
+      requirements.
+    tools:
+      - inspec
+      - opa
+      - conftest
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor MFA bypass attempts and authentication anomalies. Alert on
+      logins without MFA from within the secure zone. Track MFA token
+      lifecycle events (provisioning, loss reports, revocations). Review
+      break-glass access events within 24 hours. Analyze authentication
+      patterns to detect token sharing or cloning attempts.
+    tools:
+      - splunk
+      - elastic-siem
+      - okta-syslog
+      - duo-admin-api
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-2(1)", "IA-2(2)"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.5"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-8.4"]
+    relationship: complements

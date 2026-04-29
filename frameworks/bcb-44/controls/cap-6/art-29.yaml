@@ -1,0 +1,101 @@
+id: art-29
+family: cap-6
+title: "Ordens de Bloqueio e Atendimento a Autoridades"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 29. As instituições de pagamento devem:
+
+    I - atender prontamente às ordens de bloqueio determinadas pelo COAF,
+    pelo Poder Judiciário ou por outras autoridades competentes;
+
+    II - manter os valores bloqueados em conta remunerada e segregada, sem
+    permitir qualquer movimentação até a liberação formal pela autoridade competente;
+
+    III - informar imediatamente ao COAF a existência de valores bloqueados
+    e qualquer tentativa do cliente de movimentar os recursos bloqueados;
+
+    IV - cooperar com as investigações conduzidas pelo Ministério Público,
+    pela Polícia Federal e pelo COAF, fornecendo as informações solicitadas
+    dentro dos prazos determinados.
+guidance:
+  prose: |
+    O art. 29 trata da relacao da IP com as autoridades em casos de investigacao
+    formal, quando a suspeita ja saiu do nivel de monitoramento interno.
+
+    **Ordens de bloqueio:**
+    Podem chegar de tres fontes:
+    1. COAF: bloqueio administrativo por determinacao propria (mais raro)
+    2. Poder Judiciario: ordem judicial de quebra de sigilo + bloqueio
+    3. MP/Policia Federal: em fase de investigacao criminal formal
+
+    **Bloqueio imediato:**
+    Ao receber uma ordem de bloqueio, a IP deve agir imediatamente. Nao ha prazo
+    de "analisar a ordem" -- o bloqueio e executado e apenas apos pode-se
+    questionar a legalidade juridicamente.
+
+    **Conta remunerada segregada (inciso II):**
+    Os valores bloqueados devem ser mantidos em conta especifica para garantir
+    a integridade do ativo para eventual confisco. A IP nao pode usar esses
+    valores para seu proprio caixa.
+
+    **Tentativa de movimentacao (inciso III):**
+    Se o cliente tentar mover recursos bloqueados (via PIX, TED, saque), a IP
+    deve bloquear a operacao E imediatamente comunicar o COAF e a autoridade
+    que determinou o bloqueio.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de gestao de bloqueios judiciais/COAF:**
+      1. Modulo de "bloqueio judicial" no core de pagamentos: ao receber ordem,
+         registrar e aplicar bloqueio imediato com:
+         - Autoridade que emitiu (COAF, Judiciario, MP)
+         - Numero do processo ou oficio
+         - Valor bloqueado
+         - Data de bloqueio
+         - Status da conta segregada
+      2. Conta segregada automatica: criar sub-conta especifica para valores
+         bloqueados, remunerada e inacessivel para operacoes normais.
+      3. Detector de tentativa de movimentacao: alertar imediatamente quando
+         cliente tenta realizar qualquer operacao sobre valores bloqueados.
+      4. Fluxo de liberacao: apenas autoridade competente (via ordem formal)
+         pode liberar o bloqueio. Nenhuma acao unilateral da IP.
+      5. Log completo e imutavel de todo o historico de ordens de bloqueio.
+    tools:
+      - payment-core
+      - workflow-automation
+      - audit-logging
+      - notification-system
+  devsecops:
+    prose: |
+      **Testes de bloqueio:**
+      1. Testes de aplicacao imediata do bloqueio: ordem recebida → bloqueio
+         em < 1 minuto (nao pode aguardar processamento em batch).
+      2. Testes de tentativa de movimentacao: verificar que TODA tentativa
+         e bloqueada e gera alerta.
+      3. Testes de liberacao: apenas a role correta pode liberar.
+      4. Testes de conta segregada: verificar que valores bloqueados nao
+         estao acessiveis para operacoes normais.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - security-testing
+  secops:
+    prose: |
+      **Gestao de ordens de bloqueio:**
+      1. Registro de todas as ordens ativas com status e valor bloqueado.
+      2. Relatorio mensal de bloqueios: novas ordens, liberacoes, tentativas
+         de movimentacao detectadas.
+      3. Processo documentado de atendimento a solicitacoes de informacao
+         de MP/Policia Federal com prazo de resposta.
+      4. Exercicio anual: simular recebimento de ordem de bloqueio e verificar
+         que o processo funciona corretamente.
+    tools:
+      - aml-platform
+      - grc-platform
+      - incident-response
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-30"]
+    relationship: equivalent-to

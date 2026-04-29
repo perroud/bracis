@@ -1,0 +1,174 @@
+id: art-46
+family: cap-7
+title: "Medidas de Segurança"
+class: LGPD
+statement:
+  prose: |
+    Art. 46. Os agentes de tratamento devem adotar medidas de segurança, técnicas e
+    administrativas aptas a proteger os dados pessoais de acessos não autorizados e de
+    situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou
+    qualquer forma de tratamento inadequado ou ilícito.
+
+    § 1º A autoridade nacional poderá dispor sobre padrões técnicos mínimos para tornar
+    aplicável o disposto no caput deste artigo, considerados a natureza das informações
+    tratadas, as características específicas do tratamento e o estado atual da tecnologia,
+    especialmente no caso de dados pessoais sensíveis, assim como os princípios previstos
+    no caput do art. 6º desta Lei.
+
+    § 2º As medidas de que trata o caput deste artigo deverão ser observadas desde a fase
+    de concepção do produto ou do serviço até a sua execução.
+guidance:
+  prose: |
+    O art. 46 é o artigo mais relevante para DevSecOps e Platform Engineering. Ele
+    estabelece a obrigação de implementar segurança técnica e administrativa em todo
+    o ciclo de vida dos dados pessoais.
+
+    **§ 2º — Privacy by Design e Security by Design:**
+    A segurança deve ser incorporada "desde a fase de concepção" (design phase), não
+    adicionada posteriormente. Isso é o equivalente legal do princípio de Security by
+    Design e Privacy by Design.
+
+    **Ameaças que devem ser endereçadas (caput):**
+    1. Acessos não autorizados → Controle de acesso, autenticação forte
+    2. Destruição acidental → Backups, redundância, disaster recovery
+    3. Perda → Backups, replicação, data durability
+    4. Alteração → Integridade de dados, checksums, audit trail
+    5. Comunicação não autorizada → Criptografia em trânsito, DLP
+    6. Tratamento inadequado/ilícito → Controles lógicos, segregação de ambientes
+
+    **§ 1º — Padrões técnicos mínimos:**
+    A ANPD pode definir padrões técnicos mínimos. Enquanto não definidos, as melhores
+    práticas de mercado devem ser adotadas. Referências recomendadas:
+    - ISO/IEC 27001 e 27002
+    - NIST Cybersecurity Framework
+    - CIS Controls
+    - OWASP para aplicações web
+
+    **Proporcionalidade:**
+    As medidas devem considerar "a natureza das informações tratadas" e "as características
+    específicas do tratamento". Dados sensíveis exigem medidas mais robustas que dados
+    pessoais comuns.
+
+    **Estado atual da tecnologia:**
+    A lei reconhece que a tecnologia evolui. As medidas devem acompanhar o estado da
+    arte. O que era aceitável em 2020 pode não ser em 2025.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Criptografia:**
+      1. TLS 1.3 para dados em trânsito (mínimo TLS 1.2).
+      2. AES-256 para dados em repouso (ou equivalente).
+      3. Criptografia de campo/coluna para dados sensíveis em bancos de dados.
+      4. Key management com HSM ou cloud KMS (chaves rotacionadas periodicamente).
+
+      **Controle de acesso:**
+      5. RBAC/ABAC com princípio do menor privilégio.
+      6. MFA obrigatório para acesso a sistemas com dados pessoais.
+      7. Zero Trust Architecture para acesso a recursos internos.
+      8. Service mesh com mTLS para comunicação entre microserviços.
+
+      **Integridade e disponibilidade:**
+      9. Backups automatizados com criptografia e teste de restauração.
+      10. Disaster recovery com RPO/RTO definidos.
+      11. Replicação de dados com consistência garantida.
+      12. Audit trail imutável para todas as operações em dados pessoais.
+
+      **Segregação:**
+      13. Ambientes de desenvolvimento, staging e produção segregados.
+      14. Dados pessoais de produção NUNCA em ambientes de desenvolvimento.
+      15. Data masking/synthetic data para ambientes não produtivos.
+
+      **Monitoramento:**
+      16. Logging centralizado com retenção adequada.
+      17. Monitoramento de integridade de arquivos (FIM).
+      18. Vulnerability management com SLA de correção.
+    tools:
+      - tls-termination
+      - kms-hsm
+      - identity-provider
+      - service-mesh
+      - backup-solution
+      - vault
+      - data-masking
+      - centralized-logging
+      - vulnerability-scanner
+  devsecops:
+    prose: |
+      **Pipeline Security (Security by Design — § 2º):**
+      1. SAST (Static Application Security Testing) em todo commit.
+      2. DAST (Dynamic Application Security Testing) em staging.
+      3. SCA (Software Composition Analysis) para dependências.
+      4. Container scanning para imagens Docker.
+      5. IaC scanning para configurações de infraestrutura.
+      6. Secret scanning para prevenir vazamento de credenciais.
+
+      **Code Security:**
+      7. Secure coding guidelines documentados e enforced.
+      8. Input validation e output encoding em todas as interfaces.
+      9. Parameterized queries para prevenir SQL injection.
+      10. CSRF, XSS, SSRF protection implementados.
+
+      **Supply Chain Security:**
+      11. SBOM (Software Bill of Materials) para cada release.
+      12. Dependency pinning e verificação de integridade.
+      13. Signed commits e signed releases.
+      14. Container image signing e verification.
+
+      **Continuous Compliance:**
+      15. Security gates no pipeline (build fails se vulnerabilidade crítica).
+      16. Compliance-as-code para validar configurações de segurança.
+      17. Automated penetration testing periódico.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - trivy
+      - semgrep
+      - sonarqube
+      - snyk
+      - grype
+      - cosign
+      - syft
+  secops:
+    prose: |
+      **Monitoramento e Detecção:**
+      1. SIEM com correlação de eventos de segurança.
+      2. EDR/XDR para detecção de ameaças em endpoints.
+      3. Network Detection and Response (NDR).
+      4. Database Activity Monitoring (DAM) para dados pessoais.
+      5. User and Entity Behavior Analytics (UEBA).
+
+      **Resposta a Incidentes:**
+      6. Playbooks de resposta para vazamento de dados pessoais.
+      7. SOAR para automação de resposta.
+      8. Comunicação com ANPD (art. 48) integrada ao processo.
+
+      **Gestão de Vulnerabilidades:**
+      9. Vulnerability scanning contínuo.
+      10. Patch management com SLA por severidade.
+      11. Bug bounty program (recomendado).
+
+      **Auditoria:**
+      12. Pen testing anual (mínimo) por terceiro independente.
+      13. Auditoria de segurança com foco em dados pessoais.
+      14. Red team exercises periódicos.
+    tools:
+      - siem
+      - edr-xdr
+      - ndr
+      - dam
+      - soar
+      - vulnerability-scanner
+      - penetration-testing
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 25", "art. 32"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28", "AC-2", "AC-3", "AC-6", "AU-2", "AU-3"]
+    relationship: supports
+  - framework_id: bacen-4893
+    articles: ["art. 3", "art. 4", "art. 5"]
+    relationship: complements

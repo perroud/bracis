@@ -1,0 +1,126 @@
+id: nist-63-reauthentication
+family: authentication
+title: "Reauthentication Requirements"
+class: SP800-63B
+
+baselines: [aal1, aal2, aal3]
+
+statement:
+  prose: >-
+    Periodic reauthentication of subscriber sessions SHALL be performed as
+    follows: at AAL1, reauthentication is required at least once per 30 days.
+    At AAL2, reauthentication is required at least once every 12 hours
+    regardless of user activity, and following any period of inactivity
+    lasting 30 minutes or longer. At AAL3, reauthentication is required at
+    least once every 12 hours regardless of user activity, and following any
+    period of inactivity lasting 15 minutes or longer. Reauthentication of a
+    single-factor session SHALL require the claimant to use the same factor
+    used to authenticate initially. Reauthentication of a multi-factor session
+    MAY require only one authentication factor (provided session binding
+    remains valid). The verifier SHALL employ mechanisms to detect session
+    hijacking or man-in-the-middle attacks. If session continuity requires
+    reauthentication, the session state SHALL be preserved and the subscriber
+    returned to their previous activity after successful reauthentication.
+
+guidance:
+  prose: >-
+    Reauthentication requirements are a critical security control for limiting
+    the damage from session hijacking. The idle timeout requirements at AAL2
+    (30 minutes) and AAL3 (15 minutes) are not suggestions — they are security
+    requirements that must be enforced server-side, not just client-side.
+    Client-side idle detection (JavaScript-based) is insufficient because an
+    attacker with a stolen session token can make requests directly without
+    going through the browser. Server-side enforcement means the token
+    validation service checks the last-activity timestamp on every request
+    and rejects tokens that exceeded the idle window. Reauthentication at
+    session step-up (accessing a more sensitive resource) is a pattern
+    encouraged by 800-63B even when the regular reauthentication deadline
+    has not been reached — this implements a "step-up authentication" model
+    where the authentication context is dynamically elevated. Organizations
+    deploying single sign-on must ensure that the SSO session lifetime respects
+    the AAL reauthentication requirements, not just the application session.
+
+references:
+  - citation: "NIST SP 800-63B Section 7 — Session Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "NIST SP 800-63B Section 7.2 — Reauthentication"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "NIST SP 800-63B Section 4 — Authenticator Assurance Levels"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+related_controls:
+  - id: nist-63-aal1
+    relationship: implements
+    description: "AAL1 reauthentication policy: 30-day maximum session lifetime."
+  - id: nist-63-aal2
+    relationship: implements
+    description: "AAL2 reauthentication policy: 12h absolute, 30m idle."
+  - id: nist-63-aal3
+    relationship: implements
+    description: "AAL3 reauthentication policy: 12h absolute, 15m idle."
+  - id: nist-63-memorized-secrets
+    relationship: complements
+    description: "Reauthentication may use a memorized secret as the proof of possession."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement reauthentication enforcement at the API gateway and identity
+      provider layers, not in individual application code. Configure the IdP
+      to issue access tokens with short lifetimes: 15 minutes for AAL1, 10
+      minutes for AAL2, and 5 minutes for AAL3. Use refresh tokens for
+      transparent session extension within the idle timeout window, with
+      absolute expiry enforced at the IdP. When the refresh token absolute
+      limit is reached, redirect the user to a full reauthentication flow.
+      Preserve session state (current URL, form data) so users return to
+      their activity seamlessly after reauthentication. Implement server-side
+      last-activity timestamps on sessions, updated on every authenticated
+      request, and check the idle timeout on every token validation. For
+      step-up authentication (accessing higher-sensitivity resources), use
+      the OAuth 2.0 acr_values parameter in the authorization request to
+      prompt for a higher assurance level in an existing session without
+      full re-login.
+    tools:
+      - keycloak
+      - okta
+      - nginx
+      - envoy
+      - vault
+
+  devsecops:
+    prose: >-
+      Build integration tests that validate reauthentication enforcement: use
+      an expired token and confirm the API returns 401 with a WWW-Authenticate
+      header. Test that after the idle timeout, the next request with a valid
+      (non-expired) access token is also rejected, requiring refresh — and
+      that after the absolute timeout, the refresh token is also rejected.
+      Include automated tests for session state preservation: simulate a
+      reauthentication event and verify the user returns to the same page.
+      Validate that step-up authentication correctly elevates the acr claim
+      in the reissued token. Build a smoke test that verifies reauthentication
+      policies are configured in the IdP environment before deployment.
+    tools:
+      - gitlab-ci
+      - playwright
+      - pytest
+      - open-policy-agent
+
+  secops:
+    prose: >-
+      Monitor for sessions that appear to violate the reauthentication policy:
+      tokens with creation timestamps older than the AAL-appropriate limit
+      that are still being accepted by the application. This may indicate
+      the server-side validation is disabled or misconfigured. Alert on
+      reauthentication failures from suspicious locations or devices — an
+      attacker with a stolen session token who triggers the reauthentication
+      boundary cannot continue without re-authenticating with the correct
+      credentials. Monitor session counts per user: an unusually high number
+      of active sessions for one account may indicate session cloning or
+      a shared credential being used by multiple parties. Implement session
+      audit reports for compliance evidence demonstrating reauthentication
+      enforcement.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - azure-sentinel

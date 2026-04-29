@@ -1,0 +1,134 @@
+id: e8-app-control
+family: prevent
+title: "Application Control"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Application control is implemented on workstations and servers to restrict the
+    execution of executables, software libraries, scripts, installers, compiled HTML,
+    HTML applications, and control panel applets to an approved set. Application control
+    prevents the execution of unapproved and malicious programs, reducing the attack
+    surface and limiting malware delivery and execution.
+
+guidance:
+  prose: >-
+    Application control is one of the most effective mitigation strategies against malware
+    execution. Rather than relying solely on detection-based approaches (antivirus), it
+    takes a preventive stance by only allowing known-good applications to execute. The
+    implementation must go beyond simple file name or path rules and use publisher
+    certificates, cryptographic hashes, or both to identify approved applications.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Application control is implemented on internet-facing servers to restrict
+        execution of executables, software libraries, scripts, installers, compiled
+        HTML, HTML applications, and control panel applets to an approved set.
+        Application control is implemented on workstations to restrict execution
+        of executables, software libraries, scripts, installers, compiled HTML,
+        HTML applications, and control panel applets to an approved set. Allowed
+        and blocked execution events on workstations and internet-facing servers
+        are logged.
+    ml2:
+      prose: >-
+        Application control is implemented on internet-facing servers to restrict
+        execution of executables, software libraries, scripts, installers, compiled
+        HTML, HTML applications, control panel applets, and drivers to an approved
+        set. Application control is implemented on workstations to restrict execution
+        of executables, software libraries, scripts, installers, compiled HTML,
+        HTML applications, control panel applets, and drivers to an approved set.
+        Application control rulesets are validated on an annual or more frequent
+        basis. Allowed and blocked execution events on workstations and
+        internet-facing servers are centrally logged. Event logs are protected
+        from unauthorised modification and deletion.
+    ml3:
+      prose: >-
+        Application control is implemented on all servers (not just internet-facing)
+        and workstations to restrict execution of executables, software libraries,
+        scripts, installers, compiled HTML, HTML applications, control panel applets,
+        and drivers to an approved set. Microsoft's latest recommended block rules
+        and WDAC are implemented. Application control rulesets are validated on a
+        biannual or more frequent basis. Allowed and blocked execution events on
+        workstations and servers are centrally logged and monitored for signs of
+        compromise. Event logs are protected from unauthorised modification and
+        deletion. Event logs are analysed in a timely manner.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Application Control"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 CM-7(5) - Authorized Software / Whitelisting"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement application whitelisting using Windows Defender Application Control (WDAC)
+      or AppLocker on Windows endpoints, and fapolicyd or SELinux on Linux servers.
+      Manage application control policies as code through configuration management tools
+      (Ansible, Puppet, Chef) stored in version-controlled repositories. Use container
+      image signing and admission controllers (Sigstore Cosign, Kyverno, OPA Gatekeeper)
+      in Kubernetes to ensure only approved container images are deployed. Maintain a
+      centralized software catalog (Backstage, ServiceNow) as the source of truth for
+      approved applications. Implement binary authorization pipelines that sign artifacts
+      at build time and verify signatures at deploy time.
+    tools:
+      - wdac
+      - applocker
+      - fapolicyd
+      - selinux
+      - cosign
+      - kyverno
+      - opa-gatekeeper
+      - backstage-catalog
+      - ansible
+
+  devsecops:
+    prose: >-
+      Enforce approved base images in CI/CD pipelines by validating container images
+      against a trusted registry allowlist before deployment. Implement pipeline gates
+      that verify application signatures and checksums before promoting artifacts to
+      production. Use policy-as-code (OPA/Rego, Kyverno) to enforce that only signed
+      and scanned images pass admission control. Integrate Software Bill of Materials
+      (SBOM) generation into build pipelines to track all components within approved
+      applications. Automate ruleset validation by running periodic compliance scans
+      against application control policies.
+    tools:
+      - gitlab-ci
+      - cosign
+      - syft
+      - grype
+      - opa
+      - kyverno
+      - trivy
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor and centrally log all application control events (allowed and blocked
+      executions) using SIEM platforms. Configure alerts for blocked execution attempts
+      that may indicate malware activity or policy violations. Perform periodic reviews
+      of application control rulesets to remove stale entries and add newly approved
+      software. Conduct annual (ML2) or biannual (ML3) ruleset validation exercises.
+      Investigate patterns of blocked executions to identify potential attacks or
+      misconfigured policies. Ensure event logs are integrity-protected and backed up.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - wdac-event-forwarding
+      - crowdstrike
+      - carbon-black
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7(5)", "CM-7(2)", "SI-7"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.5", "CIS 2.6", "CIS 2.7"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.19", "A8.1"]
+    relationship: supports

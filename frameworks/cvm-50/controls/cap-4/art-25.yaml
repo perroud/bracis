@@ -1,0 +1,99 @@
+id: art-25
+family: cap-4
+title: "Integridade e Seguranca dos Registros"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 25. Os participantes devem adotar medidas para garantir a integridade,
+    a confidencialidade e a segurança dos registros de que trata este Capítulo,
+    incluindo:
+
+    I - controles de acesso para que apenas pessoas autorizadas possam
+    consultar os registros;
+    II - mecanismos de detecção de alterações nos registros;
+    III - backup regular e seguro dos registros; e
+    IV - plano de recuperação de desastres para garantir a disponibilidade
+    dos registros mesmo em situações de falha de sistemas.
+guidance:
+  prose: |
+    A integridade dos registros e tao importante quanto sua existencia. Registros
+    que podem ser manipulados nao tem valor probatorio e nao cumprem o proposito
+    regulatorio.
+
+    **Controle de acesso (inciso I):**
+    Quem pode consultar registros de PLD/FT: compliance officer, analistas de
+    PLD/FT, diretoria, auditores internos/externos, reguladores. Quem NAO deveria
+    ter acesso irrestrito: comerciais, operadores de mesa, gerentes de conta.
+
+    **Imutabilidade (inciso II):**
+    Uma alteracao em um registro historico de transacao deve ser tecnicamente
+    impossivel — ou pelo menos detectavel. Solucoes: WORM storage (Write Once
+    Read Many), event sourcing, blockchain para ledger de transacoes, hash
+    encadeado de registros.
+
+    **Backup e recuperacao (incisos III e IV):**
+    O backup deve ser testado periodicamente. Um backup que nunca foi testado
+    pode nao funcionar quando necessario. O plano de recuperacao deve definir
+    RTO (Recovery Time Objective) e RPO (Recovery Point Objective) aceitaveis
+    para registros de PLD/FT.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integridade tecnica dos registros:**
+      1. Banco de dados de transacoes em modo WORM (Write Once Read Many)
+         ou com auditoria imutavel habilitada (ex: PostgreSQL temporal tables,
+         Amazon QLDB, Immudb).
+      2. Hash SHA-256 de cada registro no momento da criacao, armazenado
+         separadamente para verificacao de integridade.
+      3. Hash encadeado (blockchain-like): cada registro inclui o hash do
+         registro anterior, tornando manipulacao retroativa detectavel.
+      4. Backup criptografado com verificacao automatica de integridade
+         apos cada backup.
+
+      **Controles de acesso:**
+      5. RBAC granular para registros de PLD/FT com revisao trimestral
+         de acessos.
+      6. Zero-trust: acesso aos registros requer autenticacao forte mesmo
+         dentro da rede corporativa.
+      7. Log de acesso aos registros: quem acessou, quando, quais dados.
+    tools:
+      - immutable-database
+      - data-encryption
+      - identity-management
+      - backup-solution
+  devsecops:
+    prose: |
+      **Testes de integridade:**
+      1. Testes de que registros nao podem ser alterados ou deletados.
+      2. Testes de verificacao de hash: registros com hash invalido devem
+         ser detectados e alertados.
+      3. Testes de backup: realizar restore periodico e verificar completude.
+      4. Testes de controle de acesso: garantir que usuarios sem permissao
+         nao conseguem acessar registros sensiveis.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - security-testing
+  secops:
+    prose: |
+      **Programa de seguranca dos registros:**
+      1. Auditoria mensal de integridade: verificar amostra de hashes de registros.
+      2. Teste de recuperacao de desastres semestral com RTO/RPO documentados.
+      3. Revisao de acessos trimestral: revogar acessos desnecessarios.
+      4. Relatorio de tentativas de acesso negado aos registros de PLD/FT.
+    tools:
+      - siem
+      - backup-testing
+      - access-review
+      - monitoring-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-19"]
+    relationship: equivalent-to
+  - framework_id: cvm-35
+    articles: ["art-5", "art-9"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

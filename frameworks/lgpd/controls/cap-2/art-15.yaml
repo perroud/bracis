@@ -1,0 +1,107 @@
+id: art-15
+family: cap-2
+title: "Término do Tratamento de Dados Pessoais"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 15. O término do tratamento de dados pessoais ocorrerá nas seguintes hipóteses:
+  parts:
+    - id: art-15-i
+      label: "I"
+      prose: |
+        verificação de que a finalidade foi alcançada ou de que os dados deixaram de ser
+        necessários ou pertinentes ao alcance da finalidade específica almejada;
+    - id: art-15-ii
+      label: "II"
+      prose: |
+        fim do período de tratamento;
+    - id: art-15-iii
+      label: "III"
+      prose: |
+        comunicação do titular, inclusive no exercício de seu direito de revogação do
+        consentimento conforme disposto no § 5º do art. 8º desta Lei, resguardado o
+        interesse público; ou
+    - id: art-15-iv
+      label: "IV"
+      prose: |
+        determinação da autoridade nacional, quando houver violação ao disposto nesta Lei.
+guidance:
+  prose: |
+    O art. 15 define as quatro situações que obrigam o encerramento do tratamento de
+    dados pessoais. É a contraparte temporal do art. 7 (bases legais para iniciar o
+    tratamento).
+
+    **I — Finalidade alcançada ou dados desnecessários:**
+    Princípio da necessidade (art. 6º, III). Uma vez que o objetivo do tratamento foi
+    atingido, os dados devem ser eliminados. Ex.: dados coletados para entrega de um
+    produto devem ser eliminados após a entrega, salvo obrigação legal de retenção.
+
+    **II — Fim do período de tratamento:**
+    Quando há prazo definido (contratual ou regulatório) para o tratamento. Ex.: dados
+    de candidatos a emprego após encerramento do processo seletivo.
+
+    **III — Revogação de consentimento:**
+    O titular pode revogar o consentimento a qualquer momento. O tratamento deve cessar,
+    ressalvado o interesse público e as hipóteses do art. 16.
+
+    **IV — Determinação da ANPD:**
+    A autoridade pode determinar a cessação do tratamento quando verificar violação à
+    LGPD. Trata-se de sanção administrativa.
+
+    **Consequência prática:**
+    Sistemas devem ter capacidade de identificar quando o tratamento deve cessar e
+    executar a eliminação ou anonimização dos dados. Isso exige políticas de retenção
+    implementadas tecnicamente, não apenas documentadas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar data retention policies configuráveis por finalidade de
+         tratamento com TTL (Time-To-Live) automático.
+      2. Criar sistema de expiração automática de dados com jobs agendados que
+         identifiquem e eliminem dados cujo período de tratamento expirou.
+      3. Implementar mecanismo de cessação de tratamento acionado por revogação
+         de consentimento com propagação para todos os sistemas.
+      4. Criar workflow de análise de necessidade: revisar periodicamente se dados
+         armazenados ainda são necessários para a finalidade original.
+      5. Implementar flag de "tratamento encerrado" que bloqueie novos acessos
+         aos dados antes da eliminação definitiva.
+      6. Manter log de eliminação como evidência de conformidade.
+    tools:
+      - data-lifecycle-management
+      - retention-policy-engine
+      - workflow-engine
+      - consent-management-platform
+      - audit-trail
+  devsecops:
+    prose: |
+      1. Validar no pipeline que toda coleta de dados pessoais tem política de
+         retenção definida e implementada.
+      2. Testar que jobs de expiração funcionam corretamente e eliminam dados
+         dentro do prazo configurado.
+      3. Implementar testes que verifiquem cessação efetiva do tratamento após
+         revogação de consentimento.
+      4. Validar que dados eliminados não permanecem em caches, filas ou
+         sistemas intermediários.
+    tools:
+      - compliance-as-code
+      - integration-testing
+      - data-lifecycle-testing
+      - cache-management
+  secops:
+    prose: |
+      1. Monitorar e alertar sobre dados que ultrapassaram o período de retenção
+         sem eliminação.
+      2. Auditar periodicamente a eficácia dos mecanismos de eliminação automática.
+      3. Verificar que backups contendo dados eliminados são gerenciados conforme
+         política de retenção de backups.
+      4. Monitorar tentativas de acesso a dados cujo tratamento foi encerrado.
+    tools:
+      - data-discovery
+      - retention-monitoring
+      - siem
+      - backup-lifecycle-management
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(e)", "art. 17"]
+    relationship: equivalent-to

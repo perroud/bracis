@@ -1,0 +1,107 @@
+id: iec-3-3-fr6
+family: part-3
+title: "FR6: Timely Response to Events (TRE)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr6
+
+statement:
+  prose: >-
+    The control system shall provide the capability to respond to security
+    violations by notifying the appropriate authority, reporting needed
+    evidence of the violation, and taking timely corrective action. The
+    system shall generate, store, and protect audit logs of
+    security-relevant events. The detail and responsiveness of event
+    handling shall be commensurate with the target security level.
+
+guidance:
+  prose: >-
+    Timely response to events in IACS environments must be carefully
+    coordinated with process safety to avoid making a cybersecurity
+    incident worse by taking hasty containment actions that disrupt
+    physical processes. Key considerations include: defining
+    security-relevant events specific to industrial operations (PLC
+    program changes, setpoint modifications, firmware updates, failed
+    authentications, configuration changes); implementing centralized
+    log collection from all IACS components including controllers,
+    network devices, safety systems, and workstations; synchronizing
+    time across all IACS devices using a dedicated NTP or PTP source
+    isolated from the enterprise network; establishing incident
+    classification criteria that account for safety impact, production
+    impact, and environmental impact; defining escalation procedures
+    with clear decision authority for containment actions that may
+    affect physical processes; maintaining pre-approved containment
+    playbooks for common scenarios that have been validated with
+    process safety teams; implementing forensic readiness procedures
+    that preserve evidence without disrupting ongoing operations;
+    and conducting post-incident reviews that feed lessons learned
+    back into the risk assessment and CSMS improvement cycle.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 6.1 through SR 6.2"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized log management platform that collects and
+      correlates events from both IT and OT systems. Implement syslog
+      and SNMP trap collection from industrial network devices. Deploy
+      OT-specific log collection agents capable of parsing industrial
+      protocol events. Implement Precision Time Protocol (PTP) or
+      dedicated NTP servers for IACS time synchronization to ensure
+      accurate event correlation. Deploy SOAR platforms with OT-specific
+      playbooks. Implement tamper-evident log storage using append-only
+      or WORM storage for audit compliance.
+    tools:
+      - splunk-ot
+      - elasticsearch
+      - graylog
+      - meinberg-ntp
+      - cortex-xsoar
+
+  devsecops:
+    prose: >-
+      Implement structured logging standards for all custom IACS
+      applications to ensure security-relevant events are captured
+      consistently. Include audit logging as a mandatory requirement
+      in the definition of done for IACS software features. Automate
+      the deployment of log collection configurations as part of the
+      CI/CD pipeline. Test incident response procedures as part of
+      the release process for critical IACS software updates.
+      Implement log integrity verification in the pipeline to
+      confirm that deployed applications generate the required
+      audit trail.
+    tools:
+      - fluentd
+      - vector
+      - gitlab-ci
+      - opa
+      - pytest
+
+  secops:
+    prose: >-
+      Implement a 24/7 monitoring capability with OT-specific detection
+      rules and alert triage procedures. Deploy SIEM correlation rules
+      that combine IT and OT indicators to detect multi-stage attacks
+      targeting industrial environments. Establish incident response
+      teams with both OT engineering and cybersecurity expertise.
+      Maintain communication plans for coordinating with vendors,
+      regulators, and law enforcement during major incidents. Conduct
+      regular incident response exercises including tabletop and
+      live-fire exercises in test environments that simulate realistic
+      OT attack scenarios.
+    tools:
+      - splunk-es
+      - cortex-xsoar
+      - swimlane
+      - dragos-platform
+      - mandiant-advantage
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "IR-4", "IR-5", "IR-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.24", "a5.25", "a5.26", "a8.15", "a8.16"]
+    relationship: supports

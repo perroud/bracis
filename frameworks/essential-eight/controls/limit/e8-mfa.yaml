@@ -1,0 +1,144 @@
+id: e8-mfa
+family: limit
+title: "Multi-Factor Authentication"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Multi-factor authentication (MFA) is implemented for all users when accessing
+    internet-facing services, when performing privileged actions, and when accessing
+    important data repositories. MFA uses at least two of the following authentication
+    factors: something the user knows (e.g., passphrase), something the user has
+    (e.g., physical token, phone), or something the user is (e.g., fingerprint).
+    Phishing-resistant MFA methods are preferred to reduce the risk of credential theft
+    through social engineering attacks.
+
+guidance:
+  prose: >-
+    Multi-factor authentication is a critical control for preventing unauthorized access,
+    even when passwords are compromised through phishing, credential stuffing, or
+    brute-force attacks. The Essential Eight progressively increases MFA requirements
+    across maturity levels, ultimately requiring phishing-resistant MFA (FIDO2/WebAuthn
+    hardware tokens) for all users at ML3. Organisations must consider the full scope of
+    authentication events including VPN, email, cloud services, privileged access, and
+    remote access.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Multi-factor authentication is used by an organisation's users when they
+        authenticate to their organisation's internet-facing services. Multi-factor
+        authentication is used by an organisation's users when they authenticate to
+        third-party internet-facing services that process, store, or communicate their
+        organisation's sensitive data. Multi-factor authentication (where available) is
+        used by an organisation's users when they authenticate to third-party
+        internet-facing services that process, store, or communicate their organisation's
+        non-sensitive data. Multi-factor authentication is enabled by default for
+        non-organisational users (but they can choose to opt out) when they authenticate
+        to an organisation's internet-facing services.
+    ml2:
+      prose: >-
+        Multi-factor authentication is used to authenticate users to their organisation's
+        internet-facing services. Multi-factor authentication is used to authenticate
+        users to third-party internet-facing services that process, store, or communicate
+        their organisation's sensitive data. Multi-factor authentication (where available)
+        is used to authenticate users to third-party internet-facing services that
+        process, store, or communicate their organisation's non-sensitive data.
+        Multi-factor authentication is used to authenticate users to important data
+        repositories. Multi-factor authentication is used to authenticate privileged
+        users of systems. Multi-factor authentication uses either: something users have
+        and something users know, or something users have that is unlocked by something
+        users know or are. Successful and unsuccessful MFA events are logged. Event logs
+        are protected from unauthorised modification and deletion.
+    ml3:
+      prose: >-
+        Multi-factor authentication is used to authenticate users to their organisation's
+        internet-facing services. Multi-factor authentication is used to authenticate
+        users to third-party internet-facing services that process, store, or communicate
+        their organisation's sensitive data. Multi-factor authentication (where available)
+        is used to authenticate users to third-party internet-facing services that
+        process, store, or communicate their organisation's non-sensitive data.
+        Multi-factor authentication is used to authenticate users to important data
+        repositories. Multi-factor authentication is used to authenticate privileged
+        users of systems. Multi-factor authentication is verified the first time a user
+        authenticates, and then on every subsequent occasion that the MFA token expires.
+        Multi-factor authentication uses phishing-resistant methods (e.g., security keys,
+        smart cards, passkeys, Windows Hello for Business). Successful and unsuccessful
+        MFA events are centrally logged and monitored for signs of compromise. Event logs
+        are protected from unauthorised modification and deletion. Event logs are analysed
+        in a timely manner.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Multi-Factor Authentication"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-63B - Authentication and Lifecycle Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy identity providers (Entra ID, Okta, Keycloak) with MFA enforced via
+      conditional access policies. Implement FIDO2/WebAuthn security keys (YubiKey,
+      Titan Key) for phishing-resistant MFA at ML3. Configure SSO with MFA for all
+      internet-facing services. Enforce MFA for all cloud provider console and API
+      access. Implement certificate-based authentication or smart card authentication
+      for privileged access to servers and network devices. Deploy Windows Hello for
+      Business for passwordless, phishing-resistant authentication on Windows endpoints.
+      Centralize identity management and enforce MFA as a baseline policy across all
+      integrated applications.
+    tools:
+      - entra-id
+      - okta
+      - keycloak
+      - yubikey
+      - windows-hello
+      - duo-security
+      - conditional-access
+
+  devsecops:
+    prose: >-
+      Enforce MFA for all developer access to source code repositories, CI/CD platforms,
+      container registries, and cloud environments. Require hardware security keys for
+      signing commits and accessing production systems. Implement OIDC federation for
+      CI/CD pipeline authentication to eliminate long-lived credentials. Integrate MFA
+      enforcement validation into infrastructure-as-code compliance checks. Use
+      policy-as-code to detect and alert on identity provider configurations that do
+      not enforce MFA.
+    tools:
+      - gitlab-ci
+      - oidc-federation
+      - cosign
+      - gitsign
+      - checkov
+      - opa
+
+  secops:
+    prose: >-
+      Monitor MFA authentication events centrally via SIEM, alerting on anomalies such
+      as MFA fatigue attacks (repeated push notifications), impossible travel, and
+      authentication from unusual devices. Track MFA enrollment coverage across the
+      organisation and alert on users without MFA configured. Detect and respond to
+      MFA bypass techniques including SIM swapping indicators and adversary-in-the-middle
+      attacks. Conduct periodic reviews of MFA policy configurations to ensure alignment
+      with target maturity level. Generate compliance reports on MFA adoption rates by
+      user type and service.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - crowdstrike
+      - entra-id-sign-in-logs
+      - okta-system-log
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2(1)", "IA-2(2)", "IA-2(6)", "IA-2(8)"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 6.3", "CIS 6.4", "CIS 6.5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: supports

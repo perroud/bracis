@@ -1,0 +1,94 @@
+id: com-1
+family: com
+title: "Network Security Management"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall manage and control networks to protect
+    information in systems and applications. Network controls shall
+    include the segregation of networks, the monitoring of network
+    traffic, and the implementation of mechanisms to protect the
+    confidentiality and integrity of data passing over public networks
+    or wireless networks. The cloud provider shall ensure that the
+    cloud services are protected from unauthorized network access
+    through network segmentation and filtering.
+
+guidance:
+  prose: >-
+    Network security in cloud environments requires a defense-in-depth
+    approach with multiple layers of network controls. Network
+    segmentation must isolate tenant environments from each other and
+    from the cloud provider's management plane. Network traffic
+    monitoring must cover both north-south (external-to-internal) and
+    east-west (internal service-to-service) traffic patterns. Zero-trust
+    network principles should be applied where possible, assuming that
+    the internal network is not inherently trusted and requiring
+    authentication and authorization for all network communications.
+
+references:
+  - citation: "C5:2020, COM-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using VPCs, subnets, and network
+      policies to isolate tenant workloads, management plane, and shared
+      services. Deploy a service mesh (Istio, Linkerd) for mTLS
+      enforcement and fine-grained east-west traffic control. Use
+      network policies in Kubernetes to enforce microsegmentation at
+      the pod level. Implement web application firewalls (WAF) and
+      DDoS protection for internet-facing services. Define network
+      architecture as code with automated compliance validation.
+    tools:
+      - terraform
+      - kubernetes-network-policies
+      - istio
+      - linkerd
+      - calico
+      - aws-vpc
+      - azure-vnet
+
+  devsecops:
+    prose: >-
+      Validate network configurations in CI/CD pipelines to ensure
+      proper segmentation and access controls. Scan IaC templates for
+      overly permissive security group rules and network ACLs. Enforce
+      network policy definitions alongside application deployments.
+      Block deployments that expose services without appropriate network
+      protection (WAF, TLS, network policies).
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - kube-linter
+      - trivy
+
+  secops:
+    prose: >-
+      Deploy network traffic monitoring and analysis tools to detect
+      anomalous traffic patterns, lateral movement, and data exfiltration
+      attempts. Implement intrusion detection systems (IDS) for both
+      network-based and host-based detection. Monitor network flow logs
+      for unauthorized communication between segmented networks. Alert
+      on network policy violations and configuration drift.
+    tools:
+      - splunk
+      - elastic-siem
+      - suricata
+      - zeek
+      - aws-vpc-flow-logs
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.20", "a8.21", "a8.22"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["SC-7", "SC-8"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["IVS-01", "IVS-03", "IVS-06"]
+    relationship: mapped

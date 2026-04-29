@@ -1,0 +1,97 @@
+id: eas-1
+family: eas
+title: "Minimise Exposed Attack Surfaces"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    All unused network and logical interfaces shall be disabled. The principle of least
+    privilege shall be applied to the device hardware and software. The device shall only
+    expose network interfaces, logical interfaces, and services that are necessary for
+    the intended use or for device maintenance. Device firmware shall be designed and
+    implemented to reduce the exploitability of the device. Code shall be minimized to
+    the functionality necessary for the service or product to operate. Software shall run
+    with appropriate privileges, taking account of both security and functionality.
+
+guidance:
+  prose: >-
+    Attack surface reduction is a fundamental security principle that is especially critical
+    for IoT devices, which often run in unmanaged environments and are exposed to hostile
+    networks. Every open port, running service, or enabled interface represents a potential
+    entry point for attackers. This provision requires a systematic approach: enumerate all
+    interfaces and services, justify each one against the device's functional requirements,
+    and disable everything that is not strictly necessary. Debug interfaces (UART, JTAG, SSH)
+    that are used during development must be disabled or secured in production firmware.
+    Software should run with the minimum privileges required, using OS-level access controls
+    where available.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.6-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Conduct an attack surface audit of all device interfaces: network ports, physical
+      interfaces (USB, UART, JTAG, SWD), Bluetooth profiles, and API endpoints. Disable all
+      debug interfaces in production firmware builds through hardware fuses or firmware
+      configuration. Implement network firewall rules on the device that drop traffic to
+      unused ports. Run services with minimal OS privileges using Linux capabilities or
+      equivalent mechanisms. Strip unnecessary libraries, binaries, and kernel modules from
+      the production firmware image. Disable unused wireless radios and protocols. Implement
+      a secure boot chain to prevent unauthorized code execution.
+    tools:
+      - buildroot
+      - yocto
+      - linux-capabilities
+      - iptables
+      - nftables
+      - secure-boot
+
+  devsecops:
+    prose: >-
+      Automate attack surface scanning in the CI/CD pipeline by running port scans and
+      service enumeration against firmware images in emulated or test environments. Implement
+      build configuration checks that verify debug interfaces are disabled in release builds.
+      Use firmware composition analysis to identify and remove unnecessary packages and
+      libraries. Scan firmware images for open debug ports, default services, and unnecessary
+      binaries. Implement automated tests that verify only expected network services are
+      listening after device boot.
+    tools:
+      - nmap
+      - firmwalker
+      - binwalk
+      - lynis
+      - trivy
+      - gitlab-container-scanning
+
+  secops:
+    prose: >-
+      Perform periodic external port scans of deployed devices to verify only expected
+      services are exposed. Monitor for new services appearing on devices that may indicate
+      compromise. Conduct physical security assessments to verify debug interfaces are
+      disabled on production units. Track the device's running process list and network
+      connections against an approved baseline. Alert on any deviation from the expected
+      attack surface profile.
+    tools:
+      - nmap
+      - shodan
+      - nessus
+      - rapid7-insightvm
+      - splunk
+      - osquery
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7.1", "SR-7.2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7", "SC-7", "AC-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.9", "A.8.19", "A.8.22"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V14.1.1", "V14.2.1"]
+    relationship: complements

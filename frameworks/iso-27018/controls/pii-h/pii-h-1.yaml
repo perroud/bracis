@@ -1,0 +1,107 @@
+id: pii-h.1
+family: pii-h
+title: "Encryption of PII in transit and at rest"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall implement appropriate technical measures
+    to protect PII during transmission over public and private networks and at rest
+    in storage systems. PII transmitted over public networks shall be encrypted
+    using strong, industry-accepted cryptographic protocols. PII stored in the
+    cloud shall be protected through encryption or equivalent technical measures.
+    The public cloud PII processor shall manage cryptographic keys in accordance
+    with a documented key management policy and shall support the cloud service
+    customer's ability to manage or control encryption keys for their PII.
+
+guidance:
+  prose: >-
+    Encryption is the primary technical safeguard for PII in cloud environments.
+    This control requires end-to-end protection: PII must be encrypted in transit
+    between the customer and the cloud service, between cloud service components,
+    and at rest in all storage systems. The key management requirement is
+    particularly important: if the processor holds all encryption keys, the
+    processor has unfettered access to the PII. Customer-managed keys (BYOK/HYOK)
+    give the customer cryptographic control over their PII, enabling them to
+    revoke access by revoking the key. The processor should support multiple key
+    management models: processor-managed, customer-managed, and hybrid approaches.
+    Encryption protocols must be current and meet industry standards (TLS 1.2+,
+    AES-256). The processor must have a key rotation policy and incident response
+    procedures for key compromise.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.8"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce encryption by default at all layers. Implement TLS 1.3 termination
+      at the edge with mutual TLS (mTLS) for service-to-service communication.
+      Enable transparent data encryption (TDE) for all databases and AES-256
+      encryption for object storage. Implement customer-managed key (CMK) support
+      through a key management service (KMS) that allows customers to bring their
+      own keys (BYOK) or hold their own keys (HYOK). Build key rotation automation
+      with zero-downtime re-encryption. Implement envelope encryption where data
+      encryption keys are wrapped with customer master keys. Provide key usage
+      auditing so customers can track when and how their keys are used. Support
+      hardware security modules (HSMs) for customers requiring FIPS 140-2
+      Level 3 key protection.
+    tools:
+      - kms-with-byok
+      - tls-1-3-termination
+      - mutual-tls
+      - transparent-data-encryption
+      - aes-256-object-encryption
+      - hsm-integration
+      - key-rotation-automation
+
+  devsecops:
+    prose: >-
+      Enforce encryption in the development pipeline. CI gates must validate
+      that all PII storage configurations have encryption enabled. Static
+      analysis rules should flag unencrypted PII storage, plaintext PII in
+      logs, and weak cryptographic algorithms. Infrastructure-as-code validation
+      must verify encryption is configured on all storage resources (databases,
+      object stores, message queues, caches). Build integration tests that
+      verify PII is encrypted at rest and in transit by inspecting raw storage
+      and network traffic. Include encryption configuration in the security
+      review checklist.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - terraform-compliance
+      - encryption-config-validator
+      - network-encryption-tests
+      - storage-encryption-tests
+      - iac-security-scanner
+
+  secops:
+    prose: >-
+      Monitor encryption posture across all PII storage systems. Build detection
+      rules for unencrypted PII in transit (cleartext protocols) and at rest
+      (unencrypted storage volumes). Track encryption key lifecycle: creation,
+      rotation, usage, and destruction. Alert on key rotation failures, expired
+      keys, and unauthorized key access. Monitor for cryptographic weaknesses:
+      deprecated protocols, weak cipher suites, and insufficient key lengths.
+      Audit customer key usage to detect anomalous patterns that could indicate
+      key compromise. Generate encryption compliance reports per customer.
+    tools:
+      - splunk
+      - elastic-siem
+      - encryption-posture-scanner
+      - key-lifecycle-monitor
+      - protocol-compliance-checker
+      - cipher-suite-auditor
+      - encryption-compliance-reports
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-32.1.a"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["clause-6.7"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["a-8.24"]
+    relationship: derived-from

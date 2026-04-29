@@ -1,0 +1,121 @@
+id: sec-10
+family: collection
+title: "Consent for Collection, Use, and Disclosure"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) An organisation shall not collect, use or disclose personal data about an
+    individual unless the individual gives, or is deemed to have given, consent
+    under this Act to the collection, use or disclosure.
+
+    (2) An organisation must not collect, use or disclose personal data about an
+    individual for any purpose unless —
+    (a) the individual has been informed of that purpose; and
+    (b) the individual has given consent, or is deemed to have given consent, for
+    the collection, use or disclosure for that purpose.
+
+    (3) An individual may withdraw consent given or deemed to have been given under
+    this Act to the collection, use or disclosure of personal data about the
+    individual for any purpose by giving the organisation reasonable notice of the
+    withdrawal.
+
+    (4) On receipt of a notice of withdrawal of consent under subsection (3), the
+    organisation —
+    (a) must inform the individual of the likely consequences of withdrawing consent;
+    and
+    (b) must not thereafter collect, use or disclose the personal data unless
+    permitted under this Act or other written law.
+
+guidance:
+  prose: |
+    Section 10 is the operative consent provision of the PDPA. Key points:
+
+    1. **Purpose-specific consent:** Consent must be tied to a specific, notified
+       purpose. Blanket or vague consent is insufficient.
+
+    2. **Right to withdraw:** Individuals can withdraw consent at any time with
+       reasonable notice. Organizations must honor withdrawal and cease processing,
+       but may inform the individual of consequences (e.g., inability to provide
+       certain services).
+
+    3. **Deemed consent:** The PDPA recognizes deemed consent in several forms —
+       voluntary provision of data for a stated purpose (Section 15), deemed consent
+       by notification (Section 15A), and deemed consent by contractual necessity
+       (Section 15B).
+
+    4. **No bundling:** Organizations cannot make consent to non-essential processing
+       a condition of providing the core product or service.
+
+    The withdrawal mechanism is simpler than GDPR's right to erasure — withdrawal
+    stops future processing but does not require deletion of already-collected data
+    (that falls under retention obligations).
+
+references:
+  - citation: "PDPA 2012, Section 10"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement consent collection at every data collection point with clear
+         purpose statements tied to specific processing activities.
+      2. Build a consent withdrawal API that propagates withdrawal signals across
+         all downstream systems and data intermediaries.
+      3. Implement consequence notification — when a user initiates withdrawal,
+         display what services or features will be affected before confirming.
+      4. Create purpose-consent mapping tables that link each data processing
+         activity to its corresponding consent record.
+      5. Build idempotent consent withdrawal that handles repeated withdrawal
+         requests gracefully.
+      6. Implement consent audit trail with immutable logging of all consent
+         grants, modifications, and withdrawals.
+    tools:
+      - consent-management-platform
+      - onetrust
+      - event-driven-architecture
+      - kafka
+      - backstage
+
+  devsecops:
+    prose: |
+      1. Create CI/CD gates that verify all new data collection endpoints include
+         consent verification middleware.
+      2. Implement integration tests for consent withdrawal flows across all
+         services that process personal data.
+      3. Scan for data processing operations that do not check consent status.
+      4. Test that withdrawal propagation reaches all downstream systems within
+         the defined SLA.
+      5. Validate that consequence notifications are accurate and complete.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - playwright
+      - contract-testing
+      - pact
+
+  secops:
+    prose: |
+      1. Monitor for data processing activities occurring after consent withdrawal.
+      2. Audit consent records for completeness — every processing activity must
+         have a corresponding valid consent or legal exception.
+      3. Track consent withdrawal rates and processing cessation latency.
+      4. Alert on processing activities that lack consent records.
+      5. Generate periodic compliance reports on consent management effectiveness.
+    tools:
+      - siem
+      - consent-analytics
+      - compliance-dashboard
+      - data-lineage-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-15"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-120"]
+    relationship: mapped

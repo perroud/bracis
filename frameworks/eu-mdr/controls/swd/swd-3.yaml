@@ -1,0 +1,144 @@
+id: swd-3
+family: swd
+title: "Cybersecurity Requirements for Medical Device Software"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    For devices that incorporate electronic programmable systems and
+    software that are devices in themselves, appropriate measures shall
+    be taken to provide cybersecurity, including protection against
+    unauthorised access that could hamper the device from functioning
+    as intended.
+
+    The manufacturer shall set out minimum requirements concerning
+    hardware, IT networks characteristics and IT security measures,
+    including protection against unauthorised access, necessary to run
+    the software as intended. The devices shall be designed and
+    manufactured in such a way as to protect, as far as possible,
+    against unauthorised access that could hamper the device from
+    functioning as intended.
+
+    Where applicable, manufacturers shall consider the risks associated
+    with the possible negative interaction between software and the IT
+    environment within which it operates, taking into account the
+    interfaces and interactions of the software with all elements of
+    the IT environment, including network infrastructure, security
+    controls, and other software applications.
+guidance:
+  prose: |
+    EU MDR Annex I, Sections 17.2 and 18.8, combined with MDCG 2019-16
+    guidance on cybersecurity, establish a comprehensive cybersecurity
+    framework for medical devices. Key requirements include:
+
+    - Secure by design: cybersecurity must be integrated from the
+      earliest design phases, not bolted on after development.
+    - Threat modeling: manufacturers must identify and analyze threats
+      to the device, including network-based attacks, physical access,
+      supply chain compromise, and social engineering.
+    - Defense in depth: multiple layers of security controls must be
+      implemented, so that compromise of one layer does not lead to
+      full device compromise.
+    - Security updates: manufacturers must have a process for
+      deploying security patches and updates throughout the device
+      lifecycle.
+    - Vulnerability management: a process for monitoring, evaluating,
+      and addressing cybersecurity vulnerabilities must be maintained
+      throughout the device's expected service life.
+    - Coordinated vulnerability disclosure: manufacturers should have
+      a process for receiving and responding to vulnerability reports
+      from external researchers.
+
+    The MDCG 2019-16 guidance specifically references IEC 62443 and
+    ISO 27001 as relevant standards for demonstrating cybersecurity
+    compliance.
+references:
+  - citation: "EU MDR 2017/745, Annex I, Section 17.2 and 18.8"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+  - citation: "MDCG 2019-16 rev.1 — Guidance on Cybersecurity for Medical Devices"
+    url: "https://health.ec.europa.eu/system/files/2020-09/md_cybersecurity_en_0.pdf"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement network segmentation isolating medical device
+         software from general IT infrastructure, with firewall rules
+         and network policies enforcing allow-list-only communication.
+      2. Deploy a secrets management solution (e.g., HashiCorp Vault)
+         for all cryptographic keys, certificates, API tokens, and
+         service credentials, with automated rotation policies.
+      3. Configure automated vulnerability scanning of infrastructure
+         components (OS, container images, Kubernetes clusters) on a
+         continuous basis, with SLA-driven remediation timelines based
+         on severity.
+      4. Implement an immutable infrastructure pattern where production
+         systems are replaced rather than patched in place, ensuring
+         a known-good state after every deployment.
+      5. Deploy runtime application self-protection (RASP) or web
+         application firewall (WAF) for internet-facing medical device
+         interfaces.
+    tools:
+      - vault
+      - kubernetes-network-policies
+      - calico
+      - trivy
+      - falco
+      - waf
+  devsecops:
+    prose: |
+      1. Integrate threat modeling into the design phase using STRIDE
+         or PASTA methodology, documenting threats, mitigations, and
+         residual risks in the risk management file.
+      2. Implement a full security scanning pipeline: SAST (static
+         analysis), DAST (dynamic analysis), SCA (software composition
+         analysis), secret detection, and container scanning, with
+         blocking policies for critical and high severity findings.
+      3. Enforce secure coding standards through automated linting
+         rules covering OWASP Top 10, CWE Top 25, and medical
+         device-specific patterns (e.g., safe handling of clinical
+         data, proper use of cryptographic APIs).
+      4. Implement signed commits and signed container images to
+         establish provenance and prevent supply chain tampering.
+      5. Configure dependency pinning and lock files with automated
+         alerts for newly disclosed vulnerabilities in pinned versions.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - semgrep
+      - cosign
+  secops:
+    prose: |
+      1. Establish a cybersecurity incident response plan specific to
+         medical devices, including procedures for assessing patient
+         safety impact, notifying competent authorities, and
+         implementing field safety corrective actions.
+      2. Implement continuous vulnerability monitoring using threat
+         intelligence feeds, CVE databases, and manufacturer advisories
+         for all components in the software bill of materials.
+      3. Conduct penetration testing by qualified independent testers
+         at least annually and after significant architectural changes,
+         with findings classified using CVSS and tracked to remediation.
+      4. Maintain a coordinated vulnerability disclosure (CVD) program
+         with a published security contact and documented process for
+         triaging, validating, and remediating externally reported
+         vulnerabilities.
+      5. Conduct tabletop cybersecurity exercises simulating device
+         compromise scenarios to validate incident response readiness.
+    tools:
+      - siem
+      - vulnerability-management
+      - penetration-testing
+      - threat-intelligence
+      - incident-response
+legal_references:
+  - framework_id: iec-62443
+    articles: ["sr-1", "sr-2", "sr-3", "sr-4", "sr-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.8", "A.8.9", "A.8.24"]
+    relationship: mapped
+  - framework_id: anvisa-samd
+    articles: ["art-8"]
+    relationship: mapped

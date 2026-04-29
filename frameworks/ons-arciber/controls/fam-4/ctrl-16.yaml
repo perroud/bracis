@@ -1,0 +1,98 @@
+id: ctrl-16
+family: fam-4
+title: "Controle de Midias Removiveis e Dispositivos Portateis no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar política e controles técnicos para o uso
+    de mídias removíveis (pendrives USB, discos externos, CD/DVD, cartões de
+    memória) e dispositivos portáteis (laptops de engenharia, tablets, celulares)
+    no ARCiber. O uso de mídias removíveis no ARCiber deve ser controlado,
+    autorizado formalmente, limitado a dispositivos aprovados e registrado.
+    Dispositivos portáteis utilizados no ARCiber devem ser dedicados ao ambiente
+    regulado — o mesmo dispositivo não deve ser utilizado na rede corporativa
+    (IT) e no ARCiber sem processo de descontaminação definido.
+
+guidance:
+  prose: >-
+    Midias removiveis sao o principal vetor de infeccao inicial em ambientes
+    OT/ICS isolados da Internet, como demonstrado pelo caso Stuxnet. Os controles
+    devem abranger: (i) politica formal de uso de midias removiveis no ARCiber
+    com proibicao de uso de midias pessoais; (ii) desabilitacao tecnica de
+    portas USB em sistemas do ARCiber onde nao ha necessidade operacional
+    (via Group Policy, BIOS, bloqueadores fisicos de USB); (iii) para midias
+    necessarias operacionalmente: lista branca de dispositivos autorizados
+    (por numero de serie), scan de malware obrigatorio antes do uso no ARCiber;
+    (iv) laptops de engenharia dedicados ao ARCiber — configuracao hardened,
+    sem acesso a Internet, sem acesso a rede corporativa simultaneo ao ARCiber;
+    (v) registro de uso de midias removiveis no ARCiber com usuario, data,
+    sistema utilizado e objetivo; (vi) procedimento de descontaminacao para
+    laptops de engenharia que foram conectados a redes externas.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar controle de dispositivos via Group Policy (GPO) para bloquear
+      o uso de midias USB nao autorizadas nos sistemas Windows do ARCiber —
+      whitelist baseada em VendorID/ProductID ou numero de serie do dispositivo.
+      Implementar solucao de DLP (Data Loss Prevention) com capacidade de
+      monitorar e bloquear copias de dados para midias removiveis em sistemas
+      SCADA. Configurar kiosk de scan de malware (estacao dedicada de verificacao)
+      para scan obrigatorio de todas as midias antes de uso no ARCiber.
+      Manter inventario de dispositivos portateis e midias removiveis autorizados
+      para uso no ARCiber no CMDB.
+    tools:
+      - group-policy
+      - ivanti-endpoint-security
+      - trendmicro-txone
+      - servicenow
+  devsecops:
+    prose: >-
+      Implementar monitoramento automatizado de conexao de dispositivos USB
+      nos sistemas criticos do ARCiber, com alerta imediato para conexao de
+      dispositivo nao autorizado. Criar processo de aprovacao e registro de uso
+      de midia removivel no ARCiber via ServiceNow, com rastreabilidade completa.
+      Auditar mensalmente os logs de uso de dispositivos USB nos sistemas do
+      ARCiber para identificar usos nao autorizados. Implementar processo formal
+      de comissionamento de novos dispositivos portateis para uso no ARCiber,
+      incluindo hardening e configuracao de seguranca documentada.
+    tools:
+      - servicenow
+      - splunk
+      - group-policy
+      - gitlab-ci
+  secops:
+    prose: >-
+      Monitorar e investigar qualquer conexao de midia removivel nao autorizada
+      nos sistemas do ARCiber como potencial incidente de seguranca. Realizar
+      inspecao fisica periodica de portas USB em paineis de automacao e salas
+      de controle para verificar uso de bloqueadores fisicos onde aplicavel.
+      Revisar semestralmente a lista de dispositivos portateis e midias removiveis
+      autorizados para uso no ARCiber. Incluir o controle de midias removiveis
+      nos exercicios de conscientizacao em seguranca — demonstrar com exemplos
+      reais como o vetor foi explorado em incidentes historicos (Stuxnet).
+    tools:
+      - splunk
+      - nozomi-networks
+      - servicenow
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR2.3"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-010-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a7.10", "a8.9"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-7", "SI-3", "CM-7"]
+    relationship: mapped

@@ -1,0 +1,129 @@
+id: stig-infra-containers
+family: infra
+title: "Container Security and Hardening"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Container images must be built from a minimal, DISA-approved or CIS Benchmark-
+    hardened base image and must not include unnecessary packages, libraries, or
+    tools that are not required for the application's function. Containers must
+    not run as root (UID 0) unless a documented exception with compensating controls
+    is approved by the AO. Container file systems must be mounted read-only where
+    technically feasible; writable volumes must be explicitly declared and limited
+    to what is required. Containers must not be granted host network access,
+    host PID namespace access, or privileged capabilities unless explicitly required
+    and documented with a risk acceptance. Container images must be scanned for
+    known vulnerabilities and STIG findings before being admitted to the production
+    registry. All container images used in production must be pulled from an
+    authorized, controlled internal registry — pulling directly from public
+    registries in production is prohibited.
+
+guidance:
+  prose: >-
+    Container security builds on OS security principles but requires container-
+    specific controls. Running containers as root is particularly dangerous because
+    container isolation boundaries (namespaces, cgroups) are not as robust as VM
+    isolation; a container escape vulnerability combined with a root container
+    provides the attacker with host-level access. The principle of minimal attack
+    surface is especially important in containers: every unnecessary package is
+    a potential vulnerability.
+
+    The internal registry requirement addresses supply chain risks specific to
+    containers: public container registries contain images from unverified sources,
+    some of which have historically contained malware or significant CVEs. An
+    internal registry that only contains images that have been vetted, scanned,
+    and approved provides a critical control point.
+
+    Distroless and scratch-based images represent best practice for minimizing
+    the container attack surface — they contain only the application binary and
+    its runtime dependencies, removing shell access, package managers, and other
+    tools that attackers leverage for post-exploitation.
+
+references:
+  - citation: "DISA STIG — Docker Enterprise, V2R1"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "DISA STIG — Kubernetes, V1R6"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, CM-6, CM-7, SC-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CIS Docker Benchmark v1.6"
+    url: "https://www.cisecurity.org/benchmark/docker"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Operate a private container registry (GitLab Container Registry, Harbor,
+      ECR) with admission controls that reject images not scanned within 24 hours
+      and images with critical CVEs without documented exceptions. Implement
+      registry mirroring for approved public images (distroless, UBI, Alpine)
+      with automated re-scanning when upstream updates are published. Configure
+      Kubernetes admission webhooks (Kyverno or OPA/Gatekeeper) to enforce
+      container security policies: non-root user, read-only root filesystem,
+      no privileged mode, no host network/PID/IPC, dropped capabilities,
+      approved registry allowlist. Deploy Falco for runtime container security
+      monitoring that detects post-exploitation behaviors: unexpected shell
+      execution, file writes to non-writable directories, network connections
+      to unusual destinations.
+    tools:
+      - harbor
+      - gitlab-container-registry
+      - kyverno
+      - opa-gatekeeper
+      - falco
+      - trivy
+      - docker-bench
+
+  devsecops:
+    prose: >-
+      Scan all Dockerfiles in CI pipelines using Hadolint (Dockerfile linting)
+      and Trivy (vulnerability scanning) before images are pushed to the registry.
+      Enforce container security best practices in Dockerfile reviews: non-root
+      user declaration, minimal base image, no ADD with URLs (use COPY instead),
+      pinned package versions, and no secrets in layers. Implement multi-stage
+      builds to minimize the final image size and reduce the attack surface.
+      Generate and publish SBOMs for all container images as pipeline artifacts.
+      Run kube-bench as a pipeline stage against cluster configuration to validate
+      Kubernetes hardening. Block promotion of images with CAT I or CAT II STIG
+      findings to the production registry.
+    tools:
+      - hadolint
+      - trivy
+      - dockle
+      - syft
+      - kube-bench
+      - gitlab-container-scanning
+
+  secops:
+    prose: >-
+      Monitor Falco alerts for runtime container anomalies and correlate with
+      other security events in the SIEM. Conduct periodic container escape
+      testing as part of platform penetration tests. Validate registry access
+      controls quarterly to ensure only authorized pipelines can push images.
+      Audit running containers for compliance with security policy (non-root,
+      read-only filesystem, approved image) using kubectl and Kubernetes
+      Admission Controller logs. Report container security metrics (% compliant
+      pods, open CVEs in running images, registry scan coverage) to the AO
+      as continuous monitoring deliverables.
+    tools:
+      - falco
+      - splunk
+      - elastic-siem
+      - trivy-operator
+      - anchore-enterprise
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "CM-7", "SC-2", "SI-2", "RA-5"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["CM.L2-3.4.6", "CM.L2-3.4.7", "SI.L1-3.14.1"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["cm-6", "cm-7", "si-2"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.PS-01", "PR.PS-02", "DE.CM-08"]
+    relationship: supports

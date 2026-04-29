@@ -1,0 +1,91 @@
+id: pix-12
+family: authn-authz
+title: "Portabilidade e Reivindicacao de Chaves"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve implementar os fluxos de portabilidade e reivindicação de chaves Pix
+    conforme definido pelo regulamento, garantindo autenticação do solicitante,
+    comunicação transparente entre PSP doador e PSP reclamante, cumprimento dos prazos
+    regulatórios e proteção contra transferências não autorizadas de chaves. O usuário
+    deve ser notificado em todas as etapas do processo.
+guidance:
+  prose: |
+    **Portabilidade de chave:**
+    Processo pelo qual o usuario transfere uma chave Pix de um PSP (doador) para outro
+    PSP (reclamante), mantendo a mesma chave vinculada a uma conta diferente.
+
+    Fluxo:
+    1. Usuario solicita portabilidade no PSP reclamante (destino).
+    2. PSP reclamante registra pedido de portabilidade no DICT.
+    3. DICT notifica PSP doador (origem).
+    4. PSP doador tem 7 dias corridos para confirmar ou contestar.
+    5. Se confirmado ou sem resposta, portabilidade e efetivada.
+    6. Se contestado, o DICT abre processo de disputa.
+
+    **Reivindicacao de chave:**
+    Processo usado quando alguem quer registrar uma chave (tipicamente CPF/CNPJ) que
+    ja esta vinculada a outra pessoa ou conta em outro PSP.
+
+    Fluxo:
+    1. Titular legitimo solicita reivindicacao no PSP reclamante.
+    2. PSP reclamante registra reivindicacao no DICT.
+    3. PSP doador notifica o usuario atual da chave.
+    4. Usuario atual tem 7 dias para confirmar ou contestar.
+    5. Se nao contestar, chave e transferida.
+
+    **Riscos e protecoes:**
+    - Notificacao obrigatoria ao usuario em cada etapa (push, SMS, e-mail)
+    - Verificacao de identidade no PSP reclamante antes de iniciar o processo
+    - Bloqueio temporario da chave durante o processo de portabilidade/reivindicacao
+    - Log de auditoria completo para disputas
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxos asincronos:**
+      1. State machine para gerenciar os estados de portabilidade e reivindicacao
+         (solicitado, pendente, confirmado, contestado, concluido, cancelado).
+      2. Scheduler para controle de prazos regulatorios (7 dias).
+      3. Fila de eventos para notificacao de todas as partes envolvidas.
+      4. API para consulta de status pelo usuario em tempo real.
+
+      **Notificacoes:**
+      5. Push notification para cada mudanca de estado do processo.
+      6. SMS e e-mail como canais complementares de notificacao.
+      7. Confirmacao explicita do usuario antes de efetivar a portabilidade.
+    tools:
+      - state-machine
+      - scheduler
+      - notification-service
+      - message-queue
+  devsecops:
+    prose: |
+      **Testes de fluxo:**
+      1. Testes end-to-end de portabilidade: solicitacao, confirmacao, efetivacao.
+      2. Testes de reivindicacao: solicitacao, contestacao, resolucao.
+      3. Testes de timeout: PSP doador nao responde em 7 dias.
+      4. Testes de concorrencia: portabilidade e reivindicacao simultaneas.
+      5. Testes de notificacao: verificar que todas as partes sao notificadas.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - event-testing
+  secops:
+    prose: |
+      **Monitoramento de portabilidade:**
+      1. Alerta para volume anomalo de portabilidades de um mesmo PSP.
+      2. Monitoramento de reivindicacoes nao resolvidas apos o prazo.
+      3. Deteccao de padroes de portabilidade fraudulenta (SIM swap + portabilidade).
+      4. Auditoria de disputas de chave para identificar tendencias.
+    tools:
+      - siem
+      - fraud-detection
+      - workflow-monitoring
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-14", "art-15"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

@@ -1,0 +1,97 @@
+id: tds-data-3
+family: tds-data
+title: "Cryptographic Key Management for 3DS Operations"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Cryptographic keys used in the 3DS environment must be managed through
+    a formal key management lifecycle. This includes secure key generation
+    using approved random number generators, secure storage in hardware
+    security modules (HSMs) or equivalent tamper-resistant devices, defined
+    key rotation periods, and secure key destruction procedures. Split
+    knowledge and dual control must be enforced for manual key management
+    operations. Key custodians must formally acknowledge their
+    responsibilities. Cryptographic key material must never be stored in
+    cleartext outside of a secure cryptographic device.
+
+guidance:
+  prose: >-
+    Cryptographic key management is fundamental to the security of 3DS
+    authentication. The 3DS protocol relies on cryptographic operations
+    for generating Authentication Values, signing messages, and encrypting
+    sensitive data. Compromise of cryptographic keys can enable fraudulent
+    authentication, transaction manipulation, or data theft. Hardware
+    security modules provide a tamper-resistant environment for key
+    operations and should be used for all production key material. Split
+    knowledge ensures no single individual has complete access to key
+    material, while dual control requires at least two authorized
+    individuals for sensitive key operations.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 2 — Cryptographic Key Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 2.3 — Key Management Procedures"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy FIPS 140-2 Level 3 or higher HSMs for all production
+      cryptographic key operations. Use cloud HSM services (AWS CloudHSM,
+      Azure Dedicated HSM, GCP Cloud HSM) or on-premises HSMs for key
+      generation and storage. Implement automated key rotation schedules
+      through a key management system. Configure secrets management
+      platforms (HashiCorp Vault) to enforce key lifecycle policies
+      including expiration and automatic rotation. Ensure all key ceremony
+      procedures are documented and require dual control.
+    tools:
+      - aws-cloudhsm
+      - azure-dedicated-hsm
+      - gcp-cloud-hsm
+      - hashicorp-vault
+      - thales-luna
+      - entrust-nshield
+
+  devsecops:
+    prose: >-
+      Implement CI/CD checks that verify cryptographic key material is
+      never embedded in source code, configuration files, or container
+      images. Use secret scanning tools to detect any key material in
+      repositories. Enforce that applications retrieve keys only from
+      approved key management systems at runtime. Include key rotation
+      validation in deployment pipelines to verify that rotated keys
+      are correctly propagated to all dependent services.
+    tools:
+      - gitlab-ci
+      - gitleaks
+      - trufflehog
+      - semgrep
+      - checkov
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor HSM audit logs for unauthorized key access or operations.
+      Alert on key usage anomalies such as unusually high operation counts
+      or access from unexpected sources. Track key expiration dates and
+      enforce rotation schedules. Conduct annual reviews of key custodian
+      assignments and acknowledgment forms. Verify that destroyed keys
+      cannot be recovered through audit testing.
+    tools:
+      - splunk
+      - elastic-siem
+      - thales-ciphertrust
+      - venafi
+      - hashicorp-vault
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

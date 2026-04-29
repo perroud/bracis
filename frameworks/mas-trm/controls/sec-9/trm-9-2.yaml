@@ -1,0 +1,124 @@
+id: trm-9-2
+family: sec-9
+title: "Cryptography"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement cryptographic controls to protect
+    the confidentiality, integrity, and authenticity of data at rest and in
+    transit, using industry-accepted algorithms and key management practices.
+  parts:
+    - id: trm-9-2.1
+      label: "9.2.1"
+      prose: >-
+        The institution shall establish a cryptographic policy that defines
+        approved algorithms, key lengths, and protocols for protecting
+        sensitive data. Cryptographic standards shall be aligned with
+        industry best practices and updated to address emerging threats
+        including quantum computing risks.
+    - id: trm-9-2.2
+      label: "9.2.2"
+      prose: >-
+        All sensitive data in transit shall be protected using strong
+        encryption protocols (TLS 1.2 or higher). Sensitive data at rest,
+        including customer data and authentication credentials, shall be
+        encrypted using approved algorithms with appropriate key lengths.
+    - id: trm-9-2.3
+      label: "9.2.3"
+      prose: >-
+        The institution shall implement secure key management practices
+        covering key generation, distribution, storage, rotation,
+        revocation, and destruction. Cryptographic keys shall be protected
+        using hardware security modules (HSMs) or equivalent controls for
+        high-value keys.
+    - id: trm-9-2.4
+      label: "9.2.4"
+      prose: >-
+        The institution shall maintain an inventory of cryptographic assets
+        including certificates, keys, and encryption endpoints. Certificate
+        lifecycle management shall ensure timely renewal and prevent
+        service disruptions from expired certificates.
+
+guidance:
+  prose: >-
+    Cryptography is the technical foundation for data protection. Weak or
+    outdated algorithms (DES, 3DES, MD5, SHA-1, TLS 1.0/1.1) must be
+    deprecated and replaced. Key management is more critical than algorithm
+    selection; compromised keys render encryption useless regardless of
+    algorithm strength. Certificate management failures cause outages; automated
+    certificate lifecycle management eliminates manual renewal risks.
+    Institutions should begin assessing quantum computing impact on current
+    cryptographic implementations and planning migration to post-quantum
+    algorithms where feasible.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 9"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "NIST SP 800-57 - Key Management Recommendations"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ across all platform services through ingress
+      controller and service mesh configuration. Implement automated
+      certificate management using cert-manager with Let's Encrypt or
+      internal CAs for automatic issuance and renewal. Deploy HashiCorp
+      Vault or equivalent for centralized secrets and key management
+      with HSM backend for high-value keys. Configure encryption at
+      rest for all storage systems (database encryption, volume
+      encryption, object storage encryption). Implement cryptographic
+      policy enforcement through OPA policies that reject deployments
+      using weak algorithms or protocols.
+    tools:
+      - vault
+      - cert-manager
+      - istio
+      - open-policy-agent
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement secret detection scanning in CI/CD pipelines to prevent
+      cryptographic keys and credentials from being committed to
+      repositories. Configure SAST rules to detect use of weak or
+      deprecated cryptographic algorithms in application code. Enforce
+      TLS configuration standards through infrastructure-as-code
+      scanning. Implement automated certificate rotation in deployment
+      pipelines. Scan container images for embedded secrets and
+      hardcoded credentials.
+    tools:
+      - gitlab-ci
+      - gitlab-secret-detection
+      - gitlab-sast
+      - semgrep
+      - trivy
+      - vault
+
+  secops:
+    prose: >-
+      Monitor for certificate expiration and weak cryptographic
+      configurations through continuous scanning. Maintain a
+      cryptographic asset inventory including all certificates, keys,
+      and encryption endpoints. Alert on detection of deprecated
+      protocols (TLS 1.0/1.1, SSLv3) or weak ciphers in network
+      traffic. Track cryptographic findings and remediation timelines.
+      Conduct periodic reviews of cryptographic implementations against
+      current best practices and emerging threats.
+    tools:
+      - splunk
+      - nessus
+      - qualys
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.24"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-9"]
+    relationship: supports

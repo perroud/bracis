@@ -1,0 +1,108 @@
+id: art-22
+family: cap-5
+title: "Criterios de Suspeicao e Tipologias"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 22. Sem prejuízo de outros critérios, as instituições de pagamento devem
+    considerar como indicadores de possíveis situações suspeitas de lavagem de
+    dinheiro ou de financiamento do terrorismo:
+
+    I - operações realizadas com o fim específico de evitar os procedimentos de
+    identificação e registro, em especial aquelas que sugiram fragmentação de
+    valores ou utilização de terceiros como interpostos;
+
+    II - situações em que não seja possível identificar o beneficiário final ou
+    a operação aparente não reflita a real natureza da transação;
+
+    III - operações realizadas com ativos virtuais ou criptoativos sem finalidade
+    econômica clara ou entre endereços de alto risco;
+
+    IV - operações relacionadas a financiamento do terrorismo, incluindo remessas
+    para jurisdições com conflitos armados ou presença de grupos terroristas;
+
+    V - operações que envolvam pessoas ou entidades listadas em watchlists de
+    sanções nacionais e internacionais.
+guidance:
+  prose: |
+    O art. 22 lista os indicadores de suspeicao mais relevantes para IPs.
+    Esses indicadores devem ser implementados como regras no sistema de monitoramento.
+
+    **Financiamento do terrorismo (inciso IV) -- atencao especial:**
+    Diferente da lavagem de dinheiro (que envolve valores elevados), o financiamento
+    do terrorismo pode envolver PEQUENOS valores para sustentar atividades
+    terroristas. Isso torna a deteccao mais dificil e a necessidade de screening
+    de contrapartes ainda mais critica.
+
+    **Ativos virtuais (inciso III):**
+    O BCB e a CVM regulam ativos virtuais no Brasil. IPs que permitem
+    transacoes com criptoativos devem:
+    - Verificar os enderecos de blockchain envolvidos em bases de dados de
+      risco (Chainalysis, Elliptic)
+    - Monitorar transacoes para/de mixers e tumblers
+    - Identificar transacoes para exchanges nao regulamentadas
+
+    **Listas de sancoes (inciso V):**
+    Verificacao em tempo real contra:
+    - Lista Consolidada da ONU
+    - OFAC SDN (EUA)
+    - Lista da UE
+    - Lista da OFAC SDN (EUA)
+    - Listas do BCB/COAF
+    - Lista do Tesouro Nacional (congelamento de ativos)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos indicadores do art. 22:**
+      1. Regras de fragmentacao (inciso I): detectar:
+         - Multiplas transacoes abaixo de limiares de registro no mesmo dia
+         - Transferencias circulares (A→B→C→A)
+         - Interposto: cliente C recebe de A e imediatamente transfere para B
+      2. Beneficiario final nao identificado (inciso II): flag automatico para
+         transacoes de clientes PJ com status "beneficiario final pendente".
+      3. Ativos virtuais (inciso III): integrar API de analise de blockchain
+         (Chainalysis, Elliptic ou similar) para scoring de enderecos cripto.
+      4. Financiamento terrorismo (inciso IV): lista de paises e regioes com
+         conflito ativo e presenca de grupos terroristas (atualizar mensalmente).
+      5. Watchlists (inciso V): verificacao em tempo real com match fuzzy,
+         atualizacao diaria das listas de sancoes.
+    tools:
+      - aml-platform
+      - sanctions-screening
+      - blockchain-analytics
+      - transaction-monitoring
+  devsecops:
+    prose: |
+      **Manutencao e teste dos indicadores:**
+      1. Biblioteca de tipologias codificada como regras testadas: cada tipologia
+         do art. 22 implementada como caso de teste automatizado.
+      2. Atualizacao das listas de sancoes: pipeline automatico que baixa,
+         valida e atualiza listas com frequencia diaria.
+      3. Testes de screening: garantir que nomes em watchlists sao corretamente
+         identificados, incluindo variantes e transliteracoes.
+      4. Alertas de falha de atualizacao das listas: se lista nao for atualizada
+         em 24h, gerar alerta critico.
+    tools:
+      - gitlab-ci
+      - sanctions-screening
+      - list-management
+      - test-automation
+  secops:
+    prose: |
+      **Revisao e atualizacao de tipologias:**
+      1. Revisao semestral das tipologias do art. 22 contra novas publicacoes
+         do COAF (notas de orientacao, relatorios de inteligencia financeira).
+      2. Verificar cobertura de todas as tipologias FATF relevantes para IPs.
+      3. Adicionar novas tipologias identificadas em investigacoes internas
+         encerradas com SAR.
+      4. Relatorio de alertas por tipologia: identificar tipologias com alta
+         taxa de conversao em SAR (mais efetivas) vs. alta taxa de falso positivo.
+    tools:
+      - aml-platform
+      - grc-platform
+      - regulatory-intelligence
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-22", "art-23"]
+    relationship: equivalent-to

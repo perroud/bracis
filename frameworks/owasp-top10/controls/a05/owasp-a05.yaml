@@ -1,0 +1,120 @@
+id: owasp-a05
+family: a05
+title: "A05:2021 — Security Misconfiguration"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Security misconfiguration is the most commonly seen issue in applications, affecting 90% of
+    applications tested. An application may be vulnerable if it is missing appropriate security
+    hardening across any part of the application stack, or improperly configured permissions on
+    cloud services; unnecessary features are enabled or installed (e.g., unnecessary ports,
+    services, pages, accounts, or privileges); default accounts and their passwords are still
+    enabled and unchanged; error handling reveals stack traces or other overly informative error
+    messages to users; for upgraded systems, the latest security features are disabled or not
+    configured securely; the security settings in the application servers, application frameworks,
+    libraries, databases, and platforms are not set to secure values; the server does not send
+    security headers or directives, or they are not set to secure values; the software is out
+    of date or vulnerable; or cloud storage permissions are misconfigured allowing public access
+    to sensitive data.
+
+guidance:
+  prose: >-
+    Security misconfiguration climbed from the sixth position in 2017 to the fifth position in
+    2021 and is often the result of insecure default configurations, incomplete or ad hoc
+    configurations, open cloud storage, misconfigured HTTP headers, and verbose error messages
+    containing sensitive information. All operating systems, frameworks, libraries, and applications
+    must be securely configured and patched in a timely fashion. Automated and repeatable
+    application security configuration processes are essential — manual configuration is
+    error-prone and does not scale. Implement a hardening process that deploys a minimal platform
+    without any unnecessary features, components, documentation, and samples. A repeatable
+    hardening process makes it fast and easy to deploy another environment that is appropriately
+    locked down. Development, QA, and production environments should all be configured identically,
+    with different credentials used in each environment.
+
+references:
+  - citation: "OWASP Top 10:2021 A05 Security Misconfiguration"
+    url: "https://owasp.org/Top10/A05_2021-Security_Misconfiguration/"
+  - citation: "OWASP Configuration Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html"
+  - citation: "CIS Benchmark Library"
+    url: "https://www.cisecurity.org/cis-benchmarks/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Manage all infrastructure as code (Terraform, Pulumi, CDK) to ensure configuration is
+      version-controlled, reviewed, and reproducible. Enforce CIS Benchmark baselines through
+      policy-as-code (OPA, Kyverno, AWS Config Rules, Azure Policy) for all cloud resources,
+      Kubernetes clusters, container images, and OS configurations. Implement configuration
+      drift detection using tools that continuously compare deployed configuration against the
+      approved baseline and alert or auto-remediate on drift. Disable all unnecessary services,
+      ports, and features at the platform level — deny-by-default in security group rules,
+      Kubernetes Network Policies, and firewall configurations. Deploy container images built
+      from minimal base images (distroless, alpine) and remove all debug tools, shells, and
+      package managers from production images. Enforce immutable infrastructure: no SSH access
+      to production hosts, configuration changes only through the deployment pipeline.
+    tools:
+      - terraform
+      - pulumi
+      - opa
+      - kyverno
+      - checkov
+      - aws-config
+      - azure-policy
+      - falco
+
+  devsecops:
+    prose: >-
+      Integrate infrastructure-as-code security scanning (Checkov, Trivy, tfsec, KICS) into
+      CI/CD pipelines for all Terraform, CloudFormation, Helm charts, Kubernetes manifests, and
+      Dockerfiles. Configure scans to detect common misconfigurations: public S3 buckets, security
+      groups with 0.0.0.0/0 ingress on sensitive ports, missing encryption at rest, disabled
+      logging, default admin credentials, and unencrypted databases. Implement automated security
+      header testing (securityheaders.com API) for all deployed applications. Include configuration
+      validation tests in integration test suites: verify that debug mode is disabled, error pages
+      do not contain stack traces, and unnecessary endpoints are unavailable. Scan container images
+      for OS-level misconfigurations and known-insecure default configurations.
+    tools:
+      - checkov
+      - trivy
+      - tfsec
+      - kics
+      - semgrep
+      - gitlab-ci
+      - securityheaders
+
+  secops:
+    prose: >-
+      Implement continuous cloud security posture management (CSPM) using cloud-native tools
+      or third-party CSPM platforms to continuously assess cloud resource configurations against
+      security benchmarks. Schedule regular configuration audits against CIS Benchmarks for
+      cloud providers, OS configurations, and application platforms. Monitor for configuration
+      drift in real-time and auto-remediate non-critical misconfigurations. Conduct quarterly
+      external attack surface assessments to identify accidentally exposed services, open ports,
+      and publicly accessible storage buckets. Maintain a configuration inventory and review
+      all configuration changes in change management workflows.
+    tools:
+      - aws-security-hub
+      - azure-security-center
+      - gcp-security-command-center
+      - prisma-cloud
+      - wiz
+      - crowdstrike
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "CM-7", "CM-8", "SA-5"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["2.2", "2.3", "6.3.3"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["4.1", "4.2", "4.6", "16.7"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V14.1", "V14.2", "V14.3"]
+    relationship: mapped

@@ -1,0 +1,94 @@
+id: id.ra-01
+family: id
+title: "Risk Assessment - Vulnerabilities in assets are identified, validated, and recorded"
+class: CSF2
+
+statement:
+  prose: >-
+    Vulnerabilities in assets are identified, validated, and recorded.
+
+guidance:
+  prose: >-
+    Vulnerability identification is a continuous process that encompasses automated
+    scanning, threat intelligence feeds, vendor advisories, and penetration testing.
+    Identified vulnerabilities must be validated to confirm exploitability and eliminate
+    false positives. Validated vulnerabilities must be recorded in a centralized
+    vulnerability management system with sufficient context for prioritization:
+    affected asset, severity score (CVSS), exploit availability (EPSS), asset
+    criticality, compensating controls, and remediation timeline. The organization
+    must maintain visibility into vulnerabilities across all asset types: operating
+    systems, applications, firmware, container images, IaC configurations, and
+    third-party dependencies.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, ID.RA-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy vulnerability scanning across all platform layers. Use image scanning
+      (Trivy, Grype) for container images, IaC scanning (Checkov, tfsec) for
+      infrastructure configurations, and OS-level scanning (Qualys, Tenable) for
+      compute instances. Feed all scan results into a centralized vulnerability
+      aggregation platform (DefectDojo) that deduplicates findings and tracks
+      remediation. Implement automated remediation for common vulnerability types:
+      base image updates via Renovate, OS patching via system managers, dependency
+      updates via automated merge requests. Block deployment of images with
+      unresolved critical vulnerabilities using admission controllers.
+    tools:
+      - trivy
+      - grype
+      - checkov
+      - tfsec
+      - defectdojo
+      - kyverno
+      - renovate
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning into every CI/CD pipeline stage. Run dependency
+      scanning and SAST on merge requests to catch vulnerabilities before merge. Run
+      container scanning after image builds. Run DAST against review environments.
+      Configure GitLab Security Policies to define vulnerability thresholds that
+      prevent merging or deploying code with unresolved critical or high-severity
+      findings. Implement automated merge requests for dependency updates. Track
+      vulnerability resolution time (MTTR) as a key DevSecOps metric. Surface
+      vulnerability findings directly in merge request discussions for developer
+      visibility.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-security-policies
+      - trivy
+      - snyk
+
+  secops:
+    prose: >-
+      Run authenticated vulnerability scans across all enterprise assets weekly.
+      Validate critical and high-severity findings through manual verification or
+      exploit simulation. Correlate vulnerability scan results with threat intelligence
+      to prioritize actively exploited vulnerabilities. Maintain a vulnerability
+      dashboard showing open vulnerabilities by severity, age, asset owner, and
+      remediation status. Generate weekly vulnerability reports for security teams
+      and monthly executive summaries. Track remediation SLA compliance and escalate
+      overdue items automatically.
+    tools:
+      - qualys-vmdr
+      - tenable-io
+      - rapid7-insightvm
+      - defectdojo
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "RA-5", "SI-2"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.8"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-7.1"]
+    relationship: equivalent-to

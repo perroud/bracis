@@ -1,0 +1,115 @@
+id: p2pe-dec-1
+family: p2pe-decrypt
+title: "Decryption Environment Physical and Logical Security"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The decryption environment shall be physically and logically secured
+    to prevent unauthorized access to decryption operations, cleartext
+    account data, and cryptographic keys. The decryption environment shall
+    be operated within a facility that meets PCI DSS physical security
+    requirements. Logical access to the decryption environment shall be
+    restricted to authorized personnel using multi-factor authentication.
+    Network connectivity to the decryption environment shall be limited
+    to the minimum required for receiving encrypted payloads and
+    transmitting decrypted data to authorized downstream systems.
+  parts:
+    - id: p2pe-dec-1.a
+      label: "Domain 3, 3A"
+      prose: >-
+        The decryption environment is located in a physically secured
+        facility with access controls, surveillance, and visitor management
+        procedures meeting PCI DSS Requirement 9 standards.
+    - id: p2pe-dec-1.b
+      label: "Domain 3, 3B"
+      prose: >-
+        Logical access to the decryption environment requires multi-factor
+        authentication and is restricted to personnel with documented
+        business need, with all access logged and monitored.
+
+guidance:
+  prose: >-
+    The decryption environment is the most security-critical component of
+    a P2PE solution because it is where encrypted account data is converted
+    back to cleartext for authorization processing. This environment must
+    meet or exceed PCI DSS Level 1 service provider requirements. The
+    physical facility should include mantrap entry, biometric access
+    controls, CCTV coverage, and 24/7 monitoring. Network architecture
+    must enforce strict segmentation — the decryption environment should
+    be in a dedicated VLAN or VPC with deny-all default firewall rules and
+    explicit allow rules only for required traffic flows. Administrative
+    access must use jump boxes or privileged access management (PAM)
+    solutions with session recording.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 3 — Decryption Environment"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI DSS v4.0.1, Requirement 9 — Restrict Physical Access to Cardholder Data"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy the decryption environment in a dedicated VPC/VNet with no
+      internet gateway. Implement private link or VPC endpoints for all
+      service connectivity. Use dedicated HSM partitions for decryption
+      operations, accessible only from the decryption application servers.
+      Deploy privileged access management (PAM) with session recording for
+      all administrative access. Implement infrastructure-as-code with
+      mandatory dual approval for any network or access control changes.
+      Use immutable infrastructure patterns — decryption servers are
+      rebuilt from verified images rather than patched in place.
+    tools:
+      - terraform
+      - pulumi
+      - aws-vpc-private-link
+      - azure-private-endpoint
+      - cyberark
+      - hashicorp-boundary
+      - packer
+
+  devsecops:
+    prose: >-
+      Enforce that all infrastructure changes to the decryption environment
+      go through code review with mandatory security team approval. Scan
+      IaC templates for overly permissive security groups, missing
+      encryption at rest, or public accessibility. Include automated
+      compliance tests that validate network segmentation rules after every
+      deployment. Test that unauthorized network paths to the decryption
+      environment are blocked.
+    tools:
+      - checkov
+      - tfsec
+      - opa-conftest
+      - gitlab-ci
+      - aws-config-rules
+      - azure-policy
+
+  secops:
+    prose: >-
+      Monitor all access attempts to the decryption environment, both
+      successful and failed. Implement anomaly detection for access
+      patterns (unusual hours, frequency, source IPs). Alert on any
+      network traffic to or from the decryption environment that does not
+      match approved flow patterns. Conduct quarterly penetration tests
+      targeting the decryption environment boundary. Review physical access
+      logs monthly and correlate with logical access records.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - crowdstrike
+      - darktrace
+      - physical-access-control-system
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.1", "req-9.2", "req-1.2"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-2", "PE-3", "PE-6", "SC-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A7.1", "A7.2", "A7.4", "A8.20"]
+    relationship: supports

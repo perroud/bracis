@@ -1,0 +1,115 @@
+id: bpf-9
+family: audit-trail
+title: "Mandatory Audit Trail for GMP Records"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    Todos os sistemas computadorizados que geram, processam ou armazenam
+    dados de BPF devem possuir trilha de auditoria (audit trail) habilitada,
+    funcional e protegida contra desativação, modificação ou exclusão por
+    qualquer usuário, incluindo administradores do sistema.
+
+    A trilha de auditoria deve registrar automaticamente, no mínimo: a
+    identidade do usuário que realizou a ação, a data e hora da ação
+    (timestamp do sistema), o tipo de ação realizada (criação, modificação,
+    exclusão, impressão, exportação), o valor anterior e o novo valor para
+    modificações, e o motivo da alteração quando aplicável.
+
+    A trilha de auditoria deve ser parte integrante do registro eletrônico
+    e deve estar disponível para revisão durante a aprovação de registros
+    de produção, investigações de qualidade, e inspeções regulatórias.
+guidance:
+  prose: |
+    Audit trail is the technical mechanism that ensures the attributability,
+    completeness, and consistency principles of ALCOA+. It provides the
+    chronological record of all activities affecting GMP data.
+
+    Audit trail requirements per RDC 658:
+    - Always on: cannot be disabled by any user role
+    - Tamper-proof: cannot be modified or deleted
+    - System-generated: timestamps from server clock, not user input
+    - Comprehensive: covers all CRUD operations plus read access to
+      sensitive data
+    - Contextual: captures before/after values for modifications
+    - Integrated: part of the record, not a separate log file
+
+    Audit trail must capture events including:
+    - Record creation, modification, and deletion
+    - User login/logout and failed authentication attempts
+    - System configuration changes
+    - Electronic signature events
+    - Data export and printing
+    - Alarm acknowledgment
+    - Method or parameter changes
+
+    Systems without native audit trail capability must implement
+    compensating controls documented in the validation package.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement centralized audit trail infrastructure using
+         append-only, tamper-evident logging with cryptographic
+         chaining (hash chain) to detect any modification or deletion
+         of audit records.
+      2. Configure audit trail storage separate from application
+         databases with independent access controls, ensuring that
+         database administrators cannot modify audit records.
+      3. Deploy automated audit trail integrity verification running
+         periodic hash chain validation with alerting on any detected
+         inconsistency.
+      4. Implement audit trail archival with the same retention period
+         as the parent record, maintaining searchability and
+         accessibility throughout the retention period.
+    tools:
+      - append-only-logging
+      - hash-chain-verification
+      - audit-storage
+      - log-archival
+  devsecops:
+    prose: |
+      1. Implement automated tests verifying audit trail completeness:
+         for every data operation (create, update, delete), verify that
+         the corresponding audit trail entry exists with all required
+         fields.
+      2. Test audit trail tamper resistance: verify that audit records
+         cannot be modified or deleted through any application or
+         database pathway, including administrative functions.
+      3. Validate audit trail timestamp accuracy: verify that timestamps
+         are system-generated, synchronized via NTP, and cannot be
+         modified by users.
+      4. Include audit trail functionality verification in every system
+         release validation to confirm continued compliance.
+    tools:
+      - gitlab-ci
+      - audit-trail-testing
+      - integrity-testing
+      - timestamp-validation
+  secops:
+    prose: |
+      1. Establish audit trail management SOP defining requirements
+         for enabling, monitoring, reviewing, and archiving audit trails
+         across all GMP computerized systems.
+      2. Conduct periodic audit trail functionality reviews verifying
+         that audit trails are enabled, complete, tamper-proof, and
+         properly configured on all classified systems.
+      3. Monitor for audit trail anomalies: gaps in chronological
+         sequence, system clock adjustments, unusually high volumes
+         of modifications, and access outside normal operating hours.
+      4. Include audit trail configuration in the scope of computerized
+         system validation and periodic requalification assessments.
+    tools:
+      - siem
+      - grc-platform
+      - audit-trail-review
+      - quality-management-system
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-19", "art-20"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-15"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-b"]
+    relationship: mapped

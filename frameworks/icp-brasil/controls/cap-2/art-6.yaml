@@ -1,0 +1,113 @@
+id: art-6
+family: cap-2
+title: "Qualified Electronic Signature (ICP-Brasil Certificate)"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 6. da Lei 14.063/2020. A assinatura eletrônica qualificada, de que
+    trata o inciso IV do caput do art. 2º desta Lei, é a que utiliza
+    certificado digital, nos termos do § 1º do art. 10 da Medida Provisória
+    nº 2.200-2, de 24 de agosto de 2001.
+
+    Art. 10, § 1º da MP 2.200-2/2001. As declarações constantes dos documentos
+    em forma eletrônica produzidos com a utilização de processo de certificação
+    disponibilizado pela ICP-Brasil presumem-se verdadeiros em relação aos
+    signatários, na forma do art. 131 da Lei nº 3.071, de 1º de janeiro de
+    1916 — Código Civil.
+
+    § 2º do art. 10 da MP 2.200-2/2001. O disposto nesta Medida Provisória
+    não obsta a utilização de outro meio de comprovação da autoria e
+    integridade de documentos em forma eletrônica, inclusive os que utilizem
+    certificados não emitidos pela ICP-Brasil, desde que admitido pelas partes
+    como válido ou aceito pela pessoa a quem for oposto o documento.
+guidance:
+  prose: |
+    Article 6 of Lei 14.063/2020 combined with Article 10 of MP 2.200-2/2001
+    establishes the qualified electronic signature as the gold standard of
+    digital signing in Brazil.
+
+    **Legal presumption of validity:**
+    This is the critical distinction: documents signed with ICP-Brasil
+    certificates carry automatic legal presumption of truthfulness regarding
+    the signer's identity. This means:
+    - No need for party acceptance or prior agreement
+    - The burden of proof shifts to whoever challenges the signature
+    - Equivalent to a notarized handwritten signature
+
+    **ICP-Brasil certificate requirements:**
+    - Issued by a CA (Autoridade Certificadora) accredited by ICP-Brasil
+    - Certificate chain must validate up to AC Raiz
+    - Certificate must be valid (not expired, not revoked) at signing time
+    - Private key must be under sole control of the certificate holder
+
+    **Certificate types commonly used:**
+    - e-CPF: individual person certificate (linked to CPF number)
+    - e-CNPJ: legal entity certificate (linked to CNPJ number)
+    - A1: software-stored key (valid 1 year)
+    - A3: hardware-stored key (smartcard/token, valid 1-5 years)
+
+    **Mandatory use cases (art. 7):**
+    - Real estate transactions
+    - Acts of transfer and registration of movable property
+    - Health sector specific acts (per CFM regulation)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implement qualified signature infrastructure:**
+      1. Deploy ICP-Brasil certificate validation service with full chain
+         verification from end-entity to AC Raiz.
+      2. Integrate OCSP and CRL checking for real-time certificate status
+         validation — reject expired or revoked certificates.
+      3. Support both A1 (software) and A3 (smartcard/token) certificate
+         types via PKCS#11 and PKCS#12 interfaces.
+      4. Implement CAdES, XAdES, or PAdES signature formats for long-term
+         validity, including timestamp and validation data embedding.
+      5. Deploy server-side signature verification that extracts and
+         validates certificate attributes (CPF, CNPJ, issuer, validity).
+    tools:
+      - pki-service
+      - ocsp-responder
+      - crl-distribution
+      - signature-validator
+      - pkcs11-interface
+  devsecops:
+    prose: |
+      **Qualified signature compliance in development:**
+      1. Implement automated tests using test ICP-Brasil certificates
+         (ITI provides a homologation environment).
+      2. Validate signature format compliance (CAdES-BES, XAdES-BES,
+         PAdES-BES at minimum) in CI/CD pipeline.
+      3. Test certificate chain validation including edge cases: expired
+         intermediate CA, revoked end-entity, incomplete chain.
+      4. Include performance testing for signature operations, as
+         hardware token interactions (A3) can introduce latency.
+    tools:
+      - gitlab-ci
+      - pki-testing
+      - signature-format-validator
+      - performance-testing
+  secops:
+    prose: |
+      **Qualified signature operations:**
+      1. Maintain inventory of all ICP-Brasil certificates issued to the
+         organization (e-CNPJ) and employees (e-CPF), tracking expiration.
+      2. Implement certificate lifecycle management: issuance, renewal,
+         revocation, and secure key destruction.
+      3. Monitor for fraudulent certificates issued under the organization's
+         identity via Certificate Transparency logs.
+      4. Ensure physical security of A3 hardware tokens (smartcards, USB
+         tokens) with issuance/return tracking and secure storage.
+      5. Define and enforce PIN/password policies for certificate access.
+    tools:
+      - certificate-lifecycle
+      - pki-inventory
+      - ct-log-monitoring
+      - physical-security
+legal_references:
+  - framework_id: pep
+    articles: ["art-5", "art-6"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,113 @@
+id: art-9
+family: cap-2
+title: "Gestao de Continuidade de Negocios"
+class: CNSP-416
+baselines: [todas-supervisionadas]
+statement:
+  prose: |
+    Art. 9. O SCI deve contemplar plano de continuidade de negócios (PCN) destinado
+    a assegurar a continuidade das atividades essenciais em caso de situações de
+    crise ou disrupção operacional.
+
+    § 1. O PCN deve abranger, no mínimo:
+    I - identificação das atividades essenciais e dos processos críticos;
+    II - análise de impacto nos negócios (BIA);
+    III - estratégias de recuperação para as atividades essenciais;
+    IV - procedimentos de ativação e desativação do plano;
+    V - definição de RTO (Recovery Time Objective) e RPO (Recovery Point Objective)
+    para cada processo crítico.
+
+    § 2. O PCN deve ser testado ao menos anualmente mediante simulações e exercícios
+    práticos, com documentação dos resultados e planos de melhoria.
+
+    § 3. O PCN deve ser revisado e atualizado após cada teste, após a ocorrência de
+    sinistros relevantes e ao menos anualmente.
+guidance:
+  prose: |
+    O art. 9 integra o PCN ao SCI. Para seguradoras, a continuidade e critica porque:
+    - Sinistros ocorrem independentemente de disrupcoes operacionais
+    - Segurados em situacao de sinistro precisam de atendimento imediato
+    - Provisoes tecnicas devem ser calculadas continuamente
+    - Reinsuro exige comunicacao tempestiva de sinistros
+
+    **BIA (Business Impact Analysis):**
+    Identifica o impacto financeiro, reputacional e regulatorio de cada interrupcao.
+    Para seguradoras, os processos mais criticos tipicamente sao:
+    1. Regulacao de sinistros (especialmente vida e saude)
+    2. Calculo e contabilizacao de provisoes tecnicas
+    3. Gestao de investimentos e fluxo de caixa
+    4. Atendimento ao segurado e canal de sinistros
+
+    **RTO e RPO:**
+    Cada processo critico deve ter:
+    - RTO: quanto tempo pode ficar fora do ar antes de impacto inaceitavel
+    - RPO: quanta perda de dados e toleravel (backups, replicacao)
+
+    **Testes obrigatorios (ss 2):**
+    Teste anual e o minimo. Testes de mesa (tabletop) e testes de failover real
+    (failover test) tem finalidades diferentes e ambos sao valiosos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de alta disponibilidade:**
+      1. Arquitetura multi-zona para sistemas criticos de seguros (policy, sinistros,
+         contabilidade) com failover automatico.
+      2. RTO/RPO tecnicos configurados conforme BIA: sistemas de sinistro com RTO <= 4h.
+      3. Backup automatizado com teste de restauracao mensal.
+      4. Disaster recovery site (DR) com replicacao continua de dados criticos.
+
+      **Monitoramento de disponibilidade:**
+      5. Monitoring 24x7 de todos os sistemas criticos com alertas em segundos.
+      6. SLA tracking: uptime vs. RTO definido no PCN.
+      7. Runbooks automatizados para procedimentos de failover.
+      8. Chaos engineering periodico para validar resiliencia antes de incidentes reais.
+    tools:
+      - backup-recovery
+      - monitoring-alerting
+      - dr-platform
+      - ha-infrastructure
+  devsecops:
+    prose: |
+      **Resiliencia no desenvolvimento:**
+      1. Testes de resiliencia (circuit breakers, retry logic) como requisito do pipeline.
+      2. Chaos engineering integrado ao ambiente de staging (simulacao de falhas).
+      3. RTO/RPO como NFRs documentados e testados no pipeline de CI/CD.
+      4. Blue-green ou canary deployments para minimizar impacto de deploys em producao.
+
+      **Continuidade do pipeline:**
+      5. Pipeline de CI/CD em alta disponibilidade (nao pode ser SPOF).
+      6. Artefatos de build armazenados em repositorio redundante.
+      7. Rollback automatizado documentado e testado para cada deploy critico.
+    tools:
+      - gitlab-ci
+      - ha-infrastructure
+      - chaos-engineering
+      - monitoring-alerting
+  secops:
+    prose: |
+      **Gestao do PCN:**
+      1. BIA documentada com processos criticos, impactos e RTO/RPO por processo.
+      2. PCN formal documentado com todos os elementos do ss 1 (incisos I a V).
+      3. Plano de teste anual do PCN com simulacoes e failover real.
+      4. Relatorio de teste com achados, lacunas e plano de melhoria.
+
+      **Manutencao e atualizacao:**
+      5. Revisao do PCN apos cada incidente relevante (post-mortem incluindo PCN).
+      6. Revisao anual mesmo sem incidentes: mudancas de sistema, de processo, de pessoal.
+      7. Treinamento das equipes sobre o PCN: quem faz o que durante ativacao.
+      8. Comunicacao do PCN ao conselho anualmente com status de testes.
+    tools:
+      - grc-platform
+      - bcp-platform
+      - monitoring-alerting
+      - document-management
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-17"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-4", "CP-9", "CP-10"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30"]
+    relationship: supports

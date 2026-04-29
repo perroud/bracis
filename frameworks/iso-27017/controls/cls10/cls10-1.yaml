@@ -1,0 +1,97 @@
+id: cls10.1
+family: cls10
+title: "Policy on the use of cryptographic controls for cloud services"
+class: ISO27017
+
+statement:
+  prose: >-
+    A policy on the use of cryptographic controls for protection of
+    information shall be developed and implemented. For cloud services,
+    the cloud service provider shall provide information to the cloud
+    service customer regarding the cryptographic controls it uses to
+    protect information, including information about the algorithms,
+    key lengths, and key management practices used. The cloud service
+    customer shall assess the adequacy of the cryptographic controls
+    provided by the cloud service provider and determine whether
+    additional encryption measures are required. The policy shall
+    address encryption of data at rest, data in transit, and data
+    in use within cloud environments.
+
+guidance:
+  prose: >-
+    Cryptographic controls in cloud environments must address the
+    protection of data across multiple states and locations. The
+    policy should specify minimum requirements for encryption
+    algorithms and key lengths, use of TLS for all data in transit,
+    encryption of data at rest in all cloud storage services,
+    management and rotation of encryption keys, and use of
+    customer-managed encryption keys where data sensitivity requires
+    it. The organization should understand the cryptographic
+    architecture of each cloud service, including where encryption
+    and decryption occur, how keys are protected, and whether the
+    cloud service provider can access plaintext data.
+
+references:
+  - citation: "ISO/IEC 27017:2015, Section 10.1.1"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce encryption by default for all cloud storage services
+      using infrastructure-as-code policies that prevent provisioning
+      of unencrypted resources. Implement customer-managed encryption
+      key management using cloud KMS services with automated key
+      rotation. Configure TLS termination at the platform level for
+      all inbound traffic and enforce mutual TLS for service-to-service
+      communication within the service mesh. Deploy certificate
+      management automation for provisioning and rotation of TLS
+      certificates.
+    tools:
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - cert-manager
+      - istio
+
+  devsecops:
+    prose: >-
+      Implement pipeline checks that fail deployments when cloud
+      resources are configured without encryption. Scan
+      infrastructure-as-code for unencrypted storage volumes, databases
+      without encryption at rest, and load balancers without TLS.
+      Detect hardcoded cryptographic keys or weak algorithms in source
+      code. Enforce minimum TLS version and cipher suite requirements
+      in application configurations.
+    tools:
+      - checkov
+      - tfsec
+      - trivy
+      - gitleaks
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor cloud environments for unencrypted data stores, expired
+      certificates, and use of deprecated cryptographic algorithms.
+      Alert on certificate expiration approaching, key rotation
+      overdue events, and attempts to disable encryption on cloud
+      resources. Conduct periodic assessment of cryptographic control
+      effectiveness and compliance with the organization's
+      cryptographic policy.
+    tools:
+      - prisma-cloud
+      - aws-config
+      - qualys
+      - splunk
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.24"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["cek-01", "cek-02", "cek-03"]
+    relationship: complements
+  - framework_id: nist-800-53
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped

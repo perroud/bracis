@@ -1,0 +1,96 @@
+id: ssf-lifecycle-3
+family: ssf-lifecycle
+title: "Software Change Management and Version Control"
+class: PCI-SSF
+baselines: [secure-slc-standard]
+
+statement:
+  prose: >-
+    The software vendor shall implement change management processes that ensure all
+    modifications to software are authorized, documented, tested, and reviewed before
+    deployment to production. Version control systems shall be used for all source
+    code, configuration files, and infrastructure definitions. Changes shall be
+    traceable to authorized work items, and the integrity of the software build
+    process shall be verifiable. Rollback procedures shall be documented and tested
+    for all production changes. Separation of duties shall be enforced between
+    development, testing, and production deployment roles.
+
+guidance:
+  prose: >-
+    Uncontrolled changes to software are a major source of vulnerabilities and
+    security incidents. PCI SSF requires a formal change management process that
+    provides traceability from requirement through deployment. Every change must
+    be tied to an authorized work item, reviewed by someone other than the author,
+    tested in a non-production environment, and approved before deployment. Separation
+    of duties ensures that no single individual can introduce and deploy malicious
+    changes. The standard also requires that the build and deployment process itself
+    is protected from tampering to maintain software supply chain integrity.
+
+references:
+  - citation: "PCI SSF v1.2, Secure SLC Standard, Objective 3 — Change Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Lifecycle Standard v1.2, Section 3.1-3.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce GitOps workflows where all changes to production are made exclusively
+      through version-controlled merge requests. Configure branch protection rules
+      requiring approval from designated reviewers before merge. Implement signed
+      commits and verified pipelines to ensure build integrity. Deploy automated
+      rollback capabilities using GitOps reconciliation (ArgoCD, FluxCD) that
+      can revert to a known-good state. Enforce separation of duties through
+      RBAC that restricts production deployment permissions to a release
+      engineering role separate from development.
+    tools:
+      - argocd
+      - fluxcd
+      - gitlab-ci
+      - sigstore
+      - cosign
+      - terraform
+
+  devsecops:
+    prose: >-
+      Configure merge request pipelines that run full security scan suites before
+      changes can be approved. Enforce that all commits reference authorized work
+      items (issue/ticket numbers). Implement mandatory approval from code owners
+      for changes to security-critical components. Use merge request approval rules
+      that prevent authors from approving their own changes. Generate software
+      bills of materials (SBOMs) as part of the build process to document
+      all components included in each release.
+    tools:
+      - gitlab-ci
+      - gitlab-merge-request-approvals
+      - syft
+      - cosign
+      - semgrep
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor change management compliance by tracking changes deployed without
+      required approvals or security scans. Alert on direct modifications to
+      production systems that bypass the change management process. Conduct
+      periodic change management audits comparing deployed versions against
+      approved releases. Track and report on rollback frequency as an indicator
+      of change management effectiveness. Investigate unauthorized changes with
+      defined incident response procedures.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - jira
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.4", "req-6.5"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v1.1", "v14.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.32", "A8.33"]
+    relationship: mapped

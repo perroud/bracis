@@ -1,0 +1,124 @@
+id: sec-5
+family: gen
+title: "Consent Obligation — Overarching Framework"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) An organisation shall not, on or after the appointed day, collect, use or
+    disclose personal data about an individual unless —
+    (a) the individual gives, or is deemed to have given, his or her consent under
+    this Act to the collection, use or disclosure, as the case may be; or
+    (b) the collection, use or disclosure, as the case may be, without the consent
+    of the individual is required or authorised under this Act or any other written
+    law.
+
+    (2) An organisation must not, as a condition of providing a product or service,
+    require an individual to consent to the collection, use or disclosure of the
+    individual's personal data beyond what is reasonable to provide the product or
+    service to that individual.
+
+    (3) An organisation must, before collecting, using or disclosing personal data
+    about an individual, inform the individual of the purposes for the collection,
+    use or disclosure of the personal data on or before such collection, use or
+    disclosure of the personal data.
+
+guidance:
+  prose: |
+    Section 5 establishes the overarching consent framework — the cornerstone of
+    the PDPA. Key principles:
+
+    1. **Consent is mandatory:** No collection, use, or disclosure without consent
+       (express or deemed) or a legal exception.
+
+    2. **Anti-bundling provision (subsection 2):** Organizations cannot force
+       consumers to consent to unnecessary data collection as a condition of service.
+       This prevents "consent or no service" coercion for data unrelated to the
+       core service.
+
+    3. **Purpose notification (subsection 3):** Individuals must be informed of the
+       purpose BEFORE data is collected, used, or disclosed.
+
+    The 2021 amendments expanded the consent framework significantly by introducing
+    "deemed consent by notification" (Section 15A) and "deemed consent by contractual
+    necessity" (Section 15B), providing organizations with more flexible lawful bases
+    for processing.
+
+    Unlike the GDPR, the PDPA does not enumerate multiple legal bases; instead, it
+    uses a consent-or-exception model where consent (including deemed consent) is the
+    primary mechanism, with statutory exceptions for specific situations.
+
+references:
+  - citation: "PDPA 2012, Section 5"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a centralized consent management platform (CMP) that records, stores,
+         and tracks consent for each individual and each purpose.
+      2. Implement granular consent collection — separate toggles for each purpose of
+         collection, use, and disclosure rather than bundled all-or-nothing consent.
+      3. Enforce the anti-bundling rule by ensuring core service functionality does not
+         depend on consent to non-essential data processing.
+      4. Create purpose-driven data access controls — data collected for Purpose A
+         cannot be used for Purpose B without separate consent.
+      5. Build consent receipt generation — provide individuals with a record of what
+         they consented to, when, and for what purpose.
+      6. Implement consent lifecycle management including expiry, renewal, and
+         withdrawal workflows.
+    tools:
+      - consent-management-platform
+      - onetrust
+      - cookiebot
+      - backstage
+      - opa
+      - open-policy-agent
+
+  devsecops:
+    prose: |
+      1. Implement automated tests verifying that all data collection points check
+         consent status before proceeding.
+      2. Create CI/CD gates that fail builds if new data collection endpoints lack
+         consent verification middleware.
+      3. Scan for data processing operations that bypass the consent management
+         platform.
+      4. Validate anti-bundling compliance — test that users can access core services
+         without consenting to optional data processing.
+      5. Test consent withdrawal flows end-to-end, verifying that data processing
+         stops upon withdrawal.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - playwright
+      - api-testing
+      - custom-consent-validators
+
+  secops:
+    prose: |
+      1. Monitor consent rates and withdrawal rates for anomalies that may indicate
+         coercive consent practices.
+      2. Audit consent records periodically to verify completeness and accuracy.
+      3. Track purpose creep — detect when data collected for one purpose is being
+         used for another without corresponding consent.
+      4. Generate compliance reports showing consent coverage across all data
+         processing activities.
+      5. Alert on data processing activities that lack a corresponding consent record
+         or legal exception.
+    tools:
+      - consent-analytics
+      - siem
+      - compliance-dashboard
+      - data-lineage-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7", "art-8"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: mapped

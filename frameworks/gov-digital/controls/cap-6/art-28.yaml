@@ -1,0 +1,116 @@
+id: art-28
+family: cap-6
+title: "Cloud-First Policy for Government"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 28. Os órgãos e as entidades da administração pública deverão
+    adotar, preferencialmente, soluções de computação em nuvem para a
+    prestação de serviços públicos digitais, observados os seguintes
+    requisitos:
+    I — conformidade com os padrões de segurança da informação
+    editados pelo Poder Executivo federal;
+    II — armazenamento de dados em território nacional, quando
+    envolver dados estratégicos ou pessoais sensíveis;
+    III — portabilidade dos dados e das aplicações entre diferentes
+    provedores de nuvem;
+    IV — transparência na gestão dos dados armazenados em nuvem,
+    incluindo localização geográfica dos centros de processamento.
+guidance:
+  prose: |
+    Article 28 establishes a cloud-first policy for government digital
+    services, with four specific requirements that balance innovation
+    with sovereignty and security.
+
+    **Cloud-first mandate:**
+    Cloud computing is the preferred ("preferencialmente") infrastructure
+    model for government. On-premises infrastructure requires justification.
+
+    **Four cloud requirements:**
+    1. **Information security compliance (I):** Cloud deployments must
+       comply with federal security standards, primarily GSI/PR IN5
+       (cloud computing security) and e-CIBER norms
+    2. **Data sovereignty (II):** Strategic data and sensitive personal
+       data must be stored in Brazil. This creates a data residency
+       requirement that limits cloud provider and region choices.
+       Note: this applies to "strategic" and "sensitive personal" data,
+       not all data
+    3. **Portability (III):** Government must avoid vendor lock-in.
+       Data and applications must be portable between cloud providers.
+       This implies: open standards, container-based deployments,
+       infrastructure-as-code, and exit strategies
+    4. **Transparency (IV):** Government must know and disclose where
+       data is processed. Cloud providers must provide geographic
+       transparency about their data centers
+
+    **Alignment with GSI/PR IN5:**
+    The IN5 from the Gabinete de Segurança Institucional provides
+    detailed cloud security requirements for the federal government,
+    complementing the high-level cloud-first mandate of this article.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sovereign cloud infrastructure:**
+      1. Deploy government workloads on cloud providers with Brazilian
+         data center regions (AWS sa-east-1, Azure Brazil South,
+         GCP southamerica-east1, Oracle Brazil East) for data
+         sovereignty compliance.
+      2. Implement infrastructure-as-code (Terraform, Pulumi) for all
+         cloud resources to ensure portability between providers.
+      3. Deploy container-based architectures (Kubernetes) that abstract
+         cloud provider specifics and enable multi-cloud portability.
+      4. Implement cloud security baselines aligned with GSI/PR IN5:
+         encryption, access controls, network segmentation, logging,
+         and monitoring.
+      5. Create data classification policies that automatically route
+         strategic and sensitive data to Brazilian data centers while
+         allowing non-sensitive data to use global regions.
+    tools:
+      - terraform
+      - kubernetes
+      - cloud-security-baselines
+      - data-residency-policy
+  devsecops:
+    prose: |
+      **Cloud compliance pipeline:**
+      1. Implement infrastructure-as-code scanning (Checkov, tfsec)
+         that validates cloud resource configurations against GSI/PR
+         IN5 security requirements.
+      2. Add data residency validation to deployment pipelines — block
+         deployments that store strategic or sensitive data outside
+         Brazilian regions.
+      3. Validate cloud portability by testing deployments on multiple
+         cloud providers as part of the CI/CD process.
+      4. Scan for cloud provider lock-in patterns: proprietary services,
+         non-standard APIs, and vendor-specific configurations.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - portability-scanner
+  secops:
+    prose: |
+      **Cloud governance:**
+      1. Maintain a cloud asset inventory with data classification,
+         geographic location, and provider details for all government
+         cloud workloads.
+      2. Audit data residency compliance — verify that strategic and
+         sensitive personal data is stored exclusively in Brazilian
+         data centers.
+      3. Monitor cloud security posture using CSPM (Cloud Security
+         Posture Management) tools aligned with GSI/PR IN5 baselines.
+      4. Review cloud provider contracts annually for data sovereignty,
+         portability, and transparency compliance.
+    tools:
+      - cloud-inventory
+      - cspm
+      - residency-audit
+      - contract-review
+legal_references:
+  - framework_id: gsi-in5
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-33"]
+    relationship: complements

@@ -1,0 +1,85 @@
+id: 03.14.01
+family: si
+title: "Flaw Remediation"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [si-2]
+  - cmmc-v2: [si.l2-3.14.1]
+statement:
+  prose: >-
+    a. Identify, report, and correct system flaws.
+    b. Test software and firmware updates related to flaw remediation for effectiveness
+       and potential side effects before installation.
+    c. Install security-relevant software and firmware updates within a defined time
+       period of the release of the updates.
+    d. Incorporate flaw remediation into the organizational configuration management
+       process.
+guidance:
+  prose: >-
+    The need to remediate system flaws applies to all types of software and firmware.
+    Organizations identify systems affected by software flaws, including potential
+    vulnerabilities resulting from those flaws, and report this information to designated
+    organizational personnel with information security responsibilities. Security-relevant
+    updates include patches, service packs, and malicious code signatures. Organizations
+    determine the urgency and timeline for remediation based on the severity of the flaw
+    and the risk to the system. Critical and high-severity flaws in internet-facing
+    systems may require remediation within 24-48 hours, while lower severity flaws may
+    allow longer remediation windows. Testing updates before deployment helps to ensure
+    that they do not introduce additional issues. Organizations balance the need for
+    rapid remediation with the need for testing by implementing staged rollouts.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated vulnerability scanning across all platform layers: container
+      images (Trivy, Grype), Kubernetes configurations (kube-bench), cloud infrastructure
+      (CSPM), and OS packages. Deploy automated patching pipelines that rebuild and
+      redeploy container images when base image updates are available. Use Renovate or
+      Dependabot for automated dependency update pull requests with CI validation. Implement
+      rolling update strategies in Kubernetes with health checks to minimize downtime
+      during patching. Maintain a vulnerability management database tracking all known
+      flaws, affected systems, and remediation status. Enforce SLAs for remediation:
+      critical (24h), high (7d), medium (30d), low (90d).
+    tools:
+      - "Trivy / Grype (container vulnerability scanning)"
+      - "Renovate / Dependabot (dependency updates)"
+      - "Kubernetes rolling updates"
+      - "Cloud CSPM (infrastructure scanning)"
+      - "Vulnerability management platform"
+      - "Automated image rebuild pipelines"
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning into every stage of the CI/CD pipeline: SAST for
+      code flaws, SCA for dependency vulnerabilities, container scanning for image flaws,
+      and IaC scanning for infrastructure misconfigurations. Implement pipeline gates that
+      block deployments containing critical or high-severity unmitigated vulnerabilities.
+      Automate the creation of remediation tickets when new vulnerabilities are detected.
+      Implement automated testing of patches in staging environments before production
+      deployment. Track mean time to remediation (MTTR) as a key DevSecOps metric.
+    tools:
+      - "SAST (Semgrep, SonarQube)"
+      - "SCA (Snyk, Dependency-Check)"
+      - "Container scanning (Trivy, Grype)"
+      - "IaC scanning (Checkov, tfsec)"
+      - "CI/CD vulnerability gates"
+      - "Automated remediation ticketing"
+  secops:
+    prose: >-
+      Monitor vulnerability scan results across the environment and track remediation
+      progress against defined SLAs. Escalate overdue remediations to management. Conduct
+      risk assessments for vulnerabilities where immediate remediation is not feasible
+      and document compensating controls. Monitor threat intelligence for active
+      exploitation of known vulnerabilities and prioritize remediation accordingly.
+      Generate executive-level reports on vulnerability posture, remediation trends,
+      and SLA compliance.
+    tools:
+      - "Vulnerability management (Qualys, Tenable, Rapid7)"
+      - "Threat intelligence (KEV catalog, exploit databases)"
+      - "Risk assessment and exception tracking"
+      - "Remediation SLA monitoring"
+      - "Executive vulnerability reporting"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — SI-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CISA Known Exploited Vulnerabilities Catalog"
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"

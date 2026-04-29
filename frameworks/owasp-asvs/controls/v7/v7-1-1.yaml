@@ -1,0 +1,102 @@
+id: v7.1.1
+family: v7
+title: "Log Content Requirements"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that the application does not log credentials or payment details. Session tokens
+    should only be stored in logs in an irreversible, hashed form. The application must log
+    all security-relevant events including authentication successes and failures, access
+    control failures, deserialization failures, and input validation failures. Each log
+    entry must contain sufficient context to identify the who, what, when, where, and
+    outcome of each event.
+
+guidance:
+  prose: >-
+    Security logging provides the foundation for incident detection, investigation, and
+    forensics. Without adequate logging, security incidents go undetected and investigation
+    is impossible. However, logging sensitive data (credentials, tokens, PII, payment card
+    numbers) creates a new attack surface: log files become a valuable target for attackers.
+    The balance is logging enough to enable detection and investigation while excluding data
+    that would amplify breach impact. Each log entry must include: timestamp (UTC), source
+    IP, authenticated user identity, event type, affected resource, and outcome
+    (success/failure). Structured logging (JSON) is preferred over unstructured text for
+    reliable parsing by SIEM systems. Log integrity must be protected against tampering by
+    shipping logs to a centralized, append-only system immediately.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V7.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Logging Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized structured logging framework that all services use. Define a
+      common log schema with mandatory fields: timestamp, service name, trace ID, user ID,
+      source IP, event type, resource, action, and outcome. Implement automatic PII
+      redaction in the logging pipeline using pattern-based filters (credit card regex,
+      email regex, SSN patterns). Ship logs to a centralized, immutable log store
+      (Elasticsearch, Loki, CloudWatch Logs) with write-once retention policies. Use
+      OpenTelemetry for distributed tracing integrated with security event logging.
+      Implement log level management that prevents debug-level logging (which often
+      contains sensitive data) in production environments.
+    tools:
+      - elasticsearch
+      - loki
+      - fluentd
+      - fluentbit
+      - opentelemetry
+      - datadog-logs
+      - cloudwatch-logs
+      - vector
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect logging of sensitive data patterns (passwords,
+      tokens, credit card numbers). Write automated tests that verify security events
+      generate appropriate log entries: failed logins, access denials, input validation
+      failures. Validate log format compliance in CI/CD by parsing sample log output
+      against the schema definition. Scan for missing logging on security-relevant code
+      paths (authentication, authorization, data access). Include log injection testing
+      in DAST scans (CRLF injection into log entries). Verify that debug logging is
+      disabled in production configuration files.
+    tools:
+      - semgrep
+      - sonarqube
+      - gitlab-ci
+      - owasp-zap
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Configure SIEM correlation rules for security-relevant events: authentication
+      failures exceeding thresholds, access control violations, mass data access patterns,
+      and deserialization errors. Establish log retention policies meeting regulatory
+      requirements (typically 1-7 years). Monitor log pipeline health: alert on gaps in
+      log delivery, services that stop sending logs, or volume anomalies. Implement log
+      integrity verification using hash chains or digital signatures. Conduct regular log
+      review exercises to validate detection rule effectiveness.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog-security
+      - sumo-logic
+      - pagerduty
+      - chronicle
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-8"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.17"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["10.2.1", "10.2.2", "10.3.1"]
+    relationship: implements

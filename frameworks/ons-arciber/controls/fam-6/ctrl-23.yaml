@@ -1,0 +1,104 @@
+id: ctrl-23
+family: fam-6
+title: "Backup e Recuperacao de Sistemas Criticos do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar procedimentos de backup e recuperação para
+    os sistemas críticos do ARCiber, garantindo que, em caso de incidente
+    cibernético ou falha, seja possível restaurar os sistemas do Ambiente
+    Regulado Cibernético a um estado operacional seguro e confiável no menor
+    tempo possível. Os backups devem incluir: configurações de sistemas de
+    supervisão (SCADA, EMS, DMS), programas de PLCs, RTUs e IEDs, configurações
+    de equipamentos de rede industriais e arquivos de projeto de sistemas de
+    proteção. Os procedimentos de recuperação devem ser testados periodicamente
+    para verificar sua efetividade.
+
+guidance:
+  prose: >-
+    A recuperacao de sistemas OT/ICS apos incidente cibernetico apresenta
+    desafios especificos: (i) sistemas de automacao industrial tem dependencias
+    complexas entre componentes — restaurar um sistema isolado pode nao restaurar
+    a funcionalidade operacional; (ii) programas de PLC e IED sao altamente
+    especificos por equipamento e versao de firmware — backup incorreto pode
+    resultar em falha de equipamento ou operacao incorreta; (iii) a urgencia
+    de restauracao e alta — indisponibilidade do SIN tem impacto economico e
+    social imediato; (iv) backups devem ser protegidos contra ransomware —
+    armazenamento offline ou imutavel. Os controles devem definir: RPO (Recovery
+    Point Objective) e RTO (Recovery Time Objective) para cada sistema critico
+    do ARCiber; procedimentos passo a passo de recuperacao testados; localizacao
+    segura de backups (offline, fora do ARCiber); e qualificacao da equipe de
+    recuperacao.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de backup especializada para ambientes OT/ICS
+      (Acronis Industrial Cyber Infrastructure, VERITAS ou equivalente) que
+      suporte backup de programas de PLC (Rockwell, Siemens, Schneider), configuracoes
+      SCADA e arquivos de projeto de IEDs sem interrupcao operacional. Configurar
+      armazenamento de backups em localizacao segura: backup local criptografado
+      para recuperacao rapida, e backup offline ou air-gapped para protecao contra
+      ransomware. Automatizar testes de verificacao de integridade dos backups
+      (checksum, restauracao em ambiente de testes) com alertas para falhas.
+      Manter copies de todos os programas de PLC e configuracoes de IEDs em
+      repositorio versionado no GitLab, com controle de acesso restrito.
+    tools:
+      - acronis
+      - veeam
+      - gitlab
+      - ansible
+      - aws-backup
+  devsecops:
+    prose: >-
+      Implementar pipeline automatizado de backup de configuracoes de sistemas
+      do ARCiber que suportam exportacao programatica (SCADA, firewalls, switches
+      industriais, servidores). Versionamento automatico de configuracoes de
+      sistemas criticos no GitLab apos cada mudanca aprovada — combinando controle
+      de mudancas com backup de configuracao. Criar runbooks de recuperacao por
+      tipo de sistema do ARCiber como documentos versionados no repositorio,
+      testados e atualizados apos cada exercicio. Automatizar alertas para
+      backups nao realizados ou com falha.
+    tools:
+      - gitlab-ci
+      - ansible
+      - gitlab
+      - veeam
+  secops:
+    prose: >-
+      Realizar testes de recuperacao de sistemas criticos do ARCiber ao menos
+      anualmente, incluindo simulacao de cenario de ransomware com restauracao
+      completa a partir de backups offline. Manter RPO e RTO documentados e
+      validados por exercicios para cada sistema critico do ARCiber. Armazenar
+      copias de backups de sistemas criticos em localizacao fisica separada
+      (site alternativo) para protecao contra desastres fisicos. Revisar e
+      atualizar os procedimentos de recuperacao apos cada mudanca significativa
+      na arquitetura do ARCiber ou apos incidente que demonstrou lacunas no
+      processo. Garantir que backups incluam toda a informacao necessaria para
+      recuperacao completa: programas, configuracoes, chaves de licenca e
+      documentacao de dependencias.
+    tools:
+      - veeam
+      - acronis
+      - gitlab
+      - servicenow
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR7.3", "62443-3-3 SR7.4"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-009-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.13", "a5.30"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-9", "CP-10", "SI-12"]
+    relationship: mapped

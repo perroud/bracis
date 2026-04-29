@@ -1,0 +1,115 @@
+id: cscf-5.1
+family: obj-3
+title: "Logical Access Control"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Enforce the principles of least privilege and need-to-know for all
+    accounts accessing SWIFT-related systems. Logical access controls must
+    ensure that users can only access the resources, functions, and data
+    required for their role. Privileged access must be tightly controlled,
+    monitored, and time-limited.
+  parts:
+    - id: cscf-5.1.a
+      label: "5.1.a"
+      prose: >-
+        Role-based access control (RBAC) is implemented for all SWIFT
+        applications, with roles defined according to job functions and
+        segregation of duties requirements.
+    - id: cscf-5.1.b
+      label: "5.1.b"
+      prose: >-
+        Privileged accounts (system administrators, database administrators)
+        are separate from standard operator accounts and are used only
+        for administrative functions.
+    - id: cscf-5.1.c
+      label: "5.1.c"
+      prose: >-
+        Access rights are reviewed at least quarterly and upon any personnel
+        change (transfer, termination, role change). Stale accounts are
+        disabled within defined timeframes.
+    - id: cscf-5.1.d
+      label: "5.1.d"
+      prose: >-
+        Segregation of duties is enforced for critical SWIFT operations:
+        transaction creation and approval require different individuals.
+
+guidance:
+  prose: >-
+    Logical access control prevents unauthorized transaction submission,
+    data exfiltration, and system manipulation. SWIFT operations require
+    strict segregation of duties — the person who creates a payment
+    instruction must not be the same person who approves it. Privileged
+    access must be time-boxed through just-in-time (JIT) access provisioning
+    rather than persistent standing privileges. Organizations should
+    implement an identity governance and administration (IGA) platform to
+    automate access reviews, certification campaigns, and joiner-mover-leaver
+    workflows. Generic or shared accounts must not be used for SWIFT
+    operations to ensure individual accountability.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 5.1"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-162 — Guide to Attribute Based Access Control (ABAC)"
+    url: "https://doi.org/10.6028/NIST.SP.800-162"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized RBAC through an identity provider integrated
+      with SWIFT applications via SAML or OIDC. Deploy just-in-time
+      privileged access using PAM solutions (CyberArk, HashiCorp Boundary).
+      Configure time-bound access elevation that auto-revokes after
+      approved durations. Implement four-eyes principle (dual authorization)
+      for critical SWIFT operations at the application layer. Automate
+      joiner-mover-leaver workflows through SCIM provisioning from HR
+      systems.
+    tools:
+      - okta
+      - azure-ad
+      - cyberark
+      - hashicorp-boundary
+      - sailpoint
+      - saviynt
+
+  devsecops:
+    prose: >-
+      Enforce RBAC definitions as code in version control. Validate that
+      IaC changes to IAM policies follow least-privilege principles using
+      OPA or Checkov. Automate access review evidence collection through
+      pipeline jobs. Test segregation of duties by validating role
+      assignments in CI/CD.
+    tools:
+      - opa
+      - checkov
+      - terraform
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor privileged account usage and alert on after-hours or
+      anomalous administrative actions. Review access certification
+      campaigns quarterly. Alert on dormant accounts, shared account
+      usage, and segregation of duties violations. Track and report
+      access review completion rates.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - cyberark-pta
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-5", "AC-6", "AC-6(5)"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A5.18", "A8.2", "A8.3"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-7.1", "req-7.2"]
+    relationship: complements

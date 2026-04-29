@@ -1,0 +1,129 @@
+id: stig-infra-kubernetes
+family: infra
+title: "Kubernetes Cluster Security and Hardening"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Kubernetes clusters hosting DoD systems must be configured according to the
+    DISA Kubernetes STIG. Required configurations include: enabling Kubernetes
+    API server audit logging with a documented audit policy capturing all API
+    server interactions; enforcing RBAC for all API server access with no use
+    of the cluster-admin role except for designated platform administrators;
+    enabling PodSecurity admission controller (or equivalent) at the Restricted
+    level for all namespaces hosting application workloads; disabling anonymous
+    API server access; enabling etcd encryption for Secrets stored in the
+    Kubernetes API; configuring TLS for all API server, etcd, and kubelet
+    communications; using a supported Kubernetes version within the vendor
+    support lifecycle; and enabling network policies to restrict pod-to-pod
+    communication. Node access must be restricted — direct SSH access to cluster
+    nodes must be through the approved bastion host only and must generate audit
+    events.
+
+guidance:
+  prose: >-
+    Kubernetes security is complex because the cluster itself is a distributed
+    system with many attack surfaces: the API server (the control plane entry
+    point), etcd (the database storing all cluster state including Secrets),
+    the kubelet (running on each node with significant privileges), and the
+    container runtime. Each of these components has specific hardening requirements
+    in the DISA Kubernetes STIG.
+
+    The etcd encryption requirement is frequently overlooked: by default, Kubernetes
+    Secrets are stored in etcd in base64 encoding (not encrypted). An attacker
+    who gains access to the etcd database (through a compromised cluster node
+    or backup files) can read all cluster Secrets including credentials, TLS
+    keys, and application secrets. Encrypting Secrets at rest in etcd requires
+    explicit configuration and key management.
+
+    RBAC misconfiguration is the most common Kubernetes security finding in
+    DoD assessments — specifically, overly broad role bindings (cluster-admin
+    granted to too many service accounts), wildcards in role rules, and bind/
+    escalate permissions that allow privilege escalation.
+
+references:
+  - citation: "DISA STIG — Kubernetes V1R6"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, CM-6, AC-3, AU-2, SC-8, SC-28"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CIS Kubernetes Benchmark v1.8"
+    url: "https://www.cisecurity.org/benchmark/kubernetes"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy Kubernetes clusters using hardened configurations validated against
+      CIS Kubernetes Benchmark and DISA Kubernetes STIG using kube-bench.
+      Enable etcd encryption at rest using AES-CBC-256 or AES-GCM with keys
+      managed by an external KMS (HashiCorp Vault, AWS KMS). Configure the API
+      server audit policy to capture all resource access events (reads and writes)
+      for Secrets, ConfigMaps, and all RBAC resources; capture authentication
+      and authorization events at maximum verbosity. Enforce PodSecurity Admission
+      at the "restricted" level for all application namespaces; use "baseline"
+      only for namespaces with documented policy exceptions. Deploy OPA/Gatekeeper
+      or Kyverno for additional policy enforcement beyond PodSecurity. Implement
+      node access controls using SSH certificate authorities with short-lived
+      certificates (4-hour expiry) so that node access is auditable and
+      time-bounded.
+    tools:
+      - kube-bench
+      - opa-gatekeeper
+      - kyverno
+      - hashicorp-vault
+      - cert-manager
+      - falco
+      - kubernetes-audit
+
+  devsecops:
+    prose: >-
+      Run kube-bench in CI against cluster configuration files to detect
+      hardening regressions before deployment. Scan all Kubernetes manifests
+      using Checkov, Kubesec, or Conftest to identify RBAC misconfigurations
+      (wildcard rules, cluster-admin bindings, missing network policies).
+      Implement mandatory PodSecurityContext and SecurityContext validation
+      in pipeline policy checks — reject manifests with missing security contexts.
+      Run kube-linter against Helm charts and Kubernetes manifests as a
+      pre-deployment gate. Validate that all namespaces have Network Policies
+      and that Secrets are not stored in ConfigMaps, environment variables
+      checked into source control, or unencrypted annotations.
+    tools:
+      - kube-bench
+      - checkov
+      - kubesec
+      - conftest
+      - kube-linter
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor Kubernetes API server audit logs in the SIEM for anomalous access:
+      direct access to etcd, access from unexpected service accounts, privilege
+      escalation attempts (bind/escalate API calls), and bulk Secret reads.
+      Conduct quarterly Kubernetes security assessments using DISA STIG content
+      and manual testing. Alert on any addition of cluster-admin bindings or
+      modifications to admission controller configurations. Include Kubernetes
+      security posture in continuous monitoring metrics and ATO assessment evidence.
+      Conduct regular CIS Kubernetes Benchmark scans and track compliance trends.
+    tools:
+      - falco
+      - splunk
+      - elastic-siem
+      - kube-bench
+      - tenable-cs
+      - prisma-cloud
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "AC-3", "AU-2", "SC-8", "SC-28(1)"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["CM.L2-3.4.1", "AU.L2-3.3.1", "SC.L2-3.13.16"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["cm-6", "au-2", "sc-28"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.PS-01", "PR.PS-02", "PR.PS-04", "DE.CM-09"]
+    relationship: supports

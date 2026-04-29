@@ -1,0 +1,94 @@
+id: pii-a.1
+family: pii-a
+title: "Consent and choice for PII processing in the cloud"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor should provide the cloud service customer with
+    the means to enable the cloud service customer to fulfill its obligation to
+    facilitate the exercise of PII principals' rights related to consent and choice
+    regarding the processing of their PII. The public cloud PII processor shall not
+    process PII for any purpose independent of the instructions of the cloud service
+    customer. The public cloud PII processor shall not use PII processed under a
+    contract for the purposes of marketing and advertising without express consent.
+    Such consent should not be a condition for receiving the service.
+
+guidance:
+  prose: >-
+    This control establishes the fundamental principle that cloud PII processors
+    act solely on the instructions of the cloud service customer (the PII controller).
+    The processor has no independent authority to determine the purposes or means of
+    PII processing. This means the cloud provider cannot repurpose customer PII for
+    its own analytics, product improvement, advertising, or any other purpose unless
+    explicitly instructed by the customer and with appropriate consent from PII
+    principals. The prohibition on marketing use is absolute unless express,
+    unbundled consent is obtained, and that consent must never be a precondition for
+    service delivery. Cloud service agreements must clearly document the scope of
+    permitted processing and include mechanisms for the customer to provide, modify,
+    and withdraw processing instructions.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement consent management APIs that cloud service customers can integrate
+      with their own consent platforms. Expose consent status as a queryable
+      attribute on all PII records so downstream services can enforce consent-based
+      processing gates. Build purpose-binding into the data layer: tag every PII
+      record with the authorized processing purposes from the customer contract.
+      Implement hard blocks in data pipelines that prevent PII from flowing to
+      marketing, analytics, or ML training systems unless an explicit consent
+      override flag is set by the customer. Provide customer-facing dashboards
+      showing all processing activities and their consent basis.
+    tools:
+      - consent-management-api
+      - purpose-binding-tags
+      - data-pipeline-gates
+      - open-policy-agent
+      - customer-dashboard
+
+  devsecops:
+    prose: >-
+      Enforce consent-awareness in CI/CD pipelines. Require that any code change
+      introducing new PII processing paths includes a consent-purpose mapping in
+      the pull request metadata. Static analysis rules should flag direct access
+      to PII tables or APIs that bypass consent checks. Implement pipeline gates
+      that validate consent flow coverage: every PII processing endpoint must have
+      an associated consent verification call. Code review checklists must include
+      consent verification for any feature that touches PII. Build automated
+      tests that simulate consent withdrawal and verify processing stops.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - consent-flow-linter
+      - integration-tests
+      - code-review-checklists
+
+  secops:
+    prose: >-
+      Monitor for unauthorized PII processing that bypasses consent controls.
+      Build SIEM rules to detect PII access from services not authorized in the
+      customer's processing agreement. Alert on PII data flows to marketing or
+      advertising systems. Implement anomaly detection for bulk PII access patterns
+      that could indicate purpose deviation. Generate consent compliance reports
+      showing all PII processing activities mapped to their consent basis, with
+      exceptions highlighted. Monitor for PII being copied to environments without
+      consent controls.
+    tools:
+      - splunk
+      - elastic-siem
+      - data-flow-monitoring
+      - anomaly-detection
+      - consent-compliance-reports
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7", "art-28"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.2.1", "a-7.2.2"]
+    relationship: complements

@@ -1,0 +1,102 @@
+id: art-23
+family: cap-5
+title: "Screening de Contrapartes e Listas de Sancoes"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 23. As instituições de pagamento devem implementar procedimentos de
+    verificação de clientes e contrapartes em listas de pessoas impedidas, de
+    sanções e em listas de terroristas e financiadores do terrorismo, incluindo:
+
+    I - verificação no momento do onboarding e periodicamente durante a relação
+    de negócio;
+
+    II - verificação em tempo real ou quasi-real nas transações, quando tecnicamente
+    possível e proporcional ao risco;
+
+    III - procedimentos de bloqueio imediato de operações quando identificada
+    coincidência com listas de sanções;
+
+    IV - comunicação imediata ao Banco Central do Brasil e ao COAF quando houver
+    identificação de cliente ou contraparte em lista de sanções.
+guidance:
+  prose: |
+    O art. 23 trata do screening de sancoes -- um dos controles mais criticos
+    e de maior risco legal para IPs.
+
+    **Consequencias de falhar no screening:**
+    - Multas internacionais (especialmente OFAC): podem chegar a dezenas de
+      milhoes de dolares, mesmo para empresas sem operacoes nos EUA.
+    - Sancoes do BCB: possibilidade de cancelamento de autorizacao.
+    - Responsabilidade criminal: processamento de transacoes de financiadores
+      de terrorismo pode configurar crime.
+
+    **Tipos de listas obrigatorias:**
+    - Lista da ONU (CSNU): pessoas e entidades sujeitas a embargo internacional
+    - OFAC SDN: lista americana (relevante para transacoes em USD ou com contrapartes americanas)
+    - Lista da UE: relevante para transacoes em EUR ou com contrapartes europeias
+    - COAF/BCB: listas nacionais (resolucoes do Conselho de Seguranca Nacional)
+    - Lista de terroristas (Lei 13.260/2016)
+
+    **Bloqueio imediato (inciso III):**
+    Diferente dos outros controles, o bloqueio de sancoes nao e "avaliar e decidir".
+    E bloquear IMEDIATAMENTE e comunicar as autoridades. Nao ha margem para analise
+    antes do bloqueio.
+
+    **False positive em sancoes:**
+    O screening gera muitos falsos positivos (nomes parecidos). A IP deve ter
+    processo de "disambiguation" rapido para liberar transacoes de clientes
+    que nao estao na lista.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de screening de sancoes:**
+      1. Integracao com provedor de listas de sancoes (ComplyAdvantage, Dow Jones RMS,
+         Refinitiv World-Check, ou similar) com API de consulta em tempo real.
+      2. Screening no onboarding: verificar cada novo cliente contra todas as
+         listas antes de ativar a conta.
+      3. Screening em transacoes: verificar pagador e recebedor em cada transacao
+         PIX, TED, DOC, remessa internacional.
+      4. Bloqueio automatico: se match confirmado, bloquear a transacao e a conta
+         IMEDIATAMENTE sem aprovacao humana.
+      5. Fila de resolucao de falsos positivos: match duvidoso vai para analise
+         rapida por compliance (SLA: < 2 horas para liberar ou confirmar bloqueio).
+      6. Notificacao automatica ao BCB e COAF quando match confirmado: pre-preencher
+         formulario de comunicacao com dados do caso.
+    tools:
+      - sanctions-screening
+      - aml-platform
+      - workflow-automation
+      - regulatory-reporting
+  devsecops:
+    prose: |
+      **Garantias de cobertura de sancoes:**
+      1. Pipeline de atualizacao diaria das listas de sancoes com verificacao
+         de integridade (hash da lista, numero de entradas).
+      2. Testes de screening: lista de nomes de teste (verdadeiros positivos)
+         que devem sempre ser identificados -- falha no teste bloqueia o deploy.
+      3. Alertas criticos se atualizacao das listas falhar.
+      4. Teste de SLA: medir tempo de resposta do screening sob carga de producao.
+    tools:
+      - gitlab-ci
+      - list-management
+      - performance-testing
+  secops:
+    prose: |
+      **Gestao do programa de sancoes:**
+      1. Registro de todas as coincidencias identificadas (matches), com
+         resultado: bloqueio confirmado, falso positivo.
+      2. Relatorio mensal de matches por lista (ONU, OFAC, COAF, etc.).
+      3. Revisao dos parametros de matching: ajustar threshold de fuzzy
+         matching para reduzir falsos positivos sem perder verdadeiros positivos.
+      4. Exercicio anual de simulacao: testar que processo de bloqueio e
+         comunicacao funciona corretamente de ponta a ponta.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-22", "art-23"]
+    relationship: equivalent-to

@@ -1,0 +1,117 @@
+id: a-7.3.2
+family: annex-a
+title: "Determining information regarding PII principal rights and facilitating their exercise"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall determine and document the rights of PII principals with
+    respect to the processing of their PII under applicable legislation and regulation,
+    and shall implement mechanisms to facilitate the exercise of those rights. The
+    organization shall provide PII principals with the means to exercise their rights,
+    including but not limited to: the right of access to their PII, the right to
+    rectification of inaccurate PII, the right to erasure of PII, the right to
+    restriction of processing, the right to data portability, and the right to object
+    to processing. The organization shall respond to PII principal rights requests
+    within the timeframes required by applicable legislation. The organization shall
+    verify the identity of the PII principal making the request before fulfilling
+    the request, using appropriate means that do not require collection of additional
+    PII beyond what is necessary for verification.
+
+guidance:
+  prose: >-
+    PII principal rights management is one of the most operationally complex privacy
+    requirements. Each applicable regulation defines its own set of rights with specific
+    conditions, exceptions, and response timeframes (GDPR: 30 days, LGPD: 15 days,
+    CCPA: 45 days). The organization must map applicable rights per jurisdiction,
+    implement technical capabilities to fulfill each right, and build operational
+    workflows for request intake, identity verification, fulfillment, and response.
+    Key technical challenges include: locating all PII across distributed systems for
+    access requests, propagating corrections across all data stores for rectification
+    requests, implementing hard deletion versus anonymization for erasure requests,
+    generating structured machine-readable exports for portability requests, and
+    implementing processing cessation for objection requests. Identity verification
+    must balance security (preventing unauthorized access to PII) against usability
+    (not creating excessive barriers to exercising rights). The organization should
+    track rights request metrics for compliance reporting and process improvement.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.3.2"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a PII principal rights fulfillment engine as a core platform service.
+      Implement a rights request intake API that accepts requests through multiple
+      channels (web portal, email, API) with automated categorization and routing.
+      Build identity verification workflows with multi-factor verification that
+      do not require excessive additional PII. Implement a PII discovery service
+      that locates all instances of a PII principal's data across all registered
+      data stores and services. Build rights fulfillment orchestration: access
+      requests trigger data aggregation from all sources; rectification requests
+      propagate corrections through event-driven updates; erasure requests
+      execute coordinated deletion across all systems with verification;
+      portability requests generate standardized data exports (JSON, CSV).
+      Implement SLA tracking with automated escalation when response deadlines
+      approach. Build audit trails for all rights request lifecycle events.
+    tools:
+      - rights-management-platform
+      - pii-discovery-service
+      - event-driven-architecture
+      - identity-verification-service
+      - data-export-engine
+      - sla-tracking-system
+
+  devsecops:
+    prose: >-
+      Require all services processing PII to implement rights fulfillment APIs
+      as part of their service contract. Build CI pipeline validation that verifies
+      PII-processing services expose the required rights endpoints (access,
+      rectification, erasure, portability). Implement integration tests that
+      validate end-to-end rights fulfillment workflows: submit request, verify
+      identity, locate data, fulfill request, verify completion. Build data
+      discovery tests that verify all PII stores are indexed and discoverable
+      for access and portability requests. Implement erasure verification tests
+      that confirm data is actually deleted (not just soft-deleted) across all
+      systems. Track rights fulfillment test coverage as a compliance metric.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - api-contract-testing
+      - integration-test-frameworks
+      - data-discovery-validation
+      - erasure-verification-tests
+
+  secops:
+    prose: >-
+      Monitor rights request fulfillment compliance in real time. Track SLA
+      adherence: time to acknowledge, time to fulfill, approaching deadlines,
+      breached deadlines. Alert when rights requests are nearing SLA expiry
+      without resolution. Monitor identity verification effectiveness: fraud
+      attempt detection, verification failure rates. Track erasure completion
+      across all systems and alert when deletion verification fails. Build
+      rights request analytics dashboards showing request volumes, types,
+      fulfillment times, and outcomes. Generate regulatory compliance reports
+      demonstrating rights request handling metrics. Detect patterns that
+      indicate process issues: high rejection rates, frequent escalations,
+      SLA breaches by specific teams or systems.
+    tools:
+      - splunk
+      - elastic-siem
+      - rights-request-dashboards
+      - sla-monitoring
+      - fraud-detection
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-15", "art-16", "art-17", "art-18", "art-20", "art-21"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18", "art-19"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.105", "sec-1798.106", "sec-1798.110"]
+    relationship: supports

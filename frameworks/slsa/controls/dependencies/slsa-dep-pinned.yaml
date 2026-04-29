@@ -1,0 +1,103 @@
+id: slsa-dep-pinned
+family: dependencies
+title: "Dependencies: Pinned to Specific Versions"
+class: SLSA
+
+baselines: [build-l2, build-l3]
+
+statement:
+  prose: >-
+    All dependencies must be pinned to specific, immutable versions identified by
+    cryptographic hash or exact version number with integrity verification. Floating
+    version ranges, latest tags, and unpinned references are prohibited for production
+    builds. Lock files must be committed to version control and verified during the
+    build process. This ensures that builds are reproducible and that a dependency
+    cannot be silently replaced with a malicious version.
+
+guidance:
+  prose: >-
+    Unpinned dependencies are a major supply-chain risk vector. Attacks like dependency
+    confusion, typosquatting, and compromised package maintainer accounts all exploit
+    the fact that build systems automatically fetch the latest version of a dependency.
+    By pinning to exact versions with hash verification, organizations ensure that the
+    exact same dependency code is used in every build. Lock files (package-lock.json,
+    go.sum, Cargo.lock, poetry.lock) provide this pinning at the application level.
+    Container base images should be pinned by digest, not tag. GitHub Actions should
+    reference commits by SHA, not branch or tag names. Every dependency resolution
+    must be deterministic and verifiable.
+
+references:
+  - citation: "SLSA v1.0 — Dependencies"
+    url: "https://slsa.dev/spec/v1.0/requirements"
+  - citation: "OpenSSF Scorecard — Pinned Dependencies"
+    url: "https://securityscorecards.dev/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce lock file usage across all package ecosystems. Configure package managers
+      to fail if lock files are outdated or missing (npm ci, pip install --require-hashes,
+      go mod verify). Pin container base images by digest (sha256) in all Dockerfiles.
+      Use dependency proxy/mirror (Artifactory, Nexus, Harbor) to cache and verify
+      dependency integrity. Implement Renovate or Dependabot for controlled dependency
+      updates that update lock files through the standard review process. Pin CI/CD action
+      references by commit SHA. Deploy admission controllers that reject container images
+      built from unpinned base images.
+    tools:
+      - renovate
+      - dependabot
+      - artifactory
+      - nexus
+      - npm
+      - go-mod
+      - pip
+      - cargo
+      - docker
+
+  devsecops:
+    prose: >-
+      Add pipeline checks that verify lock files are present and up-to-date for all
+      supported package ecosystems. Implement pre-commit hooks that fail if lock files
+      are not committed alongside dependency changes. Configure CI/CD to use strict
+      install commands (npm ci, not npm install; pip install --require-hashes) that
+      fail on lock file mismatches. Add Dockerfile linting (hadolint) that flags
+      unpinned base image references. Verify that all GitHub Actions workflow references
+      use commit SHAs. Include dependency hash verification in build provenance.
+    tools:
+      - hadolint
+      - npm
+      - pip
+      - go-mod
+      - cargo
+      - github-actions
+      - gitlab-ci
+      - conftest
+      - opa
+      - renovate
+
+  secops:
+    prose: >-
+      Monitor for dependency installation warnings that indicate hash mismatches or
+      unexpected version resolutions. Alert on lock file changes that are not associated
+      with a reviewed pull request. Audit CI/CD configurations for floating version
+      references or unpinned dependencies. Track dependency drift by comparing resolved
+      versions across builds over time. Include dependency pinning compliance in security
+      posture reports. Investigate any build failure caused by dependency hash mismatch
+      as a potential supply-chain attack indicator.
+    tools:
+      - splunk
+      - elastic-siem
+      - grafana
+      - trivy
+      - scorecard
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-3", "SR-4", "CM-2", "SI-7"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PW.4.1", "PW.4.2"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["2.5", "2.6", "16.4"]
+    relationship: supports

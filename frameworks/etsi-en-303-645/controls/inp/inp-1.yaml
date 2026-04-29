@@ -1,0 +1,97 @@
+id: inp-1
+family: inp
+title: "Validate Input Data"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The consumer IoT device software shall validate data input via user interfaces, via
+    APIs including data originating from networks and the cloud, and through other
+    interfaces. Systems processing data from consumer IoT devices should validate data
+    inputs via application programming interfaces (APIs) or other interfaces. Data input
+    that is not properly validated is a potential security risk and is one of the leading
+    causes of system compromise.
+
+guidance:
+  prose: >-
+    Input validation is a fundamental defense against a wide range of attacks including
+    buffer overflows, injection attacks, format string vulnerabilities, and data corruption.
+    IoT devices are particularly vulnerable because they often process data from multiple
+    sources: user interfaces, network APIs, cloud services, sensor inputs, and peer devices.
+    All input channels must validate data for type, length, range, and format before
+    processing. This applies to both the device firmware and any cloud services that receive
+    data from the device. Firmware written in memory-unsafe languages (C/C++) must be
+    especially rigorous about bounds checking. The provision covers all data entry points:
+    web interfaces, mobile app APIs, MQTT messages, CoAP requests, Bluetooth commands, and
+    physical sensor inputs.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.13-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized input validation layer in the firmware that all data entry
+      points use. Define strict schemas for all API inputs including type constraints, length
+      limits, allowed character sets, and value ranges. Use safe string handling functions
+      and avoid unbounded buffer operations. Implement allowlist-based validation rather than
+      blocklist approaches. For web interfaces, apply both client-side and server-side
+      validation. Use parameterized queries for any database interactions. Implement rate
+      limiting on all input interfaces to prevent denial-of-service through input flooding.
+      For sensor inputs, implement plausibility checks that reject physically impossible
+      values.
+    tools:
+      - input-validation-library
+      - json-schema
+      - protobuf
+      - safe-string-library
+      - waf
+
+  devsecops:
+    prose: >-
+      Implement static analysis with rules targeting common input validation vulnerabilities:
+      buffer overflows, format string bugs, injection flaws, and integer overflows. Run
+      fuzz testing against all device input interfaces as part of the CI/CD pipeline. Use
+      SAST tools configured for C/C++ memory safety issues. Implement DAST scanning of
+      device web interfaces and APIs. Include negative testing with malformed, oversized,
+      and malicious inputs in the automated test suite. Use AddressSanitizer and similar
+      tools during testing to catch memory safety issues.
+    tools:
+      - semgrep
+      - codeql
+      - afl-fuzz
+      - libfuzzer
+      - gitlab-sast
+      - gitlab-dast
+      - addresssanitizer
+
+  secops:
+    prose: >-
+      Monitor device logs for input validation failures that may indicate attack attempts.
+      Alert on patterns of malformed inputs from specific sources. Track and trend input
+      validation error rates across the device fleet. Include input validation testing in
+      penetration test scope. Monitor for published exploits targeting input handling
+      vulnerabilities in the device's firmware or third-party libraries. Feed findings
+      from penetration tests back into the validation rule set.
+    tools:
+      - splunk
+      - elastic-siem
+      - burp-suite
+      - waf-logs
+      - nessus
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-3.5", "SR-3.8"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-10(5)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.26", "A.8.28"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V5.1.1", "V5.1.3", "V5.2.1"]
+    relationship: complements

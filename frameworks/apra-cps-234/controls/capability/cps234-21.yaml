@@ -1,0 +1,111 @@
+id: cps234-21
+family: capability
+title: "Related Party Security"
+class: CPS234
+
+statement:
+  prose: >-
+    Where information assets are managed by a related party or by the
+    APRA-regulated entity itself on behalf of other entities, the
+    entity must evaluate the information security capability and
+    controls applied to those assets, commensurate with the potential
+    consequences of an information security incident.
+  parts:
+    - id: cps234-21.a
+      label: "a."
+      prose: >-
+        The entity must assess the information security arrangements
+        of related parties that manage information assets on behalf
+        of the entity, ensuring the same rigor applied to third-party
+        assessments.
+    - id: cps234-21.b
+      label: "b."
+      prose: >-
+        Where the entity manages information assets on behalf of
+        other entities (including subsidiaries or other group
+        members), it must ensure that the security controls applied
+        are commensurate with the criticality and sensitivity of
+        those assets.
+
+guidance:
+  prose: >-
+    APRA recognizes that related-party arrangements (e.g., shared
+    services within a corporate group) can introduce information
+    security risks comparable to third-party arrangements. The
+    familiarity of intra-group relationships should not result in
+    reduced diligence. Entities operating shared service centers
+    or managing assets on behalf of group entities must apply
+    controls commensurate with the aggregate risk, not just the
+    risk of the individual entity. This is particularly relevant
+    for consolidated groups where a technology subsidiary provides
+    IT services to multiple APRA-regulated entities.
+
+references:
+  - citation: "APRA Prudential Standard CPS 234, Paragraph 21"
+    url: "https://www.legislation.gov.au/F2018L01745/latest/text"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement multi-tenancy controls in shared platform
+      environments ensuring logical and, where appropriate, physical
+      separation between related party workloads. Use namespace
+      isolation, network policies, and resource quotas to enforce
+      boundaries between entities sharing infrastructure. Maintain
+      separate RBAC configurations per entity with no implicit
+      trust between related parties. Deploy data classification
+      tags and enforce data residency policies per entity through
+      admission controllers. Implement cross-entity audit logging
+      that clearly attributes actions to the originating entity.
+    tools:
+      - kubernetes
+      - calico
+      - open-policy-agent
+      - gatekeeper
+      - vault
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce pipeline isolation between related party codebases
+      where they share CI/CD infrastructure. Implement separate
+      security scanning configurations per entity with findings
+      routed to the appropriate security function. Use project-level
+      access controls ensuring that related party teams can only
+      access their own repositories and artifacts. Validate that
+      shared library dependencies maintained by related parties
+      undergo the same security review as third-party dependencies.
+      Generate per-entity compliance reports from shared pipeline
+      infrastructure.
+    tools:
+      - gitlab-ci
+      - gitlab-groups
+      - trivy
+      - sonarqube
+      - dependency-track
+
+  secops:
+    prose: >-
+      Maintain separate security monitoring contexts for each
+      related party entity while enabling cross-entity correlation
+      for shared infrastructure. Implement data sovereignty controls
+      in SIEM ensuring that security logs and alerts for each entity
+      are only accessible to authorized personnel of that entity.
+      Track related-party security assessments on the same cadence
+      and rigor as third-party assessments. Monitor shared service
+      boundaries for unauthorized cross-entity data flows. Report
+      on security posture per entity and consolidated for the group.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - wazuh
+      - servicenow
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.19", "a5.20", "a5.8"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "CA-3", "AC-4"]
+    relationship: supports

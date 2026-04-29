@@ -1,0 +1,134 @@
+id: art-2
+family: cap-1
+title: "Ambito de Aplicacao e Proporcionalidade"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 2. As instituições referidas no art. 1 devem observar o disposto nesta
+    Resolução Conjunta de forma proporcional ao porte, ao perfil de risco e ao
+    modelo de negócio da instituição, à natureza das operações e à complexidade dos
+    produtos, serviços, atividades e processos da instituição, bem como à sensibilidade
+    dos dados e das informações sob sua responsabilidade.
+guidance:
+  prose: |
+    O art. 2 introduz o principio da proporcionalidade na aplicacao da resolucao.
+    Embora todas as instituicoes autorizadas pelo BCB devam cumprir a resolucao,
+    a intensidade dos controles varia conforme cinco criterios:
+
+    **1. Porte da instituicao:**
+    Instituicoes de maior porte (segmentos S1/S2 do BCB) devem implementar controles
+    mais robustos. Cooperativas de credito de menor porte podem adotar abordagens
+    simplificadas, desde que atendam aos requisitos minimos.
+
+    **2. Perfil de risco:**
+    Instituicoes com operacoes de maior risco cibernetico (ex: operacoes digitais
+    intensivas, open banking, PIX de alto volume) devem ter controles proporcionalmente
+    mais rigorosos.
+
+    **3. Modelo de negocio:**
+    Bancos digitais com operacao 100% online tem perfil de risco cibernetico diferente
+    de instituicoes com operacao predominantemente presencial.
+
+    **4. Natureza das operacoes e complexidade:**
+    Instituicoes que operam infraestruturas criticas do SFN (ex: clearinghouses,
+    registradoras) requerem controles mais sofisticados do que aquelas com operacoes
+    simples.
+
+    **5. Sensibilidade dos dados:**
+    Instituicoes que processam alto volume de dados pessoais sensiveis (ex: dados
+    biometricos, dados de saude financeira) devem ter controles adicionais de
+    protecao e notificacao.
+
+    **Implicacao pratica:**
+    A proporcionalidade nao e isencao. Uma cooperativa de credito de pequeno porte
+    ainda deve notificar incidentes ao BCB, mas pode ter processos menos complexos
+    do que um banco multiplo do segmento S1. O BCB espera que cada instituicao
+    documente e justifique o nivel de controles adotado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Dimensionamento proporcional da infraestrutura de seguranca:**
+      1. Assessment de porte e perfil de risco para dimensionar a plataforma de
+         seguranca: definir se a instituicao necessita de SOC 24x7 proprio ou se
+         pode utilizar servico gerenciado (MSSP).
+      2. Mapeamento de criticidade de sistemas:
+         - Tier 1: sistemas que afetam diretamente o SFN (pagamentos, PIX, SPB)
+         - Tier 2: sistemas voltados ao cliente (internet banking, app)
+         - Tier 3: sistemas internos e de suporte
+      3. Niveis diferenciados de monitoramento por tier:
+         - Tier 1: monitoramento real-time com alerting em < 1 minuto
+         - Tier 2: monitoramento near-real-time com alerting em < 5 minutos
+         - Tier 3: monitoramento periodico com revisao diaria
+
+      **Documentacao da proporcionalidade:**
+      4. Registro formal do assessment de proporcionalidade com justificativas.
+      5. Mapeamento de cada requisito da resolucao para o nivel de controle adotado.
+      6. Revisao anual do assessment de proporcionalidade.
+    tools:
+      - grc-platform
+      - cmdb
+      - monitoring-alerting
+      - risk-assessment
+  devsecops:
+    prose: |
+      **Pipeline proporcional ao risco:**
+      1. Definir niveis de rigor de seguranca no pipeline por classificacao do sistema:
+         - Tier 1: todos os scanners obrigatorios, aprovacao de security champion,
+           pen test antes de release.
+         - Tier 2: SAST + DAST + dependency scan, revisao de seguranca.
+         - Tier 3: SAST + dependency scan minimo.
+      2. Gates de seguranca proporcionais: sistemas Tier 1 nao podem ter vulnerabilidades
+         criticas ou altas; Tier 3 pode aceitar risco documentado para vulnerabilidades
+         medias.
+      3. Frequencia de scan proporcional: Tier 1 a cada commit, Tier 2 a cada merge
+         request, Tier 3 semanal.
+
+      **Documentacao no repositorio:**
+      4. Arquivo de classificacao de risco (SECURITY.md) em cada repositorio informando
+         o tier do sistema e os controles aplicaveis.
+      5. Pipeline templates diferenciados por tier.
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - policy-engine
+  secops:
+    prose: |
+      **Assessment de proporcionalidade:**
+      1. Avaliacao formal de porte, perfil de risco e modelo de negocio da instituicao
+         para definir o nivel de controles.
+      2. Documentacao do assessment com aprovacao da diretoria e do conselho de
+         administracao.
+      3. Benchmark com instituicoes de porte e perfil similar.
+
+      **Calibracao de controles:**
+      4. Definicao de thresholds de notificacao proporcionais:
+         - Instituicoes S1/S2: notificacao para qualquer incidente que afete > 1.000
+           clientes ou > R$ 1M em operacoes.
+         - Instituicoes S3/S4/S5: thresholds ajustados proporcionalmente.
+      5. Equipe de seguranca dimensionada ao porte: desde CISO dedicado com equipe
+         completa (S1) ate responsavel cumulativo com suporte terceirizado (S5).
+      6. Frequencia de testes de resiliencia proporcional: trimestral (S1/S2),
+         semestral (S3), anual (S4/S5).
+
+      **Revisao periodica:**
+      7. Revisao anual do assessment de proporcionalidade.
+      8. Atualizacao quando houver mudanca significativa no porte, perfil de risco
+         ou modelo de negocio.
+      9. Comunicacao ao BCB quando o enquadramento de segmento mudar.
+    tools:
+      - grc-platform
+      - risk-assessment
+      - compliance-scanner
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-9", "RA-2", "RA-3"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

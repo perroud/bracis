@@ -1,0 +1,106 @@
+id: cip-007-r3
+family: cip-007
+title: "Malicious Code Prevention"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes to mitigate the threat of malicious code on BES Cyber
+    Systems that include the applicable requirement parts.
+  parts:
+    - id: cip-007-r3.1
+      label: "3.1"
+      prose: >-
+        Deploy method(s) to deter, detect, or prevent malicious code.
+    - id: cip-007-r3.2
+      label: "3.2"
+      prose: >-
+        Mitigate the threat of detected malicious code.
+    - id: cip-007-r3.3
+      label: "3.3"
+      prose: >-
+        For those methods identified in part 3.1 that use signatures
+        or patterns, have a process for the update of the signatures
+        or patterns. The process must address testing and installing
+        the signatures or patterns.
+
+guidance:
+  prose: >-
+    CIP-007 R3 requires malicious code prevention on BES Cyber Systems.
+    In OT environments, traditional antivirus may not be suitable due to
+    performance impacts, vendor support restrictions, or real-time system
+    requirements. The standard allows flexibility in the method — it can be
+    antivirus, application whitelisting, host-based IDS, or other
+    compensating measures. Application whitelisting is often preferred in
+    OT environments because it allows only known-good executables rather
+    than trying to identify all possible malware. For signature-based
+    tools, the update process must include testing (to avoid breaking
+    OT systems) and timely installation. Entities must also have a
+    defined response process for when malicious code is detected.
+
+references:
+  - citation: "NERC CIP-007-6 — System Security Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-007-6.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy multi-layered malicious code prevention: application
+      whitelisting on OT systems, endpoint detection and response (EDR)
+      on IT systems, and container image scanning in containerized
+      environments. Implement automated signature and pattern update
+      pipelines that test updates in staging before deploying to
+      production BES Cyber Systems. Deploy centralized management
+      consoles for malicious code prevention tools with dashboards
+      showing protection status, detection events, and signature
+      currency. Use immutable infrastructure patterns where feasible
+      to prevent unauthorized code execution by design.
+    tools:
+      - ansible
+      - terraform
+      - grafana
+      - falco
+
+  devsecops:
+    prose: >-
+      Integrate malicious code scanning into CI/CD pipelines: SAST
+      for source code analysis, dependency scanning for known
+      vulnerable libraries, and container scanning for base image
+      vulnerabilities. Implement pipeline gates that block deployments
+      containing detected malicious or vulnerable code. Automate
+      signature update testing through dedicated CI pipelines before
+      production deployment. Store malicious code prevention
+      configurations as version-controlled code with mandatory
+      approval for changes.
+    tools:
+      - gitlab-ci
+      - scanner_sast
+      - scanner_dependency_scanning
+      - scanner_container_scanning
+      - trivy
+      - clamav
+
+  secops:
+    prose: >-
+      Monitor malicious code detection events across all BES Cyber
+      Systems in real time. Implement automated response playbooks
+      for malicious code detection including containment, analysis,
+      and remediation. Track signature and pattern update currency
+      and alert when updates are overdue. Correlate malicious code
+      events with threat intelligence to assess severity and scope.
+      Generate reports showing detection rates, response times, and
+      signature update compliance.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - carbon-black
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-4"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.1.3"]
+    relationship: supports

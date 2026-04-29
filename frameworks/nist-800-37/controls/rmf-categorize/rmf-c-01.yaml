@@ -1,0 +1,89 @@
+id: rmf-c-01
+family: rmf-categorize
+title: "System and Information Type Categorization"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Categorize the information system and the information processed, stored, and transmitted
+    by the system. Apply the security categorization methodology defined in FIPS 199 and
+    the guidelines in NIST SP 800-60 to determine the impact levels (low, moderate, or high)
+    for each of the three security objectives — confidentiality, integrity, and availability.
+    The security categorization drives the rigor and intensity of subsequent RMF steps
+    including control selection, assessment, and continuous monitoring.
+
+guidance:
+  prose: >-
+    Security categorization is the cornerstone of the risk-based approach in the RMF. The
+    categorization considers all information types processed, stored, or transmitted by the
+    system. Using FIPS 199 and NIST SP 800-60, each information type is evaluated against
+    the three security objectives, and the highest impact level across all information types
+    determines the overall system categorization. The categorization must be reviewed and
+    approved by the authorizing official or designated representative. Changes in mission,
+    business processes, or information types processed by the system trigger recategorization.
+    Provisional impact levels from NIST SP 800-60 may be adjusted based on organizational
+    context with appropriate justification.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Categorize Step — Task C-1"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "FIPS 199, Standards for Security Categorization"
+    url: "https://csrc.nist.gov/publications/detail/fips/199/final"
+  - citation: "NIST SP 800-60 Vol 1 Rev 1, Guide for Mapping Types of Information and Systems to Security Categories"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-60/vol-1-rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement security categorization as a mandatory metadata attribute for every
+      system registered in the platform service catalog. Create a categorization wizard
+      or API that walks system owners through the FIPS 199 / SP 800-60 methodology and
+      produces a standardized categorization record. Store categorization results as
+      structured data (OSCAL format preferred) alongside the system registration.
+      Enforce that the categorization level automatically drives infrastructure
+      provisioning decisions — high-impact systems get dedicated compute, encrypted
+      storage at rest, and enhanced network segmentation. Use policy-as-code (OPA/Rego)
+      to validate that deployed infrastructure matches the security categorization level.
+    tools:
+      - backstage
+      - open-policy-agent
+      - oscal-tools
+      - terraform
+
+  devsecops:
+    prose: >-
+      Require each project to declare its FIPS 199 categorization in a machine-readable
+      metadata file checked into version control. Use the categorization to automatically
+      select the appropriate CI/CD pipeline template — high-impact systems require
+      comprehensive SAST, DAST, SCA, container scanning, and secret detection, while
+      low-impact systems may use a reduced scanning profile. Block deployments to
+      production if the categorization metadata is missing or the pipeline template
+      does not match the declared impact level. Generate categorization reports from
+      pipeline metadata for inclusion in system security plans.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-framework
+      - compliance-trestle
+
+  secops:
+    prose: >-
+      Track system categorizations in the GRC platform and link them to the
+      organizational system inventory. Alert when systems are recategorized or when
+      categorization reviews are overdue. Validate that categorizations accurately
+      reflect the information types processed by conducting periodic data flow analysis
+      and comparing actual information types against the documented categorization.
+      Generate reports showing the distribution of system categorizations across the
+      organization and identify any inconsistencies where similar systems have
+      different categorization levels without documented justification.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "PM-7"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.12", "A5.13"]
+    relationship: mapped

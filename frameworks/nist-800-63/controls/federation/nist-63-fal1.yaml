@@ -1,0 +1,115 @@
+id: nist-63-fal1
+family: federation
+title: "FAL1 — Federation Assurance Level 1 (Bearer Assertions)"
+class: SP800-63C
+
+baselines: [fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    At FAL1, the RP receives a bearer assertion from an IdP. The assertion is
+    signed by the IdP using an asymmetric key associated with the IdP. The RP
+    validates that the assertion was signed by the known IdP, that the assertion
+    has not expired, that the intended audience of the assertion includes the RP,
+    and that the assertion has not been replayed. FAL1 allows for the use of
+    Bearer authentication tokens transferred over an authenticated protected
+    channel. FAL1 assertions SHALL be signed by the IdP using a private key,
+    and the IdP's public key SHALL be made available to the RP in a secure manner.
+    The assertion SHALL contain a nonce or assertion identifier to prevent
+    replay attacks. The assertion SHALL be presented only over a protected
+    channel. An IdP MAY be operated by the same organization as the RP,
+    in which case the requirements apply as if they were separate entities.
+
+guidance:
+  prose: >-
+    FAL1 is the minimum federation assurance level and is appropriate for low-risk
+    federated identity transactions. It corresponds to the bearer token model used
+    in OIDC implicit flow (now deprecated) and the SAML bearer assertion binding.
+    The key security property at FAL1 is assertion signature verification: the RP
+    must validate the IdP's signature on every assertion, not just at federation
+    establishment time. Assertion expiration enforcement is mandatory — assertions
+    with expired timestamps must be rejected regardless of how recently they were
+    received. FAL1 does not require assertion encryption, so assertions may contain
+    PII visible in transit to intermediaries. For applications handling sensitive
+    PII, FAL2 (with encryption) should be required. The combination rules for
+    xAL allow FAL1 to be used with any IAL and AAL, but organizations should
+    evaluate the risk: a high-value AAL3 authentication at the IdP loses security
+    value if the resulting assertion is transmitted without encryption over a
+    bearer channel.
+
+references:
+  - citation: "NIST SP 800-63C Section 4.1 — Federation Assurance Level 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "NIST SP 800-63C Section 6 — Assertions"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "OpenID Connect Core 1.0 — ID Token Validation"
+    url: "https://openid.net/specs/openid-connect-core-1_0.html"
+
+related_controls:
+  - id: nist-63-fal2
+    relationship: derived-from
+    description: "FAL2 adds assertion encryption to the FAL1 baseline."
+  - id: nist-63-assertions
+    relationship: implements
+    description: "Assertion content and binding requirements apply at all FAL levels including FAL1."
+  - id: nist-63-oidc-saml
+    relationship: implements
+    description: "OIDC and SAML implementations must satisfy FAL1 minimum requirements."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement FAL1 using OIDC Authorization Code flow (not Implicit flow,
+      which is deprecated). Configure the authorization server to sign ID
+      tokens and access tokens using RSA 2048+ or EC P-256 keys. Publish
+      the IdP's JWKS (JSON Web Key Set) endpoint at a well-known URL
+      (/.well-known/jwks.json). Configure relying parties to: (1) fetch the
+      JWKS at startup and cache with appropriate TTL, (2) validate the kid
+      header to select the correct verification key, (3) verify the signature
+      using the selected key, (4) check the iss claim matches the expected
+      issuer, (5) check the aud claim includes the RP's client_id, (6) verify
+      the exp claim is in the future, (7) verify the iat claim is not too far
+      in the past, and (8) track the jti claim to prevent assertion replay.
+      Use HTTPS with TLS 1.2+ for all federation endpoints. Implement state
+      parameter in the authorization request to prevent CSRF attacks.
+    tools:
+      - keycloak
+      - dex
+      - okta
+      - auth0
+      - vault
+
+  devsecops:
+    prose: >-
+      Build automated tests in CI/CD that validate FAL1 assertion handling:
+      test rejection of assertions with expired timestamps, assertions with
+      invalid signatures, assertions with mismatched audience claims, and
+      replayed assertion identifiers (jti). Include integration tests that
+      simulate the complete OIDC Authorization Code flow end-to-end with
+      mock IdP responses. Validate that the RP implementation does not
+      accept unsigned assertions or assertions signed with weak algorithms
+      (none, HS256 with a short key). Scan the OIDC client library for
+      known vulnerabilities and ensure it is on the latest version.
+    tools:
+      - gitlab-ci
+      - playwright
+      - pytest
+      - semgrep
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor federation events for assertion validation failures: these may
+      indicate replay attacks, token tampering, or a misconfigured IdP.
+      Alert on assertions with unusually long validity windows (more than
+      5 minutes for ID tokens, more than 1 hour for access tokens). Implement
+      logging of all assertion validation events at the RP layer, including
+      the assertion jti, issuer, subject, and validation result. Detect
+      federation misuse patterns such as assertion sharing across relying
+      parties (an assertion audience-checked for one RP being presented to
+      another). Conduct annual review of federation trust configurations to
+      verify IdP public keys are current and certificate expiration is managed.
+    tools:
+      - splunk
+      - elastic-siem
+      - azure-sentinel

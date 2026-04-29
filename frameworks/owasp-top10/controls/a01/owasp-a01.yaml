@@ -1,0 +1,122 @@
+id: owasp-a01
+family: a01
+title: "A01:2021 — Broken Access Control"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Access control enforces policy such that users cannot act outside of their intended permissions.
+    Failures typically lead to unauthorized information disclosure, modification, or destruction of
+    all data, or performing a business function outside the user's limits. Common access control
+    weaknesses include violation of the principle of least privilege or deny-by-default, bypassing
+    access control checks by modifying the URL, internal application state, or the HTML page, or
+    by using an attack tool that modifies API requests, permitting viewing or editing someone else's
+    account by providing its unique identifier (insecure direct object references), accessing API
+    with missing access controls for POST, PUT, and DELETE, elevation of privilege (acting as a user
+    without being logged in, or acting as an admin when logged in as a user), metadata manipulation
+    such as replaying or tampering with a JWT token, a cookie or hidden field manipulated to elevate
+    privileges or abuse JWT invalidation, CORS misconfiguration allowing API access from unauthorized
+    or untrusted origins, force browsing to authenticated pages as an unauthenticated user or to
+    privileged pages as a standard user.
+
+guidance:
+  prose: >-
+    Broken Access Control moved up from the fifth position to the most impactful web application
+    security risk in the 2021 edition, appearing in 94% of applications tested. Access control is
+    only effective in trusted server-side code or server-less API, where the attacker cannot modify
+    the access control check or metadata. The primary defenses include implementing access control
+    as a single centralized mechanism and re-using it throughout the application, including logging
+    access control failures and alerting admins when appropriate. Stateful session identifiers
+    should be invalidated on the server after logout. Developers and QA staff should include
+    functional access control unit and integration tests. Rate limit API and controller access to
+    minimize the harm from automated attack tooling.
+
+references:
+  - citation: "OWASP Top 10:2021 A01 Broken Access Control"
+    url: "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
+  - citation: "OWASP Access Control Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html"
+  - citation: "OWASP Authorization Testing Guide"
+    url: "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized authorization layer using a Policy Decision Point (PDP) such as Open
+      Policy Agent (OPA) or Cerbos, enforced at the API gateway before requests reach application
+      services. Apply deny-by-default at the gateway: every route must have an explicit authorization
+      policy attached, and any request without a matching policy is rejected. Use attribute-based
+      access control (ABAC) or relationship-based access control (ReBAC) for resource-level
+      authorization rather than flat role checks embedded in application code. Enforce tenant
+      isolation at the data layer using row-level security (RLS) in the database to prevent
+      cross-tenant data leakage. Invalidate session tokens server-side on logout using a token
+      revocation list or short-lived JWT with no refresh capability. Configure CORS policies
+      explicitly — deny wildcard origins for any API that handles authenticated or sensitive data.
+      Apply rate limiting per user and per endpoint to limit automated enumeration attacks.
+    tools:
+      - opa
+      - cerbos
+      - casbin
+      - keycloak
+      - kong
+      - envoy
+      - istio
+      - spicedb
+      - vault
+
+  devsecops:
+    prose: >-
+      Integrate SAST rules to detect hardcoded role checks, missing authorization annotations, and
+      direct object reference patterns that lack ownership validation. Run DAST scans with
+      authenticated sessions, testing horizontal privilege escalation (access another user's
+      resources), vertical privilege escalation (access admin-only functions), and IDOR by
+      manipulating numeric or predictable identifiers. Include authorization bypass test cases in
+      the CI pipeline — send requests directly to API endpoints with invalid or missing tokens and
+      assert 401/403 responses. Write property-based tests that verify deny-by-default: for every
+      protected endpoint, test without credentials and confirm rejection. Use GitLab SAST and
+      custom Semgrep rules targeting authorization anti-patterns in your specific language and
+      framework.
+    tools:
+      - semgrep
+      - gitlab-sast
+      - burp-suite
+      - owasp-zap
+      - nuclei
+      - checkov
+      - trivy
+      - trufflehog
+
+  secops:
+    prose: >-
+      Configure SIEM rules to alert on repeated 403 or 401 responses from a single user or IP
+      within a short time window — this is a strong signal of authorization probing or IDOR
+      enumeration. Monitor for anomalous resource access patterns: a user accessing records that
+      belong to other users, accessing admin endpoints, or accessing paths not previously accessed.
+      Establish a baseline of normal access patterns per user role and alert on deviations. Require
+      approval workflows for any changes to RBAC roles, IAM policies, or authorization rules. Conduct
+      quarterly access reviews comparing active permissions against the principle of least privilege.
+      Enable audit logging for all access control decisions, especially for privileged operations.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog-security
+      - wazuh
+      - cloudflare-waf
+      - aws-waf
+
+legal_references:
+  - framework_id: owasp-asvs
+    articles: ["V4.1", "V4.2", "V4.3"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6", "AC-17"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["7.1", "7.2", "7.3"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["6.1", "6.2", "6.7"]
+    relationship: mapped

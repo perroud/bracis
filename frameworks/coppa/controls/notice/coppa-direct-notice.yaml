@@ -1,0 +1,115 @@
+id: coppa-direct-notice
+family: notice
+title: "Direct Notice to Parents Before Collection"
+class: COPPA
+
+statement:
+  prose: |
+    Before collecting, using, or disclosing personal information from a child, an operator must
+    provide direct notice to the parent of the child (16 CFR § 312.4(c)). The direct notice must:
+
+    (1) State that the operator wishes to collect personal information from the child.
+    (2) State that the parent's consent is required for the collection, use, and/or disclosure
+        of such information.
+    (3) Describe the specific types of personal information to be collected and how it will
+        be used.
+    (4) Provide a link to the operator's online privacy policy.
+    (5) State that if the parent does not consent within a reasonable time, the operator will
+        delete the parent's contact information collected for the purpose of obtaining consent.
+    (6) State how the parent can provide consent.
+
+    The direct notice must be clearly and understandably written, not contain unrelated or
+    confusing materials, and be sent to the parent's email address or other contact information
+    provided by the child or parent.
+
+guidance:
+  prose: |
+    Direct notice is distinct from the general online privacy policy. It is a targeted
+    communication sent directly to the parent before any collection occurs. Key distinctions:
+
+    1. **Timing:** Must be sent BEFORE any collection, use, or disclosure — not after.
+       The only PI that may be collected before consent is the parent's contact information
+       solely for the purpose of obtaining consent.
+
+    2. **Channel:** Must be sent directly to the parent via email or other verifiable contact
+       method. Merely posting information online is insufficient.
+
+    3. **Specificity:** Must describe the SPECIFIC information to be collected from THAT child
+       for THAT service — not a generic restatement of the privacy policy.
+
+    4. **Clarity:** Must not be bundled with marketing materials or other communications that
+       could confuse or distract the parent.
+
+    5. **Deletion obligation:** If the parent does not respond within a reasonable time, the
+       operator must delete the parent's contact information obtained for obtaining consent.
+
+    The FTC considers the totality of circumstances — if a parent could reasonably be confused
+    about what they are consenting to, the notice is deficient.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a parental notice workflow that triggers automatically when a child user
+         attempts to register or when a child's personal information would be collected.
+      2. Implement a templated notice system that dynamically generates direct notices based
+         on the specific data collection activities being requested.
+      3. Create a parent contact management system that securely stores parent email addresses
+         solely for the purpose of obtaining and managing consent.
+      4. Implement an automatic deletion scheduler that purges parent contact information if
+         consent is not received within a configurable reasonable time period (e.g., 14 days).
+      5. Build audit trail for all direct notices sent — timestamp, recipient, content,
+         delivery status, and parent response.
+      6. Implement a consent state machine: notice_sent -> awaiting_response -> consented |
+         declined | expired. Block all PI collection until state is "consented."
+    tools:
+      - email-service
+      - consent-management-platform
+      - workflow-engine
+      - audit-log
+      - scheduler
+
+  devsecops:
+    prose: |
+      1. Test that no personal information (beyond parent contact for consent) is collected
+         before parental consent is confirmed — integration tests should verify data flow
+         blocking.
+      2. Validate direct notice email templates contain all six required elements.
+      3. Test the automatic deletion of parent contact information after timeout.
+      4. Verify that the consent state machine correctly blocks PI collection in all
+         intermediate states (not just the happy path).
+      5. Test that direct notices are not bundled with marketing or promotional content.
+    tools:
+      - integration-testing
+      - email-testing
+      - gitlab-ci
+      - api-testing
+      - postman
+
+  secops:
+    prose: |
+      1. Monitor direct notice delivery rates — track bounced emails, undelivered notices,
+         and follow up on delivery failures.
+      2. Audit that parent contact information is deleted on schedule when consent is not
+         received.
+      3. Monitor for any PI collection from children in the "awaiting consent" state —
+         this constitutes a COPPA violation.
+      4. Track consent conversion rates and response times to ensure the notice process
+         is functioning as intended.
+      5. Review direct notice content periodically to ensure it remains accurate as data
+         practices change.
+    tools:
+      - email-monitoring
+      - compliance-dashboard
+      - audit-log
+      - data-discovery
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 8", "art. 12"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 14 §1"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: complements

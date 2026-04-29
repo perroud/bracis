@@ -1,0 +1,89 @@
+id: oi-si-01
+family: si
+title: "Iniciacao de Cotacao e Contratacao de Seguros via Terceiros"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O Open Insurance permite que participantes habilitados como iniciadores de
+    serviços realizem, em nome e a pedido do cliente, operações de cotação e
+    contratação de produtos de seguros, previdência e capitalização junto a
+    sociedades seguradoras, EAPCs e sociedades de capitalização.
+
+    A iniciação de serviços deve observar:
+    I - Consentimento explícito e específico do cliente para cada operação iniciada;
+    II - Autenticação do cliente na seguradora antes da confirmação da contratação;
+    III - Transmissão segura de dados necessários para cotação e contratação via
+    APIs padronizadas;
+    IV - Responsabilidade compartilhada entre iniciador e seguradora conforme
+    definido na regulamentação;
+    V - Transparência ao cliente sobre a identidade do iniciador e da seguradora
+    que emitirá a apólice/certificado;
+    VI - Vedação ao iniciador de reter dados do cliente além do necessário para
+    a operação específica.
+
+    O cronograma de implementação dos serviços de iniciação pode ser posterior ao
+    compartilhamento de dados, conforme fases definidas pela SUSEP.
+guidance:
+  prose: |
+    Os servicos de iniciacao sao a fase mais avancada do Open Insurance, permitindo
+    que terceiros (insurtechs, comparadores, corretores digitais) iniciem transacoes
+    em nome do cliente.
+
+    O modelo e similar ao "iniciador de transacao de pagamento" do Open Finance (Pix
+    via terceiros), mas aplicado a seguros. Permite, por exemplo, que um app de
+    mobilidade urbana oferte e contrate seguro auto diretamente, sem que o cliente
+    precise ir ao site da seguradora.
+
+    A responsabilidade compartilhada e um ponto critico:
+    - O iniciador e responsavel pela jornada do cliente, pelo consentimento e pela
+      transmissao correta dos dados
+    - A seguradora e responsavel pela avaliacao de risco, emissao da apolice e
+      gestao do contrato
+    - Em caso de erro na contratacao, ambos podem ser responsabilizados conforme
+      CDC e LGPD
+
+    A vedacao de retencao de dados pelo iniciador visa prevenir que intermediarios
+    acumulem bases de dados de clientes a partir de operacoes de iniciacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs de iniciacao conforme especificacao do Open Insurance
+         (cotacao, proposta, confirmacao).
+      2. Implementar fluxo de consentimento especifico para iniciacao (diferente
+         do consentimento de compartilhamento de dados).
+      3. Configurar mecanismo de callback para notificar o iniciador sobre o
+         status da operacao (cotacao pronta, proposta aceita, apolice emitida).
+      4. Implementar idempotencia para prevenir contratacoes duplicadas.
+      5. Garantir que dados de cotacao/contratacao sejam transmitidos via mTLS + FAPI.
+    tools:
+      - api-gateway
+      - oauth2-server
+      - webhook-service
+      - idempotency-service
+  devsecops:
+    prose: |
+      1. Testes end-to-end do fluxo de iniciacao (cotacao > proposta > contratacao).
+      2. Testes de idempotencia para garantir que retries nao geram contratacoes
+         duplicadas.
+      3. Testes de seguranca no fluxo de iniciacao (autorizacao, integridade de dados).
+      4. Testes de carga para endpoints de cotacao (volume pode ser alto).
+    tools:
+      - e2e-testing
+      - security-testing
+      - load-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar operacoes de iniciacao para detectar fraudes (contratacoes
+         suspeitas, volumes anomalos).
+      2. Auditar que iniciadores nao reteem dados alem do necessario.
+      3. Monitorar reclamacoes de clientes sobre operacoes iniciadas por terceiros.
+    tools:
+      - fraud-detection
+      - siem
+      - complaint-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-7", "art-8"]
+    relationship: complements

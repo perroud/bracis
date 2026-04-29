@@ -1,0 +1,99 @@
+id: req-9.1
+family: req-9
+title: "Restrict Physical Access to Cardholder Data"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for restricting physical access to cardholder data are
+    defined and understood. Physical access controls manage entry into facilities and
+    systems containing cardholder data. Physical access for personnel and visitors is
+    authorized and managed. Media with cardholder data is secured, managed, tracked,
+    and destroyed when no longer needed. Point-of-interaction (POI) devices are protected
+    from tampering and unauthorized substitution.
+  parts:
+    - id: req-9.1.a
+      label: "9.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 9
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-9.1.b
+      label: "9.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 9 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Physical access to cardholder data or systems that store, process, or transmit
+    cardholder data must be restricted. This includes data centers, server rooms,
+    network closets, and any location housing CDE components. Physical access controls
+    include badge systems, biometric readers, mantraps, and security cameras. Visitor
+    access must be authorized, logged, and escorted in sensitive areas. Physical media
+    containing cardholder data (backup tapes, hard drives, paper records) must be
+    physically secured, tracked during transport, and destroyed via cross-cut shredding,
+    degaussing, or incineration when no longer needed. POI devices (payment terminals)
+    must be protected from skimming attacks through regular inspection and tamper
+    detection.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 9"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      For cloud-hosted CDE environments, leverage cloud provider physical security
+      controls (SOC 2 Type II reports, ISO 27001 certifications) and document the
+      shared responsibility model. For on-premises or colocation facilities, implement
+      physical access control systems integrated with the identity provider for
+      automated provisioning and deprovisioning of physical access badges. Use API
+      integrations between physical access control systems (PACS) and identity
+      management to synchronize access rights. Implement automated media destruction
+      tracking using asset management systems that enforce destruction workflows
+      before hardware decommissioning.
+    tools:
+      - cloud-provider-compliance-reports
+      - asset-management-system
+      - physical-access-control-api
+      - snipe-it
+
+  devsecops:
+    prose: >-
+      Maintain infrastructure-as-code definitions for cloud resource placement
+      that enforce CDE workloads run only in approved regions and availability
+      zones with validated physical security. Include physical security verification
+      steps in deployment checklists for on-premises components. Track hardware
+      assets and their physical locations through the CI/CD asset inventory. Enforce
+      that development and testing environments never contain real cardholder data
+      by implementing data masking in CI/CD data provisioning pipelines.
+    tools:
+      - terraform
+      - gitlab-ci
+      - data-masking-tools
+      - snipe-it
+
+  secops:
+    prose: >-
+      Monitor physical access control system logs and correlate with logical access
+      events. Alert on after-hours physical access to data centers and server rooms.
+      Track visitor logs and ensure all visitors are properly escorted and badges
+      returned. Conduct periodic POI device inspections and maintain an inspection
+      log with device serial numbers, locations, and inspection dates. Implement
+      tamper-evident seals on POI devices and inspect regularly. Monitor surveillance
+      camera feeds covering CDE physical locations and retain footage per the
+      retention policy (minimum 3 months).
+    tools:
+      - physical-access-control-system
+      - video-surveillance
+      - splunk
+      - servicenow
+      - asset-management
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-1", "PE-2", "PE-3", "PE-5", "PE-6", "MP-2", "MP-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A7.1", "A7.2", "A7.3", "A7.4", "A7.10", "A7.14"]
+    relationship: supports

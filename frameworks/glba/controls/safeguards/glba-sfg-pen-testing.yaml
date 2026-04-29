@@ -1,0 +1,144 @@
+id: glba-sfg-pen-testing
+family: safeguards
+title: "Penetration Testing and Vulnerability Assessment"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall regularly test or otherwise monitor the effectiveness
+    of the safeguards' key controls, systems, and procedures through continuous monitoring
+    or periodic penetration testing and vulnerability assessments. Testing shall cover
+    the information systems that contain customer information and shall identify
+    vulnerabilities that could result in unauthorized access to or compromise of
+    customer information.
+  parts:
+    - id: glba-sfg-pen-testing.1
+      label: "(1)"
+      prose: >-
+        The institution shall conduct annual penetration testing of information systems
+        that contain customer information. Penetration tests shall simulate real-world
+        attack scenarios and assess the effectiveness of controls against both external
+        and internal threats.
+    - id: glba-sfg-pen-testing.2
+      label: "(2)"
+      prose: >-
+        The institution shall conduct vulnerability assessments at least every six months
+        to identify technical vulnerabilities in systems, applications, and network
+        infrastructure that handle customer information.
+    - id: glba-sfg-pen-testing.3
+      label: "(3)"
+      prose: >-
+        As an alternative to annual penetration testing and bi-annual vulnerability
+        assessments, the institution may implement continuous monitoring that detects
+        and responds to relevant changes in the information systems and environment,
+        with equivalent or greater effectiveness.
+    - id: glba-sfg-pen-testing.4
+      label: "(4)"
+      prose: >-
+        Findings from penetration tests and vulnerability assessments shall be
+        documented, prioritized by risk, and remediated within defined timelines.
+        Critical and high-severity findings shall be remediated promptly.
+    - id: glba-sfg-pen-testing.5
+      label: "(5)"
+      prose: >-
+        Penetration testing shall be performed by qualified personnel (internal or
+        external) with independence from the teams responsible for implementing and
+        maintaining the systems being tested.
+
+guidance:
+  prose: >-
+    The 2023 Safeguards Rule amendment prescribes specific testing cadences: annual
+    penetration testing and bi-annual vulnerability assessments, or alternatively,
+    continuous monitoring. The FTC examines whether testing is comprehensive and whether
+    findings are remediated. Common findings include: penetration tests that only cover
+    external perimeter without testing internal network or application-layer controls,
+    vulnerability scans that are not authenticated (missing internal vulnerabilities),
+    findings that remain unresolved across multiple assessment cycles, testing scope
+    that excludes cloud environments or third-party hosted systems containing NPI,
+    and continuous monitoring programs that do not actually provide equivalent coverage
+    to discrete testing. Institutions choosing the continuous monitoring alternative
+    must demonstrate that their monitoring program covers the same threat vectors that
+    penetration testing and vulnerability assessments would identify. The qualified
+    individual should receive penetration test and vulnerability assessment reports
+    and track remediation to completion.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(d)(2)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-115/final"
+  - citation: "OWASP Testing Guide"
+    url: "https://owasp.org/www-project-web-security-testing-guide/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement continuous vulnerability scanning as part of the platform infrastructure
+      using authenticated scanners that assess all layers (OS, middleware, application,
+      container images, infrastructure-as-code). Deploy automated penetration testing
+      tools (DAST scanners) in staging environments that run against every deployment.
+      Implement container image scanning in the registry to detect vulnerabilities
+      before images are deployed. Deploy network vulnerability scanning on a scheduled
+      cadence covering all network segments that carry customer information. Implement
+      a vulnerability management platform that aggregates findings from all scanning
+      sources, deduplicates, prioritizes by risk context (NPI exposure, internet-facing,
+      exploit availability), and tracks remediation. Build automated remediation
+      pipelines that apply security patches to base images and infrastructure
+      configurations through the standard CI/CD process.
+    tools:
+      - trivy
+      - grype
+      - nuclei
+      - nessus
+      - qualys
+      - tenable
+      - kubernetes
+      - terraform
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning into every stage of the CI/CD pipeline: SAST
+      during code commit, dependency scanning during build, container scanning during
+      image creation, infrastructure scanning during IaC validation, and DAST during
+      staging deployment. Implement pipeline gates that block deployment when critical
+      or high-severity vulnerabilities are detected in NPI-handling components.
+      Configure automated dependency updates (Dependabot, Renovate) to keep libraries
+      patched. Implement a vulnerability exception workflow that requires security
+      review and documented risk acceptance for findings that cannot be immediately
+      remediated. Deploy purple team exercises where offensive and defensive teams
+      collaboratively test pipeline security controls.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - trivy
+      - defectdojo
+      - burp-suite
+  secops:
+    prose: >-
+      Manage the penetration testing program including annual engagement scoping,
+      vendor selection, rules of engagement, and findings remediation tracking.
+      Operate the vulnerability management program with defined SLAs for remediation
+      by severity (critical: 72 hours, high: 30 days, medium: 90 days, low: 180 days).
+      Generate monthly vulnerability management reports showing: open vulnerabilities
+      by severity, aging analysis, remediation rates, and SLA compliance. Coordinate
+      bi-annual vulnerability assessments and ensure scope includes all NPI systems.
+      Track penetration test findings across years to identify systemic control
+      weaknesses. Report testing results and remediation status to the qualified
+      individual.
+    tools:
+      - grc-platform
+      - servicenow
+      - defectdojo
+      - tenable
+      - qualys
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-2", "CA-7", "CA-8", "RA-5", "SA-11", "SI-2"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.3", "11.3", "11.4"]
+    relationship: complements

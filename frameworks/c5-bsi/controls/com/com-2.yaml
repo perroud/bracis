@@ -1,0 +1,93 @@
+id: com-2
+family: com
+title: "Tenant Separation"
+class: C5BSI
+baselines: [c5-basic, c5-additional]
+
+statement:
+  prose: >-
+    The cloud provider shall implement logical or physical separation
+    of cloud customer data, virtualised networks, and administration
+    environments to prevent the unintended or unauthorised disclosure,
+    modification, or deletion of data of cloud customers. The isolation
+    mechanisms shall be designed to prevent one cloud customer from
+    accessing data or resources of another cloud customer. The
+    effectiveness of the isolation mechanisms shall be regularly tested.
+
+guidance:
+  prose: >-
+    Tenant separation is the most critical control for multi-tenant
+    cloud services. Inadequate isolation can lead to cross-tenant data
+    breaches affecting multiple customers simultaneously. Isolation
+    must be implemented at multiple levels: compute (virtual machines,
+    containers), storage (databases, file systems, object storage),
+    network (virtual networks, security groups), and management
+    (administrative consoles, APIs). The isolation mechanisms should
+    be regularly tested through penetration testing and architecture
+    reviews to verify that side-channel attacks and escape
+    vulnerabilities are mitigated.
+
+references:
+  - citation: "C5:2020, COM-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement multi-layered tenant isolation: dedicated namespaces or
+      virtual clusters per tenant in Kubernetes, dedicated VPCs or VNets
+      for network isolation, per-tenant encryption keys for data
+      isolation, and RBAC policies preventing cross-tenant access.
+      Use admission controllers to enforce tenant labelling on all
+      resources and prevent cross-namespace communication unless
+      explicitly allowed. Implement resource quotas to prevent noisy
+      neighbor effects. Conduct regular architecture reviews of
+      isolation boundaries.
+    tools:
+      - kubernetes
+      - terraform
+      - open-policy-agent
+      - kyverno
+      - calico
+      - vault
+
+  devsecops:
+    prose: >-
+      Validate tenant isolation configurations in CI/CD pipelines.
+      Enforce namespace-scoped deployments and prevent cross-tenant
+      resource references in deployment manifests. Include tenant
+      isolation verification in integration test suites. Implement
+      automated penetration testing that specifically targets tenant
+      boundary controls as part of the release process.
+    tools:
+      - gitlab-ci
+      - kube-linter
+      - checkov
+      - trivy
+      - zap
+
+  secops:
+    prose: >-
+      Monitor for cross-tenant access attempts and alert on any
+      successful or attempted boundary violations. Implement anomaly
+      detection for resource access patterns that could indicate
+      tenant isolation failures. Conduct regular penetration testing
+      targeting isolation mechanisms and track remediation of findings.
+      Generate tenant isolation compliance reports for audit evidence.
+    tools:
+      - splunk
+      - elastic-siem
+      - falco
+      - crowdstrike
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.22"]
+    relationship: mapped
+  - framework_id: nist-800-53
+    articles: ["SC-4", "SC-7", "SC-39"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["IVS-06", "IVS-09"]
+    relationship: equivalent-to

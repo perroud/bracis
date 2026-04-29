@@ -1,0 +1,134 @@
+id: art-28
+family: cap-6
+title: "Comunicacao de Operacoes Suspeitas ao COAF"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 28. As supervisionadas devem comunicar ao Conselho de Controle de Atividades
+    Financeiras (COAF), no prazo de vinte e quatro horas, as operações ou propostas
+    de operações que, após análise, apresentem indícios de lavagem de dinheiro ou de
+    financiamento do terrorismo, incluindo:
+    I - a descrição detalhada da operação ou proposta de operação;
+    II - a identificação das pessoas envolvidas;
+    III - os fundamentos da suspeita;
+    IV - a indicação dos critérios de seleção e análise que motivaram a comunicação.
+guidance:
+  prose: |
+    O art. 28 estabelece a obrigacao central de todo programa de PLD/FT: a
+    comunicacao ao COAF de operacoes suspeitas (STR - Suspicious Transaction Report).
+
+    **Prazo de 24 horas:**
+    O prazo de 24 horas conta a partir da CONCLUSAO DA ANALISE (art. 25), nao da
+    data da operacao. Na pratica, o fluxo temporal completo e:
+    1. Operacao ocorre (D+0)
+    2. Sistema gera alerta (D+0 a D+1)
+    3. Analista investiga (ate D+45 conforme art. 25)
+    4. Decisao de comunicar (D+X)
+    5. Comunicacao ao COAF (D+X+1, maximo 24 horas apos decisao)
+    O prazo de 24 horas e apertado e exige automacao do processo de comunicacao.
+
+    **Conteudo obrigatorio (incisos I-IV):**
+
+    1. Descricao detalhada (I):
+       - Tipo de operacao (contratacao, sinistro, resgate, portabilidade)
+       - Valores envolvidos
+       - Datas relevantes
+       - Sequencia de eventos
+       - Produto(s) envolvido(s)
+       No mercado securitario: detalhar se envolve premio, sinistro, resgate de
+       VGBL/PGBL, capitalizacao, com valores e datas especificos.
+
+    2. Identificacao das pessoas (II):
+       - Cliente (segurado, proponente, participante, titular)
+       - Beneficiario de sinistro ou resgate
+       - Terceiros envolvidos (pagadores, procuradores)
+       - Corretor ou intermediario
+       - CPF/CNPJ, endereco, telefone de todos os envolvidos
+
+    3. Fundamentos da suspeita (III):
+       - Tipologia de LD/FT identificada
+       - Incompatibilidades entre perfil e operacao
+       - Padroes atipicos detectados
+       - Informacoes de fontes externas que corroboram suspeita
+       A fundamentacao deve ser solida: o COAF utiliza a comunicacao para
+       producao de inteligencia financeira e eventual encaminhamento ao MP.
+
+    4. Criterios de selecao (IV):
+       - Regra(s) do sistema de monitoramento que geraram o alerta
+       - Indicadores do art. 27 aplicaveis
+       - Parametros que foram excedidos
+
+    **Proibicao de tipping off:**
+    A supervisionada NAO pode informar ao cliente que uma comunicacao foi feita
+    ao COAF. Violacao do sigilo da comunicacao e crime (art. 10 da Lei 9.613/1998).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de comunicacao ao COAF:**
+      1. Integracao direta com SISCOAF (Sistema de Informacoes do COAF) via
+         web service para envio automatizado de comunicacoes.
+      2. Formulario estruturado de comunicacao com todos os campos obrigatorios
+         (incisos I a IV) pre-populados a partir do dossie de investigacao.
+      3. Workflow de aprovacao: analista prepara, supervisor revisa, compliance
+         officer/diretor responsavel aprova, sistema envia ao SISCOAF.
+      4. Controle de prazo de 24 horas com alerta automatico ao compliance
+         officer quando decisao de comunicar e tomada.
+
+      **Automacao e rastreabilidade:**
+      5. Protocolo de recebimento do SISCOAF registrado automaticamente no
+         sistema de case management.
+      6. Arquivo digital da comunicacao com todos os documentos de suporte.
+      7. Dashboard de comunicacoes enviadas com status (enviada, recebida,
+         complemento solicitado).
+      8. Controle de comunicacoes complementares quando COAF solicita
+         informacoes adicionais.
+    tools:
+      - siscoaf-integration
+      - case-management
+      - workflow-engine
+      - compliance-dashboard
+  devsecops:
+    prose: |
+      **Testes de comunicacao ao COAF:**
+      1. Testes de integracao com SISCOAF (ambiente de homologacao) para
+         validar envio automatizado.
+      2. Testes de completude: comunicacao sem campos obrigatorios deve ser
+         rejeitada pelo sistema antes do envio.
+      3. Testes de prazo: alerta quando comunicacao nao enviada em 24 horas
+         apos decisao.
+
+      **Seguranca da comunicacao:**
+      4. Criptografia da comunicacao em transito (TLS 1.2 minimo para SISCOAF).
+      5. Controle de acesso restrito: somente compliance pode visualizar e
+         enviar comunicacoes.
+      6. Logs de acesso a comunicacoes com retencao de 10 anos.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - security-tests
+      - access-control-tests
+  secops:
+    prose: |
+      **Gestao de comunicacoes:**
+      1. Processo formal de preparacao, revisao e aprovacao de comunicacoes
+         com segregacao de funcoes.
+      2. Controle de qualidade de comunicacoes: amostragem para verificar
+         completude e fundamentacao.
+      3. Acompanhamento de comunicacoes complementares solicitadas pelo COAF.
+
+      **Metricas e reporte:**
+      4. Indicadores de comunicacao: numero por periodo, por produto, por
+         tipo de suspeita, por valor.
+      5. Tempo medio entre decisao e envio (meta: < 12 horas).
+      6. Taxa de comunicacoes complementares (indicador de qualidade).
+      7. Relatorio mensal de comunicacoes para diretor responsavel.
+      8. Relatorio anual de comunicacoes para SUSEP e conselho de administracao.
+    tools:
+      - case-management
+      - compliance-metrics
+      - reporting-engine
+      - regulatory-reporting
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-28"]
+    relationship: equivalent-to

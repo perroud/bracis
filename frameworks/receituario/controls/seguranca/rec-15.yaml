@@ -1,0 +1,128 @@
+id: rec-15
+family: seguranca
+title: "Business Continuity and Disaster Recovery"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 28. Os responsáveis por sistemas de prescrição eletrônica devem
+    manter plano de continuidade de negócios e recuperação de desastres
+    que contemple:
+
+    I — procedimentos de contingência para emissão de prescrições em caso
+    de indisponibilidade do sistema eletrônico, incluindo a possibilidade
+    de emissão temporária de receitas em papel com posterior registro no
+    SNCR;
+
+    II — backup automatizado de todos os dados de prescrição com
+    frequência mínima diária e retenção conforme os prazos legais
+    aplicáveis;
+
+    III — testes periódicos de recuperação de desastres, com frequência
+    mínima semestral, documentando os resultados e as ações corretivas;
+
+    IV — replicação geográfica dos dados de prescrição em, no mínimo,
+    dois centros de dados distintos;
+
+    V — tempo máximo de recuperação (RTO) de 4 (quatro) horas e ponto
+    máximo de recuperação (RPO) de 1 (uma) hora.
+
+    Parágrafo único. O plano de continuidade deve ser revisado anualmente
+    e atualizado após qualquer incidente que resulte em indisponibilidade
+    superior a 2 (duas) horas.
+guidance:
+  prose: |
+    Article 28 mandates business continuity and disaster recovery
+    planning for prescription systems, recognizing that system
+    unavailability directly impacts patient care.
+
+    **Recovery objectives:**
+    - RTO (Recovery Time Objective): maximum 4 hours
+    - RPO (Recovery Point Objective): maximum 1 hour
+    - These are demanding targets that require active replication
+
+    **Paper fallback:**
+    During system outages, prescribers may issue paper prescriptions
+    as a temporary measure. These must be retrospectively registered
+    in the SNCR when the system is restored.
+
+    **Backup requirements:**
+    - Minimum daily automated backups
+    - Retention aligned with legal requirements (5 years common drugs,
+      20 years controlled substances)
+    - Geographic replication across at least 2 data centers
+
+    **DR testing:**
+    - Minimum semi-annual DR tests
+    - Full documentation of test results and corrective actions
+    - Recovery must be demonstrated within the 4-hour RTO target
+
+    **Plan maintenance:**
+    - Annual review of the business continuity plan
+    - Mandatory update after any outage exceeding 2 hours
+    - Lessons learned must be incorporated into plan revisions
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Business continuity infrastructure:**
+      1. Deploy multi-region active-passive or active-active
+         architecture with synchronous or asynchronous replication
+         meeting the 1-hour RPO requirement.
+      2. Implement automated daily backups with point-in-time recovery
+         capability, stored in a geographically separate region.
+      3. Deploy automated failover with health checks and DNS-based
+         traffic routing to the standby region when the primary
+         becomes unavailable.
+      4. Implement a paper prescription registration queue for
+         retrospective SNCR registration after system recovery.
+      5. Configure monitoring and alerting with automatic escalation
+         for outages exceeding 30 minutes, 1 hour, and 2 hours.
+    tools:
+      - multi-region-deployment
+      - postgresql-replication
+      - patroni
+      - pgbackrest
+      - route53
+      - cloudflare
+      - runbook-automation
+  devsecops:
+    prose: |
+      **DR validation pipeline:**
+      1. Implement automated DR test scenarios that can be triggered
+         from the CI/CD pipeline, simulating primary region failure.
+      2. Create backup restoration tests that verify data integrity
+         and completeness after restore operations.
+      3. Add RPO validation tests that measure actual replication
+         lag and alert when it exceeds the 1-hour target.
+      4. Deploy chaos engineering tests that randomly terminate
+         components and verify automatic recovery behavior.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - litmus
+      - backup-validation
+      - dr-automation
+  secops:
+    prose: |
+      **Business continuity operations:**
+      1. Conduct semi-annual DR tests with full documentation of
+         recovery time achieved versus 4-hour RTO target.
+      2. Monitor replication lag continuously and alert when it
+         approaches the 1-hour RPO threshold.
+      3. Review and update the business continuity plan annually
+         and after every outage exceeding 2 hours.
+      4. Maintain a paper prescription registration backlog tracker
+         during outages to ensure all paper prescriptions are
+         retrospectively registered in the SNCR.
+    tools:
+      - dr-orchestration
+      - replication-monitoring
+      - incident-management
+      - backlog-tracker
+legal_references:
+  - framework_id: iso-22301
+    articles: ["clausula-8"]
+    relationship: mapped
+  - framework_id: anvisa-134
+    articles: ["art-30", "art-31"]
+    relationship: mapped

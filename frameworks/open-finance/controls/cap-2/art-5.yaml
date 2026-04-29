@@ -1,0 +1,98 @@
+id: art-5
+family: cap-2
+title: "Escopo de Dados Compartilhaveis"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 5. O compartilhamento de dados no âmbito do Open Finance abrange:
+
+    I - dados sobre produtos e serviços oferecidos pelas instituições
+    participantes (dados abertos), incluindo taxas, tarifas, condições
+    contratuais e canais de atendimento;
+
+    II - dados cadastrais de clientes, incluindo identificação, qualificação
+    e informações complementares;
+
+    III - dados transacionais de clientes, incluindo saldos, extratos,
+    limites, faturas e histórico de operações;
+
+    IV - dados sobre produtos contratados pelo cliente, incluindo
+    características, condições e parâmetros operacionais.
+
+    Parágrafo único. O compartilhamento dos dados previstos nos incisos II
+    a IV depende de consentimento prévio do cliente.
+guidance:
+  prose: |
+    O art. 5 define os quatro niveis de dados compartilhaveis:
+
+    **Nivel 1 - Dados abertos (sem consentimento):**
+    - Taxas de juros, tarifas, pacotes de servicos
+    - Condicoes contratuais padronizadas
+    - Canais de atendimento e localizacao de agencias
+    - Produtos disponiveis (credito, investimento, seguros)
+
+    **Nivel 2 - Dados cadastrais (com consentimento):**
+    - CPF/CNPJ, nome, data de nascimento
+    - Endereco, telefone, e-mail
+    - Renda declarada, profissao
+    - Documentos de identificacao
+
+    **Nivel 3 - Dados transacionais (com consentimento):**
+    - Saldos de contas correntes e poupanca
+    - Extratos e historico de movimentacoes
+    - Faturas de cartao de credito
+    - Limites de credito disponiveis
+
+    **Nivel 4 - Dados de produtos (com consentimento):**
+    - Contratos de credito vigentes
+    - Investimentos e previdencia
+    - Seguros contratados
+    - Condicoes e parametros de cada produto
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de exposicao de dados:**
+      1. Implementar API de dados abertos (Fase 1) com cache agressivo
+         e CDN, pois nao requer autenticacao do cliente.
+      2. Implementar APIs de dados cadastrais e transacionais (Fase 2)
+         com autenticacao FAPI e validacao de consentimento em cada request.
+      3. Modelar domain events para capturar mudancas em dados que
+         precisam ser refletidos nas APIs em tempo proximo ao real.
+      4. Implementar paginacao, filtros e ordenacao conforme
+         especificacoes do diretorio para cada endpoint.
+    tools:
+      - api-gateway
+      - event-driven-architecture
+      - caching-layer
+      - cdn
+  devsecops:
+    prose: |
+      **Pipeline de qualidade de dados:**
+      1. Validar schemas de resposta contra especificacoes OpenAPI do
+         diretorio em cada build.
+      2. Implementar testes de integracao que verifiquem completude
+         dos dados retornados por categoria.
+      3. Garantir que APIs de dados abertos NAO exponham dados pessoais.
+      4. Verificar mascaramento e truncamento conforme especificacoes.
+    tools:
+      - openapi-validator
+      - data-quality-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Classificacao e protecao de dados:**
+      1. Classificar dados por nivel (aberto, cadastral, transacional,
+         produto) no inventario de dados.
+      2. Aplicar controles proporcionais ao nivel de sensibilidade.
+      3. Monitorar tentativas de acesso a dados de nivel superior
+         sem consentimento valido.
+      4. Auditar periodicamente a completude e acuracia dos dados expostos.
+    tools:
+      - data-classification
+      - dlp
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

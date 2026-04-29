@@ -1,0 +1,96 @@
+id: art-3
+family: cap-1
+title: "Modelos de Servico de Nuvem"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 3. Os modelos de serviço de computação em nuvem, para os fins desta Instrução
+    Normativa, são:
+    I - Infraestrutura como Serviço (IaaS): o provedor disponibiliza ao contratante
+    recursos de processamento, armazenamento, rede e outros recursos computacionais
+    fundamentais, nos quais o contratante pode instalar e executar softwares;
+    II - Plataforma como Serviço (PaaS): o provedor disponibiliza ao contratante
+    infraestrutura de nuvem para implantar aplicações criadas ou adquiridas pelo
+    contratante, utilizando linguagens de programação, bibliotecas e ferramentas
+    suportadas pelo provedor;
+    III - Software como Serviço (SaaS): o provedor disponibiliza ao contratante
+    aplicações executadas em infraestrutura de nuvem, acessíveis por meio de
+    navegador web, API ou cliente dedicado.
+guidance:
+  prose: |
+    O art. 3 define os tres modelos de servico de nuvem conforme taxonomia NIST,
+    cada um com diferentes niveis de responsabilidade compartilhada.
+
+    **Responsabilidade compartilhada por modelo:**
+    - IaaS: orgao responsavel por SO, middleware, aplicacao, dados
+    - PaaS: orgao responsavel por aplicacao e dados
+    - SaaS: orgao responsavel apenas por dados e configuracao de acesso
+
+    **Implicacao na seguranca:**
+    Quanto mais alto o modelo (IaaS → PaaS → SaaS), menor o controle do orgao
+    sobre a infraestrutura subjacente e maior a dependencia do provedor.
+
+    **Mapeamento CSA CCM v4:**
+    - STA-02: Supply Chain Security (seguranca da cadeia de fornecimento)
+    - STA-03: Supply Chain Management (gestao de fornecedores de nuvem)
+
+    **Mapeamento ISO 27017:**
+    - Clausula 5: Modelos de servico de nuvem e responsabilidades compartilhadas
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Matriz de responsabilidade por modelo:**
+      1. Documentar matriz RACI (Responsible, Accountable, Consulted, Informed)
+         para cada modelo de servico, delimitando responsabilidades de seguranca
+         entre orgao e provedor.
+      2. IaaS: implementar hardening de SO, patching, firewall, IDS/IPS, backup
+         como responsabilidade do orgao.
+      3. PaaS: configurar controles de seguranca da plataforma (roles, secrets,
+         networking) e monitorar dependencias da aplicacao.
+      4. SaaS: configurar SSO, MFA, politicas de acesso e DLP como controles
+         primarios do orgao.
+    tools:
+      - cloud-config-management
+      - hardening-scripts
+      - sso-provider
+      - identity-management
+  devsecops:
+    prose: |
+      **Pipeline diferenciado por modelo:**
+      1. IaaS: pipeline inclui scan de imagens de SO, hardening CIS Benchmark,
+         validacao de firewall rules e testes de penetracao.
+      2. PaaS: pipeline inclui SAST, DAST, dependency scanning e validacao de
+         configuracao da plataforma.
+      3. SaaS: pipeline inclui validacao de configuracao de seguranca (SSPM),
+         testes de integracao com IdP e auditoria de permissoes.
+      4. Todos os modelos: secret detection e compliance checks.
+    tools:
+      - gitlab-ci
+      - cis-benchmark
+      - sspm
+      - sast-scanner
+      - dast-scanner
+  secops:
+    prose: |
+      **Monitoramento adaptado ao modelo:**
+      1. IaaS: monitoramento de infraestrutura (CPU, memoria, disco, rede),
+         logs de SO, deteccao de intrusao.
+      2. PaaS: monitoramento de aplicacao (APM), logs de plataforma, metricas
+         de disponibilidade.
+      3. SaaS: monitoramento de acessos, auditoria de configuracao, deteccao
+         de anomalias de uso.
+      4. CSPM (Cloud Security Posture Management) para validacao continua de
+         configuracao de seguranca em todos os modelos.
+    tools:
+      - cspm
+      - siem
+      - apm
+      - ids-ips
+legal_references:
+  - framework_id: csa-ccm-v4
+    articles: ["STA-02", "STA-03"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-3"]
+    relationship: derived-from

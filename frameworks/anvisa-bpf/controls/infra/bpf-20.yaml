@@ -1,0 +1,128 @@
+id: bpf-20
+family: infra
+title: "System Decommissioning and Data Migration"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    A desativação de sistemas computadorizados de BPF deve seguir
+    procedimento formal que assegure a preservação e acessibilidade
+    de todos os dados regulatórios durante o período de retenção
+    obrigatório, incluindo dados de processo, registros de lote,
+    resultados analíticos, trilhas de auditoria e assinaturas
+    eletrônicas.
+
+    O procedimento de desativação deve incluir: inventário completo
+    dos dados regulatórios contidos no sistema, plano de migração
+    ou arquivamento com validação de integridade, verificação de que
+    todos os dados foram transferidos com sucesso e são acessíveis
+    no destino, manutenção da capacidade de leitura e pesquisa dos
+    dados migrados, e documentação da evidência de transferência
+    verificada.
+
+    A migração de dados para novo sistema deve ser tratada como
+    mudança crítica, com protocolo de validação específico que
+    demonstre equivalência entre os dados no sistema de origem e
+    destino, incluindo contagem de registros, comparação de checksums,
+    verificação amostral de conteúdo, e integridade de relacionamentos
+    entre dados e suas trilhas de auditoria.
+guidance:
+  prose: |
+    System decommissioning is a high-risk activity that, if executed
+    poorly, can result in permanent loss of regulatory records. ANVISA
+    expects manufacturers to maintain access to GMP data for the full
+    retention period regardless of system changes.
+
+    Decommissioning approaches:
+    - Data migration to replacement system: preferred when a new system
+      is replacing the old one. Requires full validation of data
+      transfer completeness and integrity.
+    - Data archival: export to a readable archive format when no
+      replacement system exists. Must maintain searchability and
+      auditability.
+    - System preservation: maintain the old system in read-only mode.
+      Acceptable but creates ongoing maintenance and licensing burden.
+
+    Critical decommissioning requirements:
+    - Complete data inventory before any action
+    - Validated migration/archival procedure
+    - Post-migration verification (record counts, checksums, sampling)
+    - Audit trail preservation with parent records
+    - Electronic signature validity maintenance
+    - Retention period compliance verification
+    - Regulatory notification if required
+    - Documented evidence package
+
+    Common failures:
+    - Losing audit trail data during migration
+    - Breaking electronic signature associations
+    - Exporting only summary data instead of raw data
+    - Not testing data accessibility post-migration
+    - Failing to account for all data repositories
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement standardized data migration toolkit with automated
+         integrity verification: record count comparison, cryptographic
+         hash validation, referential integrity checking, and sample
+         content verification between source and destination.
+      2. Deploy data archival infrastructure supporting long-term
+         preservation in open, vendor-independent formats with
+         maintained searchability and audit trail association.
+      3. Configure migration validation pipelines that automatically
+         generate evidence packages documenting transfer completeness,
+         integrity verification results, and exception reports.
+      4. Implement post-decommissioning data access portal providing
+         authorized users and regulators with continued access to
+         archived GMP data throughout the retention period.
+    tools:
+      - data-migration-tools
+      - archival-infrastructure
+      - validation-pipeline
+      - data-access-portal
+  devsecops:
+    prose: |
+      1. Build automated migration validation test suites: record
+         count comparison, field-level content verification, audit
+         trail linkage validation, and electronic signature
+         preservation checks.
+      2. Implement automated format fidelity testing verifying that
+         migrated or archived data maintains original attributes:
+         dynamic data remains dynamic, metadata is preserved, and
+         all relationships are intact.
+      3. Test archived data accessibility: verify that archived
+         records can be searched, retrieved, and displayed correctly
+         throughout simulated retention period scenarios.
+      4. Create decommissioning validation protocol templates that
+         can be executed automatically for each system retirement.
+    tools:
+      - gitlab-ci
+      - migration-validation
+      - format-testing
+      - archival-testing
+  secops:
+    prose: |
+      1. Establish system decommissioning SOP covering data inventory,
+         migration planning, validation protocol, execution, post-
+         migration verification, and documentation requirements.
+      2. Require quality assurance approval of the decommissioning
+         plan and post-migration verification results before the
+         source system is deactivated.
+      3. Conduct periodic verification of archived data accessibility
+         and integrity (minimum annually) for decommissioned systems
+         with active retention obligations.
+      4. Maintain decommissioning records as part of the system
+         lifecycle documentation, including data location mapping
+         for all retired systems.
+    tools:
+      - grc-platform
+      - decommissioning-management
+      - quality-management-system
+      - data-inventory
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-31", "art-27"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-10", "controle-A-5-37"]
+    relationship: mapped

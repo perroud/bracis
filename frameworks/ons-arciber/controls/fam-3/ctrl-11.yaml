@@ -1,0 +1,99 @@
+id: ctrl-11
+family: fam-3
+title: "Controle de Acesso Remoto ao ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles específicos para acesso remoto
+    ao ARCiber, garantindo que todo acesso remoto seja autenticado, autorizado,
+    monitorado e registrado. O acesso remoto ao ARCiber deve ser realizado
+    exclusivamente por meio de infraestrutura controlada (VPN, jump server,
+    acesso remoto privilegiado) com autenticação multifator obrigatória. Sessões
+    de acesso remoto devem ser gravadas e retidas por período mínimo de um ano.
+    O acesso remoto por terceiros deve ser realizado sob supervisão e em
+    janelas de tempo definidas e aprovadas.
+
+guidance:
+  prose: >-
+    O acesso remoto e um dos principais vetores de ataque a sistemas OT/ICS,
+    como demonstrado em multiplos incidentes no setor eletrico mundial. Os
+    controles devem abranger: (i) inventario de todos os pontos de acesso
+    remoto ao ARCiber (modems dial-up, VPNs, acessos via Internet, MPLS);
+    (ii) eliminacao de acessos remotos nao autorizados ou desnecessarios;
+    (iii) jump server dedicado na DMZ industrial como unico ponto de entrada
+    remoto ao ARCiber operacional; (iv) VPN com criptografia forte (AES-256,
+    TLS 1.3) para todos os acessos remotos; (v) MFA obrigatoria para todos
+    os usuarios de acesso remoto, incluindo colaboradores internos;
+    (vi) timeout automatico de sessao apos periodo de inatividade (maximo 15
+    minutos para sistemas de nivel 2-3); (vii) para acesso de terceiros:
+    acesso just-in-time com aprovacao previa, janela de tempo limitada,
+    sessao gravada e responsavel interno supervisionando.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de acesso remoto privilegiado (PAM) com capacidade
+      de gravacao de sessao completa (keystroke, video) para todos os acessos
+      remotos ao ARCiber — CyberArk Privileged Session Manager ou BeyondTrust
+      Privileged Remote Access. Configurar jump server dedicado na DMZ industrial
+      como unico ponto de acesso remoto, com sistema operacional hardened e
+      monitoramento reforçado. Implementar VPN com certificados digitais e MFA
+      para acesso remoto de colaboradores internos. Configurar revogacao
+      automatica de acesso apos expiracoes de janela aprovada para terceiros.
+      Implementar monitoramento em tempo real de sessoes remotas ativas ao ARCiber.
+    tools:
+      - cyberark-psm
+      - beyondtrust-pra
+      - cisco-anyconnect
+      - palo-alto-globalprotect
+      - jump-server
+  devsecops:
+    prose: >-
+      Implementar workflow automatizado de aprovacao de acesso remoto de terceiros
+      ao ARCiber via ServiceNow ou Jira, com notificacao ao RSCA e responsavel
+      pelo ativo. Configurar alertas para acessos remotos ao ARCiber fora de
+      janelas aprovadas ou por usuarios nao autorizados. Auditar mensalmente
+      os logs de acesso remoto ao ARCiber para identificar padroes anomalos.
+      Eliminar acessos remotos permanentes — todos os acessos de terceiros
+      devem ser just-in-time com expiracao automatica.
+    tools:
+      - servicenow
+      - gitlab-ci
+      - cyberark
+      - pagerduty
+  secops:
+    prose: >-
+      Monitorar em tempo real todas as sessoes de acesso remoto ativas ao
+      ARCiber. Alertar imediatamente para: accesso remoto fora de janela
+      aprovada, sessao remota prolongada sem atividade, acesso remoto de
+      localizacao geografica inesperada, e multiplas sessoes simultaneas do
+      mesmo usuario. Revisar mensalmente os logs de acesso remoto ao ARCiber.
+      Realizar varredura trimestral de todos os pontos de acesso remoto ao
+      ARCiber para detectar conexoes nao autorizadas (modems, acessos diretos
+      a Internet). Evidenciar controles de acesso remoto para auditorias
+      regulatorias ANEEL/ONS.
+    tools:
+      - cyberark-psm
+      - splunk
+      - nozomi-networks
+      - servicenow
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR1.13", "62443-2-1 cl.4.3.3.6"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-005-R2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.20", "a6.7"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-17", "IA-2", "AU-14"]
+    relationship: mapped

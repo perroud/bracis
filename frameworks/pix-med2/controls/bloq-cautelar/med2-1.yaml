@@ -1,0 +1,97 @@
+id: med2-1
+family: bloq-cautelar
+title: "Cascading Precautionary Block Activation"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP recebedor, ao ser notificado de infração via DICT relativa a fundada suspeita de fraude,
+    deve efetuar o bloqueio cautelar dos recursos creditados na conta do usuário recebedor no prazo
+    máximo estabelecido pelo BCB. Caso os recursos tenham sido transferidos para outras contas,
+    o PSP deve rastrear a cadeia de transferências e solicitar o bloqueio cautelar em cascata nas
+    contas intermediárias (contas-mula) e na conta de destino final, acionando os respectivos PSPs
+    por meio do DICT. O bloqueio em cascata aplica-se a todas as contas que receberam valores
+    direta ou indiretamente vinculados à transação objeto da notificação de infração, até o limite
+    do valor originalmente transacionado.
+guidance:
+  prose: |
+    **Cascading Precautionary Block:**
+    The MED 2.0 fundamentally changes the blocking mechanism by extending it beyond the
+    immediate receiver account. When a fraud notification is received, the PSP must:
+
+    1. **Immediate block:** Block funds in the direct receiver's account within the
+       regulatory timeframe (30 minutes from notification).
+    2. **Trace the chain:** Identify all downstream transfers originating from the
+       fraudulent transaction — funds may have been split and forwarded through
+       multiple mule accounts.
+    3. **Cascade blocking:** Issue blocking requests via DICT to all PSPs holding
+       accounts that received funds in the chain, proportional to the amounts
+       transferred.
+    4. **Value cap:** The total amount blocked across all accounts in the cascade
+       must not exceed the original transaction value.
+
+    **Key operational challenge:** Mule account networks can involve 3–5 hops within
+    minutes. The PSP must have automated tracing capabilities to act within the
+    regulatory window.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a real-time transaction graph engine capable of tracing fund flows
+         across multiple accounts and PSPs within seconds of receiving a DICT infraction
+         notification.
+      2. Build a cascade orchestrator service that, upon detecting downstream transfers,
+         automatically generates and dispatches blocking requests to each PSP in the chain
+         via the DICT API.
+      3. Maintain a ledger of cascade blocks with the original transaction ID, each hop
+         in the chain, amounts blocked per account, and timestamps for audit.
+      4. Implement idempotency controls to prevent duplicate blocking requests when
+         multiple infraction notifications reference the same original transaction.
+      5. Deploy the cascade engine with sub-second latency to maximize the chance of
+         blocking funds before further movement.
+    tools:
+      - graph-database
+      - event-streaming
+      - dict-api-client
+      - distributed-tracing
+      - workflow-engine
+  devsecops:
+    prose: |
+      1. Create integration tests simulating multi-hop fund transfers (2, 3, 5 hops)
+         and verify that cascade blocking requests are generated for each hop within the
+         required timeframe.
+      2. Test edge cases: circular transfers, partial amounts at each hop, zero-balance
+         accounts, and concurrent blocking requests.
+      3. Load-test the cascade engine to ensure it handles peak fraud notification volumes
+         (e.g., 1,000+ simultaneous cascades) without degradation.
+      4. Include DICT API contract tests to validate blocking request/response formats.
+      5. Implement chaos engineering tests for DICT API unavailability during cascade.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - load-testing
+      - contract-testing
+      - chaos-engineering
+  secops:
+    prose: |
+      1. Monitor cascade blocking metrics: time-to-block per hop, total cascade depth,
+         success/failure rates per PSP.
+      2. Alert on cascade failures — if any PSP in the chain fails to acknowledge the
+         blocking request within the regulatory window, escalate immediately.
+      3. Maintain a real-time dashboard showing active cascades, blocked amounts, and
+         pending confirmations.
+      4. Conduct weekly reviews of cascade effectiveness: percentage of funds successfully
+         blocked vs. total fraud value.
+      5. Coordinate with peer PSPs on recurring mule account patterns identified through
+         cascade data.
+    tools:
+      - monitoring-platform
+      - alerting-system
+      - analytics-dashboard
+      - case-management
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21"]
+    relationship: implements

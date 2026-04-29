@@ -1,0 +1,145 @@
+id: e8-restrict-admin
+family: limit
+title: "Restrict Administrative Privileges"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Administrative privileges to operating systems and applications are restricted to
+    personnel whose duties require such access. Privileged accounts are not used for
+    reading email, browsing the web, or performing other standard user activities.
+    Requests for privileged access are validated when first requested and revalidated
+    on a regular basis. Just-in-time administration and just-enough-administration
+    principles are applied to minimize the standing attack surface of privileged accounts.
+
+guidance:
+  prose: >-
+    Restricting administrative privileges is essential to limiting the impact of an
+    initial compromise. Once an adversary gains access to a privileged account, they can
+    move laterally, escalate privileges, access sensitive data, and maintain persistence.
+    The principle of least privilege must be enforced rigorously, with privileged accounts
+    separated from standard user accounts and subjected to enhanced monitoring. Privileged
+    access workstations (PAWs) or jump servers should be used for administrative tasks.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Requests for privileged access to systems, applications, and data repositories
+        are validated when first requested. Privileged accounts (excluding local
+        administrator accounts and service accounts) are prevented from accessing the
+        internet, email, and web services. Privileged users use separate privileged and
+        unprivileged operating environments. Unprivileged accounts cannot log on to
+        privileged operating environments. Privileged accounts (excluding local
+        administrator accounts) cannot log on to unprivileged operating environments.
+    ml2:
+      prose: >-
+        Requests for privileged access to systems, applications, and data repositories
+        are validated when first requested, and revalidated on an annual or more frequent
+        basis. Privileged access to systems, applications, and data repositories is
+        limited to only what is required for personnel to undertake their duties.
+        Administrative activities are conducted through jump servers. Credentials for
+        local administrator accounts and service accounts are long, unique, unpredictable,
+        and managed. Privileged accounts are prevented from accessing the internet, email,
+        and web services. Privileged users use separate privileged and unprivileged
+        operating environments. Unprivileged accounts cannot log on to privileged
+        operating environments. Privileged accounts (excluding local administrator
+        accounts) cannot log on to unprivileged operating environments. Privileged access
+        events are logged. Event logs are protected from unauthorised modification and
+        deletion.
+    ml3:
+      prose: >-
+        Requests for privileged access to systems, applications, and data repositories
+        are validated when first requested, and revalidated on a biannual or more frequent
+        basis. Privileged access to systems, applications, and data repositories is
+        limited to only what is required for personnel to undertake their duties, and is
+        automatically disabled after 12 months unless revalidated. Just-in-time
+        administration is used for administering systems and applications. Administrative
+        activities are conducted through jump servers or privileged access workstations.
+        Credentials for local administrator accounts and service accounts are long, unique,
+        unpredictable, and managed via an automated credential management solution.
+        Windows credential caching is disabled on jump servers and workstations. Privileged
+        accounts are prevented from accessing the internet, email, and web services.
+        Privileged users use separate privileged and unprivileged operating environments.
+        Unprivileged accounts cannot log on to privileged operating environments. Privileged
+        accounts (excluding local administrator accounts) cannot log on to unprivileged
+        operating environments. Privileged access events are centrally logged and monitored
+        for signs of compromise. Event logs are protected from unauthorised modification
+        and deletion. Event logs are analysed in a timely manner.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Restrict Administrative Privileges"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 AC-6 - Least Privilege"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement tiered administration models with dedicated privileged access workstations
+      (PAWs) or hardened jump servers for administrative tasks. Deploy Privileged Access
+      Management (PAM) solutions (CyberArk, HashiCorp Vault, Azure PIM) for credential
+      vaulting, session recording, and just-in-time access provisioning. Use Active
+      Directory tiering (Tier 0/1/2) to segment administrative privileges. Enforce
+      separate accounts for privileged and unprivileged activities via GPO and conditional
+      access policies. Configure LAPS (Local Administrator Password Solution) for unique,
+      rotated local admin passwords. Disable credential caching on privileged workstations
+      via Group Policy. Implement break-glass procedures for emergency access with full
+      audit trails.
+    tools:
+      - cyberark
+      - hashicorp-vault
+      - azure-pim
+      - laps
+      - group-policy
+      - intune
+      - active-directory
+
+  devsecops:
+    prose: >-
+      Enforce least-privilege principles in CI/CD pipelines by using ephemeral,
+      scoped credentials for deployment operations. Implement short-lived tokens
+      (OIDC federation) for pipeline access to cloud environments instead of long-lived
+      service account keys. Use policy-as-code to audit IAM configurations and detect
+      over-privileged roles across cloud providers. Integrate PAM approval workflows
+      into GitOps processes where infrastructure changes requiring elevated privileges
+      trigger approval gates. Scan IaC templates for overly broad IAM policies before
+      deployment.
+    tools:
+      - gitlab-ci
+      - hashicorp-vault
+      - oidc-federation
+      - checkov
+      - tfsec
+      - opa
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor all privileged account usage via centralized logging and SIEM correlation.
+      Alert on anomalous privileged access patterns: off-hours usage, access from
+      unexpected locations, privilege escalation attempts. Conduct periodic access reviews
+      (annual for ML2, biannual for ML3) of all privileged accounts with business
+      justification validation. Monitor for credential caching artifacts on endpoints.
+      Track privileged account lifecycle events (creation, modification, deletion) and
+      ensure disabled accounts are cleaned up promptly. Generate compliance reports on
+      privileged access posture.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - cyberark-pta
+      - crowdstrike
+      - azure-ad-access-reviews
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-6", "AC-6(1)", "AC-6(2)", "AC-6(5)", "AC-6(10)", "IA-2(1)"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 5.4", "CIS 6.1", "CIS 6.2", "CIS 6.8"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.18", "A8.2", "A8.18"]
+    relationship: supports

@@ -1,0 +1,132 @@
+id: glba-sfg-encryption
+family: safeguards
+title: "Encryption of Nonpublic Personal Information"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall encrypt all customer information held or transmitted
+    by the institution both in transit over external networks and at rest. Encryption
+    shall use industry-standard algorithms and key lengths appropriate to the sensitivity
+    of the information and the current state of cryptographic practice. Where encryption
+    is not feasible, the institution shall implement alternative compensating controls
+    approved by the qualified individual, with written justification.
+  parts:
+    - id: glba-sfg-encryption.1
+      label: "(1)"
+      prose: >-
+        All customer information transmitted over external networks shall be encrypted
+        using industry-standard protocols (e.g., TLS 1.2 or higher) to protect against
+        interception and unauthorized disclosure during transmission.
+    - id: glba-sfg-encryption.2
+      label: "(2)"
+      prose: >-
+        All customer information stored at rest shall be encrypted using
+        industry-standard encryption algorithms (e.g., AES-256) to protect against
+        unauthorized access in the event of physical or logical compromise of
+        storage media.
+    - id: glba-sfg-encryption.3
+      label: "(3)"
+      prose: >-
+        Encryption key management shall follow industry best practices, including
+        secure key generation, storage, rotation, and destruction. Keys shall be
+        protected from unauthorized access with controls at least as strong as the
+        data they protect.
+    - id: glba-sfg-encryption.4
+      label: "(4)"
+      prose: >-
+        Where encryption of customer information at rest is not feasible due to
+        technical constraints, the qualified individual shall document the
+        justification, approve alternative compensating controls, and review the
+        exception at least annually.
+
+guidance:
+  prose: >-
+    The 2023 Safeguards Rule amendment explicitly requires encryption of NPI in
+    transit and at rest — this was not a prescriptive requirement under the prior
+    rule. The FTC examines whether encryption is applied comprehensively across all
+    NPI storage and transmission pathways. Common findings include: NPI transmitted
+    over internal networks without encryption (the rule specifies "external networks"
+    but best practice includes internal), NPI stored in databases without column-level
+    or transparent data encryption, encryption keys stored alongside the encrypted
+    data, legacy systems that cannot support modern encryption standards without
+    documented compensating controls, and backup media containing NPI without
+    encryption. The qualified individual must document any exception to the encryption
+    requirement with a risk-based justification and compensating controls. Institutions
+    should maintain a cryptographic inventory that documents all encryption implementations,
+    algorithms, key lengths, and key management practices.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(3)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "NIST SP 800-175B — Guideline for Using Cryptographic Standards"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-175b/rev-1/final"
+  - citation: "FFIEC IT Examination Handbook — Cryptography"
+    url: "https://ithandbook.ffiec.gov/it-booklets/information-security.aspx"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ on all ingress controllers, load balancers, and service mesh
+      endpoints. Implement mutual TLS (mTLS) for all service-to-service communication
+      within the platform to protect NPI in transit on internal networks. Deploy
+      transparent data encryption (TDE) on all databases containing customer information.
+      Implement application-level encryption for sensitive NPI fields (SSN, account
+      numbers) using envelope encryption with a centralized key management service.
+      Configure the key management service with automatic key rotation on a defined
+      schedule (e.g., annually) and secure key storage in HSM-backed vaults. Implement
+      encrypted storage for all backup and archive media. Deploy certificate management
+      automation that monitors certificate expiration and rotates certificates before
+      expiry. Implement policy-as-code that prevents deployment of services handling
+      NPI without encryption configurations. Maintain a cryptographic inventory as code
+      that documents all encryption implementations across the platform.
+    tools:
+      - vault
+      - cert-manager
+      - istio
+      - kubernetes
+      - terraform
+      - aws-kms
+      - azure-key-vault
+  devsecops:
+    prose: >-
+      Implement CI/CD pipeline checks that detect unencrypted NPI storage or
+      transmission configurations before deployment. Scan infrastructure-as-code for
+      missing encryption settings (unencrypted S3 buckets, databases without TDE,
+      load balancers without TLS). Implement automated certificate validation in
+      pipelines that verify TLS configurations meet minimum standards. Deploy secret
+      scanning to prevent encryption keys from being committed to source code.
+      Implement automated tests that verify encryption is active on all NPI data
+      pathways. Add pipeline stages that validate cryptographic algorithm and key
+      length compliance against organizational standards.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - trivy
+      - gitleaks
+      - open-policy-agent
+  secops:
+    prose: >-
+      Monitor TLS certificate validity and cipher suite compliance across all
+      endpoints. Implement automated scanning that detects unencrypted NPI in storage
+      and transmission. Track encryption coverage metrics and report gaps to the
+      qualified individual. Monitor key management operations (key creation, rotation,
+      access) for anomalies. Generate quarterly encryption compliance reports showing:
+      encryption coverage percentage, certificate expiration timeline, key rotation
+      status, and exception inventory. Conduct periodic cryptographic assessments to
+      verify that algorithms and key lengths remain adequate against current threats.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys
+      - tenable
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["3.5", "4.1", "4.2"]
+    relationship: complements

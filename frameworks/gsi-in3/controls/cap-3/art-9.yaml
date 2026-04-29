@@ -1,0 +1,79 @@
+id: art-9
+family: cap-3
+title: "Gestao de Identidades"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 9. Os órgãos e entidades devem implementar processo de gestão de
+    identidades digitais, contemplando:
+
+    I - registro único de identidades para cada usuário;
+    II - vinculação da identidade digital à pessoa física responsável;
+    III - ciclo de vida da identidade: criação, ativação, suspensão, desativação
+    e exclusão;
+    IV - vedação do uso de identidades compartilhadas ou genéricas para acesso
+    a sistemas críticos.
+guidance:
+  prose: |
+    O art. 9 exige gestao formal do ciclo de vida de identidades digitais.
+    Identidades compartilhadas sao proibidas em sistemas criticos.
+
+    **Ciclo de vida da identidade:**
+    1. Criacao: onboarding do servidor/colaborador
+    2. Ativacao: primeiro acesso com credenciais temporarias
+    3. Suspensao: afastamento temporario (ferias, licenca)
+    4. Desativacao: desligamento ou mudanca de funcao
+    5. Exclusao: apos periodo de retencao legal
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.5.16 (Identity management)
+    - NIST 800-53 rev5: IA-4 (Identifier Management)
+    - CIS Controls v8: 5.1 (Identity Management)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Identity lifecycle automation:**
+      1. IdP centralizado com provisionamento automatico via integracao com SIAPE/RH.
+      2. Workflow de onboarding: RH cria servidor -> IdP provisiona identidade -> acesso
+         automatico a sistemas da lotacao.
+      3. Webhook de desligamento: RH desliga servidor -> identidade desativada em 24h.
+      4. Deteccao de identidades orfas (sem vinculo ativo no RH) via reconciliacao.
+      5. Proibicao de contas genericas em nivel de policy (OPA/Kyverno).
+    tools:
+      - identity-provider
+      - hr-integration
+      - lifecycle-automation
+      - orphan-detection
+  devsecops:
+    prose: |
+      **Identidades em pipelines:**
+      1. Service accounts com escopo minimo para pipelines CI/CD.
+      2. Rotacao automatica de tokens de service accounts.
+      3. Proibicao de personal access tokens de longa duracao.
+      4. Auditoria de bots e contas de servico em repositorios.
+    tools:
+      - service-account-management
+      - token-rotation
+      - bot-audit
+  secops:
+    prose: |
+      **Governanca de identidades:**
+      1. Inventario completo de identidades ativas vs. servidores ativos no RH.
+      2. Reconciliacao mensal entre IdP e SIAPE.
+      3. Alerta imediato para contas genericas em sistemas criticos.
+      4. Relatorio de identidades com acesso nao utilizado em 90+ dias.
+    tools:
+      - identity-governance
+      - reconciliation-engine
+      - dormant-account-detection
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-4", "IA-4(4)"]
+    relationship: mapped

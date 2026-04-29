@@ -1,0 +1,125 @@
+id: art-21
+family: cap-4
+title: "Retencao de Registros e Documentos"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 21. As supervisionadas devem conservar os registros de que tratam os arts.
+    19 e 20, bem como toda a documentação relativa aos procedimentos de identificação,
+    qualificação e classificação de risco de clientes, por período mínimo de dez anos,
+    contados do encerramento da relação contratual ou da data da última operação,
+    o que ocorrer por último.
+guidance:
+  prose: |
+    O art. 21 define o periodo de retencao obrigatoria de toda a documentacao de
+    PLD/FT, alinhado com o padrao internacional de 10 anos.
+
+    **Documentos sujeitos a retencao de 10 anos:**
+    1. Registros de operacoes (art. 19): todas as transacoes do ciclo de vida
+    2. Registros de operacoes em especie (art. 20): detalhamento adicional
+    3. Documentacao de KYC: documentos de identidade, comprovantes de renda,
+       comprovantes de endereco
+    4. Classificacao de risco: historico de scoring e reclassificacoes
+    5. Due diligence: dossies de CDD e EDD
+    6. Comunicacoes ao COAF: copias de comunicacoes enviadas
+    7. Alertas e investigacoes: dossies de analise de operacoes suspeitas
+    8. Treinamentos: registros de participacao e certificados
+
+    **Marco inicial da contagem:**
+    O prazo de 10 anos conta a partir do que ocorrer por ULTIMO:
+    - Encerramento da relacao contratual (cancelamento de apolice, fim do plano)
+    - Data da ultima operacao (ultimo pagamento de sinistro, ultimo resgate)
+    Na pratica, para apolices de longa duracao (vida inteira, previdencia), o
+    prazo pode se estender por decadas.
+
+    **Desafio no mercado securitario:**
+    - Apolices de vida podem durar 30-50 anos. Somando 10 anos de retencao,
+      a supervisionada pode precisar manter documentos por 60+ anos.
+    - Migracao de sistemas: documentos criados em sistemas antigos devem
+      permanecer acessiveis e legiveis.
+    - Fusoes e incorporacoes: a entidade incorporadora herda a obrigacao de
+      retencao da incorporada.
+    - Formato de armazenamento: documentos em papel devem ser digitalizados
+      com garantia de autenticidade.
+
+    **Conflito com LGPD:**
+    A retencao de 10 anos de PLD/FT prevalece sobre o principio de minimizacao
+    da LGPD (art. 16, IV). A base legal para retencao e o cumprimento de obrigacao
+    legal (art. 7, II da LGPD). Porem, apos os 10 anos, os dados devem ser
+    eliminados conforme LGPD, salvo outra base legal.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao:**
+      1. Storage de longo prazo com garantia de durabilidade (99.999999999%)
+         e protecao contra exclusao acidental ou maliciosa (WORM - Write Once
+         Read Many).
+      2. Politica de retencao automatica com calculo dinamico do prazo: data
+         do encerramento do relacionamento + 10 anos ou data da ultima
+         operacao + 10 anos (o maior).
+      3. Indexacao de documentos retidos para busca rapida por cliente, periodo,
+         tipo de documento e tipo de operacao.
+      4. Migracao automatica de dados entre tiers de storage (hot/warm/cold)
+         com garantia de legibilidade.
+
+      **Gestao do ciclo de vida:**
+      5. Alerta automatico quando documento atinge prazo de retencao para
+         decisao de expurgo ou renovacao.
+      6. Processo de expurgo com aprovacao do compliance officer e registro
+         do expurgo.
+      7. Audit trail de todos os acessos a documentos retidos.
+      8. Backup geograficamente distribuido para protecao contra desastres.
+    tools:
+      - long-term-storage
+      - worm-storage
+      - document-management
+      - retention-management
+  devsecops:
+    prose: |
+      **Testes de retencao:**
+      1. Testes de calculo de prazo de retencao para cenarios complexos:
+         apolice com sinistro apos cancelamento, portabilidade entre
+         instituicoes, fusao de entidades.
+      2. Testes de imutabilidade: documentos retidos nao podem ser alterados.
+      3. Testes de legibilidade: documentos armazenados ha anos devem ser
+         legiveis e completos.
+
+      **Conformidade LGPD:**
+      4. Testes de expurgo: documentos apos prazo legal devem ser eliminados.
+      5. Testes de bloqueio de expurgo prematuro (antes de 10 anos).
+      6. Reconciliacao entre politica de retencao PLD/FT e politica LGPD.
+    tools:
+      - gitlab-ci
+      - retention-tests
+      - immutability-tests
+      - lgpd-compliance-tests
+  secops:
+    prose: |
+      **Gestao de retencao:**
+      1. Inventario de todos os repositorios de documentos de PLD/FT com
+         status de retencao.
+      2. Verificacao periodica de integridade e legibilidade de documentos
+         retidos (amostragem anual).
+      3. Plano de migracao quando sistemas sao substituidos, garantindo
+         continuidade da retencao.
+
+      **Expurgo controlado:**
+      4. Processo formal de expurgo com aprovacao do compliance officer e
+         do diretor responsavel.
+      5. Registro de expurgo com identificacao dos documentos eliminados.
+      6. Verificacao pre-expurgo: garantir que nao ha investigacoes abertas,
+         processos judiciais ou requisicoes pendentes que exijam retencao
+         adicional.
+      7. Relatorio anual de retencao para auditoria.
+    tools:
+      - retention-management
+      - document-management
+      - legal-hold
+      - audit-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-16"]
+    relationship: complements

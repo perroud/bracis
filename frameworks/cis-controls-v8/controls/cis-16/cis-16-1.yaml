@@ -1,0 +1,106 @@
+id: cis-16.1
+family: cis-16
+title: "Establish and Maintain a Secure Application Development Process"
+class: CISv8
+
+baselines: [ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain a secure application development process. In the process,
+    address such items as: secure application design standards, secure coding practices,
+    developer training, vulnerability management, security of third-party code, and
+    application security testing procedures. Review and update documentation annually,
+    or when significant enterprise changes occur that could impact this Safeguard.
+
+guidance:
+  prose: >-
+    Application-layer vulnerabilities are consistently the most exploited attack vector.
+    A secure application development process (Secure SDLC) embeds security into every
+    phase of software development rather than treating it as an afterthought. The process
+    should include: threat modeling during design, secure coding standards (OWASP guidelines),
+    mandatory code review with security focus, automated security testing (SAST, DAST,
+    SCA, IAST), security acceptance criteria for user stories, and incident response
+    procedures for application-level vulnerabilities. Third-party and open-source
+    components must be evaluated for security before adoption and continuously monitored
+    for new vulnerabilities. All developers must receive annual secure coding training
+    relevant to their technology stack.
+
+references:
+  - citation: "CIS Controls v8.1, Control 16, Safeguard 16.1"
+    url: "https://www.cisecurity.org/controls/v8"
+  - citation: "OWASP Software Assurance Maturity Model (SAMM)"
+    url: "https://owaspsamm.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide secure-by-default application templates and scaffolding through an internal
+      developer platform (Backstage). Pre-configure templates with security headers,
+      input validation libraries, authentication middleware, and structured logging.
+      Maintain a curated library of approved frameworks, libraries, and base images
+      that have been security-reviewed. Provide centralized secret management (Vault)
+      and certificate management (cert-manager) as platform services so developers
+      do not implement their own. Implement service mesh (Istio, Linkerd) for
+      automatic mTLS between services, removing the burden of TLS configuration from
+      developers. Provide platform-level observability (distributed tracing, metrics,
+      logs) that enables security monitoring without requiring application-level
+      instrumentation.
+    tools:
+      - backstage
+      - hashicorp-vault
+      - cert-manager
+      - istio
+      - linkerd
+      - sonarqube
+
+  devsecops:
+    prose: >-
+      Implement a comprehensive security scanning pipeline that runs SAST, SCA,
+      secret detection, and license compliance on every merge request. Configure
+      DAST scans against review environments for merge requests targeting production
+      branches. Enforce merge request approval from a security-trained reviewer for
+      changes to authentication, authorization, cryptography, and input validation
+      code. Use GitLab Security Policies to define scan requirements and vulnerability
+      thresholds at the group level. Implement pre-commit hooks for common security
+      anti-patterns (SQL injection, XSS, insecure deserialization). Maintain a
+      security champions program where designated developers in each team receive
+      advanced security training and serve as first-line security reviewers.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-secret-detection
+      - gitlab-license-compliance
+      - semgrep
+      - sonarqube
+      - snyk
+
+  secops:
+    prose: >-
+      Monitor application security posture through vulnerability dashboards aggregating
+      findings from all scanning tools. Track security debt (open vulnerabilities by
+      age and severity) per application and team. Implement runtime application
+      self-protection (RASP) or web application firewalls (WAF) for production
+      applications to detect and block exploitation attempts. Conduct annual penetration
+      testing of critical applications. Maintain an application risk register categorizing
+      applications by data sensitivity and exposure. Correlate WAF/RASP findings with
+      SAST/DAST results to identify false negatives in pre-production testing.
+    tools:
+      - defectdojo
+      - gitlab-security-dashboard
+      - cloudflare-waf
+      - aws-waf
+      - burp-suite
+      - owasp-zap
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-3", "SA-8", "SA-11", "SA-15", "SA-17"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.26", "A8.27", "A8.28"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.PS-06"]
+    relationship: implements

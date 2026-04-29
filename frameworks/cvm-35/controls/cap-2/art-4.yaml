@@ -1,0 +1,135 @@
+id: art-4
+family: cap-2
+title: "Requisitos da Politica de Seguranca da Informacao"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 4. Os prestadores de serviços e os administradores de carteira de que trata o
+    art. 2 devem implementar e manter política de segurança da informação compatível com:
+    I - o porte da entidade;
+    II - o perfil de risco;
+    III - o modelo de negócio;
+    IV - a natureza das operações;
+    V - a complexidade dos produtos, serviços e atividades;
+    VI - a sensibilidade dos dados e das informações sob sua responsabilidade.
+
+    Parágrafo único. A política de segurança da informação deve abranger os procedimentos
+    e controles necessários para reduzir a vulnerabilidade a incidentes de segurança
+    da informação e atender aos demais objetivos de segurança da informação da entidade.
+guidance:
+  prose: |
+    O art. 4 estabelece a obrigacao central do capitulo 2: toda entidade regulada deve
+    possuir uma PSI formalizada, implementada e mantida de forma continua.
+
+    **Compatibilidade com perfil:**
+    A PSI nao pode ser generica ou copiada de modelo. Deve ser calibrada conforme os
+    seis criterios listados (porte, risco, modelo, natureza, complexidade e sensibilidade).
+    A CVM avalia essa adequacao durante supervisao direta e indireta.
+
+    **Implementar E manter:**
+    "Implementar" significa que a politica deve ter controles operacionais correspondentes
+    em producao. "Manter" significa revisao continua, atualizacao e melhoria. Politica
+    criada e nunca revisada configura descumprimento.
+
+    **Paragrafo unico — Reducao de vulnerabilidade:**
+    A PSI deve ir alem de declaracoes de intencao. Deve conter procedimentos e controles
+    tecnicos e administrativos que efetivamente reduzam a superficie de ataque e a
+    probabilidade de incidentes.
+
+    **Diferenca entre art. 4 e art. 9:**
+    O art. 4 trata da PSI (abrangente, cobrindo toda a seguranca da informacao). O
+    art. 9 trata da PSC (especifica para ameacas ciberneticas). Sao politicas distintas,
+    embora possam estar em documento unico com secoes separadas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Documentacao e operacionalizacao da PSI:**
+      1. Codificar a PSI em formato versionavel (Markdown/YAML) em repositorio Git
+         com controle de aprovacao via merge request.
+      2. Mapear cada diretriz da PSI para controles tecnicos implementados
+         (criptografia, controle de acesso, backup, segmentacao de rede).
+      3. Implementar Policy-as-Code com OPA/Kyverno para enforcar diretrizes da PSI
+         automaticamente na infraestrutura.
+
+      **Classificacao e proporcionalidade:**
+      4. Inventariar todos os ativos de informacao (servidores, bancos de dados,
+         aplicacoes, APIs, repositorios).
+      5. Classificar ativos por criticidade e sensibilidade de dados.
+      6. Aplicar controles proporcionais: assets criticos recebem controles avancados,
+         assets de suporte recebem baseline minimo.
+
+      **Automacao de conformidade:**
+      7. Dashboards automatizados de cobertura de controles por ativo.
+      8. Alertas quando um ativo critico perde conformidade com a PSI.
+      9. Relatorio automatico de postura de seguranca para a diretoria.
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - vault
+      - asset-inventory
+      - git
+      - terraform
+  devsecops:
+    prose: |
+      **Pipeline de seguranca alinhado a PSI:**
+      1. Security gates no CI/CD mapeados para cada diretriz da PSI.
+      2. SAST obrigatorio em todo merge request para detectar vulnerabilidades em codigo.
+      3. Secret detection para prevenir vazamento de credenciais e chaves.
+      4. Dependency scanning para identificar bibliotecas vulneraveis.
+
+      **Governanca de codigo:**
+      5. Branch protection com revisao obrigatoria por code owners.
+      6. Merge request approvals com no minimo 2 aprovadores para projetos criticos.
+      7. Assinatura de commits para rastreabilidade de autoria.
+      8. Changelog automatico para evidenciar evolucao da PSI e controles.
+
+      **Evidencias automatizadas:**
+      9. Metricas de cobertura de testes de seguranca por repositorio.
+      10. Historico de vulnerabilidades encontradas e remediadas.
+      11. Tempo medio de correcao (MTTR) como indicador de manutencao ativa.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - sonarqube
+      - trivy
+  secops:
+    prose: |
+      **Gestao operacional da PSI:**
+      1. Revisao formal da PSI no minimo anual (conforme art. 6), documentando
+         alteracoes e justificativas.
+      2. Gap analysis semestral entre a PSI documentada e os controles efetivamente
+         operacionais.
+      3. Metricas de efetividade: taxa de incidentes, cobertura de controles,
+         tempo medio de deteccao e resposta.
+
+      **Monitoramento e auditoria:**
+      4. SIEM configurado para monitorar violacoes de diretrizes da PSI (acesso
+         nao autorizado, transferencia de dados, tentativas de intrusao).
+      5. Auditoria interna periodica da implementacao da PSI.
+      6. Registro e investigacao de excecoes a PSI com aprovacao formal.
+
+      **Preparacao para fiscalizacao:**
+      7. Dossiê de conformidade com a PSI disponivel para a CVM.
+      8. Evidencias organizadas por artigo da Resolucao CVM 35.
+      9. Indicadores de maturidade de seguranca da informacao.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+      - vulnerability-scanner
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-4"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-1", "PL-2", "PM-1", "PM-9"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.1", "A.5.2", "A.5.3"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

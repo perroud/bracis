@@ -1,0 +1,114 @@
+id: sec-3
+family: gen
+title: "Application of the Act"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) Parts III to VI shall not apply to —
+    (a) any individual acting in a personal or domestic capacity;
+    (b) any employee acting in the course of his or her employment with an organisation;
+    (c) any public agency or an organisation in the course of acting on behalf of a
+    public agency in relation to the collection, use or disclosure of the personal data;
+    (d) business contact information.
+
+    (2) Parts III to VI shall apply to an organisation in respect of personal data —
+    (a) collected in Singapore by or on behalf of the organisation;
+    (b) collected outside Singapore by or on behalf of the organisation, in the case
+    where the organisation controls the collection, use or disclosure of the personal
+    data in or from Singapore.
+
+    (3) In this section, "business contact information" means an individual's name,
+    position name or title, business telephone number, business address, business
+    electronic mail address or business fax number and any other similar information
+    about the individual, not provided by the individual solely for his or her personal
+    purposes.
+
+guidance:
+  prose: |
+    Section 3 defines the territorial and subject-matter scope of the PDPA's data
+    protection provisions:
+
+    1. **Excluded entities:** Public agencies (governed by the Public Sector (Governance)
+       Act instead), individuals acting in personal capacity, and employees acting in the
+       course of employment are excluded.
+
+    2. **Business contact information:** Explicitly carved out from data protection
+       provisions. An employee's work email, work phone number, and job title are not
+       protected under Parts III-VI.
+
+    3. **Extraterritorial reach:** The PDPA applies to organisations that collect personal
+       data in Singapore OR control the collection/use/disclosure of personal data from
+       Singapore, even if the data was collected overseas. This gives the PDPA
+       extraterritorial effect similar to (but narrower than) the GDPR.
+
+    Organizations must carefully assess whether their data processing activities fall
+    within scope, particularly for cross-border data flows involving Singapore-based
+    individuals.
+
+references:
+  - citation: "PDPA 2012, Section 3"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement geo-detection capabilities to identify when personal data is collected
+         from Singapore-based individuals, triggering PDPA compliance requirements.
+      2. Maintain a scope registry that maps data processing activities to applicable
+         jurisdictions, flagging PDPA-in-scope operations.
+      3. Build data flow diagrams that distinguish between personal data, business contact
+         information, and public agency data to determine PDPA applicability.
+      4. Implement automated tagging of business contact information as out-of-scope for
+         PDPA obligations while still applying reasonable security.
+      5. Create separate data handling pipelines for public agency data (governed by
+         different legislation) versus private sector data (governed by PDPA).
+    tools:
+      - data-flow-mapping
+      - backstage
+      - maxmind-geoip
+      - compliance-engine
+      - datahub
+
+  devsecops:
+    prose: |
+      1. Implement automated checks in CI/CD to verify that data collection endpoints
+         serving Singapore users include PDPA-required consent mechanisms.
+      2. Create test suites that validate business contact information is correctly
+         classified and excluded from PDPA data subject request workflows.
+      3. Validate that geo-detection logic correctly identifies Singapore-based
+         collection points.
+      4. Scan for hardcoded jurisdiction assumptions that may miss PDPA scope triggers.
+    tools:
+      - gitlab-ci
+      - selenium
+      - playwright
+      - custom-compliance-tests
+
+  secops:
+    prose: |
+      1. Monitor data collection endpoints to detect personal data collection from
+         Singapore that may not have been flagged for PDPA compliance.
+      2. Audit scope classifications quarterly to ensure new services and data flows
+         are correctly assessed for PDPA applicability.
+      3. Review employee data handling to confirm business contact information is
+         correctly distinguished from personal data.
+      4. Track regulatory changes to the PDPA's scope provisions and update
+         compliance assessments accordingly.
+    tools:
+      - siem
+      - compliance-dashboard
+      - data-flow-monitoring
+      - regulatory-change-tracker
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-2", "art-3"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-3", "art-4"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-140"]
+    relationship: mapped

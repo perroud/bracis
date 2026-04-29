@@ -1,0 +1,83 @@
+id: 01-06
+family: cat-1
+title: "Network Access Control"
+class: HITRUST-CSF
+baselines: [i1, r2]
+statement:
+  prose: >-
+    The organization shall implement controls to ensure that access to both internal and external
+    networked services is restricted and controlled. A formal policy shall be established regarding
+    the use of networks and network services. Users shall only be provided with access to the
+    network and network services that they have been specifically authorized to use. Appropriate
+    authentication methods shall be used to control access by remote users. Automatic equipment
+    identification shall be considered as a means to authenticate connections from specific
+    locations and equipment. Physical and logical access to diagnostic and configuration ports
+    shall be controlled. Groups of information services, users, and information systems shall
+    be segregated on networks.
+guidance:
+  prose: >-
+    Network access control is critical for protecting organizational information assets from
+    unauthorized access, lateral movement, and data exfiltration. This control requires network
+    segmentation, enforcement of authorized access paths, and monitoring of network traffic for
+    anomalous behavior. Organizations must implement defense-in-depth strategies that combine
+    network-level controls (firewalls, VPNs, NAC) with application-level controls (API gateways,
+    WAFs) and identity-aware proxies. At i1, organizations must demonstrate network segmentation
+    and access controls for sensitive systems. At r2, micro-segmentation, zero-trust network
+    architecture, and continuous network monitoring with threat detection are expected.
+    Network access policies must address remote access, wireless access, VPN, and third-party
+    connectivity.
+references:
+  - citation: "NIST SP 800-53 Rev 5: AC-17, SC-7"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+  - citation: "ISO/IEC 27001:2022 A.8.20, A.8.21, A.8.22"
+    url: "https://www.iso.org/standard/27001"
+  - citation: "HIPAA Security Rule 45 CFR 164.312(e)(1)"
+    url: "https://www.hhs.gov/hipaa/for-professionals/security/index.html"
+  - citation: "PCI DSS v4.0 Requirement 1"
+    url: "https://www.pcisecuritystandards.org/document_library/"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using Kubernetes NetworkPolicies, cloud VPCs with security
+      groups, and service mesh (Istio/Linkerd) for mTLS and traffic policies. Deploy zero-trust
+      network architecture where every connection is authenticated and authorized regardless of
+      network location. Use Calico or Cilium for Kubernetes network policy enforcement with
+      microsegmentation. Implement API gateways (Kong, Envoy) for north-south traffic control
+      and service mesh for east-west traffic. Automate network policy deployment through
+      infrastructure-as-code with drift detection.
+    tools:
+      - "Kubernetes NetworkPolicies"
+      - "Calico / Cilium"
+      - "Istio / Linkerd (service mesh)"
+      - "Cloud VPC / Security Groups"
+      - "Kong / Envoy (API Gateway)"
+      - "Terraform (network modules)"
+      - "Tailscale / WireGuard (zero-trust networking)"
+  devsecops:
+    prose: >-
+      Validate network configurations in CI/CD pipelines before deployment. Use policy-as-code
+      tools (Conftest, Checkov, tfsec) to enforce network segmentation requirements on
+      infrastructure definitions. Prevent deployment of overly permissive network rules such
+      as 0.0.0.0/0 ingress. Implement GitOps workflows for network policy management ensuring
+      all changes are version-controlled, reviewed, and auditable. Run automated network
+      vulnerability scanning as part of the deployment pipeline.
+    tools:
+      - "Conftest / Checkov / tfsec"
+      - "GitLab CI/CD"
+      - "Trivy (network misconfiguration scanning)"
+      - "Nmap (network discovery in CI)"
+      - "GitOps (ArgoCD / Flux)"
+  secops:
+    prose: >-
+      Monitor network traffic through NDR (Network Detection and Response) solutions and SIEM
+      correlation rules. Implement network flow logging and analysis to detect unauthorized
+      lateral movement, data exfiltration, and anomalous communication patterns. Conduct periodic
+      network segmentation testing to verify isolation effectiveness. Maintain network topology
+      documentation and update it upon changes. Implement automated alerting for firewall rule
+      changes and unauthorized network connections.
+    tools:
+      - "NDR (Darktrace, ExtraHop, Vectra)"
+      - "SIEM (Splunk, Elastic Security)"
+      - "Firewall Management (Palo Alto Panorama, Fortinet FortiManager)"
+      - "Network Flow Analysis (NetFlow, sFlow)"
+      - "Vulnerability Scanner (Nessus, Qualys)"

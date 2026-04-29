@@ -1,0 +1,99 @@
+id: med2-9
+family: notificacao
+title: "Regulatory Deadlines and SLA Compliance"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Os PSPs devem observar rigorosamente os prazos regulamentares estabelecidos pelo BCB para
+    cada etapa do processo do MED 2.0: (i) registro da notificação de infração no DICT dentro
+    do prazo regulamentar após a confirmação de fundada suspeita; (ii) execução do bloqueio
+    cautelar em até 30 minutos após o recebimento da notificação; (iii) conclusão da análise
+    de mérito e decisão sobre devolução em até 7 dias corridos; (iv) efetivação da devolução
+    dos recursos em até 96 horas após a decisão favorável; (v) comunicação do resultado ao
+    usuário pagador. O descumprimento dos prazos regulamentares sujeita o PSP às penalidades
+    previstas no regulamento do arranjo Pix e às medidas de supervisão do BCB.
+guidance:
+  prose: |
+    **Regulatory Deadlines Summary:**
+
+    | Stage | Deadline | Starts from |
+    |-------|----------|-------------|
+    | Infraction notification | Regulatory window | Fraud suspicion confirmed |
+    | Precautionary block | 30 minutes | Notification received |
+    | Merit analysis | 7 calendar days | Block executed |
+    | Return execution | 96 hours | Favorable decision |
+    | User communication | Ongoing | Each stage transition |
+
+    **Consequences of non-compliance:**
+    - BCB supervisory measures (warnings, fines, restrictions).
+    - Pix arrangement penalties (financial penalties, reputational impact).
+    - Liability for losses: if a PSP's delay causes irrecoverable fund movement,
+      the PSP may be held liable for the victim's loss.
+
+    **Operational implications:**
+    - The 30-minute blocking window is the most operationally challenging — it
+      requires full automation.
+    - The 7-day analysis window requires efficient case management with workload
+      balancing across analysts.
+    - The 96-hour return window requires automated settlement processing.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a centralized MED SLA tracker that monitors each case against all
+         regulatory deadlines, with countdown timers and automatic escalation triggers.
+      2. Build SLA breach prevention alerts: trigger warnings at 50%, 75%, and 90%
+         of each deadline to enable proactive intervention.
+      3. Implement automated stage transitions where possible: upon block confirmation,
+         automatically create analysis case; upon favorable decision, automatically
+         initiate return settlement.
+      4. Build SLA reporting APIs for BCB supervision: on-demand and scheduled reports
+         showing compliance rates for each deadline.
+      5. Implement deadline extension handling for exceptional cases (e.g., system
+         outages, force majeure) with proper documentation and BCB notification.
+    tools:
+      - sla-tracker
+      - scheduler
+      - workflow-engine
+      - alerting-system
+      - reporting-platform
+  devsecops:
+    prose: |
+      1. Test SLA tracking for each deadline: verify countdown timers, escalation
+         triggers, and breach detection are accurate.
+      2. Simulate deadline breaches and verify the system generates correct alerts,
+         audit events, and escalation actions.
+      3. Test automated stage transitions: verify each trigger correctly advances the
+         case to the next stage.
+      4. Load-test the SLA tracker with thousands of concurrent cases to ensure
+         accuracy under volume.
+      5. Test timezone handling: all deadlines use calendar days (not business days)
+         and must account for time zones correctly.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - load-testing
+      - time-simulation
+  secops:
+    prose: |
+      1. Daily SLA compliance dashboard: percentage of cases meeting each deadline,
+         trend analysis, and outlier identification.
+      2. Immediate escalation for any SLA breach: case must be reviewed by a senior
+         analyst and compliance officer within 1 hour of breach.
+      3. Root cause analysis for all SLA breaches: document the cause, impact, and
+         corrective action taken.
+      4. Monthly SLA compliance report for BCB submission.
+      5. Quarterly review of SLA performance with recommendations for process
+         improvements.
+    tools:
+      - sla-tracking
+      - analytics-dashboard
+      - incident-management
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20", "pix-21", "pix-22"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21", "art-22"]
+    relationship: implements

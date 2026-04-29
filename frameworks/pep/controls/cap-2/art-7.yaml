@@ -1,0 +1,118 @@
+id: art-7
+family: cap-2
+title: "Requisitos Funcionais e Interoperabilidade"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 7. Os sistemas PEP devem atender aos seguintes requisitos
+    funcionais mínimos:
+
+    I - registro completo e estruturado de todos os atendimentos
+    prestados ao paciente, incluindo anamnese, exame físico,
+    diagnóstico, prescrições e evoluções;
+
+    II - interoperabilidade com outros sistemas de informação em
+    saúde, utilizando padrões abertos (HL7, FHIR, TISS, DICOM)
+    para troca de informações;
+
+    III - suporte a terminologias padronizadas (CID-10, CID-11,
+    CIAP-2, TUSS, CBHPM) para codificação de diagnósticos,
+    procedimentos e medicamentos;
+
+    IV - funcionalidade de prescrição eletrônica integrada com
+    base de dados de medicamentos, alergias e interações
+    medicamentosas;
+
+    V - capacidade de geração de relatórios, sumários de alta,
+    encaminhamentos e demais documentos médicos diretamente
+    a partir dos dados registrados no PEP.
+guidance:
+  prose: |
+    O art. 7 define que o PEP nao e apenas um repositorio passivo
+    de dados, mas um sistema ativo que deve suportar o fluxo clinico
+    completo.
+
+    **Registro estruturado (inciso I):**
+    Dados clinicos devem ser registrados de forma estruturada (campos
+    codificados) e nao apenas como texto livre. Dados estruturados
+    permitem busca, analise e interoperabilidade.
+
+    **Interoperabilidade (inciso II):**
+    O PEP deve ser capaz de trocar informacoes com:
+    - Outros PEPs (transferencia de pacientes entre instituicoes)
+    - Sistemas laboratoriais (LIS) via HL7/FHIR
+    - Sistemas de imagem (RIS/PACS) via DICOM
+    - Operadoras de saude via TISS
+    - RNDS (Rede Nacional de Dados em Saude) do Ministerio da Saude
+
+    **Terminologias padronizadas (inciso III):**
+    CID-10/CID-11 para diagnosticos, TUSS para procedimentos, CBHPM
+    para honorarios medicos. O uso de terminologias padronizadas e
+    pre-requisito para interoperabilidade e analise epidemiologica.
+
+    **Prescricao eletronica (inciso IV):**
+    A prescricao integrada ao PEP reduz erros de medicacao ao
+    verificar automaticamente alergias, interacoes e duplicidades.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de interoperabilidade do PEP:**
+      1. Implementar camada de integracao baseada em HL7 FHIR R4
+         como padrao primario de interoperabilidade, com adaptadores
+         para HL7 v2.x, TISS e DICOM conforme necessario.
+      2. Modelar dados clinicos usando recursos FHIR padronizados
+         (Patient, Encounter, Observation, MedicationRequest,
+         DiagnosticReport, Condition).
+      3. Integrar terminologias padronizadas via FHIR
+         Terminology Service (CID-10, CID-11, TUSS, CBHPM, LOINC).
+      4. Implementar integracao com RNDS (Rede Nacional de Dados
+         em Saude) para envio de sumarios de atendimento.
+      5. Provisionar message broker para integracao assincrona com
+         sistemas laboratoriais e de imagem.
+    tools:
+      - hl7-fhir-server
+      - terminology-service
+      - integration-engine
+      - message-broker
+      - rnds-connector
+  devsecops:
+    prose: |
+      **Validacao de interoperabilidade no pipeline:**
+      1. Implementar testes de conformidade FHIR usando FHIR
+         Validator para cada recurso exposto pela API do PEP.
+      2. Criar testes de integracao com mocks de sistemas
+         laboratoriais (LIS), imagem (PACS) e operadoras (TISS).
+      3. Validar codificacao correta de terminologias (CID-10,
+         TUSS) em testes automatizados.
+      4. Testar cenarios de prescricao eletronica: alergias,
+         interacoes, doses maximas.
+    tools:
+      - gitlab-ci
+      - fhir-validator
+      - integration-mocks
+      - terminology-validator
+  secops:
+    prose: |
+      **Governanca de interoperabilidade:**
+      1. Manter catalogo de integracoes ativas do PEP com sistemas
+         internos e externos, incluindo SLAs e responsaveis.
+      2. Monitorar conformidade das mensagens trocadas com padroes
+         FHIR/TISS, identificando desvios que possam comprometer
+         qualidade dos dados.
+      3. Auditar acessos via integracoes, garantindo que sistemas
+         externos acessem apenas os dados autorizados.
+      4. Validar periodicamente atualizacoes de terminologias
+         (novas versoes CID, TUSS) e garantir implantacao no PEP.
+    tools:
+      - integration-catalog
+      - api-monitoring
+      - access-audit
+      - terminology-management
+legal_references:
+  - framework_id: tiss
+    articles: ["padrao-tiss"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-e"]
+    relationship: mapped

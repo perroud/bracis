@@ -1,0 +1,100 @@
+id: v4.2.1
+family: v4
+title: "Operation Level Access Control"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that sensitive data and APIs are protected against Insecure Direct Object
+    Reference (IDOR) attacks targeting creation, reading, updating, and deletion of
+    records. The application must verify that the user is authorized to access the
+    specific record, not merely authenticated. Authorization checks must be applied
+    at the operation level for every request to sensitive resources.
+
+guidance:
+  prose: >-
+    IDOR vulnerabilities occur when an application uses user-controllable input (such as
+    a numeric ID, UUID, or filename) to directly reference an internal object without
+    verifying that the requesting user is authorized to access that specific object. This
+    is consistently one of the most common and impactful web application vulnerabilities.
+    Simply being authenticated is insufficient; the application must verify the user has
+    permission to perform the specific operation on the specific resource. Horizontal
+    privilege escalation (accessing another user's data) and vertical privilege escalation
+    (performing admin operations as a regular user) are both manifestations of missing
+    operation-level access control. Every CRUD operation on every sensitive endpoint must
+    include an authorization check that validates the relationship between the requesting
+    user and the target resource.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V4.2.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP IDOR Prevention"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement resource-level authorization using a relationship-based access control (ReBAC)
+      system that models ownership and delegation relationships. Use middleware or decorators
+      that automatically inject authorization checks before data access. Apply row-level
+      security (RLS) at the database layer as a defense-in-depth measure, filtering query
+      results to only include records the user owns or has been granted access to. Use
+      unpredictable resource identifiers (UUIDs v4) instead of sequential integers, but do
+      not rely on identifier unpredictability as a security control. Implement authorization
+      caching with short TTLs to maintain performance while ensuring revocation propagates
+      quickly.
+    tools:
+      - spicedb
+      - cerbos
+      - opa
+      - casbin
+      - supabase-rls
+      - postgresql-rls
+      - kong
+
+  devsecops:
+    prose: >-
+      Implement automated IDOR testing in DAST pipelines: authenticate as User A, create a
+      resource, then authenticate as User B and attempt to read, update, and delete User A's
+      resource. Develop parameterized test suites that systematically test all CRUD endpoints
+      with cross-user authorization scenarios. Use SAST rules to detect data access patterns
+      that query by ID without including an ownership filter. Implement code review checklists
+      that specifically verify authorization checks exist for every data access method. Use
+      Burp Suite Authorize extension or equivalent to automate horizontal privilege escalation
+      testing.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - gitlab-ci
+      - nuclei
+      - postman
+      - k6
+
+  secops:
+    prose: >-
+      Monitor for IDOR exploitation patterns: users accessing resources in rapid sequential
+      order (ID enumeration), accessing resources far outside their normal access patterns,
+      or sudden spikes in data retrieval volume. Configure SIEM rules to correlate resource
+      access with ownership data to detect unauthorized access. Implement data loss prevention
+      (DLP) rules that alert when users access volumes of records inconsistent with their
+      role. Review audit logs for cross-tenant data access in multi-tenant applications.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog-security
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-4", "AC-6"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A8.3"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["7.2.1", "7.2.2", "7.2.5"]
+    relationship: implements

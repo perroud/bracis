@@ -1,0 +1,134 @@
+id: sec-1798-115
+family: consumer-rights
+title: "Right to Know What Personal Information is Sold or Shared"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right to request that a business that sells or shares the
+    consumer's personal information, or that discloses it for a business purpose, disclose to
+    that consumer:
+    (1) The categories of personal information that the business collected about the consumer.
+    (2) The categories of personal information that the business sold or shared about the
+    consumer and the categories of third parties to whom the personal information was sold or
+    shared, by category or categories of personal information for each category of third parties
+    to whom the personal information was sold or shared.
+    (3) The categories of personal information that the business disclosed about the consumer
+    for a business purpose and the categories of persons to whom it was disclosed for a business
+    purpose.
+
+    (b) A business that sells or shares personal information about a consumer, or that discloses
+    a consumer's personal information for a business purpose, shall disclose, pursuant to
+    subparagraph (C) of paragraph (3) of subdivision (a) of Section 1798.130, the information
+    specified in subdivision (a) to the consumer upon receipt of a verifiable consumer request
+    from the consumer.
+
+    (c) A business that sells or shares consumers' personal information, or that discloses
+    consumers' personal information for a business purpose, shall disclose, pursuant to
+    subdivisions (a) and (b) of Section 1798.130:
+    (1) The category or categories of consumers' personal information it has sold or shared,
+    or if the business has not sold or shared consumers' personal information, it shall disclose
+    that fact.
+    (2) The category or categories of consumers' personal information it has disclosed for a
+    business purpose, or if the business has not disclosed consumers' personal information for
+    a business purpose, it shall disclose that fact.
+
+    (d) A third party shall not sell or share personal information about a consumer that has
+    been sold to, or shared with, the third party by a business unless the consumer has received
+    explicit notice and is provided an opportunity to exercise the right to opt-out pursuant to
+    Section 1798.120.
+
+guidance:
+  prose: |
+    Section 1798.115 addresses transparency around the sale and sharing of personal information.
+    Critical distinctions:
+
+    1. **"Sold" vs. "Shared":** CPRA added "sharing" (defined as cross-context behavioral
+       advertising) as a separate category alongside "selling" (monetary or other valuable
+       consideration). Both trigger disclosure obligations.
+
+    2. **Category-by-category mapping:** Businesses must disclose not just what was sold/shared,
+       but the specific categories of PI matched to the specific categories of third-party
+       recipients.
+
+    3. **Business purpose disclosures:** Separate disclosure required for PI disclosed for
+       business purposes (distinct from selling/sharing).
+
+    4. **Third-party downstream restriction:** Third parties who receive PI through sale/sharing
+       cannot further sell or share it unless the consumer receives notice and an opt-out
+       opportunity — creating a chain-of-custody obligation.
+
+    5. **Negative disclosure:** If a business does NOT sell or share PI, it must affirmatively
+       state that fact.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a data sharing registry that tracks every instance of PI disclosure to
+         third parties, categorized by: (a) sale, (b) sharing for cross-context behavioral
+         advertising, (c) disclosure for business purposes.
+      2. Build a third-party management system that maintains a catalog of all recipients,
+         their categories, contractual obligations, and the PI categories they receive.
+      3. Create automated data flow mapping that traces PI from collection through all
+         internal processing and external disclosures.
+      4. Implement API-level tracking of outbound PI transfers — log every API call, file
+         transfer, or data export that sends PI to third parties.
+      5. Build a consumer-facing disclosure generator that produces the category-by-category
+         mapping required by subdivision (a)(2).
+      6. Implement contractual compliance tracking for third-party data recipients to enforce
+         downstream restrictions per subdivision (d).
+    tools:
+      - data-lineage
+      - datahub
+      - third-party-risk-management
+      - api-gateway
+      - kong
+      - backstage
+      - privacy-portal
+
+  devsecops:
+    prose: |
+      1. Implement automated tests verifying that all outbound PI transfers are logged in the
+         data sharing registry.
+      2. Test data flow maps against actual API traffic to detect undocumented third-party
+         data flows.
+      3. Validate that third-party API integrations include proper contractual controls and
+         use restriction headers/parameters.
+      4. Implement pipeline checks that flag new third-party integrations without privacy
+         impact assessment.
+      5. Test consumer disclosure responses for completeness — verify they include all
+         sold/shared/disclosed-for-business-purpose categories.
+    tools:
+      - gitlab-ci
+      - api-testing
+      - integration-testing
+      - semgrep
+      - postman
+
+  secops:
+    prose: |
+      1. Monitor outbound data flows for unauthorized PI transfers to undocumented third parties.
+      2. Audit third-party compliance with downstream sale/sharing restrictions (subdivision d).
+      3. Verify that the data sharing registry accurately reflects actual data flows through
+         periodic reconciliation with network traffic analysis.
+      4. Alert on new outbound data flows to third parties not registered in the sharing registry.
+      5. Track and report on sale/sharing volumes by PI category and recipient category for
+         compliance reporting.
+    tools:
+      - siem
+      - elastic-siem
+      - dlp
+      - network-monitoring
+      - compliance-dashboard
+      - third-party-risk-management
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 13", "art. 14", "art. 15"]
+    relationship: intersects-with
+  - framework_id: lgpd
+    articles: ["art. 18-vii"]
+    relationship: intersects-with
+  - framework_id: iso-27701
+    articles: ["A.7.3.5", "A.7.5.1"]
+    relationship: supports

@@ -1,0 +1,133 @@
+id: art-24
+family: cap-6
+title: "Transparencia Algoritmica e Explicabilidade"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 24. O fabricante de SaMD com IA/ML deve assegurar nível
+    adequado de transparência e explicabilidade do algoritmo,
+    proporcional à classe de risco e ao impacto da saída clínica
+    na decisão de tratamento:
+
+    I - para SaMD Classe I e II: o fabricante deve fornecer descrição
+    geral do funcionamento do algoritmo, incluindo tipo de modelo,
+    dados de entrada utilizados e lógica geral de processamento;
+    II - para SaMD Classe III e IV: o fabricante deve adicionalmente
+    fornecer capacidade de explicabilidade local, permitindo que o
+    profissional de saúde compreenda os fatores que contribuíram para
+    a saída clínica em cada caso individual;
+    III - documentação técnica deve incluir avaliação de interpretabilidade
+    do modelo, identificando se o modelo é intrinsecamente interpretável
+    (ex: regressão logística, árvore de decisão) ou se requer técnicas
+    de explicabilidade post-hoc (ex: SHAP, LIME, Grad-CAM);
+    IV - limitações de explicabilidade devem ser claramente comunicadas
+    ao usuário, incluindo cenários onde o modelo pode produzir saídas
+    que não são facilmente explicáveis.
+
+    Parágrafo único. A ausência de explicabilidade não impede registro
+    de SaMD Classe III e IV, desde que o fabricante demonstre que
+    benefício clínico justifica o uso apesar da limitação, e que medidas
+    compensatórias de supervisão humana sejam implementadas.
+guidance:
+  prose: |
+    O art. 24 aborda um dos desafios centrais de IA em saude: a
+    necessidade de explicar decisoes algoritmicas para profissionais
+    de saude e pacientes.
+
+    **Espectro de interpretabilidade:**
+    - Modelos intrinsecamente interpretaveis: regressao logistica,
+      arvores de decisao, regras -> explicabilidade inerente
+    - Modelos opacos com explicabilidade post-hoc: redes neurais
+      profundas, ensemble complexos -> requerem SHAP, LIME, Grad-CAM
+    - Modelos black-box: modelos complexos sem explicabilidade viavel
+      -> exigem medidas compensatorias
+
+    **Tecnicas de explicabilidade:**
+    - SHAP (SHapley Additive exPlanations): atribuicao de importancia
+      de features baseada em teoria dos jogos
+    - LIME (Local Interpretable Model-agnostic Explanations):
+      aproximacao local por modelo simples
+    - Grad-CAM: visualizacao de regioes de atencao em imagens
+    - Attention maps: visualizacao de atencao em modelos Transformer
+    - Counterfactual explanations: "o resultado seria diferente se..."
+
+    **Proporcionalidade por classe:**
+    - Classe I/II: "este software analisa seus dados de X e Y para
+      estimar Z" (descricao geral)
+    - Classe III/IV: "neste caso, os fatores que mais influenciaram
+      o resultado foram: A (35%), B (28%), C (20%)" (explicacao local)
+
+    **Medidas compensatorias:**
+    Quando explicabilidade e limitada, o fabricante pode:
+    - Requerer validacao por profissional de saude
+    - Apresentar nivel de confianca do resultado
+    - Fornecer dados de referencia para comparacao
+    - Limitar uso autonomo do SaMD
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de explicabilidade:**
+      1. Implementar servico de explicabilidade (XAI service) que
+         gera explicacoes locais para cada predicao do SaMD, utilizando
+         SHAP, LIME ou Grad-CAM conforme tipo de modelo.
+      2. Configurar pipeline de explicabilidade que executa em tempo
+         real (latencia < 2 segundos) para SaMD interativos, ou
+         batch para SaMD assincrono.
+      3. Implementar dashboard de explicabilidade para profissionais
+         de saude: visualizacao de fatores influentes, nivel de
+         confianca, comparacao com casos similares.
+      4. Manter infraestrutura de logging de explicacoes para
+         auditoria: cada predicao e sua explicacao devem ser
+         armazenaveis e recuperaveis.
+    tools:
+      - shap
+      - lime
+      - grad-cam
+      - xai-service
+  devsecops:
+    prose: |
+      **Pipeline de explicabilidade:**
+      1. Integrar avaliacao de explicabilidade no pipeline de ML:
+         calcular metricas de fidelidade de explicacoes (faithfulness,
+         stability, consistency) em cada versao de modelo.
+      2. Implementar testes automatizados de explicabilidade: verificar
+         que explicacoes sao consistentes para inputs similares e que
+         fatores explicativos fazem sentido clinico.
+      3. Gerar documentacao de interpretabilidade como artefato de
+         pipeline: tipo de modelo, tecnica de explicabilidade, metricas
+         de fidelidade, limitacoes identificadas.
+      4. Criar gate de pipeline que verifica se nivel de explicabilidade
+         e adequado a classe de risco: Classe III/IV deve ter
+         explicabilidade local validada.
+    tools:
+      - gitlab-ci
+      - xai-evaluation
+      - model-documentation
+      - explainability-tests
+  secops:
+    prose: |
+      **Governanca de transparencia algoritmica:**
+      1. Documentar avaliacao de interpretabilidade no dosie tecnico,
+         incluindo tipo de modelo, tecnicas de explicabilidade, metricas
+         de fidelidade e limitacoes comunicadas.
+      2. Validar explicabilidade com usuarios pretendidos (profissionais
+         de saude): as explicacoes geradas pelo XAI sao uteis e
+         compreensiveis na pratica clinica?
+      3. Monitorar feedback de usuarios sobre qualidade das explicacoes
+         e atualizar tecnicas de explicabilidade conforme necessidade.
+      4. Garantir que limitacoes de explicabilidade estao claramente
+         documentadas na rotulagem e IFU, com medidas compensatorias
+         quando aplicavel.
+    tools:
+      - grc-platform
+      - usability-testing
+      - feedback-collection
+      - labeling-management
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-13", "art-14"]
+    relationship: mapped
+  - framework_id: cfm-ia
+    articles: ["art-4", "art-6"]
+    relationship: complements

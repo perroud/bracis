@@ -1,0 +1,128 @@
+id: crowd-20
+family: tecnologia
+title: "Data Protection and Privacy"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 47. A plataforma deve adotar medidas técnicas e organizacionais
+    adequadas para proteção dos dados pessoais e financeiros de
+    investidores e de sociedades empresárias emissoras, em conformidade
+    com a legislação de proteção de dados pessoais aplicável.
+
+    § 1º A plataforma deve: I — coletar apenas os dados pessoais
+    estritamente necessários para a prestação de seus serviços e para
+    o cumprimento de obrigações regulatórias; II — informar aos
+    investidores e emissores sobre a finalidade da coleta e tratamento
+    de seus dados; III — obter consentimento específico para o
+    compartilhamento de dados com terceiros, quando aplicável;
+    IV — implementar controles de acesso que limitem o acesso a dados
+    pessoais e financeiros a funcionários autorizados.
+
+    § 2º Em caso de incidente de segurança que envolva dados pessoais,
+    a plataforma deve comunicar o fato à Autoridade Nacional de Proteção
+    de Dados e aos titulares afetados nos termos da legislação aplicável.
+
+    § 3º A plataforma deve designar encarregado pelo tratamento de
+    dados pessoais (DPO), cuja identidade deve ser divulgada em seu
+    sítio eletrônico.
+guidance:
+  prose: |
+    Article 47 establishes data protection requirements for crowdfunding
+    platforms, explicitly bridging CVM 88 with LGPD (Brazil's data
+    protection law).
+
+    **Data minimization:**
+    Platforms must collect only data strictly necessary for service
+    provision and regulatory compliance. This limits the scope of data
+    processing to operational and regulatory needs.
+
+    **Transparency and consent:**
+    Investors and issuers must be informed about data collection
+    purposes. Specific consent is required for third-party data sharing.
+
+    **Access controls:**
+    Only authorized personnel may access personal and financial data.
+    This requires granular role-based access control implementation.
+
+    **Breach notification:**
+    Data security incidents must be reported to ANPD (National Data
+    Protection Authority) and affected individuals per LGPD timelines.
+
+    **Data Protection Officer:**
+    A DPO must be designated and publicly identified on the platform
+    website.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Data protection infrastructure:**
+      1. Implement data classification system labeling all data fields
+         as: public, internal, confidential, or restricted. Financial
+         and personal data must be classified as restricted.
+      2. Deploy column-level encryption for PII and financial data in
+         databases (SSN equivalents, bank accounts, income data).
+      3. Implement consent management platform that records, tracks,
+         and enforces investor consent preferences.
+      4. Deploy data masking for non-production environments — no real
+         investor data in staging/development.
+
+      **Access control:**
+      5. Implement attribute-based access control (ABAC) for fine-grained
+         data access based on role, purpose, and data sensitivity.
+      6. Deploy data access audit logging capturing every access to
+         personal and financial data.
+    tools:
+      - vault
+      - postgresql
+      - consent-management
+      - data-masking
+      - kubernetes
+  devsecops:
+    prose: |
+      **Privacy-by-design in development:**
+      1. Implement secret detection to prevent PII from appearing in
+         code, logs, or configuration files.
+      2. SAST rules targeting data protection: detect unencrypted PII
+         storage, missing access controls, excessive data collection.
+      3. Automated DPIA (Data Protection Impact Assessment) triggers
+         for changes to data processing flows.
+
+      **Testing:**
+      4. Unit tests for consent enforcement logic.
+      5. Integration tests verifying data minimization (ensure APIs
+         do not expose more data than necessary).
+      6. Automated checks for data masking in non-production environments.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - sonarqube
+  secops:
+    prose: |
+      **Data protection monitoring:**
+      1. Monitor data access patterns with anomaly detection — alert on
+         bulk data exports, unusual access hours, or unauthorized access
+         attempts.
+      2. Implement data loss prevention (DLP) for all outbound
+         communications and data transfers.
+      3. Maintain data processing inventory (ROPA — Record of Processing
+         Activities) per LGPD requirements.
+
+      **Breach response:**
+      4. Maintain ANPD breach notification process with pre-drafted
+         templates and escalation chain.
+      5. Conduct annual data protection audit with DPO oversight.
+      6. Publish DPO contact information on platform website and
+         verify accessibility.
+    tools:
+      - siem
+      - dlp-solution
+      - grc-platform
+      - data-discovery
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-46", "art-48"]
+    relationship: implements
+  - framework_id: cvm-35
+    articles: ["art-12"]
+    relationship: complements

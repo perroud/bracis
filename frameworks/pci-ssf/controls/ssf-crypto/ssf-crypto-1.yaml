@@ -1,0 +1,96 @@
+id: ssf-crypto-1
+family: ssf-crypto
+title: "Cryptographic Algorithm and Protocol Requirements"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall use only approved cryptographic algorithms, key lengths, and
+    modes of operation for all cryptographic functions. Deprecated or weak algorithms
+    such as DES, 3DES, RC4, MD5, and SHA-1 (for digital signatures) shall not be
+    used. Symmetric encryption shall use AES-128 or stronger. Asymmetric encryption
+    shall use RSA-2048 or stronger, or equivalent elliptic curve algorithms. Hashing
+    for password storage shall use bcrypt, scrypt, Argon2, or PBKDF2 with appropriate
+    work factors. The software shall support cryptographic agility to enable migration
+    to stronger algorithms without requiring a complete software redesign.
+
+guidance:
+  prose: >-
+    Cryptographic strength degrades over time as computing power increases and new
+    attack techniques are discovered. PCI SSF requires that payment software uses
+    only algorithms and key lengths that are currently considered strong by industry
+    standards (NIST, FIPS). The concept of cryptographic agility is particularly
+    important: the software architecture must allow cryptographic algorithms to be
+    replaced without a fundamental redesign. This forward-looking requirement
+    ensures that software can adapt to future cryptographic requirements without
+    costly rewrites.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 10 — Cryptographic Support"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 8.1-8.2"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized cryptographic services through a secrets management platform
+      that enforces approved algorithms and key lengths. Configure TLS policies at
+      the platform level to restrict cipher suites to those using AES-GCM or
+      ChaCha20-Poly1305 with forward secrecy. Use hardware security modules (HSMs)
+      for high-value key operations. Implement platform-level policy enforcement
+      that blocks deployment of services configured with deprecated algorithms.
+      Maintain a cryptographic inventory documenting all algorithms, key lengths,
+      and certificate authorities in use.
+    tools:
+      - vault
+      - aws-kms
+      - hsm
+      - cert-manager
+      - istio
+      - checkov
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect use of deprecated cryptographic algorithms, weak
+      key lengths, insecure modes of operation (ECB), and improper random number
+      generation. Implement custom Semgrep rules targeting cryptographic anti-patterns
+      specific to payment software. Write unit tests that validate cryptographic
+      operations produce expected output formats and key lengths. Use dependency
+      scanning to identify libraries with known cryptographic vulnerabilities.
+      Enforce that all cryptographic operations go through approved wrapper
+      libraries rather than direct API calls.
+    tools:
+      - gitlab-sast
+      - gitlab-dependency-scanning
+      - semgrep
+      - sonarqube
+      - snyk
+
+  secops:
+    prose: >-
+      Monitor certificate and key expiration schedules and alert before expiry.
+      Conduct periodic cryptographic assessments to identify use of deprecated
+      algorithms in production. Track cryptographic inventory changes and alert
+      on introduction of unapproved algorithms. Investigate and respond to
+      cryptographic failures such as certificate validation errors and key
+      compromise indicators. Report on organizational compliance with
+      cryptographic standards.
+    tools:
+      - splunk
+      - qualys
+      - venafi
+      - keyfactor
+      - nessus
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.6", "req-4.2"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v6.1", "v6.2", "v6.3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

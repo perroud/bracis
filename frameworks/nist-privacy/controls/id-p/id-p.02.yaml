@@ -1,0 +1,78 @@
+id: id-p.02
+family: id-p
+title: "Business Environment — Privacy Values and Objectives"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    The organization's role(s) in the data processing ecosystem are identified and
+    communicated.
+
+guidance:
+  prose: >-
+    Organizations operate in complex data processing ecosystems where they may
+    simultaneously act as data controllers, processors, and sub-processors. Understanding
+    and communicating these roles is critical for establishing accountability and ensuring
+    appropriate privacy protections. The organization must identify whether it determines
+    the purposes and means of processing (controller), processes data on behalf of another
+    entity (processor), or both. These roles must be documented in data processing
+    agreements, communicated to relevant stakeholders, and reflected in the organization's
+    privacy policies and notices. Role clarity enables proper allocation of privacy
+    responsibilities across the ecosystem.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, ID.BE-P1"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Encode data processing roles into infrastructure metadata. Tag each service and
+      data store with its controller/processor designation. Implement API gateway policies
+      that enforce data processing agreements — for example, a processor-designated
+      service should not initiate data processing beyond the scope defined by the
+      controller. Use infrastructure labels to distinguish first-party processing from
+      third-party processing. Maintain a registry of all data processing agreements
+      and their technical enforcement points.
+    tools:
+      - backstage-catalog
+      - api-gateway
+      - terraform
+      - opa
+
+  devsecops:
+    prose: >-
+      Require data processing role declarations in service manifests. Implement CI/CD
+      checks that validate services acting as processors do not exceed their declared
+      processing scope. Use contract testing to verify that data shared with third-party
+      processors conforms to data processing agreements. Include data processing role
+      metadata in deployment artifacts for audit traceability.
+    tools:
+      - gitlab-ci
+      - opa
+      - contract-testing
+      - custom-policy-checks
+
+  secops:
+    prose: >-
+      Monitor data flows to detect processing activities that exceed declared roles.
+      Alert when a processor-designated system initiates data collection or sharing
+      not covered by its data processing agreement. Conduct periodic reviews of data
+      processing agreements against actual system behavior. Maintain an audit trail
+      of role assignments and changes for regulatory inquiries.
+    tools:
+      - siem
+      - dlp-tools
+      - audit-logging
+      - grc-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-26", "art-28"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-25", "PT-3"]
+    relationship: derived-from
+  - framework_id: iso-27701
+    articles: ["A.7.2.1"]
+    relationship: mapped

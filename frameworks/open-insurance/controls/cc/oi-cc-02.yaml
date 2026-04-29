@@ -1,0 +1,76 @@
+id: oi-cc-02
+family: cc
+title: "Prazo de Validade e Renovacao do Consentimento"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O consentimento para compartilhamento de dados no Open Insurance possui prazo
+    máximo de validade de 12 (doze) meses, contados da data de autorização pelo
+    cliente.
+
+    Ao término do prazo de validade:
+    I - O compartilhamento de dados deve ser interrompido automaticamente;
+    II - A receptora deve cessar o uso dos dados para a finalidade consentida;
+    III - A renovação do consentimento exige nova manifestação expressa do cliente,
+    seguindo a mesma jornada de consentimento;
+    IV - Não é permitida a renovação automática ou tácita do consentimento.
+
+    O cliente deve ser informado sobre a proximidade do vencimento do consentimento
+    com antecedência razoável, para que possa decidir sobre a renovação.
+guidance:
+  prose: |
+    O prazo maximo de 12 meses evita consentimentos "eternos" que o cliente
+    esquece de ter dado. Esse prazo e alinhado com o Open Finance e com boas
+    praticas internacionais (PSD2, CDR australiano).
+
+    A proibicao de renovacao automatica e fundamental: o cliente deve
+    conscientemente decidir renovar. Mecanismos de "dark patterns" para induzir
+    renovacao sao vedados.
+
+    A notificacao proativa de vencimento e uma boa pratica que beneficia tanto
+    o cliente (transparencia) quanto a receptora (continuidade do servico). O
+    prazo de antecedencia para notificacao deve ser de pelo menos 30 dias.
+
+    Apos o vencimento, a receptora pode manter dados se houver outra base legal
+    (ex: execucao de contrato vigente), mas nao pode mais acessar novas
+    atualizacoes via API.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar controle de validade de consentimentos com expiracao automatica.
+      2. Configurar job scheduler para revogar consentimentos expirados e
+         interromper compartilhamento.
+      3. Implementar mecanismo de notificacao ao cliente sobre vencimento proximo
+         (push notification, e-mail, in-app).
+      4. Invalidar automaticamente tokens de acesso vinculados a consentimentos
+         expirados.
+    tools:
+      - consent-management
+      - job-scheduler
+      - notification-service
+      - oauth2-server
+  devsecops:
+    prose: |
+      1. Testes automatizados de expiracao: verificar que APIs param de retornar
+         dados apos vencimento do consentimento.
+      2. Testar que tokens vinculados a consentimentos expirados sao rejeitados.
+      3. Testar fluxo de renovacao end-to-end.
+      4. Testar que notificacoes sao enviadas com antecedencia correta.
+    tools:
+      - integration-testing
+      - e2e-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar consentimentos proximos ao vencimento e taxas de renovacao.
+      2. Auditar que consentimentos expirados foram efetivamente desativados.
+      3. Alertar se APIs continuam compartilhando dados apos expiracao.
+    tools:
+      - consent-monitoring
+      - audit-platform
+      - alerting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-8", "art-15"]
+    relationship: complements

@@ -1,0 +1,124 @@
+id: art-22
+family: cap-5
+title: "Recall e Acao Corretiva de Campo para SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 22. O fabricante deve implementar procedimento de recall e
+    ação corretiva de campo para SaMD, incluindo:
+
+    I - critérios predefinidos para determinação de recall voluntário,
+    baseados em avaliação de risco para a saúde dos usuários e pacientes;
+    II - capacidade de identificar e comunicar todos os usuários e
+    instituições que utilizam a versão afetada do SaMD;
+    III - mecanismo técnico para desabilitar, substituir ou atualizar
+    o SaMD afetado de forma remota, quando tecnicamente viável;
+    IV - procedimento de comunicação à ANVISA de início de recall,
+    incluindo descrição do problema, avaliação de risco, versões
+    afetadas e ação corretiva planejada;
+    V - acompanhamento da efetividade do recall até sua conclusão,
+    com reporte final à ANVISA;
+    VI - análise de causa raiz do problema que motivou o recall e
+    implementação de ações preventivas para evitar recorrência.
+
+    Parágrafo único. O fabricante deve ser capaz de executar recall
+    de SaMD em prazo compatível com o risco identificado, não superior
+    a 72 horas para riscos graves à saúde.
+guidance:
+  prose: |
+    O art. 22 regula o processo de recall de SaMD, que difere
+    significativamente de recall de dispositivos fisicos por ser
+    potencialmente executavel de forma remota e rapida.
+
+    **Vantagem de SaMD em recall:**
+    Diferente de dispositivos fisicos, SaMD pode ser atualizado,
+    desabilitado ou substituido remotamente. Isso permite recall
+    mais rapido e efetivo, mas exige infraestrutura tecnica adequada.
+
+    **Tipos de acao corretiva de campo:**
+    - Recall Classe I: risco grave de morte ou dano serio
+      -> Desabilitar SaMD em 72 horas, notificar ANVISA imediatamente
+    - Recall Classe II: risco de dano temporario ou reversivel
+      -> Atualizar SaMD em 30 dias, notificar ANVISA em 72 horas
+    - Recall Classe III: improvavel causar dano, mas viola regulacao
+      -> Atualizar em 90 dias, notificar ANVISA em 30 dias
+
+    **Rastreabilidade para recall:**
+    O fabricante deve manter registro de:
+    - Quais versoes do SaMD estao em uso
+    - Quais instituicoes/usuarios utilizam cada versao
+    - Canal de comunicacao para cada usuario/instituicao
+    - Capacidade de forcar atualizacao ou desabilitacao remota
+
+    **Analise de causa raiz:**
+    Apos recall, o fabricante deve conduzir analise de causa raiz
+    (ex: 5-Why, Ishikawa, RCA) e implementar acoes preventivas
+    (CAPA - Corrective and Preventive Actions) para evitar recorrencia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de recall de SaMD:**
+      1. Implementar mecanismo de feature kill switch que permite
+         desabilitar funcionalidades especificas ou o SaMD inteiro
+         remotamente, com latencia maxima de 1 hora para propagacao.
+      2. Configurar sistema de distribuicao forcada de atualizacoes
+         (forced update) que pode impor atualizacao de versao antes
+         de permitir uso continuado do SaMD.
+      3. Manter registro centralizado de deployment: qual versao
+         esta instalada em cada cliente/instituicao, com dashboard
+         de cobertura de recall em tempo real.
+      4. Implementar infraestrutura de comunicacao multicanal (email,
+         SMS, push notification, in-app) para notificacao de recall
+         a usuarios e instituicoes afetados.
+    tools:
+      - feature-flags
+      - forced-update
+      - deployment-registry
+      - notification-system
+  devsecops:
+    prose: |
+      **Pipeline de recall e acao corretiva:**
+      1. Implementar pipeline de hotfix acelerado para recall: branch
+         de emergencia -> desenvolvimento -> testes minimos obrigatorios
+         -> release -> deploy forcado, com SLA de 24 horas para
+         correcao disponivel.
+      2. Criar pipeline de rollback automatizado que reverte SaMD
+         para ultima versao segura conhecida, testado mensalmente.
+      3. Automatizar notificacao de recall via pipeline: gerar
+         comunicacao padronizada, distribuir por canais configurados,
+         rastrear confirmacao de recebimento.
+      4. Implementar pipeline de CAPA (Corrective and Preventive
+         Actions) que rastreia: causa raiz, correcao, validacao de
+         correcao, acao preventiva, verificacao de efetividade.
+    tools:
+      - hotfix-pipeline
+      - rollback-pipeline
+      - notification-pipeline
+      - capa-tracking
+  secops:
+    prose: |
+      **Governanca de recall:**
+      1. Manter plano de recall documentado e testado com simulacros
+         anuais, definindo: criterios de acionamento, equipe de recall,
+         canais de comunicacao, templates de notificacao e SLAs.
+      2. Implementar processo de notificacao ANVISA para recall com
+         formularios pre-preenchidos e fluxo de aprovacao acelerado.
+      3. Conduzir analise de causa raiz (RCA) para todo recall, com
+         documentacao de achados, acoes corretivas e preventivas
+         (CAPA), e verificacao de efetividade em 90 dias.
+      4. Manter registro historico de recalls com analise de tendencias
+         para identificar fraquezas sistematicas no processo de
+         desenvolvimento ou qualidade.
+    tools:
+      - recall-management
+      - notivisa-integration
+      - rca-tools
+      - capa-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-308-a-6"]
+    relationship: mapped

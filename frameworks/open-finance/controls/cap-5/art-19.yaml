@@ -1,0 +1,95 @@
+id: art-19
+family: cap-5
+title: "Jornada de Consentimento do Cliente"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 19. O compartilhamento de dados e serviços no âmbito do Open Finance
+    depende de consentimento prévio do cliente, que deve atender aos seguintes
+    requisitos:
+
+    I - ser obtido de forma livre, informada e inequívoca pelo cliente;
+
+    II - ser registrado eletronicamente com identificação precisa de:
+    a) dados ou serviços objeto do compartilhamento;
+    b) instituições transmissora e receptora;
+    c) período de validade do consentimento;
+    d) data e hora da concessão;
+
+    III - ser precedido de informação clara ao cliente sobre:
+    a) a finalidade do compartilhamento;
+    b) os dados ou serviços que serão compartilhados;
+    c) o prazo de validade;
+    d) a possibilidade de revogação a qualquer momento;
+
+    IV - utilizar linguagem clara, objetiva e acessível, evitando termos
+    técnicos excessivos ou jurídicos complexos.
+guidance:
+  prose: |
+    O art. 19 define a jornada de consentimento alinhada a LGPD:
+
+    **Etapas obrigatorias da jornada:**
+    1. Identificacao: cliente informa CPF/CNPJ no receptor
+    2. Autenticacao: cliente e redirecionado a transmissora
+    3. Confirmacao: cliente confirma quais dados compartilhar
+    4. Aprovacao: cliente autoriza o compartilhamento
+    5. Efetivacao: consentimento e registrado e dados fluem
+
+    **Informacoes obrigatorias na tela de consentimento:**
+    - Quem esta pedindo (receptor) e para que (finalidade)
+    - Quais dados serao compartilhados (escopo granular)
+    - Por quanto tempo (prazo de validade)
+    - Como revogar (link ou instrucao clara)
+
+    **Granularidade do consentimento:**
+    O cliente deve poder escolher quais categorias de dados compartilhar.
+    Nao e permitido consentimento "tudo ou nada" (bundling).
+
+    **Alinhamento com LGPD:**
+    - Art. 7, I (consentimento como base legal)
+    - Art. 8 (consentimento por escrito em destaque)
+    - Art. 9 (direito a informacao sobre tratamento)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao da jornada de consentimento:**
+      1. Implementar API de consentimento conforme especificacao do diretorio
+         (POST /consents, GET /consents/{id}, DELETE /consents/{id}).
+      2. Armazenar consentimentos com todos os metadados obrigatorios
+         (escopo, participantes, prazo, timestamp).
+      3. Implementar tela de consentimento na detentora com UX padronizada
+         conforme guia de experiencia do diretorio.
+      4. Validar consentimento em cada requisicao de dados (middleware).
+      5. Implementar granularidade por permission (escopo de dados).
+    tools:
+      - consent-management
+      - oauth-server
+      - ux-framework
+  devsecops:
+    prose: |
+      **Testes da jornada de consentimento:**
+      1. Testar fluxo completo de consentimento end-to-end.
+      2. Validar que consentimento "tudo ou nada" nao e possivel.
+      3. Testar exibicao de todas as informacoes obrigatorias.
+      4. Verificar que consentimento e validado em cada request de dados.
+    tools:
+      - e2e-tests
+      - accessibility-tests
+      - integration-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de consentimentos:**
+      1. Auditar registro de consentimentos para completude.
+      2. Monitorar volume de consentimentos concedidos e revogados.
+      3. Verificar que informacoes obrigatorias estao presentes.
+      4. Analisar taxa de conversao de consentimentos (UX issues).
+    tools:
+      - consent-analytics
+      - grc-platform
+      - audit-trail
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-9"]
+    relationship: complements

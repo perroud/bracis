@@ -1,0 +1,80 @@
+id: art-31
+family: cap-6
+title: "Seguranca de Ambientes de Desenvolvimento"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 31. Os ambientes de desenvolvimento e homologação devem ser protegidos,
+    observando:
+
+    I - separação lógica ou física entre ambientes de desenvolvimento,
+    homologação e produção;
+    II - proibição de uso de dados reais de produção em ambientes de
+    desenvolvimento e homologação, salvo quando anonimizados;
+    III - controle de acesso diferenciado para cada ambiente;
+    IV - proteção de código-fonte contra acesso não autorizado.
+guidance:
+  prose: |
+    O art. 31 exige separacao de ambientes e proibe dados reais em dev/hml
+    sem anonimizacao. Codigo-fonte deve ser protegido.
+
+    **Requisitos obrigatorios:**
+    1. Ambientes separados: dev, homologacao, producao
+    2. Dados: NUNCA copiar producao para dev sem anonimizar
+    3. Acesso: roles diferentes por ambiente
+    4. Codigo-fonte: protegido contra acesso nao autorizado
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.31 (Separation of development, test and production)
+    - NIST 800-53 rev5: CM-4 (Impact Analyses), SA-11
+    - CIS Controls v8: 16.7 (Separate Production and Non-Production)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Isolamento de ambientes:**
+      1. VPCs/namespaces separados por ambiente (dev, staging, prod).
+      2. Pipeline de anonimizacao para popular ambientes de dev com dados mascarados.
+      3. IAM roles distintos: dev nao acessa prod, prod nao e acessivel por devs.
+      4. Secrets diferentes por ambiente (nunca reusar credenciais de prod em dev).
+      5. Repositorios com visibilidade controlada (internal, private).
+    tools:
+      - environment-separation
+      - data-anonymization
+      - iam-per-environment
+      - secret-per-environment
+  devsecops:
+    prose: |
+      **Seguranca de ambientes no pipeline:**
+      1. Protected environments no GitLab para staging e producao.
+      2. Deploy approval obrigatorio para producao.
+      3. Verificacao automatica de que dados de producao nao estao em dev.
+      4. Pipeline de sanitizacao de dados para ambientes nao produtivos.
+    tools:
+      - protected-environments
+      - deployment-approval
+      - data-sanitization-pipeline
+  secops:
+    prose: |
+      **Auditoria de ambientes:**
+      1. Verificacao trimestral de isolamento entre ambientes.
+      2. Scan de dados de producao em ambientes de desenvolvimento.
+      3. Revisao de acessos: quem tem acesso a quais ambientes.
+      4. Alerta para copia de dados de producao para ambientes inferiores.
+    tools:
+      - environment-audit
+      - production-data-scan
+      - cross-environment-alert
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.31"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-4", "SA-11"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-12", "art-46"]
+    relationship: complements

@@ -1,0 +1,93 @@
+id: cis-2.1
+family: cis-2
+title: "Establish and Maintain a Software Inventory"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain a detailed inventory of all licensed software installed on
+    enterprise assets. The software inventory must document the title, publisher,
+    initial install/use date, and business purpose for each entry; where appropriate,
+    include the Uniform Resource Locator (URL), app store(s), version(s), deployment
+    mechanism, and decommission date. Review and update the software inventory
+    bi-annually, or more frequently.
+
+guidance:
+  prose: >-
+    A complete software inventory is essential for identifying unauthorized software,
+    managing vulnerabilities, and controlling license costs. Modern environments include
+    traditional installed applications, SaaS subscriptions, container images, serverless
+    functions, and browser extensions. The inventory must cover all of these. Automated
+    tools should continuously reconcile deployed software against the approved inventory.
+    Shadow IT -- software installed or subscribed to without IT approval -- is a persistent
+    risk that can only be addressed through comprehensive, automated inventory management.
+
+references:
+  - citation: "CIS Controls v8.1, Control 2, Safeguard 2.1"
+    url: "https://www.cisecurity.org/controls/v8"
+  - citation: "NIST SP 800-53 CM-8(1)"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a centralized software catalog (e.g., Backstage) listing all approved
+      software, container images, and libraries. Enforce that only images from approved
+      registries can be deployed to production via admission controllers (Kyverno,
+      OPA Gatekeeper). Implement SBOM (Software Bill of Materials) generation for every
+      build artifact. Use dependency management tools to track all transitive dependencies.
+      Integrate cloud SaaS discovery to identify shadow IT subscriptions. Tag every
+      container image with its source repository, build pipeline URL, and SBOM reference.
+    tools:
+      - backstage-catalog
+      - kyverno
+      - opa-gatekeeper
+      - syft
+      - harbor-registry
+      - artifactory
+
+  devsecops:
+    prose: >-
+      Generate SBOMs automatically during CI/CD pipeline execution for every build
+      artifact (container images, binaries, packages). Use tools like Syft or Trivy
+      to extract dependency trees and produce CycloneDX or SPDX-format SBOMs. Store
+      SBOMs as pipeline artifacts attached to each release. Implement pipeline policies
+      that reject builds containing unapproved or end-of-life dependencies. Scan
+      dependency lock files (package-lock.json, go.sum, Cargo.lock) for known
+      vulnerabilities on every merge request.
+    tools:
+      - syft
+      - trivy
+      - grype
+      - gitlab-dependency-scanning
+      - renovate
+      - dependabot
+
+  secops:
+    prose: >-
+      Deploy endpoint detection agents that continuously report installed software
+      to a centralized platform. Compare reported software against the approved
+      inventory and generate alerts for unauthorized installations. Run periodic
+      audits of SaaS subscriptions through CASB tools and SSO provider logs.
+      Correlate CVE feeds against the software inventory to prioritize patching.
+      Produce monthly software inventory reports highlighting new installations,
+      decommissions, and policy exceptions.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender
+      - qualys-asset-inventory
+      - netskope
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "CM-8(1)", "CM-11"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.9", "A8.19"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["ID.AM-02"]
+    relationship: implements

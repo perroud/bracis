@@ -1,0 +1,117 @@
+id: art-11
+family: cap-3
+title: "Explicabilidade de Sistemas de IA Medica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 11. Todo sistema de IA médica classificado como risco médio, alto ou
+    muito alto deve fornecer explicações compreensíveis sobre suas inferências,
+    predições ou recomendações:
+
+    I - a explicação deve ser suficiente para que o médico compreenda os
+    fatores que levaram o sistema a determinada conclusão ou recomendação;
+
+    II - a explicação deve identificar os dados de entrada mais relevantes
+    para a inferência (feature importance), os padrões reconhecidos pelo
+    modelo e o grau de confiança da inferência;
+
+    III - para modelos baseados em aprendizado profundo ou outros métodos
+    de baixa interpretabilidade inerente, devem ser implementados mecanismos
+    de explicabilidade pós-hoc, tais como SHAP, LIME, Grad-CAM ou métodos
+    equivalentes;
+
+    IV - a explicação deve ser apresentada em linguagem compreensível ao
+    médico, sem exigir conhecimento especializado em ciência de dados
+    ou aprendizado de máquina.
+guidance:
+  prose: |
+    O art. 11 trata de um dos temas mais complexos da regulamentacao de IA:
+    a explicabilidade. A Resolucao adota abordagem pragmatica, exigindo
+    explicabilidade funcional (util para o medico) e nao necessariamente
+    explicabilidade total do modelo.
+
+    **Niveis de explicabilidade exigidos:**
+
+    - Feature importance (inciso II): o medico deve saber quais dados
+      pesaram mais na decisao. Ex: "A recomendacao de investigacao
+      oncologica se baseou principalmente na lesao detectada no
+      quadrante superior direito da mamografia (contribuicao: 78%)
+      e no historico familiar de cancer de mama (contribuicao: 15%)."
+
+    - Grau de confianca (inciso II): o sistema deve informar a
+      probabilidade ou confianca de sua inferencia. Ex: "Confianca
+      de 92% para diagnostico de melanoma" vs "Confianca de 54%
+      para diagnostico de melanoma" mudam a postura do medico.
+
+    - Metodos pos-hoc (inciso III): modelos black-box (redes neurais
+      profundas, transformers) nao sao proibidos, mas devem ter
+      camada de explicabilidade. SHAP e LIME sao citados como
+      exemplos, nao como unicas opcoes.
+
+    - Linguagem medica (inciso IV): a explicacao deve usar terminologia
+      medica padronizada, nao jargao de ML. "Feature importance" deve
+      ser traduzida para "fatores clinicos determinantes".
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de explicabilidade:**
+      1. Implementar camada de explicabilidade como servico reutilizavel
+         na plataforma de ML: SHAP, LIME, Grad-CAM, attention maps —
+         disponivel para todos os modelos via API padronizada.
+      2. Configurar armazenamento de explicacoes junto com cada inferencia,
+         vinculando explicacao ao registro clinico do paciente no PEP.
+      3. Implementar metricas de qualidade de explicacao: fidelidade
+         (a explicacao reflete o modelo real?), consistencia (explicacoes
+         similares para inputs similares?) e compreensibilidade (testada
+         com medicos).
+      4. Criar componentes de UI padronizados para visualizacao de
+         explicacoes em linguagem medica, reutilizaveis por todos os
+         sistemas de IA.
+    tools:
+      - shap
+      - lime
+      - grad-cam
+      - explainability-service
+      - model-monitoring
+  devsecops:
+    prose: |
+      **Validacao de explicabilidade no pipeline:**
+      1. Implementar testes automatizados de explicabilidade no CI/CD:
+         verificar que todo modelo de risco medio+ produz explicacao
+         para cada inferencia, com metricas de qualidade definidas.
+      2. Automatizar teste de fidelidade: a explicacao deve ser
+         consistente com o comportamento real do modelo (validar
+         que remover features de alta importancia muda a predicao).
+      3. Bloquear deploy de modelos de risco medio+ sem camada de
+         explicabilidade configurada e testada.
+      4. Incluir revisao de explicabilidade como criterio obrigatorio
+         de code review para modelos em escopo.
+    tools:
+      - gitlab-ci
+      - explainability-tests
+      - model-testing
+      - code-review
+  secops:
+    prose: |
+      **Governanca de explicabilidade:**
+      1. Realizar testes de usabilidade de explicacoes com medicos de
+         diferentes especialidades, verificando compreensibilidade.
+      2. Auditar periodicamente qualidade das explicacoes: amostragem
+         de inferencias com revisao por medico e engenheiro de ML.
+      3. Documentar limitacoes conhecidas de explicabilidade para cada
+         modelo e comunicar ao corpo clinico.
+      4. Manter registro de feedback de medicos sobre qualidade das
+         explicacoes para melhoria continua.
+    tools:
+      - usability-testing
+      - audit-tools
+      - feedback-management
+      - grc-platform
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-13", "art-86"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["measure-2", "manage-3"]
+    relationship: mapped

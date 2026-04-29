@@ -1,0 +1,174 @@
+id: art-14
+family: cap-4
+title: "Dados Processados ou Armazenados no Exterior"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 14. As supervisionadas que contratarem serviços de processamento e
+    armazenamento de dados e de computação em nuvem prestados no exterior devem
+    observar as disposições legais e regulamentares em vigor, incluindo a legislação
+    relativa à proteção de dados pessoais.
+
+    § 1º As supervisionadas devem comunicar previamente à SUSEP a contratação de
+    serviços de processamento e armazenamento de dados e de computação em nuvem
+    prestados no exterior, informando:
+    I - os países e as regiões em cada país onde os serviços poderão ser prestados
+    e os dados poderão ser armazenados, processados e gerenciados;
+    II - a denominação das empresas subcontratadas para a prestação dos serviços
+    de que trata o caput, quando houver.
+
+    § 2º Alterações contratuais que impliquem modificação das informações de que
+    trata o § 1º devem ser comunicadas previamente à SUSEP.
+guidance:
+  prose: |
+    O art. 14 trata especificamente da contratação de serviços de nuvem com
+    processamento ou armazenamento de dados no exterior.
+
+    **Obediência à legislação (caput):**
+    Quando dados são processados ou armazenados no exterior, a supervisionada
+    deve observar:
+    - LGPD: transferência internacional de dados pessoais (art. 33-36)
+    - Regulamentação SUSEP: requisitos adicionais para dados no exterior
+    - Legislação do país de destino: proteção de dados, privacidade
+    - Convenções internacionais aplicáveis
+
+    **Comunicação prévia à SUSEP (§ 1º):**
+    A comunicação é PRÉVIA — deve ser feita ANTES da contratação, não depois.
+    Conteúdo obrigatório:
+
+    **I — Países e regiões:**
+    Não basta informar "Estados Unidos" — é necessário informar as regiões
+    específicas dentro de cada país (ex: US-East-1, US-West-2 no caso da AWS).
+    A SUSEP quer saber exatamente onde os dados estarão localizados.
+
+    **II — Subcontratados:**
+    Se o provedor principal subcontrata outros para prestar o serviço, os
+    subcontratados devem ser informados à SUSEP. Ex: se o provedor de nuvem
+    usa data centers de terceiros ou subcontrata serviços específicos.
+
+    **Alterações contratuais (§ 2º):**
+    Qualquer mudança que altere os países/regiões ou subcontratados deve ser
+    comunicada previamente à SUSEP. Isso inclui:
+    - Migração de região (ex: mudança de data center de Frankfurt para Dublin)
+    - Novo subcontratado adicionado pelo provedor
+    - Expansão para novas regiões
+
+    **Relação com LGPD:**
+    A transferência internacional de dados pessoais só é permitida nos casos
+    do art. 33 da LGPD:
+    - Países com nível adequado de proteção
+    - Garantias oferecidas pelo controlador (cláusulas-padrão contratuais)
+    - Consentimento específico do titular
+    - Cooperação jurídica internacional
+    - Necessidade para execução de contrato
+
+    **Em inspeções, a SUSEP verifica:**
+    1. Comunicação prévia para todas as contratações no exterior
+    2. Especificação de países e regiões
+    3. Identificação de subcontratados
+    4. Comunicação de alterações contratuais
+    5. Compliance com LGPD para transferência internacional
+    6. Capacidade de acesso da SUSEP mesmo com dados no exterior
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de localização de dados:**
+      1. Data residency policies implementadas na infraestrutura de nuvem:
+         - AWS: S3 Bucket policies com restrição de região, SCP para bloquear
+           criação de recursos fora de regiões aprovadas
+         - Azure: Azure Policy para restringir regiões permitidas
+         - GCP: Organization Policies para restrição de localização
+      2. Monitoramento contínuo de localização de dados:
+         - Alertas quando dados são movidos para região não autorizada
+         - Dashboard de localização de dados por provedor e região
+         - Verificação automática de compliance de data residency
+
+      **Inventário de localizações:**
+      3. Inventário automatizado de todas as regiões de nuvem utilizadas:
+         - Mapeamento: recurso → provedor → região → país
+         - Classificação de dados por região
+         - Identificação de subcontratados por região
+      4. Relatório automatizado para comunicação à SUSEP.
+
+      **Proteção de dados internacionais:**
+      5. Criptografia com chaves gerenciadas pela supervisionada (BYOK/HYOK).
+      6. Controles de acesso que impeçam acesso a dados por pessoal do provedor
+         em jurisdições não autorizadas.
+    tools:
+      - cloud-policy-engine
+      - data-residency-monitoring
+      - cloud-asset-inventory
+      - encryption-key-management
+  devsecops:
+    prose: |
+      **Controles de localização no pipeline:**
+      1. Validação de IaC para garantir que recursos só sejam provisionados em
+         regiões aprovadas:
+         - Regras Checkov/tfsec para região obrigatória
+         - OPA policies para bloqueio de regiões não autorizadas
+         - Pipeline que falha se recurso for provisionado em região não comunicada
+      2. Tags obrigatórias em recursos de nuvem:
+         - data-classification: nível de sensibilidade
+         - data-residency: região aprovada
+         - susep-notification: data da comunicação à SUSEP
+
+      **Rastreabilidade:**
+      3. Audit trail de todas as mudanças de localização de dados.
+      4. Alertas automáticos ao compliance quando:
+         - Nova região é utilizada
+         - Novo subcontratado é detectado
+         - Configuração de replicação cross-region é alterada
+    tools:
+      - terraform
+      - checkov
+      - opa-gatekeeper
+      - gitlab-ci
+      - tagging-policies
+  secops:
+    prose: |
+      **Processo de comunicação à SUSEP:**
+      1. Processo formal de comunicação prévia para contratações no exterior:
+         - Identificação de todas as regiões onde dados serão processados/armazenados
+         - Mapeamento de subcontratados do provedor principal
+         - Elaboração do comunicado com dados do § 1º
+         - Aprovação pelo diretor responsável (art. 18)
+         - Envio à SUSEP antes da efetivação do contrato
+      2. Modelo de comunicado padronizado contendo:
+         - Identificação da supervisionada
+         - Provedor contratado
+         - Serviços contratados
+         - Países e regiões específicas
+         - Subcontratados identificados
+         - Classificação dos dados envolvidos
+         - Medidas de segurança adotadas
+
+      **Monitoramento contínuo:**
+      3. Revisão trimestral de localizações de dados versus comunicado à SUSEP.
+      4. Processo de comunicação de alterações (§ 2º) com SLA definido.
+      5. Monitoramento de mudanças nos subcontratados do provedor.
+
+      **Compliance com LGPD:**
+      6. Avaliação de adequação do país de destino conforme LGPD art. 33.
+      7. Cláusulas-padrão contratuais (standard contractual clauses) quando
+         aplicável.
+      8. Avaliação de impacto à proteção de dados (DPIA) para transferências
+         internacionais.
+    tools:
+      - grc-platform
+      - compliance-reporting
+      - vendor-risk-management
+      - data-protection-impact-assessment
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-13", "art-14"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35", "art-36"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.22", "A.5.23"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "PE-18", "SC-12"]
+    relationship: supports

@@ -1,0 +1,91 @@
+id: 03.03.01
+family: au
+title: "Event Logging"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [au-2, au-3, au-12]
+  - cmmc-v2: [au.l2-3.3.1]
+statement:
+  prose: >-
+    a. Identify the types of events that the system is capable of logging in support of
+       the audit function.
+    b. Coordinate the event logging function with other organizational entities requiring
+       audit-related information to guide and inform the selection criteria for events to
+       be logged.
+    c. Specify the following event types for logging within the system: successful and
+       unsuccessful account logon events, account management events, object access,
+       policy change, privilege functions, process tracking, and system events, including
+       events related to the handling and access of CUI.
+    d. Provide a rationale for why the event types selected for logging are deemed to be
+       adequate to support after-the-fact investigations of incidents.
+    e. Review and update the event types selected for logging on a defined frequency.
+guidance:
+  prose: >-
+    An event is an observable occurrence in a system. The types of events that require
+    logging are those events that are significant and relevant to the security of systems
+    and the privacy of individuals. Event logging requirements can be derived from
+    applicable laws, executive orders, directives, regulations, policies, standards, and
+    guidelines. Event logging supports after-the-fact investigations, trend analysis,
+    and the generation of management and technical reports. The selection of events to be
+    logged considers both the event types that are most useful for meeting audit
+    objectives and the logging capacity of the system. Organizations coordinate event
+    logging with incident response to ensure that the events needed for incident
+    investigation are available. For CUI systems, logging must capture events related to
+    CUI access, modification, transfer, and deletion.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized log aggregation using the ELK stack (Elasticsearch, Logstash,
+      Kibana) or Loki/Grafana. Configure structured logging (JSON format) across all
+      platform services with consistent schemas including timestamp, source, actor,
+      action, resource, and outcome fields. Deploy Kubernetes audit logging at the API
+      server level with comprehensive audit policies capturing authentication,
+      authorization, and resource modifications. Implement cloud-native audit logging
+      (AWS CloudTrail, GCP Cloud Audit Logs, Azure Monitor) for all infrastructure
+      events. Configure application-level logging frameworks to capture CUI access
+      events. Use Fluentd or Fluent Bit as log shippers with guaranteed delivery.
+      Implement log rotation and retention policies aligned with CUI requirements
+      (minimum 1 year online, 3 years archived).
+    tools:
+      - "ELK Stack / Loki + Grafana"
+      - "Fluentd / Fluent Bit"
+      - "Kubernetes Audit Logging"
+      - "Cloud audit trails (CloudTrail, Cloud Audit Logs)"
+      - "OpenTelemetry (structured logging)"
+      - "Vector (log pipeline)"
+  devsecops:
+    prose: >-
+      Implement logging standards as part of the development framework. Provide shared
+      logging libraries that enforce consistent event formats and required fields.
+      Validate logging configurations in CI pipelines, ensuring that all deployable
+      artifacts include adequate logging. Implement log-level policies preventing
+      sensitive data (passwords, tokens, PII) from appearing in logs. Test audit trail
+      completeness as part of integration testing. Include logging configuration in
+      infrastructure-as-code templates so every deployed service has audit logging
+      enabled by default.
+    tools:
+      - "Shared logging libraries (structured logging)"
+      - "CI/CD log validation checks"
+      - "Terraform (audit logging configuration)"
+      - "Log sanitization libraries"
+      - "Integration test suites (audit completeness)"
+  secops:
+    prose: >-
+      Configure SIEM correlation rules to detect gaps in expected log streams. Monitor
+      for log tampering, deletion, or interruption. Implement alerting on critical events
+      including failed authentication attempts, privilege escalation, CUI access from
+      unauthorized sources, and configuration changes. Conduct periodic log coverage
+      assessments to verify all in-scope systems are generating required event types.
+      Generate compliance reports demonstrating log coverage and retention compliance.
+    tools:
+      - "SIEM (Splunk, Elastic Security, Microsoft Sentinel)"
+      - "Log integrity monitoring"
+      - "Alerting and notification systems"
+      - "Compliance reporting dashboards"
+      - "Log coverage assessment tools"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — AU-2, AU-3, AU-12"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-92"
+    url: "https://doi.org/10.6028/NIST.SP.800-92"

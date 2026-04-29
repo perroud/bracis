@@ -1,0 +1,98 @@
+id: v11.1.1
+family: v11
+title: "Business Logic Security"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify the application will only process business logic flows for the same user in
+    sequential step order and without skipping steps. Business logic processing must
+    enforce limits and controls that are appropriate to the business context, such as
+    rate limits, transaction maximums, and workflow sequencing. The application must
+    detect and reject automation of business-critical operations that should require
+    human interaction.
+
+guidance:
+  prose: >-
+    Business logic vulnerabilities are flaws in the design and implementation of an
+    application's business rules. Unlike technical vulnerabilities (SQL injection, XSS),
+    business logic flaws cannot be detected by generic scanning tools because they require
+    understanding of the intended application behavior. Common examples include: skipping
+    payment steps in a checkout flow, manipulating prices or quantities in shopping carts,
+    exploiting race conditions in financial transactions, and abusing promotional features
+    beyond intended limits. These flaws often cause direct financial losses. Prevention
+    requires server-side enforcement of business workflow sequencing, transaction integrity
+    checks, and rate limiting that reflects business constraints. Anti-automation controls
+    protect against bot-driven exploitation of business logic at scale.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V11.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Business Logic Security"
+    url: "https://owasp.org/www-community/vulnerabilities/Business_logic_vulnerability"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement state machines for multi-step business workflows that enforce valid state
+      transitions server-side. Use optimistic locking or distributed locks to prevent race
+      conditions in financial transactions. Deploy server-side rate limiting per user, per
+      action, and per time window for business-critical operations (purchases, transfers,
+      account modifications). Implement idempotency keys for payment and financial
+      operations to prevent double-processing. Use event sourcing or audit logging for
+      all business-critical state changes to enable forensic analysis. Deploy anti-bot
+      protection (CAPTCHA, proof-of-work challenges) for actions vulnerable to automation.
+    tools:
+      - redis
+      - temporal
+      - step-functions
+      - kong
+      - cloudflare-bot-management
+      - recaptcha
+      - stripe
+
+  devsecops:
+    prose: >-
+      Write business logic test suites that attempt to skip workflow steps, repeat
+      completed steps, manipulate server-side values (prices, quantities), and exploit
+      race conditions through concurrent requests. Use load testing tools to send
+      concurrent requests that test transaction isolation. Implement integration tests
+      for all business rule boundaries (maximum values, minimum quantities, rate limits).
+      Include business logic abuse scenarios in penetration test scopes. Review business
+      workflows for missing server-side validation of state transitions.
+    tools:
+      - k6
+      - burp-suite
+      - postman
+      - gitlab-ci
+      - selenium
+      - playwright
+
+  secops:
+    prose: >-
+      Monitor for business logic abuse patterns: abnormal transaction volumes, purchases
+      at manipulated prices, repeated promotional code usage, or sequential workflow
+      violations. Configure alerts for financial anomalies: transactions outside normal
+      ranges, bulk operations from single accounts, or unusual geographic patterns in
+      financial operations. Implement fraud detection rules correlating transaction
+      patterns with account behavior baselines. Review business operation logs for
+      workflow integrity violations.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog-security
+      - sift
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: supports

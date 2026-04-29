@@ -1,0 +1,182 @@
+id: art-13
+family: cap-4
+title: "Due Diligence de Prestadores de Serviços de Nuvem"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 13. Previamente à contratação de serviços de processamento e armazenamento
+    de dados e de computação em nuvem, as supervisionadas devem:
+
+    I - adotar práticas de governança corporativa e de gestão proporcionais à
+    relevância do serviço a ser contratado e aos riscos a que estejam expostas;
+
+    II - verificar a capacidade do potencial prestador de serviço de assegurar:
+    a) o cumprimento da legislação e da regulamentação em vigor;
+    b) o acesso da supervisionada aos dados e às informações a serem processados
+       ou armazenados pelo prestador de serviço;
+    c) a confidencialidade, a integridade, a disponibilidade e a recuperação dos
+       dados e das informações processados ou armazenados pelo prestador de serviço;
+    d) a sua aderência a certificações exigidas pela supervisionada para a prestação
+       do serviço a ser contratado;
+    e) o acesso da SUSEP aos contratos e aos acordos firmados para a prestação de
+       serviço, à documentação e às informações referentes aos serviços prestados,
+       aos dados armazenados e às informações sobre seus processamentos, às cópias
+       de segurança dos dados e das informações, bem como às informações necessárias
+       para auditoria do serviço contratado;
+
+    III - verificar a existência de convênio para troca de informações entre o
+    supervisor do país de origem do prestador de serviço e a SUSEP, quando o
+    prestador de serviço for sediado no exterior.
+guidance:
+  prose: |
+    O art. 13 estabelece o processo de due diligence obrigatório ANTES da
+    contratação de serviços de nuvem.
+
+    **Caráter prévio:**
+    A due diligence é PRÉ-CONTRATUAL. A entidade não pode contratar primeiro e
+    avaliar depois. A evidência de due diligence prévia é verificada em inspeções.
+
+    **Inciso I — Governança proporcional:**
+    O nível de governança e gestão de riscos deve ser proporcional à:
+    - Relevância do serviço: core system vs. serviço periférico
+    - Exposição a riscos: volume de dados, sensibilidade, criticidade
+
+    Serviço crítico (core insurance em nuvem) exige avaliação pelo conselho.
+    Serviço periférico (ferramenta de produtividade) pode ser aprovado pela TI.
+
+    **Inciso II — Capacidade do prestador:**
+    Cinco requisitos que o prestador deve ser capaz de assegurar:
+
+    a) Compliance legal: o provedor deve cumprir legislação brasileira e regulamentação
+       da SUSEP aplicável, incluindo LGPD.
+
+    b) Acesso aos dados: a supervisionada deve manter capacidade de acessar seus
+       dados a qualquer momento, sem dependência exclusiva do provedor.
+
+    c) CIA + recuperação: o provedor deve garantir confidencialidade, integridade,
+       disponibilidade e capacidade de recuperação de dados (backup, DR).
+
+    d) Certificações: verificar certificações relevantes do provedor:
+       - SOC 2 Type II (controles de segurança)
+       - ISO 27001 (gestão de segurança da informação)
+       - CSA STAR (segurança em nuvem)
+       - PCI DSS (se dados de pagamento)
+
+    e) Acesso da SUSEP: o contrato deve permitir que a SUSEP acesse:
+       - Contratos e acordos entre supervisionada e provedor
+       - Documentação e informações sobre os serviços
+       - Dados armazenados e informações sobre processamento
+       - Cópias de segurança
+       - Informações para auditoria
+
+    **Inciso III — Convênio internacional:**
+    Para provedores sediados no exterior, verificar se existe acordo de cooperação
+    entre o supervisor do país de origem e a SUSEP. Na prática, os grandes provedores
+    (AWS, Azure, GCP) operam em jurisdições com supervisores cooperantes.
+
+    **Em inspeções, a SUSEP verifica:**
+    1. Documentação de due diligence prévia à contratação
+    2. Avaliação formal da capacidade do prestador
+    3. Cláusulas contratuais que garantam os requisitos do inciso II
+    4. Certificações do provedor verificadas e vigentes
+    5. Garantia de acesso da SUSEP nos contratos
+    6. Verificação de convênio para provedores estrangeiros
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Avaliação técnica de provedores:**
+      1. Checklist técnico de due diligence para provedores de nuvem:
+         - Arquitetura de segurança do provedor (isolamento, criptografia, rede)
+         - SLA de disponibilidade (mínimo 99.9% para serviços críticos)
+         - Capacidade de backup e recuperação (RPO/RTO oferecidos)
+         - Criptografia em trânsito e em repouso (algoritmos, gestão de chaves)
+         - Controles de acesso e autenticação (IAM, MFA, federation)
+         - Monitoramento e logging disponíveis
+         - Compliance e certificações (SOC 2, ISO 27001, CSA STAR)
+      2. Teste de portabilidade: validar capacidade de exportação de dados
+         antes da contratação.
+      3. PoC (Proof of Concept) para serviços críticos antes do compromisso
+         contratual.
+
+      **Controles técnicos pós-contratação:**
+      4. Cloud Security Posture Management (CSPM) para monitorar configurações.
+      5. Cloud Access Security Broker (CASB) para controle de acesso.
+      6. Monitoramento contínuo de SLAs e disponibilidade.
+    tools:
+      - cspm
+      - casb
+      - cloud-monitoring
+      - compliance-scanner
+      - vendor-assessment
+  devsecops:
+    prose: |
+      **Validação técnica no pipeline:**
+      1. Políticas de IaC que garantam conformidade com requisitos do art. 13:
+         - Criptografia habilitada para todos os serviços de armazenamento
+         - Logging habilitado para auditoria
+         - Acesso restrito por princípio de menor privilégio
+         - Backup configurado conforme requisitos de recuperação
+      2. Verificação automática de compliance do provedor no pipeline:
+         - Checkov/tfsec para validar configurações de segurança
+         - Bloqueio de serviços de provedores não aprovados
+         - Alertas quando recurso é provisionado em região não autorizada
+
+      **Portabilidade e acesso a dados:**
+      3. APIs de exportação de dados documentadas e testadas.
+      4. Formato de dados padronizado para facilitar migração.
+      5. Scripts de migração mantidos e testados periodicamente.
+    tools:
+      - terraform
+      - checkov
+      - opa-gatekeeper
+      - gitlab-ci
+      - data-migration-tools
+  secops:
+    prose: |
+      **Processo de due diligence:**
+      1. Framework formal de avaliação de provedores de nuvem:
+         - Questionário de segurança padronizado (SIG, CAIQ)
+         - Análise de certificações e relatórios de auditoria
+         - Verificação de compliance com LGPD e regulamentação SUSEP
+         - Avaliação de estabilidade financeira do provedor
+         - Verificação de histórico de incidentes de segurança
+      2. Classificação de risco do provedor (baixo, médio, alto, crítico).
+      3. Aprovação conforme nível de risco:
+         - Baixo/médio: aprovação do CISO
+         - Alto: aprovação do diretor responsável
+         - Crítico: aprovação do conselho/diretoria
+
+      **Gestão contratual:**
+      4. Cláusulas obrigatórias nos contratos:
+         - Direito de auditoria pela supervisionada e pela SUSEP
+         - Notificação de incidentes de segurança pelo provedor
+         - SLA de disponibilidade, backup e recuperação
+         - Direito de exportação e portabilidade de dados
+         - Prazo de transição após rescisão
+         - Confidencialidade e proteção de dados
+         - Compliance com legislação brasileira
+      5. Revisão jurídica de todos os contratos de nuvem.
+
+      **Convênio internacional (inciso III):**
+      6. Consultar base de convênios de cooperação da SUSEP.
+      7. Documentar verificação de convênio para cada provedor estrangeiro.
+      8. Plano de contingência caso convênio não exista ou seja revogado.
+    tools:
+      - vendor-risk-management
+      - grc-platform
+      - contract-management
+      - compliance-reporting
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-11", "art-12"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-46"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-12", "SA-15", "SR-1", "SR-5", "SR-6"]
+    relationship: supports

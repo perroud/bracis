@@ -1,0 +1,86 @@
+id: art-2
+family: cap-1
+title: "Definicoes e Conceitos"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 2. Para os fins desta Resolução, consideram-se:
+    I - ativo virtual: a representação digital de valor conforme definido na
+    Lei n. 14.478/2022;
+    II - prestadora de serviços de ativos virtuais (VASP): pessoa jurídica que
+    executa, em nome de terceiros, pelo menos um dos serviços de ativos virtuais;
+    III - serviços de ativos virtuais: troca entre ativos virtuais e moeda nacional
+    ou estrangeira, troca entre ativos virtuais, transferência de ativos virtuais,
+    custódia ou administração de ativos virtuais, e participação em serviços financeiros
+    relacionados à oferta ou venda de ativos virtuais;
+    IV - custódia de ativos virtuais: guarda de chaves criptográficas privadas em
+    nome de terceiros para armazenamento e movimentação de ativos virtuais;
+    V - carteira custodiada: endereço em rede de registro distribuído (blockchain)
+    cujas chaves privadas são mantidas pela VASP em nome do cliente.
+guidance:
+  prose: |
+    O art. 2 estabelece as definicoes centrais que governam toda a Resolucao.
+
+    **Conceito de VASP:**
+    Alinhado com a definicao do GAFI/FATF (Recomendacao 15). Qualquer pessoa juridica
+    que execute ao menos um dos cinco servicos regulados e considerada VASP e precisa
+    de autorizacao do BCB.
+
+    **Cinco servicos regulados:**
+    1. Troca ativo virtual <-> moeda fiat (exchange fiat-to-crypto)
+    2. Troca ativo virtual <-> ativo virtual (exchange crypto-to-crypto)
+    3. Transferencia de ativos virtuais (remessa/envio)
+    4. Custodia/administracao (custodian)
+    5. Participacao em servicos financeiros de oferta/venda (broker/dealer)
+
+    **Custodia como servico critico:**
+    A custodia de chaves privadas em nome de terceiros e tratada com rigor especial
+    por envolver controle direto sobre os ativos dos clientes. A VASP custodiante
+    assume responsabilidade fiduciaria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelagem de dominio regulatorio:**
+      1. Implementar domain model que reflita as definicoes do art. 2:
+         AssetType (virtual-asset, fiat, security-token), ServiceType (exchange,
+         transfer, custody, brokerage), WalletType (custodial, non-custodial).
+      2. Cada operacao no sistema deve ser classificada por tipo de servico regulado.
+      3. Sistema de tagging de transacoes com tipo de servico para rastreabilidade
+         regulatoria.
+      4. API de consulta que identifica quais servicos regulados uma operacao envolve.
+    tools:
+      - domain-model
+      - transaction-classifier
+      - service-registry
+  devsecops:
+    prose: |
+      **Validacao de dominio:**
+      1. Testes de contrato que validam consistencia do domain model com definicoes
+         regulatorias do art. 2.
+      2. Testes que garantem classificacao correta de operacoes por tipo de servico.
+      3. Linting de codigo para garantir uso correto dos enums de tipo de ativo e servico.
+      4. Contract tests entre microsservicos que trafegam dados de ativos virtuais.
+    tools:
+      - contract-testing
+      - gitlab-ci
+      - domain-linting
+  secops:
+    prose: |
+      **Inventario de servicos regulados:**
+      1. Manter inventario atualizado de quais servicos regulados a VASP oferece.
+      2. Cada novo servico lancado deve ser classificado conforme art. 2 antes da
+         entrada em producao.
+      3. Auditoria periodica da classificacao de servicos vs. realidade operacional.
+      4. Relatorio ao BCB com descricao dos servicos oferecidos e sua classificacao.
+    tools:
+      - grc-platform
+      - service-catalog
+      - regulatory-reporting
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: implements
+  - framework_id: bcb-44
+    articles: ["art-1", "art-2"]
+    relationship: complements

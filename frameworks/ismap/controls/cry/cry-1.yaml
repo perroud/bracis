@@ -1,0 +1,83 @@
+id: cry-1
+family: cry
+title: "Cryptographic Controls Policy"
+class: ISMAP
+baselines:
+  - ismap
+  - ismap-lcs
+
+statement:
+  prose: |
+    The cloud service provider shall develop and implement a policy on the use
+    of cryptographic controls for protection of information. The policy shall
+    specify the approved cryptographic algorithms, key lengths, and protocols
+    for data at rest and data in transit. Cryptographic controls shall use
+    algorithms and key lengths that comply with Japanese government standards
+    (CRYPTREC cipher list) and international best practices. All government
+    data stored in the cloud service shall be encrypted using approved methods.
+
+guidance:
+  prose: |
+    ISMAP mandates compliance with CRYPTREC (Cryptography Research and Evaluation
+    Committees) recommendations, which is the Japanese government standard for
+    approved cryptographic algorithms. This list is maintained by NICT and IPA
+    and is functionally equivalent to NIST-approved algorithms but includes
+    algorithms such as Camellia alongside AES. Cloud service providers must
+    demonstrate that encryption is applied consistently across all data
+    storage and transmission paths. The encryption policy must address key
+    management lifecycle, including generation, distribution, storage, rotation,
+    and destruction.
+
+references:
+  - citation: "ISMAP Management Criteria, CRY-01"
+    url: "https://www.ismap.go.jp/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Enforce encryption at rest for all storage services using AES-256 or
+      CRYPTREC-approved algorithms. Configure TLS 1.2 or higher for all
+      data in transit. Implement centralized key management using a
+      dedicated KMS. Automate encryption policy enforcement through
+      infrastructure-as-code templates that require encryption parameters.
+    tools:
+      - vault
+      - aws-kms
+      - terraform
+      - cert-manager
+
+  devsecops:
+    prose: |
+      Scan infrastructure-as-code for unencrypted storage resources and
+      unencrypted communication channels. Validate TLS configurations in
+      CI/CD pipelines. Detect use of deprecated cryptographic algorithms
+      or weak key lengths in application code and configuration.
+    tools:
+      - checkov
+      - tfsec
+      - trivy
+      - gitlab-ci
+
+  secops:
+    prose: |
+      Monitor for cryptographic compliance across all cloud services.
+      Alert on unencrypted data stores, expired certificates, or use
+      of deprecated algorithms. Track certificate lifecycle and key
+      rotation schedules. Generate cryptographic compliance reports for
+      ISMAP audit evidence.
+    tools:
+      - qualys
+      - prisma-cloud
+      - splunk
+      - venafi
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a-8.24"]
+    relationship: derived-from
+  - framework_id: nist-800-53
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped
+  - framework_id: fedramp
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped

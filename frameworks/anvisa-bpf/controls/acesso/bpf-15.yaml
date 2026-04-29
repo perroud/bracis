@@ -1,0 +1,120 @@
+id: bpf-15
+family: acesso
+title: "User Lifecycle Management"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    O ciclo de vida de usuários de sistemas computadorizados de BPF
+    deve ser gerenciado por procedimento formal que abranja a criação
+    de contas, atribuição de perfis de acesso, treinamento obrigatório
+    antes da concessão de acesso, revisão periódica de acessos, e
+    desativação de contas.
+
+    A criação de novos acessos deve exigir solicitação formal do
+    gestor da área, aprovação da Garantia da Qualidade, verificação
+    de treinamento concluído no sistema e nos procedimentos
+    operacionais padrão aplicáveis, e ativação apenas após todas as
+    aprovações documentadas.
+
+    Contas de usuários inativos por período superior a noventa dias
+    devem ser automaticamente desabilitadas. Contas de usuários
+    desligados ou transferidos devem ser desativadas no prazo máximo
+    de vinte e quatro horas após a comunicação formal pela área de
+    Recursos Humanos.
+guidance:
+  prose: |
+    User lifecycle management ensures that access to GMP systems is
+    always current, authorized, and traceable. Orphaned accounts,
+    inactive users, and delayed deprovisioning are common regulatory
+    findings.
+
+    User lifecycle stages and requirements:
+    - Provisioning: formal request → approval → training verification
+      → account creation → access assignment → user notification
+    - Modification: change request → impact assessment → approval →
+      implementation → verification
+    - Periodic review: access validation against current role →
+      adjustment or confirmation → documentation
+    - Deprovisioning: trigger event (termination, transfer) → immediate
+      access suspension → access removal → account archival
+
+    Training requirements before access:
+    - System-specific training (navigation, data entry, reporting)
+    - Data integrity awareness (ALCOA+ principles)
+    - SOPs relevant to the user's system functions
+    - Electronic signature responsibilities (if applicable)
+    - Training must be documented and recertified periodically
+
+    Common regulatory findings:
+    - Active accounts for former employees
+    - Access not aligned with current job responsibilities
+    - Missing training documentation for system users
+    - No formal approval for access provisioning
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement automated user lifecycle management integrated
+         with HR system: automated account provisioning based on
+         role assignment, automated disablement on termination or
+         transfer events, and automated inactivity monitoring.
+      2. Configure automated account disablement after 90 days of
+         inactivity across all GMP systems, with notification to
+         the user's manager 14 days before disablement.
+      3. Deploy training-gated access provisioning: system access
+         is technically blocked until the training management system
+         confirms required training completion.
+      4. Implement automated access certification campaigns
+         generating periodic review requests to managers and quality
+         for each user's access profile.
+    tools:
+      - iam-platform
+      - hr-integration
+      - training-management
+      - access-certification
+  devsecops:
+    prose: |
+      1. Test automated user lifecycle workflows: verify that account
+         creation requires all approvals, training gate blocks access
+         until training is confirmed, and deprovisioning executes
+         within 24 hours of trigger.
+      2. Implement automated tests for dormant account detection and
+         disablement, verifying that accounts inactive for 90 days
+         are automatically disabled.
+      3. Validate access provisioning audit trail: verify that every
+         access change is recorded with requestor, approver, timestamp,
+         and justification.
+      4. Test access revocation completeness: verify that
+         deprovisioning removes access from all integrated systems,
+         not just the primary directory.
+    tools:
+      - gitlab-ci
+      - lifecycle-testing
+      - access-audit-testing
+      - deprovisioning-validation
+  secops:
+    prose: |
+      1. Establish user access management SOP covering the complete
+         lifecycle from request through deactivation, with defined
+         roles, timelines, and documentation requirements.
+      2. Conduct periodic user access reviews (quarterly for high-risk
+         systems) verifying that each active account is authorized,
+         trained, and aligned with current job responsibilities.
+      3. Monitor compliance with deprovisioning timelines: track time
+         between HR notification and actual access revocation, escalating
+         delays beyond 24 hours.
+      4. Audit training records ensuring all active system users have
+         current, documented training for their assigned system roles
+         and data integrity responsibilities.
+    tools:
+      - iam-platform
+      - access-review
+      - training-management
+      - grc-platform
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-18"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-16", "controle-A-5-18"]
+    relationship: mapped

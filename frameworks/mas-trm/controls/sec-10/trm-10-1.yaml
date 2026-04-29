@@ -1,0 +1,138 @@
+id: trm-10-1
+family: sec-10
+title: "Data and Infrastructure Security"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement security controls to protect
+    its data, networks, endpoints, and infrastructure from unauthorized
+    access, modification, and exfiltration.
+  parts:
+    - id: trm-10-1.1
+      label: "10.1.1"
+      prose: >-
+        The institution shall implement network security controls including
+        network segmentation, firewalls, intrusion detection/prevention
+        systems (IDS/IPS), and secure network architecture. Critical
+        systems shall be isolated in dedicated network segments with
+        controlled access points.
+    - id: trm-10-1.2
+      label: "10.1.2"
+      prose: >-
+        The institution shall classify data based on sensitivity and
+        implement data protection controls proportionate to the
+        classification level. Data loss prevention (DLP) controls shall
+        be implemented to detect and prevent unauthorized data
+        exfiltration through network, email, endpoint, and cloud channels.
+    - id: trm-10-1.3
+      label: "10.1.3"
+      prose: >-
+        The institution shall implement endpoint security controls
+        including anti-malware, host-based intrusion detection, endpoint
+        detection and response (EDR), and device management for all
+        endpoints accessing corporate systems. Unmanaged devices shall
+        be restricted from accessing sensitive systems.
+    - id: trm-10-1.4
+      label: "10.1.4"
+      prose: >-
+        The institution shall implement security hardening baselines for
+        all systems including servers, databases, network devices, and
+        containers. Configurations shall be monitored for drift from
+        baselines and unauthorized changes shall be investigated.
+    - id: trm-10-1.5
+      label: "10.1.5"
+      prose: >-
+        The institution shall implement patch management processes to
+        ensure timely application of security patches. Critical security
+        patches shall be applied within defined timelines based on risk
+        assessment. Compensating controls shall be applied where patches
+        cannot be deployed immediately.
+
+guidance:
+  prose: >-
+    Defense in depth requires layered controls across network, endpoint,
+    data, and infrastructure layers. Network segmentation limits lateral
+    movement after a breach. DLP must cover all egress channels including
+    cloud storage and collaboration tools that are commonly overlooked.
+    Endpoint security must evolve beyond signature-based anti-malware to
+    behavior-based EDR for detecting advanced threats. Security hardening
+    baselines should be based on CIS Benchmarks or equivalent standards.
+    Patch management timelines must be risk-based; applying the same
+    timeline to all patches is neither practical nor effective.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 10"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "MAS Notice on Cyber Hygiene (CMG-N02) - Security Patching"
+    url: "https://www.mas.gov.sg/regulation/notices/notice-cmg-n02"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation through Kubernetes network policies,
+      service mesh mTLS, and cloud VPC architecture defined in
+      infrastructure-as-code. Deploy security hardening baselines for
+      container images using distroless or minimal base images, scanned
+      and validated in the CI/CD pipeline. Implement automated patch
+      management through image rebuild pipelines triggered by base image
+      updates. Configure infrastructure-as-code scanning to enforce
+      security baselines and detect misconfigurations before deployment.
+      Implement DLP controls at the platform level through network
+      policies and egress filtering.
+    tools:
+      - terraform
+      - kubernetes
+      - istio
+      - checkov
+      - tfsec
+      - trivy
+      - falco
+
+  devsecops:
+    prose: >-
+      Integrate container image scanning into CI/CD pipelines to detect
+      vulnerabilities and misconfigurations before deployment. Implement
+      infrastructure-as-code scanning for security baseline compliance.
+      Configure dependency scanning to identify vulnerable libraries
+      and enforce patch timelines through pipeline policies. Implement
+      automated security hardening validation as a pipeline stage.
+      Generate patch compliance reports from pipeline execution data
+      showing patch currency across all deployed components.
+    tools:
+      - gitlab-ci
+      - gitlab-container-scanning
+      - gitlab-dependency-scanning
+      - trivy
+      - checkov
+      - tfsec
+      - grype
+
+  secops:
+    prose: >-
+      Operate network monitoring through IDS/IPS and SIEM correlation
+      to detect unauthorized access, lateral movement, and data
+      exfiltration. Deploy and manage EDR solutions across all endpoints
+      with centralized alerting and response. Monitor patch compliance
+      across the infrastructure and generate reports on patch currency
+      and remediation timelines. Investigate security hardening drift
+      detected by automated scanning. Manage DLP alerts and investigate
+      potential data exfiltration incidents.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - crowdstrike
+      - falco
+      - nessus
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SI-2", "SI-3", "SI-4", "AC-4", "MP-4"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.7", "a8.8", "a8.9", "a8.12", "a8.20", "a8.22", "a8.23"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-7", "art-9"]
+    relationship: supports

@@ -1,0 +1,120 @@
+id: gsr-4
+family: gsr
+title: "Information Supplied with the Device — Labelling and IFU"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    Each device shall be accompanied by the information needed to identify
+    the device and its manufacturer, and by any safety and performance
+    information relevant to the user, or any other person, as appropriate.
+    Such information may appear on the device itself, on the packaging or
+    in the instructions for use, and shall, if the manufacturer has a
+    website, be made available and kept up to date on the website, taking
+    into account the following:
+
+    (a) The medium, format, content, legibility and location of the label
+    and instructions for use shall be appropriate to the particular device,
+    its intended purpose and the technical knowledge, experience, education
+    or training of the intended user(s). In particular, instructions for
+    use shall be written in terms readily understood by the intended user
+    and, where appropriate, supplemented with drawings and diagrams.
+
+    (b) The information to be supplied on the label shall be provided on
+    the device itself. If this is not practicable or appropriate, some or
+    all of the information may appear on the packaging for each unit, and/or
+    on the packaging of multiple devices.
+
+    For software-based devices, the label shall include the software version
+    identifier, and for devices incorporating electronic programmable
+    systems or software that are devices in themselves, the release notes
+    and change history shall be made available to users.
+guidance:
+  prose: |
+    Annex I, Chapter III, Sections 23.1–23.4 establish comprehensive
+    labelling and instructions for use (IFU) requirements. For software
+    medical devices, key requirements include:
+
+    - Unique software version identification visible to the user.
+    - Release notes documenting changes, known issues, and resolved
+      defects for each software version.
+    - Instructions for use covering installation, configuration,
+      intended use conditions, contraindications, warnings, and
+      maintenance/update procedures.
+    - Residual risk information communicated to users.
+    - Hardware/software environment requirements and compatibility
+      information.
+
+    For SaMD (Software as a Medical Device), the "label" includes the
+    digital interface elements that communicate device identity, version,
+    and safety information to the user within the application.
+references:
+  - citation: "EU MDR 2017/745, Annex I, Chapter III, Sections 23.1–23.4"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement automated version tagging in the CI/CD pipeline
+         using semantic versioning (SemVer) that embeds the version
+         identifier into the software build artifacts, user interface,
+         and API response headers.
+      2. Configure automated release note generation from commit
+         messages and merge request descriptions, categorizing changes
+         into features, fixes, security patches, and known issues.
+      3. Deploy a documentation-as-code pipeline that generates and
+         publishes IFU, release notes, and system requirements from
+         source-controlled markdown or structured data files.
+      4. Maintain a centralized artifact repository with signed builds,
+         each linked to its corresponding release notes, IFU version,
+         and regulatory documentation.
+    tools:
+      - semantic-release
+      - gitlab-releases
+      - mkdocs
+      - artifact-registry
+  devsecops:
+    prose: |
+      1. Enforce commit message conventions (Conventional Commits)
+         that enable automated changelog generation and regulatory
+         traceability between code changes and release documentation.
+      2. Implement pipeline gates that block releases missing required
+         documentation artifacts: release notes, updated IFU, version
+         manifest, and compatibility matrix.
+      3. Automate SBOM (Software Bill of Materials) generation for
+         each release, listing all third-party components, their
+         versions, and license information.
+      4. Configure automated checks that verify the software version
+         displayed in the UI matches the build version and the version
+         registered in the regulatory documentation.
+    tools:
+      - conventional-commits
+      - gitlab-ci
+      - syft
+      - cosign
+      - sbom-tooling
+  secops:
+    prose: |
+      1. Maintain a document control system for all labelling and IFU
+         documents with version control, review/approval workflows,
+         and distribution records.
+      2. Establish a change control process that evaluates whether
+         software changes require IFU updates, label changes, or
+         notification to users and competent authorities.
+      3. Conduct periodic reviews of labelling and IFU accuracy
+         against the current software version and known issues list,
+         documenting review outcomes in the QMS.
+      4. Implement a mechanism for users to report labelling errors
+         or IFU deficiencies, feeding into the post-market surveillance
+         process.
+    tools:
+      - document-management
+      - change-control
+      - regulatory-information-management
+      - complaint-management
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-19"]
+    relationship: mapped
+  - framework_id: fda-21-cfr-11
+    articles: ["11.10"]
+    relationship: mapped

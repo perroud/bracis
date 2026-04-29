@@ -1,0 +1,123 @@
+id: art-20
+family: cap-4
+title: "Padrao de Comunicacao e Protocolos"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 20. A comunicação entre sistemas TISS deve seguir o padrão de
+    protocolos definido pela ANS, incluindo regras para endereçamento,
+    roteamento, controle de fluxo e tratamento de erros.
+
+    Parágrafo 1. Cada transação TISS deve conter:
+    I - Cabeçalho (header) com identificação do emissor, receptor,
+    data/hora, versão do padrão e número de protocolo;
+    II - Corpo (body) com os dados da transação conforme schema XSD;
+    III - Hash de integridade calculado sobre o corpo da mensagem.
+
+    Parágrafo 2. O receptor deve retornar protocolo de recebimento
+    confirmando a recepção da transação, incluindo:
+    I - Número de protocolo único;
+    II - Data e hora de recebimento;
+    III - Status de validação (aceito, rejeitado com motivo, pendente).
+
+    Parágrafo 3. Transações rejeitadas devem incluir código de erro
+    e descrição conforme tabela padronizada pela ANS.
+guidance:
+  prose: |
+    O art. 20 define o protocolo de comunicacao sobre o qual as transacoes
+    TISS trafegam, incluindo estrutura de mensagem e controle de fluxo.
+
+    **Estrutura da mensagem TISS:**
+    ```
+    <mensagemTISS>
+      <cabecalho>
+        <identificacaoTransacao>
+          <tipoTransacao>ENVIO_LOTE_GUIAS</tipoTransacao>
+          <sequencialTransacao>12345</sequencialTransacao>
+          <dataRegistroTransacao>2024-01-15</dataRegistroTransacao>
+        </identificacaoTransacao>
+        <origem>...</origem>
+        <destino>...</destino>
+      </cabecalho>
+      <corpo>
+        <!-- guias, lotes, etc. -->
+      </corpo>
+      <hash>SHA256_DO_CORPO</hash>
+    </mensagemTISS>
+    ```
+
+    **Protocolo de recebimento:**
+    Toda mensagem TISS recebida gera um protocolo que serve como
+    comprovante de entrega. O numero de protocolo e o identificador
+    unico para rastreamento da transacao.
+
+    **Controle de fluxo:**
+    - Mensagens sinicronas: resposta imediata com protocolo
+    - Mensagens assincronas: protocolo de recebimento + consulta
+      posterior de resultado
+    - Reenvio: mesma transacao com mesmo identificador = idempotente
+
+    **Tabela de erros padronizada:**
+    Codigos de erro definidos pela ANS por categoria:
+    - 1xx: erros de validacao de schema
+    - 2xx: erros de regra de negocio
+    - 3xx: erros de autenticacao/autorizacao
+    - 4xx: erros de sistema/infraestrutura
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao do protocolo de comunicacao TISS:**
+      1. Implementar gerador de cabecalho TISS que preencha
+         automaticamente campos de identificacao (emissor, receptor,
+         protocolo, timestamp, versao) em cada transacao.
+      2. Configurar calculo de hash SHA-256 como middleware obrigatorio
+         no pipeline de envio/recepcao de mensagens.
+      3. Implementar servico de protocolo que gere numeros unicos,
+         armazene historico e permita consulta de status.
+      4. Configurar idempotencia: reprocessamento de mensagem com
+         mesmo identificador retorna resultado anterior sem duplicar.
+    tools:
+      - message-builder
+      - hash-middleware
+      - protocol-service
+      - idempotency-store
+  devsecops:
+    prose: |
+      **Validacao de protocolo no pipeline:**
+      1. Implementar testes que validem estrutura completa da mensagem
+         TISS: cabecalho, corpo e hash de integridade.
+      2. Criar testes de idempotencia: envio duplicado da mesma
+         transacao deve retornar mesmo protocolo sem duplicacao.
+      3. Automatizar validacao de codigos de erro conforme tabela ANS
+         para cada cenario de falha.
+      4. Incluir testes de integridade: modificar corpo da mensagem
+         e verificar que hash invalido e detectado.
+    tools:
+      - message-validation
+      - idempotency-testing
+      - error-code-validation
+      - integrity-testing
+  secops:
+    prose: |
+      **Monitoramento de protocolo TISS:**
+      1. Monitorar em tempo real o fluxo de transacoes TISS, com
+         dashboards por tipo de transacao, operadora e prestador.
+      2. Implementar alertas para anomalias: picos de rejeicao,
+         timeouts, falhas de integridade (hash invalido).
+      3. Manter registro de todos os protocolos emitidos e recebidos
+         com retencao de 5 anos para rastreabilidade.
+      4. Auditar periodicamente a taxa de erros por categoria e tomar
+         acoes corretivas para erros recorrentes.
+    tools:
+      - transaction-monitoring
+      - anomaly-detection
+      - protocol-registry
+      - error-analytics
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1101"]
+    relationship: mapped

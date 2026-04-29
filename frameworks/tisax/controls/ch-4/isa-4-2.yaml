@@ -1,0 +1,131 @@
+id: isa-4.2
+family: ch-4
+title: "Cryptography"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall develop and implement a policy on the use
+    of cryptographic controls for protection of information. A policy
+    on the use, protection, and lifetime of cryptographic keys shall
+    be developed and implemented through their whole lifecycle.
+    Cryptographic controls shall be used to protect information in
+    transit and at rest in accordance with the information
+    classification scheme and applicable regulatory requirements.
+
+guidance:
+  prose: >-
+    VDA ISA requires that the organization defines which cryptographic
+    algorithms and key lengths are approved for use, aligned with
+    current industry standards (BSI TR-02102, NIST SP 800-57). The
+    cryptography policy must address: approved algorithms and key
+    lengths, key generation procedures, key distribution and storage,
+    key rotation schedules, key revocation and destruction, and
+    management of cryptographic hardware (HSMs). For automotive
+    data classified as confidential or above, encryption in transit
+    (TLS 1.2+) and at rest (AES-256) is mandatory. Prototype-related
+    data may require additional cryptographic measures such as
+    end-to-end encryption for email and file transfers. At AL3,
+    auditors verify that deprecated algorithms (MD5, SHA-1, DES,
+    3DES, RC4) are not in use, that key management procedures are
+    followed, and that cryptographic controls match the data
+    classification requirements. The organization must have a
+    documented plan for crypto-agility to address future algorithm
+    deprecation and quantum computing threats.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of cryptographic policy and implementation."
+  al2:
+    applicability: required
+    notes: "Auditor verifies cryptographic standards, key management, and algorithm compliance."
+  al3:
+    applicability: required
+    notes: "On-site verification of cryptographic implementations, HSM usage, and deprecated algorithm absence."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 4.2"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.8.24"
+    url: "https://www.iso.org/standard/27001"
+  - citation: "BSI TR-02102 — Cryptographic Mechanisms"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/Technische-Richtlinien/TR-nach-Thema-sortiert/tr02102/tr-02102.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ for all service-to-service communication
+      using service mesh (Istio, Linkerd) with automatic mTLS
+      enforcement. Implement centralized certificate management
+      using cert-manager with automated rotation. Store all
+      encryption keys in a dedicated secrets management system
+      (HashiCorp Vault, AWS KMS, Azure Key Vault) with HSM-backed
+      key storage for production environments. Use policy-as-code
+      to enforce approved cryptographic algorithms across all
+      platform components, rejecting deployments that use deprecated
+      algorithms. Implement automated scanning of TLS configurations
+      across all endpoints to detect weak ciphers or expired
+      certificates. Define and enforce encryption-at-rest for all
+      persistent storage (database encryption, volume encryption,
+      object storage encryption).
+    tools:
+      - vault
+      - cert-manager
+      - istio
+      - linkerd
+      - kyverno
+      - open-policy-agent
+      - aws-kms
+      - azure-keyvault
+
+  devsecops:
+    prose: >-
+      Integrate cryptographic compliance checks into CI/CD pipelines
+      to detect hardcoded secrets, weak cryptographic algorithm usage
+      in code, and insecure TLS configurations in infrastructure
+      definitions. Use SAST tools configured with custom rules to
+      flag usage of deprecated algorithms (MD5, SHA-1, DES) in
+      application code. Scan container images and infrastructure
+      templates for insecure cryptographic configurations before
+      deployment. Implement secret scanning in pre-commit hooks and
+      pipeline stages to prevent credential leakage. Enforce signed
+      commits, signed container images, and signed artifacts
+      throughout the delivery pipeline to ensure integrity.
+    tools:
+      - gitleaks
+      - trufflehog
+      - semgrep
+      - checkov
+      - trivy
+      - cosign
+      - sigstore
+
+  secops:
+    prose: >-
+      Monitor for usage of deprecated cryptographic algorithms
+      across the network by analyzing TLS handshake metadata in
+      network traffic logs. Alert on certificate expiration events
+      and track certificate lifecycle compliance. Implement
+      continuous scanning of all externally and internally facing
+      endpoints for weak TLS configurations (SSLyze, testssl).
+      Monitor key management system audit logs for unauthorized
+      key access, export, or deletion. Integrate cryptographic
+      compliance status into the security posture dashboard.
+      Maintain an inventory of all cryptographic assets (certificates,
+      keys, HSMs) with automated expiration tracking and alerting.
+    tools:
+      - splunk
+      - elastic-siem
+      - sslyze
+      - qualys-ssl-labs
+      - vault
+      - venafi
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped

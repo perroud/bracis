@@ -1,0 +1,93 @@
+id: slsa-build-l1-attestation
+family: build
+title: "Build L1: Attestation Format"
+class: SLSA
+
+baselines: [build-l1, build-l2, build-l3]
+
+statement:
+  prose: >-
+    The provenance must be expressed in a recognized attestation format, specifically
+    the in-toto attestation framework using the SLSA Provenance predicate type. The
+    attestation must include the builder identity, the build configuration source, the
+    invocation parameters, and the output artifact digests. Using a standardized format
+    enables automated verification and interoperability across toolchains and
+    organizations.
+
+guidance:
+  prose: >-
+    Standardized attestation formats are critical for interoperability. The SLSA
+    specification mandates the in-toto attestation framework with SLSA Provenance as
+    the predicate type. This format provides a structured envelope that separates the
+    attestation metadata from the payload, enabling signature verification independently
+    of content parsing. Organizations should adopt the latest SLSA Provenance predicate
+    version (v1) and ensure all tooling in the pipeline can produce and consume this
+    format. Custom or proprietary formats should be avoided as they prevent cross-
+    organization verification and tool ecosystem interoperability.
+
+references:
+  - citation: "in-toto Attestation Framework"
+    url: "https://github.com/in-toto/attestation"
+  - citation: "SLSA Provenance Predicate v1"
+    url: "https://slsa.dev/provenance/v1"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Standardize on in-toto attestation bundles as the canonical provenance format across
+      all build systems. Configure CI/CD platforms to produce SLSA Provenance v1 predicates
+      using slsa-github-generator or equivalent tooling. Store attestation bundles in OCI
+      registries as referrer artifacts or in dedicated attestation stores. Implement schema
+      validation for all attestations before they are accepted into the artifact store.
+      Ensure attestation bundles include complete build environment metadata, including
+      builder image digests, to enable reproducibility analysis.
+    tools:
+      - in-toto
+      - slsa-github-generator
+      - cosign
+      - oras
+      - harbor
+      - artifactory
+
+  devsecops:
+    prose: >-
+      Add attestation format validation to CI/CD pipelines as a quality gate. Use
+      slsa-verifier to check that generated attestations conform to the SLSA Provenance
+      schema before publishing. Implement pre-merge checks that verify provenance
+      attestations are well-formed for any pipeline that produces releasable artifacts.
+      Maintain a library of attestation templates for common build types (container images,
+      Go binaries, npm packages) to ensure consistency. Run attestation format linting in
+      pull request pipelines to catch issues early.
+    tools:
+      - slsa-verifier
+      - cosign
+      - github-actions
+      - gitlab-ci
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Monitor attestation stores for non-conforming formats that could indicate tampering
+      or misconfigured pipelines. Validate that all production-deployed artifacts have
+      attestations matching the expected SLSA Provenance schema version. Integrate
+      attestation format checks into the artifact promotion workflow so that only properly
+      attested artifacts can reach production. Maintain a registry of expected builder
+      identities and alert on attestations from unknown builders.
+    tools:
+      - slsa-verifier
+      - cosign
+      - rekor
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-4", "SR-4(3)"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PS.1.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.4"]
+    relationship: supports

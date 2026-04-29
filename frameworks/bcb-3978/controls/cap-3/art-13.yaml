@@ -1,0 +1,129 @@
+id: art-13
+family: cap-3
+title: "Identificacao do Beneficiario Final"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 13. As instituições mencionadas no art. 1 devem adotar medidas para identificar
+    o beneficiário final de clientes pessoa jurídica.
+
+    § 1. Consideram-se beneficiários finais, no mínimo, as pessoas naturais que,
+    direta ou indiretamente:
+    I - possuem participação societária, direta ou indireta, superior a 25% do capital;
+    II - exercem controle significativo sobre a pessoa jurídica; ou
+    III - em nome das quais transações são conduzidas.
+
+    § 2. Quando não for possível identificar o beneficiário final após a adoção dos
+    procedimentos previstos neste artigo, a instituição deve classificar o cliente em
+    categoria de maior risco.
+guidance:
+  prose: |
+    O art. 13 trata especificamente da identificacao do beneficiario final (ultimate
+    beneficial owner - UBO), uma das obrigacoes mais complexas e importantes de PLD/FT.
+
+    **Criterios de identificacao (ss 1):**
+    Tres criterios cumulativos (qualquer um e suficiente):
+    1. Participacao societaria > 25%: criterio quantitativo objetivo. Deve-se
+       calcular participacao direta e indireta (cadeia societaria).
+    2. Controle significativo: criterio qualitativo. Acordos de acionistas,
+       procuracoes com poderes amplos, controle de gestao de fato.
+    3. Transacao em nome de terceiro: quando a PJ e mero veiculo para
+       transacoes de pessoa natural especifica.
+
+    **Cadeia societaria:**
+    A identificacao deve percorrer toda a cadeia societaria ate encontrar a
+    pessoa natural no topo. Estruturas tipicas que dificultam:
+    - Holdings em cascata
+    - Empresas offshore (BVI, Panama, Ilhas Cayman)
+    - Trustes (onde o conceito de "propriedade" e diferente)
+    - Fundacoes (sem quotistas/acionistas)
+    - SPEs (Special Purpose Entities)
+
+    **Impossibilidade de identificacao (ss 2):**
+    Se, apos esforcos razoaveis, o beneficiario final nao puder ser identificado,
+    o cliente deve ser classificado em categoria de MAIOR risco. Isso implica:
+    - Enhanced due diligence
+    - Monitoramento reforcado
+    - Aprovacao de nivel hierarquico superior para manter relacao
+    - Documentacao da justificativa para nao-identificacao
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Engine de resolucao de beneficiario final:**
+      1. Algoritmo recursivo de travessia de cadeia societaria que:
+         - Percorre todas as camadas ate encontrar pessoa natural
+         - Calcula participacao indireta (produto das participacoes em cada nivel)
+         - Identifica controle significativo por regras de negocio
+         - Sinaliza quando cadeia excede limite configuravel de niveis
+      2. Integracao com fontes de dados para obter quadro societario:
+         - Receita Federal (CNPJ): socios nacionais
+         - Juntas comerciais: contrato social/estatuto
+         - Registros comerciais internacionais: empresas offshore
+         - Bases comerciais (ex: Bureau van Dijk, Dun & Bradstreet)
+      3. Grafo de relacionamento (graph database) para visualizacao da
+         cadeia societaria e deteccao de ciclos.
+      4. Alerta automatico quando participacao indireta excede 25%.
+
+      **Tratamento de casos complexos:**
+      5. Workflow para analise manual de estruturas nao-resolvidas automaticamente.
+      6. Classificacao automatica em maior risco quando UBO nao identificado.
+      7. Registro de justificativa para nao-identificacao com aprovacao do
+         compliance officer.
+      8. Scheduler de re-tentativa periodica para UBOs nao identificados.
+    tools:
+      - ubo-resolution-engine
+      - graph-database
+      - kyc-system
+      - data-enrichment-api
+  devsecops:
+    prose: |
+      **Testes do motor de resolucao:**
+      1. Testes com estruturas societarias de complexidade crescente:
+         - Nivel 1: PJ -> PF (direto)
+         - Nivel 2: PJ -> PJ -> PF
+         - Nivel 3+: cadeias profundas
+         - Circular: PJ -> PJ -> PJ -> PJ (ciclo)
+         - Mista: PJ nacional -> PJ offshore -> trust -> PF
+      2. Testes de calculo de participacao indireta com validacao matematica.
+      3. Testes de integracao com cada fonte de dados.
+      4. Testes de performance com grandes volumes de PJ.
+
+      **Seguranca dos dados de UBO:**
+      5. Dados de beneficiario final classificados como altamente confidenciais.
+      6. Criptografia adicional para dados de UBO em repouso.
+      7. Audit trail granular de acesso a dados de beneficiario final.
+      8. Testes de penetracao no modulo de resolucao de UBO.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - gitlab-sast
+  secops:
+    prose: |
+      **Monitoramento de completude de UBO:**
+      1. Dashboard de completude: percentual de PJ com UBO identificado.
+      2. Relatorio de PJ com UBO nao identificado (por tempo, por risco).
+      3. Escalacao automatica para compliance officer quando prazo de
+         identificacao excede limite.
+      4. Auditoria por amostragem da qualidade da identificacao de UBO.
+
+      **Governanca de UBO:**
+      5. Revisao anual de UBOs identificados para validar atualidade.
+      6. Monitoramento de mudancas em quadros societarios que afetem UBO.
+      7. Verificacao de UBOs contra listas restritivas e PEP.
+      8. Relatorio ao diretor responsavel sobre status de identificacao de UBO.
+    tools:
+      - aml-platform
+      - grc-platform
+      - sanctions-screening
+      - reporting-dashboard
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-4", "IA-12", "PM-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

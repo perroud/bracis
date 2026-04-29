@@ -1,0 +1,100 @@
+id: art-3
+family: cap-1
+title: "ICP-Brasil PKI Hierarchy Establishment"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 1º da MP 2.200-2/2001. Fica instituída a Infraestrutura de Chaves
+    Públicas Brasileira — ICP-Brasil, para garantir a autenticidade, a
+    integridade e a validade jurídica de documentos em forma eletrônica, das
+    aplicações de suporte e das aplicações habilitadas que utilizem certificados
+    digitais, bem como a realização de transações eletrônicas seguras.
+
+    Art. 2º da MP 2.200-2/2001. A ICP-Brasil, cuja organização será definida
+    em regulamento, será composta por uma autoridade gestora de políticas e
+    pela cadeia de autoridades certificadoras composta pela Autoridade
+    Certificadora Raiz — AC Raiz, pelas Autoridades Certificadoras — AC e
+    pelas Autoridades de Registro — AR.
+guidance:
+  prose: |
+    Articles 1 and 2 of MP 2.200-2/2001 establish the legal foundation of
+    the Brazilian Public Key Infrastructure (ICP-Brasil), which is the backbone
+    for qualified electronic signatures under Lei 14.063/2020.
+
+    **ICP-Brasil hierarchy:**
+    - **Comite Gestor (CG-ICP-Brasil):** Policy management authority that
+      defines rules, criteria, and operational standards for the PKI.
+    - **AC Raiz (Root CA):** Operated by ITI (Instituto Nacional de Tecnologia
+      da Informacao). Issues certificates only to first-level CAs.
+    - **AC (Certification Authorities):** Issue end-entity certificates to
+      individuals and organizations. Multiple levels are allowed.
+    - **AR (Registration Authorities):** Perform identity verification and
+      certificate request validation on behalf of CAs.
+
+    **Legal guarantees provided by ICP-Brasil:**
+    - Authenticity: proof of the signer's identity
+    - Integrity: proof that the document was not altered after signing
+    - Legal validity: automatic legal presumption equivalent to handwritten
+      signature (no need for party acceptance)
+
+    **Trust model:**
+    ICP-Brasil uses a hierarchical trust model anchored at AC Raiz.
+    All certificate chains must terminate at AC Raiz for the signature
+    to qualify as "qualified" under Lei 14.063/2020.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integrate ICP-Brasil trust chain into platform infrastructure:**
+      1. Import and maintain the AC Raiz certificate bundle in all systems
+         that validate ICP-Brasil signatures (trust store management).
+      2. Implement Certificate Revocation List (CRL) and OCSP responder
+         integration for real-time certificate status checking.
+      3. Configure TLS/mTLS with ICP-Brasil certificates for government
+         system integrations requiring mutual authentication.
+      4. Automate trust store updates when ICP-Brasil publishes new CA
+         certificates or revocations via ITI distribution points.
+    tools:
+      - certificate-manager
+      - trust-store-automation
+      - ocsp-responder
+      - mtls-gateway
+  devsecops:
+    prose: |
+      **PKI chain validation in development and deployment:**
+      1. Include ICP-Brasil CA bundle as a versioned artifact in the
+         repository, with automated update checks.
+      2. Add pipeline steps that validate ICP-Brasil certificate chains
+         against the current AC Raiz during integration testing.
+      3. Implement automated tests for CRL/OCSP checking to ensure
+         revoked certificates are properly rejected.
+      4. Include certificate chain depth and path validation in security
+         scanning profiles.
+    tools:
+      - gitlab-ci
+      - certificate-linting
+      - integration-testing
+      - security-scanning
+  secops:
+    prose: |
+      **PKI trust operations and monitoring:**
+      1. Monitor AC Raiz and intermediate CA certificate expiration dates
+         with alerts at 180, 90, and 30 days before expiry.
+      2. Subscribe to ITI security bulletins for CA compromise or
+         revocation notifications.
+      3. Maintain inventory of all ICP-Brasil certificates in use across
+         the organization, including issuing CA and expiration.
+      4. Implement certificate transparency log monitoring for
+         unauthorized certificate issuance under the organization's domain.
+    tools:
+      - certificate-monitoring
+      - pki-inventory
+      - threat-intelligence
+      - ct-log-monitoring
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

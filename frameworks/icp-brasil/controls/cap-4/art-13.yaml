@@ -1,0 +1,119 @@
+id: art-13
+family: cap-4
+title: "Integration with Gov.br Digital Identity Platform"
+class: ICP-BRASIL
+baselines: [government]
+statement:
+  prose: |
+    Art. 13 da Lei 14.063/2020. O Poder Executivo federal promoverá a
+    integração dos mecanismos de assinatura eletrônica de que trata esta
+    Lei com a plataforma de governo digital de que trata a Lei nº 14.129,
+    de 29 de março de 2021.
+
+    § 1º A integração de que trata o caput deste artigo deverá permitir
+    que o cidadão realize a assinatura eletrônica a partir de sua conta
+    de acesso à plataforma gov.br.
+
+    § 2º Os entes públicos federais deverão utilizar preferêncialmente a
+    plataforma gov.br como mecanismo de assinatura eletrônica em suas
+    interações com cidadãos e empresas.
+
+    Art. 3º da Lei 14.063/2020, § 2º. O disposto nesta Lei aplica-se
+    aos Estados, ao Distrito Federal e aos Municípios que aderirem à
+    plataforma gov.br ou que disponibilizarem mecanismo próprio de
+    assinatura eletrônica, nos termos desta Lei.
+guidance:
+  prose: |
+    Article 13 and related provisions mandate the integration of electronic
+    signatures with the gov.br digital government platform.
+
+    **Gov.br as signature hub:**
+    The gov.br platform serves as the central mechanism for electronic
+    signatures in the Brazilian federal government. Citizens sign documents
+    using their gov.br account, with the signature level determined by
+    their account verification level.
+
+    **Gov.br signature levels mapping:**
+    - **Bronze (selo bronze):** Self-registration with CPF validation.
+      Supports simple electronic signature.
+    - **Silver (selo prata):** Validated against government databases
+      (INSS, SIGEPE, internet banking). Supports simple and advanced
+      electronic signatures.
+    - **Gold (selo ouro):** Biometric validation (TSE facial recognition)
+      or ICP-Brasil certificate. Supports advanced electronic signatures
+      (gold with certificate also supports qualified).
+
+    **Federal agency obligation:**
+    Federal agencies MUST preferentially use gov.br for citizen-facing
+    signature needs. Custom solutions are allowed but gov.br should be
+    the default.
+
+    **Subnational adoption:**
+    States, Federal District, and municipalities can opt into gov.br or
+    implement their own compliant mechanisms. Many have adopted gov.br
+    to avoid building separate infrastructure.
+
+    **Technical integration:**
+    Gov.br provides APIs (OpenID Connect, OAuth 2.0, and Assinatura
+    Eletronica API) for integration with government systems.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gov.br platform integration:**
+      1. Implement gov.br Login integration using OpenID Connect protocol,
+         supporting all three verification levels (bronze, silver, gold).
+      2. Integrate gov.br Assinatura Eletronica API for document signing,
+         mapping account levels to signature levels automatically.
+      3. Implement fallback mechanism for gov.br unavailability: queue
+         signature requests and retry, or offer alternative authentication
+         with equivalent assurance level.
+      4. Build signature level check middleware that validates whether
+         the citizen's gov.br account level meets the minimum requirement
+         for the requested operation.
+      5. For subnational governments: implement federation with gov.br
+         or build compliant alternative with equivalent identity assurance.
+    tools:
+      - gov-br-login-sdk
+      - gov-br-assinatura-api
+      - oidc-integration
+      - fallback-mechanism
+      - identity-federation
+  devsecops:
+    prose: |
+      **Gov.br integration quality assurance:**
+      1. Implement test suite against gov.br staging environment covering
+         all three account levels and signature operations.
+      2. Test signature level enforcement: verify system correctly maps
+         gov.br account levels to signature capabilities.
+      3. Add integration tests for gov.br API error scenarios: expired
+         sessions, revoked accounts, service unavailability.
+      4. Include gov.br API version compatibility checks in CI/CD
+         pipeline to detect breaking changes early.
+    tools:
+      - gitlab-ci
+      - gov-br-testing
+      - api-compatibility
+      - e2e-testing
+  secops:
+    prose: |
+      **Gov.br integration operations:**
+      1. Monitor gov.br API availability and response times, alerting on
+         degradation that could impact citizen signature flows.
+      2. Track gov.br account level distribution for users of government
+         services to plan signature level requirements.
+      3. Maintain gov.br integration documentation current with API
+         version updates and policy changes.
+      4. Coordinate with SERPRO/DATAPREV (gov.br operators) for incident
+         resolution and planned maintenance windows.
+    tools:
+      - api-monitoring
+      - analytics-dashboard
+      - vendor-management
+      - incident-coordination
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-1", "art-3", "art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-18"]
+    relationship: complements

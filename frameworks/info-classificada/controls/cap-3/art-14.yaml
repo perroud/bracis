@@ -1,0 +1,105 @@
+id: art-14
+family: cap-3
+title: "Secure Transmission of Classified Information"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 14. A transmissão de informação classificada em qualquer grau de
+    sigilo, por qualquer meio, deverá ser feita de forma a garantir que
+    somente o destinatário autorizado a tenha acesso.
+
+    § 1º A transmissão de informação classificada nos graus de sigilo
+    ultrassecreto e secreto deverá utilizar recurso criptográfico
+    adequado ao grau de sigilo.
+
+    § 2º A transmissão de informação classificada no grau de sigilo
+    reservado poderá utilizar recurso criptográfico ou outro meio que
+    garanta a segurança da informação.
+
+    § 3º Quando a transmissão se fizer por meio de rede de computadores,
+    deverá ser utilizado recurso criptográfico compatível com o grau de
+    sigilo da informação transmitida.
+
+    § 4º É vedada a transmissão de informação classificada nos graus de
+    sigilo ultrassecreto e secreto por meio de redes de computadores que
+    não atendam a padrões de segurança definidos pelo Gabinete de
+    Segurança Institucional da Presidência da República.
+guidance:
+  prose: |
+    Article 14 establishes transmission security requirements, with
+    encryption mandates proportional to classification level:
+
+    **Transmission rules:**
+    | Level          | Encryption Required | Network Restrictions         |
+    |----------------|--------------------|-----------------------------|
+    | Ultrassecreta  | Mandatory crypto   | GSI/PR-approved networks only|
+    | Secreta        | Mandatory crypto   | GSI/PR-approved networks only|
+    | Reservada      | Crypto or equivalent| Standard secure networks    |
+
+    **Critical restrictions:**
+    - Ultrassecreta and secreta information CANNOT be transmitted over
+      networks that do not meet GSI/PR security standards
+    - This effectively prohibits transmission over the public internet
+      without approved cryptographic protection
+    - "Recurso criptografico" must be appropriate to the classification
+      level — state algorithms for ultrassecreta
+
+    **Digital network implications:**
+    This article directly impacts network architecture: classified
+    networks must be physically or cryptographically separated from
+    general-purpose networks.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classified network architecture:**
+      1. Implement network segmentation with dedicated classified network
+         segments for ultrassecreta and secreta transmissions.
+      2. Deploy encryption gateways at network boundaries that enforce
+         mandatory encryption for all classified traffic.
+      3. For ultrassecreta/secreta: deploy GSI/PR-approved cryptographic
+         solutions (state algorithms where required).
+      4. For reservada: implement TLS 1.3+ with strong cipher suites
+         as minimum encryption standard.
+      5. Implement network access control that verifies both sender and
+         recipient clearance before allowing classified data transfer.
+    tools:
+      - network-segmentation
+      - encryption-gateway
+      - vpn-classified
+      - tls-management
+  devsecops:
+    prose: |
+      **Secure transmission in CI/CD:**
+      1. Ensure all artifact transfers between pipeline stages use
+         encrypted channels matching the classification level.
+      2. Implement classified artifact signing: all transmitted artifacts
+         include integrity verification (checksums, digital signatures).
+      3. Block pipeline stages from transmitting classified artifacts
+         to unclassified endpoints.
+    tools:
+      - artifact-signing
+      - encrypted-transport
+      - network-policies
+  secops:
+    prose: |
+      **Transmission security monitoring:**
+      1. Monitor classified networks for unauthorized transmission
+         attempts (classified data leaving approved network boundaries).
+      2. Implement DLP (Data Loss Prevention) rules that detect
+         classified content being transmitted over unapproved channels.
+      3. Audit encryption configurations quarterly to verify they meet
+         GSI/PR standards for each classification level.
+      4. Maintain approved network registry for classified transmissions.
+    tools:
+      - dlp
+      - network-monitoring
+      - encryption-audit
+      - approved-network-registry
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-11"]
+    relationship: complements

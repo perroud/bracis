@@ -1,0 +1,95 @@
+id: tds-access-3
+family: tds-access
+title: "Unique Identification and Account Management"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Every individual with access to 3DS system components must be assigned
+    a unique identification (ID). Shared, group, or generic accounts must
+    not be used for administrative access to 3DS systems. Each user account
+    must be associated with a specific individual for accountability
+    purposes. Service accounts used by system components must be uniquely
+    identifiable and restricted to the minimum privileges required. Account
+    lifecycle management procedures must include provisioning, modification,
+    suspension, and revocation processes. Accounts of terminated personnel
+    must be disabled immediately upon termination.
+
+guidance:
+  prose: >-
+    Unique identification ensures that every action within the 3DS
+    environment can be attributed to a specific individual or system
+    component. This accountability is essential for forensic investigation,
+    access auditing, and regulatory compliance. Shared accounts make it
+    impossible to determine who performed a specific action, undermining
+    the entire audit trail. Service accounts must be carefully managed
+    because they often have elevated privileges and operate without
+    interactive user oversight. Prompt account revocation upon termination
+    prevents former personnel from accessing sensitive 3DS systems.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 4 — User Identification"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 4.3 — Account Management"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate all 3DS system access through a centralized identity
+      provider (IdP) that enforces unique user identification. Implement
+      automated account provisioning and de-provisioning through SCIM or
+      directory synchronization. Configure service accounts with unique
+      identifiers, defined owners, and automated credential rotation.
+      Implement privileged access management (PAM) solutions for
+      administrative accounts that provide session recording and
+      just-in-time access. Configure automated account disablement
+      triggered by HR system termination events.
+    tools:
+      - okta
+      - azure-ad
+      - aws-iam
+      - cyberark
+      - hashicorp-vault
+      - teleport
+
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code for shared credentials or generic
+      account configurations. Implement pipeline checks that verify
+      service accounts are uniquely named and scoped to minimum required
+      permissions. Automate detection of hardcoded credentials or shared
+      secrets in application code. Generate compliance reports listing
+      all accounts with 3DS access and their last authentication date.
+    tools:
+      - gitlab-ci
+      - gitleaks
+      - trufflehog
+      - checkov
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor for use of shared or generic accounts within the 3DS
+      environment. Alert on concurrent sessions from the same account
+      (indicating sharing). Conduct periodic access reviews to verify
+      account-to-individual mappings. Monitor for dormant accounts and
+      initiate suspension procedures. Verify that termination procedures
+      are executed within required timeframes through spot audits.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - okta
+      - cyberark
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-8"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "IA-2", "IA-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A5.16", "A5.17", "A5.18"]
+    relationship: mapped

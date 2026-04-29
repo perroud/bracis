@@ -1,0 +1,107 @@
+id: art-8
+family: cap-3
+title: "Certificado Digital ICP-Brasil para Profissionais de Saude"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 8. A assinatura digital de registros no prontuário eletrônico
+    do paciente deve ser realizada exclusivamente com certificado digital
+    emitido por Autoridade Certificadora (AC) credenciada na
+    Infraestrutura de Chaves Públicas Brasileira (ICP-Brasil).
+
+    Parágrafo 1. Os médicos devem utilizar certificado digital que
+    contenha o número de inscrição no Conselho Regional de Medicina
+    (CRM) como atributo do certificado.
+
+    Parágrafo 2. Demais profissionais de saúde devem utilizar certificado
+    digital que contenha o número de inscrição no respectivo conselho
+    profissional.
+
+    Parágrafo 3. Os certificados digitais devem ser de tipo A3
+    (armazenamento em mídia criptográfica) ou A1 (armazenamento em
+    arquivo), conforme política de segurança da instituição.
+guidance:
+  prose: |
+    O art. 8 especifica que so ICP-Brasil e aceito -- nenhuma outra
+    infraestrutura de certificacao tem validade para fins de assinatura
+    de prontuario eletronico.
+
+    **Certificado e-Saude:**
+    O CFM, em parceria com a AC credenciada, oferece o certificado
+    e-Saude, que ja vem com o numero do CRM como atributo OID
+    especifico. Isso permite validacao automatica de que o assinante
+    e medico inscrito e com registro ativo.
+
+    **Tipo A1 vs. A3:**
+    - A1: certificado em arquivo (software), validade 1 ano, menor
+      custo, mais pratico para assinatura em massa. Risco: arquivo
+      pode ser copiado.
+    - A3: certificado em token USB ou smartcard, validade 3 anos,
+      chave privada nao exportavel. Mais seguro, exige dispositivo
+      fisico para assinar.
+
+    **Recomendacao pratica:**
+    Para assinatura de registros clinicos em ambiente hospitalar, A3
+    e mais seguro pois a chave privada nunca sai do dispositivo.
+    Para prescricao eletronica remota (telemedicina), A1 pode ser
+    mais pratico, mas exige controles adicionais de protecao do arquivo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com ICP-Brasil:**
+      1. Integrar com SDK de assinatura digital compativel com
+         ICP-Brasil (ex.: Lacuna PKI Suite, BRy SDK) que suporte
+         certificados A1 e A3.
+      2. Implementar validacao automatica do certificado: cadeia
+         de confianca, validade temporal, status de revogacao
+         (consulta OCSP ou LCR da AC emissora).
+      3. Extrair e validar numero do CRM/conselho profissional
+         do certificado digital, cruzando com cadastro interno
+         de profissionais.
+      4. Suportar leitoras de smartcard e tokens USB em estacoes
+         de trabalho clinicas para certificados A3.
+    tools:
+      - icp-brasil-sdk
+      - ocsp-client
+      - smartcard-middleware
+      - certificate-parser
+  devsecops:
+    prose: |
+      **Testes de integracao com ICP-Brasil:**
+      1. Criar ambiente de testes com certificados de homologacao
+         ICP-Brasil (AC de teste) para validacao sem custo.
+      2. Testar fluxo completo: insercao de token, leitura de
+         certificado, assinatura, validacao, armazenamento.
+      3. Testar cenarios de falha: token removido durante
+         assinatura, certificado expirado, AC revogada.
+      4. Automatizar verificacao de que atributo CRM esta presente
+         e valido no certificado utilizado para assinatura.
+    tools:
+      - gitlab-ci
+      - icp-brasil-test-certs
+      - integration-tests
+      - certificate-validator
+  secops:
+    prose: |
+      **Gestao operacional de certificados:**
+      1. Manter inventario centralizado de certificados digitais
+         de todos os profissionais de saude, com vencimentos.
+      2. Implementar processo de emissao de certificados para
+         novos profissionais como parte do onboarding.
+      3. Revogar imediatamente certificados de profissionais
+         desligados ou com registro profissional suspenso.
+      4. Treinar profissionais sobre uso correto do certificado
+         digital (nao emprestar token, proteger senha PIN).
+    tools:
+      - certificate-lifecycle
+      - identity-management
+      - onboarding-workflow
+      - awareness-training
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-11"]
+    relationship: complements

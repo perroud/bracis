@@ -1,0 +1,120 @@
+id: stig-app-error-handling
+family: app-sec
+title: "Error Handling and Information Disclosure Prevention"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Applications must implement error handling that prevents the disclosure of
+    sensitive system information to unauthorized parties. Error messages
+    displayed to users must not include stack traces, database error messages,
+    internal IP addresses, server software version information, source code
+    snippets, file system paths, or any other information that could assist an
+    attacker in mapping the system architecture or identifying exploitable
+    vulnerabilities. Applications must catch and handle all anticipated
+    exceptions to prevent unhandled exceptions from leaking internal state.
+    Detailed error information must be logged internally to support debugging
+    but must never be returned in API responses or rendered in user interfaces.
+    HTTP response headers must not reveal web server software, version
+    information, or application framework details (e.g., Server, X-Powered-By
+    headers must be removed or obfuscated).
+
+guidance:
+  prose: >-
+    Information disclosure through error messages is a significant reconnaissance
+    aid for attackers. Stack traces reveal code structure and library versions.
+    Database error messages reveal the database type, schema structure, and
+    query patterns — directly enabling SQL injection exploitation by revealing
+    the underlying data model. Internal IP addresses assist in network mapping
+    for lateral movement. Framework version information enables attackers to
+    look up applicable CVEs without any additional probing.
+
+    This control also addresses error handling completeness: applications that
+    crash or enter undefined states when encountering unexpected input create
+    availability issues and may bypass security controls that assume normal
+    execution flow. Comprehensive exception handling is therefore both a security
+    and a reliability requirement.
+
+    STIG reviewers test this by deliberately triggering errors (malformed input,
+    invalid API parameters, missing required fields) and observing what
+    information is returned in the response body and HTTP headers.
+
+references:
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222656 through SV-222660"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, SI-11"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "OWASP Error Handling Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure ingress controllers and API gateways to strip information-
+      disclosing HTTP headers (Server, X-Powered-By, X-AspNet-Version) from
+      all responses. Implement a global error handling middleware at the platform
+      layer that intercepts unhandled exceptions and returns a generic error
+      response (with a correlation ID for support lookup) rather than propagating
+      the exception detail to the client. Configure web servers (Nginx, Apache)
+      to suppress version information in server tokens. Use custom error pages
+      for 4xx and 5xx responses that display only user-friendly messages and
+      correlation IDs. Centralize all detailed error logging in the observability
+      platform rather than exposing it through response bodies.
+    tools:
+      - nginx
+      - envoy
+      - kong-gateway
+      - elasticsearch
+      - loki
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect unhandled exception paths, catch-all
+      exception handlers that swallow errors silently, and code that returns
+      exception details in API responses (e.g., e.getMessage() in JSON responses,
+      raw stack trace serialization). Run DAST scans configured to test for
+      information disclosure by triggering error conditions and analyzing
+      responses. Add integration tests that verify error responses do not include
+      sensitive system information. Implement HTTP header security testing
+      (securityheaders.com equivalent) as a pipeline gate that validates
+      required headers are present and disclosing headers are absent. Conduct
+      code reviews specifically focused on exception handling paths in all
+      new features.
+    tools:
+      - semgrep
+      - gitlab-sast
+      - gitlab-dast
+      - owasp-zap
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor application logs for error spikes that may indicate active
+      exploitation attempts or deliberate error triggering for reconnaissance.
+      Include information disclosure testing in application penetration tests —
+      specifically test error conditions by sending malformed requests and
+      analyzing response content for sensitive information. Review HTTP response
+      headers for information disclosure during ATO assessments. Verify that
+      internal error logging captures sufficient detail for debugging while
+      external responses are sanitized.
+    tools:
+      - splunk
+      - elastic-apm
+      - burp-suite
+      - rapid7-insightappsec
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-11"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SI.L2-3.14.6", "SI.L2-3.14.7"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["si-11"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-02"]
+    relationship: supports

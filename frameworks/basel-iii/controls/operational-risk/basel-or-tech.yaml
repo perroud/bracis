@@ -1,0 +1,129 @@
+id: basel-or-tech
+family: operational-risk
+title: "Technology and Cyber Operational Risk"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must manage technology risk and cyber risk as material components of operational
+    risk within the ORM framework. Technology risk — including the risk of loss from failures
+    or inadequacies of information systems, infrastructure, or processes — must be explicitly
+    covered by the bank's operational risk appetite and RCSA. Cyber risk — the risk of loss
+    resulting from cyber attacks, unauthorised access, use, disclosure, disruption,
+    modification, or destruction of information systems or data — must be governed by a
+    dedicated cyber risk management framework aligned with the ORM framework and the bank's
+    IT strategy. Banks must maintain operational resilience capabilities consistent with the
+    BCBS Principles for Operational Resilience (March 2021), which require banks to: map
+    critical operations and their underlying IT systems and third-party dependencies; set
+    impact tolerances for critical operations that define the maximum acceptable disruption;
+    test resilience through scenario-based exercises including cyber attack simulations; and
+    demonstrate to supervisors that critical operations can be delivered within impact
+    tolerances even during severe but plausible disruption scenarios. Banks must also manage
+    technology vendor concentration risk and ensure that outsourcing arrangements for critical
+    functions do not increase overall operational risk.
+
+guidance:
+  prose: >-
+    Technology and cyber risk have become the dominant operational risk concern for banks
+    globally, reflected in the BCBS Operational Resilience Principles (2021), the FSB Cyber
+    Lexicon (2018), and the G7 Cyber Expert Group fundamental elements. Supervisors in the
+    EU (DORA), UK (PRA PS6/21, FCA DP1/22), US (NYDFS Cybersecurity Regulation, OCC
+    Bulletin 2023-22), Singapore (MAS TRM), and Australia (APRA CPS 234) have all issued
+    binding technology risk and cyber risk requirements that go beyond the BCBS principles.
+    Banks should treat operational resilience as a core strategic capability, mapping
+    critical services (customer payments, trade settlement, risk reporting) to their
+    underlying IT components and third-party providers, stress-testing resilience under
+    plausible cyber and technology failure scenarios, and maintaining exercised playbooks for
+    major incident response. Concentration in cloud service providers (hyperscalers) or
+    critical software vendors represents a systemic risk that supervisors are increasingly
+    focused on. Banks should maintain alternative processing capabilities and exit strategies
+    for all critical third-party arrangements.
+
+references:
+  - citation: "BCBS, Principles for Operational Resilience, March 2021"
+    url: "https://www.bis.org/bcbs/publ/d516.htm"
+  - citation: "BCBS, Supervisory guidance on managing risks associated with the settlement of foreign exchange transactions, February 2013"
+    url: "https://www.bis.org/publ/bcbs241.htm"
+  - citation: "FSB, Cyber Lexicon, November 2018"
+    url: "https://www.fsb.org/2018/11/fsb-publishes-cyber-lexicon/"
+  - citation: "G7 Cyber Expert Group, Fundamental Elements of Cybersecurity for the Financial Sector, October 2016"
+    url: "https://www.treasury.gov/press-center/press-releases/Documents/CEG%20Fundamental%20Elements%20final.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a service-to-infrastructure dependency mapping platform (service catalog)
+      that documents all critical banking services (payments, settlements, risk reporting,
+      customer-facing applications), their supporting IT components (applications, databases,
+      middleware, network), and third-party dependencies (cloud providers, SaaS vendors,
+      payment networks). Use this map to define and test impact tolerances. Build automated
+      continuous availability monitoring for all critical services with alerting when
+      availability falls below the impact tolerance threshold. Implement chaos engineering
+      practices — regular game days simulating infrastructure failures, cloud region outages,
+      and security incidents — to validate resilience capabilities. Maintain runbooks and
+      playbooks in a version-controlled, easily accessible knowledge base.
+    tools:
+      - backstage
+      - datadog
+      - pagerduty
+      - chaos-mesh
+      - grafana
+      - terraform
+      - vault
+
+  devsecops:
+    prose: >-
+      Embed security and resilience controls throughout the software development and
+      operations lifecycle. Enforce SAST scanning for all banking application code, DAST
+      testing for all customer-facing APIs, container scanning for all container images,
+      and SCA/dependency scanning for all software components. Implement automated secret
+      detection to prevent credentials and API keys from being committed to source code.
+      Mandate signed commits and protected main branches for all critical banking
+      applications. Run automated security regression tests as part of every CI/CD pipeline
+      and block deployments that introduce new critical or high vulnerabilities unless
+      approved through an exception workflow.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - trivy
+      - sonarqube
+
+  secops:
+    prose: >-
+      Operate a 24/7 Security Operations Centre (SOC) with capabilities covering threat
+      intelligence, threat hunting, vulnerability management, incident response, and forensics.
+      Implement a SIEM solution ingesting logs from all critical banking systems, network
+      devices, endpoint protection platforms, and cloud providers. Apply use cases tuned for
+      banking-specific threats: credential stuffing against online banking portals, lateral
+      movement within the internal network, data exfiltration from core banking systems,
+      and anomalous SWIFT/payment transaction patterns. Conduct annual cyber resilience
+      testing including CBEST (UK), TIBER-EU, iCAST (Singapore), or equivalent intelligence-
+      led penetration tests. Report material cyber incidents to supervisors within the
+      prescribed notification window (e.g., 4 hours under DORA, immediately under MAS TRM).
+    tools:
+      - splunk
+      - crowdstrike
+      - paloalto-networks
+      - sentinel
+      - tenable
+      - cyberark
+      - pagerduty
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-5", "art-6", "art-7", "art-8", "art-9", "art-10", "art-11", "art-19"]
+    relationship: equivalent-to
+  - framework_id: iso-22301
+    articles: ["cl-8.4", "cl-8.5", "cl-8.6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-6", "SI-3", "SI-4", "RA-5", "CA-8", "SC-28"]
+    relationship: mapped
+  - framework_id: cobit-2019
+    articles: ["DSS05", "DSS06", "APO13", "MEA02"]
+    relationship: supports

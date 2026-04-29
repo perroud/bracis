@@ -1,0 +1,121 @@
+id: art-28
+family: cap-5
+title: "Seguranca de Modelos de IA Medica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 28. A segurança técnica de sistemas de IA médica deve contemplar
+    proteção contra ameaças específicas à inteligência artificial:
+
+    I - proteção contra ataques adversariais: implementação de mecanismos
+    de detecção e mitigação de inputs adversariais projetados para
+    manipular inferências do modelo;
+
+    II - proteção contra envenenamento de dados (data poisoning):
+    controles de integridade e validação de dados de treinamento para
+    prevenir inserção de dados maliciosos;
+
+    III - proteção contra extração de modelo (model extraction):
+    controles que impeçam a reconstrução do modelo por meio de
+    consultas sistemáticas à API de inferência;
+
+    IV - proteção contra inferência de pertinência (membership inference):
+    controles que impeçam a determinação de se um paciente específico
+    fez parte do dataset de treinamento;
+
+    V - testes periódicos de segurança (red teaming de IA) para
+    identificar vulnerabilidades específicas do modelo e do pipeline
+    de ML.
+guidance:
+  prose: |
+    O art. 28 trata de ameacas especificas a IA (AI security) que
+    vao alem da ciberseguranca tradicional.
+
+    **Ataques adversariais (inciso I):**
+    Inputs manipulados que enganam o modelo. Em medicina: imagem de
+    raio-X com perturbacao imperceptivel que muda diagnostico de
+    "normal" para "pneumonia". Ataques podem ser digitais (manipulacao
+    de pixels) ou fisicos (adesivo em lesao de pele que engana IA).
+
+    **Envenenamento de dados (inciso II):**
+    Insercao de dados maliciosos no dataset de treinamento para
+    manipular o comportamento do modelo. Em medicina: inserir
+    imagens com rotulos incorretos para degradar performance do
+    modelo para determinado tipo de lesao.
+
+    **Extracao de modelo (inciso III):**
+    Atacante consulta o modelo repetidamente para reconstruir uma
+    copia funcional. Em medicina: risco de propriedade intelectual
+    e de uso nao autorizado em contextos nao validados.
+
+    **Inferencia de pertinencia (inciso IV):**
+    Atacante determina se dados de paciente especifico foram usados
+    no treinamento. Viola privacidade: revela que paciente teve
+    determinada condicao clinica (dados sensiveis LGPD).
+
+    **Red teaming de IA (inciso V):**
+    Testes ofensivos especializados em IA, distintos de pen test
+    tradicional. Incluem: ataques adversariais, tentativas de
+    extracao, prompt injection (para LLMs), bypass de guardrails.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de seguranca de IA:**
+      1. Implementar camada de deteccao de inputs adversariais na
+         API de inferencia: analise estatistica de inputs antes de
+         passar ao modelo, com rejeicao de inputs anomalos.
+      2. Configurar rate limiting e fingerprinting na API de
+         inferencia para detectar e bloquear tentativas de extracao
+         de modelo (consultas sistematicas).
+      3. Implementar differential privacy nos dados de treinamento
+         para mitigar risco de membership inference.
+      4. Configurar pipeline de integridade de dados de treinamento:
+         checksums, validacao de schema, deteccao de anomalias em
+         novos dados antes de incorporacao ao dataset.
+    tools:
+      - adversarial-detection
+      - api-gateway
+      - differential-privacy
+      - data-integrity
+  devsecops:
+    prose: |
+      **Seguranca de IA no pipeline:**
+      1. Implementar testes de robustez adversarial no CI/CD:
+         executar ataques adversariais automatizados (PGD, FGSM,
+         C&W) e verificar resiliencia do modelo.
+      2. Automatizar testes de membership inference: verificar que
+         modelo nao vaza informacao sobre dados de treinamento.
+      3. Implementar scanning de integridade de pipeline de ML:
+         verificar que modelo em producao e identico ao modelo
+         validado (hash do modelo, pesos, configuracao).
+      4. Integrar red teaming de IA no ciclo de releases para
+         modelos de risco alto e muito alto.
+    tools:
+      - gitlab-ci
+      - adversarial-testing
+      - privacy-testing
+      - model-integrity
+  secops:
+    prose: |
+      **Operacao de seguranca de IA:**
+      1. Incluir ameacas especificas de IA no programa de gestao
+         de riscos: ataques adversariais, data poisoning, extracao.
+      2. Realizar red teaming de IA anual para sistemas de risco
+         alto/muito alto, com equipe especializada.
+      3. Monitorar tentativas de ataques a APIs de inferencia:
+         padroes anomalos de consulta, inputs adversariais detectados.
+      4. Manter plano de resposta a incidentes especifico para
+         ameacas de IA, incluindo procedimento de desativacao.
+    tools:
+      - threat-intelligence
+      - red-team
+      - siem
+      - incident-response
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-15"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["manage-1", "manage-2"]
+    relationship: mapped

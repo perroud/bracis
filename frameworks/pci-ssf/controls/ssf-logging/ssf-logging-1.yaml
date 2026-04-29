@@ -1,0 +1,96 @@
+id: ssf-logging-1
+family: ssf-logging
+title: "Security Event Logging and Audit Trails"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall generate audit logs for all security-relevant events including
+    successful and failed authentication attempts, authorization decisions, access to
+    sensitive data, changes to security configurations, and administrative actions.
+    Log entries shall include sufficient detail to support forensic analysis,
+    including timestamp, source identity, event type, affected resource, and outcome.
+    Timestamps shall be synchronized to a reliable time source. Audit logs shall be
+    protected from unauthorized modification and deletion. The software shall provide
+    mechanisms for log export to centralized logging systems.
+
+guidance:
+  prose: >-
+    Comprehensive logging is essential for detecting security incidents, supporting
+    forensic investigations, and demonstrating compliance. PCI SSF requires that
+    payment software generates detailed audit trails for all events that could
+    indicate a security breach or policy violation. The log format must include
+    enough context to reconstruct the sequence of events during an investigation.
+    Critically, logs themselves must be protected: if an attacker can modify or
+    delete logs, they can cover their tracks. The standard requires that logs can
+    be exported to centralized systems for correlation and long-term retention.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 12 — Security Logging"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 9.1-9.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized log aggregation infrastructure (Elasticsearch, Loki, or
+      equivalent) with immutable storage to prevent log tampering. Implement
+      structured logging standards across all services using JSON format with
+      mandatory fields aligned to PCI SSF requirements. Configure NTP
+      synchronization for all hosts to ensure timestamp accuracy. Deploy log
+      shipping agents with TLS encryption and mutual authentication. Enforce
+      log retention policies at the platform level with automatic archival to
+      tamper-evident long-term storage. Implement log-based alerting for
+      security-critical events.
+    tools:
+      - elasticsearch
+      - grafana-loki
+      - fluentd
+      - fluentbit
+      - prometheus
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement logging libraries as shared packages that enforce the required
+      log format and mandatory fields. Use SAST rules to detect missing audit
+      logging on security-relevant code paths. Write integration tests that
+      validate audit logs are generated for all required event types with
+      complete field sets. Enforce that sensitive data (PANs, credentials) is
+      never included in log messages through automated scanning. Include
+      logging coverage as part of code review checklists for security-relevant
+      changes.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - sonarqube
+      - owasp-zap
+
+  secops:
+    prose: >-
+      Monitor log pipeline health to detect logging failures or gaps that could
+      indicate log tampering. Implement correlation rules in the SIEM to detect
+      attack patterns across multiple log sources. Conduct periodic log
+      completeness audits to verify all required event types are being captured.
+      Alert on log volume anomalies that may indicate denial-of-service attacks
+      against the logging infrastructure. Maintain incident response procedures
+      that reference specific log queries for common attack scenarios.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - grafana
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-10.1", "req-10.2", "req-10.3"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v7.1", "v7.2", "v7.3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.16"]
+    relationship: mapped

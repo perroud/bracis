@@ -1,0 +1,111 @@
+id: art-12
+family: cap-4
+title: "Prazo Minimo de Guarda -- 20 Anos"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 12. O prontuário do paciente, em qualquer meio de
+    armazenamento, deve ser conservado pelo prazo mínimo de 20 (vinte)
+    anos, contados a partir do último registro realizado.
+
+    Parágrafo 1. Após o prazo mínimo de 20 anos, o prontuário pode
+    ser eliminado ou, alternativamente, devolvido ao paciente.
+
+    Parágrafo 2. O prontuário de paciente menor de idade deve ser
+    guardado por prazo mínimo de 20 anos a contar da data em que o
+    paciente completar 18 anos de idade.
+
+    Parágrafo 3. A instituição de saúde deve manter a capacidade
+    de recuperar e apresentar os dados do prontuário durante todo
+    o período de guarda, independentemente de evoluções tecnológicas.
+guidance:
+  prose: |
+    O art. 12 define o prazo de 20 anos como MINIMO obrigatorio.
+    Algumas situacoes exigem guarda permanente (ex.: doencas
+    cronicas, prontuarios de pesquisa clinica).
+
+    **Calculo do prazo para menores:**
+    Paciente atendido aos 5 anos: prazo inicia quando completa 18
+    (13 anos depois) e vai ate 38 anos de idade. Total de guarda
+    efetivo: 33 anos.
+
+    **Desafio tecnologico:**
+    20 anos e muito tempo em tecnologia. Formatos de arquivo,
+    bancos de dados, sistemas operacionais e midias de armazenamento
+    mudam drasticamente. A instituicao deve ter estrategia ativa de
+    migracao tecnologica para garantir acessibilidade.
+
+    **Risco juridico da eliminacao prematura:**
+    Eliminar prontuario antes de 20 anos e infringir a resolucao CFM
+    e expoe a instituicao a risco juridico: em caso de processo, a
+    ausencia do prontuario gera presuncao desfavoravel (inversao do
+    onus da prova contra o medico/instituicao).
+
+    **Prazo vs. prescricao civil:**
+    O prazo de 20 anos da resolucao CFM e conservador. A prescricao
+    para danos a saude no Codigo Civil e de 3-10 anos, mas para
+    menores so inicia aos 18 anos. O prazo de 20 anos cobre a
+    maioria dos cenarios.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Estrategia de armazenamento de longo prazo:**
+      1. Implementar politica de retencao automatizada no sistema
+         PEP que calcule o prazo de guarda por paciente (20 anos
+         a partir do ultimo registro, ajustado para menores).
+      2. Adotar arquitetura de storage em camadas (tiering):
+         - Hot: ultimos 2 anos (acesso frequente, SSD)
+         - Warm: 2-10 anos (acesso ocasional, HDD/object storage)
+         - Cold: 10-20+ anos (acesso raro, archive storage)
+      3. Implementar verificacao periodica de integridade dos
+         dados armazenados (checksum validation) em todas as
+         camadas, com alerta para corrupcao detectada.
+      4. Provisionar capacidade de storage para crescimento
+         projetado de 20 anos, com revisao anual.
+    tools:
+      - tiered-storage
+      - retention-policy-engine
+      - integrity-checker
+      - capacity-planning
+  devsecops:
+    prose: |
+      **Testes de retencao e recuperacao:**
+      1. Criar testes automatizados que validem o calculo correto
+         do prazo de guarda (especialmente para menores).
+      2. Testar recuperacao de dados de cada camada de storage
+         (hot, warm, cold) periodicamente.
+      3. Validar que o sistema impede eliminacao de prontuarios
+         dentro do prazo de guarda obrigatorio.
+      4. Simular cenarios de migracao de storage: dados movidos
+         entre camadas devem permanecer integros e acessiveis.
+    tools:
+      - gitlab-ci
+      - retention-tests
+      - recovery-tests
+      - migration-tests
+  secops:
+    prose: |
+      **Governanca de temporalidade:**
+      1. Manter tabela de temporalidade institucional que defina
+         prazos de guarda por tipo de documento e categoria de
+         paciente (adulto, menor, pesquisa clinica, obito).
+      2. Criar processo formal de eliminacao de prontuarios com
+         aprovacao de comissao de prontuarios, registro em ata
+         e notificacao ao paciente quando aplicavel.
+      3. Auditar anualmente conformidade com prazos de guarda:
+         nenhum prontuario pode ser eliminado antes do prazo.
+      4. Documentar todas as eliminacoes com identificacao do
+         prontuario, data de eliminacao, responsavel e justificativa.
+    tools:
+      - retention-schedule
+      - disposal-workflow
+      - audit-scheduler
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.530-j"]
+    relationship: mapped

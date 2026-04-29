@@ -1,0 +1,100 @@
+id: iec-3-3-fr4
+family: part-3
+title: "FR4: Data Confidentiality (DC)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr4
+
+statement:
+  prose: >-
+    The control system shall provide the capability to protect the
+    confidentiality of information at rest and in transit to prevent
+    unauthorized disclosure. Confidentiality mechanisms shall protect
+    process data, configuration data, authentication credentials, and
+    audit logs. The strength of confidentiality controls shall be
+    commensurate with the target security level of the zone.
+
+guidance:
+  prose: >-
+    Data confidentiality in IACS environments requires balancing encryption
+    overhead with real-time performance requirements. Key considerations
+    include: classifying data within the IACS environment by sensitivity
+    (process setpoints, safety parameters, recipe data, credentials, audit
+    logs); encrypting communications between zones using TLS 1.2 or higher
+    for IT protocols and OT-specific security mechanisms for industrial
+    protocols; encrypting stored credentials, keys, and sensitive
+    configuration data at rest; protecting intellectual property embedded
+    in control logic and process recipes; implementing encrypted remote
+    access (VPN with IKEv2/IPsec or WireGuard) for all external connections
+    to IACS zones; managing cryptographic keys with a dedicated key
+    management system; protecting audit and log data from unauthorized
+    access; restricting access to engineering documentation, network
+    diagrams, and architecture documents; and considering the performance
+    impact of encryption on real-time control loops, using hardware-
+    accelerated encryption where available for time-critical communications.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 4.1 through SR 4.3"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement TLS termination at zone boundaries using industrial-grade
+      firewalls. Deploy hardware security modules (HSMs) or dedicated key
+      management systems for the IACS environment. Enable encryption for
+      all data at rest on IACS servers, historians, and engineering
+      workstations. Implement encrypted VPN tunnels for all remote access
+      to IACS networks with split tunneling disabled. Deploy data loss
+      prevention (DLP) controls at the enterprise-OT boundary to prevent
+      exfiltration of process data, engineering drawings, and control
+      logic. Configure industrial protocols with their native security
+      extensions (OPC UA encryption, secure MQTT with TLS).
+    tools:
+      - vault
+      - thales-luna-hsm
+      - wireguard
+      - palo-alto-ngfw
+      - forcepoint-dlp
+
+  devsecops:
+    prose: >-
+      Scan code and configuration files for plaintext secrets, hardcoded
+      credentials, and unencrypted sensitive data. Enforce encryption
+      requirements in deployment configurations through policy-as-code.
+      Validate TLS configurations meet minimum cipher suite requirements
+      before deployment. Implement secrets management integration in the
+      CI/CD pipeline so that credentials are injected at runtime and never
+      stored in repositories or container images. Test cryptographic
+      implementations for weaknesses as part of the security testing phase.
+    tools:
+      - gitleaks
+      - vault
+      - trivy
+      - tls-checker
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor for unencrypted communications crossing zone boundaries.
+      Detect and alert on plaintext transmission of credentials or
+      sensitive process data. Monitor for unauthorized data exfiltration
+      from IACS zones to external networks. Validate that encryption
+      configurations remain compliant through continuous certificate
+      and TLS monitoring. Investigate any instances of expired or
+      weak certificates in the IACS environment. Monitor VPN sessions
+      for unauthorized remote access patterns.
+    tools:
+      - zeek
+      - suricata
+      - nozomi-networks
+      - qualys-ssl
+      - splunk-es
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.14", "a8.24"]
+    relationship: supports

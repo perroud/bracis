@@ -1,0 +1,104 @@
+id: med2-14
+family: ressarcimento
+title: "User Dispute Resolution and Contestation"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O titular da conta bloqueada pelo MED tem o direito de apresentar contestação ao bloqueio
+    cautelar e à decisão de devolução. O PSP recebedor deve disponibilizar canais acessíveis
+    para recebimento de contestações e deve analisar a contestação de forma fundamentada,
+    considerando as evidências apresentadas pelo titular. A contestação deve ser analisada
+    dentro do prazo de vigência do bloqueio cautelar. Caso a contestação seja acatada,
+    os recursos devem ser desbloqueados imediatamente. Caso a contestação seja rejeitada,
+    o titular deve ser informado dos fundamentos da decisão e dos canais de recurso
+    disponíveis, incluindo a possibilidade de reclamação junto ao BCB e ao Poder Judiciário.
+    O PSP deve manter registro completo de todas as contestações recebidas, análises realizadas
+    e decisões tomadas.
+guidance:
+  prose: |
+    **User Contestation Rights:**
+    The blocked account holder is not presumed guilty — they have a right to contest
+    the block and present evidence of legitimate transaction.
+
+    **Common legitimate scenarios:**
+    - The transaction was a genuine purchase (goods/services delivered).
+    - The payer authorized the transaction but later regretted it (not fraud).
+    - Identity confusion — the account holder is not involved in the fraud.
+    - The holder was an unwitting intermediary (money mule victim).
+
+    **Contestation process:**
+    1. **Intake:** Holder submits contestation with supporting evidence (receipts,
+       communication records, delivery confirmations).
+    2. **Analysis:** PSP evaluates evidence against the fraud indicators.
+    3. **Decision:**
+       - Accepted → immediate unblock.
+       - Rejected → notify holder with reasons and available appeals.
+    4. **Appeals:** BCB ombudsman, consumer protection (Procon), judiciary.
+
+    **Due process requirement:** The PSP must give genuine consideration to the
+    contestation — a rubber-stamp rejection exposes the PSP to regulatory and
+    legal risk.
+
+    **Record-keeping:** All contestations, evidence, analysis, and decisions must
+    be archived for at least 5 years for regulatory audit.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a digital contestation portal (in-app and web) where blocked account
+         holders can submit contestation claims with document attachments.
+      2. Implement a contestation workflow: intake → evidence review → analyst
+         assignment → decision → notification → appeal tracking.
+      3. Integrate contestation evidence into the merit analysis workflow — the
+         analyst reviewing the MED case should have access to both the fraud evidence
+         and the holder's contestation in a single view.
+      4. Build automated unblocking triggered by accepted contestations — immediate
+         release of funds with audit logging.
+      5. Implement a contestation archive with 5+ year retention, indexed for
+         regulatory audit retrieval.
+    tools:
+      - case-management
+      - document-management
+      - workflow-engine
+      - blocking-service
+      - archive-storage
+  devsecops:
+    prose: |
+      1. Test contestation submission: all document types (PDF, images), large files,
+         multiple attachments.
+      2. Test contestation workflow: intake through decision for accepted, rejected,
+         and partially accepted outcomes.
+      3. Test immediate unblocking on accepted contestation — verify funds are released
+         within minutes.
+      4. Test analyst view: verify both fraud evidence and contestation evidence are
+         displayed together.
+      5. Test archive retrieval: submit, archive, then retrieve by various search
+         criteria (date, account, case ID).
+    tools:
+      - gitlab-ci
+      - e2e-testing
+      - integration-testing
+      - accessibility-testing
+  secops:
+    prose: |
+      1. Track contestation volumes: submissions per day, acceptance rate, rejection
+         rate, average processing time.
+      2. Quality audit of contestation decisions: monthly sample review to ensure
+         fair and well-reasoned outcomes.
+      3. Monitor for patterns: accounts that repeatedly receive blocks and contest
+         them may indicate sophisticated fraud operations.
+      4. Handle BCB and Procon inquiries: provide complete case documentation within
+         regulatory response timeframes.
+      5. Report contestation statistics to BCB as required.
+    tools:
+      - analytics-dashboard
+      - quality-assurance
+      - case-management
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-21"]
+    relationship: extends
+  - framework_id: lgpd
+    articles: ["art-1"]
+    relationship: complements

@@ -1,0 +1,108 @@
+id: p2pe-enc-1
+family: p2pe-encrypt
+title: "POI Device Encryption Requirements"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The P2PE solution shall use only PCI-approved POI devices that encrypt
+    account data at the point of interaction using strong cryptography. POI
+    devices must be listed on the PCI SSC list of validated P2PE devices and
+    must employ SRED (Secure Reading and Exchange of Data) functionality.
+    Encryption shall occur immediately upon reading the account data from
+    the payment card, prior to any processing or storage within the POI
+    device or the merchant environment. Only PCI-approved cryptographic
+    algorithms (e.g., AES-128 or higher, TDEA with unique keys per
+    transaction) shall be used for account data encryption.
+  parts:
+    - id: p2pe-enc-1.a
+      label: "Domain 1, 1A"
+      prose: >-
+        POI devices used in the P2PE solution are PCI-approved and listed
+        on the PCI SSC website with SRED capability.
+    - id: p2pe-enc-1.b
+      label: "Domain 1, 1B"
+      prose: >-
+        Account data is encrypted immediately upon card read within the
+        POI device, using a PCI-approved encryption algorithm and key
+        length, before any data leaves the secure boundary of the device.
+
+guidance:
+  prose: >-
+    The fundamental premise of P2PE is that account data is encrypted at the
+    earliest possible point — the moment it is read from the card — and
+    remains encrypted throughout the merchant environment until it reaches
+    the secure decryption environment. Only POI devices that have been
+    evaluated and approved by PCI SSC under the PTS POI device program with
+    SRED module approval are eligible for P2PE solutions. The use of
+    PCI-approved algorithms ensures a baseline of cryptographic strength.
+    AES with 128-bit or 256-bit keys is the preferred algorithm. TDEA
+    (Triple DES) remains acceptable but is being phased out. Solution
+    providers must verify the device approval status is current and not
+    expired at the time of deployment.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 1 — Encryption Device and Application Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI PTS POI Modular Security Requirements v6.1"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain an automated registry of all deployed POI devices mapped to
+      their PCI PTS approval numbers, SRED module versions, and firmware
+      hashes. Integrate with PCI SSC's device listing API or periodic
+      scraping to validate that device approvals have not expired. Deploy a
+      device configuration management platform that pushes cryptographic
+      parameters (algorithm, key length, DUKPT BDK identifiers) to POI
+      devices using encrypted channels. Implement infrastructure-as-code
+      templates for the device management server infrastructure with
+      mandatory code review for any configuration change.
+    tools:
+      - terraform
+      - ansible
+      - hashicorp-vault
+      - device-management-platform
+      - asset-inventory-cmdb
+
+  devsecops:
+    prose: >-
+      Integrate POI device firmware signature validation into CI/CD
+      pipelines. Scan device configuration templates for deprecated
+      algorithms (DES, RC4) or insufficient key lengths. Enforce that all
+      device management API endpoints require mutual TLS. Include automated
+      tests that validate encryption output from POI devices using test card
+      data to confirm ciphertext is produced (not cleartext passthrough).
+    tools:
+      - gitlab-ci
+      - semgrep
+      - checkov
+      - testssl.sh
+      - custom-device-validation-scripts
+
+  secops:
+    prose: >-
+      Monitor POI device health and encryption status in real time. Alert
+      on any device reporting cleartext output, failed encryption, or
+      tamper events. Track PCI PTS approval expiration dates and generate
+      alerts 90 days before expiry. Conduct periodic sampling of encrypted
+      output from POI devices to confirm cryptographic integrity. Review
+      PCI SSC bulletins for device compromise notices.
+    tools:
+      - splunk
+      - elastic-siem
+      - pci-ssc-device-listings
+      - nagios
+      - zabbix
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.5", "req-4.1"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-crypto-1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped

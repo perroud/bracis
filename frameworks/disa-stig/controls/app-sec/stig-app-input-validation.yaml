@@ -1,0 +1,124 @@
+id: stig-app-input-validation
+family: app-sec
+title: "Input Validation and Injection Prevention"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Applications must validate all input received from external sources before
+    processing, storing, or passing it to other system components. Input validation
+    must be implemented on the server side and must not rely solely on client-side
+    validation, which can be bypassed. Applications must sanitize or reject input
+    that contains characters, patterns, or values that could be interpreted as
+    code or commands by backend systems, including SQL injection characters,
+    OS command injection sequences, LDAP injection patterns, XML/XPath injection,
+    script injection (XSS), and path traversal sequences. Applications must
+    use parameterized queries or stored procedures for all database interactions —
+    dynamic SQL constructed by concatenating user input is prohibited. Output
+    encoding appropriate to the output context (HTML, JavaScript, URL, CSS)
+    must be applied to all data derived from untrusted sources before rendering.
+
+guidance:
+  prose: >-
+    Injection vulnerabilities (SQL injection, command injection, XSS) consistently
+    rank among the most prevalent and high-impact vulnerabilities in web
+    applications, including DoD systems. They are also among the most preventable
+    through secure coding practices. The DISA Application Security and Development
+    STIG dedicates substantial coverage to input validation because a single
+    injection vulnerability can provide an unauthenticated attacker with full
+    database access, server-side code execution, or the ability to compromise
+    the browsers of every application user.
+
+    STIG reviewers test input validation through application security testing —
+    automated scanning tools (DAST) that probe input fields with injection
+    payloads, and manual testing by security professionals who can probe
+    application logic for context-specific vulnerabilities that automated tools
+    miss. Input validation must be tested in all application contexts: web forms,
+    API parameters, file uploads, HTTP headers, and any other user-influenced input.
+
+    The server-side validation requirement is critical: client-side validation
+    (JavaScript form validation, HTML5 input type restrictions) can be trivially
+    bypassed using browser developer tools or by sending raw HTTP requests.
+    Server-side validation is the only reliable enforcement mechanism.
+
+references:
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222602 through SV-222612"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, SI-10, SI-15"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "OWASP Input Validation Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a web application firewall (WAF — AWS WAF, Azure Application Gateway
+      WAF, ModSecurity with OWASP Core Rule Set) at the ingress layer to provide
+      a defense-in-depth layer against injection attacks. The WAF does not replace
+      application-level input validation but catches attacks targeting known
+      vulnerability patterns before they reach the application. Implement API
+      gateway request validation (schema validation against OpenAPI specifications)
+      to reject malformed requests before they reach backend services. Enable
+      Kubernetes admission webhook validation to prevent deployment of applications
+      that fail security policy checks. Monitor WAF block events in the SIEM and
+      alert on spikes that may indicate active exploitation attempts.
+    tools:
+      - aws-waf
+      - azure-waf
+      - modsecurity
+      - kong-gateway
+      - nginx-ingress
+
+  devsecops:
+    prose: >-
+      Run SAST tools (Semgrep with OWASP ruleset, CodeQL, SonarQube) in CI
+      pipelines to detect injection vulnerabilities including SQL injection,
+      command injection, XSS, and path traversal in application source code.
+      Configure DAST scans (OWASP ZAP, Burp Suite Enterprise) as a mandatory
+      pre-release gate for all web applications; DAST scans must include
+      active injection testing, not just passive analysis. Implement IDE
+      security plugins (Semgrep IDE, SonarLint) to provide developers with
+      real-time feedback on injection vulnerabilities as they write code.
+      Enforce code review requirements for all changes to data access layers
+      and input handling code. Include injection testing in the automated
+      integration test suite using parameterized test cases with known-malicious
+      inputs.
+    tools:
+      - semgrep
+      - codeql
+      - sonarqube
+      - gitlab-sast
+      - gitlab-dast
+      - owasp-zap
+
+  secops:
+    prose: >-
+      Monitor WAF and application logs for injection attack patterns and alert
+      on successful bypasses (requests that passed WAF but triggered application
+      errors consistent with injection). Conduct quarterly application penetration
+      testing with specific focus on injection vulnerability classes. Review
+      DAST scan results monthly and track injection-related findings in the
+      POA&M. Subscribe to vulnerability feeds for injection CVEs affecting
+      frameworks and libraries used in the system.
+    tools:
+      - splunk
+      - elastic-siem
+      - burp-suite-enterprise
+      - rapid7-insightappsec
+      - qualys-was
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15", "SA-11"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SI.L2-3.14.6"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["si-10", "sa-11"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-02", "DE.CM-08"]
+    relationship: supports

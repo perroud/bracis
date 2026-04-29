@@ -1,0 +1,95 @@
+id: pii-c.1
+family: pii-c
+title: "Data minimization in cloud PII processing"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall limit the processing of PII to what is
+    adequate, relevant, and not excessive in relation to the stated purposes. The
+    design and implementation of cloud services should minimize the PII that is
+    processed. Temporary files and documents that are created as a by-product of
+    the normal operation of the cloud service and that might contain PII shall be
+    erased or made unrecoverable within a specified, documented period.
+
+guidance:
+  prose: >-
+    Data minimization in the cloud processor context has two dimensions. First, the
+    processor must not request, collect, or process more PII than the customer has
+    authorized and the purpose requires. Second, the processor must manage the
+    lifecycle of incidental PII that arises during processing, such as log entries
+    containing PII, temporary processing files, cache entries, debug dumps, and
+    intermediate computation results. These incidental copies are often overlooked
+    and can persist indefinitely, creating privacy risks and expanding the attack
+    surface. The processor must implement systematic discovery and cleanup of
+    incidental PII, with documented retention periods that are as short as
+    technically feasible. The specification of the erasure period should be part of
+    the contractual arrangement with the cloud service customer.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.3"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement platform-level data minimization controls. Configure all logging
+      systems to apply PII redaction filters before storage. Set default TTLs on
+      temporary storage locations (object store staging areas, message queues,
+      cache layers) and enforce automatic cleanup. Build data classification
+      scanning into storage systems to detect PII in locations not designated for
+      PII storage. Implement storage quotas and retention policies per data
+      category. Design services to process PII in streaming mode where possible,
+      avoiding persistent intermediate copies. Implement cryptographic erasure
+      for storage volumes to ensure deleted PII is unrecoverable.
+    tools:
+      - pii-redaction-filters
+      - automatic-ttl-enforcement
+      - data-classification-scanner
+      - retention-policy-engine
+      - cryptographic-erasure
+      - storage-lifecycle-manager
+
+  devsecops:
+    prose: >-
+      Enforce data minimization in the development lifecycle. Static analysis
+      rules should flag excessive PII collection (e.g., requesting full PII
+      records when only a subset is needed). CI gates must validate that new
+      temporary file creation includes cleanup logic with documented retention
+      periods. Require data flow diagrams for features that process PII, showing
+      all intermediate storage locations and their cleanup mechanisms. Build
+      integration tests that verify temporary PII is erased within the specified
+      period. Log sanitization tests should confirm PII redaction is effective.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - data-flow-validators
+      - pii-cleanup-tests
+      - log-sanitization-tests
+      - retention-period-validator
+
+  secops:
+    prose: >-
+      Monitor for PII accumulation in temporary storage locations. Build
+      automated scans that detect PII persisting beyond its defined retention
+      period. Alert on temporary files containing PII that exceed their TTL.
+      Audit log storage systems to verify PII redaction effectiveness. Track
+      data minimization metrics: volume of PII stored versus minimum required,
+      average time to erasure for temporary PII, and number of locations where
+      PII is stored. Investigate and remediate any PII found in unauthorized
+      storage locations.
+    tools:
+      - splunk
+      - data-discovery-scanner
+      - retention-compliance-monitor
+      - pii-detection-rules
+      - storage-audit-tools
+      - minimization-metrics-dashboard
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.c", "art-25"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.4.5"]
+    relationship: complements

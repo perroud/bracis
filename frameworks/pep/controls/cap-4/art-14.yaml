@@ -1,0 +1,104 @@
+id: art-14
+family: cap-4
+title: "Microfilmagem e Digitalizacao para Guarda"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 14. Os prontuários em papel podem ser microfilmados ou
+    digitalizados para fins de preservação, desde que o processo
+    atenda aos requisitos legais e técnicos aplicáveis.
+
+    Parágrafo 1. A microfilmagem deve atender aos requisitos da
+    Lei 5.433/1968 e do Decreto 1.799/1996, que regulamentam a
+    microfilmagem de documentos oficiais.
+
+    Parágrafo 2. A digitalização deve produzir cópias fidedignas
+    dos originais, com resolução e qualidade suficientes para
+    preservar a legibilidade ao longo do período de guarda.
+
+    Parágrafo 3. Após microfilmagem ou digitalização com sistema
+    certificado NGS2, os originais em papel podem ser eliminados,
+    respeitando o prazo de guarda aplicável.
+guidance:
+  prose: |
+    O art. 14 trata da conversao de prontuarios em papel para
+    formato eletronico ou microfilme como estrategia de preservacao.
+
+    **Microfilmagem (paragrafo 1):**
+    A microfilmagem e o unico metodo que tem lei federal propria
+    (Lei 5.433/1968) autorizando a eliminacao do original apos
+    microfilmagem. Para instituicoes com acervo historico em papel,
+    a microfilmagem pode ser mais adequada para documentos antigos.
+
+    **Digitalizacao para eliminacao do papel (paragrafo 3):**
+    A eliminacao do papel apos digitalizacao SO e permitida se o
+    sistema de armazenamento (GED/PEP) for certificado NGS2. Sem
+    NGS2, a digitalizacao serve como copia de seguranca, mas o
+    papel deve ser mantido.
+
+    **Requisitos de qualidade da digitalizacao:**
+    - Documentos textuais: minimo 300 DPI, formato PDF/A
+    - Imagens medicas: minimo 600 DPI ou formato DICOM original
+    - Conferencia de qualidade por amostragem antes de eliminacao
+    - Vinculacao de metadados ao documento digitalizado
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de digitalizacao em larga escala:**
+      1. Provisionar estacoes de digitalizacao com scanners de
+         producao (capacidade minima de 60 ppm) configurados
+         para gerar PDF/A-3 com OCR embutido.
+      2. Implementar pipeline automatizado de digitalizacao:
+         scan -> validacao de qualidade -> OCR -> indexacao ->
+         armazenamento no GED -> vinculacao ao PEP.
+      3. Armazenar documentos digitalizados em storage imutavel
+         (WORM) com retencao alinhada ao prazo de guarda.
+      4. Integrar GED ao PEP para que documentos digitalizados
+         sejam acessiveis diretamente do prontuario eletronico.
+    tools:
+      - production-scanner
+      - ocr-engine
+      - pdf-a-converter
+      - worm-storage
+      - ged-system
+  devsecops:
+    prose: |
+      **Validacao de qualidade de digitalizacao:**
+      1. Implementar verificacao automatica de resolucao minima
+         (300 DPI texto, 600 DPI imagens) em documentos ingeridos.
+      2. Validar formato PDF/A com ferramenta de conformidade
+         (ex.: veraPDF) antes de aceitar no GED.
+      3. Testar legibilidade via OCR: documento deve produzir
+         texto extraivel com taxa de acerto superior a 95%.
+      4. Verificar integridade de metadados obrigatorios
+         (paciente, tipo, data, responsavel).
+    tools:
+      - gitlab-ci
+      - dpi-checker
+      - verapdf-validator
+      - ocr-quality-test
+  secops:
+    prose: |
+      **Governanca de digitalizacao:**
+      1. Definir procedimento operacional padrao (POP) de
+         digitalizacao com responsabilidades, resolucoes, formatos
+         e processo de conferencia.
+      2. Realizar controle de qualidade por amostragem (minimo 5%
+         do lote) antes de autorizar eliminacao do papel.
+      3. Registrar cadeia de custodia: quem digitalizou, quando,
+         equipamento utilizado, conferente responsavel.
+      4. Manter registro permanente de lotes digitalizados e
+         correspondentes lotes de papel eliminados.
+    tools:
+      - digitization-workflow
+      - quality-control
+      - chain-of-custody
+      - disposal-log
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.310-d"]
+    relationship: mapped

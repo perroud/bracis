@@ -1,0 +1,72 @@
+id: epd-7
+family: art-7
+title: "Itemised Billing"
+class: ePrivacy
+statement:
+  prose: >-
+    1. Subscribers shall have the right to receive non-itemised bills.
+
+    2. Member States shall apply national provisions in order to reconcile the rights of subscribers
+    receiving itemised bills with the right to privacy of calling users and called subscribers, for
+    example by ensuring that sufficient alternative privacy-enhancing methods of communications or
+    payments are available to such users and subscribers.
+  parts:
+    - id: epd-7.1
+      label: "(1)"
+      prose: >-
+        Subscribers shall have the right to receive non-itemised bills.
+    - id: epd-7.2
+      label: "(2)"
+      prose: >-
+        Member States shall apply national provisions in order to reconcile the rights of subscribers
+        receiving itemised bills with the right to privacy of calling users and called subscribers.
+guidance:
+  prose: >-
+    Article 7 addresses the privacy tension inherent in itemised billing. While subscribers may want
+    detailed bills for cost control, itemised bills reveal the communication patterns of all users on
+    that account and the called parties. This is particularly sensitive in shared accounts (family plans,
+    business accounts) where one subscriber can see the communication patterns of others. The directive
+    requires that subscribers can opt for non-itemised bills and that national law provides
+    privacy-enhancing alternatives. For service providers, this means billing systems must support
+    configurable levels of detail, with the default protecting privacy of third parties (called numbers).
+    Implementations often include partial number masking on itemised bills and the ability to exclude
+    certain numbers from billing records.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design billing systems with configurable itemisation levels. Implement a billing preference service
+      that allows subscribers to choose between itemised and non-itemised bills. Build number masking
+      capabilities that partially redact called/calling numbers on itemised bills (e.g., show only last
+      4 digits). Implement a "hidden number" feature allowing individual calls to be excluded from itemised
+      bills when requested by users. Ensure billing data access controls prevent unauthorized users on
+      shared accounts from accessing full call detail records. Build billing data retention aligned with
+      Article 6 traffic data requirements.
+    tools:
+      - "Billing preference management API with privacy-by-default settings"
+      - "Number masking/redaction service for billing records"
+      - "Role-based billing access control for shared/business accounts"
+      - "Billing data retention automation aligned with traffic data rules"
+  devsecops:
+    prose: >-
+      Code review must verify that billing systems implement configurable itemisation levels. SAST rules
+      must detect full phone number exposure in billing outputs. Pipeline gates must verify that new billing
+      features default to the privacy-preserving option. Automated tests must verify number masking
+      functionality and that non-itemised billing options work correctly.
+    tools:
+      - "SAST rules detecting unmasked phone numbers in billing output"
+      - "Automated billing privacy feature regression tests"
+      - "Default configuration verification in CI pipeline gates"
+  secops:
+    prose: >-
+      Monitor billing system access for unauthorized call detail record retrieval. Audit billing outputs
+      to verify number masking is applied correctly. Alert on bulk billing data exports that may indicate
+      unauthorized surveillance of communication patterns. Track subscriber billing preference changes
+      for anomaly detection.
+    tools:
+      - "Billing system access monitoring and anomaly detection"
+      - "Automated billing output audit for masking compliance"
+      - "Bulk data export alerting for billing records"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5", "art-25"]
+    relationship: complements

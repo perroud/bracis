@@ -1,0 +1,97 @@
+id: ac-l2-001
+family: ac
+title: "Limit system access to the types of transactions and functions that authorized users are permitted to execute"
+class: CMMC-L2
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Limit system access to the types of transactions and functions that
+    authorized users are permitted to execute.
+
+guidance:
+  prose: >-
+    This control extends basic access control (Level 1) by requiring
+    granular authorization that limits what authorized users can do,
+    not just who can access the system. This requires implementation of
+    role-based or attribute-based access control that maps user roles
+    to specific permitted transactions and functions. The principle of
+    least privilege must be enforced: users should only be authorized
+    for the minimum set of transactions required for their assigned
+    duties. This control maps to NIST SP 800-171 control 3.1.2 and
+    NIST SP 800-53 AC-2, AC-3, AC-5, AC-6.
+
+references:
+  - citation: "NIST SP 800-171 Rev 2, 3.1.2"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, AC-2, AC-3, AC-5, AC-6"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement fine-grained RBAC/ABAC policies that map organizational
+      roles to specific permitted operations across all platform services.
+      Use OPA/Rego or Kubernetes RBAC to define and enforce authorization
+      policies declaratively. Implement namespace-level isolation in
+      Kubernetes with per-namespace RBAC bindings. Deploy API gateway
+      authorization that enforces endpoint-level access control based on
+      user roles and attributes. Use policy-as-code to define separation
+      of duties constraints (e.g., developers cannot approve their own
+      deployments to production). Implement just-in-time privilege
+      elevation for administrative actions with automatic expiration
+      and full audit logging.
+    tools:
+      - open-policy-agent
+      - kubernetes-rbac
+      - hashicorp-vault
+      - hashicorp-boundary
+      - kong
+      - istio-authorization
+
+  devsecops:
+    prose: >-
+      Enforce least-privilege access in CI/CD pipelines through
+      environment-specific deploy tokens with scoped permissions.
+      Implement separation of duties: code authors cannot approve their
+      own merge requests, and merge request approvers must have the
+      appropriate role designation. Use protected environments with
+      deployment approval gates requiring authorized roles. Scan
+      infrastructure-as-code for overly permissive IAM policies
+      (wildcard actions, resource *) and fail builds on violations.
+      Implement automated RBAC validation tests that verify
+      authorization boundaries are correctly enforced.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - gitlab-protected-environments
+      - checkov
+      - conftest
+      - terraform
+
+  secops:
+    prose: >-
+      Monitor for privilege violations: users executing transactions
+      outside their authorized scope, privilege escalation attempts,
+      and role assignment anomalies. Implement UEBA to detect behavioral
+      deviations from established role patterns. Conduct quarterly
+      access certification reviews where managers verify user role
+      assignments and permitted transactions. Generate compliance
+      reports showing least-privilege enforcement metrics, exception
+      counts, and remediation status. Alert on emergency privilege
+      grants and track their timely revocation.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - beyond-trust
+      - cyberark
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-5", "AC-6"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a8.2", "a8.3"]
+    relationship: supports

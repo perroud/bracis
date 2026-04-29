@@ -1,0 +1,131 @@
+id: isa-4.1
+family: ch-4
+title: "Identity and Access Management"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall implement a formal user registration and
+    de-registration process, a user access provisioning process, and
+    management of privileged access rights. Users shall be required
+    to follow the organization's practices in the use of secret
+    authentication information. Access to information and application
+    system functions shall be restricted in accordance with the
+    access control policy. Secure log-on procedures shall be used
+    where required by the access control policy. Access rights shall
+    be reviewed at regular intervals.
+
+guidance:
+  prose: >-
+    VDA ISA requires identity and access management (IAM) controls
+    that enforce the principle of least privilege across all systems
+    processing automotive information. User accounts must be uniquely
+    identifiable (no shared accounts), and privileged accounts must
+    be strictly separated from regular accounts. Multi-factor
+    authentication (MFA) is mandatory for remote access and
+    privileged operations at AL2 and above. Access reviews must be
+    conducted at least annually, with more frequent reviews (quarterly)
+    for privileged accounts and accounts with access to prototype
+    or highly confidential information. The organization must
+    implement automated de-provisioning triggered by HR events
+    (termination, role change) with a maximum delay of 24 hours for
+    terminations. Service accounts and technical accounts must be
+    inventoried, have defined owners, and be included in access
+    reviews. Password policies must enforce minimum complexity and
+    rotation requirements, or be replaced by stronger authentication
+    mechanisms (passwordless, certificate-based).
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of IAM processes and policies."
+  al2:
+    applicability: required
+    notes: "Auditor verifies MFA enforcement, access review records, and provisioning processes."
+  al3:
+    applicability: required
+    notes: "On-site verification of IAM controls, privileged access management, and de-provisioning timeliness."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 4.1"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.5.15, A.5.16, A.5.17, A.5.18, A.8.2, A.8.3, A.8.4, A.8.5"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management using an identity
+      provider (IdP) that supports OIDC/SAML federation across all
+      platform services. Enforce MFA at the IdP level for all users,
+      with phishing-resistant MFA (FIDO2, WebAuthn) required for
+      privileged accounts. Use infrastructure-as-code to define and
+      manage RBAC policies across Kubernetes clusters, cloud
+      providers, and SaaS tools. Implement just-in-time (JIT)
+      privileged access with automatic expiration rather than
+      standing privileged accounts. Automate access provisioning
+      and de-provisioning through SCIM integration between the IdP
+      and all platform services. Implement automated access reviews
+      by generating periodic reports of all access grants mapped
+      against organizational roles, flagging anomalies for review.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - vault
+      - kubernetes-rbac
+      - terraform
+      - teleport
+
+  devsecops:
+    prose: >-
+      Enforce authentication for all CI/CD pipeline operations using
+      short-lived, scoped tokens rather than long-lived credentials.
+      Implement pipeline identity federation so that pipeline jobs
+      authenticate to target services using workload identity rather
+      than static secrets. Require MFA for all human interactions
+      with the CI/CD system (merge approvals, manual deployments,
+      configuration changes). Scan repositories for hardcoded
+      credentials and secrets using automated pre-commit and
+      pipeline checks. Implement branch protection rules that
+      enforce identity verification for all contributors. Generate
+      access audit trails from pipeline execution logs showing
+      who deployed what, when, and to which environment.
+    tools:
+      - vault
+      - gitlab-ci
+      - github-actions
+      - gitleaks
+      - trufflehog
+      - cosign
+      - spiffe-spire
+
+  secops:
+    prose: >-
+      Monitor all authentication events in the SIEM, with specific
+      detection rules for brute-force attacks, credential stuffing,
+      MFA bypass attempts, and impossible travel scenarios. Implement
+      user and entity behavior analytics (UEBA) to detect anomalous
+      access patterns that may indicate compromised credentials or
+      insider threats. Alert on privileged account usage outside
+      of approved maintenance windows. Integrate identity provider
+      logs with endpoint detection to correlate authentication
+      events with device posture. Generate automated access review
+      reports and flag accounts with excessive privileges or
+      dormant access. Monitor for and alert on service account
+      credential exposure in public repositories or paste sites.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - crowdstrike
+      - cyberark
+      - sailpoint
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.15", "A.5.16", "A.5.17", "A.5.18", "A.8.2", "A.8.3", "A.8.5"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-5", "AC-6", "IA-1", "IA-2", "IA-4", "IA-5"]
+    relationship: mapped

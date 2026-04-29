@@ -1,0 +1,117 @@
+id: art-2
+family: cap-1
+title: "Definicoes Tecnicas e Terminologia"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 2. Para os efeitos desta Resolução, aplicam-se as seguintes
+    definições:
+
+    I - Software como Dispositivo Médico (SaMD): software destinado a
+    ser utilizado para uma ou mais finalidades médicas que desempenha
+    essas finalidades sem fazer parte de um dispositivo médico de hardware;
+
+    II - Fabricante de SaMD: pessoa jurídica responsável pelo projeto,
+    fabricação, embalagem ou rotulagem de um SaMD, ou por montar ou
+    processar um SaMD em nome de outra pessoa;
+
+    III - Versão de SaMD: iteração identificável do software, com
+    identificador único de versão, que representa um estado específico
+    do conjunto de funcionalidades e correções;
+
+    IV - Ciclo de vida do software: período que abrange desde a concepção
+    até a descontinuação do SaMD, incluindo desenvolvimento, verificação,
+    validação, liberação, manutenção e descontinuação;
+
+    V - Dados de entrada: dados fornecidos ao SaMD para processamento,
+    incluindo dados clínicos, imagens médicas, sinais fisiológicos e
+    dados demográficos do paciente;
+
+    VI - Saída clínica: resultado gerado pelo SaMD que se destina a
+    informar decisão clínica, diagnóstico, tratamento ou monitoramento.
+guidance:
+  prose: |
+    O art. 2 padroniza a terminologia regulatoria, alinhando definicoes
+    brasileiras aos termos internacionais do IMDRF, IEC 62304 e ISO 14971.
+
+    **Fabricante de SaMD:**
+    O conceito de fabricante e amplo e inclui quem projeta, desenvolve
+    ou rotula o SaMD. Em modelos de desenvolvimento terceirizado, o
+    detentor do registro ANVISA e o fabricante legal, mesmo que o
+    codigo seja escrito por terceiros.
+
+    **Versao de SaMD:**
+    A definicao de versao e critica porque alteracoes de versao podem
+    exigir novo registro ou alteracao de registro junto a ANVISA. O
+    fabricante deve distinguir entre:
+    - Versoes maiores (major): potencial impacto em seguranca/eficacia
+    - Versoes menores (minor): melhorias sem impacto clinico
+    - Correcoes (patches): correccao de defeitos sem mudanca funcional
+
+    **Dados de entrada vs. saida clinica:**
+    A distincao entre dados de entrada e saida clinica e determinante
+    para classificacao de risco. SaMD que processa dados de alta
+    criticidade (ex: imagens radiologicas) para gerar saida clinica
+    direta (ex: diagnostico) recebe classificacao de risco mais alta.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Governanca de versoes e rastreabilidade:**
+      1. Adotar versionamento semantico (SemVer) para todos os SaMD,
+         com regras claras que mapeiem major/minor/patch para impacto
+         regulatorio (major = alteracao ANVISA, minor = notificacao,
+         patch = registro interno).
+      2. Implementar pipeline de versionamento automatico que gere
+         identificadores unicos de versao (build number + hash de commit)
+         para cada release de SaMD.
+      3. Manter registro imutavel de todas as versoes liberadas, com
+         hash criptografico, data de liberacao e status regulatorio.
+      4. Configurar sistema de gestao de configuracao (SCM) que
+         impeca alteracao de artefatos ja liberados sem novo ciclo
+         de versionamento.
+    tools:
+      - semantic-versioning
+      - git-tags
+      - artifact-registry
+      - scm
+  devsecops:
+    prose: |
+      **Rastreabilidade de versao no pipeline:**
+      1. Automatizar geracao de Software Bill of Materials (SBOM) em
+         cada build, vinculando versao do SaMD a todas as dependencias.
+      2. Implementar assinatura digital de artefatos de release para
+         garantir integridade e autenticidade da versao.
+      3. Criar gate de pipeline que valida conformidade da nomenclatura
+         de versao com a politica de versionamento regulatorio.
+      4. Manter changelog automatico derivado de commits convencionais,
+         classificando alteracoes por impacto regulatorio.
+    tools:
+      - syft
+      - cosign
+      - conventional-commits
+      - gitlab-ci
+  secops:
+    prose: |
+      **Registro e controle de terminologia:**
+      1. Manter glossario regulatorio interno alinhado com art. 2 da
+         RDC 657 e termos IMDRF, acessivel a todas as equipes.
+      2. Implementar processo de revisao de rotulagem que garanta uso
+         consistente da terminologia regulatoria em toda comunicacao
+         publica sobre o SaMD.
+      3. Auditar trimestralmente se as definicoes de fabricante e versao
+         estao sendo aplicadas corretamente nos registros ANVISA.
+      4. Documentar cadeia de responsabilidade: quem e o fabricante
+         legal de cada SaMD quando ha terceirizacao de desenvolvimento.
+    tools:
+      - grc-platform
+      - document-management
+      - regulatory-tracking
+      - audit-trail
+legal_references:
+  - framework_id: hipaa
+    articles: ["160-103"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: complements

@@ -1,0 +1,140 @@
+id: art-12
+family: title-3
+title: "Record-Keeping"
+class: EU-AI-Act
+
+statement:
+  prose: >-
+    High-risk AI systems shall technically allow for the automatic recording of events
+    (logs) over the lifetime of the system. The logging capabilities shall ensure a
+    level of traceability of the AI system's functioning throughout its lifecycle that
+    is appropriate to the intended purpose of the system.
+  parts:
+    - id: art-12.1
+      label: "1."
+      prose: >-
+        High-risk AI systems shall technically allow for the automatic recording of
+        events (logs) over the lifetime of the system. The logging capabilities shall
+        ensure a level of traceability of the AI system's functioning throughout its
+        lifecycle that is appropriate to the intended purpose of the system.
+    - id: art-12.2
+      label: "2."
+      prose: >-
+        In particular, logging capabilities shall enable the monitoring of the
+        operation of the high-risk AI system with respect to the occurrence of
+        situations that may result in the AI system presenting a risk within the
+        meaning of Article 79(1) or lead to a substantial modification, and facilitate
+        the post-market monitoring referred to in Article 72.
+    - id: art-12.3
+      label: "3."
+      prose: >-
+        For high-risk AI systems referred to in point 1(a) of Annex III, the logging
+        capabilities shall provide, at a minimum, the period of each use of the system
+        (start date and time and end date and time of each use); the reference database
+        against which input data has been checked; the input data for which the search
+        has led to a match; and the identification of the natural persons involved in
+        the verification of the results.
+    - id: art-12.4
+      label: "4."
+      prose: >-
+        For high-risk AI systems referred to in Annex III, the logging capabilities
+        shall provide, at a minimum, recording of the periods of each use of the
+        system; the reference database against which input data has been checked by
+        the system; the input data for which the search has led to a match; and the
+        identification of the natural persons involved in the verification of the
+        results, as referred to in Article 14(5).
+
+guidance:
+  prose: >-
+    Article 12 establishes logging as a mandatory technical capability, not merely an
+    operational practice. The AI system must be designed and built with logging built
+    in, capturing events that enable full traceability of system behaviour. Logs must
+    be sufficient to reconstruct why a particular decision or output was produced,
+    who was involved in verifying results, and whether the system operated within its
+    intended parameters. For biometric identification systems (Annex III, point 1(a)),
+    the logging requirements are particularly detailed, requiring timestamps, reference
+    database identification, matched inputs, and human verifier identification. Log
+    retention periods should align with the AI system lifecycle and applicable sectoral
+    regulations. Logs must be tamper-resistant and accessible to competent authorities
+    for audit purposes.
+
+references:
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 12"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 72 (Post-Market Monitoring)"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 79 (Procedure at national level)"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design and deploy a centralised AI logging infrastructure that captures inference
+      requests, model outputs, confidence scores, feature attributions, and system
+      state for every high-risk AI system interaction. Implement structured logging
+      schemas specific to each AI system type ensuring compliance with Article 12
+      minimum requirements including timestamps, input references, match results, and
+      human verifier identification. Deploy append-only, tamper-evident log storage
+      using write-once storage backends or blockchain-anchored integrity verification.
+      Build real-time log streaming pipelines from AI inference endpoints to the
+      centralised logging platform with guaranteed delivery and ordering. Implement
+      log retention policies aligned with regulatory requirements and configure
+      automated lifecycle management for log data including archival and purging.
+    tools:
+      - elastic-stack
+      - kafka
+      - minio
+      - grafana-loki
+      - terraform
+      - kubernetes
+
+  devsecops:
+    prose: >-
+      Enforce logging capability as a mandatory non-functional requirement for all
+      high-risk AI systems through pipeline validation gates that verify logging
+      endpoints are configured and functional. Implement logging integration tests
+      that validate log completeness, format compliance, and delivery reliability
+      as part of the CI/CD pipeline for every AI system deployment. Require logging
+      schema definitions as code artifacts in the repository, validated against
+      Article 12 minimum requirements through automated schema validation tools.
+      Include log tamper-resistance verification in deployment acceptance tests by
+      confirming that write-once storage policies are enforced. Automate log sampling
+      tests in staging environments that verify all required fields are populated
+      for representative inference scenarios.
+    tools:
+      - gitlab-ci
+      - conftest
+      - pytest
+      - elastic-stack
+      - gitlab-compliance-framework
+
+  secops:
+    prose: >-
+      Monitor AI system logs in real-time for anomalies indicating system malfunction,
+      risk situations per Article 79(1), or substantial modifications to system
+      behaviour. Configure SIEM correlation rules specific to AI system logs that
+      detect patterns such as unusual inference volumes, confidence score
+      distribution shifts, error rate spikes, or missing human verification records.
+      Implement automated compliance reporting that verifies log completeness against
+      Article 12 requirements on a continuous basis and alerts on gaps. Conduct
+      periodic log integrity audits verifying tamper-evidence mechanisms are intact
+      and log data has not been modified or deleted outside of retention policies.
+      Maintain log access controls ensuring competent authorities can access logs
+      upon request while protecting personal data within logs per GDPR requirements.
+    tools:
+      - splunk
+      - elastic-siem
+      - grafana
+      - grc-platform
+      - wazuh
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.17"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["DE.CM-01", "DE.CM-09", "PR.DS-01"]
+    relationship: supports
+  - framework_id: gdpr
+    articles: ["art-5", "art-30"]
+    relationship: complements

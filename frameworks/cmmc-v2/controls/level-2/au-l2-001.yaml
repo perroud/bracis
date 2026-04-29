@@ -1,0 +1,104 @@
+id: au-l2-001
+family: au
+title: "Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity"
+class: CMMC-L2
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Create and retain system audit logs and records to the extent needed
+    to enable the monitoring, analysis, investigation, and reporting of
+    unlawful or unauthorized system activity.
+
+guidance:
+  prose: >-
+    This control requires comprehensive audit logging that captures
+    sufficient detail to support security monitoring, forensic investigation,
+    and compliance reporting. Audit records must include events such as
+    login attempts (success and failure), privilege escalation, data access,
+    configuration changes, and system errors. Logs must be retained for a
+    sufficient period to support investigation of incidents that may not
+    be detected immediately. The control requires both creation and
+    retention, meaning logs must be stored securely and protected from
+    unauthorized modification or deletion. This maps to NIST SP 800-171
+    control 3.3.1 and NIST SP 800-53 AU-2, AU-3, AU-6, AU-11, AU-12.
+
+references:
+  - citation: "NIST SP 800-171 Rev 2, 3.3.1"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, AU-2, AU-3, AU-6, AU-11, AU-12"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized log aggregation platform (Elasticsearch/Loki)
+      that collects audit logs from all platform components: Kubernetes
+      audit logs, API server logs, authentication events, network flow
+      logs, and application security events. Implement structured logging
+      standards that ensure all services emit logs with required audit
+      fields (timestamp, actor, action, resource, outcome, source IP).
+      Configure log retention policies aligned with regulatory and
+      investigation requirements (minimum 1 year for CUI systems).
+      Implement immutable log storage using write-once storage or
+      cryptographic chaining to prevent tampering. Deploy log pipeline
+      monitoring to detect and alert on logging gaps or failures.
+      Ensure audit logs are excluded from routine data deletion processes.
+    tools:
+      - elasticsearch
+      - loki
+      - fluentd
+      - vector
+      - grafana
+      - s3-immutable-storage
+      - kubernetes-audit-logging
+
+  devsecops:
+    prose: >-
+      Enforce audit logging standards through pipeline policy checks
+      that verify applications implement required logging instrumentation
+      before deployment. Implement CI/CD audit trails that capture
+      pipeline execution details, deployment artifacts, approvals, and
+      configuration changes. Store pipeline logs with the same retention
+      and integrity protections as application audit logs. Scan
+      application code for logging gaps (missing audit events for
+      security-relevant operations). Generate audit log completeness
+      reports as pipeline artifacts. Implement log format validation
+      tests in the CI pipeline.
+    tools:
+      - gitlab-ci
+      - gitlab-audit-events
+      - fluentd
+      - vector
+      - conftest
+
+  secops:
+    prose: >-
+      Operate SIEM with correlation rules that consume audit logs for
+      real-time security monitoring. Configure alerts for audit log
+      anomalies: missing logs, log volume deviations, and tamper
+      indicators. Implement regular audit log review processes with
+      documented procedures for identifying unauthorized activity.
+      Conduct periodic audit log completeness assessments verifying
+      all required event types are being captured. Maintain chain-of-
+      custody documentation for audit logs used in investigations.
+      Generate compliance reports demonstrating log retention compliance
+      and review cadence.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - qradar
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-11", "AU-12"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a8.15"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["au-2", "au-6"]
+    relationship: equivalent-to

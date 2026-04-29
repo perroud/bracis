@@ -1,0 +1,91 @@
+id: soc1-ra-fraud-risk
+family: risk-assessment
+title: "Fraud Risk Assessment"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization considers the potential for fraud in assessing risks to the
+    achievement of its control objectives related to financial reporting. The fraud risk
+    assessment addresses the risk of management override of controls, the potential for
+    misappropriation of assets, and the possibility of fraudulent financial reporting.
+    The organization considers incentives and pressures that may motivate individuals
+    to commit fraud, opportunities that exist due to the absence or ineffectiveness of
+    controls, and the attitudes and rationalizations that allow individuals to justify
+    fraudulent activity. Controls are designed to address identified fraud risks, with
+    particular emphasis on areas where fraud risk is highest given the nature of the
+    service organization's processing activities on behalf of user entities.
+guidance:
+  prose: >-
+    Fraud risk assessment is explicitly required under SSAE 18 and represents a distinct
+    component of the overall risk assessment process. For service organizations processing
+    financial transactions, the fraud risk assessment must address risks specific to the
+    service organization's role — including unauthorized access to user entities' financial
+    data, manipulation of transaction records, and misappropriation of assets processed
+    on behalf of user entities. Auditors look for evidence that the fraud risk assessment
+    was performed with appropriate rigor and that identified fraud risks are specifically
+    addressed by detective and preventive controls. Management override risk must always
+    be considered, and controls to mitigate this risk (such as independent review of journal
+    entries and segregation of duties) must be documented. The fraud risk assessment should
+    be linked explicitly to the design of anti-fraud controls.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement technical controls that directly address fraud scenarios identified in the
+      fraud risk assessment. For manipulation of transaction records, deploy immutable
+      audit logs using append-only storage (e.g., AWS CloudTrail with S3 Object Lock or
+      equivalent) that cannot be altered even by privileged administrators. For unauthorized
+      access to financial data, implement privileged access management requiring just-in-time
+      elevation with formal approval and automatic revocation. Deploy anomaly detection
+      on financial transaction flows to identify unusual patterns that may indicate fraud.
+      Implement data integrity validation (cryptographic hashing or digital signatures)
+      on financial records to detect unauthorized modifications.
+    tools:
+      - cyberark
+      - vault
+      - aws-cloudtrail
+      - s3-object-lock
+      - elasticsearch-anomaly-detection
+  devsecops:
+    prose: >-
+      Address fraud risk in the software development lifecycle by enforcing strict controls
+      on changes to financial processing logic. Require that all changes to transaction
+      processing code pass through peer review by a designated financial controls reviewer,
+      not just a technical reviewer. Enable signed commits to create attributable records
+      of code changes. Implement static analysis rules specifically targeting financial
+      calculation accuracy (division errors, rounding, currency handling). Scan all
+      commits for hardcoded credentials and secrets that could enable unauthorized access.
+      Maintain an immutable history of all changes to financial processing code through
+      Git history and GitLab audit events.
+    tools:
+      - gitlab-signed-commits
+      - gitlab-secret-detection
+      - sonarqube-financial-rules
+      - semgrep
+      - checkov
+  secops:
+    prose: >-
+      Conduct a formal, documented fraud risk assessment at least annually, using the
+      fraud triangle framework (incentives/pressures, opportunities, attitudes/rationalizations).
+      Map identified fraud scenarios to specific anti-fraud controls. Implement a continuous
+      transaction monitoring capability that flags unusual financial transactions for human
+      review. Operate an anonymous fraud reporting channel. Conduct periodic forensic reviews
+      of high-risk transaction types. Ensure that the fraud risk assessment results are
+      reviewed by the audit committee. Retain fraud risk assessment documentation and
+      the results of any fraud investigations for the audit examination period.
+    tools:
+      - actimize
+      - nice-actimize
+      - splunk-ueba
+      - archer-grc
+      - navex-ethics-hotline
+related_controls:
+  - control_id: soc1-ce-ethics
+    relationship: supports
+    description: "A strong ethical culture is the primary preventive control against fraud."
+  - control_id: soc1-ca-segregation
+    relationship: supports
+    description: "Segregation of duties is the most fundamental structural control addressing fraud opportunity."
+  - control_id: soc1-mon-continuous
+    relationship: supports
+    description: "Continuous monitoring provides detective controls that identify fraud indicators."

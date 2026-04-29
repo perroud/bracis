@@ -1,0 +1,108 @@
+id: art-15
+family: cap-3
+title: "Registro Eletronico de Atendimentos"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 15. Todo atendimento realizado por telemedicina deve ser
+    registrado eletronicamente, contendo no mínimo:
+
+    I - identificação do médico (nome, CRM, especialidade);
+    II - identificação do paciente (nome, CPF, data de nascimento);
+    III - data e hora de início e término do atendimento;
+    IV - modalidade de telemedicina utilizada;
+    V - resumo clínico do atendimento;
+    VI - hipótese diagnóstica ou diagnóstico, quando aplicável;
+    VII - conduta adotada (prescrição, encaminhamento, orientação);
+    VIII - registro de consentimento informado.
+
+    Parágrafo único. O registro eletrônico deve ser armazenado de
+    forma segura e integrado ao prontuário eletrônico do paciente,
+    com garantia de autenticidade, integridade e disponibilidade.
+guidance:
+  prose: |
+    O art. 15 especifica o conteudo minimo obrigatorio do registro
+    de atendimento por telemedicina. O registro deve ser completo,
+    auditavel e integrado ao prontuario eletronico.
+
+    **Campos obrigatorios:**
+    O sistema de telemedicina deve garantir que todos os oito itens
+    sejam preenchidos antes de finalizar o atendimento. Campos
+    obrigatorios nao podem ser ignorados ou deixados em branco.
+
+    **Integracao com prontuario (paragrafo unico):**
+    O registro do atendimento de telemedicina nao pode existir
+    apenas na plataforma de telemedicina. Deve ser integrado ao
+    prontuario eletronico do paciente (PEP/RES), garantindo
+    continuidade do cuidado independentemente da modalidade.
+
+    **Autenticidade e integridade:**
+    - Autenticidade: o registro deve ser atribuivel inequivocamente
+      ao medico que realizou o atendimento (assinatura digital)
+    - Integridade: o registro nao pode ser alterado apos assinatura
+      sem registro auditavel da alteracao (adendo, nao edicao)
+    - Disponibilidade: o registro deve estar acessivel para
+      continuidade do cuidado e auditoria
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de registro de atendimentos:**
+      1. Implementar formulario estruturado de registro de
+         atendimento com todos os oito campos obrigatorios como
+         campos de preenchimento obrigatorio (nao opcional).
+      2. Integrar registro de atendimento com prontuario
+         eletronico (PEP) via HL7 FHIR, CDA ou API proprietaria,
+         garantindo sincronizacao em tempo real.
+      3. Implementar assinatura digital ICP-Brasil no registro
+         do atendimento, garantindo autenticidade e integridade.
+      4. Criar mecanismo de adendo que permite complementar
+         registro sem alterar conteudo original (append-only).
+      5. Pre-preencher campos de identificacao do medico e
+         paciente automaticamente a partir do sistema, reduzindo
+         erro humano e garantindo completude.
+    tools:
+      - ehr-integration
+      - hl7-fhir
+      - digital-signature-icp
+      - form-builder
+  devsecops:
+    prose: |
+      **Qualidade do registro de atendimentos:**
+      1. Testar que registro nao pode ser finalizado sem
+         preenchimento de todos os oito campos obrigatorios.
+      2. Validar integracao com prontuario eletronico, verificando
+         que dados sao transmitidos corretamente e em tempo real.
+      3. Testar mecanismo de assinatura digital e verificar que
+         registro assinado nao pode ser alterado (apenas adendo).
+      4. Verificar que integracao HL7 FHIR gera recursos FHIR
+         validos (Encounter, Condition, MedicationRequest).
+    tools:
+      - gitlab-ci
+      - fhir-validation
+      - digital-signature-testing
+      - data-integrity-testing
+  secops:
+    prose: |
+      **Operacao de registro de atendimentos:**
+      1. Auditar completude dos registros de atendimento,
+         verificando que todos os campos obrigatorios estao
+         preenchidos em 100% dos atendimentos.
+      2. Verificar que registros estao integrados ao prontuario
+         eletronico e acessiveis para continuidade do cuidado.
+      3. Monitorar integridade de registros assinados, alertando
+         se houver tentativa de alteracao nao autorizada.
+      4. Manter metricas de completude e qualidade dos registros
+         por medico e por modalidade de telemedicina.
+    tools:
+      - audit-management
+      - data-quality-monitoring
+      - integrity-monitoring
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-37"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-b", "164.530-j"]
+    relationship: mapped

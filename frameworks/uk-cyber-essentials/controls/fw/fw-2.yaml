@@ -1,0 +1,88 @@
+id: fw-2
+family: fw
+title: "Firewall Rule Management and Documentation"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    All firewall rules that allow network traffic to pass through the boundary must be
+    subject to an approval process. Rules must be documented with a business justification
+    for each allowed service or port. Rules that are no longer required must be removed or
+    disabled in a timely manner. Administrative interfaces for firewalls must not be
+    accessible from the internet unless there is a documented business need, and if so,
+    access must be protected by multi-factor authentication or an IP allow-list.
+
+guidance:
+  prose: >-
+    Firewall rule sprawl is a common cause of security incidents. Organisations must
+    maintain a living register of all active firewall rules, including the business owner,
+    the date of approval, and the scheduled review date. Unused rules should be identified
+    through traffic analysis and removed. Administrative access to the firewall management
+    plane must be tightly restricted — ideally limited to a dedicated management network
+    or VPN with multi-factor authentication enforced. Any change to firewall rules should
+    follow a formal change management process.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Firewalls"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Manage all firewall rules through version-controlled Infrastructure-as-Code with
+      mandatory peer review and approval gates. Tag each rule with metadata including
+      owner, approval ticket, expiry date, and business justification. Implement automated
+      policies that prevent deployment of rules without required metadata tags. Use
+      infrastructure scanning to detect rules that allow access to administrative ports
+      (22, 3389, 443/management) from 0.0.0.0/0. Deploy bastion hosts or identity-aware
+      proxies for administrative access rather than exposing management interfaces directly.
+    tools:
+      - terraform
+      - pulumi
+      - aws-config
+      - azure-policy
+      - gcp-organization-policy
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Enforce policy-as-code checks in CI/CD pipelines that reject firewall rules
+      missing required metadata (owner, justification, expiry). Implement automated
+      tests that enumerate all active rules and compare against the approved rule
+      register. Create pipeline stages that scan for rules allowing unrestricted
+      administrative access and block deployment. Generate audit reports on rule
+      changes as pipeline artifacts for compliance evidence.
+    tools:
+      - checkov
+      - tfsec
+      - open-policy-agent
+      - gitlab-ci
+      - conftest
+
+  secops:
+    prose: >-
+      Schedule quarterly firewall rule reviews with the relevant business owners.
+      Use traffic analysis tools to identify rules with zero traffic hits over the
+      review period and flag them for removal. Monitor for any direct administrative
+      access to firewalls from untrusted networks and generate immediate alerts.
+      Maintain an auditable log of all firewall rule changes, approvals, and removals.
+      Report on rule hygiene metrics including total rules, rules past expiry, and
+      rules without traffic.
+    tools:
+      - splunk
+      - elastic-siem
+      - tufin
+      - algosec
+      - firemon
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A5.1"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "CM-3", "CM-6"]
+    relationship: mapped
+  - framework_id: cis-controls-v8
+    articles: ["CIS 4.1", "CIS 4.4", "CIS 4.5"]
+    relationship: mapped

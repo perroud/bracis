@@ -1,0 +1,89 @@
+id: ssf-design-1
+family: ssf-design
+title: "Threat Identification and Mitigation in Software Design"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software vendor shall identify and document threats applicable to the software
+    during the design phase. Threat modeling shall be performed to identify potential
+    attack vectors, trust boundaries, and data flows. The design shall incorporate
+    mitigations for identified threats, and residual risks shall be documented and
+    accepted by accountable parties. Threat models shall be reviewed and updated when
+    significant changes are made to the software architecture.
+
+guidance:
+  prose: >-
+    Threat modeling is a structured approach to identifying security threats and
+    designing countermeasures. PCI SSF requires that vendors proactively analyze how
+    attackers might exploit software before writing code. Effective threat modeling
+    considers data flow diagrams, trust boundaries between components, and STRIDE or
+    similar categorization of threats. The output must directly inform security
+    requirements and architecture decisions. This is not a one-time activity; it must
+    be revisited whenever the software undergoes material architectural changes.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 1 — Threat Identification"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 1.1"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate threat modeling into the CI/CD pipeline as a mandatory gate for
+      architecture-significant changes. Use tools such as OWASP Threat Dragon or
+      Microsoft Threat Modeling Tool to create and maintain machine-readable threat
+      models stored alongside source code. Automate detection of architectural drift
+      by comparing deployed service topologies against documented threat model
+      boundaries. Enforce that infrastructure-as-code changes affecting trust
+      boundaries trigger a threat model review workflow. Maintain a centralized
+      threat library cataloging known threat patterns for payment software components.
+    tools:
+      - owasp-threat-dragon
+      - microsoft-threat-modeling-tool
+      - threagile
+      - terraform
+      - argocd
+
+  devsecops:
+    prose: >-
+      Require threat model artifacts as part of the Definition of Done for user
+      stories that introduce new attack surfaces. Store threat models as code
+      (YAML/JSON) in the repository alongside the components they describe. Configure
+      merge request templates to include a threat model impact checklist. Use SAST
+      tools to validate that mitigations identified in the threat model are actually
+      implemented in code. Track threat model coverage metrics and report gaps in
+      security dashboards.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - owasp-threat-dragon
+      - threagile
+      - jira
+
+  secops:
+    prose: >-
+      Review threat model outputs as part of security assessment activities. Validate
+      that identified threats have corresponding monitoring and detection rules in the
+      SIEM. Map threat model findings to incident response playbooks. Conduct periodic
+      reviews of threat models against observed attack patterns and threat intelligence
+      feeds. Ensure that residual risk acceptances are reviewed by management at
+      defined intervals.
+    tools:
+      - splunk
+      - elastic-siem
+      - jira
+      - confluence
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.1", "req-6.2"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v1.1", "v1.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.26"]
+    relationship: mapped

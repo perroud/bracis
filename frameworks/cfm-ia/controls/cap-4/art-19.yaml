@@ -1,0 +1,122 @@
+id: art-19
+family: cap-4
+title: "Responsabilidade por Decisoes Assistidas por IA"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 19. A responsabilidade ético-profissional por atos médicos praticados
+    com assistência de sistemas de inteligência artificial observa as seguintes
+    regras:
+
+    I - o médico que utiliza sistema de IA é responsável pela decisão clínica
+    final, devendo responder perante o Conselho Regional de Medicina por
+    eventuais danos decorrentes de negligência, imprudência ou imperícia
+    na utilização do sistema;
+
+    II - constitui imperícia a utilização de sistema de IA médica sem
+    compreensão adequada de suas capacidades, limitações e cenários de
+    falha;
+
+    III - constitui negligência a omissão de supervisão adequada de sistema
+    de IA médica conforme nível de risco classificado;
+
+    IV - constitui imprudência a utilização de sistema de IA médica em
+    cenários contraindicados na documentação técnica ou fora das condições
+    de uso validadas;
+
+    V - o médico responsável técnico da instituição responde solidariamente
+    quando a falha decorrer de deficiência na governança, monitoramento
+    ou manutenção dos sistemas de IA.
+guidance:
+  prose: |
+    O art. 19 adapta os conceitos classicos de responsabilidade medica
+    (negligencia, imprudencia, impericia) ao contexto de IA.
+
+    **Tipificacao da culpa com IA:**
+
+    - Impericia (inciso II): usar IA sem entender como funciona. Se o
+      medico nao leu a model card, nao compreende as limitacoes e aceita
+      cegamente toda recomendacao, comete impericia. A capacitacao do
+      art. 15-IV e essencial para evitar essa tipificacao.
+
+    - Negligencia (inciso III): nao supervisionar adequadamente. Se o
+      modelo exige supervisao em tempo real (risco muito alto) e o
+      medico supervisiona com atraso, e negligencia. Se o modelo
+      apresenta alertas de degradacao e ninguem investiga, negligencia.
+
+    - Imprudencia (inciso IV): usar IA fora do escopo validado. Se a
+      model card diz "validado para adultos" e o medico usa em pediatria,
+      e imprudencia. Se o cenario e contraindicado e o medico ignora, idem.
+
+    **Responsabilidade solidaria (inciso V):**
+    O medico responsavel tecnico (art. 15-I) responde quando a causa
+    raiz e institucional: falta de monitoramento, modelo desatualizado
+    em producao, ausencia de plano de contingencia. Nao responde por
+    decisoes clinicas individuais de outros medicos.
+
+    **Interface com responsabilidade do fabricante:**
+    A Resolucao nao exime o fabricante de responsabilidade civil
+    (CDC, LGPD). O medico tem responsabilidade etico-profissional
+    (CRM); o fabricante, responsabilidade civil e consumerista.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de evidencia de diligencia:**
+      1. Implementar registro automatico de evidencias de diligencia
+         medica: acesso a explicacao, tempo de revisao, consulta a
+         model card — para defesa em caso de processo etico.
+      2. Configurar sistema de alerta ao medico quando utilizar
+         sistema de IA fora de condicoes validadas (cenario
+         contraindicado, populacao nao validada).
+      3. Implementar registro de capacitacao integrado: vincular
+         certificado de treinamento em IA ao perfil do medico no
+         sistema, bloqueando uso por medicos nao capacitados.
+      4. Automatizar notificacao ao medico responsavel tecnico
+         quando metricas de governanca estiverem abaixo do limiar.
+    tools:
+      - audit-log
+      - alert-system
+      - training-registry
+      - compliance-monitoring
+  devsecops:
+    prose: |
+      **Prevencao de uso fora de escopo:**
+      1. Implementar validacao de contexto de uso no runtime: verificar
+         que dados de entrada sao compativeis com condicoes validadas
+         do modelo antes de executar inferencia.
+      2. Automatizar alerta quando modelo for invocado com dados fora
+         da distribuicao de treinamento (out-of-distribution detection).
+      3. Implementar feature flags por populacao: desativar modelo
+         para subgrupos nao validados automaticamente.
+      4. Registrar toda invocacao fora de condicoes validadas no log
+         de auditoria para rastreabilidade.
+    tools:
+      - gitlab-ci
+      - ood-detection
+      - feature-flags
+      - audit-log
+  secops:
+    prose: |
+      **Gestao de responsabilidade operacional:**
+      1. Manter registro atualizado de medicos capacitados para uso
+         de cada sistema de IA, com data de ultima capacitacao.
+      2. Investigar incidentes adversos com foco em identificar se
+         houve negligencia, imprudencia ou impericia conforme art. 19.
+      3. Implementar programa de auditoria que verifique uso de IA
+         fora de condicoes validadas: cruzar logs de uso com condicoes
+         de validacao documentadas.
+      4. Preparar documentacao de defesa: evidencias de governanca,
+         monitoramento e capacitacao para apresentacao ao CRM.
+    tools:
+      - incident-investigation
+      - training-registry
+      - audit-tools
+      - legal-readiness
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-25", "art-28"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-42", "art-43"]
+    relationship: complements

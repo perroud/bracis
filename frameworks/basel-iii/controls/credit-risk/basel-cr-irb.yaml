@@ -1,0 +1,112 @@
+id: basel-cr-irb
+family: credit-risk
+title: "Internal Ratings-Based (IRB) Approach for Credit Risk"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks with supervisory approval may use the Internal Ratings-Based (IRB) approach to
+    calculate minimum capital requirements for credit risk. Under the Foundation IRB (F-IRB)
+    approach, banks provide their own estimates of probability of default (PD) for each
+    exposure, while supervisory values are used for loss given default (LGD), exposure at
+    default (EAD), and maturity (M). Under the Advanced IRB (A-IRB) approach, banks provide
+    own estimates of PD, LGD, and EAD, with M determined by contract terms. The Basel IV
+    finalisation restricts the use of A-IRB: for exposures to large corporates (consolidated
+    revenue > EUR 500m) and financial institutions (assets > EUR 100bn), only F-IRB is
+    permitted; for bank exposures and equity exposures, IRB approaches are no longer
+    permitted. For retail and qualifying revolving retail exposures, A-IRB is retained.
+    All IRB estimates must meet minimum requirements for model design, data, validation,
+    and ongoing monitoring. Banks must demonstrate to their supervisor that PD models
+    discriminate adequately between obligors and that PD, LGD, and EAD estimates are
+    conservative, risk-sensitive, and stable over time.
+
+guidance:
+  prose: >-
+    The IRB approach is the most model-intensive component of the Basel framework, requiring
+    sophisticated credit risk modelling infrastructure and rigorous model governance. Key
+    requirements include: maintaining at least five years of internal default and loss data
+    (seven years for LGD/EAD under A-IRB); using a through-the-cycle (TTC) philosophy for
+    PD estimates to reduce procyclicality; applying conservative margins of conservatism
+    (MoC) to account for estimation uncertainty; conducting annual back-testing and
+    benchmarking of all rating systems; maintaining a model inventory covering all rating
+    systems in scope; and submitting rating system changes to supervisors for approval.
+    Basel IV imposes input floors on PD (0.05% for corporate, 0.05% for retail), LGD
+    (25% for unsecured corporate/bank, 20% for retail mortgage), and EAD (equivalent to
+    the committed amount for off-balance-sheet facilities). These input floors limit the
+    capital relief available from sophisticated internal models and interact with the
+    output floor to constrain total model benefit.
+
+references:
+  - citation: "BCBS, Calculation of RWA for credit risk — IRB approach (CRE30-CRE36), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/CRE/30.htm"
+  - citation: "BCBS, Basel III: Finalising post-crisis reforms, December 2017, Chapter 3"
+    url: "https://www.bis.org/bcbs/publ/d424.htm"
+  - citation: "BCBS, Guidelines: Credit risk and accounting for expected credit losses, December 2015"
+    url: "https://www.bis.org/bcbs/publ/d350.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a model risk management platform that centralises all IRB rating system
+      inventories, model documentation, validation reports, and regulatory approval
+      correspondence. The platform must enforce the full model lifecycle: development →
+      validation → supervisor notification/approval → production deployment → ongoing
+      monitoring → model review/redevelopment. Integrate rating system outputs from
+      statistical modelling tools (SAS, Python scikit-learn, R) directly into the credit
+      RWA calculation engine via APIs, with automated data quality checks on PD, LGD, and
+      EAD inputs before they are used in capital calculation. Maintain at least seven years
+      of historical rating and outcome data in an immutable data warehouse for back-testing
+      and validation.
+    tools:
+      - mlflow
+      - apache-spark
+      - postgresql
+      - dbt
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Treat credit risk models as code: store model code, training data specifications,
+      hyperparameter configurations, and validation test suites in dedicated Git repositories
+      with full history. Require peer review by an independent model validation team before
+      any model update is merged to the production branch. Implement automated performance
+      monitoring tests — Gini coefficient, KS statistic, migration matrices — that run
+      monthly and generate alerts when model performance deteriorates below defined thresholds.
+      Use MLflow or a similar platform to track model experiments, register approved model
+      versions, and manage production deployments with rollback capability.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - pytest
+      - sonarqube
+      - dvc
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Apply model risk management controls at the data, model, and output layers: restrict
+      access to training data to modelling and validation teams; restrict write access to
+      production model files to the model governance team; and audit all accesses to PD/LGD/
+      EAD parameter tables used in capital calculation. Implement a model tampering detection
+      mechanism that computes and stores a cryptographic hash of model artefacts at approval
+      time and verifies them at each production use. Log all capital calculation runs with
+      the model version used, enabling regulatory reconstruction of any historical ratio.
+    tools:
+      - hashicorp-vault
+      - cyberark
+      - splunk
+      - sentinel
+      - aws-kms
+
+legal_references:
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12", "BAI08"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-9", "AC-5", "AC-6"]
+    relationship: mapped
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements

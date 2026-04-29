@@ -1,0 +1,109 @@
+id: samm-ver-security-testing
+family: verification
+title: "Security Testing"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Perform comprehensive security testing activities beyond automated scanning to
+    identify vulnerabilities that evade static and automated dynamic analysis. Conduct
+    dynamic application security testing (DAST), penetration testing, and where appropriate,
+    operate bug bounty or vulnerability disclosure programs. Use security testing findings
+    to validate threat model coverage, improve automated detection capabilities, and
+    drive remediation priorities.
+  parts:
+    - id: samm-ver-security-testing_smt.a
+      label: "Stream A — Scalable Baseline"
+      prose: >-
+        Deploy dynamic application security testing (DAST) against all externally accessible
+        systems on a regular cadence, using automated scanners to identify runtime
+        vulnerabilities not detectable through static analysis. Integrate DAST into the
+        CI/CD pipeline for automated execution against staging environments. Triage DAST
+        findings against known false positives and confirmed vulnerabilities, routing
+        confirmed issues to the defect management workflow. Maintain DAST scan coverage
+        metrics and ensure all production-facing endpoints are included in the scan scope.
+    - id: samm-ver-security-testing_smt.b
+      label: "Stream B — Deep Understanding"
+      prose: >-
+        Conduct structured penetration testing of critical systems by qualified internal
+        or external testers, targeting threat scenarios identified in threat models and
+        vulnerability patterns identified by automated tools. Define penetration testing
+        scope, rules of engagement, and success criteria before each engagement. Produce
+        detailed penetration test reports documenting vulnerabilities, exploitation steps,
+        and business impact. Track remediation of penetration test findings to closure.
+        Consider establishing a vulnerability disclosure policy (VDP) or bug bounty program
+        to leverage external researcher expertise for continuous security validation.
+
+guidance:
+  prose: >-
+    Automated scanning finds the low-hanging fruit; penetration testing finds the
+    sophisticated issues that require human creativity. Neither replaces the other.
+    At maturity level 1, the organization runs DAST scans against production periodically
+    and conducts annual penetration tests of critical systems. At level 2, DAST is
+    integrated into CI/CD pipelines; penetration tests are risk-based and cover
+    a broader scope; findings are tracked systematically. At level 3, continuous
+    penetration testing or a red team capability exists; a bug bounty or VDP program
+    provides ongoing external validation; DAST findings feed back into SAST rule
+    improvements, creating a virtuous cycle between testing activities.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Verification: Security Testing"
+    url: "https://owaspsamm.org/model/verification/security-testing/"
+  - citation: "OWASP Web Security Testing Guide (WSTG)"
+    url: "https://owasp.org/www-project-web-security-testing-guide/"
+  - citation: "OWASP DAST Guide"
+    url: "https://owasp.org/www-community/Fuzzing"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide DAST as a platform service by deploying OWASP ZAP or Burp Suite Enterprise
+      in the CI/CD infrastructure, configurable via a shared pipeline component that teams
+      include in their pipeline definitions. Maintain authenticated scan profiles for
+      common application types (REST API, web app, GraphQL) in the platform, reducing
+      the effort for teams to set up effective DAST coverage. Implement a penetration
+      testing request workflow in the IDP that allows teams to schedule internal security
+      assessments with scope definitions, auto-populating system documentation from the
+      software catalog. Provide a vulnerability disclosure policy (VDP) portal as a
+      platform service to enable organizations to receive external reports.
+    tools:
+      - "OWASP ZAP (platform-deployed DAST)"
+      - "Burp Suite Enterprise (managed DAST)"
+      - "Nuclei (scalable vuln scanning)"
+      - "HackerOne / Bugcrowd (VDP/bug bounty platform)"
+      - "Backstage (pentest request workflow)"
+  devsecops:
+    prose: >-
+      Integrate DAST scans into CI/CD pipelines as post-deployment verification stages
+      that execute against staging environments after each deployment. Use GitLab DAST
+      or ZAP with GitLab CI integration to surface DAST findings directly in merge
+      request security reports. Configure DAST to test authenticated scenarios using
+      credentials injected from the secrets vault, ensuring complete application
+      coverage beyond anonymous endpoints. Implement automated regression testing for
+      previously discovered vulnerabilities to prevent reintroduction. Feed DAST
+      findings into DefectDojo for consolidated tracking alongside SAST and SCA results.
+    tools:
+      - "GitLab DAST"
+      - "OWASP ZAP (CI/CD integration)"
+      - "Burp Suite Enterprise"
+      - "Nuclei"
+      - "DefectDojo (finding aggregation)"
+      - "Ffuf / Feroxbuster (directory/endpoint discovery)"
+  secops:
+    prose: >-
+      Plan and execute annual penetration tests of critical systems, using external
+      qualified testers for objectivity on highest-risk systems. Define penetration
+      testing methodology aligned to OWASP WSTG, PTES, or MITRE ATT&CK. Manage
+      the penetration test lifecycle: scoping, rules of engagement, execution,
+      report review, and remediation tracking. Operate or coordinate a vulnerability
+      disclosure policy to provide external researchers a safe channel for responsible
+      disclosure. Track mean time to remediate penetration test findings and report
+      on program effectiveness to risk committees.
+    tools:
+      - "Cobalt.io / Synack (managed pentesting)"
+      - "Burp Suite Professional (manual pentesting)"
+      - "Metasploit (exploitation framework)"
+      - "HackerOne / Intigriti (bug bounty)"
+      - "DefectDojo (pentest finding tracking)"
+      - "OWASP WSTG (testing methodology)"

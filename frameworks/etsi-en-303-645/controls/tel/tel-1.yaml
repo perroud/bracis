@@ -1,0 +1,92 @@
+id: tel-1
+family: tel
+title: "Examine System Telemetry Data"
+class: ETSIEN303645
+baselines: [recommendation]
+
+statement:
+  prose: >-
+    If telemetry data is collected from consumer IoT devices and services, such as
+    usage and measurement data, it should be examined for security anomalies. The
+    manufacturer should monitor and audit telemetry data for anomalies that may indicate
+    security compromises, using it to identify and respond to security threats in a
+    timely manner.
+
+guidance:
+  prose: >-
+    Telemetry data from IoT device fleets can provide valuable early warning indicators of
+    security compromises. Unusual patterns in device behavior — unexpected network connections,
+    abnormal resource usage, authentication failures, or changes in communication patterns —
+    may signal that devices have been compromised. This provision encourages (but does not
+    mandate, hence "should") manufacturers to implement security monitoring on the telemetry
+    they collect. The analysis should look for both individual device anomalies and fleet-wide
+    patterns that could indicate coordinated attacks or widespread exploitation of a
+    vulnerability. This is a "recommendation" baseline provision, meaning it uses "should"
+    rather than "shall" in the standard.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.10-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a telemetry collection pipeline that captures security-relevant device metrics:
+      authentication events, network connection logs, firmware integrity status, resource
+      utilization, and error conditions. Design the pipeline to aggregate data at the fleet
+      level while preserving the ability to drill down to individual devices. Implement
+      anomaly detection models that baseline normal device behavior and alert on deviations.
+      Provide dashboards for security operations teams to visualize fleet health and security
+      posture. Ensure telemetry collection respects user privacy preferences and data
+      minimization requirements.
+    tools:
+      - azure-iot-hub
+      - aws-iot-analytics
+      - kafka
+      - prometheus
+      - grafana
+      - influxdb
+
+  devsecops:
+    prose: >-
+      Define and implement structured telemetry event schemas that capture security-relevant
+      data consistently across all device firmware versions. Include telemetry validation
+      tests in the CI/CD pipeline to ensure new firmware versions emit the expected events.
+      Implement automated tests that verify security events are properly generated for
+      known attack scenarios. Validate that telemetry data is transmitted securely and
+      cannot be spoofed by unauthorized parties. Test anomaly detection rules against
+      simulated attack scenarios to verify detection coverage.
+    tools:
+      - gitlab-ci
+      - pytest
+      - schema-validator
+      - data-pipeline-testing
+      - locust
+
+  secops:
+    prose: >-
+      Establish a 24/7 monitoring capability for IoT fleet telemetry with defined escalation
+      procedures for security anomalies. Implement automated correlation rules that combine
+      multiple weak signals into high-confidence security alerts. Track fleet-wide metrics
+      including percentage of devices reporting anomalies, geographic distribution of alerts,
+      and trending analysis. Feed telemetry insights back into the vulnerability management
+      process and product security improvements. Conduct periodic reviews of detection rule
+      effectiveness and adjust thresholds based on false positive rates.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - grafana
+      - pagerduty
+      - opsgenie
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-6.1", "SR-6.2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "SI-4", "IR-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16"]
+    relationship: mapped

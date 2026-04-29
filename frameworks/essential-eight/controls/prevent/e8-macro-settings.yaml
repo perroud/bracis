@@ -1,0 +1,122 @@
+id: e8-macro-settings
+family: prevent
+title: "Configure Microsoft Office Macro Settings"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Microsoft Office macros are configured to reduce the attack surface by blocking macros
+    from the internet, only allowing vetted macros in trusted locations with limited write
+    access, or blocking all macros entirely. Macro execution settings are enforced via
+    Group Policy or equivalent management tools to prevent users from overriding security
+    controls. This mitigates spearphishing and social engineering attacks that leverage
+    malicious macro-enabled documents.
+
+guidance:
+  prose: >-
+    Microsoft Office macros remain a primary initial access vector for adversaries.
+    Malicious documents containing VBA macros are routinely delivered via spearphishing
+    emails. Restricting macro execution is one of the most effective controls against
+    this threat. The approach must be enforced centrally and cannot rely on users making
+    correct decisions. Organisations should identify legitimate business processes that
+    require macros and implement targeted exceptions rather than allowing broad macro use.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Microsoft Office macros are disabled for users who do not have a demonstrated
+        business requirement. Microsoft Office macros in files originating from the
+        internet are blocked. Microsoft Office macro antivirus scanning is enabled.
+        Microsoft Office macro security settings cannot be changed by users.
+    ml2:
+      prose: >-
+        Microsoft Office macros are disabled for users who do not have a demonstrated
+        business requirement. Microsoft Office macros in files originating from the
+        internet are blocked. Microsoft Office macros are blocked from making Win32
+        API calls. Microsoft Office macro antivirus scanning is enabled. Microsoft
+        Office macro security settings cannot be changed by users. Allowed and blocked
+        Microsoft Office macro execution events are logged. Event logs are protected
+        from unauthorised modification and deletion.
+    ml3:
+      prose: >-
+        Microsoft Office macros are disabled for users who do not have a demonstrated
+        business requirement. Only Microsoft Office macros running from within a
+        sandboxed environment, a Trusted Location, or that are digitally signed by a
+        trusted publisher are allowed to execute. Microsoft Office macros in files
+        originating from the internet are blocked. Microsoft Office macros are blocked
+        from making Win32 API calls. Microsoft Office macro antivirus scanning is
+        enabled. Microsoft Office macro security settings cannot be changed by users.
+        Allowed and blocked Microsoft Office macro execution events are centrally
+        logged and monitored for signs of compromise. Event logs are protected from
+        unauthorised modification and deletion. Event logs are analysed in a timely
+        manner.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Configure Microsoft Office Macro Settings"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "Microsoft - Macros from the internet will be blocked by default in Office"
+    url: "https://learn.microsoft.com/en-us/deployoffice/security/internet-macros-blocked"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce macro settings via Group Policy Objects (GPO) or Microsoft Intune compliance
+      policies. Deploy Attack Surface Reduction (ASR) rules via Microsoft Defender for
+      Endpoint to block Win32 API calls from Office macros and block Office applications
+      from creating child processes. Configure Trusted Locations via GPO, ensuring the
+      locations have restricted write access (only administrators can deploy macro-enabled
+      files). Use Microsoft Cloud App Security or DLP policies to detect and quarantine
+      macro-enabled files arriving via email or cloud storage. Manage GPO templates in
+      version control alongside other infrastructure configuration.
+    tools:
+      - group-policy
+      - intune
+      - microsoft-defender-asr
+      - sccm
+      - ansible-windows
+      - terraform-azuread
+
+  devsecops:
+    prose: >-
+      Integrate Office document scanning into CI/CD pipelines for any workflows that
+      process uploaded documents (e.g., document portals, HR systems). Implement
+      pre-deployment checks that validate Group Policy templates for correct macro
+      restriction settings. Use policy-as-code to audit and enforce macro configuration
+      compliance across the endpoint fleet. Version-control all GPO templates and Intune
+      configuration profiles, enforcing peer review before deployment.
+    tools:
+      - gitlab-ci
+      - conftest
+      - opa
+      - powershell-dsc
+      - ansible-lint
+
+  secops:
+    prose: >-
+      Monitor and centrally log macro execution events via Windows Event Forwarding (WEF)
+      or Microsoft Defender for Endpoint telemetry. Configure SIEM alerts for blocked
+      macro executions, particularly from files originating from the internet, as these
+      may indicate spearphishing attempts. Investigate repeated macro block events from
+      the same user or department to identify social engineering campaigns. Conduct
+      periodic audits of Trusted Location contents to ensure no unauthorized macro-enabled
+      files have been placed there. Review and validate the list of users with macro
+      execution privileges quarterly.
+    tools:
+      - microsoft-defender-endpoint
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - windows-event-forwarding
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7", "CM-6", "SI-3"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.7", "CIS 9.6"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.19", "A8.7"]
+    relationship: supports

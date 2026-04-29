@@ -1,0 +1,152 @@
+id: art-5
+family: cap-2
+title: "Metodologia de Avaliacao de Impacto do Incidente"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 5. A avaliação de impacto do incidente de segurança cibernética deve
+    considerar:
+
+    I - o escopo do incidente, com identificação dos sistemas, redes, dados e
+    processos afetados;
+    II - a extensão geográfica do impacto, indicando as regiões, unidades ou
+    canais afetados;
+    III - a natureza dos dados comprometidos, com distinção entre dados pessoais,
+    dados financeiros, dados operacionais e dados estratégicos;
+    IV - os impactos diretos e indiretos na cadeia de serviços da instituição,
+    incluindo dependências com sistemas de terceiros;
+    V - a estimativa de danos, com quantificação ou estimativa razoável do impacto
+    financeiro, operacional e reputacional.
+
+    § 1. A avaliação de impacto deve ser iniciada imediatamente após a detecção
+    do incidente e atualizada continuamente ao longo da gestão do incidente.
+
+    § 2. Os métodos e pressupostos utilizados na avaliação de impacto devem ser
+    documentados e estarem disponíveis para revisão pelo BCB.
+guidance:
+  prose: |
+    O art. 5 estabelece os cinco dimensoes da avaliacao de impacto e dois requisitos
+    processuais de continuidade e documentacao.
+
+    **Dimensao I - Escopo do incidente:**
+    Mapa completo de sistemas afetados com relacionamento entre eles. Ferramentas
+    de CMDB e dependency mapping sao essenciais. A pergunta central: "o que foi
+    comprometido e o que foi exposto por dependencia transitiva?"
+
+    **Dimensao II - Extensao geografica:**
+    Relevante para:
+    - Instituicoes com presenca em multiplos estados (agencias, ATMs, datacenters)
+    - Incidentes em sistemas regionais versus centralizados
+    - Clientes afetados por regiao geografica
+    - Transferencias internacionais de dados comprometidos (aciona obrigacoes adicionais)
+
+    **Dimensao III - Natureza dos dados:**
+    Hierarquia de criticidade:
+    1. Dados pessoais sensiveis (biometria, saude, origem etnica) - protecao maxima
+    2. Dados financeiros (saldos, transacoes, limites de credito)
+    3. Dados pessoais cadastrais (CPF, nome, endereco, renda)
+    4. Dados operacionais (logs, configuracoes, auditorias)
+    5. Dados estrategicos (planos de negocio, contratos, precificacao)
+    A natureza dos dados determina a obrigacao de notificacao cumulativa (ANPD para
+    dados pessoais, CVM para dados de mercado).
+
+    **Dimensao IV - Cadeia de servicos:**
+    Analise de dependencias upstream e downstream:
+    - Upstream: provedores de nuvem, ISPs, fornecedores de software
+    - Downstream: clientes que dependem dos servicos da instituicao
+    - Lateral: outras instituicoes conectadas via sistemas de pagamento
+    Um incidente em um componente pequeno pode ter impacto sistemico por dependencias.
+
+    **Dimensao V - Estimativa de danos:**
+    Tres dimensoes de dano:
+    - Financeiro: perdas operacionais, custos de remediacao, multas projetadas
+    - Operacional: capacidade reduzida de prestacao de servicos, backlog de transacoes
+    - Reputacional: estimativa de churn de clientes, impacto em NPS, cobertura de midia
+
+    **Continuidade da avaliacao (ss 1):**
+    A avaliacao de impacto nao e um documento unico, e um processo iterativo.
+    A primeira versao e necessariamente incompleta e baseada em dados parciais.
+    O BCB entende esta limitacao, mas espera atualizacoes regulares.
+
+    **Documentacao dos metodos (ss 2):**
+    Transparencia metodologica: o BCB pode questionar como os numeros foram calculados.
+    Documentar pressupostos, fontes de dados e limitacoes da estimativa.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de avaliacao de impacto:**
+      1. Dependency map automatizado via service mesh e CMDB:
+         Identificacao em tempo real de todos os servicos dependentes de um
+         componente afetado (impact blast radius).
+      2. Data classification engine integrado:
+         Cada dataset no data catalog classificado por tipo (pessoal, financeiro,
+         operacional, estrategico) com metadados de localizacao e volume.
+      3. Impact calculator automatizado:
+         - Usuarios ativos por sistema (via APM metrics)
+         - Volume de transacoes por sistema (via banking metrics)
+         - SLA violation tracking com timestamp preciso
+      4. Geographic mapping: atribuicao de cada sistema a regioes geograficas no
+         CMDB para avaliacao automatica da dimensao II.
+      5. Third-party dependency tracking: catalogo de dependencias externas com
+         notificacao automatica quando um provider reporta incidente.
+    tools:
+      - cmdb
+      - service-mesh
+      - data-catalog
+      - apm
+      - monitoring-alerting
+      - third-party-risk
+  devsecops:
+    prose: |
+      **Dados de impacto gerados no pipeline:**
+      1. Data flow diagrams atualizados a cada mudanca de arquitetura via
+         IaC (Infrastructure as Code), documentando quais dados passam por
+         cada sistema (alimenta dimensao III).
+      2. SBOM (Software Bill of Materials) para identificar blast radius
+         de vulnerabilidades em dependencias transitivas.
+      3. Architecture decision records (ADRs) documentando dependencias criticas
+         entre sistemas (alimenta dimensao IV).
+      4. Smoke tests e synthetic monitoring para cada integracao critica,
+         detectando impactos na cadeia de servicos em minutos.
+    tools:
+      - gitlab-ci
+      - sbom-generator
+      - infrastructure-as-code
+      - synthetic-monitoring
+      - architecture-docs
+  secops:
+    prose: |
+      **Processo de avaliacao de impacto:**
+      1. Metodologia documentada de avaliacao de impacto aprovada pela diretoria:
+         - Template padronizado com as cinco dimensoes do art. 5
+         - Responsaveis por cada dimensao (ex: TI para I e II, DPO para III,
+           arquitetura para IV, financas e comunicacao para V)
+         - Escala de estimativa com intervalos de confianca declarados
+      2. Cadencia de atualizacao:
+         - T+4h: primeira avaliacao (parcial, baseada em dados iniciais)
+         - T+12h: avaliacao revisada (com dados da investigacao em andamento)
+         - T+24h: avaliacao atualizada (para relatorio inicial ao BCB)
+         - Diariamente: atualizacao ate encerramento do incidente
+      3. Revisao das estimativas por peer: outro analista senior revisa cada
+         versao da avaliacao antes de ser incluida em comunicacao ao BCB.
+      4. Registro de todas as versoes da avaliacao com timestamps e autores
+         para rastreabilidade auditavel.
+    tools:
+      - incident-management
+      - grc-platform
+      - data-catalog
+      - soar
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-3", "art-4"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46", "art-48"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "RA-3", "SA-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.30"]
+    relationship: supports

@@ -1,0 +1,650 @@
+id: owasp-top10_to_nist-800-53
+title: "OWASP Top 10 2021 to NIST SP 800-53 Rev 5 Control Mapping"
+source_framework: owasp-top10
+target_framework: nist-800-53-rev5
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+
+mappings:
+  # ── A01: Broken Access Control ────────────────────────────────────────
+
+  - source_control: owasp-a01
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          OWASP A01 (Broken Access Control) directly addresses failures in enforcing
+          authorized access to resources. NIST AC-3 (Access Enforcement) requires
+          enforcing approved authorizations for logical access to information and
+          system resources. Both controls target the same fundamental objective:
+          ensuring users cannot act outside their intended permissions. AC-3 provides
+          the policy framework that A01 operationalizes in web applications.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          A01 covers weaknesses in account-level access controls including elevation
+          of privilege, acting as another user, and metadata manipulation. AC-2
+          (Account Management) addresses the lifecycle management of accounts
+          including defining authorized users, group membership, and access
+          authorizations. Proper account management per AC-2 prevents several A01
+          attack vectors such as unauthorized account access and privilege abuse.
+      - id: ac-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          A01 explicitly references violation of the principle of least privilege as a
+          common access control weakness. AC-6 (Least Privilege) mandates allowing
+          only authorized accesses necessary to accomplish assigned tasks. Enforcing
+          AC-6 directly prevents the privilege escalation and excessive permission
+          scenarios described in A01.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A01 includes CORS misconfiguration and force browsing to authenticated pages
+          as attack vectors. SC-7 (Boundary Protection) addresses monitoring and
+          controlling communications at system interfaces, including implementing
+          subnetworks for publicly accessible components. Network boundary controls
+          complement application-level access control by limiting exposure of internal
+          resources.
+
+  - source_control: owasp-a01-idor
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          IDOR vulnerabilities are a direct failure of access enforcement at the
+          object level. AC-3 requires enforcing approved authorizations for logical
+          access to information and system resources. IDOR prevention requires
+          server-side ownership validation for every data object access, which is
+          the application-level implementation of AC-3 access enforcement.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          IDOR prevention benefits from least privilege principles applied at the
+          data access layer. AC-6 ensures processes operate at privilege levels no
+          higher than necessary. When combined with object-level authorization
+          checks, least privilege limits the scope of data accessible through any
+          single request context.
+
+  - source_control: owasp-a01-path-traversal
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          Path traversal is an access control failure where attackers access files
+          and directories outside the intended scope. AC-3 requires enforcing
+          approved authorizations for logical access to information, which includes
+          filesystem resources. Canonicalizing paths and validating against allowlists
+          implements AC-3 at the filesystem level.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          Path traversal exploits applications running with excessive filesystem
+          permissions. AC-6 mandates that processes operate at the minimum privilege
+          level necessary. Running application processes with restricted filesystem
+          access (non-root, limited directory access) reduces the impact of path
+          traversal by limiting which files an exploited process can reach.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Preventing path traversal requires secure configuration of the application
+          environment including AppArmor, seccomp, or SELinux profiles that restrict
+          filesystem access. CM-6 requires establishing and implementing configuration
+          settings that reflect the most restrictive mode consistent with operational
+          requirements, directly supporting filesystem-level path traversal defenses.
+
+  # ── A02: Cryptographic Failures ───────────────────────────────────────
+
+  - source_control: owasp-a02
+    target_controls:
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          A02 addresses cryptographic failures including data transmitted in cleartext
+          and weak TLS configurations. SC-7 requires monitoring and controlling
+          communications at managed interfaces, which includes ensuring transport
+          encryption. Both controls address the protection of data as it crosses
+          system boundaries, though SC-7 focuses on boundary architecture while A02
+          focuses on cryptographic implementation quality.
+      - id: ia-2
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A02 covers weak password storage using unsalted or weak hash functions and
+          deprecated cryptographic algorithms for credential protection. IA-2
+          (Identification and Authentication) requires uniquely identifying and
+          authenticating users through secure mechanisms including multifactor
+          authentication. Proper cryptographic implementation per A02 is essential
+          for the authenticator security that IA-2 depends upon.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          A02 explicitly calls out insecure default crypto keys, deprecated cipher
+          suites, and misconfigured TLS settings. CM-6 requires configuration
+          settings that reflect the most restrictive mode consistent with operational
+          requirements. Secure cryptographic configuration (disabling weak protocols,
+          enforcing strong ciphers) is a direct application of CM-6 to cryptographic
+          components.
+
+  - source_control: owasp-a02-secrets
+    target_controls:
+      - id: ia-2
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          Hardcoded secrets (API keys, JWT signing secrets, service account tokens)
+          undermine authentication mechanisms. IA-2 requires secure identification
+          and authentication of users and processes. Exposed authentication
+          credentials directly compromise the identification and authentication
+          controls that IA-2 establishes, making secrets management an essential
+          complement.
+      - id: cm-6
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          Secrets exposure often results from insecure configuration: credentials
+          committed to source control, baked into container images, or stored in
+          environment variables without protection. CM-6 mandates secure configuration
+          settings for all system components. Proper secrets management through
+          runtime injection from dedicated secret stores represents secure
+          configuration of the deployment pipeline and application environment.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          Exposed secrets allow attackers to bypass access enforcement entirely.
+          AC-3 requires enforcing approved authorizations, but stolen credentials
+          render access enforcement meaningless since the attacker authenticates as
+          an authorized entity. Secrets protection is a prerequisite for effective
+          access enforcement.
+
+  - source_control: owasp-a02-tls
+    target_controls:
+      - id: sc-7
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          TLS failures directly compromise the confidentiality and integrity of
+          communications at system boundaries. SC-7 requires monitoring and
+          controlling communications at managed interfaces and connecting to external
+          networks only through managed interfaces with boundary protection. Proper
+          TLS configuration (TLS 1.2+, AEAD ciphers, certificate validation, HSTS)
+          is the primary mechanism for implementing SC-7 transport security
+          requirements for web applications.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          TLS misconfiguration (deprecated protocols, weak ciphers, missing HSTS)
+          represents a failure to apply secure configuration settings. CM-6 requires
+          the most restrictive configuration mode consistent with operational
+          requirements. Hardened TLS configurations following Mozilla or NIST SP
+          800-52 guidelines implement CM-6 for transport security components.
+
+  # ── A03: Injection ────────────────────────────────────────────────────
+
+  - source_control: owasp-a03
+    target_controls:
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          A03 covers injection attacks (SQL, NoSQL, OS command, LDAP, SSTI, XSS)
+          that must be detected through system monitoring. SI-4 requires monitoring
+          the system to detect attacks and indicators of potential attacks. WAF rules,
+          IDS signatures, and database query anomaly detection for injection patterns
+          are direct implementations of SI-4 monitoring objectives applied to the
+          injection threat category.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Injection prevention requires secure configuration of WAFs, database
+          proxies, and API gateways with input validation rules. CM-6 mandates
+          establishing and implementing secure configuration settings. Configuring
+          ModSecurity CRS rules, database least privilege, and API schema validation
+          are CM-6 implementations that reduce injection attack surface.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Injection attacks often escalate to unauthorized data access or privilege
+          escalation. AC-3 enforces approved authorizations for logical access. When
+          database accounts operate under least privilege (per AC-3 and AC-6
+          principles), successful injection is limited in scope because the
+          compromised database session lacks permissions for administrative operations.
+
+  - source_control: owasp-a03-sqli
+    target_controls:
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          SQL injection detection requires monitoring database query patterns for
+          anomalies such as UNION SELECT, information_schema access, and unusual data
+          extraction volumes. SI-4 mandates monitoring the system to detect attacks
+          and analyzing detected events. Database activity monitoring, SIEM rules for
+          SQL injection indicators, and database audit logging directly implement
+          SI-4 for the SQL injection threat vector.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          SQL injection impact is directly proportional to the database account
+          privileges available. AC-6 requires applying least privilege to system
+          processes. Application database accounts restricted to SELECT, INSERT,
+          UPDATE, DELETE on specific tables (never DDL or DBA roles) limit SQL
+          injection blast radius, implementing AC-6 at the database access layer.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SQL injection bypasses application-level access enforcement to directly
+          access database resources. AC-3 requires enforcing approved authorizations
+          for logical access. Database-level access controls (separate read/write
+          accounts, table-level permissions) provide defense-in-depth for AC-3 when
+          application-layer enforcement is bypassed through injection.
+
+  - source_control: owasp-a03-xss
+    target_controls:
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          XSS detection requires monitoring for script injection patterns in
+          application inputs and CSP violation reports. SI-4 requires monitoring
+          the system to detect attacks and indicators of potential attacks. WAF XSS
+          rules, CSP violation monitoring, and browser telemetry for anomalous
+          JavaScript execution implement SI-4 for the XSS attack class.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          XSS defenses include Content Security Policy headers that restrict script
+          sources, X-Frame-Options for clickjacking prevention, and WAF rules at
+          the network boundary. SC-7 addresses boundary protection including
+          monitoring and controlling communications at managed interfaces. CSP and
+          WAF-based XSS filtering operate at the boundary between client and server,
+          complementing SC-7 boundary protection objectives.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          XSS prevention depends on secure configuration of HTTP security headers
+          (CSP, X-Content-Type-Options, X-Frame-Options), cookie attributes
+          (HttpOnly, Secure, SameSite), and Trusted Types enforcement. CM-6 requires
+          configuration settings that reflect the most restrictive mode. Hardened
+          browser security header configuration is a direct CM-6 implementation.
+
+  # ── A04: Insecure Design ──────────────────────────────────────────────
+
+  - source_control: owasp-a04
+    target_controls:
+      - id: cm-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          A04 calls for secure design patterns, reference architectures, and
+          threat modeling integrated into the SDLC. CM-2 requires developing and
+          maintaining a current baseline configuration under configuration control.
+          Reference architectures and secure design patterns serve as the design-phase
+          baseline from which implementation derives, intersecting CM-2 baseline
+          management at the architectural level.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          Insecure design includes missing security controls in business logic such
+          as absent rate limiting, missing account lockout, and insufficient
+          separation of privileges. AC-3 requires enforcing approved authorizations.
+          Many A04 failures represent the absence of access enforcement mechanisms
+          that should have been designed in from the start, making AC-3 a complement
+          to A04 secure design requirements.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          A04 emphasizes that insecure design cannot be fixed by implementation alone
+          and requires architectural controls built into the platform. SI-4 addresses
+          system monitoring to detect attacks. Platform-level monitoring controls
+          (service mesh observability, API gateway rate limiting, centralized
+          authentication) must be designed into the architecture per A04 to enable
+          the detection capabilities that SI-4 requires.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          A04 identifies lack of defense-in-depth, fail-secure defaults, and least
+          privilege as indicators of insecure design. AC-6 mandates employing least
+          privilege for all accesses. Designing systems with least privilege as an
+          architectural principle (not an afterthought) addresses the root cause
+          that A04 highlights: security must be embedded in design, not patched in
+          later.
+
+  # ── A05: Security Misconfiguration ────────────────────────────────────
+
+  - source_control: owasp-a05
+    target_controls:
+      - id: cm-6
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          A05 (Security Misconfiguration) and CM-6 (Configuration Settings) address
+          the same core concern: ensuring system components are configured securely.
+          A05 describes the symptoms (default passwords, unnecessary features, verbose
+          errors, missing security headers), while CM-6 prescribes the control
+          (establishing and documenting secure configuration settings using recognized
+          benchmarks like CIS). Implementing CM-6 directly prevents A05 vulnerabilities.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          A05 requires that development, QA, and production environments be
+          identically configured with hardened baselines. CM-2 (Baseline
+          Configuration) mandates developing and maintaining a current baseline
+          configuration under configuration control. CM-2 provides the baseline
+          management framework that prevents the configuration drift and inconsistency
+          A05 warns against.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          A05 includes failure to detect misconfiguration changes and configuration
+          drift as part of the vulnerability class. SI-4 requires monitoring the
+          system to detect unauthorized changes and anomalies. Continuous configuration
+          monitoring and drift detection (CSPM, AWS Config, file integrity monitoring)
+          implements SI-4 specifically for the A05 threat category.
+
+  - source_control: owasp-a05-hardening
+    target_controls:
+      - id: cm-6
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          Security hardening is the operational implementation of CM-6. A05-hardening
+          describes establishing minimum security baselines for all stack components
+          using CIS Benchmarks and DISA STIGs. CM-6 requires configuration settings
+          that reflect the most restrictive mode using organization-defined secure
+          configurations (explicitly naming CIS Benchmarks and STIGs as examples).
+          The two controls are functionally equivalent in scope and objective.
+      - id: cm-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          A05-hardening requires maintaining a hardened baseline configuration across
+          all infrastructure components with automated enforcement. CM-2 mandates
+          developing, documenting, and maintaining a current baseline configuration
+          under configuration control. Golden image pipelines, Pod Security Standards,
+          and kube-bench compliance checks implement both A05-hardening and CM-2
+          simultaneously.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A05-hardening specifies running containers as non-root, dropping
+          capabilities, disabling privilege escalation, and read-only filesystems.
+          AC-6 mandates least privilege for all processes. Container security
+          hardening (non-root, dropped capabilities, restricted filesystem) is the
+          infrastructure-level implementation of AC-6 least privilege principles.
+
+  # ── A06: Vulnerable and Outdated Components ──────────────────────────
+
+  - source_control: owasp-a06
+    target_controls:
+      - id: sr-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          A06 addresses software supply chain risks through vulnerable dependencies,
+          outdated components, and missing SBOM inventory. SR-3 (Supply Chain
+          Controls and Processes) requires establishing processes to identify and
+          address supply chain weaknesses and employing controls to protect against
+          supply chain risks. A06 prevention measures (SCA, SBOM, dependency pinning,
+          patch SLAs) directly implement SR-3 for the software component supply chain.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          A06 requires maintaining a real-time inventory of all components and their
+          versions. CM-2 mandates a current baseline configuration under
+          configuration control. The SBOM (Software Bill of Materials) that A06
+          requires serves as the software component layer of the CM-2 baseline
+          configuration, tracking what software is deployed and at what versions.
+      - id: si-4
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A06 requires continuous monitoring of deployed components against known
+          vulnerability databases (NVD, OSV, CISA KEV). SI-4 requires monitoring
+          the system to detect attacks and indicators of potential attacks.
+          Continuous SCA scanning, vulnerability feed monitoring, and SBOM-based
+          impact assessment implement SI-4 for the vulnerable component threat vector.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          A06 prevention includes configuring artifact management systems to block
+          packages with critical CVEs and enforcing vulnerability policies. CM-6
+          requires implementing secure configuration settings. Configuring Artifactory
+          or Nexus with vulnerability gates and approved package lists applies CM-6
+          to the dependency management infrastructure.
+
+  # ── A07: Identification and Authentication Failures ───────────────────
+
+  - source_control: owasp-a07
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          A07 and IA-2 address the same fundamental concern: ensuring reliable
+          identification and authentication of users. A07 describes authentication
+          failures (credential stuffing, weak passwords, missing MFA, session
+          management flaws) while IA-2 prescribes the requirement to uniquely
+          identify and authenticate users with appropriate mechanisms including
+          multifactor authentication. Implementing IA-2 with its enhancements
+          (MFA for privileged and non-privileged accounts) directly prevents A07
+          vulnerabilities.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          A07 includes default accounts with unchanged passwords, failure to
+          invalidate sessions, and weak credential recovery as attack vectors. AC-2
+          requires account lifecycle management including defining authorized
+          accounts, disabling accounts, and managing account changes. Proper account
+          management per AC-2 prevents default credential abuse and ensures accounts
+          are properly controlled throughout their lifecycle.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          A07 describes elevation of privilege through authentication failures where
+          users gain access beyond their intended permissions. AC-6 mandates least
+          privilege for all accesses. Even when authentication is compromised, AC-6
+          ensures the compromised account has minimal permissions, limiting the
+          impact of A07 exploitation.
+      - id: si-4
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A07 mitigation requires detecting credential stuffing, brute force
+          attacks, and anomalous session activity. SI-4 mandates monitoring the
+          system to detect attacks. Authentication monitoring (failed login rates,
+          impossible travel detection, concurrent session alerts) implements SI-4
+          for the authentication threat vector described in A07.
+
+  # ── A08: Software and Data Integrity Failures ────────────────────────
+
+  - source_control: owasp-a08
+    target_controls:
+      - id: sr-3
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          A08 directly addresses software supply chain integrity including untrusted
+          sources, insecure CI/CD pipelines, auto-update without integrity
+          verification, and insecure deserialization. SR-3 requires establishing
+          processes to identify supply chain weaknesses and employing controls to
+          protect against supply chain risks. A08 prevention measures (SLSA
+          framework, code signing, Sigstore, SBOM, signature verification) are
+          direct implementations of SR-3 supply chain controls.
+      - id: si-4
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A08 requires monitoring for supply chain anomalies: unexpected outbound
+          connections from build systems, new dependencies without review, and
+          artifact integrity failures. SI-4 mandates monitoring the system to detect
+          attacks and unauthorized changes. Supply chain monitoring (binary
+          transparency, CI/CD audit logging, deserialization attack detection)
+          implements SI-4 for the integrity threat vector.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          A08 requires maintaining integrity of the software baseline through signed
+          artifacts, pinned dependencies, and verified builds. CM-2 mandates a
+          current baseline configuration under configuration control. The build
+          attestation and provenance tracking that A08 requires extends CM-2
+          baseline management to include cryptographic proof of software integrity.
+
+  - source_control: owasp-a08-cicd
+    target_controls:
+      - id: sr-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          CI/CD pipeline integrity is a critical element of software supply chain
+          security. SR-3 requires controls to protect against supply chain risks
+          including processes for identifying weaknesses in supply chain elements.
+          A08-cicd addresses pipeline-specific threats (credential theft, pipeline
+          poisoning, third-party action compromise) and implements SR-3 through
+          OIDC federation, ephemeral runners, pinned action references, and pipeline
+          signing.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          CI/CD security requires hardened pipeline configurations: protected
+          variables, branch protection, separated credential scopes, and ephemeral
+          runners. CM-6 mandates secure configuration settings for system
+          components. Pipeline configuration hardening (disabling fork PR access to
+          secrets, enforcing protected branches, implementing OIDC over static
+          credentials) implements CM-6 for CI/CD infrastructure.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          A08-cicd emphasizes least-privilege pipeline credentials with separate
+          scopes for PR, merge, and deployment pipelines. AC-6 mandates least
+          privilege for processes. Pipeline credential scoping (read-only for PR
+          pipelines, deployment permissions only for protected branch pipelines)
+          directly implements AC-6 in the CI/CD context.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          A08-cicd requires access controls on pipeline configuration files,
+          protected branch enforcement, and code owner approval. AC-3 requires
+          enforcing approved authorizations for logical access. Branch protection
+          rules, pipeline modification restrictions, and required approvals implement
+          AC-3 for the CI/CD configuration and deployment process.
+
+  # ── A09: Security Logging and Monitoring Failures ─────────────────────
+
+  - source_control: owasp-a09
+    target_controls:
+      - id: au-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          A09 and AU-2 address the same core requirement: ensuring the right events
+          are logged. A09 describes logging failures (missing audit events, unclear
+          log messages, no monitoring of suspicious activity) while AU-2 requires
+          identifying and specifying event types for logging, providing rationale
+          for their adequacy, and reviewing them periodically. Implementing AU-2
+          event logging requirements directly addresses A09 logging deficiencies.
+      - id: au-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          A09 specifically calls out that logs are not monitored for suspicious
+          activity, alerting thresholds are ineffective, and active attacks are not
+          detected. AU-6 requires reviewing and analyzing audit records for
+          inappropriate or unusual activity and reporting findings. AU-6 directly
+          addresses the monitoring and analysis gap that A09 identifies as a
+          critical vulnerability.
+      - id: si-4
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          A09 requires real-time or near-real-time detection of active attacks
+          through security monitoring. SI-4 mandates monitoring the system to detect
+          attacks, identifying unauthorized use, analyzing detected events, and
+          adjusting monitoring based on risk changes. SI-4 provides the comprehensive
+          monitoring framework that A09 identifies as missing in most applications.
+      - id: ir-4
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          A09 notes that logging failures extend dwell time and prevent effective
+          incident response. IR-4 requires implementing incident handling capability
+          including detection, analysis, containment, eradication, and recovery.
+          Effective logging and monitoring per A09 is a prerequisite for the incident
+          detection and analysis phases of IR-4 incident handling.
+
+  # ── A10: Server-Side Request Forgery (SSRF) ──────────────────────────
+
+  - source_control: owasp-a10
+    target_controls:
+      - id: sc-7
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          SSRF exploits the application's position inside the network perimeter to
+          access internal resources, cloud metadata APIs, and private network
+          services. SC-7 requires monitoring and controlling communications at
+          managed interfaces and implementing subnetworks for publicly accessible
+          components separated from internal networks. SSRF prevention through
+          network segmentation, egress controls, and metadata endpoint protection
+          directly implements SC-7 boundary protection at the application layer.
+      - id: si-4
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          SSRF detection requires monitoring egress traffic for connections to
+          internal IP ranges, cloud metadata endpoints, and localhost. SI-4 mandates
+          monitoring the system to detect attacks and unauthorized connections.
+          Egress traffic analysis, WAF SSRF pattern detection, and cloud metadata
+          access monitoring implement SI-4 for the SSRF threat vector.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSRF bypasses network-level access controls by using the application as a
+          proxy to reach internal resources. AC-3 requires enforcing approved
+          authorizations for logical access. URL allowlisting, scheme enforcement,
+          and post-DNS-resolution IP validation implement AC-3 access enforcement
+          for outbound HTTP requests initiated by the application.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSRF mitigation includes platform-level configuration such as enforcing
+          AWS IMDSv2, disabling legacy GCP metadata endpoints, and configuring
+          Kubernetes Network Policies for egress restriction. CM-6 requires secure
+          configuration settings for system components. Cloud metadata endpoint
+          hardening and network policy configuration are direct CM-6 implementations
+          that reduce SSRF impact.

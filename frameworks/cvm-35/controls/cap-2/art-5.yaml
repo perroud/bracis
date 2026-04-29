@@ -1,0 +1,218 @@
+id: art-5
+family: cap-2
+title: "Conteudo Minimo da Politica de Seguranca da Informacao"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 5. A política de segurança da informação deve conter, no mínimo:
+    I - procedimentos e controles para classificação das informações segundo
+    a relevância para o negócio e para a proteção dos investidores;
+    II - procedimentos e controles de acesso lógico e físico a informações
+    e a sistemas relevantes;
+    III - procedimentos e controles de proteção contra softwares maliciosos;
+    IV - procedimentos e controles para realização periódica de cópias de
+    segurança (backup);
+    V - controles específicos para garantir a segurança das redes de comunicação,
+    incluindo acesso remoto;
+    VI - procedimentos e controles para gestão de vulnerabilidades técnicas;
+    VII - procedimentos e controles para manutenção de trilhas de auditoria;
+    VIII - definição das responsabilidades dos integrantes da entidade quanto
+    à segurança da informação.
+guidance:
+  prose: |
+    O art. 5 define os oito pilares obrigatorios da PSI. Nao se trata de itens
+    opcionais ou sugestoes — sao requisitos minimos que toda PSI deve conter.
+
+    **I — Classificacao de informacoes:**
+    Deve haver taxonomia formal (ex: publica, interna, confidencial, restrita)
+    com criterios objetivos. A relevancia para protecao de investidores e criterio
+    especifico do mercado de capitais (informacoes privilegiadas, material fact).
+
+    **II — Controle de acesso logico e fisico:**
+    Principio de menor privilegio, segregacao de funcoes, autenticacao multifator
+    para sistemas criticos. Controle fisico inclui data centers, salas de servidores
+    e areas com acesso a informacoes sensiveis.
+
+    **III — Protecao contra malware:**
+    Antimalware, EDR/XDR, controle de execucao de aplicacoes, sandboxing.
+    Cobertura em endpoints, servidores e gateways de e-mail.
+
+    **IV — Backup:**
+    Politica de backup com frequencia, retencao, criptografia, teste de restauracao
+    e armazenamento offsite. Backup de dados de investidores e registros de operacoes
+    sao especialmente criticos.
+
+    **V — Seguranca de redes:**
+    Segmentacao, firewalls, IDS/IPS, VPN para acesso remoto, monitoramento de trafego.
+    Redes de negociacao devem ter isolamento especial.
+
+    **VI — Gestao de vulnerabilidades:**
+    Scanning periodico, priorizacao baseada em risco, SLAs de remediacao,
+    patching management, hardening de sistemas.
+
+    **VII — Trilhas de auditoria:**
+    Logs de acesso, operacoes, alteracoes de configuracao, acoes administrativas.
+    Retencao minima compativel com prazos regulatorios. Protecao contra adulteracao.
+
+    **VIII — Responsabilidades:**
+    Matriz RACI clara. Quem e responsavel por seguranca da informacao em cada
+    area, quem aprova excecoes, quem monitora, quem reporta.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I — Classificacao de informacoes:**
+      1. Implementar labels/tags de classificacao em repositorios, bancos de dados
+         e sistemas de armazenamento (publica, interna, confidencial, restrita).
+      2. Data Loss Prevention (DLP) para prevenir exfiltracao de dados classificados.
+      3. Metadados de classificacao em APIs e schemas de dados.
+
+      **II — Controle de acesso:**
+      4. Identity Provider centralizado (Okta, Azure AD, Keycloak) com SSO.
+      5. MFA obrigatorio para todos os sistemas criticos e acesso administrativo.
+      6. RBAC com principio de menor privilegio, revisao de acessos trimestral.
+      7. PAM (Privileged Access Management) para contas administrativas.
+
+      **III — Protecao contra malware:**
+      8. EDR/XDR em todos os endpoints e servidores.
+      9. Container scanning para imagens Docker em pipelines e registros.
+      10. Controle de admissao de imagens em clusters Kubernetes.
+
+      **IV — Backup:**
+      11. Backup automatizado com retencao definida por classificacao do dado.
+      12. Criptografia de backups em repouso e em transito.
+      13. Teste de restauracao trimestral documentado.
+
+      **V — Seguranca de redes:**
+      14. Segmentacao de rede (microsegmentacao com service mesh quando aplicavel).
+      15. Zero Trust Network Access para acesso remoto (substituir VPN tradicional).
+      16. WAF para aplicacoes web expostas.
+
+      **VI — Gestao de vulnerabilidades:**
+      17. Scanning automatizado semanal de infraestrutura e aplicacoes.
+      18. SLAs de remediacao: critica 24h, alta 72h, media 30d, baixa 90d.
+      19. Patch management automatizado para SO e dependencias.
+
+      **VII — Trilhas de auditoria:**
+      20. Centralizacao de logs em SIEM com retencao minima de 5 anos.
+      21. Logs imutaveis (write-once) para prevenir adulteracao.
+      22. Monitoramento de acesso a logs (quem acessou trilhas de auditoria).
+
+      **VIII — Responsabilidades:**
+      23. IaC com ownership definido por CODEOWNERS em repositorios.
+      24. Automacao de provisionamento/desligamento de acessos via IdP.
+    tools:
+      - vault
+      - identity-provider
+      - dlp-solution
+      - edr-xdr
+      - waf
+      - siem
+      - backup-solution
+      - vulnerability-scanner
+      - pam-solution
+  devsecops:
+    prose: |
+      **Controles no pipeline para cada pilar:**
+
+      **Classificacao (I):**
+      1. Lint rules para detectar dados sensiveis hardcoded em codigo.
+      2. Schema validation para garantir que APIs expoe apenas campos permitidos.
+
+      **Controle de acesso (II):**
+      3. Code owners obrigatorio para repositorios de sistemas criticos.
+      4. Branch protection com aprovacao obrigatoria.
+      5. Revisao de permissoes de CI/CD (tokens, service accounts).
+
+      **Malware (III):**
+      6. SAST para detectar codigo malicioso e backdoors.
+      7. Container scanning para vulnerabilidades em imagens base.
+      8. Dependency scanning para bibliotecas comprometidas (supply chain).
+
+      **Backup (IV):**
+      9. IaC para backup policies (Terraform/Pulumi), garantindo que todo recurso
+         critico tem backup configurado automaticamente.
+      10. Testes automatizados de restore em pipeline de DR.
+
+      **Redes (V):**
+      11. Network policies como codigo (Calico, Cilium) versionadas em Git.
+      12. DAST para testar seguranca de aplicacoes em ambiente staging.
+
+      **Vulnerabilidades (VI):**
+      13. Vulnerability scanning automatizado em cada merge request.
+      14. Security dashboard com metricas de vulnerabilidades abertas.
+      15. Auto-merge de patches de seguranca via Dependabot/Renovate.
+
+      **Auditoria (VII):**
+      16. Audit trail de todas as acoes no pipeline (quem aprovou, quando, o que).
+      17. Audit events do GitLab habilitados e exportados para SIEM.
+
+      **Responsabilidades (VIII):**
+      18. CODEOWNERS arquivo mapeando ownership de seguranca por modulo.
+      19. Security champions designados por equipe de desenvolvimento.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - sonarqube
+      - renovate
+      - trivy
+  secops:
+    prose: |
+      **Operacao e monitoramento dos oito pilares:**
+
+      **Classificacao (I):**
+      1. Auditoria periodica de dados classificados vs. controles aplicados.
+      2. Discovery automatizado de dados sensiveis em repositorios nao classificados.
+
+      **Controle de acesso (II):**
+      3. Revisao de acessos trimestral (user access review).
+      4. Monitoramento de acessos anomalos via UEBA (User Entity Behavior Analytics).
+      5. Deteccao de escalacao de privilegios e movimentacao lateral.
+
+      **Malware (III):**
+      6. Monitoramento 24x7 de alertas de EDR/XDR com triagem automatizada.
+      7. Threat intelligence feeds para deteccao proativa de malware.
+
+      **Backup (IV):**
+      8. Monitoramento de execucao de backups (sucesso/falha).
+      9. Teste de restauracao trimestral com documento de evidencia.
+
+      **Redes (V):**
+      10. Monitoramento de trafego de rede com deteccao de anomalias.
+      11. Alertas de acesso remoto fora do padrao (horario, localizacao, volume).
+
+      **Vulnerabilidades (VI):**
+      12. Gestao centralizada de vulnerabilidades com SLA tracking.
+      13. Relatorio mensal de postura de vulnerabilidades para diretoria.
+
+      **Auditoria (VII):**
+      14. Monitoramento de integridade de logs (tampering detection).
+      15. Retencao de logs conforme prazo regulatorio (minimo 5 anos para CVM).
+
+      **Responsabilidades (VIII):**
+      16. Matriz RACI documentada e revisada anualmente.
+      17. Treinamento obrigatorio para responsaveis por seguranca da informacao.
+    tools:
+      - siem
+      - edr-xdr
+      - ueba
+      - dlp-solution
+      - vulnerability-scanner
+      - grc-platform
+      - backup-monitoring
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-4", "art-5"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AU-1", "AU-2", "CP-9", "RA-5", "SC-7", "SI-3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.12", "A.5.15", "A.8.1", "A.8.7", "A.8.13", "A.8.8", "A.8.15", "A.5.2"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-47", "art-49"]
+    relationship: complements

@@ -1,0 +1,85 @@
+id: art-8
+family: cap-2
+title: "Interface Dedicada e Padrao de APIs"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 8. O compartilhamento de dados deve ser realizado exclusivamente por
+    meio de interface dedicada (API), desenvolvida conforme as especificações
+    técnicas definidas no âmbito da estrutura de governança do Open Finance.
+
+    Parágrafo 1. As interfaces dedicadas devem:
+    I - utilizar o protocolo HTTPS com TLS versão 1.2 ou superior;
+    II - adotar o padrão REST (Representational State Transfer);
+    III - utilizar o formato JSON para troca de mensagens;
+    IV - implementar versionamento de APIs conforme especificações do diretório;
+    V - disponibilizar documentação no padrão OpenAPI 3.0 ou superior.
+
+    Parágrafo 2. É vedada a utilização de técnicas de screen scraping, web
+    crawling ou qualquer método de raspagem de dados para o compartilhamento.
+guidance:
+  prose: |
+    O art. 8 define os requisitos tecnicos das APIs:
+
+    **Padrao tecnico obrigatorio:**
+    - Protocolo: HTTPS com TLS 1.2+
+    - Arquitetura: REST
+    - Formato: JSON
+    - Documentacao: OpenAPI 3.0+
+    - Versionamento: conforme diretorio (major.minor.patch)
+
+    **Vedacoes explicitas:**
+    - Screen scraping (captura de tela)
+    - Web crawling (varredura de sites)
+    - Raspagem de dados por qualquer metodo
+    - APIs que exponham interfaces de usuario (HTML)
+
+    **Implicacoes tecnicas:**
+    - APIs devem ser idempotentes e stateless
+    - Headers padronizados (x-fapi-interaction-id, x-fapi-auth-date)
+    - Content-Type: application/json
+    - Paginacao padronizada com links HATEOAS
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de APIs conforme especificacoes:**
+      1. Configurar API gateway com TLS 1.2+ (desabilitar TLS 1.0/1.1).
+      2. Implementar APIs REST seguindo a especificacao OpenAPI do diretorio
+         com code generation a partir dos schemas oficiais.
+      3. Implementar headers FAPI obrigatorios em middleware:
+         x-fapi-interaction-id, x-fapi-auth-date, x-fapi-customer-ip-address.
+      4. Configurar versionamento de API via path (/open-banking/v1/...).
+      5. Publicar documentacao OpenAPI em endpoint padronizado.
+    tools:
+      - api-gateway
+      - openapi-generator
+      - nginx
+      - envoy
+  devsecops:
+    prose: |
+      **Validacao automatizada de conformidade de APIs:**
+      1. Lint de especificacao OpenAPI em pipeline (Spectral/Redocly).
+      2. Validar TLS cipher suites em testes de seguranca automatizados.
+      3. Verificar ausencia de endpoints nao-REST ou HTML.
+      4. Contract testing contra schemas oficiais do diretorio.
+    tools:
+      - spectral
+      - ssl-test
+      - openapi-validator
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de conformidade de interfaces:**
+      1. Escanear periodicamente configuracao TLS das APIs expostas.
+      2. Monitorar tentativas de acesso via metodos nao-padronizados.
+      3. Validar que respostas seguem formato JSON estritamente.
+      4. Auditar versionamento e deprecacao de APIs conforme politica.
+    tools:
+      - ssl-monitoring
+      - api-monitoring
+      - waf
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

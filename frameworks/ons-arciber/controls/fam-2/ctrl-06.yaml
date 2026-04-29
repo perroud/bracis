@@ -1,0 +1,102 @@
+id: ctrl-06
+family: fam-2
+title: "Segmentacao de Redes e Definicao do Perimetro Eletronico do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar segmentação de redes que isole lógica e
+    fisicamente os sistemas do ARCiber das redes corporativas (IT) e de redes
+    externas, incluindo a Internet. O perímetro eletrônico do ARCiber deve ser
+    claramente definido e documentado, com todos os pontos de comunicação entre
+    o ARCiber e redes externas sendo controlados por firewalls industriais,
+    dispositivos de transferência unidirecional de dados (data diodes) ou
+    zonas desmilitarizadas (DMZ industrial). A arquitetura de segmentação deve
+    ser baseada no modelo de zonas e condutos da IEC 62443.
+
+guidance:
+  prose: >-
+    A segmentacao e o controle de perimetro sao controles fundamentais para
+    limitar a superficie de ataque do ARCiber. A arquitetura deve implementar:
+    (i) segregacao completa entre nivel IT (nivel 4 ISA-95) e nivel OT (niveis 0-3);
+    (ii) DMZ industrial entre a rede corporativa e a rede OT, onde sistemas de
+    interface (historians, jump servers) residem; (iii) firewalls industriais com
+    politicas de negacao por padrao (deny-all) apenas permitindo os protocolos
+    e portas estritamente necessarios para operacao do SIN; (iv) data diodes para
+    fluxos de dados unidirecionais quando o risco de comunicacao bidirecional e
+    inaceitavel (ex: replicacao de dados de processo para sistemas de relatorio);
+    (v) segmentacao adicional dentro do ARCiber por local fisico (subestacao,
+    usina) e por funcao (protecao, supervisao, telecom). Documentar todos os
+    fluxos de comunicacao permitidos como matriz de comunicacao.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar arquitetura de zonas e condutos baseada em IEC 62443-3-3,
+      com firewall industrial de proxima geracao (Fortinet FortiGate Rugged,
+      Palo Alto PA-220R ou similar) em cada fronteira de zona. Gerenciar regras
+      de firewall como codigo (IaC) com repositorio GitLab para auditoria e
+      controle de mudancas. Implementar solucao de monitoramento de fluxos de
+      rede (NetFlow/IPFIX) nos firewalls industriais para deteccao de desvios
+      do baseline de comunicacao. Utilizar data diodes (Waterfall Security,
+      Owl Cyber Defense) para transferencia unidirecional de dados de processo
+      para sistemas corporativos. Documentar topologia completa de zonas e
+      condutos como diagrama versionado no repositorio de arquitetura.
+    tools:
+      - fortinet-fortigate-rugged
+      - palo-alto
+      - waterfall-security
+      - nozomi-networks
+      - gitlab
+  devsecops:
+    prose: >-
+      Implementar validacao automatica de regras de firewall como parte do
+      pipeline CI/CD — qualquer mudanca em politicas de acesso do ARCiber
+      deve passar por revisao de seguranca e aprovacao dupla antes de ser
+      aplicada. Usar ferramentas de analise de regras de firewall (AlgoSec,
+      Tufin) para detectar regras permissivas ou redundantes. Implementar
+      testes de segmentacao de rede (penetration testing limitado) como parte
+      do pipeline de validacao de mudancas criticas na arquitetura de rede do
+      ARCiber. Manter diagrama de arquitetura de rede atualizado como artefato
+      versionado no GitLab.
+    tools:
+      - gitlab-ci
+      - algosec
+      - tufin
+      - ansible
+      - terraform
+  secops:
+    prose: >-
+      Realizar revisao semestral das regras de firewall industrial do ARCiber,
+      removendo ou restringindo regras permissivas identificadas. Executar testes
+      de validacao do perimetro eletronico (network segmentation tests) ao menos
+      anualmente para confirmar que a segmentacao esta funcionando conforme
+      projetado. Monitorar continuamente tentativas de acesso nao autorizado
+      ao perimetro do ARCiber e correlacionar alertas no SIEM. Documentar e
+      manter atualizada a matriz de comunicacao (Communication Matrix) do ARCiber,
+      listando todos os fluxos de dados permitidos com protocolo, porta, direcao
+      e justificativa de negocio.
+    tools:
+      - splunk
+      - nozomi-vantage
+      - algosec
+      - fortinet-fortimanager
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 8", "art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR5.1", "62443-3-3 SR5.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-005-R1", "CIP-005-R2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.22", "a8.20"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-3", "CA-3"]
+    relationship: mapped

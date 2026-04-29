@@ -1,0 +1,137 @@
+id: e8-backups
+family: recover
+title: "Regular Backups"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Backups of important data, software, and configuration settings are performed and
+    retained in a coordinated and resilient manner. Backups are tested to ensure that
+    data can be restored in the event of a cyber security incident, such as a ransomware
+    attack, or data loss event. Backup processes and restoration capabilities are aligned
+    with business continuity requirements and recovery time objectives.
+
+guidance:
+  prose: >-
+    Regular backups are the primary mitigation strategy for recovering from ransomware
+    attacks and other destructive incidents. Without reliable, tested backups, an
+    organisation may face permanent data loss or be compelled to pay ransom demands.
+    Backups must be stored in a manner that prevents an adversary who has compromised
+    the production environment from also compromising the backups. This requires
+    offline storage, immutable storage, or storage in a separate security domain.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Backups of important data, software, and configuration settings are performed
+        and retained in accordance with business continuity requirements. Backups of
+        important data, software, and configuration settings are synchronised to enable
+        restoration to a common point in time. Backups of important data, software, and
+        configuration settings are retained in a secure and resilient manner. Restoration
+        of important data, software, and configuration settings from backups to a common
+        point in time is tested as part of disaster recovery exercises.
+    ml2:
+      prose: >-
+        Backups of important data, software, and configuration settings are performed
+        and retained in accordance with business continuity requirements. Backups of
+        important data, software, and configuration settings are synchronised to enable
+        restoration to a common point in time. Backups of important data, software, and
+        configuration settings are retained in a secure and resilient manner. Unprivileged
+        accounts cannot access backups belonging to other accounts. Unprivileged accounts
+        are prevented from modifying and deleting backups. Privileged accounts (excluding
+        backup administrator accounts) are prevented from modifying and deleting backups.
+        Restoration of important data, software, and configuration settings from backups
+        to a common point in time is tested as part of disaster recovery exercises.
+    ml3:
+      prose: >-
+        Backups of important data, software, and configuration settings are performed
+        and retained in accordance with business continuity requirements. Backups of
+        important data, software, and configuration settings are synchronised to enable
+        restoration to a common point in time. Backups of important data, software, and
+        configuration settings are retained in a secure and resilient manner.
+        Unprivileged accounts cannot access backups belonging to other accounts or their
+        own account. Unprivileged accounts are prevented from modifying and deleting
+        backups. Privileged accounts (excluding backup administrator accounts) are
+        prevented from modifying and deleting backups. Privileged accounts (including
+        backup administrator accounts) are prevented from modifying and deleting backups
+        during their retention period. Restoration of important data, software, and
+        configuration settings from backups to a common point in time is tested as part
+        of disaster recovery exercises at least annually.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Regular Backups"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 CP-9 - System Backup"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement the 3-2-1 backup rule: three copies, two different media types, one
+      offsite. Deploy immutable backup storage using cloud object storage with object
+      lock (AWS S3 Object Lock, Azure Immutable Blob Storage, GCP Bucket Lock) to
+      prevent backup deletion even by privileged accounts. Configure Velero for
+      Kubernetes cluster state and persistent volume backups. Use database-native backup
+      solutions (pg_basebackup, mongodump, mysqldump) with encrypted offsite replication.
+      Implement Infrastructure-as-Code to ensure all configuration settings are
+      version-controlled and reproducible without backup restoration. Deploy backup
+      monitoring to alert on missed backup windows or failed backup jobs. Enforce
+      role-based access control on backup management operations with separate backup
+      administrator accounts.
+    tools:
+      - velero
+      - aws-s3-object-lock
+      - azure-immutable-blob
+      - gcp-bucket-lock
+      - restic
+      - borgbackup
+      - terraform
+      - ansible
+
+  devsecops:
+    prose: >-
+      Store all application code, infrastructure-as-code, and configuration in
+      version-controlled repositories as a form of backup for software and configuration
+      settings. Implement automated backup verification pipelines that periodically
+      restore backups to isolated environments and run integrity checks. Include backup
+      and restore procedures in disaster recovery runbooks stored alongside application
+      code. Test backup restoration as part of CI/CD pipeline validation for database
+      migration workflows. Automate backup encryption key management and rotation through
+      secrets management platforms.
+    tools:
+      - gitlab-ci
+      - velero
+      - restic
+      - hashicorp-vault
+      - terraform
+
+  secops:
+    prose: >-
+      Monitor backup job completion and integrity via centralized dashboards. Alert on
+      backup failures, missed schedules, or integrity check failures. Conduct annual
+      (minimum) disaster recovery exercises that include full restoration from backups
+      to validate recovery time objectives (RTO) and recovery point objectives (RPO).
+      Audit backup access controls to ensure only designated backup administrator accounts
+      can manage backups. Monitor for unauthorized backup deletion attempts. Verify that
+      immutable storage retention periods align with organisational and regulatory
+      requirements. Generate compliance reports on backup posture including coverage,
+      frequency, retention, and test results.
+    tools:
+      - splunk
+      - elastic-siem
+      - veeam
+      - commvault
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-9", "CP-9(1)", "CP-9(8)", "CP-10"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 11.1", "CIS 11.2", "CIS 11.3", "CIS 11.4", "CIS 11.5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.13", "A8.14"]
+    relationship: supports

@@ -1,0 +1,139 @@
+id: pp-1
+family: prototype
+title: "Prototype Protection Requirements"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall implement specific protection measures for
+    prototype vehicles, components, parts, and related information
+    throughout the entire prototype lifecycle — from design and
+    development through testing, transport, storage, and disposal.
+    A prototype protection concept shall be established that defines
+    classification levels, handling procedures, access restrictions,
+    and physical and digital security measures appropriate to the
+    sensitivity of the prototype assets. All personnel with access
+    to prototype information shall be identified, authorized, and
+    bound by specific confidentiality agreements.
+
+guidance:
+  prose: >-
+    Prototype protection is a TISAX-specific assessment objective
+    that goes beyond standard information security. It addresses
+    the unique requirements of the automotive industry where
+    pre-release vehicle designs, components, and technologies
+    represent significant competitive advantage and their premature
+    disclosure can cause substantial financial and reputational
+    damage. The prototype protection concept must cover: classification
+    of prototype assets (visual, technical, strategic), definition
+    of protection zones with escalating security levels, specific
+    handling procedures for prototype documents (digital and physical),
+    photography and recording device policies (typically prohibited
+    in prototype areas), visitor management with specific prototype
+    awareness briefings, transport security for prototype vehicles
+    and components (camouflage, covered transport, GPS tracking),
+    secure disposal of prototype materials, and incident response
+    specific to prototype compromises (unauthorized photography,
+    information leaks). The organization must maintain a prototype
+    asset register and conduct regular inventories. NDAs specific
+    to prototype information must be signed by all personnel
+    (employees, contractors, visitors) before access is granted.
+    At AL3, which is typically required for prototype protection,
+    auditors conduct detailed physical inspections of prototype
+    areas, verify camouflage and concealment measures, test access
+    controls, and review incident response procedures.
+
+baselines:
+  al1:
+    applicability: not-applicable
+    notes: "Prototype protection is not assessed at AL1."
+  al2:
+    applicability: conditional
+    notes: "Required when prototype protection assessment objective is selected. Auditor reviews protection concept and procedures."
+  al3:
+    applicability: required
+    notes: "Full on-site assessment of prototype protection measures, physical inspections, and incident response testing."
+
+references:
+  - citation: "VDA ISA 6.0, Prototype Protection Module"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "VDA Recommendations — Protection of Prototypes"
+    url: "https://www.vda.de/en"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a dedicated, air-gapped or heavily segmented
+      infrastructure environment for prototype-related digital
+      assets. Use strict RBAC with named-user access only (no
+      shared accounts, no service accounts with broad access)
+      for prototype data systems. Implement enhanced audit logging
+      with tamper-evident storage for all access to prototype data.
+      Deploy data loss prevention (DLP) at the platform level with
+      specific rules for prototype classification markings and
+      file types (CAD files, design documents, test data).
+      Implement watermarking for prototype documents accessed
+      through the platform to enable leak tracing. Use encrypted
+      storage with dedicated key management separate from
+      non-prototype systems. Enforce time-limited access grants
+      with mandatory re-authorization for ongoing prototype access.
+    tools:
+      - vault
+      - kubernetes
+      - calico
+      - falco
+      - open-policy-agent
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement separate CI/CD pipelines for prototype-related
+      software with enhanced security controls: mandatory dual
+      approval for all changes, additional security scanning, and
+      restricted deployment targets. Enforce repository-level
+      access controls that limit prototype repository access to
+      explicitly authorized personnel. Implement automated
+      classification detection in pipeline stages to prevent
+      prototype-classified information from being committed to
+      non-prototype repositories. Use signed commits and artifact
+      signing with separate signing keys for prototype projects.
+      Implement branch protection rules that require CISO or
+      prototype security officer approval for prototype repository
+      changes. Generate enhanced audit trails for all prototype
+      pipeline activities.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - vault
+      - cosign
+      - gitleaks
+      - trivy
+
+  secops:
+    prose: >-
+      Implement dedicated monitoring and alerting for prototype
+      environments with zero-tolerance detection rules. Monitor
+      for bulk data access, unauthorized file downloads, screen
+      capture attempts, and data exfiltration indicators with
+      immediate alerting to the prototype security officer. Deploy
+      user and entity behavior analytics (UEBA) with prototype-specific
+      baselines that flag any anomalous access patterns. Implement
+      enhanced incident response procedures for prototype compromises
+      with immediate containment, forensic preservation, and
+      escalation to OEM security contacts. Monitor public internet
+      and social media for unauthorized disclosure of prototype
+      information (brand protection monitoring). Maintain a
+      prototype-specific incident register with root cause analysis
+      and preventive action tracking.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - forcepoint
+      - digital-shadows
+      - recorded-future
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.10", "A.5.12", "A.5.13", "A.5.14", "A.7.3", "A.7.7"]
+    relationship: extends

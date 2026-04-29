@@ -1,0 +1,82 @@
+id: art-58
+family: cap-12
+title: "Criptografia e Protecao de Dados em Nuvem"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 58. Os órgãos e entidades devem assegurar a proteção criptográfica
+    dos dados armazenados e processados em serviços de nuvem, incluindo:
+
+    I - criptografia em repouso com chaves gerenciadas pelo órgão
+    (customer-managed keys);
+    II - criptografia em trânsito para todas as comunicações;
+    III - gestão de chaves criptográficas sob controle do órgão;
+    IV - capacidade de realizar crypto-shredding ao encerrar contrato.
+guidance:
+  prose: |
+    O art. 58 exige criptografia em nuvem com chaves gerenciadas pelo orgao
+    (CMK), nao apenas pelo provider. Crypto-shredding ao encerrar contrato.
+
+    **Requisitos criptograficos cloud:**
+    1. At rest: AES-256 com customer-managed keys (CMK)
+    2. In transit: TLS 1.3 entre client e cloud, e entre servicos
+    3. Key management: chaves no HSM do orgao ou cloud KMS com CMK
+    4. Crypto-shredding: destruir chave = destruir dados ao encerrar
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.24 (Use of cryptography)
+    - NIST 800-53 rev5: SC-12 (Cryptographic Key Establishment)
+    - CSA CCM: EKM (Encryption & Key Management)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Criptografia cloud:**
+      1. AWS KMS / Azure Key Vault / GCP Cloud KMS com CMK obrigatorio.
+      2. HSM-backed keys para dados classificados (CloudHSM, Dedicated HSM).
+      3. Envelope encryption para dados em object storage.
+      4. Criptografia client-side para dados ultrassensiveis.
+      5. Policy: nenhum dado armazenado sem criptografia (enforce via SCP).
+    tools:
+      - cloud-kms
+      - cloud-hsm
+      - envelope-encryption
+      - client-side-encryption
+      - encryption-policy
+  devsecops:
+    prose: |
+      **Criptografia no pipeline:**
+      1. IaC template com criptografia habilitada por padrao em todos os servicos.
+      2. Scan para detectar recursos sem criptografia (Checkov, Prowler).
+      3. Pipeline que bloqueia criacao de S3 bucket/storage sem encryption.
+      4. Key rotation automatizada via pipeline.
+    tools:
+      - encryption-iac-template
+      - encryption-scan
+      - encryption-enforcement
+      - key-rotation-pipeline
+  secops:
+    prose: |
+      **Gestao de chaves cloud:**
+      1. Inventario de todas as chaves criptograficas em uso por provider.
+      2. Monitoramento de expiracoes e rotacoes de chaves.
+      3. Procedimento de crypto-shredding para encerramento de contrato.
+      4. Auditoria anual de conformidade criptografica em nuvem.
+    tools:
+      - key-inventory
+      - key-rotation-monitoring
+      - crypto-shredding-procedure
+      - crypto-audit
+legal_references:
+  - framework_id: gsi-in5
+    articles: ["art-7"]
+    relationship: complements
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped

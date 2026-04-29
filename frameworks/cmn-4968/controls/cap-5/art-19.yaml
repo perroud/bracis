@@ -1,0 +1,105 @@
+id: art-19
+family: cap-5
+title: "Retencao de Documentacao de Auditoria"
+class: CMN-4968
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 19. A documentação referente à atividade de auditoria interna deve ser
+    mantida em condições de integridade, segurança e disponibilidade pelo prazo
+    mínimo de cinco anos, contados da data de conclusão do trabalho de auditoria.
+
+    Parágrafo único. A documentação deve ser mantida de forma a permitir a sua
+    recuperação integral e tempestiva, inclusive para fins de supervisão pelo
+    Banco Central do Brasil.
+guidance:
+  prose: |
+    O art. 19 estabelece o regime de retencao de documentacao de auditoria. Cinco anos
+    e o prazo minimo absoluto -- normas especificas ou a decisao interna da instituicao
+    podem exigir prazo maior.
+
+    **Tres requisitos cumulativos (cabecalho):**
+    1. Integridade: a documentacao nao pode ser alterada apos o encerramento do trabalho.
+       Qualquer alteracao retrospectiva de workpapers e irregularidade grave.
+    2. Seguranca: protecao contra acesso nao autorizado, destruicao acidental ou
+       intencional. Backups, controles de acesso, ambiente seguro.
+    3. Disponibilidade: a documentacao deve poder ser acessada quando necessario --
+       inclui recuperacao de backups em tempo habil.
+
+    **Contagem do prazo:**
+    O prazo corre da data de conclusao do trabalho, nao da data do ultimo achado
+    ou recomendacao. Portanto, trabalhos concluidos em dezembro de 2022 devem ser
+    retidos ate dezembro de 2027.
+
+    **Acesso do BCB (paragrafo unico):**
+    O BCB tem o direito de acessar toda a documentacao de auditoria interna durante
+    suas supervisoes. A instituicao nao pode negar acesso nem apresentar documentacao
+    incompleta. A recuperacao deve ser tempestiva (tipicamente 1-5 dias uteis conforme
+    os prazos de supervisao do BCB).
+
+    **Boas praticas:**
+    - Indexacao: documentacao indexada por trabalho, data, area auditada e auditor
+    - Formatos duradouros: PDF/A, conforme norma ISO 19005 para arquivos de longo prazo
+    - Backup geograficamente separado do arquivo principal
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao e arquivo:**
+      1. Configurar politica de retencao de 5+ anos no audit management system:
+         bloqueio automatico de exclusao de documentos de trabalhos concluidos.
+      2. Armazenamento em formato imutavel (WORM - Write Once Read Many) para
+         workpapers finalizados, garantindo integridade tecnica.
+      3. Backup automatico diario com retencao de 5+ anos em storage geograficamente
+         separado (ex: outra regiao de cloud ou datacenter fisico diferente).
+      4. Indexacao completa de toda documentacao de auditoria: busca por trabalho,
+         area, data, auditor, tipo de documento, achado.
+      5. Processo de recuperacao testado semestralmente: simulacao de recuperacao de
+         documentos de anos anteriores para garantir disponibilidade real.
+      6. Logs imutaveis de todos os acessos a documentacao de auditoria, para demonstrar
+         cadeia de custodia ao BCB quando necessario.
+    tools:
+      - document-management
+      - cloud-storage-worm
+      - backup-solution
+      - audit-log-management
+  devsecops:
+    prose: |
+      **Retencao de evidencias de auditoria de TI:**
+      1. Configurar retencao de logs de SIEM por minimo 5 anos alinhada ao art. 19
+         (evidencias de seguranca usadas em trabalhos de auditoria).
+      2. Arquivar relatorios de scans de seguranca (SAST, DAST, dependency scanning)
+         como parte dos workpapers digitais com retencao de 5+ anos.
+      3. Exportar e arquivar relatorios do compliance management platform em formato PDF/A
+         com hash criptografico para garantia de integridade.
+      4. Pipeline de arquivamento automatico: ao encerrar um trabalho de auditoria de TI,
+         gatilho para exportar e arquivar todas as evidencias digitais associadas.
+    tools:
+      - siem
+      - document-management
+      - cloud-storage-worm
+      - gitlab-export
+  secops:
+    prose: |
+      **Governanca da retencao de documentacao:**
+      1. Elaborar politica de retencao de documentacao de auditoria aprovada pelo CA,
+         definindo: tipos de documentos, formatos aceitos, prazo (minimo 5 anos),
+         localizacao e controles de acesso.
+      2. Inventario anual da documentacao de auditoria: verificar que nenhum trabalho
+         dos ultimos 5 anos esta sem documentacao completa.
+      3. Definir processo de resposta a requisicoes do BCB: responsavel, prazo maximo
+         de entrega (ex: 2 dias uteis para documentos eletronicos) e checklist de entrega.
+      4. Testar anualmente a recuperacao de documentacao de auditoria de anos anteriores.
+      5. Ao encerrar cada trabalho, gerar pacote digital de arquivo com todos os workpapers
+         em formato padronizado, assinado digitalmente pelo diretor de auditoria.
+    tools:
+      - document-management
+      - grc-platform
+      - e-signature
+      - backup-testing
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-31"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-8"]
+    relationship: complements

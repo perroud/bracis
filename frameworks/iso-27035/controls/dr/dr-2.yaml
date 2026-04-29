@@ -1,0 +1,87 @@
+id: dr.2
+family: dr
+title: "Event collection and logging"
+class: ISO27035
+
+statement:
+  prose: >-
+    The organization shall collect and retain logs and evidence of information
+    security events from all relevant sources. Log collection shall be
+    comprehensive, covering network devices, operating systems, applications,
+    databases, identity and access management systems, and cloud services.
+    Logs shall be protected against unauthorized access, modification, and
+    deletion, and shall be retained for a period sufficient to support
+    incident investigation and compliance requirements.
+
+guidance:
+  prose: >-
+    Log sources should include firewalls, routers, switches, servers,
+    workstations, applications, authentication systems, cloud provider
+    audit trails, and physical access control systems. Time synchronization
+    across all sources is critical for accurate event correlation. Log
+    integrity should be ensured through write-once storage, digital
+    signatures, or hash chains. Retention periods should comply with
+    legal, regulatory, and contractual requirements. The organization
+    should implement log management processes that address collection,
+    normalization, storage, and archival.
+
+references:
+  - citation: "ISO/IEC 27035-1:2023, Clause 6.2"
+    url: "https://www.iso.org/standard/78973.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized log aggregation pipeline using structured logging
+      standards (e.g., JSON, CEF, ECS). Implement log shipping agents on all
+      infrastructure components and enforce logging standards through platform
+      policies. Use immutable storage (write-once-read-many) for security
+      logs. Ensure NTP synchronization across all infrastructure. Implement
+      log retention policies as infrastructure-as-code with automated lifecycle
+      management.
+    tools:
+      - elasticsearch
+      - fluentd
+      - fluentbit
+      - kafka
+      - s3
+      - minio
+  devsecops:
+    prose: >-
+      Enforce structured logging standards in application code through
+      linting rules and shared logging libraries. Include security-relevant
+      events (authentication, authorization, data access) in application
+      logging. Configure CI/CD pipelines to validate that deployed services
+      produce required log events. Implement log format validation in
+      integration tests.
+    tools:
+      - gitlab-ci
+      - winston
+      - pino
+      - structlog
+      - datadog
+  secops:
+    prose: >-
+      Centralize all log sources into the SIEM and implement parsing rules
+      for normalization. Monitor log source health to detect collection gaps
+      or failures. Implement log integrity monitoring to detect tampering.
+      Define and enforce retention policies aligned with regulatory
+      requirements and investigation needs. Create alerts for log source
+      disconnection or volume anomalies.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - wazuh
+      - logrhythm
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.15"]
+    relationship: supports
+  - framework_id: nist-800-61
+    articles: ["det.2"]
+    relationship: mapped
+  - framework_id: nist-csf-v2
+    articles: ["DE.CM-09"]
+    relationship: complements

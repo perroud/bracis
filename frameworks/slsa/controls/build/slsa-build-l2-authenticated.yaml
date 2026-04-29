@@ -1,0 +1,97 @@
+id: slsa-build-l2-authenticated
+family: build
+title: "Build L2: Authenticated Provenance"
+class: SLSA
+
+baselines: [build-l2, build-l3]
+
+statement:
+  prose: >-
+    The provenance must be authenticated — digitally signed by the hosted build
+    platform using a signing mechanism that consumers can verify. The signature must
+    be verifiable without trusting the build tenant. This means the signing key or
+    identity must belong to the build platform itself, not to the developer or build
+    script. Consumers must be able to validate the signature to confirm that the
+    provenance was genuinely produced by the claimed build platform.
+
+guidance:
+  prose: >-
+    Authenticated provenance is the key differentiator between Build L1 and Build L2.
+    At L1, anyone can claim provenance. At L2, the build platform cryptographically
+    signs the provenance, creating a verifiable chain of trust. The preferred approach
+    is keyless signing via Sigstore (Fulcio + Rekor), where the build platform uses
+    its OIDC identity to obtain short-lived signing certificates. This eliminates key
+    management complexity. Consumers verify provenance using slsa-verifier, which checks
+    the signature, the builder identity, and the transparency log entry. Organizations
+    should publish their expected builder identities so consumers know which signatures
+    to trust.
+
+references:
+  - citation: "SLSA v1.0 Specification — Build L2"
+    url: "https://slsa.dev/spec/v1.0/levels#build-l2"
+  - citation: "Sigstore — Keyless Signing"
+    url: "https://docs.sigstore.dev/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement keyless signing using Sigstore (Fulcio + Rekor) integrated into the CI/CD
+      pipeline. Configure build platforms to sign provenance attestations using the platform's
+      OIDC identity (e.g., GitHub Actions OIDC token, GitLab CI JWT). Store signatures and
+      attestations in Rekor transparency log for public verifiability. Deploy cosign-based
+      verification as an admission controller in Kubernetes clusters. Configure container
+      registries to enforce signature verification policies before allowing image pulls.
+      Maintain a list of trusted builder identities and distribute them as policy bundles.
+    tools:
+      - sigstore
+      - cosign
+      - fulcio
+      - rekor
+      - kyverno
+      - opa-gatekeeper
+      - harbor
+      - notation
+
+  devsecops:
+    prose: >-
+      Add provenance signing as a mandatory step in all release pipelines. Use cosign to
+      sign attestations with the CI/CD platform's OIDC identity immediately after provenance
+      generation. Implement pipeline gates that verify the signing identity matches the
+      expected build platform before allowing artifact promotion. Add slsa-verifier checks
+      to deployment pipelines that confirm provenance authenticity before deploying to any
+      environment. Include signature verification status in pull request checks for
+      downstream consumers.
+    tools:
+      - cosign
+      - slsa-verifier
+      - sigstore
+      - github-actions
+      - gitlab-ci
+      - tekton-chains
+
+  secops:
+    prose: >-
+      Monitor Rekor transparency logs for unexpected signing identities associated with
+      the organization's artifacts. Alert on provenance signatures from unknown or
+      unauthorized builder identities. Periodically audit that all production artifacts
+      have valid, verifiable provenance signatures. Investigate any artifacts where
+      signature verification fails as potential supply-chain compromise indicators.
+      Include provenance signature verification in incident response playbooks.
+    tools:
+      - rekor
+      - slsa-verifier
+      - cosign
+      - splunk
+      - elastic-siem
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-4", "SR-4(3)", "SA-12", "SI-7"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PS.1.1", "PS.2.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.4", "16.6"]
+    relationship: supports

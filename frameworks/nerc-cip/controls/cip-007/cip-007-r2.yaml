@@ -1,0 +1,120 @@
+id: cip-007-r2
+family: cip-007
+title: "Security Patch Management"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes for patch management of BES Cyber Systems that include
+    the applicable requirement parts.
+  parts:
+    - id: cip-007-r2.1
+      label: "2.1"
+      prose: >-
+        A patch management process for tracking, evaluating, and
+        installing cyber security patches for applicable Cyber
+        Assets. The tracking process shall include the identification
+        of a source or sources that the Responsible Entity tracks
+        for the release of cyber security patches for applicable
+        Cyber Assets that are updateable and for which a patching
+        source exists.
+    - id: cip-007-r2.2
+      label: "2.2"
+      prose: >-
+        At least once every 35 calendar days, evaluate security
+        patches for applicability that have been released since the
+        last evaluation from the source or sources identified in
+        part 2.1.
+    - id: cip-007-r2.3
+      label: "2.3"
+      prose: >-
+        For applicable patches identified in part 2.2, within
+        35 calendar days of the evaluation completion, take one of
+        the following actions: apply the applicable patches; create
+        a dated mitigation plan; or revise an existing mitigation
+        plan.
+    - id: cip-007-r2.4
+      label: "2.4"
+      prose: >-
+        For each mitigation plan created or revised in part 2.3,
+        implement the plan within the timeframe specified in the plan,
+        unless a revision to the plan is approved by the CIP Senior
+        Manager or delegate.
+
+guidance:
+  prose: >-
+    CIP-007 R2 establishes a disciplined patch management cycle with
+    specific timelines. The 35-day evaluation cycle means entities must
+    check for new patches at least monthly, and then have another 35 days
+    to either apply the patch or create a mitigation plan. This is
+    particularly challenging in OT environments where patches may require
+    vendor validation, testing in a staging environment, and planned
+    outage windows. Entities must maintain records showing patch source
+    identification, evaluation dates, applicability determinations, and
+    installation dates (or mitigation plan details). For OT systems where
+    patching is not immediately feasible, the mitigation plan must include
+    compensating controls and a timeline for eventual patch application.
+
+references:
+  - citation: "NERC CIP-007-6 — System Security Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-007-6.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated patch tracking that monitors vendor advisories,
+      CVE databases, and OT-specific sources (ICS-CERT) for relevant
+      patches. Deploy automated patch testing pipelines that validate
+      patches in staging environments before production deployment.
+      Use configuration management tools to automate patch deployment
+      across IT assets. Maintain patch status dashboards showing
+      evaluation dates, applicability decisions, and deployment status
+      per BES Cyber System. Implement automated mitigation plan tracking
+      with escalation workflows when timelines are exceeded.
+    tools:
+      - ansible
+      - terraform
+      - grafana
+      - backstage
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning (dependency scanning, container
+      scanning) into CI/CD pipelines to identify patchable components.
+      Implement automated patch evaluation workflows triggered by
+      security advisory feeds. Create pipeline stages for patch testing,
+      validation, and deployment with approval gates. Store patch
+      evaluation records and mitigation plans as version-controlled
+      artifacts. Enforce that container base images are rebuilt with
+      latest patches within the 35-day evaluation cycle.
+    tools:
+      - gitlab-ci
+      - scanner_dependency_scanning
+      - scanner_container_scanning
+      - trivy
+      - renovate
+
+  secops:
+    prose: >-
+      Monitor patch compliance status across all BES Cyber Systems and
+      alert when the 35-day evaluation window is approaching. Track
+      patch-related vulnerabilities and correlate with threat intelligence
+      to prioritize critical patches. Monitor mitigation plan timelines
+      and escalate when deadlines are at risk. Generate audit-ready
+      reports showing the complete patch lifecycle: identification,
+      evaluation, applicability determination, and installation or
+      mitigation.
+    tools:
+      - tenable
+      - splunk
+      - servicenow
+      - qualys
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-1-4.3.4.3.7"]
+    relationship: supports

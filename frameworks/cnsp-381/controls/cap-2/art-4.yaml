@@ -1,0 +1,185 @@
+id: art-4
+family: cap-2
+title: "Conteúdo Mínimo da Política de Segurança Cibernética"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 4. A política de segurança cibernética deve contemplar, no mínimo:
+
+    I - os procedimentos e os controles adotados para reduzir a vulnerabilidade da
+    supervisionada a incidentes e atender aos demais objetivos de segurança cibernética;
+
+    II - os controles específicos, incluindo os voltados para a rastreabilidade da
+    informação, que busquem garantir a segurança das informações sensíveis;
+
+    III - o registro, a análise da causa e do impacto, bem como o controle dos efeitos
+    de incidentes relevantes para as atividades da supervisionada;
+
+    IV - as diretrizes para:
+    a) a elaboração de cenários de incidentes considerados nos testes de continuidade
+       de negócios;
+    b) a definição de procedimentos e de controles voltados à prevenção e ao tratamento
+       dos incidentes a serem adotados por empresas prestadoras de serviços a terceiros
+       que manuseiem dados ou informações sensíveis ou que sejam relevantes para a
+       condução das atividades operacionais da supervisionada;
+
+    V - a classificação dos dados e das informações quanto à relevância;
+
+    VI - os mecanismos de disseminação da cultura de segurança cibernética na
+    supervisionada;
+
+    VII - as iniciativas para compartilhamento de informações sobre os incidentes
+    relevantes com as demais supervisionadas.
+guidance:
+  prose: |
+    O art. 4 detalha o conteúdo mínimo obrigatório da política de segurança cibernética.
+    É o artigo mais operacional do Capítulo 2.
+
+    **Inciso I — Procedimentos e controles:**
+    Exige que a política descreva explicitamente os mecanismos técnicos e organizacionais
+    para reduzir vulnerabilidades. Não basta declarar intenções — é necessário listar
+    controles concretos (firewall, criptografia, controle de acesso, etc.).
+
+    **Inciso II — Rastreabilidade e dados sensíveis:**
+    A rastreabilidade implica capacidade de reconstruir o histórico de acesso e
+    modificação de informações sensíveis. Dados sensíveis no mercado de seguros incluem:
+    dados de saúde (seguros de vida/saúde), dados financeiros, dados pessoais de
+    segurados, informações atuariais proprietárias.
+
+    **Inciso III — Registro e análise de incidentes:**
+    Exige processo formal de gestão de incidentes com:
+    - Registro: documentação do incidente (o quê, quando, como)
+    - Análise de causa: root cause analysis (RCA)
+    - Análise de impacto: avaliação de consequências (dados afetados, sistemas, clientes)
+    - Controle de efeitos: contenção e mitigação
+
+    **Inciso IV — Cenários e terceiros:**
+    a) Os cenários de incidentes devem alimentar os testes de continuidade de negócios.
+       Exemplos: ransomware, DDoS, vazamento massivo de dados, comprometimento de
+       credenciais privilegiadas.
+    b) Prestadores de serviço que manuseiam dados sensíveis devem adotar procedimentos
+       e controles de segurança. Inclui operadores de TI, call centers, atuários
+       terceirizados, consultores.
+
+    **Inciso V — Classificação de dados:**
+    Exige taxonomia formal de classificação (ex: público, interno, confidencial,
+    restrito). Cada nível deve ter controles proporcionais.
+
+    **Inciso VI — Cultura de segurança:**
+    Treinamentos, campanhas de conscientização, phishing simulado, gamificação.
+    A SUSEP verifica evidências de execução, não apenas existência de plano.
+
+    **Inciso VII — Compartilhamento de informações:**
+    Incentiva a colaboração entre supervisionadas para compartilhamento de indicadores
+    de comprometimento (IoCs), táticas, técnicas e procedimentos (TTPs) de atacantes.
+    Pode ser via ISACs (Information Sharing and Analysis Centers) ou acordos bilaterais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Inciso I — Controles técnicos para redução de vulnerabilidades:**
+      1. WAF (Web Application Firewall) para proteção de aplicações web.
+      2. Segmentação de rede com microsegmentação para workloads sensíveis.
+      3. Endpoint Detection and Response (EDR) em todas as estações e servidores.
+      4. Gestão de patches automatizada com SLA por severidade (crítico: 24h, alto: 72h).
+      5. Hardening de sistemas operacionais e aplicações conforme CIS Benchmarks.
+
+      **Inciso II — Rastreabilidade:**
+      6. Logging centralizado (ELK, Splunk, Loki) com retenção mínima de 5 anos.
+      7. Audit trail imutável para operações em dados sensíveis.
+      8. Data Loss Prevention (DLP) para monitorar e bloquear exfiltração de dados.
+
+      **Inciso V — Classificação de dados:**
+      9. Implementar tagging automático de dados por sensibilidade na infraestrutura.
+      10. Políticas de acesso diferenciadas por classificação de dados (RBAC granular).
+      11. Criptografia obrigatória para dados classificados como confidenciais ou restritos.
+    tools:
+      - waf
+      - edr
+      - siem
+      - dlp
+      - encryption
+      - patch-management
+      - network-segmentation
+  devsecops:
+    prose: |
+      **Inciso I — Controles no pipeline:**
+      1. SAST (Static Application Security Testing) em cada merge request.
+      2. DAST (Dynamic Application Security Testing) em ambientes de staging.
+      3. Dependency scanning para vulnerabilidades em bibliotecas de terceiros.
+      4. Container scanning para imagens Docker.
+      5. Secret detection para prevenir vazamento de credenciais em código.
+      6. Infrastructure-as-Code scanning (Checkov, tfsec) para configurações inseguras.
+
+      **Inciso II — Rastreabilidade no código:**
+      7. Signed commits obrigatórios para garantir autoria e integridade.
+      8. Audit log de merge requests, aprovações e deploys.
+      9. Variáveis sensíveis gerenciadas via Vault, nunca em código.
+
+      **Inciso III — Registro de incidentes no pipeline:**
+      10. Integração do pipeline com sistema de gestão de incidentes para abertura
+          automática de tickets quando vulnerabilidades críticas são detectadas.
+      11. Dashboards de vulnerabilidades por projeto, equipe e severidade.
+
+      **Inciso IV — Cenários de teste:**
+      12. Testes de intrusão automatizados no pipeline (DAST, fuzzing).
+      13. Varredura de vulnerabilidades em dependências com alertas de zero-day.
+    tools:
+      - gitlab-ci
+      - sast-scanner
+      - dast-scanner
+      - dependency-scanning
+      - container-scanning
+      - secret-detection
+      - checkov
+      - vault
+  secops:
+    prose: |
+      **Inciso III — Gestão de incidentes:**
+      1. Processo formal de gestão de incidentes com fases: detecção, triagem,
+         contenção, erradicação, recuperação, lições aprendidas.
+      2. Playbooks para cenários comuns: ransomware, phishing, DDoS, vazamento
+         de dados, comprometimento de credenciais.
+      3. Root Cause Analysis (RCA) obrigatória para incidentes de severidade alta
+         ou crítica, com relatório formal.
+      4. Registro de incidentes com campos obrigatórios: data/hora, sistemas
+         afetados, dados comprometidos, impacto, causa raiz, ações tomadas.
+
+      **Inciso IV — Cenários e terceiros:**
+      5. Manutenção de cenários de incidentes atualizados com base em threat
+         intelligence e incidentes reais do setor.
+      6. Due diligence de segurança para prestadores de serviço que manuseiam
+         dados sensíveis (questionários, auditorias, cláusulas contratuais).
+
+      **Inciso V — Classificação de dados:**
+      7. Inventário de dados com classificação por sensibilidade.
+      8. Revisão periódica da classificação (mínimo anual).
+
+      **Inciso VI — Cultura de segurança:**
+      9. Programa de conscientização com treinamentos periódicos (mínimo trimestral).
+      10. Simulações de phishing com métricas de evolução.
+      11. Comunicações regulares sobre ameaças atuais e boas práticas.
+
+      **Inciso VII — Compartilhamento:**
+      12. Participação em fóruns e ISACs do setor de seguros.
+      13. Processo de compartilhamento de IoCs com outras supervisionadas.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - threat-intelligence
+      - grc-platform
+      - security-awareness-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-4"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-46", "art-48", "art-50"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.10", "A.5.12", "A.5.13", "A.5.24", "A.5.25", "A.5.26", "A.8.8", "A.8.15", "A.8.16"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-4", "IR-5", "IR-6", "RA-5", "SC-7", "SC-8", "SC-28", "SI-4", "PM-15"]
+    relationship: supports

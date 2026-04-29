@@ -1,0 +1,116 @@
+id: art-4
+family: cap-2
+title: "Independencia da Auditoria Interna"
+class: CMN-4968
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 4. A atividade de auditoria interna deve ser exercida com independência
+    organizacional e objetividade, asseguradas por meio:
+
+    I - do posicionamento da unidade de auditoria interna na estrutura da instituição,
+    com subordinação funcional direta ao conselho de administração ou, na ausência deste,
+    a órgão equivalente de nível hierárquico superior;
+
+    II - da proibição de que a unidade de auditoria interna exerça atividades operacionais
+    ou de gestão, que possam comprometer sua independência ou objetividade;
+
+    III - da inexistência de conflito de interesses entre o responsável pela unidade de
+    auditoria interna e as áreas objeto de auditoria.
+guidance:
+  prose: |
+    O art. 4 e o nucleo da resolucao: sem independencia, a auditoria interna nao tem valor.
+    O artigo opera em tres dimensoes complementares.
+
+    **Independencia organizacional (inciso I):**
+    A linha de reporte da auditoria interna vai diretamente ao conselho de administracao
+    (CA) ou comite de auditoria. Isso e diferente da linha administrativa que pode passar
+    pela diretoria executiva. O objetivo e garantir que a auditoria interna nao seja
+    capturada pela gestao que ela audita.
+
+    Implicacoes praticas:
+    - O diretor de auditoria interna deve ter acesso direto e irrestrito ao CA
+    - O CA aprova o orcamento e os recursos da auditoria interna (nao a diretoria)
+    - O CA aprova ou valida o plano anual de auditoria
+    - O CA decide sobre a remocao do diretor de auditoria interna
+
+    **Proibicao de atividades operacionais (inciso II):**
+    Auditores internos nao podem ser responsaveis pelos processos que auditam.
+    Exemplos de vedacoes criticas:
+    - O auditor de TI nao pode ser tambem o administrador dos sistemas que audita
+    - A equipe de auditoria nao pode implementar os controles que ela avalia
+    - Auditores nao podem aprovar transacoes, liberar credito ou gerenciar riscos
+
+    **Conflito de interesses (inciso III):**
+    O responsavel pela auditoria interna nao pode ter interesses pessoais, familiares
+    ou profissionais que afetem sua imparcialidade em relacao as areas auditadas.
+    Isso inclui: relacionamentos familiares com gestores das areas, participacoes
+    societarias em fornecedores da instituicao, historico recente de trabalho nas
+    areas que vai auditar.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles tecnicos de independencia:**
+      1. Implementar perfis de acesso somente-leitura para a equipe de auditoria em
+         todos os sistemas de producao, garantindo que auditores nao possam modificar
+         dados ou configuracoes.
+      2. Segregacao de ambiente: a plataforma de auditoria interna deve ser separada
+         dos sistemas operacionais que a auditoria examina.
+      3. Logs imutaveis de acesso da equipe de auditoria aos sistemas, para demonstrar
+         que acessos foram apenas para leitura e coleta de evidencias.
+      4. Controle de identidade e acesso (IAM) com revisao semestral dos acessos da
+         equipe de auditoria, garantindo que nao ha acessos de escrita inadvertidos.
+      5. Separacao de privilegios: auditores com acesso read-only a bases de dados,
+         auditores de TI com acesso de leitura a configuracoes de sistemas.
+    tools:
+      - iam-platform
+      - read-only-db-replica
+      - audit-log-management
+      - privileged-access-management
+  devsecops:
+    prose: |
+      **Independencia na auditoria de TI:**
+      1. Auditores de TI devem ter acesso de leitura ao repositorio de codigo-fonte
+         (gitlab read-only) sem capacidade de commit, merge ou configuracao de pipelines.
+      2. Separacao obrigatoria de funcoes (SoD): o auditor que avalia o pipeline de CI/CD
+         nao pode ser o mesmo que configura ou opera esse pipeline.
+      3. Relatorios de auditoria de scans (SAST, DAST, dependency scanning) entregues
+         automaticamente a plataforma de auditoria sem intermediacao das equipes de dev.
+      4. Auditores devem ter acesso de leitura a logs de pipeline e resultados de testes
+         de forma independente da equipe de desenvolvimento.
+      5. Configurar Webhooks ou integracao que envia resultados de compliance do GitLab
+         diretamente para o audit management system da auditoria interna.
+    tools:
+      - gitlab-read-only-access
+      - audit-management-system
+      - siem
+      - webhook-integration
+  secops:
+    prose: |
+      **Implementacao e manutencao da independencia:**
+      1. Documentar a linha de reporte da auditoria interna no estatuto/charter de auditoria,
+         com subordinacao funcional explicita ao conselho de administracao ou CA.
+      2. Incluir no regimento do CA a competencia para: aprovacao do plano de auditoria,
+         nomeacao/demissao do diretor de auditoria, aprovacao do orcamento da unidade.
+      3. Implementar processo formal de declaracao anual de conflito de interesses para
+         todos os membros da equipe de auditoria interna.
+      4. Manter politica escrita de rotatividade: auditores nao devem auditar a mesma
+         area por mais de 3-4 anos consecutivos (best practice do IIA).
+      5. Revisar anualmente os acessos a sistemas da equipe de auditoria para confirmar
+         que nao ha acesso de escrita ou privilegio operacional.
+      6. Registrar em ata do CA todas as decisoes sobre a funcao de auditoria interna.
+    tools:
+      - grc-platform
+      - conflict-of-interest-management
+      - document-management
+      - board-management-platform
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-26", "art-27"]
+    relationship: complements
+  - framework_id: sox
+    articles: ["sec-301", "sec-302"]
+    relationship: supports
+  - framework_id: bacen-4893
+    articles: ["art-5"]
+    relationship: complements

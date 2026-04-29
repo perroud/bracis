@@ -1,0 +1,110 @@
+id: art-13
+family: cap-4
+title: "Descarte Controlado de Prontuarios"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 13. A eliminação de prontuários, após decorrido o prazo
+    mínimo de guarda, deve obedecer a procedimento formal que garanta
+    a destruição completa e irreversível dos dados, impedindo sua
+    recuperação.
+
+    Parágrafo 1. Para prontuários em papel, a eliminação deve ser
+    realizada por meio de fragmentação mecânica ou incineração,
+    com lavratura de termo de eliminação.
+
+    Parágrafo 2. Para prontuários eletrônicos, a eliminação deve
+    incluir a destruição lógica e física dos dados, utilizando
+    métodos de sanitização que impeçam a recuperação por meios
+    forenses.
+
+    Parágrafo 3. A comissão de revisão de prontuários da instituição
+    deve aprovar formalmente cada lote de eliminação, verificando
+    o cumprimento do prazo mínimo de guarda.
+guidance:
+  prose: |
+    O art. 13 trata do descarte seguro de prontuarios apos o
+    cumprimento do prazo de guarda. O descarte e tao regulado
+    quanto a guarda.
+
+    **Eliminacao de dados eletronicos (paragrafo 2):**
+    Simplesmente "deletar" arquivos ou registros do banco de dados
+    NAO atende ao requisito. Os dados devem ser eliminados de forma
+    irrecuperavel. Metodos aceitos:
+    - Sanitizacao de midias conforme NIST SP 800-88 Rev. 1
+    - Destruicao fisica de midias de armazenamento
+    - Sobrescrita criptografica (crypto-shredding): destruir a
+      chave de criptografia que protege os dados
+
+    **Crypto-shredding como metodo preferencial para PEP:**
+    Se os dados do PEP estao criptografados com chave dedicada
+    por paciente ou por periodo, a destruicao segura da chave
+    torna os dados irrecuperaveis sem necessidade de sobrescrever
+    cada byte.
+
+    **Comissao de revisao de prontuarios (paragrafo 3):**
+    A instituicao deve ter comissao formal (medicos, enfermeiros,
+    TI, juridico) que aprove cada lote de eliminacao. A aprovacao
+    deve ser documentada em ata.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Eliminacao segura de dados eletronicos:**
+      1. Implementar crypto-shredding: criptografar dados do PEP
+         com chaves dedicadas (por paciente ou por periodo) usando
+         envelope encryption. A eliminacao consiste em destruir
+         a chave, tornando os dados irrecuperaveis.
+      2. Criar workflow automatizado de eliminacao que verifica
+         cumprimento do prazo de guarda, solicita aprovacao da
+         comissao e executa a eliminacao apos aprovacao.
+      3. Garantir que eliminacao abrange todas as copias: banco
+         principal, replicas, backups, caches e logs que contenham
+         dados do prontuario.
+      4. Gerar certificado de eliminacao automatico com hash dos
+         dados eliminados, metodo utilizado, data e responsavel.
+    tools:
+      - crypto-shredding
+      - key-management
+      - disposal-workflow
+      - backup-purge
+  devsecops:
+    prose: |
+      **Validacao de eliminacao segura:**
+      1. Testar que dados eliminados sao efetivamente irrecuperaveis
+         (tentativa de leitura apos eliminacao deve retornar vazio).
+      2. Validar que eliminacao remove dados de todas as copias
+         (replicas, backups, caches).
+      3. Testar que o workflow de eliminacao rejeita solicitacoes
+         para prontuarios dentro do prazo de guarda.
+      4. Verificar geracao correta do certificado de eliminacao
+         com todos os campos obrigatorios.
+    tools:
+      - gitlab-ci
+      - data-recovery-tests
+      - disposal-validation
+      - certificate-generator-tests
+  secops:
+    prose: |
+      **Governanca de eliminacao:**
+      1. Constituir formalmente comissao de revisao de prontuarios
+         com membros de areas medica, enfermagem, TI e juridico.
+      2. Criar procedimento operacional padrao (POP) de eliminacao
+         com checklist obrigatorio antes da aprovacao.
+      3. Manter registro permanente de todas as eliminacoes
+         (numero do prontuario, paciente, data de eliminacao,
+         metodo, responsavel, ata de aprovacao).
+      4. Auditar periodicamente que nenhum prontuario foi
+         eliminado sem aprovacao formal da comissao.
+    tools:
+      - disposal-committee-workflow
+      - document-management
+      - permanent-disposal-log
+      - audit-scheduler
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.310-d-2"]
+    relationship: mapped

@@ -1,0 +1,114 @@
+id: art-2
+family: cap-1
+title: "Setores de Infraestrutura Critica Nacional"
+class: PNSIC
+baselines: [critical-infrastructure]
+statement:
+  prose: |
+    Art. 2. São considerados setores de infraestrutura crítica nacional:
+    I - energia: incluindo energia elétrica, petróleo, gás natural e
+    combustíveis renováveis;
+    II - telecomunicações: incluindo redes de telefonia, internet, satélite
+    e radiocomunicação;
+    III - transportes: incluindo aviação civil, portos, ferrovias, rodovias
+    e transporte aquaviário;
+    IV - água: incluindo abastecimento de água potável, esgotamento sanitário
+    e controle de cheias;
+    V - finanças: incluindo sistema financeiro nacional, meios de pagamento,
+    mercado de capitais e seguros.
+
+    Parágrafo único. Outros setores poderão ser declarados críticos pelo
+    Gabinete de Segurança Institucional da Presidência da República (GSI/PR)
+    mediante análise de risco fundamentada.
+guidance:
+  prose: |
+    O art. 2 enumera os cinco setores primarios de infraestrutura critica
+    nacional reconhecidos pelo Decreto 9.573/2018, com possibilidade de
+    expansao pelo GSI/PR.
+
+    **Interdependencia setorial:**
+    Os cinco setores possuem dependencias criticas entre si que amplificam
+    o impacto de incidentes:
+    - Energia alimenta telecomunicacoes, transportes e financas
+    - Telecomunicacoes e essencial para o sistema financeiro e gestao de agua
+    - Transportes depende de energia e telecomunicacoes para operacao
+    - Agua depende de energia para bombeamento e tratamento
+    - Financas dependem de telecomunicacoes para transacoes
+
+    **Implicacao para gestao de riscos:**
+    A interdependencia setorial exige que planos de seguranca considerem
+    ataques em cascata (cascading failures), onde a disrupcao de um setor
+    propaga falhas para outros.
+
+    **Expansao do rol de setores:**
+    O paragrafo unico da a possibilidade de o GSI/PR declarar novos setores
+    como criticos, o que ocorreu com saude e defesa em instrumentos
+    subsequentes. A ENSIC (Decreto 10.569/2020) detalhou as acoes estrategicas
+    por setor.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura setorial para infraestruturas criticas:**
+      1. Implementar modelos de interdependencia entre os cinco setores,
+         identificando automaticamente impactos em cascata de cada falha.
+      2. Redes fisicamente separadas (air-gap quando necessario) para sistemas
+         SCADA/ICS dos setores de energia, agua e transportes.
+      3. Protocolos industriais protegidos (Modbus, DNP3, IEC 61850) com
+         gateways de seguranca validados para sistemas de controle industrial.
+      4. Arquitetura de comunicacao redundante (fibra + satelite + radio) para
+         garantir comunicacao entre setores em situacoes de emergencia.
+      5. Plataforma unificada de gestao de ativos por setor, com visibilidade
+         cross-setorial para o GSI/PR.
+    tools:
+      - interdependency-modeling
+      - ics-scada-security-gateway
+      - secure-industrial-protocols
+      - redundant-communication-infra
+      - cross-sector-asset-platform
+  devsecops:
+    prose: |
+      **Desenvolvimento seguro para sistemas setoriais:**
+      1. Perfis de seguranca especificos por setor no pipeline: sistemas de
+         energia com validacao de protocolos industriais, financas com PCI-DSS,
+         telecomunicacoes com LGT e ANATEL.
+      2. Testes de penetracao obrigatorios para sistemas que tocam protocolos
+         industriais (OT/ICS) antes de cada release major.
+      3. Analise de composicao de software (SCA) com foco em vulnerabilidades
+         especificas de cada setor (CVEs de SCADA, financeiro, etc).
+      4. Segregacao de ambientes de desenvolvimento por setor: sistemas de
+         energia nao compartilham pipeline com sistemas de telecomunicacoes.
+      5. Revisao de codigo obrigatoria por especialista setorial para mudancas
+         em sistemas criticos de controle industrial.
+    tools:
+      - sector-specific-security-profiles
+      - ics-penetration-testing
+      - software-composition-analysis
+      - sector-isolated-pipelines
+  secops:
+    prose: |
+      **Operacao de seguranca por setor:**
+      1. CERTs setoriais: CTIR Energia, CTIR Telecom, CTIR Financeiro com
+         coordenacao pelo CTIR Gov do GSI/PR.
+      2. Compartilhamento de indicadores de ameaca (IOCs) entre setores via
+         plataforma MISP ou equivalente homologada pelo GSI/PR.
+      3. Exercicios setoriais anuais e exercicio cross-setorial bienal para
+         testar resposta a incidentes com cascata entre setores.
+      4. Integracao de alertas dos CERTs setoriais com o SOC do GSI/PR para
+         visao unificada de ameacas a infraestruturas criticas nacionais.
+      5. Protocolo de notificacao entre setores: quando energia sofre incidente
+         grave, notificar automaticamente operadores dependentes (agua, telecom).
+    tools:
+      - misp-threat-intel
+      - cert-coordination-platform
+      - cross-sector-soc
+      - incident-notification-protocol
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art-1", "art-2"]
+    relationship: complements
+  - framework_id: r-ciber
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: nist-csf-v2
+    articles: ["ID.AM-03", "ID.AM-05"]
+    relationship: mapped

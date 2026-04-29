@@ -1,0 +1,125 @@
+id: art-20
+family: cap-4
+title: "Registro de Operacoes em Especie"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 20. As supervisionadas devem registrar toda operação realizada ou
+    tentada com pagamento ou recebimento em espécie de valor igual ou superior
+    a R$ 50.000,00 (cinquenta mil reais), incluindo as informações previstas no
+    art. 19 e, adicionalmente:
+    I - a identificação completa da pessoa que realizou o pagamento ou recebimento;
+    II - a descrição das circunstâncias da operação;
+    III - a justificativa para a utilização de espécie.
+guidance:
+  prose: |
+    O art. 20 estabelece regras especificas para operacoes em especie, que sao
+    o principal vetor de lavagem de dinheiro pela dificuldade de rastreamento.
+
+    **Threshold de R$ 50.000:**
+    Qualquer operacao em especie igual ou superior a R$ 50.000 exige registro
+    detalhado adicional, independentemente do tipo de operacao. Este valor inclui:
+    - Pagamento de premio em dinheiro
+    - Resgate de capitalizacao em especie
+    - Qualquer movimentacao fisica de valores
+
+    **Fracionamento (structuring):**
+    Atencao especial para tentativas de fracionamento abaixo do threshold:
+    - Multiplos pagamentos em especie de R$ 49.000 pelo mesmo cliente
+    - Pagamentos fracionados em datas proximas
+    - Pagamentos em especie por diferentes pessoas para o mesmo produto
+    O fracionamento e indicativo forte de tentativa de evasao aos controles
+    de PLD/FT.
+
+    **Informacoes adicionais (incisos I-III):**
+
+    1. Identificacao do pagador (I):
+       Pode ser diferente do cliente/segurado. Ex: terceiro que paga premio
+       em especie em nome do segurado. A supervisionada deve identificar
+       QUEM efetivamente entregou o dinheiro.
+
+    2. Circunstancias (II):
+       Descricao detalhada da operacao: local, hora, forma de entrega,
+       eventual acompanhamento, comportamento do portador. Registro deve
+       ser feito pelo colaborador que recebeu o pagamento.
+
+    3. Justificativa (III):
+       Por que especie e nao meios eletronicos? Justificativas aceitaveis
+       sao raras no contexto securitario moderno. Possibilidades:
+       - Cliente em area rural sem acesso bancario (cada vez mais raro)
+       - Pagamento de sinistro emergencial em area de desastre
+       Justificativas vagas ou incompativeis devem gerar alerta de PLD/FT.
+
+    **Contexto securitario:**
+    No mercado de seguros moderno, pagamentos em especie sao extremamente
+    incomuns. Premios sao pagos por boleto, cartao ou debito. Sinistros
+    sao pagos por transferencia bancaria. Qualquer operacao em especie no
+    mercado securitario deve ser tratada como altamente suspeita.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Registro de operacoes em especie:**
+      1. Modulo dedicado para registro de operacoes em especie com formulario
+         estruturado contendo todos os campos adicionais (identificacao do
+         pagador, circunstancias, justificativa).
+      2. Alerta automatico quando valor de operacao em especie atinge ou
+         excede R$ 50.000.
+      3. Deteccao de fracionamento: motor de regras que identifica multiplas
+         operacoes em especie do mesmo cliente ou para o mesmo produto
+         dentro de periodo configuravel.
+      4. Integracao com sistema financeiro para flagging automatico de forma
+         de pagamento "especie".
+
+      **Controles de threshold:**
+      5. Bloqueio automatico de operacao em especie acima de threshold
+         pendente de aprovacao de compliance.
+      6. Consolidacao de operacoes em especie por cliente em janela de 30 dias
+         para detectar fracionamento.
+      7. Comunicacao automatica ao COAF para operacoes em especie acima de
+         R$ 50.000 (comunicacao automatica obrigatoria).
+    tools:
+      - transaction-monitoring
+      - rules-engine
+      - siscoaf-integration
+      - alerting-system
+  devsecops:
+    prose: |
+      **Testes de registro em especie:**
+      1. Testes para threshold exato: operacao de R$ 49.999,99 vs. R$ 50.000,00.
+      2. Testes de fracionamento: multiplas operacoes abaixo do threshold pelo
+         mesmo cliente.
+      3. Testes de campos obrigatorios adicionais: registro sem identificacao
+         do pagador deve ser rejeitado.
+
+      **Integracao com COAF:**
+      4. Testes de comunicacao automatica ao SISCOAF para operacoes em especie
+         acima do threshold.
+      5. Testes de formato da comunicacao conforme especificacao do COAF.
+    tools:
+      - gitlab-ci
+      - unit-tests
+      - integration-tests
+      - siscoaf-tests
+  secops:
+    prose: |
+      **Monitoramento de especie:**
+      1. Dashboard de operacoes em especie por periodo, valor, cliente e
+         localidade.
+      2. Alertas para tendencias de aumento de operacoes em especie.
+      3. Analise de fracionamento com relatorio semanal.
+
+      **Investigacao:**
+      4. Processo de investigacao para todas as operacoes em especie acima
+         de R$ 50.000 independentemente de suspeita.
+      5. Cross-reference entre operacoes em especie e perfil do cliente.
+      6. Relatorio de operacoes em especie para diretoria e SUSEP.
+      7. Retencao de registros de operacoes em especie por 10 anos.
+    tools:
+      - transaction-monitoring
+      - investigation-management
+      - reporting-engine
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-20"]
+    relationship: equivalent-to

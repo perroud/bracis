@@ -1,0 +1,131 @@
+id: trm-9-1
+family: sec-9
+title: "Access Control"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement robust access control mechanisms
+    to ensure that access to IT systems and data is restricted to authorized
+    personnel based on the principles of least privilege, need-to-know, and
+    segregation of duties.
+  parts:
+    - id: trm-9-1.1
+      label: "9.1.1"
+      prose: >-
+        The institution shall implement an access control policy that defines
+        requirements for user authentication, authorization, and account
+        management. Access rights shall be granted based on the principle
+        of least privilege and reviewed periodically.
+    - id: trm-9-1.2
+      label: "9.1.2"
+      prose: >-
+        The institution shall enforce strong authentication mechanisms,
+        including multi-factor authentication (MFA) for access to critical
+        systems, remote access, privileged accounts, and customer-facing
+        online services. Password policies shall enforce complexity,
+        rotation, and history requirements.
+    - id: trm-9-1.3
+      label: "9.1.3"
+      prose: >-
+        Privileged access management (PAM) shall be implemented to control,
+        monitor, and audit the use of privileged accounts. Privileged
+        access shall be time-limited, logged, and subject to enhanced
+        monitoring. Shared privileged accounts shall be avoided where
+        possible and compensating controls applied where necessary.
+    - id: trm-9-1.4
+      label: "9.1.4"
+      prose: >-
+        The institution shall implement processes for timely provisioning,
+        modification, and revocation of user access rights, including
+        upon role changes and termination. Access recertification reviews
+        shall be conducted at least annually for critical systems.
+    - id: trm-9-1.5
+      label: "9.1.5"
+      prose: >-
+        The institution shall implement segregation of duties to prevent
+        any single individual from having conflicting roles that could
+        be exploited for fraud or error. Segregation of duties shall be
+        enforced through technical controls where feasible.
+
+guidance:
+  prose: >-
+    Access control is the most fundamental security control. MFA is non-negotiable
+    for privileged access and critical systems. Privileged access is the highest
+    risk category and requires enhanced controls: just-in-time access, session
+    recording, and break-glass procedures for emergencies. Access reviews must be
+    meaningful, not checkbox exercises; reviewers must understand what access
+    they are certifying and have the authority to revoke it. Segregation of
+    duties must be enforced technically in automated systems rather than relying
+    solely on manual processes.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 9"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "MAS Notice on Cyber Hygiene (CMG-N02) - Multi-Factor Authentication"
+    url: "https://www.mas.gov.sg/regulation/notices/notice-cmg-n02"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity and access management through SSO
+      with SAML/OIDC integration across all platform services. Enforce
+      MFA at the identity provider level for all users, with hardware
+      tokens or FIDO2 for privileged accounts. Implement just-in-time
+      privileged access through PAM solutions that grant temporary
+      elevated permissions with automatic revocation. Define RBAC
+      policies in infrastructure-as-code with automated enforcement.
+      Implement automated access provisioning and deprovisioning through
+      SCIM integration with the HR system. Configure platform-level
+      audit logging for all authentication and authorization events.
+    tools:
+      - keycloak
+      - vault
+      - teleport
+      - open-policy-agent
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce MFA for all GitLab/repository access and CI/CD pipeline
+      operations. Implement branch protection rules that enforce
+      segregation of duties (code author cannot approve their own
+      changes). Configure secret detection scanning to prevent
+      credentials from being committed to repositories. Implement
+      pipeline identity with minimal permissions using service accounts
+      or workload identity federation. Audit CI/CD pipeline access and
+      secret usage. Enforce access reviews for repository permissions
+      through automated access certification workflows.
+    tools:
+      - gitlab-ci
+      - gitlab-secret-detection
+      - vault
+      - teleport
+
+  secops:
+    prose: >-
+      Monitor authentication events for anomalies including brute force
+      attempts, impossible travel, and credential stuffing through SIEM
+      correlation rules. Implement continuous monitoring of privileged
+      account activity with automated alerting for suspicious behavior.
+      Conduct periodic access recertification reviews and track
+      completion rates and revocation actions. Monitor for orphaned
+      accounts and excessive privileges. Generate access control
+      compliance reports for audit and management review.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - cyberark
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-5", "AC-6", "IA-2", "IA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.16", "a5.17", "a5.18", "a8.2", "a8.3", "a8.5"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-9"]
+    relationship: supports

@@ -1,0 +1,131 @@
+id: art-9
+family: cap-4
+title: "Evidence Preservation and Log Retention"
+class: CRIMES-CIBER
+baselines: [all-sectors]
+statement:
+  prose: |
+    A preservação de evidências digitais para fins de investigação de crimes
+    cibernéticos decorre da combinação dos seguintes dispositivos legais:
+
+    Marco Civil da Internet (Lei 12.965/2014):
+    Art. 13. Na provisão de conexão à internet, cabe ao administrador de
+    sistema autônomo respectivo o dever de manter os registros de conexão,
+    sob sigilo, em ambiente controlado e de segurança, pelo prazo de 1 (um)
+    ano, nos termos do regulamento.
+
+    Art. 15. O provedor de aplicações de internet constituído na forma de
+    pessoa jurídica e que exerça essa atividade de forma organizada,
+    profissionalmente e com fins econômicos deverá manter os respectivos
+    registros de acesso a aplicações de internet, sob sigilo, em ambiente
+    controlado e de segurança, pelo prazo de 6 (seis) meses, nos termos
+    do regulamento.
+
+    Art. 22. A parte interessada poderá, com o propósito de formar conjunto
+    probatório em processo judicial cível ou penal, em caráter incidental
+    ou autônomo, requerer ao juiz que ordene ao responsável pela guarda o
+    fornecimento de registros de conexão ou de registros de acesso a
+    aplicações de internet.
+
+    Código de Processo Penal:
+    Art. 6.º Logo que tiver conhecimento da prática da infração penal, a
+    autoridade policial deverá: [...] III — colher todas as provas que
+    servirem para o esclarecimento do fato e suas circunstâncias.
+guidance:
+  prose: |
+    Evidence preservation for cybercrime investigation is not established
+    by a single article but by the combined operation of multiple legal
+    provisions. This control consolidates the obligations most directly
+    relevant to cybercrime investigation support.
+
+    **Log retention obligations (Marco Civil):**
+    - Connection logs (art. 13): 1 year minimum, kept by ISPs
+    - Application access logs (art. 15): 6 months minimum, kept by
+      application providers
+    - Both must be kept under confidentiality, in controlled and
+      secure environments
+
+    **Judicial evidence orders (Marco Civil art. 22):**
+    Courts can order production of connection and application access
+    logs for both civil and criminal proceedings. Organizations must
+    be prepared to respond to these orders promptly.
+
+    **Police authority (CPP art. 6):**
+    Law enforcement has broad authority to collect all evidence
+    relevant to a criminal investigation, including digital evidence.
+
+    **Practical implications for organizations:**
+    - Logs must be retained for legally mandated minimum periods
+    - Log integrity must be guaranteed (immutability, tamper evidence)
+    - Logs must be producible on judicial order
+    - Premature log deletion may constitute obstruction
+    - Log confidentiality must be maintained (access only on court order)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Compliant log retention infrastructure:**
+      1. Implement centralized log management (SIEM/log aggregation) with
+         retention policies meeting legal minimums: 1 year for connection
+         logs, 6 months for application access logs.
+      2. Deploy immutable log storage (write-once-read-many, cryptographic
+         hashing) to guarantee evidence integrity for court proceedings.
+      3. Implement log access controls ensuring confidentiality — logs
+         containing user data must be accessible only through proper
+         authorization channels (court order, authorized personnel).
+      4. Maintain separate, secured log archives for evidence preservation
+         holds when litigation or investigation is anticipated.
+      5. Implement automated log lifecycle management with legal hold
+         capabilities that prevent deletion when preservation orders exist.
+    tools:
+      - siem
+      - immutable-storage
+      - log-management
+      - legal-hold
+  devsecops:
+    prose: |
+      **Forensic logging in application development:**
+      1. Implement standardized logging frameworks across all applications
+         that capture legally required fields: timestamp, source IP,
+         user identifier, action performed, resource accessed.
+      2. Enforce log generation as a mandatory pipeline gate — applications
+         that do not produce compliant logs cannot deploy to production.
+      3. Implement log integrity verification (hash chains, digital
+         signatures) at the application level to support evidence
+         admissibility.
+      4. Ensure log formats are compatible with law enforcement forensic
+         tools and can be exported in standard formats (JSON, CEF, LEEF).
+      5. Include log retention compliance verification in security
+         testing and audit procedures.
+    tools:
+      - logging-framework
+      - log-integrity
+      - compliance-pipeline
+      - forensic-export
+  secops:
+    prose: |
+      **Evidence preservation operations:**
+      1. Implement evidence preservation procedures activated immediately
+         upon detection of a cybercrime incident, including snapshot of
+         all relevant logs, memory dumps, and network captures.
+      2. Maintain chain-of-custody documentation for all digital evidence
+         from collection through potential court presentation.
+      3. Establish procedures for responding to judicial evidence orders
+         (art. 22 Marco Civil) within legally required timeframes.
+      4. Train incident responders on digital evidence handling procedures
+         that maintain admissibility in Brazilian criminal courts.
+      5. Implement legal hold procedures that automatically extend log
+         retention when a cybercrime investigation is initiated.
+      6. Coordinate with legal counsel on evidence preservation scope
+         when criminal proceedings are anticipated.
+    tools:
+      - digital-forensics
+      - evidence-management
+      - legal-hold
+      - chain-of-custody
+legal_references:
+  - framework_id: marco-civil
+    articles: ["art-13", "art-15", "art-22"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46", "art-48"]
+    relationship: complements

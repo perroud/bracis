@@ -1,0 +1,119 @@
+id: art-25
+family: cap-6
+title: "Comunicacao de Operacoes Suspeitas ao COAF"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 25. As instituições mencionadas no art. 1 devem comunicar ao COAF, sem dar
+    ciência aos envolvidos, as operações e situações que possam configurar indícios de
+    lavagem de dinheiro ou de financiamento do terrorismo.
+
+    § 1. A comunicação de que trata o caput deve ser efetuada até o vigésimo quarto
+    dia útil seguinte ao da ocorrência ou da conclusão da análise da operação ou
+    situação suspeita.
+
+    § 2. A comunicação deve conter, no mínimo:
+    I - a descrição da operação ou situação;
+    II - os dados de identificação dos envolvidos;
+    III - os valores envolvidos; e
+    IV - a fundamentação da suspeita.
+guidance:
+  prose: |
+    O art. 25 estabelece a obrigacao central de comunicacao ao COAF, que e a
+    razao de existir do programa de PLD/FT.
+
+    **Tipping-off proibido:**
+    "Sem dar ciencia aos envolvidos" e uma obrigacao critica. Informar o cliente
+    ou qualquer envolvido que uma comunicacao foi feita ao COAF e crime
+    (art. 11 da Lei 9.613/1998). Pena: reclusao de 1 a 5 anos.
+
+    **Prazo de comunicacao (ss 1):**
+    24 dias uteis apos:
+    - A ocorrencia da operacao (quando a suspeita e imediata), ou
+    - A conclusao da analise (quando a suspeita surge apos monitoramento)
+    Este prazo e maximo. A comunicacao deve ser feita o mais breve possivel.
+
+    **Conteudo minimo (ss 2):**
+    1. Descricao: narrativa detalhada da operacao/situacao suspeita
+    2. Dados dos envolvidos: identificacao completa (nome, CPF/CNPJ, dados)
+    3. Valores: montantes envolvidos na operacao/situacao
+    4. Fundamentacao: justificativa tecnica que motivou a comunicacao
+
+    **Sistema SISCOAF:**
+    As comunicacoes sao feitas via SISCOAF (Sistema de Controle de Atividades
+    Financeiras), sistema eletronico do COAF com formato e campos especificos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modulo de comunicacao ao COAF:**
+      1. Interface de preenchimento de comunicacao com campos obrigatorios
+         mapeados para o formato SISCOAF.
+      2. Pre-preenchimento automatico com dados do case management
+         (operacoes, envolvidos, valores).
+      3. Workflow de aprovacao antes do envio: analista -> supervisor ->
+         compliance officer.
+      4. Integracao com SISCOAF via API/web service para envio automatizado.
+
+      **Controle de prazos:**
+      5. Timer automatico de 24 dias uteis a partir da conclusao da analise.
+      6. Alertas escalonados: 50% do prazo, 75%, 90%, vencimento.
+      7. Escalacao automatica ao diretor quando prazo esta proximo de vencer.
+      8. Dashboard de comunicacoes pendentes com prazo restante.
+
+      **Confidencialidade (tipping-off):**
+      9. Acesso ao modulo de comunicacao restrito a equipe de PLD/FT.
+      10. Dados de comunicacoes ao COAF segregados de dados operacionais.
+      11. Sem marcacao visivel no cadastro do cliente quando comunicacao e feita.
+      12. Logs de acesso ao modulo de comunicacao monitorados.
+    tools:
+      - aml-platform
+      - coaf-reporting
+      - workflow-engine
+      - scheduling-engine
+  devsecops:
+    prose: |
+      **Testes de comunicacao:**
+      1. Testes de geracao de comunicacao no formato SISCOAF.
+      2. Testes de validacao de campos obrigatorios.
+      3. Testes de integracao com SISCOAF (envio e confirmacao).
+      4. Testes de controle de prazo (calculo de dias uteis).
+
+      **Seguranca:**
+      5. Testes de controle de acesso ao modulo de comunicacao.
+      6. Testes de que dados de comunicacao nao vazam para interfaces
+         de atendimento ao cliente.
+      7. Testes de criptografia de dados de comunicacao em transito e repouso.
+      8. Testes de audit trail de acessos.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - gitlab-sast
+  secops:
+    prose: |
+      **Gestao de comunicacoes:**
+      1. Registro completo de todas as comunicacoes enviadas ao COAF.
+      2. Reconciliacao entre comunicacoes enviadas e confirmacoes recebidas.
+      3. Acompanhamento de solicitacoes de informacoes complementares do COAF.
+      4. Arquivo de comunicacoes por 10 anos.
+
+      **Monitoramento de prazos:**
+      5. Dashboard de comunicacoes com status (pendente, enviada, confirmada).
+      6. Alerta critico quando comunicacao vence sem envio.
+      7. Relatorio mensal de volume e tempestividade de comunicacoes.
+      8. Analise de tendencias de comunicacoes por tipo, valor e perfil.
+    tools:
+      - aml-platform
+      - coaf-reporting
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "IR-6", "IR-7"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.31"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-23"]
+    relationship: complements

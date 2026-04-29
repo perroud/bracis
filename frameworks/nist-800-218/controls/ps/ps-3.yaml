@@ -1,0 +1,80 @@
+id: ps-3
+family: ps
+title: "Archive and Protect Each Software Release"
+class: SP800-218
+statement:
+  prose: >-
+    Preserve software releases and the integrity of their associated artifacts (SBOMs,
+    provenance data, signatures) to enable future investigation, analysis, and reproduction
+    of software at any point in its lifecycle.
+  parts:
+    - id: ps-3_smt.a
+      label: "a."
+      prose: >-
+        Securely archive each software release, including all associated artifacts such as
+        source code, build configurations, SBOMs, provenance attestations, and cryptographic
+        signatures.
+    - id: ps-3_smt.b
+      label: "b."
+      prose: >-
+        Protect archived releases from unauthorized modification or deletion using access
+        controls, integrity verification, and immutable storage mechanisms.
+    - id: ps-3_smt.c
+      label: "c."
+      prose: >-
+        Define and implement retention policies for archived releases that align with
+        organizational, regulatory, and contractual requirements.
+guidance:
+  prose: >-
+    Archiving software releases enables organizations to investigate vulnerabilities discovered
+    after release, reproduce builds for verification, and respond to supply chain incidents.
+    Archives should include not only the release artifacts themselves but also the complete
+    context needed to understand and reproduce the release: source code at the tagged version,
+    build configurations, dependency manifests, SBOMs, and provenance data. Immutable storage
+    (write-once-read-many) prevents tampering with archived releases. Retention policies should
+    consider regulatory requirements, product support lifecycles, and incident response needs.
+references:
+  - citation: "NIST SP 800-218 Section 2.2"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure artifact repositories with immutable release policies that prevent overwriting
+      or deleting published releases. Implement automated archival workflows that capture source
+      code snapshots (Git tags), build configurations, SBOMs, and provenance data alongside
+      release artifacts. Use object storage with versioning and object lock for long-term
+      archival. Implement lifecycle policies that automatically transition artifacts between
+      storage tiers based on age while maintaining immutability guarantees.
+    tools:
+      - "GitLab Package Registry"
+      - "Harbor (immutable tags)"
+      - "AWS S3 (Object Lock)"
+      - "MinIO (immutable buckets)"
+      - "Artifactory (immutable repositories)"
+      - "Git Tags (source archival)"
+  devsecops:
+    prose: >-
+      Automate the archival process within release pipelines so that every release automatically
+      archives source code, build configuration, dependency manifests, SBOMs, scan results,
+      and signed artifacts. Configure container registries to enforce immutable image tags for
+      release versions. Implement automated integrity checks that periodically verify archived
+      artifacts against their recorded checksums. Include archival verification as a post-release
+      pipeline stage.
+    tools:
+      - "GitLab CI/CD (release stage)"
+      - "Cosign (signed archives)"
+      - "Syft (SBOM archival)"
+      - "OCI Registry (immutable tags)"
+      - "Rclone / Restic (backup)"
+  secops:
+    prose: >-
+      Monitor access to archived releases and alert on unauthorized access or modification
+      attempts. Verify the integrity of archived releases on a scheduled basis using stored
+      checksums and signatures. Ensure retention policies are enforced and generate compliance
+      reports on archive completeness. Maintain an inventory of all archived releases and their
+      associated artifacts for incident response readiness.
+    tools:
+      - "SIEM (Splunk, Elastic Security)"
+      - "AWS CloudTrail / S3 Access Logs"
+      - "GRC Platforms (ServiceNow, Archer)"
+      - "Veeam / Velero (backup monitoring)"

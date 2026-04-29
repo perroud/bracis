@@ -1,0 +1,113 @@
+id: art-13
+family: cap-3
+title: "Authentication Levels (Bronze, Silver, Gold)"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 13. A plataforma de governo digital poderá ter diferentes níveis
+    de autenticação, de acordo com o grau de exigência do serviço público
+    a ser prestado, observados os seguintes critérios:
+    I — a compatibilidade do nível de autenticação exigido com o grau de
+    sigilo ou de complexidade do serviço ou da informação acessada;
+    II — a segurança proporcional dos métodos de autenticação utilizados;
+    III — a redução de barreiras de acesso do cidadão ao serviço público
+    digital.
+
+    § 1º Os níveis de autenticação da plataforma de governo digital
+    observarão, no mínimo, os seguintes parâmetros:
+    I — nível básico (bronze): cadastro com validação de dados pessoais
+    em bases governamentais;
+    II — nível intermediário (prata): cadastro com validação biométrica
+    ou por certificação digital;
+    III — nível avançado (ouro): cadastro com validação biométrica e
+    por certificação digital.
+guidance:
+  prose: |
+    Article 13 establishes the three-tier authentication model for the
+    gov.br platform: bronze, silver, and gold. Each level has specific
+    identity proofing requirements and determines which services the
+    citizen can access.
+
+    **Authentication level matrix:**
+
+    | Level | Method | Assurance | Use Cases |
+    |-------|--------|-----------|-----------|
+    | Bronze | Data validation against government DBs | Basic | Information access, simple queries |
+    | Silver | Biometric OR digital certificate | Medium | Transactions, document requests |
+    | Gold | Biometric AND digital certificate | High | Legal acts, financial transactions |
+
+    **Risk-proportionate access (items I-III):**
+    - Services must match their authentication level to the sensitivity
+      of the data or transaction involved
+    - Higher authentication must not be demanded for low-risk services
+    - Authentication barriers must be minimized — the lowest acceptable
+      level should be used for each service
+
+    **Alignment with NIST 800-63 (Digital Identity Guidelines):**
+    - Bronze approximately maps to IAL1/AAL1
+    - Silver approximately maps to IAL2/AAL2
+    - Gold approximately maps to IAL3/AAL3
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Multi-level authentication infrastructure:**
+      1. Implement a step-up authentication framework that supports all
+         three gov.br levels (bronze, silver, gold) with seamless
+         escalation between levels.
+      2. Deploy biometric verification services (facial recognition,
+         fingerprint) integrated with TSE and DENATRAN databases for
+         silver and gold authentication.
+      3. Integrate ICP-Brasil digital certificate validation for silver
+         (alternative) and gold (mandatory) authentication levels.
+      4. Implement a service-level authentication policy engine that
+         maps each digital service to its required minimum authentication
+         level based on data sensitivity and transaction risk.
+      5. Deploy session management that maintains authentication level
+         context and supports step-up without full re-authentication.
+    tools:
+      - step-up-auth
+      - biometric-service
+      - icp-brasil-validator
+      - policy-engine
+  devsecops:
+    prose: |
+      **Authentication level compliance testing:**
+      1. Implement automated tests that verify each service enforces
+         its required minimum authentication level — no service should
+         accept a lower level than mandated.
+      2. Test step-up authentication workflows end-to-end, including
+         biometric capture, certificate validation, and session upgrade.
+      3. Validate that low-risk services do not over-require authentication
+         (principle of reducing access barriers).
+      4. Implement security tests for authentication bypass attempts
+         across all three levels.
+    tools:
+      - gitlab-ci
+      - auth-testing
+      - security-testing
+      - e2e-testing
+  secops:
+    prose: |
+      **Authentication governance:**
+      1. Maintain a service-to-authentication-level mapping registry and
+         review it quarterly to ensure proportionality.
+      2. Monitor authentication events for anomalies: unusual level
+         escalation patterns, failed biometric attempts, certificate
+         issues.
+      3. Track authentication level distribution across the citizen base
+         and implement campaigns to encourage silver/gold adoption.
+      4. Audit biometric verification accuracy and false positive/negative
+         rates to ensure service quality.
+    tools:
+      - auth-registry
+      - anomaly-detection
+      - adoption-tracking
+      - biometric-audit
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-1"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

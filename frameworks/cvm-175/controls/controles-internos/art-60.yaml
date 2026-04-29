@@ -1,0 +1,111 @@
+id: art-60
+family: controles-internos
+title: "Chinese Wall e Barreira de Informacao"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 60. O administrador e o gestor devem manter barreiras de informação
+    (chinese wall) entre as áreas que exercem funções conflitantes, impedindo
+    o fluxo indevido de informações privilegiadas ou confidenciais.
+
+    Parágrafo 1. As barreiras de informação devem contemplar, no mínimo:
+    I - segregação física de áreas conflitantes; II - controles de acesso
+    lógico que impeçam o acesso a informações de áreas segregadas;
+    III - política de comunicação que defina quais informações podem ser
+    compartilhadas e por quais canais; IV - procedimentos para tratamento
+    de informações privilegiadas; V - treinamento de colaboradores sobre
+    as barreiras e suas obrigações.
+
+    Parágrafo 2. O administrador e o gestor devem manter registro de todas
+    as transposições de barreira de informação autorizadas, documentando a
+    justificativa, os participantes e as informações compartilhadas.
+guidance:
+  prose: |
+    O art. 60 regulamenta as barreiras de informacao (chinese wall), mecanismo
+    essencial para prevenir uso indevido de informacoes privilegiadas.
+
+    **Conflitos tipicos em fundos:**
+    (i) Gestao de carteira vs. area comercial (gestor nao pode compartilhar
+    estrategias com vendedores); (ii) Gestao vs. compliance (compliance deve
+    monitorar sem interferir); (iii) Diferentes fundos sob mesma gestao
+    (informacao de um fundo nao pode beneficiar outro).
+
+    **Cinco requisitos minimos:**
+    Segregacao fisica, controles de acesso logico, politica de comunicacao,
+    tratamento de informacoes privilegiadas e treinamento. A barreira deve
+    ser fisica E logica.
+
+    **Transposicao de barreira:**
+    Em situacoes excepcionais, a barreira pode ser transposta (ex: due diligence
+    de aquisicao que requer acesso a informacoes de multiplas areas). Porem,
+    TODA transposicao deve ser documentada: justificativa, participantes,
+    informacoes compartilhadas. Isso e auditavel.
+
+    **Impacto direto em TI:**
+    Barreiras logicas sao implementadas via controles de acesso em sistemas.
+    Active Directory/LDAP, RBAC, segmentacao de rede, DLP (Data Loss Prevention)
+    sao ferramentas essenciais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Barreiras logicas:**
+      1. RBAC rigoroso: perfis de acesso que refletem a estrutura de chinese
+         wall, mutuamente exclusivos entre areas conflitantes.
+      2. Segmentacao de rede: areas segregadas em VLANs ou namespaces
+         distintos sem comunicacao direta.
+      3. DLP (Data Loss Prevention): prevenir transferencia de dados entre
+         areas segregadas via email, chat, compartilhamento de arquivos.
+
+      **Gestao de transposicoes:**
+      4. Workflow formal para solicitacao de transposicao de barreira:
+         solicitacao, justificativa, aprovacao por compliance, registro.
+      5. Acesso temporario com revogacao automatica apos prazo definido.
+      6. Audit trail de todas as transposicoes com detalhes completos.
+    tools:
+      - vault
+      - opa-gatekeeper
+      - kyverno
+      - terraform
+  devsecops:
+    prose: |
+      **Validacao de barreiras no codigo:**
+      1. SAST para detectar chamadas entre modulos que deveriam ser segregados.
+      2. Revisao de codigo com foco em fluxo de dados entre areas: nenhum
+         dado pode fluir entre modulos segregados sem autorizacao.
+      3. Testes automatizados de controle de acesso: verificar que usuario
+         de area A nao acessa dados da area B.
+
+      **Monitoramento de comunicacoes:**
+      4. Pipeline de auditoria de comunicacoes entre areas segregadas.
+      5. Alertas para tentativas de acesso cruzado.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - vault
+      - opa-gatekeeper
+  secops:
+    prose: |
+      **Monitoramento de barreiras:**
+      1. SIEM com regras de deteccao de violacao de chinese wall: acesso
+         cruzado, transferencia de dados, comunicacao nao autorizada.
+      2. Dashboard de barreiras: estrutura vigente, transposicoes autorizadas,
+         tentativas bloqueadas.
+      3. Revisao trimestral de efetividade das barreiras.
+
+      **Auditoria de chinese wall:**
+      4. Auditoria semestral: verificar segregacao fisica, controles logicos,
+         treinamento realizado, transposicoes documentadas.
+      5. Teste de penetracao de barreira: tentar acessar informacoes de
+         area segregada sem autorizacao.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5", "art-20"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-7"]
+    relationship: complements

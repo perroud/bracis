@@ -1,0 +1,93 @@
+id: med2-2
+family: bloq-cautelar
+title: "Mule Account Identification and Traceability"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Os participantes do Pix devem implementar mecanismos de identificação de contas intermediárias
+    utilizadas para recebimento e repasse de valores provenientes de fraude (contas-mula). O PSP
+    deve manter rastreabilidade completa da cadeia de transferências vinculadas a uma notificação
+    de infração, registrando: a identificação de cada conta envolvida, os valores transferidos em
+    cada etapa, os horários das movimentações, e os PSPs responsáveis por cada conta na cadeia.
+    Essas informações devem ser disponibilizadas ao BCB e aos demais PSPs envolvidos no processo
+    de devolução, conforme procedimentos estabelecidos no DICT.
+guidance:
+  prose: |
+    **Mule Account Detection:**
+    MED 2.0 requires PSPs to proactively identify accounts that serve as intermediaries
+    in fraud chains. Key indicators of mule accounts include:
+
+    1. **Behavioral patterns:** Newly opened accounts with immediate high-volume
+       incoming Pix transfers followed by rapid outgoing transfers.
+    2. **Velocity anomalies:** Accounts receiving and forwarding funds within seconds
+       or minutes, inconsistent with normal usage.
+    3. **Network clustering:** Multiple accounts transferring to the same destination
+       in rapid succession (fan-in/fan-out patterns).
+    4. **KYC mismatches:** Account holder profile inconsistent with transaction patterns
+       (e.g., low-income individual processing high-value transfers).
+
+    **Traceability Requirements:**
+    The PSP must maintain a complete audit trail for every cascade chain, including:
+    - Original transaction ID and infraction notification ID
+    - Each hop: source account, destination account, amount, timestamp, PSP
+    - Blocking status at each hop
+    - Final disposition (returned, partially returned, unrecoverable)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a mule account scoring model that evaluates accounts in real-time based on
+         behavioral indicators: transaction velocity, account age, transfer patterns,
+         fan-in/fan-out ratios.
+      2. Implement a transaction graph database (e.g., Neo4j, TigerGraph) that stores
+         all Pix transfers as edges between account nodes, enabling rapid traversal for
+         cascade tracing.
+      3. Create an API endpoint for DICT integration that accepts traceability queries
+         and returns the full chain of transfers associated with an infraction.
+      4. Store all traceability data with immutable audit logging — use append-only
+         storage to prevent tampering with cascade records.
+      5. Implement data retention policies compliant with BCB requirements (minimum 5
+         years for fraud-related records).
+    tools:
+      - graph-database
+      - ml-scoring-engine
+      - audit-logging
+      - dict-api-client
+      - data-lake
+  devsecops:
+    prose: |
+      1. Test mule account scoring model with known fraud patterns and verify detection
+         rates meet internal thresholds (e.g., >90% detection of known mule behaviors).
+      2. Validate graph traversal performance: trace a 5-hop chain in under 1 second.
+      3. Test audit log immutability — verify that cascade records cannot be modified or
+         deleted after creation.
+      4. Test DICT traceability API responses against BCB-specified schemas.
+      5. Implement data integrity checks for traceability records (checksums, digital
+         signatures).
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - performance-testing
+      - security-testing
+  secops:
+    prose: |
+      1. Establish a mule account monitoring team that reviews flagged accounts daily.
+      2. Maintain metrics on mule detection: accounts flagged, confirmed mules, false
+         positive rate, average detection-to-block time.
+      3. Share mule account intelligence with BCB and peer PSPs through established
+         channels (DICT markers, bilateral agreements).
+      4. Conduct monthly analysis of mule network evolution — new patterns, geographic
+         clusters, recruitment channels.
+      5. Report mule account statistics to BCB as required by regulation.
+    tools:
+      - fraud-analytics
+      - case-management
+      - threat-intelligence
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-19", "pix-20"]
+    relationship: extends
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: complements

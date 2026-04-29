@@ -1,0 +1,105 @@
+id: cscf-2.4a
+family: obj-2
+title: "Back Office Data Flow Security"
+class: SWIFT-CSP
+classification: advisory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure the confidentiality, integrity, and authentication of data flows
+    between back-office applications and SWIFT-related infrastructure. Data
+    exchanged between back-office systems (e.g., payment engines, treasury
+    management, ERP) and the SWIFT secure zone should be protected against
+    interception, modification, and replay attacks.
+  parts:
+    - id: cscf-2.4a.a
+      label: "2.4A.a"
+      prose: >-
+        Data flows between back-office applications and the SWIFT secure
+        zone are encrypted and integrity-protected using TLS 1.2 or higher,
+        or equivalent protocol.
+    - id: cscf-2.4a.b
+      label: "2.4A.b"
+      prose: >-
+        Authentication mechanisms (mutual TLS, API keys, or token-based
+        authentication) are implemented for back-office to secure zone
+        communications to prevent unauthorized data injection.
+    - id: cscf-2.4a.c
+      label: "2.4A.c"
+      prose: >-
+        Message integrity validation (digital signatures, HMACs) is applied
+        to financial messages transiting between back-office and SWIFT
+        components to detect unauthorized modification.
+
+guidance:
+  prose: >-
+    While Control 2.1 covers internal secure zone data flows, this advisory
+    control extends protection to the back-office integration layer. Attackers
+    who compromise back-office systems could inject fraudulent payment
+    instructions if the integration channel lacks authentication and
+    integrity controls. The Bangladesh Bank attack demonstrated how
+    manipulation at the back-office integration point can lead to
+    unauthorized fund transfers. Organizations should implement end-to-end
+    message signing from the payment origination system through to SWIFT
+    submission, creating a tamper-evident chain of custody for every
+    transaction.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.4A"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "ISO 20022 — Financial Services Messaging"
+    url: "https://www.iso20022.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement middleware (MQ, Kafka, API gateway) in a controlled DMZ
+      between back-office and the secure zone, enforcing mTLS for all
+      connections. Use message-level signing (XML-DSig for ISO 20022,
+      HMAC for proprietary formats) to ensure integrity from origination
+      to submission. Deploy an API gateway with mutual authentication
+      for REST-based integrations. Maintain a strict schema validation
+      layer that rejects malformed or unexpected message types.
+    tools:
+      - apache-kafka
+      - ibm-mq
+      - kong-gateway
+      - istio
+      - hashicorp-vault
+      - cert-manager
+
+  devsecops:
+    prose: >-
+      Include integration channel security in CI/CD validation. Test
+      message signing and verification in automated integration tests.
+      Validate mTLS configurations and certificate trust chains in
+      pipeline checks. Scan API gateway configurations for authentication
+      bypasses using OWASP ZAP or similar tools.
+    tools:
+      - owasp-zap
+      - postman
+      - gitlab-ci
+      - github-actions
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor back-office to secure zone traffic for anomalies in volume,
+      timing, and message types. Alert on authentication failures between
+      integration components. Correlate transaction volumes between
+      back-office and SWIFT to detect discrepancies indicating injection
+      attacks. Review message signing validation failures.
+    tools:
+      - splunk
+      - elastic-siem
+      - ibm-qradar
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-8(1)", "SC-13", "SI-7"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.26"]
+    relationship: supports

@@ -1,0 +1,155 @@
+id: itgc-change
+family: itgc
+title: "IT General Control: Change Management"
+class: SOX
+
+statement:
+  prose: >-
+    The organization shall establish and maintain a formal change management process
+    for IT systems that support financial reporting. All changes to applications,
+    databases, operating systems, and infrastructure shall be authorized, tested,
+    approved, and documented before implementation in the production environment.
+    Emergency changes shall follow a defined expedited process with retrospective
+    documentation and approval. Changes shall be segregated between development,
+    testing, and production environments to prevent unauthorized modifications.
+  parts:
+    - id: itgc-change.1
+      label: "(1)"
+      prose: >-
+        All changes to in-scope IT systems shall be documented with a business
+        justification, risk assessment, and description of the modification.
+    - id: itgc-change.2
+      label: "(2)"
+      prose: >-
+        Changes shall be tested in a non-production environment to validate that
+        they function as intended and do not introduce unintended side effects
+        to financial data processing.
+    - id: itgc-change.3
+      label: "(3)"
+      prose: >-
+        Changes shall be approved by appropriate management prior to implementation
+        in the production environment. The approver shall be independent of the
+        developer (segregation of duties).
+    - id: itgc-change.4
+      label: "(4)"
+      prose: >-
+        Production environments shall be logically or physically separated from
+        development and testing environments. Direct access to modify production
+        systems shall be restricted and monitored.
+    - id: itgc-change.5
+      label: "(5)"
+      prose: >-
+        Emergency changes shall follow a defined expedited process and shall be
+        retrospectively documented and approved within a defined timeframe.
+    - id: itgc-change.6
+      label: "(6)"
+      prose: >-
+        A complete audit trail of all changes to production systems shall be
+        maintained, including who requested, developed, tested, approved, and
+        implemented the change.
+
+guidance:
+  prose: >-
+    Change management is the second most scrutinized ITGC domain in SOX audits.
+    Auditors verify that the organization maintains control over what changes are
+    made to financial systems, preventing unauthorized or untested modifications
+    that could affect the accuracy of financial data. The audit typically examines
+    a sample of changes deployed during the period and traces each change through
+    the complete lifecycle: request, development, testing, approval, deployment,
+    and post-implementation review. Common audit findings include: changes deployed
+    without documented approval, developers deploying their own code, inadequate
+    testing evidence, direct production modifications without change tickets,
+    emergency changes without retrospective approval, and inadequate environment
+    separation. The scope includes application code changes, database schema changes,
+    configuration changes, infrastructure changes, and operating system patches to
+    in-scope systems.
+
+references:
+  - citation: "COSO Internal Control — Integrated Framework, Principle 11: Select and Develop General Controls Over Technology"
+    url: "https://www.coso.org/guidance-on-ic"
+  - citation: "COBIT 2019 — BAI06: Manage IT Changes"
+    url: "https://www.isaca.org/resources/cobit"
+  - citation: "ITIL 4 — Change Enablement"
+    url: "https://www.axelos.com/best-practice-solutions/itil"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps-based change management where all infrastructure and application
+      changes are expressed as code in version-controlled repositories. Configure branch
+      protection rules that require pull/merge requests for all changes, preventing
+      direct commits to main branches. Enforce automated testing gates in the deployment
+      pipeline that prevent changes from progressing without passing defined test suites
+      (unit tests, integration tests, security scans, compliance checks). Implement
+      environment promotion pipelines (dev -> staging -> production) with gate approvals
+      at each stage. Deploy drift detection that continuously compares production
+      state against the desired state defined in code and alerts on unauthorized
+      divergence. Implement immutable infrastructure patterns where production changes
+      are made by deploying new artifacts rather than modifying existing systems.
+      Establish automated change documentation that captures the complete change
+      lifecycle from commit to production deployment in a structured, queryable format.
+    tools:
+      - gitlab-ci
+      - argocd
+      - flux
+      - terraform
+      - kubernetes
+      - backstage
+      - open-policy-agent
+  devsecops:
+    prose: >-
+      Configure CI/CD pipelines as the sole deployment mechanism for production
+      systems, eliminating manual deployment pathways. Enforce merge request approval
+      rules that require at least one reviewer independent of the author (segregation
+      of duties) for all changes to in-scope repositories. Implement automated change
+      risk classification that applies enhanced review and testing requirements to
+      high-risk changes (database schema modifications, authentication logic,
+      financial calculation code). Deploy pre-merge compliance checks that verify
+      change ticket linkage, test evidence, and approval status before allowing
+      merges. Configure the CI/CD system to generate immutable deployment records
+      that capture the commit hash, pipeline execution, approvers, test results,
+      and deployment timestamp. Implement emergency change procedures as a separate
+      pipeline with expedited approvals but enhanced logging, and automated reminders
+      for retrospective documentation. Deploy automated rollback capabilities that
+      allow rapid reversion when post-deployment validation fails.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-framework
+      - gitlab-approval-rules
+      - argocd
+      - sonarqube
+      - checkov
+      - conftest
+      - trivy
+  secops:
+    prose: >-
+      Monitor production environments for unauthorized changes using file integrity
+      monitoring (FIM), configuration drift detection, and SIEM correlation rules.
+      Alert immediately on changes that bypass the approved change management process.
+      Conduct periodic change management audits by sampling production changes and
+      tracing each through the complete lifecycle to verify compliance with the defined
+      process. Track change management metrics: percentage of changes with complete
+      documentation, average approval cycle time, emergency change frequency, rollback
+      frequency, and post-implementation issues. Generate monthly change management
+      compliance reports for IT management and the audit committee. Maintain a register
+      of emergency changes and track retrospective approval completion rates.
+      Investigate patterns of change management exceptions to identify systemic process
+      issues that need remediation.
+    tools:
+      - splunk
+      - elastic-siem
+      - tripwire
+      - ossec
+      - servicenow
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-3", "CM-4", "CM-5", "CM-6", "CM-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.9", "a8.25", "a8.31", "a8.32", "a8.33"]
+    relationship: supports
+  - framework_id: soc2
+    articles: ["cc8.1"]
+    relationship: supports

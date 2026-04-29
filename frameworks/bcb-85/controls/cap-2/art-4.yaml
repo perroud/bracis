@@ -1,0 +1,204 @@
+id: art-4
+family: cap-2
+title: "Principios e Diretrizes da Politica de Seguranca Cibernetica"
+class: BCB-85
+statement:
+  prose: |
+    Art. 4. A política de segurança cibernética deve contemplar, no mínimo:
+    I - os objetivos de segurança cibernética da instituição;
+    II - os procedimentos e os controles adotados para reduzir a vulnerabilidade da
+    instituição a incidentes e atender aos demais objetivos de segurança cibernética;
+    III - os controles específicos, incluindo os voltados para a rastreabilidade da
+    informação, que busquem garantir a segurança das informações sensíveis;
+    IV - o registro, a análise da causa e do impacto, bem como o controle dos efeitos
+    de incidentes relevantes para as atividades da instituição;
+    V - as diretrizes para:
+    a) a elaboração de cenários de incidentes considerados nos testes de continuidade
+    de negócios;
+    b) a definição de procedimentos e de controles voltados à prevenção e ao tratamento
+    dos incidentes a serem adotados por empresas prestadoras de serviços a terceiros que
+    manuseiem dados ou informações sensíveis ou que sejam relevantes para a condução das
+    atividades operacionais da instituição;
+    c) a classificação dos dados e das informações quanto à relevância;
+    d) a definição dos parâmetros a serem utilizados na avaliação da relevância dos
+    incidentes;
+    VI - os mecanismos para disseminação da cultura de segurança cibernética na
+    instituição, incluindo:
+    a) a implementação de programas de capacitação e de avaliação periódica de pessoal;
+    b) a prestação de informações a clientes e usuários sobre precauções na utilização
+    de produtos e serviços de pagamento;
+    VII - as iniciativas para compartilhamento de informações sobre os incidentes
+    relevantes, mencionados no inciso IV, com as demais instituições referidas no art. 1.
+guidance:
+  prose: |
+    O art. 4 detalha o conteudo minimo obrigatorio da politica de seguranca cibernetica.
+    E o artigo mais extenso do capitulo e funciona como checklist de conformidade.
+
+    **Conteudo minimo estruturado:**
+
+    **I - Objetivos:** A politica deve declarar explicitamente o que busca proteger e
+    quais resultados de seguranca sao esperados. Nao basta copiar texto generico;
+    os objetivos devem refletir a realidade da IP e seus servicos de pagamento.
+
+    **II - Procedimentos e controles:** Descricao concreta de como a instituicao reduz
+    vulnerabilidades. Deve cobrir controles tecnicos (firewalls, criptografia),
+    administrativos (processos, segregacao de funcoes) e fisicos.
+
+    **III - Rastreabilidade:** Controles especificos para rastrear o acesso e a
+    manipulacao de informacoes sensiveis de pagamento. Isso exige logs de auditoria,
+    correlacao de eventos e capacidade de investigacao forense.
+
+    **IV - Gestao de incidentes:** Registro, analise de causa raiz, avaliacao de impacto
+    e controle de efeitos. Nao se trata apenas de responder ao incidente, mas de
+    documentar e aprender com ele.
+
+    **V - Diretrizes especificas:**
+    - (a) Cenarios de incidentes para testes de continuidade: tabletop exercises,
+      simulacoes de ransomware, DDoS, vazamento de dados de pagamento
+    - (b) Controles para terceiros: exigencias contratuais de seguranca para
+      prestadores que acessam dados sensiveis (ex: processadores de pagamento)
+    - (c) Classificacao de dados: taxonomia formal de classificacao
+    - (d) Parametros de relevancia: criterios claros para determinar quando um
+      incidente e "relevante"
+
+    **VI - Cultura de seguranca:**
+    - (a) Treinamento e avaliacao periodica: nao apenas awareness generico, mas
+      capacitacao tecnica especifica por funcao
+    - (b) Informacao a clientes: comunicacao sobre fraudes, phishing, golpes do PIX
+      e boas praticas no uso de servicos de pagamento
+
+    **VII - Compartilhamento:** Mecanismo para compartilhar informacoes sobre incidentes
+    com outras instituicoes de pagamento (relaciona-se com o art. 20).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I - Objetivos codificados:**
+      1. Documentar objetivos de seguranca como OKRs ou KPIs mensuraveis no repositorio
+         da politica.
+      2. Dashboards de metricas de seguranca vinculados aos objetivos declarados.
+
+      **II - Procedimentos e controles como codigo:**
+      3. Policy-as-Code com OPA/Rego, Kyverno ou Sentinel para cada controle.
+      4. Admission controllers no Kubernetes que enforcem controles em tempo real.
+      5. Network policies que implementam segmentacao e microsegmentacao.
+      6. WAF (Web Application Firewall) para protecao de APIs de pagamento.
+
+      **III - Rastreabilidade:**
+      7. Audit logging centralizado com retencao minima de 5 anos (exigencia BCB).
+      8. Correlacao de logs com identidade do usuario (user_id, session_id, IP).
+      9. Imutabilidade de logs (append-only, WORM storage).
+      10. Tracing distribuido (OpenTelemetry) para rastrear fluxo de transacoes de pagamento.
+
+      **IV - Gestao de incidentes na plataforma:**
+      11. Incident management integrado (PagerDuty, Opsgenie, Incident.io).
+      12. Post-mortem templates padronizados com campos obrigatorios.
+      13. Runbooks automatizados para incidentes recorrentes.
+
+      **V(a) - Continuidade de negocios:**
+      14. Chaos engineering (Litmus, Chaos Mesh) para simular cenarios de incidentes.
+      15. Game days regulares testando failover e disaster recovery.
+      16. Testes de recuperacao de backup automatizados e auditaveis.
+
+      **V(c) - Classificacao de dados:**
+      17. Labels de classificacao em recursos de infraestrutura (tags, annotations).
+      18. Enforcement automatico baseado em classificacao (ex: dados de cartao somente
+          em subnets privadas com criptografia adicional).
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - opentelemetry
+      - centralized-logging
+      - waf
+      - chaos-engineering
+      - incident-management
+      - network-policies
+  devsecops:
+    prose: |
+      **II - Controles no pipeline:**
+      1. Security gates mapeados para cada controle da politica.
+      2. Quality gates com thresholds de seguranca (zero critical/high vulnerabilities).
+      3. Compliance checks automatizados em cada merge request.
+
+      **III - Rastreabilidade no codigo:**
+      4. Git commit signing (GPG/SSH) para rastreabilidade de autoria.
+      5. Audit trail de merge requests, aprovacoes e deploys.
+      6. SBOM (Software Bill of Materials) gerado em cada release.
+      7. Provenance attestation para artefatos de build.
+
+      **IV - Gestao de incidentes no desenvolvimento:**
+      8. Blameless post-mortems com integracao ao repositorio de incidentes.
+      9. Issue tracking de vulnerabilidades com SLA por severidade.
+      10. Metricas DORA enriquecidas com dados de seguranca.
+
+      **V(b) - Controles para terceiros:**
+      11. Dependabot/Renovate para atualizacao automatica de dependencias.
+      12. Verificacao de licencas e supply chain security para bibliotecas de terceiros.
+      13. Vendor security assessment integrado ao processo de onboarding.
+
+      **V(c) - Classificacao no codigo:**
+      14. Data classification annotations no codigo-fonte.
+      15. Linting rules que identificam tratamento inadequado de dados de pagamento.
+
+      **VI(a) - Capacitacao:**
+      16. Security champions program com treinamento tecnico especifico.
+      17. Secure coding guidelines versionadas no repositorio.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - cosign
+      - syft
+      - renovate
+      - sonarqube
+      - semgrep
+  secops:
+    prose: |
+      **II - Monitoramento de controles:**
+      1. SIEM com dashboards que mapeiam status de cada controle da politica.
+      2. Compliance monitoring continuo com alertas de desvio.
+      3. Vulnerability management com SLA por criticidade.
+
+      **III - Rastreabilidade operacional:**
+      4. UEBA (User and Entity Behavior Analytics) para detecao de anomalias.
+      5. Database Activity Monitoring para acesso a dados sensiveis de pagamento.
+      6. Forensic readiness: capacidade de investigacao preservando cadeia de custodia.
+
+      **IV - Gestao de incidentes:**
+      7. SOAR com playbooks para cada tipo de incidente relevante.
+      8. Taxonomia de incidentes padronizada (ex: VERIS framework).
+      9. Metricas de incidentes: MTTD, MTTR, volume, impacto.
+      10. Lessons learned integrado ao ciclo de melhoria da politica.
+
+      **V(a) - Testes de continuidade:**
+      11. Tabletop exercises trimestrais com cenarios atualizados.
+      12. Simulacao de ransomware, DDoS, insider threat, vazamento de dados de pagamento.
+      13. Teste de failover para data center secundario/cloud.
+
+      **V(d) - Parametros de relevancia:**
+      14. Matriz de classificacao de incidentes com criterios quantitativos.
+      15. Thresholds automatizados para escalacao de incidentes.
+
+      **VI - Cultura de seguranca:**
+      16. Phishing simulation mensal com metricas de progresso.
+      17. Security awareness training com avaliacao por funcao.
+      18. Boletins de seguranca para clientes sobre golpes em pagamentos.
+    tools:
+      - siem
+      - soar
+      - ueba
+      - dam
+      - vulnerability-scanner
+      - phishing-simulation
+      - forensic-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-4"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-1", "PL-1", "PL-2", "RA-3", "IR-1", "IR-8", "AT-1", "AT-2", "CP-2"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.1", "A.5.10", "A.5.12", "A.5.24", "A.6.3", "A.8.2"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-50"]
+    relationship: complements

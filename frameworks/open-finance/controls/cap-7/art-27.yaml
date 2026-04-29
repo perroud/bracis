@@ -1,0 +1,96 @@
+id: art-27
+family: cap-7
+title: "Padroes de APIs e Interoperabilidade"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 27. As interfaces dedicadas do Open Finance devem ser interoperáveis
+    entre todos os participantes, observando:
+
+    I - especificações de APIs no formato OpenAPI 3.0 ou superior, mantidas
+    e publicadas pela estrutura de governança;
+
+    II - padrão de nomenclatura, formatos de dados e códigos de resposta
+    unificados conforme especificações técnicas;
+
+    III - compatibilidade retroativa (backward compatibility) entre versões
+    de APIs, com período mínimo de convivência entre versões;
+
+    IV - mecanismo padronizado de discovery de APIs, permitindo que
+    participantes localizem automaticamente os endpoints de outros
+    participantes;
+
+    V - ambiente de sandbox padronizado para testes de integração entre
+    participantes antes da entrada em produção.
+guidance:
+  prose: |
+    O art. 27 garante interoperabilidade tecnica:
+
+    **Especificacoes de APIs:**
+    O diretorio publica especificacoes OpenAPI para cada area:
+    - /open-banking/accounts/v2/ (contas)
+    - /open-banking/credit-cards/v2/ (cartoes)
+    - /open-banking/loans/v2/ (emprestimos)
+    - /open-banking/payments/v4/ (pagamentos)
+    - /open-banking/consents/v2/ (consentimentos)
+
+    **Versionamento:**
+    - Major: mudancas incompativeis (v1 -> v2)
+    - Minor: addicoes retrocompativeis (v2.0 -> v2.1)
+    - Convivencia: versao antiga disponivel por periodo apos deprecacao
+    - Comunicacao: aviso previo de deprecacao via diretorio
+
+    **Discovery:**
+    - Cada participante publica well-known endpoint
+    - Diretorio centraliza mapa de endpoints
+    - Receptores consultam diretorio para localizar transmissoras
+
+    **Sandbox:**
+    - Ambiente isolado para testes de integracao
+    - Dados ficticios (nao dados reais de clientes)
+    - Mesmas especificacoes de producao
+    - Obrigatorio para homologacao antes de ir a producao
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de interoperabilidade:**
+      1. Gerar codigo de APIs a partir das especificacoes OpenAPI oficiais
+         (code-first ou spec-first com validacao cruzada).
+      2. Implementar versionamento por path (/v1/, /v2/) com roteamento
+         no API gateway.
+      3. Manter versao anterior ativa pelo periodo de convivencia definido.
+      4. Publicar well-known endpoint com metadados padronizados.
+      5. Manter ambiente de sandbox identico a producao em especificacoes.
+    tools:
+      - openapi-generator
+      - api-gateway
+      - sandbox-environment
+      - version-routing
+  devsecops:
+    prose: |
+      **Validacao de interoperabilidade:**
+      1. Validar APIs contra especificacoes oficiais em cada build.
+      2. Executar testes de integracao contra sandbox de outros participantes.
+      3. Testar backward compatibility em cada nova versao de API.
+      4. Automatizar conformance testing com suite do diretorio.
+    tools:
+      - openapi-diff
+      - backward-compatibility-tests
+      - conformance-suite
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de versoes e interoperabilidade:**
+      1. Acompanhar calendario de deprecacao de versoes de APIs.
+      2. Monitorar uso de versoes antigas por parceiros.
+      3. Auditar conformidade com especificacoes periodicamente.
+      4. Reportar problemas de interoperabilidade ao diretorio.
+    tools:
+      - api-analytics
+      - version-monitoring
+      - grc-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

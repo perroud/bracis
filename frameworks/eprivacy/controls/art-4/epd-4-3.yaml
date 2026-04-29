@@ -1,0 +1,83 @@
+id: epd-4-3
+family: art-4
+title: "Breach Notification to Subscribers"
+class: ePrivacy
+statement:
+  prose: >-
+    When the personal data breach is likely to adversely affect the personal data or privacy of a subscriber
+    or individual, the provider shall also notify the subscriber or individual of the breach without undue delay.
+
+    Notification of a personal data breach to a subscriber or individual concerned shall not be required if
+    the provider has demonstrated to the satisfaction of the competent authority that it has implemented
+    appropriate technological protection measures, and that those measures were applied to the data concerned
+    by the security breach. Such technological protection measures shall render the data unintelligible to
+    any person who is not authorised to access it.
+  parts:
+    - id: epd-4.3.subscriber
+      label: "(3) subscriber notification"
+      prose: >-
+        When the personal data breach is likely to adversely affect the personal data or privacy of a subscriber
+        or individual, the provider shall also notify the subscriber or individual of the breach without undue delay.
+    - id: epd-4.3.exemption
+      label: "(3) encryption exemption"
+      prose: >-
+        Notification of a personal data breach to a subscriber or individual concerned shall not be required if
+        the provider has demonstrated to the satisfaction of the competent authority that it has implemented
+        appropriate technological protection measures, and that those measures were applied to the data concerned
+        by the security breach. Such technological protection measures shall render the data unintelligible to
+        any person who is not authorised to access it.
+guidance:
+  prose: >-
+    Article 4(3) second part creates a direct-to-subscriber notification obligation when a breach is likely
+    to adversely affect their privacy. This is the ePrivacy equivalent of GDPR Article 34. The key
+    difference is the encryption safe harbour: if the provider can demonstrate to the competent authority
+    that the breached data was encrypted (or otherwise rendered unintelligible), subscriber notification
+    is not required. This creates a strong incentive to encrypt all personal data at rest and in transit.
+    "Appropriate technological protection measures" typically means strong encryption (AES-256 or equivalent)
+    where the keys were not compromised in the same breach. The burden of proof is on the provider to
+    demonstrate this to the competent authority.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement end-to-end encryption for all subscriber personal data. Use envelope encryption with
+      separate data encryption keys (DEKs) and key encryption keys (KEKs) to ensure key compromise
+      isolation. Build a subscriber notification system that can reach affected subscribers through
+      multiple channels (email, SMS, in-app, postal). Implement automated breach impact assessment
+      that determines whether subscriber notification is required based on encryption status of
+      affected data. Build cryptographic proof generation that documents the encryption state of
+      breached data for competent authority demonstration. Maintain an up-to-date subscriber contact
+      registry for notification delivery.
+    tools:
+      - "Envelope encryption with HSM-backed key hierarchy (AWS KMS, GCP Cloud KMS, HashiCorp Vault)"
+      - "Multi-channel subscriber notification platform"
+      - "Automated breach impact assessment engine"
+      - "Cryptographic state audit tooling for breach evidence"
+      - "Column-level / field-level encryption for PII in databases"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must verify that all new data stores containing subscriber personal data implement
+      encryption at rest. SAST rules must detect unencrypted personal data storage patterns. Pipeline
+      gates must verify that encryption key management follows the approved architecture (separate DEKs/KEKs,
+      HSM-backed). Code review must verify that subscriber notification hooks are present in breach
+      response code paths. Automated tests must verify notification delivery across all channels.
+    tools:
+      - "IaC scanning (Checkov, tfsec) for encryption-at-rest verification"
+      - "SAST rules detecting unencrypted PII storage"
+      - "Encryption configuration verification in CI pipeline gates"
+      - "Notification delivery integration tests"
+  secops:
+    prose: >-
+      Maintain capability to rapidly assess encryption status of breached data. SOC playbooks must include
+      procedures for determining whether the encryption safe harbour applies. Prepare evidence packages
+      for competent authority demonstrating encryption measures on affected data. Monitor encryption
+      configuration drift that could invalidate the safe harbour. Maintain tested subscriber notification
+      procedures with verified contact information. Track notification delivery metrics and failure rates.
+    tools:
+      - "Encryption status verification tooling for incident response"
+      - "Competent authority evidence package templates"
+      - "Subscriber notification delivery tracking and verification"
+      - "Key management audit trails for breach forensics"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-34"]
+    relationship: complements

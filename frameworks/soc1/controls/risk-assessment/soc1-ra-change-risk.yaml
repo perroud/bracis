@@ -1,0 +1,87 @@
+id: soc1-ra-change-risk
+family: risk-assessment
+title: "Risk Assessment for Change"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization identifies and assesses changes that could significantly
+    impact the system of internal control over financial reporting. Changes considered
+    include changes in the operating environment, changes in personnel with significant
+    ICFR responsibilities, changes in information systems, changes in the volume or nature
+    of transactions processed on behalf of user entities, changes in the regulatory environment,
+    new lines of business or product offerings, and changes to subservice organizations.
+    The service organization has mechanisms to identify changes promptly, assess their impact
+    on existing ICFR controls, update controls as necessary, and communicate material
+    changes to user entities in advance where possible.
+guidance:
+  prose: >-
+    Change risk is treated as a distinct risk category under COSO because changes to systems,
+    people, and processes represent the most common source of control breakdowns in financial
+    reporting environments. Service organizations are particularly susceptible to change risk
+    because changes made to improve service delivery for one user entity can inadvertently
+    affect ICFR-relevant controls for all user entities. Auditors examine the change risk
+    assessment process by reviewing change management records, testing whether high-risk
+    changes triggered additional risk assessment, and confirming that user entity communications
+    were sent for material changes. The change risk assessment should be integrated with the
+    change management process so that risk assessment is not a separate step but an embedded
+    part of how changes are authorized and implemented.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate change risk assessment into the infrastructure change management workflow.
+      Tag infrastructure components by their ICFR impact level (critical, significant, low)
+      so that IaC pipelines automatically apply additional controls for high-risk components.
+      Implement automated drift detection to identify unauthorized changes to financial
+      processing infrastructure. Deploy a configuration management database (CMDB) that
+      tracks all components in the financial processing environment and their relationships,
+      enabling impact analysis when changes are proposed. Use GitOps workflows to ensure
+      all infrastructure changes are version-controlled, reviewed, and approved before
+      application.
+    tools:
+      - terraform
+      - backstage
+      - servicenow-cmdb
+      - aws-config
+      - config-connector
+  devsecops:
+    prose: >-
+      Implement a risk-tiered change management process in the CI/CD pipeline. Classify
+      all merge requests by their potential ICFR impact and require commensurate levels
+      of review and testing. High-risk changes affecting financial processing logic require
+      approval from a designated financial controls reviewer in addition to standard
+      technical review. Use GitLab's merge request templates to include a mandatory ICFR
+      impact assessment field for all changes. Implement automated tests that validate
+      financial processing logic correctness before and after changes. Require regression
+      testing for all changes to financial transaction processing code.
+    tools:
+      - gitlab-mr-templates
+      - gitlab-ci
+      - pytest
+      - cucumber
+      - sonarqube
+  secops:
+    prose: >-
+      Maintain a formal change risk assessment process that is embedded in the change advisory
+      board (CAB) process. Define ICFR impact criteria and require that all proposed changes
+      are rated against these criteria before approval. Implement a communication process
+      to notify user entities of material changes to ICFR-relevant systems. Conduct a
+      post-implementation review for all high-risk changes to confirm that controls were
+      not adversely affected. Maintain change logs that show the risk assessment, approval,
+      implementation, and post-implementation review for each change to the financial
+      processing environment.
+    tools:
+      - servicenow-change-management
+      - jira
+      - confluence
+      - archer-grc
+related_controls:
+  - control_id: soc1-ca-change-mgmt
+    relationship: supports
+    description: "Change risk assessment drives the design and rigor of the change management control activity."
+  - control_id: soc1-ic-user-controls
+    relationship: supports
+    description: "Change risk assessment determines what material changes must be communicated to user entities."
+  - control_id: soc1-mon-continuous
+    relationship: supports
+    description: "Continuous monitoring provides signals that may trigger change risk reassessment."

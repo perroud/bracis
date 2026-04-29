@@ -1,0 +1,116 @@
+id: trm-6-2
+family: sec-6
+title: "Source Code Review"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement source code review processes
+    to identify and remediate security vulnerabilities, coding defects, and
+    compliance issues before code is deployed to production.
+  parts:
+    - id: trm-6-2.1
+      label: "6.2.1"
+      prose: >-
+        The institution shall establish a mandatory source code review
+        process for all application code changes, including both automated
+        static analysis and peer review by qualified personnel. Code reviews
+        shall assess security, quality, and adherence to coding standards.
+    - id: trm-6-2.2
+      label: "6.2.2"
+      prose: >-
+        Automated static application security testing (SAST) shall be
+        integrated into the development pipeline and executed on every
+        code change. SAST rules shall be configured to detect
+        vulnerabilities aligned with OWASP Top 10 and CWE/SANS Top 25.
+    - id: trm-6-2.3
+      label: "6.2.3"
+      prose: >-
+        The institution shall maintain source code in version-controlled
+        repositories with branch protection policies that enforce review
+        requirements, prevent direct commits to protected branches, and
+        maintain a complete audit trail of all code changes.
+    - id: trm-6-2.4
+      label: "6.2.4"
+      prose: >-
+        Findings from source code reviews shall be tracked, prioritized
+        based on severity, and remediated within defined timelines.
+        Critical and high-severity findings shall be resolved before
+        code is promoted to production.
+
+guidance:
+  prose: >-
+    Source code review is a critical control for preventing vulnerabilities
+    from reaching production. Automated SAST catches known vulnerability
+    patterns at scale but cannot replace human review for business logic
+    flaws, authorization issues, and architectural weaknesses. Peer review
+    should be performed by developers who did not write the code, and
+    security-critical components should receive review from personnel with
+    security expertise. Branch protection and audit trails are essential
+    for demonstrating control effectiveness to auditors.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 6"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "OWASP Code Review Guide"
+    url: "https://owasp.org/www-project-code-review-guide/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure repository templates with mandatory branch protection
+      rules: require merge request approvals (minimum two reviewers for
+      security-critical repos), enforce SAST pipeline success, prevent
+      force pushes, and require linear history. Implement CODEOWNERS
+      files to route security-sensitive file changes to security team
+      reviewers automatically. Deploy centralized SAST configurations
+      that standardize scanning rules across all repositories. Integrate
+      code review metrics into the platform dashboard to track review
+      coverage, turnaround time, and finding density.
+    tools:
+      - gitlab
+      - backstage
+      - semgrep
+      - sonarqube
+
+  devsecops:
+    prose: >-
+      Integrate SAST scanning as a mandatory pipeline stage that executes
+      on every merge request. Configure SAST rules to enforce OWASP Top 10
+      and CWE/SANS Top 25 detection. Implement merge request approval
+      rules that require both peer review and SAST scan passage before
+      merge. Configure quality gates in SonarQube that block merges when
+      security hotspots or critical vulnerabilities are detected. Generate
+      code review evidence reports for compliance audits showing review
+      coverage, finding trends, and remediation timelines.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - semgrep
+      - sonarqube
+      - gitlab-code-quality
+
+  secops:
+    prose: >-
+      Monitor SAST finding trends to identify systemic coding weaknesses
+      and inform developer training priorities. Review and tune SAST
+      rules periodically to reduce false positives and ensure coverage
+      of emerging vulnerability patterns. Track code review findings in
+      the vulnerability management platform alongside other security
+      findings. Conduct periodic assessments of the code review process
+      effectiveness and recommend improvements.
+    tools:
+      - defectdojo
+      - sonarqube
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-15", "SI-10"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.25", "a8.28"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-7"]
+    relationship: supports

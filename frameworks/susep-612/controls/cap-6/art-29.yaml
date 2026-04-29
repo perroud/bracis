@@ -1,0 +1,131 @@
+id: art-29
+family: cap-6
+title: "Comunicacoes Automaticas ao COAF"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 29. As supervisionadas devem comunicar ao COAF, independentemente de
+    análise ou suspeita, as seguintes operações:
+    I - operações de seguro de vida, previdência complementar aberta ou capitalização
+    cujo valor seja igual ou superior a R$ 50.000,00 (cinquenta mil reais), pagas
+    total ou parcialmente em espécie;
+    II - transferência de recursos, entre planos de previdência complementar aberta,
+    de valor igual ou superior a R$ 50.000,00;
+    III - operações de resgate de seguro de vida, previdência complementar aberta ou
+    capitalização, de valor igual ou superior a R$ 100.000,00;
+    IV - qualquer operação que envolva pagamento ou recebimento de recursos em
+    espécie de valor igual ou superior a R$ 50.000,00.
+guidance:
+  prose: |
+    O art. 29 define as comunicacoes automaticas (CTR - Currency Transaction Reports)
+    que devem ser feitas ao COAF INDEPENDENTEMENTE de analise de suspeita. Sao
+    obrigacoes objetivas baseadas em valor.
+
+    **Comunicacoes automaticas por inciso:**
+
+    1. Operacoes em especie >= R$ 50.000 (I):
+       Qualquer pagamento de premio, aporte ou operacao paga total ou parcialmente
+       em especie. No mercado securitario moderno, pagamentos em especie sao raros,
+       o que torna cada ocorrencia altamente significativa.
+       Exemplos: premio de seguro de vida pago em dinheiro, aporte em VGBL em
+       especie, aquisicao de titulo de capitalizacao em dinheiro.
+
+    2. Portabilidade >= R$ 50.000 (II):
+       Transferencia entre planos de previdencia complementar aberta. A
+       portabilidade e mecanismo legitimo, mas pode ser utilizada para:
+       - Dificultar rastreamento de recursos entre instituicoes
+       - Fragmentar historico operacional
+       - Acessar produto com regras de resgate mais favoraveis
+       Toda portabilidade acima do threshold deve ser comunicada automaticamente.
+
+    3. Resgates >= R$ 100.000 (III):
+       Resgate de qualquer produto securitario com componente de acumulacao:
+       - Resgate total ou parcial de VGBL/PGBL
+       - Resgate de seguro de vida com valor de resgate
+       - Resgate de titulo de capitalizacao
+       Threshold de R$ 100.000 e mais alto que para especie, refletindo que
+       resgates sao operacoes legitimas e frequentes.
+
+    4. Especie >= R$ 50.000 generico (IV):
+       Clausula residual que captura qualquer movimentacao em especie nao coberta
+       pelos incisos anteriores. Inclui recebimento de sinistros em especie
+       (extremamente raro mas possivel em emergencias).
+
+    **Prazo de comunicacao:**
+    As comunicacoes automaticas devem ser feitas ate o dia util seguinte a
+    realizacao da operacao. Nao ha prazo de analise como nas comunicacoes de
+    suspeita (art. 28).
+
+    **Diferenca entre comunicacao automatica e de suspeita:**
+    - Automatica (art. 29): baseada apenas em valor, sem analise de suspeita
+    - Suspeita (art. 28): baseada em analise, independente de valor
+    - Uma operacao pode gerar ambas as comunicacoes simultaneamente
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de comunicacoes automaticas:**
+      1. Regras automaticas no sistema transacional que identificam em tempo
+         real operacoes que atingem thresholds do art. 29.
+      2. Integracao com SISCOAF para envio automatizado de comunicacoes
+         automaticas no dia util seguinte.
+      3. Consolidacao de operacoes do mesmo cliente no mesmo dia para verificar
+         se o threshold e atingido (anti-fracionamento).
+      4. Gerador automatico do formulario de comunicacao automatica com dados
+         pre-populados do sistema transacional.
+
+      **Controle de thresholds:**
+      5. Parametrizacao de thresholds por tipo de operacao:
+         - Especie: R$ 50.000
+         - Portabilidade: R$ 50.000
+         - Resgate: R$ 100.000
+      6. Alerta de fracionamento: multiplas operacoes do mesmo cliente/tipo
+         que somadas atingem o threshold dentro de periodo configuravel.
+      7. Dashboard de comunicacoes automaticas com volumetria e tendencias.
+      8. Reconciliacao entre operacoes que atingem threshold e comunicacoes
+         efetivamente enviadas.
+    tools:
+      - transaction-monitoring-system
+      - siscoaf-integration
+      - rules-engine
+      - reconciliation-engine
+  devsecops:
+    prose: |
+      **Testes de comunicacoes automaticas:**
+      1. Testes de threshold: operacao de R$ 49.999 vs. R$ 50.000 vs. R$ 50.001.
+      2. Testes de consolidacao: multiplas operacoes que somadas atingem threshold.
+      3. Testes de prazo: comunicacao deve ser gerada no dia util seguinte.
+      4. Testes de integracao com SISCOAF para envio automatizado.
+
+      **Reconciliacao:**
+      5. Testes de reconciliacao: toda operacao acima do threshold deve ter
+         comunicacao correspondente.
+      6. Testes de nao-duplicidade: mesma operacao nao pode gerar comunicacao
+         em duplicidade.
+    tools:
+      - gitlab-ci
+      - unit-tests
+      - integration-tests
+      - reconciliation-tests
+  secops:
+    prose: |
+      **Monitoramento de comunicacoes automaticas:**
+      1. Dashboard diario de comunicacoes automaticas pendentes e enviadas.
+      2. Reconciliacao diaria entre operacoes acima de threshold e comunicacoes.
+      3. Alerta para comunicacoes nao enviadas no prazo (dia util seguinte).
+
+      **Analise de tendencias:**
+      4. Tendencia de volume de comunicacoes automaticas por tipo e produto.
+      5. Identificacao de clientes com comunicacoes automaticas frequentes
+         para investigacao adicional.
+      6. Deteccao de fracionamento: clientes com operacoes recorrentes
+         ligeiramente abaixo dos thresholds.
+      7. Relatorio mensal de comunicacoes automaticas para compliance officer.
+    tools:
+      - compliance-dashboard
+      - reconciliation-engine
+      - trend-analysis
+      - reporting-engine
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-29"]
+    relationship: equivalent-to

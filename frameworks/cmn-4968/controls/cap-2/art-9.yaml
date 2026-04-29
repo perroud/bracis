@@ -1,0 +1,108 @@
+id: art-9
+family: cap-2
+title: "Acesso da Auditoria Interna a Informacoes e Areas"
+class: CMN-4968
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 9. A unidade de auditoria interna deve ter acesso irrestrito a todas as áreas,
+    atividades, registros, sistemas de informação, pessoas e bens da instituição necessários
+    ao desempenho de suas funções.
+
+    Parágrafo único. Eventuais restrições de acesso devem ser comunicadas ao conselho de
+    administração ou órgão equivalente, que deverá se pronunciar sobre a questão.
+guidance:
+  prose: |
+    O art. 9 e o "dente" operacional da independencia: de nada vale ter uma unidade
+    formalmente independente se ela nao consegue acessar o que precisa auditar.
+    O acesso irrestrito e pressuposto basico da funcao de auditoria interna.
+
+    **Acesso irrestrito (cabecalho):**
+    Sem excecoes previstas pela propria resolucao: toda area, todo sistema, todo
+    registro, toda pessoa. Isso inclui:
+    - Areas operacionais (credito, tesouraria, cambio, mesa de operacoes)
+    - Areas de suporte (TI, RH, juridico, compliance)
+    - Alta administracao (diretorias, presidencia)
+    - Filiais, subsidiarias e conglomerado
+    - Dados senssiveis (dados de clientes, contrapartes, operacoes de credito)
+    - Sistemas de TI (com acesso de leitura, nao de escrita)
+
+    **Comunicacao de restricoes ao CA (paragrafo unico):**
+    Se uma area ou gestora nega acesso a auditoria interna, isso e fato material
+    que deve ser imediatamente reportado ao CA. A gestao nao pode obstruir a auditoria.
+    O CA deve se pronunciar -- e a resolucao obriga esse pronunciamento, o que cria
+    evidencia formal de governanca.
+
+    **Implicacao para a cultura da instituicao:**
+    O acesso irrestrito requer cultura de cooperacao com a auditoria. Ambientes onde
+    a auditoria e vista como "inimiga" geram obstrucao tacita (atrasos, informacoes
+    incompletas). O CA deve promover a cultura de colaboracao com a auditoria interna.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao tecnica do acesso irrestrito:**
+      1. Configurar perfil de acesso de leitura em todos os sistemas de producao para
+         a equipe de auditoria interna, sem excecao de sistemas ou bancos de dados.
+      2. Provisionar acesso somente-leitura a replicas de banco de dados de producao,
+         evitando impacto de desempenho nos sistemas operacionais durante auditorias.
+      3. Acesso de leitura a logs de sistema (SIEM, logs de aplicacao, logs de acesso)
+         diretamente pela equipe de auditoria, sem dependencia de TI para extrato.
+      4. Acesso a sistemas de monitoramento e observabilidade (Grafana, Prometheus,
+         Kibana) para analise de metricas operacionais.
+      5. Processo formal e auditavel de solicitacao de acesso adicional em caso de
+         necessidade de dados especificos nao cobertos pelo perfil padrao.
+      6. Registro de todos os acessos da equipe de auditoria para demonstrar que
+         foram somente de leitura (evidencia de independencia).
+    tools:
+      - iam-platform
+      - read-only-db-replica
+      - siem
+      - privileged-access-management
+      - audit-log-management
+  devsecops:
+    prose: |
+      **Acesso irrestrito a sistemas de desenvolvimento:**
+      1. Configurar no GitLab acesso de "Reporter" ou "Guest" para a equipe de auditoria
+         a todos os projetos/grupos, permitindo visualizacao de repositorios, pipelines,
+         MRs e issues sem capacidade de modificacao.
+      2. Acesso de leitura a logs de pipeline, resultados de scans de seguranca e
+         relatorios de compliance do compliance management platform.
+      3. Acesso ao SIEM para consulta de alertas e eventos de seguranca relacionados
+         a sistemas de desenvolvimento.
+      4. Exportacao automatica de metricas de qualidade de software para a plataforma
+         de auditoria (cobertura de testes, vulnerabilidades abertas, debito tecnico).
+      5. Processo de notificacao automatica a auditoria quando incidentes criticos
+         de seguranca ocorrerem em sistemas de TI.
+    tools:
+      - gitlab-reader-access
+      - siem
+      - audit-management-system
+      - metrics-export
+  secops:
+    prose: |
+      **Governanca do acesso irrestrito:**
+      1. Documentar no charter de auditoria o direito de acesso irrestrito como poder
+         formal da unidade, aprovado pelo CA.
+      2. Estabelecer processo de onboarding de novos auditores que garante provisionamento
+         de acessos de leitura em D+1 de admissao.
+      3. Criar processo formal para documentar e escalar restricoes de acesso ao CA,
+         com template de comunicado e prazo de pronunciamento do CA (ex: 5 dias uteis).
+      4. Registrar em ata toda vez que acesso foi negado ou dificultado, para historico
+         regulatorio e governanca.
+      5. Revisar semestralmente a lista de sistemas a que a auditoria tem acesso vs.
+         inventario completo de sistemas da instituicao (gap analysis de acesso).
+    tools:
+      - grc-platform
+      - iam-platform
+      - document-management
+      - board-portal
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-26"]
+    relationship: complements
+  - framework_id: sox
+    articles: ["sec-301"]
+    relationship: supports
+  - framework_id: bacen-4893
+    articles: ["art-5"]
+    relationship: complements

@@ -1,0 +1,95 @@
+id: del-1
+family: del
+title: "Make It Easy for Users to Delete User Data"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The consumer shall be provided with functionality on the device such that user data
+    can be erased from the device in a simple manner. The consumer shall be provided with
+    clear instructions on how to delete personal data from associated services. Where
+    personal data can be transferred from one device to another, this process shall be
+    secure. A clear confirmation shall be provided to the consumer that personal data has
+    been deleted.
+
+guidance:
+  prose: >-
+    Users must be able to erase their personal data from IoT devices, especially when
+    selling, recycling, or returning a device. This provision requires a straightforward
+    factory reset or data erasure function that is accessible to non-technical users —
+    typically a physical button combination or a clearly labeled option in the device
+    settings. The erasure must cover all user data stored on the device, including cached
+    credentials, usage logs, personal configurations, and any locally stored media. The
+    scope extends to cloud services associated with the device: the manufacturer must
+    provide clear instructions for deleting data from backend services. When data is
+    transferred between devices, the transfer mechanism must be encrypted and authenticated
+    to prevent interception.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.11-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a factory reset function accessible via both a physical mechanism (button
+      press combination) and the device management interface. The reset must securely erase
+      all user data from persistent storage, including credentials, configuration, logs, and
+      cached media. Use cryptographic erasure (destroying the encryption key) for encrypted
+      storage volumes rather than attempting to overwrite every block. Provide a data deletion
+      API in the cloud backend that removes all user data associated with the device when
+      triggered. Implement a deletion confirmation mechanism that notifies the user (via email
+      or companion app) when data has been fully removed. Design secure device-to-device data
+      transfer using end-to-end encryption with user-verified pairing.
+    tools:
+      - secure-erase
+      - crypto-shredding
+      - cloud-data-api
+      - mobile-companion-app
+      - bluetooth-secure-pairing
+
+  devsecops:
+    prose: >-
+      Implement automated tests that verify factory reset completely removes all user data —
+      extract the filesystem after reset and scan for residual personal data. Test the cloud
+      data deletion API and verify data is removed from all storage layers including backups
+      and caches within the documented timeframe. Validate that device-to-device transfer
+      encrypts data in transit and authenticates both endpoints. Include data erasure
+      verification in the regression test suite for every firmware release. Test that factory
+      reset returns the device to a safe, provisioning-ready state.
+    tools:
+      - pytest
+      - forensic-tools
+      - gitlab-ci
+      - api-testing-framework
+      - data-recovery-tools
+
+  secops:
+    prose: >-
+      Conduct periodic audits of the data deletion process by performing factory resets and
+      forensic analysis of device storage to verify completeness of erasure. Monitor cloud
+      data deletion requests and track fulfillment against SLA. Audit backup systems to
+      verify deleted user data does not persist in backup archives beyond the retention
+      policy. Maintain procedures for responding to data subject deletion requests (DSARs)
+      that cover both device and cloud data.
+    tools:
+      - forensic-tools
+      - data-recovery-tools
+      - onetrust
+      - servicenow
+      - splunk
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-4.3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-6", "SI-12"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.10", "A.5.34"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V8.3.2", "V8.3.6"]
+    relationship: complements

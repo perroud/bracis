@@ -1,0 +1,93 @@
+id: ssf-design-3
+family: ssf-design
+title: "Secure Defaults and Configuration Management"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall be delivered with secure default configurations that protect
+    sensitive data without requiring additional hardening by the customer. Default
+    credentials, sample data, unnecessary accounts, and development or debug features
+    shall not be present in production releases. The vendor shall provide clear
+    documentation of all configurable security parameters and their recommended
+    settings. A configuration management process shall ensure that security-relevant
+    settings are tracked and changes are authorized.
+
+guidance:
+  prose: >-
+    Insecure defaults are among the most exploited weaknesses in payment software.
+    PCI SSF mandates that software ships in a secure state by default, placing the
+    burden on the vendor rather than the customer to achieve a baseline security
+    posture. This includes removing all default passwords, disabling debug modes,
+    removing test accounts, and ensuring that security features such as encryption
+    and logging are enabled by default. Configuration changes that affect security
+    must be traceable and authorized.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 3 — Secure Defaults"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 3.1-3.2"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Use infrastructure-as-code templates that enforce secure defaults for all
+      deployment configurations. Implement policy-as-code with tools like OPA/Gatekeeper
+      to reject deployments containing insecure configurations (debug flags, default
+      credentials, excessive permissions). Store all configuration in version-controlled
+      repositories with mandatory review for security-relevant changes. Use sealed
+      secrets or external secret managers to prevent credentials from appearing in
+      configuration files. Automate configuration drift detection to alert when
+      deployed settings deviate from the approved baseline.
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - vault
+      - sealed-secrets
+      - terraform
+      - checkov
+      - argocd
+
+  devsecops:
+    prose: >-
+      Implement secret detection scanning in CI/CD pipelines to prevent default
+      credentials and hardcoded secrets from reaching production. Use SAST rules
+      to detect debug flags, verbose error messages, and development-only features
+      left in production code paths. Enforce that configuration files pass schema
+      validation before merge. Maintain a security configuration baseline document
+      and automate compliance checks against it in the pipeline.
+    tools:
+      - gitlab-secret-detection
+      - gitlab-sast
+      - semgrep
+      - gitleaks
+      - checkov
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor for configuration changes in production environments and alert on
+      unauthorized modifications to security-relevant settings. Conduct periodic
+      configuration audits comparing deployed settings against the documented secure
+      baseline. Review and validate that default credentials and debug features are
+      absent from production releases as part of release sign-off. Track configuration
+      drift incidents and remediation timelines.
+    tools:
+      - splunk
+      - wiz
+      - chef-inspec
+      - aws-config
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-2.1", "req-2.2", "req-2.3"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v14.1", "v14.2", "v14.3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.24"]
+    relationship: mapped

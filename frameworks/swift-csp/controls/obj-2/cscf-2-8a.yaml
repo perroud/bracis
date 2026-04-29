@@ -1,0 +1,105 @@
+id: cscf-2.8a
+family: obj-2
+title: "Critical Activity Outsourcing"
+class: SWIFT-CSP
+classification: advisory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Ensure that critical SWIFT-related activities outsourced to third-party
+    service providers are governed by appropriate security requirements,
+    contractual obligations, and ongoing oversight. Outsourcing does not
+    transfer the responsibility for compliance with the SWIFT CSP.
+  parts:
+    - id: cscf-2.8a.a
+      label: "2.8A.a"
+      prose: >-
+        Third-party service providers handling SWIFT-related operations
+        (service bureaux, managed security providers, cloud hosting) are
+        assessed against SWIFT CSP requirements before engagement and
+        at least annually thereafter.
+    - id: cscf-2.8a.b
+      label: "2.8A.b"
+      prose: >-
+        Contracts with service providers include explicit security
+        requirements aligned with SWIFT CSP controls, right-to-audit
+        clauses, incident notification timelines, and data handling
+        obligations.
+    - id: cscf-2.8a.c
+      label: "2.8A.c"
+      prose: >-
+        A register of all outsourced SWIFT-related activities is maintained,
+        including the specific controls delegated to each provider and
+        evidence of their compliance.
+
+guidance:
+  prose: >-
+    Architecture types A2, A3, and B rely on third parties for significant
+    portions of their SWIFT infrastructure. Even type A1 organizations
+    may outsource managed security monitoring or infrastructure hosting.
+    SWIFT's independent assessment framework holds the SWIFT user — not the
+    service provider — accountable for compliance. Organizations must
+    therefore obtain and verify evidence that their providers implement
+    required controls. SWIFT publishes a list of assessed service bureaux,
+    but customers must still validate provider compliance against their
+    specific architecture and risk profile. Service level agreements should
+    include security KPIs, breach notification within 24 hours, and
+    termination rights for non-compliance.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.8A"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "EBA Guidelines on Outsourcing Arrangements"
+    url: "https://www.eba.europa.eu/regulation-and-policy/internal-governance/guidelines-on-outsourcing-arrangements"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement third-party connectivity through controlled integration
+      points with dedicated network segments. Use API gateways with mutual
+      authentication for service provider interfaces. Deploy monitoring
+      agents on provider-managed infrastructure where contractually
+      permitted. Maintain infrastructure-as-code definitions for provider
+      integration points to ensure consistent security posture.
+    tools:
+      - terraform
+      - kong-gateway
+      - aws-privatelink
+      - azure-private-link
+      - gcp-private-service-connect
+
+  devsecops:
+    prose: >-
+      Include third-party integration security in CI/CD validation.
+      Automate compliance evidence collection from provider APIs.
+      Validate provider TLS configurations and certificate chains in
+      pipeline checks. Maintain provider security assessment artifacts
+      in version control.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - opa
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor third-party connections for anomalous traffic patterns.
+      Review provider security reports and attestations quarterly.
+      Maintain a risk register for all outsourced activities with
+      residual risk ratings. Conduct annual provider security assessments
+      using questionnaires based on SWIFT CSP controls.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow-vrm
+      - onetrust
+      - prevalent
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-9(2)", "SR-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.19", "A5.20", "A5.21", "A5.22"]
+    relationship: supports

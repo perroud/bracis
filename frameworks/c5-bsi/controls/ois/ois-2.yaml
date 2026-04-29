@@ -1,0 +1,84 @@
+id: ois-2
+family: ois
+title: "Segregation of Duties"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall ensure segregation of conflicting duties and
+    areas of responsibility in order to reduce opportunities for unauthorised
+    or unintentional modification or misuse of the cloud provider's assets.
+    If segregation of duties is difficult to achieve, compensating controls
+    such as monitoring of activities, audit trails, and management supervision
+    shall be implemented.
+
+guidance:
+  prose: >-
+    Segregation of duties is a key internal control that prevents a single
+    individual from controlling all aspects of a critical process. In the
+    cloud context, this means separating roles for development, deployment,
+    and operations so that no single person can introduce and approve changes
+    to production systems unilaterally. Where full segregation is not
+    feasible (e.g., small teams), compensating controls such as enhanced
+    logging, peer review, and management oversight must be in place.
+
+references:
+  - citation: "C5:2020, OIS-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) across all platform services
+      to enforce duty segregation. Configure separate roles for infrastructure
+      provisioning, deployment approval, and production access. Use namespace
+      and project isolation in Kubernetes and GitLab to prevent developers from
+      directly modifying production resources. Enforce the four-eyes principle
+      for infrastructure changes via mandatory merge request approvals with
+      distinct approver and author roles.
+    tools:
+      - kubernetes-rbac
+      - gitlab
+      - vault
+      - backstage
+      - terraform
+
+  devsecops:
+    prose: >-
+      Configure CI/CD pipelines to enforce separation between code authoring,
+      review, and deployment approval. Require merge request approvals from
+      a different person than the author. Implement protected branches that
+      restrict who can merge to production branches. Use CODEOWNERS files to
+      enforce mandatory reviews by designated teams. Ensure pipeline
+      configurations cannot be modified by developers without review.
+    tools:
+      - gitlab-ci
+      - codeowners
+      - branch-protection
+      - merge-request-approvals
+
+  secops:
+    prose: >-
+      Monitor for violations of duty segregation policies by alerting on
+      scenarios where the same identity performs conflicting actions (e.g.,
+      code commit and deployment approval). Implement audit trails that
+      capture the identity performing each action in the change lifecycle.
+      Create dashboards showing segregation compliance metrics and flag
+      compensating control gaps for management review.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - chronicle
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.3"]
+    relationship: mapped
+  - framework_id: nist-800-53
+    articles: ["AC-5"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["GRC-03"]
+    relationship: mapped

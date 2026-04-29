@@ -1,0 +1,131 @@
+id: isa-5.3
+family: ch-5
+title: "Network Security"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall manage and control networks to protect
+    information in systems and applications. Security mechanisms,
+    service levels, and management requirements of all network
+    services shall be identified, implemented, and monitored.
+    Groups of information services, users, and information systems
+    shall be segregated in networks. The organization shall implement
+    filtering and inspection mechanisms to control network traffic
+    and protect the network perimeter, including connections to
+    third-party networks.
+
+guidance:
+  prose: >-
+    VDA ISA requires network security controls that protect the
+    confidentiality, integrity, and availability of automotive
+    information in transit. Network segmentation must isolate
+    sensitive environments: prototype development networks must
+    be separated from corporate networks and production networks.
+    Connections to OEM networks and supplier networks must be
+    controlled through dedicated secure channels (VPN, dedicated
+    lines) with firewalls and intrusion detection/prevention systems.
+    Wireless networks must be secured with WPA3 or equivalent, with
+    separate SSIDs for corporate, guest, and production traffic.
+    Network monitoring must detect and alert on unauthorized devices,
+    lateral movement, and data exfiltration attempts. Remote access
+    must use encrypted VPN tunnels with MFA and must be logged and
+    monitored. For AL3, auditors verify network architecture diagrams,
+    firewall rule sets, segmentation effectiveness, and IDS/IPS
+    deployment and alerting. Special attention is given to networks
+    handling prototype data, which must have enhanced monitoring
+    and restricted connectivity.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of network security architecture and controls."
+  al2:
+    applicability: required
+    notes: "Auditor reviews network diagrams, firewall rules, and segmentation evidence."
+  al3:
+    applicability: required
+    notes: "On-site verification of network segmentation, IDS/IPS, and traffic monitoring effectiveness."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 5.3"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.8.20, A.8.21, A.8.22, A.8.23"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using Kubernetes network
+      policies, service mesh (Istio, Cilium) with mutual TLS, and
+      cloud VPC/subnet isolation. Define network policies as code
+      in version-controlled repositories and apply them through
+      GitOps workflows. Enforce zero-trust network architecture
+      where every service-to-service communication is authenticated,
+      authorized, and encrypted regardless of network location.
+      Implement network policy enforcement that denies all traffic
+      by default and explicitly allows only required communication
+      paths. Deploy DNS-based traffic monitoring and anomaly detection
+      to identify data exfiltration through DNS tunneling. Automate
+      network topology documentation generation from infrastructure
+      state.
+    tools:
+      - cilium
+      - istio
+      - calico
+      - kubernetes
+      - terraform
+      - argocd
+      - coredns
+
+  devsecops:
+    prose: >-
+      Validate network configurations in CI/CD pipelines before
+      deployment, ensuring that new services do not violate
+      segmentation policies. Implement automated testing of network
+      policies using network policy simulation tools that verify
+      allowed and denied traffic paths match the intended design.
+      Scan infrastructure-as-code templates for overly permissive
+      network rules (0.0.0.0/0 ingress, unrestricted egress).
+      Generate network architecture documentation automatically
+      from deployed infrastructure state as pipeline artifacts.
+      Enforce that all external service dependencies are declared
+      and approved, with egress filtering preventing unauthorized
+      outbound connections.
+    tools:
+      - checkov
+      - kube-hunter
+      - cilium-cli
+      - trivy
+      - terraform
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Deploy network detection and response (NDR) tools to monitor
+      all network segments for anomalous traffic patterns, lateral
+      movement, and command-and-control communication. Implement
+      IDS/IPS at network boundaries with signature and behavioral
+      detection. Monitor DNS query logs for indicators of compromise
+      (DGA domains, tunneling, fast-flux). Integrate network flow
+      data (NetFlow, sFlow) into the SIEM for traffic analysis
+      and baseline anomaly detection. Alert on unauthorized network
+      connections between segregated zones. Generate network security
+      compliance reports showing segmentation effectiveness,
+      firewall rule compliance, and detected threats.
+    tools:
+      - suricata
+      - zeek
+      - splunk
+      - elastic-siem
+      - darktrace
+      - palo-alto
+      - fortinet
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.8.20", "A.8.21", "A.8.22", "A.8.23"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-8", "AC-4", "SI-4", "CA-3"]
+    relationship: mapped

@@ -1,0 +1,102 @@
+id: art-26
+family: cap-6
+title: "Prazos de Comunicacao ao COAF"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 26. A comunicação de que trata o art. 25 deve ser realizada nos seguintes
+    prazos:
+
+    I - em até um dia útil: para operações que envolvam risco de perda de
+    evidências, rastreabilidade ou que estejam relacionadas a financiamento
+    do terrorismo ou ao crime de proliferação de armas de destruição em massa;
+
+    II - em até três dias úteis: para operações que envolvam valores elevados ou
+    situações de urgência operacional;
+
+    III - em até dez dias úteis: para as demais operações ou situações suspeitas,
+    contados da data em que a análise for concluída.
+
+    Parágrafo único. A contagem dos prazos tem início na data em que a análise
+    interna for concluída, cabendo à instituição demonstrar que os procedimentos
+    de análise foram conduzidos de forma diligente e tempestiva.
+guidance:
+  prose: |
+    O art. 26 define tres faixas de urgencia com prazos distintos. O descumprimento
+    de prazo constitui infracao autonoma.
+
+    **Prazo de 1 dia util (inciso I):**
+    Casos de maxima urgencia:
+    - Financiamento do terrorismo (qualquer valor)
+    - Proliferacao de armas de destruicao em massa
+    - Risco iminente de destruicao de evidencias
+    - Operacoes que envolvam suspeita de sequestro ou extorsao
+
+    **Prazo de 3 dias uteis (inciso II):**
+    Casos de alta urgencia:
+    - Valores muito elevados (ex: transferencias > R$ 1 milhao)
+    - Situacoes com risco de continuidade da atividade criminosa
+
+    **Prazo de 10 dias uteis (inciso III):**
+    Casos padrao -- a maioria das comunicacoes cai nesta categoria.
+
+    **Contagem do prazo (paragrafo unico):**
+    ATENCAO: o prazo conta a partir da CONCLUSAO DA ANALISE, nao da geracao
+    do alerta. Isso significa que a IP deve ser diligente na analise tambem --
+    nao pode deixar o alerta em fila por 30 dias e depois comunicar em 10 dias
+    (o BCB pode questionar o prazo total desde o alerta).
+
+    **Implicacao para SLA de analise:**
+    Para casos urgentes (inciso I), a analise deve ser concluida em horas, nao
+    dias. Isso exige processo de escalacao rapida para o compliance officer/diretor.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **SLA e alertas de prazo no case management:**
+      1. Classificar cada caso de analise por nivel de urgencia no momento da
+         criacao do alerta (1 dia, 3 dias, 10 dias).
+      2. Temporizador visivel no case management: dias restantes para comunicacao
+         ao COAF, com escalonamento de cor (verde/amarelo/vermelho).
+      3. Notificacoes automaticas de prazo:
+         - 1 dia: alertar compliance officer e diretor imediatamente
+         - 3 dias: alertar 24h antes do vencimento
+         - 10 dias: alertar 3 dias antes do vencimento
+      4. Escalacao automatica: caso com prazo em risco e nao atribuido a analista
+         e automaticamente escalado para o supervisor.
+      5. Dashboard de SLA: porcentagem de comunicacoes dentro do prazo por tipo,
+         backlog em risco.
+    tools:
+      - case-management
+      - aml-platform
+      - notification-system
+      - reporting-dashboard
+  devsecops:
+    prose: |
+      **Automacao de prazos:**
+      1. Testes de calculo de prazo: garantir que dias uteis sao calculados
+         corretamente (excluindo finais de semana e feriados nacionais).
+      2. Testes de notificacao: verificar que alertas de prazo sao enviados
+         nos momentos corretos.
+      3. Testes de escalacao: verificar que casos expirados sao escalados
+         automaticamente.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - calendar-integration
+  secops:
+    prose: |
+      **KPIs de cumprimento de prazos:**
+      1. Percentual de comunicacoes COAF dentro do prazo por categoria (1d, 3d, 10d).
+      2. Tempo medio de analise por nivel de urgencia.
+      3. Numero de casos com prazo estourado por periodo (zero tolerancia).
+      4. Auditoria trimestral: verificar que todos os casos urgentes foram
+         classificados e tratados corretamente.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-27", "art-28"]
+    relationship: equivalent-to

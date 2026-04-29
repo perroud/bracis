@@ -1,0 +1,84 @@
+id: po-5
+family: po
+title: "Implement and Maintain Secure Environments for Software Development"
+class: SP800-218
+statement:
+  prose: >-
+    Ensure that all components of the environments for software development are strongly
+    protected from internal and external threats to prevent compromises of the environments,
+    the software being developed or maintained within them, or the tools and processes used.
+  parts:
+    - id: po-5_smt.a
+      label: "a."
+      prose: >-
+        Separate and protect each environment involved in software development, including build
+        environments, test environments, staging environments, and distribution environments.
+    - id: po-5_smt.b
+      label: "b."
+      prose: >-
+        Secure and harden all build systems, CI/CD infrastructure, artifact repositories, and
+        code repositories to prevent unauthorized access and tampering.
+    - id: po-5_smt.c
+      label: "c."
+      prose: >-
+        Implement and maintain logging and monitoring for all development environments to detect
+        and respond to anomalous activity, unauthorized access attempts, and potential compromises.
+guidance:
+  prose: >-
+    Compromised development environments can introduce vulnerabilities, backdoors, or malicious
+    code into software without detection. The SolarWinds attack demonstrated how attackers can
+    target build environments to compromise software at scale. Development environments should
+    be treated with the same rigor as production environments, with strong access controls,
+    network segmentation, endpoint protection, and continuous monitoring. Build environments
+    should be ephemeral where possible, reducing the attack surface. Secrets used in development
+    environments (API keys, signing keys, credentials) must be managed securely using dedicated
+    secret management solutions.
+references:
+  - citation: "NIST SP 800-218 Section 2.1"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "SLSA Build Requirements"
+    url: "https://slsa.dev/spec/v1.0/requirements"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement ephemeral, hermetic build environments that are provisioned fresh for each build
+      and destroyed afterward. Use hardened base images for CI/CD runners and enforce image
+      provenance verification. Segment development, staging, and production networks with strict
+      firewall rules. Centralize secret management through a dedicated vault solution with
+      just-in-time credential provisioning. Implement infrastructure-as-code for all development
+      environment provisioning, ensuring configurations are auditable and reproducible.
+    tools:
+      - "HashiCorp Vault"
+      - "Kubernetes Namespaces (isolation)"
+      - "GitLab Runner (ephemeral)"
+      - "Tekton Pipelines (hermetic builds)"
+      - "Falco (runtime security)"
+      - "Terraform / Pulumi"
+  devsecops:
+    prose: >-
+      Enforce that all CI/CD runners use hardened, approved base images with automated rotation.
+      Implement pipeline-level secret injection that never exposes secrets in logs or artifacts.
+      Configure build environments as ephemeral containers that cannot persist state between
+      builds. Enforce network policies that restrict build environment egress to approved
+      registries and endpoints only. Implement build provenance generation (SLSA) to attest
+      that builds occurred in trusted environments.
+    tools:
+      - "GitLab CI/CD (protected environments)"
+      - "Docker-in-Docker (isolated builds)"
+      - "Cosign / SLSA Provenance"
+      - "Cilium / Calico (network policies)"
+      - "GitLeaks (secret detection)"
+      - "HashiCorp Vault Agent"
+  secops:
+    prose: >-
+      Monitor development environment infrastructure for indicators of compromise, including
+      unauthorized access, configuration changes, and anomalous network traffic. Implement
+      intrusion detection for build systems and artifact repositories. Audit access logs for
+      CI/CD systems, code repositories, and secret management solutions. Conduct periodic
+      security assessments of development infrastructure and respond to findings promptly.
+    tools:
+      - "SIEM (Splunk, Elastic Security)"
+      - "Falco (runtime detection)"
+      - "GitLab Audit Events"
+      - "Wazuh (HIDS)"
+      - "CrowdStrike / SentinelOne"

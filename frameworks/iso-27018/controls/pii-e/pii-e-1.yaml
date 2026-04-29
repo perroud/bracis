@@ -1,0 +1,95 @@
+id: pii-e.1
+family: pii-e
+title: "Transparency of PII processing and sub-processor disclosure"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall disclose to the cloud service customer
+    the identity, location, and processing activities of any sub-processors used
+    in the provision of the cloud service. The public cloud PII processor shall
+    inform the cloud service customer in advance of any intended changes concerning
+    the addition or replacement of sub-processors, giving the customer the
+    opportunity to object. The public cloud PII processor shall disclose the
+    countries and, where applicable, specific geographic locations where PII may
+    be processed, including locations used by sub-processors.
+
+guidance:
+  prose: >-
+    Transparency is essential for the cloud service customer to fulfill its own
+    obligations as PII controller. The customer must know the complete processing
+    chain: who processes the PII, where they are located, and what processing
+    activities they perform. This information enables the customer to conduct risk
+    assessments, ensure adequate safeguards for cross-border transfers, and respond
+    accurately to PII principal inquiries. The advance notification of sub-processor
+    changes with an objection mechanism gives the customer control over its
+    processing chain. If the customer objects, the processor should either refrain
+    from using the new sub-processor or provide the customer with a mechanism to
+    terminate the service without penalty. Geographic disclosure must be specific
+    enough to determine applicable legal jurisdictions.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.5"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a public sub-processor registry that customers can query via API
+      and web portal. Include sub-processor identity, geographic location (country
+      and region), processing activities, and PII categories accessed. Implement
+      change notification workflows that automatically notify affected customers
+      when sub-processor changes are proposed, with a configurable objection
+      period. Build data residency dashboards that show customers exactly where
+      their PII is stored and processed in real time. Implement geographic
+      fencing controls that technically enforce PII processing restrictions to
+      disclosed locations.
+    tools:
+      - sub-processor-registry-api
+      - change-notification-service
+      - data-residency-dashboard
+      - geographic-fencing
+      - customer-notification-api
+      - objection-workflow
+
+  devsecops:
+    prose: >-
+      Integrate sub-processor transparency into the deployment pipeline.
+      Infrastructure-as-code must declare the geographic locations of all
+      deployed services, and CI gates should validate these match the disclosed
+      locations. Any deployment to a new region must trigger the sub-processor
+      change notification workflow before proceeding. Build automated tests
+      that verify PII does not flow to undisclosed geographic locations. Include
+      sub-processor disclosure verification in the release checklist.
+    tools:
+      - gitlab-ci
+      - terraform
+      - pulumi
+      - region-disclosure-validator
+      - geo-routing-tests
+      - deployment-location-gates
+
+  secops:
+    prose: >-
+      Monitor for PII processing in undisclosed locations. Build network-level
+      detection for PII data flows to geographic regions not listed in the
+      sub-processor registry. Track sub-processor change notifications and
+      verify customer acknowledgment or objection handling. Audit sub-processor
+      compliance with contractual requirements. Monitor for shadow sub-processors
+      (third-party services receiving PII that are not in the registry).
+      Generate quarterly transparency reports for customer review.
+    tools:
+      - splunk
+      - elastic-siem
+      - geo-flow-monitoring
+      - sub-processor-compliance-audit
+      - shadow-processor-detection
+      - transparency-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-13", "art-14", "art-28.2"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.3.2", "b-8.5.1"]
+    relationship: complements

@@ -1,0 +1,144 @@
+id: sc-7
+family: sc
+title: "Boundary Protection"
+class: SP800-53
+baselines: [low, moderate, high]
+statement:
+  prose: >-
+    a. Monitor and control communications at the external managed interfaces to the system
+       and at key internal managed interfaces within the system;
+    b. Implement subnetworks for publicly accessible system components that are [Selection:
+       physically; logically] separated from internal organizational networks; and
+    c. Connect to external networks or systems only through managed interfaces consisting
+       of boundary protection devices arranged in accordance with an organizational security
+       and privacy architecture.
+  parts:
+    - id: sc-7_smt.a
+      label: "a."
+      prose: >-
+        Monitor and control communications at the external managed interfaces to the system
+        and at key internal managed interfaces within the system;
+    - id: sc-7_smt.b
+      label: "b."
+      prose: >-
+        Implement subnetworks for publicly accessible system components that are [Selection:
+        physically; logically] separated from internal organizational networks; and
+    - id: sc-7_smt.c
+      label: "c."
+      prose: >-
+        Connect to external networks or systems only through managed interfaces consisting of
+        boundary protection devices arranged in accordance with an organizational security
+        and privacy architecture.
+guidance:
+  prose: >-
+    Managed interfaces include gateways, routers, firewalls, guards, network-based malicious
+    code analysis, virtualization systems, or encrypted tunnels implemented within a security
+    architecture. Subnetworks that are physically or logically separated from internal networks
+    are referred to as demilitarized zones or DMZs. Restricting or prohibiting interfaces within
+    organizational systems includes restricting external web traffic to designated web servers
+    within managed interfaces, prohibiting external traffic that appears to be spoofing internal
+    addresses, and restricting information system access to specific IP addresses or ranges of
+    addresses. Organizations consider the shared nature of commercial telecommunications in the
+    implementation of security controls associated with the use of such services. Commercial
+    telecommunications services are commonly based on network components and consolidated
+    management systems shared by all attached commercial customers and may also include third-party
+    provided access lines and other service elements. Such services may therefore represent sources
+    of increased risk despite contractual agreements with telecommunications providers. Organizations
+    consider concepts such as zero trust and micro-segmentation as part of boundary protection strategies.
+enhancements:
+  - id: sc-7.3
+    title: "Access Points"
+    baselines: [moderate, high]
+  - id: sc-7.4
+    title: "External Telecommunications Services"
+    baselines: [moderate, high]
+  - id: sc-7.5
+    title: "Deny by Default — Allow by Exception"
+    baselines: [moderate, high]
+  - id: sc-7.7
+    title: "Split Tunneling for Remote Devices"
+    baselines: [moderate, high]
+  - id: sc-7.8
+    title: "Route Traffic to Authenticated Proxy Servers"
+    baselines: [moderate, high]
+  - id: sc-7.9
+    title: "Restrict Threatening Outgoing Communications Traffic"
+    baselines: []
+  - id: sc-7.10
+    title: "Prevent Exfiltration"
+    baselines: []
+  - id: sc-7.11
+    title: "Restrict Incoming Communications Traffic"
+    baselines: []
+  - id: sc-7.18
+    title: "Fail Secure"
+    baselines: [high]
+  - id: sc-7.21
+    title: "Isolation of System Components"
+    baselines: [high]
+  - id: sc-7.24
+    title: "Personally Identifiable Information"
+    baselines: []
+  - id: sc-7.25
+    title: "Unclassified Telecommunications Systems — External Network Boundaries"
+    baselines: []
+  - id: sc-7.29
+    title: "Separate Subnets to Isolate Functions"
+    baselines: []
+references:
+  - citation: "NIST SP 800-41 Rev. 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-41r1"
+  - citation: "NIST SP 800-77 Rev. 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-77r1"
+  - citation: "NIST SP 800-189"
+    url: "https://doi.org/10.6028/NIST.SP.800-189"
+  - citation: "NIST SP 800-207"
+    url: "https://doi.org/10.6028/NIST.SP.800-207"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using Kubernetes NetworkPolicies with default-deny ingress
+      and egress rules per namespace. Deploy a service mesh (Istio, Linkerd) for workload-to-workload
+      mTLS and authorization policies. Use cloud VPCs with private subnets for internal services
+      and public subnets only for load balancers and ingress controllers. Implement Web Application
+      Firewalls (WAF) at ingress points. Use cloud-native firewalls (Security Groups, NSGs) as the
+      first layer of defense. Deploy API gateways for all external-facing services with rate limiting,
+      authentication, and input validation. Implement zero-trust network architecture where every
+      connection is authenticated and authorized regardless of network location.
+    tools:
+      - "Kubernetes NetworkPolicy"
+      - "Istio / Linkerd (service mesh)"
+      - "Cloud VPC / Subnets"
+      - "WAF (AWS WAF, Cloudflare, ModSecurity)"
+      - "Ingress controllers (NGINX, Envoy)"
+      - "Calico / Cilium (network policy enforcement)"
+      - "API Gateway (Kong, Ambassador)"
+  devsecops:
+    prose: >-
+      Define network boundaries as code using Terraform for cloud network infrastructure and
+      Kubernetes manifests for cluster-level segmentation. Validate network configurations in
+      CI/CD pipelines using policy-as-code tools. Scan for exposed services and open ports as
+      part of the deployment pipeline. Implement DAST scanning that tests boundary protection
+      effectiveness from an external perspective. Enforce that all network configuration changes
+      go through merge request review with security approval.
+    tools:
+      - "Terraform (VPC, Security Groups, NSGs)"
+      - "Kubernetes NetworkPolicy manifests"
+      - "Checkov / tfsec (network policy validation)"
+      - "GitLab DAST"
+      - "Nuclei (external exposure scanning)"
+      - "GitLab Container Scanning"
+  secops:
+    prose: >-
+      Monitor network boundaries using intrusion detection/prevention systems (IDS/IPS) and
+      network traffic analysis. Detect and alert on unauthorized lateral movement, data exfiltration
+      attempts, and command-and-control communications. Implement DNS monitoring for malicious
+      domain resolution. Conduct regular network penetration testing to validate boundary protection
+      effectiveness. Monitor cloud security group and network ACL changes for unauthorized modifications.
+    tools:
+      - "IDS/IPS (Suricata, Snort, AWS Network Firewall)"
+      - "Network traffic analysis (Zeek, Darktrace)"
+      - "DNS monitoring (Cisco Umbrella, DNSFilter)"
+      - "Cloud network flow logs (VPC Flow Logs)"
+      - "SIEM (network event correlation)"
+      - "Penetration testing tools"

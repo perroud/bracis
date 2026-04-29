@@ -1,0 +1,122 @@
+id: owasp-a10
+family: a10
+title: "A10:2021 — Server-Side Request Forgery (SSRF)"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Server-Side Request Forgery (SSRF) flaws occur whenever a web application fetches a remote
+    resource without validating the user-supplied URL. It allows an attacker to coerce the
+    application to send a crafted request to an unexpected destination, even when protected by
+    a firewall, VPN, or another type of network access control list. As modern web applications
+    provide end-users with convenient features, fetching a URL becomes a common scenario. As a
+    result, the incidence of SSRF is increasing. Also, the severity of SSRF is becoming higher
+    due to cloud services and the complexity of architectures. Successful exploitation of SSRF
+    can allow attackers to scan and map internal network services that are not otherwise accessible,
+    access cloud provider metadata APIs (AWS IMDS, GCP metadata server) to steal IAM credentials,
+    bypass authentication mechanisms on internal services, read local files using file:// scheme,
+    and achieve remote code execution through access to internal management interfaces.
+
+guidance:
+  prose: >-
+    SSRF was added to the OWASP Top 10 in 2021 through community data analysis, reflecting its
+    increasing prevalence and severity in cloud-native architectures. In a cloud environment,
+    SSRF is particularly dangerous because the cloud provider metadata API (http://169.254.169.254
+    on AWS, Azure, GCP) is accessible from any cloud instance and returns IAM credentials that
+    grant access to the cloud account. The Capital One breach in 2019 was executed through an
+    SSRF vulnerability that allowed the attacker to query the AWS metadata endpoint and steal
+    IAM credentials. Prevention requires a defense-in-depth approach: sanitize and validate all
+    client-supplied input URLs against an allowlist of expected destinations and protocols; disable
+    HTTP redirects that could redirect to internal resources; do not return raw responses from
+    fetched URLs to clients; and isolate the URL-fetching functionality in a network segment with
+    no access to internal services or cloud metadata endpoints.
+
+references:
+  - citation: "OWASP Top 10:2021 A10 Server-Side Request Forgery"
+    url: "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/"
+  - citation: "OWASP SSRF Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"
+  - citation: "AWS SSRF Protection — IMDSv2"
+    url: "https://aws.amazon.com/blogs/security/defense-in-depth-open-firewalls-reverse-proxies-ssrf-vulnerabilities-ec2-instance-metadata-service/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce IMDSv2 (Instance Metadata Service Version 2) on all AWS EC2 instances to require
+      session-oriented authentication for metadata requests, significantly raising the bar for
+      SSRF-based metadata credential theft. Apply the equivalent protection on GCP (disable legacy
+      metadata endpoints) and Azure (use IMDS with Managed Identity properly scoped). Implement
+      Kubernetes Network Policies and service mesh egress controls that restrict which services
+      can make external HTTP requests and to which destinations — services that do not need to
+      make external requests should be blocked from doing so by network policy. Deploy an egress
+      proxy (Squid, Envoy, Cloudflare Gateway) as the single egress point for all external HTTP
+      requests from application services, implementing URL allowlisting at the proxy. Isolate
+      URL-fetching services (webhook processors, link previewers, PDF generators) in their own
+      network segment with explicit egress rules that block access to RFC 1918 (private) IP ranges
+      and cloud metadata IP addresses.
+    tools:
+      - aws-imdsv2
+      - kubernetes-network-policy
+      - istio
+      - linkerd
+      - envoy
+      - cloudflare-gateway
+      - opa
+
+  devsecops:
+    prose: >-
+      Implement SAST rules to detect patterns where user-supplied URLs are used in HTTP client
+      calls without allowlist validation: identify uses of HTTP clients (requests, axios, curl,
+      HttpClient, URLConnection) with parameters derived from user input. Mandate URL allowlisting
+      for any feature that fetches external URLs: implement a URL validator that resolves the URL
+      and verifies both the scheme (https only) and the resolved IP against an allowlist — check
+      after DNS resolution because DNS rebinding can bypass hostname-based checks. Test for SSRF
+      in DAST scans by submitting URLs pointing to internal resources: http://localhost:8080,
+      http://169.254.169.254/latest/meta-data/, http://10.0.0.1, and internal service addresses.
+      Verify that all URL inputs have scheme enforcement (reject file://, gopher://, dict://,
+      ftp:// schemes). Implement redirect following limits and validate the final destination
+      after all redirects.
+    tools:
+      - semgrep
+      - burp-suite
+      - owasp-zap
+      - nuclei
+      - gitlab-sast
+      - codeql
+
+  secops:
+    prose: >-
+      Monitor egress traffic from application services for connections to RFC 1918 IP ranges
+      (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), link-local addresses (169.254.0.0/16 — the
+      cloud metadata endpoint range), and localhost (127.0.0.0/8) — these represent likely SSRF
+      exploitation attempts. Configure WAF rules to detect and block SSRF payloads in URL parameters
+      and request bodies (patterns targeting metadata endpoints, localhost, internal domain names).
+      Alert on successful AWS CloudTrail API calls made using instance profile credentials from
+      unexpected source IP addresses or regions — this indicates potential SSRF-based credential
+      theft. Monitor cloud metadata service access logs (when available) for anomalous access
+      patterns. Implement network flow analysis to detect SSRF enumeration: sequential HTTP
+      requests to different internal IP addresses from a single application instance.
+    tools:
+      - cloudflare-waf
+      - aws-waf
+      - aws-guardduty
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - falco
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SC-7", "CA-3"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4", "1.3.2"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V10.3.2", "V10.3.3"]
+    relationship: mapped
+  - framework_id: cis-controls-v8
+    articles: ["13.1", "13.2"]
+    relationship: mapped

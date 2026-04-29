@@ -1,0 +1,102 @@
+id: art-14
+family: cap-3
+title: "Atualizacao Cadastral e Encerramento de Relacao de Negocio"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 14. As instituições de pagamento devem manter os dados cadastrais de seus
+    clientes atualizados, observando:
+
+    I - prazo de atualização compatível com o nível de risco do cliente: menor
+    prazo para clientes de alto risco e maior prazo para clientes de baixo risco;
+
+    II - procedimentos de coleta de informações atualizadas sobre a situação
+    econômica e financeira do cliente, incluindo fonte de renda e patrimônio;
+
+    III - verificação periódica da continuidade das condições que levaram
+    à classificação de risco do cliente.
+
+    Parágrafo único. A instituição de pagamento pode encerrar a relação de negócio
+    com o cliente que não atualizar seus dados cadastrais no prazo estabelecido,
+    devendo adotar os procedimentos previstos na política de PLD/FT para essa situação,
+    incluindo a avaliação da necessidade de comunicação ao COAF antes do encerramento.
+guidance:
+  prose: |
+    O art. 14 encerra o ciclo de vida do KYC: o cadastro nao e apenas coletado
+    no onboarding, mas mantido vivo durante todo o relacionamento.
+
+    **Prazos de atualizacao por nivel de risco (recomendacao de mercado):**
+    - Alto risco (PEP, offshore, setores de risco): 12 meses
+    - Medio risco: 24 meses
+    - Baixo risco: 36-48 meses (ou quando houver mudanca relevante)
+
+    **O que deve ser atualizado:**
+    - Dados de contato (endereco, telefone, email)
+    - Atividade economica e fonte de renda
+    - Composicao societaria e beneficiario final (para PJ)
+    - Status de PEP
+    - Situacao em listas de sancoes
+
+    **Encerramento por falta de atualizacao (paragrafo unico):**
+    Antes de encerrar, a IP deve avaliar se o encerramento em si deve ser
+    comunicado ao COAF -- especialmente se o motivo do encerramento estiver
+    relacionado a suspeita de lavagem de dinheiro. Encerrar a conta de um
+    suspeito sem comunicar o COAF pode ser considerado cumplicidade.
+
+    **Best practice:**
+    Nao encerrar abruptamente. Fluxo: notificacao → prazo de resposta →
+    restricao de funcionalidades → encerramento → avaliacao de comunicacao COAF.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Ciclo de vida do cadastro:**
+      1. Calcular proximo prazo de atualizacao por cliente no momento do
+         onboarding, baseado na classificacao de risco.
+      2. Campanhas automaticas de recadastramento: notificacao 90, 60, 30 e 7
+         dias antes do vencimento via email, push notification, SMS.
+      3. Self-service de atualizacao cadastral: portal ou app onde o cliente
+         pode atualizar dados com verificacao automatica.
+      4. Restricao progressiva: conta com cadastro vencido tem funcionalidades
+         limitadas (apenas consulta, sem movimentacao acima de limite).
+      5. Encerramento assistido: fluxo que avalia, antes de encerrar, se ha
+         sinais de suspeita que exijam comunicacao ao COAF.
+    tools:
+      - kyc-platform
+      - notification-system
+      - payment-core
+      - grc-platform
+  devsecops:
+    prose: |
+      **Automacao do ciclo de vida:**
+      1. Job agendado (cron) diario para calcular clientes com atualizacao vencida
+         ou proxima do vencimento.
+      2. Testes do fluxo de restricao progressiva: garantir que restricoes
+         corretas sao aplicadas em cada fase.
+      3. Testes do fluxo de encerramento: verificar que checklist de avaliacao
+         COAF e executado antes do encerramento.
+      4. Monitoramento de falha nos jobs de calculo de vencimento (alertar
+         imediatamente em caso de falha silenciosa).
+    tools:
+      - gitlab-ci
+      - job-scheduler
+      - test-automation
+  secops:
+    prose: |
+      **KPIs de atualizacao cadastral:**
+      1. Percentual de clientes com cadastro vigente por nivel de risco.
+      2. Numero de clientes em fase de restricao por falta de atualizacao.
+      3. Numero de encerramentos por falta de atualizacao por mes.
+      4. Numero de comunicacoes ao COAF derivadas de encerramentos.
+      5. Tempo medio de conclusao de atualizacao cadastral quando solicitada.
+    tools:
+      - reporting-dashboard
+      - aml-platform
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-13"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

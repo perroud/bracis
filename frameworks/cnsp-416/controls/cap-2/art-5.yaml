@@ -1,0 +1,132 @@
+id: art-5
+family: cap-2
+title: "Segregacao de Funcoes"
+class: CNSP-416
+baselines: [todas-supervisionadas]
+statement:
+  prose: |
+    Art. 5. O SCI deve contemplar segregação de funções destinada a evitar que uma
+    única pessoa ou área controle todas as etapas de um processo, de forma a prevenir
+    erros e fraudes.
+
+    § 1. A segregação de funções deve ser implementada especialmente:
+    I - entre as áreas que originam transações e as que as registram;
+    II - entre as áreas que custodiam ativos e as que os contabilizam;
+    III - entre as áreas operacionais e as áreas de controle;
+    IV - entre as áreas que aprovam e as que executam operações.
+
+    § 2. Onde a segregação plena não for praticável em razão do porte da supervisionada,
+    devem ser adotados controles compensatórios documentados e aprovados pela diretoria.
+guidance:
+  prose: |
+    O art. 5 e o artigo de segregacao de funcoes (SoD — Segregation of Duties). O principio
+    e evitar que uma unica pessoa ou area controle TODO o ciclo de uma operacao critica.
+
+    **Por que SoD e fundamental:**
+    A maioria das fraudes corporativas ocorre quando uma pessoa tem controle de ponta a ponta.
+    Ex: o mesmo funcionario que emite a apolice, coleta o premio e registra na contabilidade
+    pode desviar recursos sem ser detectado.
+
+    **Quatro pares de funcoes conflitantes (ss 1):**
+
+    **I - Originacao vs. registro:**
+    Quem cria a transacao nao pode ser quem a registra nos livros. Ex: o subscritor que
+    aceita o risco nao pode registrar o premio na contabilidade.
+
+    **II - Custodia vs. contabilizacao:**
+    Quem gerencia os investimentos nao pode ser quem contabiliza os ativos. Ex: o gestor
+    de carteira nao pode registrar os lancamentos contabeis dos investimentos.
+
+    **III - Operacional vs. controle:**
+    Quem executa as operacoes nao pode ser quem controla sua qualidade. Ex: o analista de
+    sinistros nao pode ser o aprovador de sinistros.
+
+    **IV - Aprovacao vs. execucao:**
+    Quem autoriza uma operacao nao pode ser quem a executa. Ex: quem aprova o pagamento
+    de sinistro nao pode ser quem efetua o pagamento.
+
+    **Controles compensatorios (ss 2):**
+    Para entidades menores onde SoD plena nao e viavel (ex: corretora com 5 funcionarios),
+    controles compensatorios aceitaveis incluem: supervisao direta do diretor, reconciliacoes
+    por terceiro independente, auditoria mais frequente das areas sem SoD.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Segregacao tecnica de funcoes:**
+      1. Implementar RBAC (Role-Based Access Control) granular em todos os sistemas
+         criticos, impedindo tecnicamente o acumulo de funcoes conflitantes.
+      2. Matriz de segregacao de funcoes (SoD matrix) implementada no sistema de IAM
+         com blocking e alerting automatico.
+      3. Workflows de aprovacao multi-nivel para operacoes criticas (nao basta politica
+         — o sistema deve impedir fisicamente a execucao sem aprovacao).
+      4. Dual control para operacoes de alto risco (ex: transferencias acima de X,
+         cancelamento de sinistros, alteracao de beneficiarios).
+
+      **Sistemas de custodiar ativos:**
+      5. Segregacao tecnica entre sistemas de custodiar investimentos (custodia) e
+         sistemas de contabilidade (registro).
+      6. Reconciliacoes automatizadas diarias entre custodia e contabilidade.
+      7. Acesso segregado: gestor de investimentos nao pode alterar registros contabeis.
+
+      **Controles compensatorios:**
+      8. Para entidades menores: enhanced monitoring automatizado quando segregacao
+         plena nao e possivel.
+      9. Compensating controls dashboard: mostra quais SoD conflicts existem e quais
+         controles compensatorios estao ativos.
+    tools:
+      - iam-platform
+      - grc-platform
+      - sod-matrix
+      - workflow-engine
+      - reconciliation-system
+  devsecops:
+    prose: |
+      **Segregacao no pipeline de desenvolvimento:**
+      1. Branches protegidas: desenvolvedor nao pode fazer merge do proprio codigo
+         sem aprovacao de outro desenvolvedor (code review obrigatorio).
+      2. CODEOWNERS: donos de arquivos criticos definidos explicitamente.
+      3. Aprovadores diferentes do autor do MR (prevent_approval_by_author = true).
+      4. Ambientes de producao: deploy requer aprovacao separada da equipe de infraestrutura.
+
+      **IAM no ciclo de desenvolvimento:**
+      5. Privileged Access Management (PAM) para acesso a producao.
+      6. Just-in-time access: acesso a producao concedido apenas quando necessario.
+      7. Audit trail completo de quem aprovou o que no pipeline.
+      8. Separation: quem escreve o codigo nao pode aprovar o deploy em producao.
+    tools:
+      - gitlab-ci
+      - iam-platform
+      - pam-solution
+      - audit-logging
+  secops:
+    prose: |
+      **Gestao da segregacao de funcoes:**
+      1. Mapeamento completo de todos os processos criticos que exigem SoD.
+      2. SoD matrix: funcoes conflitantes identificadas para cada sistema.
+      3. Revisao semestral de conflitos de SoD: usuarios que acumulam funcoes indevidas.
+      4. Processo formal de excecao para SoD conflicts necessarios com controles
+         compensatorios documentados e aprovados.
+
+      **Controles compensatorios (ss 2):**
+      5. Inventario de controles compensatorios com justificativa, responsavel e prazo.
+      6. Aprovacao formal da diretoria para cada controle compensatorio adotado.
+      7. Teste periodico da efetividade dos controles compensatorios.
+      8. Reducao gradual de conflitos de SoD conforme crescimento da entidade.
+    tools:
+      - iam-platform
+      - grc-platform
+      - sod-matrix
+      - audit-logging
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-6"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-5", "AC-6", "PS-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.3", "A.8.2"]
+    relationship: supports
+  - framework_id: cobit-2019
+    articles: ["APO01.02", "DSS06.03"]
+    relationship: supports

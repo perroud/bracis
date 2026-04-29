@@ -1,0 +1,93 @@
+id: cls8.2
+family: cls8
+title: "Removal of cloud service customer assets"
+class: ISO27017
+
+statement:
+  prose: >-
+    Upon termination of a cloud service agreement, the cloud service
+    customer's data and any copies of that data shall be securely erased
+    or returned to the cloud service customer in a timely manner. The
+    cloud service provider shall provide the cloud service customer with
+    the ability to determine whether all copies of data have been removed.
+    The cloud service provider shall inform the cloud service customer
+    about any residual data that may exist in backups or archives and
+    specify the retention periods and deletion procedures for such data.
+
+guidance:
+  prose: >-
+    Data removal in cloud environments is more complex than in traditional
+    environments due to data replication, backup systems, content delivery
+    caches, and the use of shared storage infrastructure. The cloud
+    service provider should provide documented procedures for data
+    deletion that cover all locations where customer data may reside,
+    including primary storage, backups, disaster recovery sites, logs,
+    and temporary processing caches. Cryptographic erasure, where
+    encryption keys are destroyed rendering the encrypted data
+    unrecoverable, may be an acceptable alternative to physical
+    deletion in some cases. The cloud service customer should verify
+    data deletion through audit reports or attestations from the
+    cloud service provider.
+
+references:
+  - citation: "ISO/IEC 27017:2015, Section 8.1.5"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated data lifecycle management policies that define
+      retention periods and deletion procedures for all cloud-stored data.
+      Use cloud-native data lifecycle features such as object storage
+      lifecycle policies, database retention policies, and automated
+      backup expiration. Implement cryptographic erasure capabilities
+      where customer data is encrypted with customer-managed keys that
+      can be destroyed to render data unrecoverable. Provide self-service
+      tools for data export and deletion that cover all data storage
+      locations.
+    tools:
+      - terraform
+      - aws-s3-lifecycle
+      - azure-blob-lifecycle
+      - vault
+
+  devsecops:
+    prose: >-
+      Implement automated tests that verify data deletion procedures
+      work correctly across all storage layers. Include data lifecycle
+      validation in deployment pipelines to ensure that provisioned
+      storage resources have appropriate retention and deletion policies
+      configured. Build data export APIs that allow customers to
+      retrieve their data in standard, portable formats before
+      service termination.
+    tools:
+      - gitlab-ci
+      - checkov
+      - terraform
+      - custom-scripts
+
+  secops:
+    prose: >-
+      Monitor data deletion operations to verify they complete
+      successfully across all storage locations. Audit cloud service
+      provider data deletion certificates and attestations upon
+      service termination. Track data residuals in backup systems
+      and verify they are purged according to the documented retention
+      schedule. Alert when data retention periods expire without
+      corresponding deletion actions being completed.
+    tools:
+      - splunk
+      - aws-cloudtrail
+      - prisma-cloud
+      - elastic-siem
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.10", "a8.10"]
+    relationship: derived-from
+  - framework_id: iso-27018
+    articles: ["a11.1"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["dsp-17"]
+    relationship: complements

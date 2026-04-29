@@ -1,0 +1,124 @@
+id: stig-cat2-access-control
+family: cat-ii
+title: "Access Control and Identity Management"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must enforce least-privilege access control, granting users and
+    processes only the permissions required to perform authorized functions.
+    Privileged access must be limited to the minimum number of accounts
+    necessary and must be distinct from unprivileged user accounts — individuals
+    who require both privileged and unprivileged access must use separate accounts
+    for each role. The system must implement role-based access control (RBAC)
+    with documented role definitions. Access control lists and role assignments
+    must be reviewed at least annually and whenever personnel change. Privileged
+    access to production systems must be logged, monitored, and require approval
+    through a privileged access management (PAM) solution. Unused accounts must
+    be disabled within 35 days of inactivity.
+
+guidance:
+  prose: >-
+    Overly permissive access control is a persistent finding in DoD system
+    assessments. The principle of least privilege limits the blast radius of
+    a compromise — an attacker who gains access to an unprivileged account
+    should not be able to access administrative functions or sensitive data
+    without additional exploitation steps, each of which creates a detectable
+    event in audit logs.
+
+    STIG reviewers evaluate access control by examining the actual permission
+    configurations (not just documented intent), testing whether standard users
+    can access administrative interfaces, and verifying that privileged account
+    separation is enforced at the technical level, not just through policy.
+    Reviewers also check for dormant accounts, which often retain full access
+    long after the associated individual has left the organization or changed
+    roles.
+
+    In cloud environments, access control reviews must include IAM policies,
+    service account bindings, and resource-based policies (S3 bucket policies,
+    Azure resource locks), not just OS-level accounts.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AC-2, AC-3, AC-6, AC-17"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA STIG — General Purpose Operating System SRG, V1R14, SV-204438"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "DoD CIO — Zero Trust Reference Architecture v2.0"
+    url: "https://dodcio.defense.gov/Portals/0/Documents/Library/(U)ZT_RA_v2.0(U)_Sep22.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement RBAC across all platform layers: Kubernetes RBAC with
+      namespace-scoped roles, cloud IAM with attribute-based access control
+      (ABAC) for resource-level permissions, and database-level roles with
+      schema-specific grants. Use a PAM solution (CyberArk, BeyondTrust) for
+      all privileged access to production systems, requiring explicit checkout
+      of credentials, session recording, and just-in-time (JIT) privilege
+      elevation. Enforce account inactivity monitoring with automated disabling
+      after 35 days using identity governance tooling. Implement Kubernetes
+      Network Policies and security policies (OPA/Gatekeeper) to enforce
+      workload-level access control. Run scheduled access reviews by integrating
+      the IdP with governance tools that generate recertification campaigns.
+    tools:
+      - keycloak
+      - cyberark
+      - beyondtrust
+      - opa-gatekeeper
+      - kyverno
+      - terraform
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce least privilege in CI/CD pipelines by scoping pipeline service
+      accounts to the minimum permissions required per stage. Scan Kubernetes
+      RBAC manifests and Terraform IAM policies in CI pipelines using policy-as-
+      code tools that flag wildcard permissions, cluster-admin bindings, and
+      overly broad IAM policies. Require code owner approval for changes to
+      access control configurations (RBAC manifests, IAM Terraform modules).
+      Implement drift detection that alerts when production access control
+      configurations diverge from the version-controlled baseline. Automate
+      privileged access review workflows by generating access reports from
+      the IdP as pipeline artifacts during scheduled compliance runs.
+    tools:
+      - gitlab-ci
+      - conftest
+      - opa
+      - checkov
+      - kyverno
+      - code-owners
+
+  secops:
+    prose: >-
+      Monitor privileged account activity in the SIEM with alerts for access
+      outside approved windows, access from unexpected locations, and use of
+      accounts not checked out through the PAM solution. Conduct quarterly
+      privileged access reviews and produce formal reports documenting the
+      review findings and remediation actions. Include access control
+      configuration in the vulnerability assessment scope. Maintain a
+      continuously updated inventory of all privileged accounts across all
+      system components as part of the account management process documented
+      in the SSP.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark
+      - sailpoint
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6", "AC-17", "AC-17(1)"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.5"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["ac-2", "ac-3", "ac-6"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-01", "PR.AA-03", "PR.AA-05", "PR.AA-06"]
+    relationship: supports

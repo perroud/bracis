@@ -1,0 +1,108 @@
+id: art-11
+family: cap-3
+title: "Identificacao e Qualificacao de Clientes"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 11. Os participantes devem adotar procedimentos que permitam identificar,
+    qualificar e classificar seus clientes.
+
+    § 1. Os procedimentos de identificação e qualificação devem incluir a
+    coleta, a verificação e a validação das seguintes informações:
+
+    I - para pessoas físicas: nome completo, número de CPF, data de nascimento,
+    nacionalidade, tipo e número do documento de identificação, endereço completo,
+    declaração de renda e patrimônio, e natureza e objetivo da relação de negócios;
+
+    II - para pessoas jurídicas: denominação social, número de CNPJ, endereço
+    da sede, lista dos representantes legais, atividade econômica principal e
+    secundária, declaração de faturamento, e natureza e objetivo da relação
+    de negócios.
+
+    § 2. Os procedimentos de que trata o caput devem ser realizados no início
+    da relação de negócios e atualizados periodicamente ou quando houver
+    mudança relevante no perfil do cliente.
+guidance:
+  prose: |
+    O KYC (Know Your Customer) e o pilar operacional mais importante da CVM 50.
+    Sem identificacao adequada, o monitoramento e sem sentido: nao e possivel
+    avaliar se uma transacao e suspeita sem saber quem e o cliente e qual seu
+    perfil de negocios legitimos.
+
+    **Dados minimos por tipo de cliente:**
+    Para PF: CPF + nome completo sao o nucleo, mas a declaracao de renda e
+    patrimonio e essencial para avaliar a proporcionalidade das operacoes.
+    Um cliente com renda declarada de R$ 5.000/mes que investe R$ 500.000
+    deve ser investigado.
+
+    Para PJ: CNPJ + razao social + atividade economica sao o nucleo. A atividade
+    economica e fundamental: uma empresa de cash-intensive (bares, postos de
+    combustivel, joalherias) tem perfil de risco diferente de uma empresa de
+    tecnologia.
+
+    **Verificacao vs. coleta:**
+    Nao basta coletar os dados — e necessario verificar sua autenticidade.
+    Para PF: confirmar CPF na Receita Federal, autenticar documento via OCR
+    com validacao de caracteristicas de seguranca.
+    Para PJ: confirmar CNPJ na Receita Federal, verificar registro na Junta
+    Comercial, confirmar representantes legais.
+
+    **Atualizacao periodica:**
+    A periodicidade depende do nivel de risco: clientes de alto risco devem
+    ser atualizados com maior frequencia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Formulario de KYC digital:**
+      1. Formulario onboarding adaptativo por tipo de pessoa (PF/PJ/ME/estrangeiro)
+         com campos obrigatorios por nivel de risco.
+      2. Validacao em tempo real de CPF/CNPJ via API da Receita Federal.
+      3. OCR de documentos (RG, CNH, CTPS, passaporte) com verificacao de
+         autenticidade e consistencia de dados.
+      4. Verificacao biometrica com liveness detection para onboarding digital.
+      5. Consulta automatica a fontes externas: SRF, Detran, cartorio,
+         bureaus de credito.
+
+      **Armazenamento seguro de KYC:**
+      6. Dados de KYC armazenados criptografados com chaves distintas por cliente.
+      7. Acesso a dados de KYC restrito a necessidade-de-saber com log de acesso.
+      8. Retencao de documentos de KYC por periodo regulatorio (minimo 10 anos
+         apos encerramento da relacao).
+    tools:
+      - kyc-platform
+      - ocr-engine
+      - biometric-verification
+      - data-encryption
+  devsecops:
+    prose: |
+      **Qualidade e seguranca dos dados de KYC:**
+      1. Testes end-to-end do fluxo de onboarding para cada tipo de cliente.
+      2. Testes de validacao de documentos: validos, expirados, adulterados.
+      3. Criptografia de dados sensiveis em transito (TLS 1.3) e repouso.
+      4. Mascaramento de CPF/CNPJ em logs e ambientes de desenvolvimento.
+      5. Secret scanning para credenciais de APIs de consulta externa.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - data-masking
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Auditoria de qualidade do KYC:**
+      1. Auditoria por amostragem de completude cadastral mensalmente.
+      2. Relatorio de clientes com cadastro incompleto ou desatualizado.
+      3. Processo de regularizacao de cadastros pendentes com prazo definido.
+      4. KPI: percentual de clientes com todos os campos obrigatorios preenchidos
+         e verificados.
+    tools:
+      - aml-platform
+      - data-quality
+      - audit-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-10", "art-11"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-18"]
+    relationship: complements

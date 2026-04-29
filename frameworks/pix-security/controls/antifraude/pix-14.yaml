@@ -1,0 +1,98 @@
+id: pix-14
+family: antifraude
+title: "Motor Antifraude Obrigatorio"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Todo PSP participante do arranjo Pix deve implementar e manter motor antifraude
+    operacional, capaz de analisar transações em tempo real antes da efetivação do
+    pagamento, considerando o perfil do usuário, histórico transacional, padrões de
+    comportamento, horário, valor, destinatário e demais variáveis de risco. O motor
+    antifraude deve ser capaz de bloquear, alertar ou exigir autenticação adicional
+    para transações classificadas como suspeitas.
+guidance:
+  prose: |
+    **Obrigatoriedade:**
+    O regulamento do Pix exige que todo participante possua motor antifraude operacional
+    como pre-requisito para adesao e permanencia no arranjo. Nao ha excecao por porte.
+
+    **Variaveis de analise (minimas):**
+    1. **Perfil do usuario:** Renda presumida, historico de transacoes, padroes habituais.
+    2. **Comportamento transacional:** Desvios de valor, frequencia e destinatarios.
+    3. **Contexto temporal:** Horario da transacao, dia da semana, concentracao.
+    4. **Dispositivo:** Device fingerprint, localizacao, mudanca de dispositivo recente.
+    5. **Destinatario:** Primeira transacao para a chave, chave recem-criada, PSP.
+    6. **Marcacoes do DICT:** Chaves ou contas com marcacao de fraude no DICT.
+
+    **Acoes do motor antifraude:**
+    - **Aprovar:** Transacao segue normalmente.
+    - **Alertar:** Transacao segue, mas gera alerta para analise posterior.
+    - **Step-up:** Solicita autenticacao adicional ao usuario.
+    - **Bloquear:** Transacao rejeitada, usuario notificado.
+    - **Reter:** Transacao pendente para analise manual (prazo maximo regulatorio).
+
+    **Marcacao de fraude no DICT:**
+    O PSP deve informar ao DICT chaves e contas envolvidas em fraudes confirmadas,
+    alimentando a base de inteligencia compartilhada do ecossistema Pix.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura do motor antifraude:**
+      1. Servico de analise de risco sincrono (latencia < 200ms) no fluxo de pagamento.
+      2. Pipeline de ML para modelos de deteccao de fraude (treinamento e inferencia).
+      3. Feature store com variaveis em tempo real (ultimas transacoes, device, geolocalizacao).
+      4. Regras estaticas configuraveis (limites por valor, horario, frequencia).
+
+      **Integracao com DICT:**
+      5. Consulta de marcacoes de fraude no DICT antes de efetivar pagamento.
+      6. API para registrar marcacoes de fraude confirmada no DICT.
+      7. Cache local de chaves marcadas com TTL alinhado ao SLA do DICT.
+
+      **Escalabilidade:**
+      8. Auto-scaling do servico antifraude para suportar picos de TPS.
+      9. Circuit breaker: se o motor antifraude estiver indisponivel, aplicar regras
+         conservadoras (limites reduzidos).
+    tools:
+      - ml-platform
+      - feature-store
+      - rules-engine
+      - api-gateway
+      - redis
+  devsecops:
+    prose: |
+      **Desenvolvimento e teste do motor:**
+      1. Dataset de teste com cenarios de fraude conhecidos para validacao de regras.
+      2. A/B testing de modelos de ML com metricas de precision e recall.
+      3. Testes de latencia: motor antifraude deve responder em < 200ms (p99).
+      4. Testes de fallback: comportamento quando motor antifraude esta indisponivel.
+      5. Versionamento de modelos e regras com rollback automatico.
+    tools:
+      - ml-pipeline
+      - gitlab-ci
+      - load-testing
+      - model-registry
+  secops:
+    prose: |
+      **Operacao antifraude:**
+      1. Time de analise de fraude (fraud analysts) com acesso ao motor e aos alertas.
+      2. Fila de alertas com priorizacao por score de risco.
+      3. SLA de analise: alertas de alto risco em ate 4 horas.
+      4. Metricas operacionais: taxa de falso positivo, falso negativo, tempo de analise.
+      5. Relatorio mensal de fraudes detectadas, bloqueadas e confirmadas.
+      6. Compartilhamento de inteligencia de fraude com outros PSPs via DICT.
+    tools:
+      - fraud-detection-platform
+      - case-management
+      - siem
+      - analytics-dashboard
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3", "art-7"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-1", "art-2"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

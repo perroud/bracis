@@ -1,0 +1,98 @@
+id: art-25
+family: cap-6
+title: "Obrigacao de Comunicacao de Operacoes Suspeitas ao COAF"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 25. As instituições de pagamento devem comunicar ao Conselho de Controle
+    de Atividades Financeiras (COAF) as operações ou as situações suspeitas de
+    lavagem de dinheiro ou de financiamento do terrorismo identificadas nos
+    procedimentos de monitoramento previstos nesta Resolução.
+
+    § 1. A comunicação deve ser realizada por meio do SISCOAF (Sistema de
+    Controle de Atividades Financeiras do COAF), respeitados os prazos e os
+    formatos estabelecidos pelo COAF.
+
+    § 2. A não comunicação de operações suspeitas identificadas constitui
+    infração passível de sanção administrativa, nos termos da Lei n. 9.613, de 1998.
+
+    § 3. A comunicação ao COAF é confidencial e o seu conteúdo não deve
+    ser revelado a terceiros, incluindo o próprio cliente investigado.
+guidance:
+  prose: |
+    O art. 25 e a obrigacao central de todo o programa de PLD/FT -- a razao de
+    existir dos controles anteriores.
+
+    **O que comunicar (criterio central):**
+    Operacoes ou situacoes que, apos analise, gerem suspeita RAZOAVEL de lavagem
+    de dinheiro ou financiamento do terrorismo. Nao e necessario ter certeza --
+    a suspeita fundamentada e suficiente e obrigatoria.
+
+    **SAR (Suspicious Activity Report) no contexto brasileiro:**
+    A comunicacao ao COAF e o equivalente nacional do SAR americano ou STR europeu.
+    Deve ser enviada pelo SISCOAF, o sistema online do COAF.
+
+    **Omissao e infracao (ss 2):**
+    A nao comunicacao quando deveriam ser comunicadas e tao grave quanto a
+    comunicacao falsa. As sancoes incluem:
+    - Multa de 1% a 200% do valor da operacao nao comunicada
+    - Suspensao do exercicio de cargo
+    - Inabilitacao para funcionar como instituicao autorizada
+
+    **Sigilo (ss 3):**
+    A comunicacao ao COAF e protegida por sigilo legal. Revelar a existencia
+    de uma comunicacao ao COAF (mesmo para o cliente, mesmo para um advogado
+    do cliente que nao seja o advogado da IP) e "tipping off" e crime.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de comunicacao COAF:**
+      1. Implementar modulo de geracao de SAR/comunicacao COAF no sistema de
+         case management, com pre-preenchimento automatico a partir dos dados
+         do caso investigado.
+      2. Integracao com SISCOAF: API ou mecanismo de envio seguro ao sistema
+         do COAF (verificar especificacao tecnica atual do COAF).
+      3. Rastreamento do status: comunicacao enviada, recebida, protocolo COAF,
+         arquivada.
+      4. Controle de acesso restrito: apenas compliance officers e diretor de
+         PLD/FT podem criar e enviar comunicacoes ao COAF.
+      5. Log imutavel: registrar data/hora de envio, usuario, protocolo COAF
+         e conteudo da comunicacao (auditoria).
+      6. Segregacao: comunicacoes ao COAF em ambiente logicamente separado,
+         sem acesso por equipes de atendimento ou operacoes.
+    tools:
+      - case-management
+      - aml-platform
+      - regulatory-reporting
+      - audit-logging
+  devsecops:
+    prose: |
+      **Seguranca e integridade do processo COAF:**
+      1. Criptografia end-to-end para dados de comunicacoes ao COAF.
+      2. Controle de acesso com autenticacao multifator para modulo de SAR.
+      3. Secret scanning: dados de comunicacoes COAF nao devem aparecer em
+         logs, traces ou sistemas de monitoramento acessiveis a terceiros.
+      4. Testes do pipeline de envio ao SISCOAF (ambiente de sandbox do COAF).
+    tools:
+      - vault
+      - mfa-authentication
+      - gitlab-secret-detection
+      - api-testing
+  secops:
+    prose: |
+      **Gestao das comunicacoes ao COAF:**
+      1. Registro de todas as comunicacoes realizadas (numero, data, protocolo,
+         tipo de operacao suspeita).
+      2. Relatorio mensal de SAR enviados por tipo de suspeicao e valor.
+      3. Acompanhar eventuals retornos do COAF (pedidos de informacao adicional).
+      4. Exercicio anual de simulacao de comunicacao ao COAF para garantir
+         que o processo funciona quando necessario.
+    tools:
+      - aml-platform
+      - grc-platform
+      - regulatory-reporting
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-25", "art-26"]
+    relationship: equivalent-to

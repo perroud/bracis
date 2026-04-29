@@ -1,0 +1,113 @@
+id: anx-v-art-4
+family: criptoativos
+title: "Custodia de Criptoativos e Seguranca de Chaves Privadas"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Anexo Normativo V, Art. 4. A custódia de criptoativos integrantes da
+    carteira do fundo deve ser realizada por entidade que atenda aos requisitos
+    de segurança, controle e segregação estabelecidos pela CVM.
+
+    Parágrafo 1. O custodiante de criptoativos deve: I - manter as chaves
+    privadas dos criptoativos em ambiente seguro, segregado e com controle de
+    acesso restrito; II - implementar mecanismos de backup e recuperação de
+    chaves privadas; III - adotar procedimentos de multisig ou mecanismos
+    equivalentes para movimentação de criptoativos; IV - manter registro
+    detalhado de todas as movimentações de criptoativos.
+
+    Parágrafo 2. Os criptoativos do fundo devem ser mantidos em wallets
+    segregadas dos demais ativos do custodiante e de outros fundos.
+
+    Parágrafo 3. O custodiante deve ser capaz de comprovar a existência e a
+    titularidade dos criptoativos custodiados a qualquer momento.
+guidance:
+  prose: |
+    O art. 4 do Anexo V define os requisitos de custodia de criptoativos,
+    reconhecendo as particularidades da custodia digital versus a custodia
+    tradicional.
+
+    **Seguranca de chaves privadas:**
+    Em criptoativos, quem controla a chave privada controla o ativo. A perda
+    da chave privada significa perda irreversivel do ativo. A seguranca das
+    chaves e a funcao mais critica da custodia cripto.
+
+    **Multisig obrigatorio:**
+    A CVM exige multisig ou equivalente. Isso significa que nenhuma pessoa
+    sozinha pode movimentar criptoativos. Sao necessarias multiplas assinaturas
+    (ex: 2 de 3, 3 de 5). Isso previne fraude e perda por comprometimento
+    de uma unica chave.
+
+    **Segregacao de wallets:**
+    Cada fundo deve ter wallets proprias, segregadas de outros fundos e do
+    patrimonio do custodiante. Isso e essencial para protecao do patrimonio
+    e auditabilidade.
+
+    **Proof of reserves:**
+    O custodiante deve comprovar existencia e titularidade a QUALQUER MOMENTO.
+    Em blockchain, isso e tecnicamente possivel via proof of reserves on-chain.
+
+    **Cold storage vs hot wallet:**
+    A pratica de mercado e manter a grande maioria dos ativos em cold storage
+    (offline) e apenas uma fracao em hot wallet (online) para operacoes diarias.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Custodia institucional:**
+      1. HSM (Hardware Security Module) para armazenamento de chaves privadas
+         em ambiente isolado e inviolavel.
+      2. Arquitetura de multisig: pelo menos 2-de-3 assinaturas para qualquer
+         movimentacao, com signatarios em locais diferentes.
+      3. Cold storage para 95%+ dos ativos; hot wallet apenas para liquidez
+         operacional diaria.
+
+      **Segregacao e auditabilidade:**
+      4. Wallets dedicadas por fundo com endereco publicavel on-chain.
+      5. Backup de chaves em multiplos locais geograficos (sharding de seed).
+      6. Pipeline de proof of reserves automatizado: verificacao on-chain
+         periodica de saldos.
+    tools:
+      - vault
+      - terraform
+      - git
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Seguranca de chaves:**
+      1. Secret detection com regras especificas para seeds, private keys,
+         mnemonics e API keys de exchanges.
+      2. SAST para codigo de interacao com wallets e blockchains: vulnerabilidades
+         podem permitir extracao de chaves.
+      3. Container scanning para imagens que executam nodes de blockchain.
+      4. Dependency scanning para bibliotecas criptograficas.
+
+      **Testes de custodia:**
+      5. Testes de procedimento de backup e recuperacao de chaves.
+      6. Testes de multisig: verificar que movimentacoes exigem quorum minimo.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-container-scanning
+      - gitlab-dependency-scanning
+  secops:
+    prose: |
+      **Monitoramento de custodia:**
+      1. Monitoramento on-chain 24/7: alertas para movimentacoes nao
+         autorizadas de criptoativos.
+      2. Proof of reserves diario: verificar saldos on-chain versus sistema.
+      3. Monitoramento de tentativas de acesso a HSM e chaves privadas.
+
+      **Auditoria de custodia cripto:**
+      4. Auditoria semestral de seguranca de custodia: acesso a HSM, backup
+         de chaves, procedimentos de multisig.
+      5. Penetration test em infraestrutura de custodia.
+      6. Reconciliacao on-chain versus sistema do custodiante.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5", "art-9", "art-10"]
+    relationship: complements

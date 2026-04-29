@@ -1,0 +1,141 @@
+id: trm-14-1
+family: sec-14
+title: "Online Financial Services"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement security controls for online
+    financial services, including e-payments, mobile banking, and digital
+    channels, to protect customers and transactions from fraud, unauthorized
+    access, and cyber threats.
+  parts:
+    - id: trm-14-1.1
+      label: "14.1.1"
+      prose: >-
+        The institution shall implement strong customer authentication for
+        online financial services, including multi-factor authentication
+        for high-risk transactions such as fund transfers, account
+        modifications, and new payee additions. Authentication mechanisms
+        shall be proportionate to the risk level of the transaction.
+    - id: trm-14-1.2
+      label: "14.1.2"
+      prose: >-
+        The institution shall implement real-time transaction monitoring
+        and fraud detection systems for online financial services.
+        Anomalous transactions shall be flagged for review, and
+        automated blocking mechanisms shall be implemented for
+        transactions that exceed risk thresholds.
+    - id: trm-14-1.3
+      label: "14.1.3"
+      prose: >-
+        Mobile applications shall be developed using secure coding
+        practices and subjected to application security testing, including
+        mobile-specific security assessments (certificate pinning,
+        jailbreak/root detection, secure storage, reverse engineering
+        protection). Applications shall be distributed only through
+        official app stores.
+    - id: trm-14-1.4
+      label: "14.1.4"
+      prose: >-
+        The institution shall implement session management controls for
+        online services, including session timeout, concurrent session
+        limits, and secure session token handling. Sensitive operations
+        shall require re-authentication.
+    - id: trm-14-1.5
+      label: "14.1.5"
+      prose: >-
+        The institution shall implement controls to protect customer
+        data transmitted and stored through online channels, including
+        end-to-end encryption, tokenization of sensitive data, and
+        secure API design. Customer notification mechanisms shall be
+        implemented for significant account activities.
+
+guidance:
+  prose: >-
+    Online financial services represent the highest-risk customer-facing
+    attack surface. MAS expects robust customer authentication that goes
+    beyond simple passwords; the 2021 guidelines align with Singapore's
+    push toward Singpass and FIDO-based authentication. Transaction
+    monitoring must be adaptive and leverage behavioral analytics, not
+    just rule-based systems. Mobile security requires attention to
+    platform-specific threats and client-side protections that are
+    easily bypassed if not implemented correctly. API security is
+    critical as more institutions adopt open banking and API-driven
+    architectures.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 14"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "MAS E-Payments User Protection Guidelines"
+    url: "https://www.mas.gov.sg/regulation/guidelines/guidelines-for-e-payments-user-protection"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement API security gateway with rate limiting, input
+      validation, and authentication enforcement for all customer-facing
+      APIs. Deploy WAF (Web Application Firewall) configured with
+      financial-services-specific rule sets. Implement session
+      management infrastructure with configurable timeout policies
+      and secure token handling. Deploy real-time event streaming
+      infrastructure for transaction monitoring and fraud detection
+      integration. Implement API observability with detailed request
+      logging for security analysis and fraud investigation.
+    tools:
+      - kong
+      - istio
+      - grafana
+      - kafka
+      - redis
+      - cloudflare
+
+  devsecops:
+    prose: >-
+      Implement comprehensive security testing for customer-facing
+      applications: SAST for source code, DAST for running applications,
+      API security testing for backend services, and mobile-specific
+      security testing. Configure OWASP API Security Top 10 detection
+      rules in DAST scanners. Implement automated security regression
+      testing for authentication flows, session management, and
+      transaction authorization. Deploy secret scanning to prevent
+      API keys and customer credentials from being committed. Test
+      for common mobile application vulnerabilities including insecure
+      storage, certificate validation, and data leakage.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-secret-detection
+      - zap
+      - semgrep
+      - mobsf
+
+  secops:
+    prose: >-
+      Operate real-time transaction monitoring and fraud detection
+      with adaptive rules based on customer behavior analytics.
+      Monitor for account takeover indicators including credential
+      stuffing, session hijacking, and SIM swapping. Coordinate with
+      the fraud team on investigation of suspicious transactions.
+      Monitor dark web and threat intelligence feeds for customer
+      credential exposure. Conduct regular assessments of online
+      service security controls and generate compliance reports for
+      MAS requirements.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - cloudflare
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-8", "SC-8", "SC-13", "SI-10"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.14", "a8.5", "a8.24", "a8.26"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-9"]
+    relationship: supports

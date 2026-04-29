@@ -1,0 +1,125 @@
+id: sec2-01
+family: sec-2
+title: "Protecao de Sistemas Criticos de Controle de Acesso e CFTV"
+class: RBAC-107
+baselines: [aerodrome-operators]
+statement:
+  prose: |
+    O operador de aeródromo deve implementar medidas de segurança cibernética
+    específicas para os sistemas de controle de acesso físico e de circuito
+    fechado de televisão (CFTV) utilizados na proteção de áreas de segurança
+    do aeródromo.
+
+    As medidas devem incluir:
+    I - autenticação forte para acesso administrativo a consoles e servidores
+        dos sistemas de controle de acesso e CFTV;
+    II - criptografia de dados em trânsito e em repouso para registros de acesso
+         e imagens de vigilância de áreas de segurança;
+    III - segregação de rede dos sistemas de controle de acesso e CFTV em relação
+         a redes corporativas e redes de passageiros;
+    IV - monitoramento de integridade e disponibilidade dos sistemas de controle
+         de acesso e CFTV em tempo real;
+    V - política de atualização e gerenciamento de patches para dispositivos,
+        servidores e softwares dos sistemas de controle de acesso e CFTV;
+    VI - proteção contra acesso físico não autorizado a racks, servidores e
+         equipamentos de rede dos sistemas críticos.
+guidance:
+  prose: |
+    Os sistemas de controle de acesso e CFTV sao de especial relevancia para
+    a seguranca AVSEC pois seu comprometimento pode diretamente facilitar
+    atos de interferencia ilicita na aviacao civil.
+
+    **Ameacas especificas:**
+    - Comprometimento de credenciais administrativas de sistemas de controle de
+      acesso pode permitir a emissao fraudulenta de credenciais de acesso a
+      areas restritas do aerodromo
+    - Ataques a sistemas CFTV (ex: ransomware em servidores de gravacao, adulteracao
+      de cameras) comprometem a capacidade de vigilancia e deteccao de ameacas
+    - Dispositivos IP (cameras, leitores de acesso) frequentemente possuem firmware
+      desatualizado com vulnerabilidades conhecidas exploraveis remotamente
+
+    **Segmentacao de rede:**
+    A segregacao de rede para sistemas OT/IoT de seguranca fisica (CFTV e
+    controle de acesso) e recomendada pela norma IEC 62443 e pelo NIST
+    Cybersecurity Framework, sendo adotada como pratica obrigatoria neste contexto.
+
+    **Gestao de patches em ambiente critico:**
+    A atualizacao de sistemas criticos em operacao 24x7 requer janelas de
+    manutencao planejadas e testes em ambiente de homologacao antes de
+    aplicar patches em producao, balanceando seguranca e disponibilidade.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura segura para sistemas de controle de acesso e CFTV:**
+      1. Implementar VLAN dedicada para sistemas de controle de acesso (ACS) e
+         VLAN separada para CFTV, isoladas da rede corporativa e da rede de
+         passageiros por firewalls com regras de acesso minimo necessario.
+      2. Implantar sistema de gestao de identidade privilegiada (PAM) para
+         controle de acesso administrativo a servidores e consoles dos sistemas
+         de CFTV e ACS, com gravacao de sessoes de manutencao.
+      3. Implementar sistema de gestao de patches (patch management) com inventario
+         automatico de versoes de firmware de cameras IP, leitores de acesso e
+         dispositivos de borda, com alertas para CVEs criticos.
+      4. Configurar monitoramento de disponibilidade (uptime) e integridade
+         (checksum de configuracoes) dos servidores de controle de acesso e
+         gravadores de CFTV com alertas automaticos para o SOC aeroportuario.
+      5. Implementar backup criptografado e offsite para configuracoes e dados
+         criticos dos sistemas de ACS e CFTV, com testes de restauracao periodicos.
+    tools:
+      - network-segmentation
+      - pam-solution
+      - patch-management
+      - monitoring-platform
+      - backup-solution
+  devsecops:
+    prose: |
+      **Seguranca no ciclo de vida de sistemas de controle e vigilancia:**
+      1. Exigir security review de novos dispositivos CFTV e ACS antes da
+         aquisicao, verificando politicas de suporte a patches do fabricante
+         e historico de vulnerabilidades (CVEs).
+      2. Implementar hardening automatizado de dispositivos conforme baseline de
+         seguranca (CIS Benchmarks para servidores, NIST guidelines para IoT)
+         como parte do processo de comissionamento de novos equipamentos.
+      3. Manter catalogo versionado de configuracoes baseline dos sistemas de
+         ACS e CFTV, com diff automatico para detectar desvios nao autorizados.
+      4. Realizar testes de integracao de seguranca apos cada atualizacao de
+         firmware ou software dos sistemas criticos, em ambiente de homologacao.
+      5. Implementar secret detection no repositorio de configuracoes dos sistemas
+         para prevenir exposicao de credenciais e chaves criptograficas.
+    tools:
+      - configuration-management
+      - hardening-automation
+      - secret-detection
+      - cve-scanner
+  secops:
+    prose: |
+      **Monitoramento e resposta para sistemas de controle de acesso e CFTV:**
+      1. Integrar logs dos servidores de ACS e CFTV ao SIEM aeroportuario com
+         regras de correlacao para detectar acessos administrativos anomalos,
+         falhas de autenticacao em massa e alteracoes de configuracao nao autorizadas.
+      2. Implementar alertas em tempo real para eventos criticos: servidor de
+         CFTV offline, falha de camera em area de seguranca, acesso privilegiado
+         fora de janela de manutencao.
+      3. Monitorar logs de acesso fisico dos sistemas ACS para detectar padroes
+         suspeitos (tentativas de acesso repetidas, acesso em horarios incomuns,
+         uso de credenciais de pessoal desligado).
+      4. Conduzir auditoria periodica de contas e privilegios nos sistemas de
+         ACS e CFTV, removendo acessos de funcionarios desligados ou transferidos.
+      5. Manter plano de resposta especifico para incidentes nos sistemas de
+         ACS e CFTV, incluindo procedimentos manuais de backup para manutencao
+         da seguranca de area durante indisponibilidade cibernetica.
+    tools:
+      - siem
+      - access-log-monitoring
+      - privileged-access-audit
+      - incident-response-platform
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["8.1", "8.12", "8.15"]
+    relationship: mapped
+  - framework_id: rbac-108
+    articles: ["relevant"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-4", "art-5"]
+    relationship: mapped

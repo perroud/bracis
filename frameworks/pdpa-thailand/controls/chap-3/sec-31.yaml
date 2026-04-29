@@ -1,0 +1,101 @@
+id: sec-31
+family: chap-3
+title: "Right of Access"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 31. A data subject shall have the right to request access to and obtain
+    a copy of personal data relating to him or her which is under the responsibility
+    of the data controller, or to request that such personal data be disclosed as to
+    the acquisition of personal data obtained without his or her consent.
+
+    The data controller shall comply with the request of the data subject and provide
+    the personal data in a commonly used and machine-readable format, unless the data
+    controller has a legitimate reason to refuse such request as prescribed by this Act
+    or other laws.
+  parts:
+    - id: sec-31-1
+      label: "Paragraph 1"
+      prose: |
+        Right to access: the data subject may request access to personal data
+        held by the data controller and obtain a copy.
+    - id: sec-31-2
+      label: "Paragraph 2"
+      prose: |
+        Right to disclosure of acquisition: the data subject may request
+        information about how personal data was obtained, especially if
+        collected without consent.
+    - id: sec-31-3
+      label: "Paragraph 3"
+      prose: |
+        Data must be provided in a commonly used and machine-readable format.
+guidance:
+  prose: |
+    Section 31 details the right of access, corresponding to GDPR Article 15. This
+    is typically the most frequently exercised data subject right.
+
+    Implementation requirements:
+
+    - **Complete Data Inventory:** You must be able to locate all personal data for
+      a given data subject across all systems. Without a comprehensive data map,
+      access requests cannot be fully fulfilled.
+
+    - **Machine-Readable Format:** The PDPA explicitly requires machine-readable
+      output. JSON, CSV, or XML are standard choices. PDF alone is insufficient.
+
+    - **Acquisition Disclosure:** Unique to the PDPA's emphasis: the data subject
+      can ask how their data was obtained. This requires maintaining data provenance
+      metadata (source, date, method of collection).
+
+    - **Response Content:** Include all personal data categories held, the purposes
+      of processing, recipients or categories of recipients, retention periods,
+      and the data subject's rights.
+
+    - **Third-Party Data:** If personal data was obtained from third parties,
+      disclose the source as part of the access response.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a personal data aggregation service that queries all systems and
+         assembles a comprehensive profile for access requests.
+      2. Implement machine-readable export formats (JSON primary, CSV secondary)
+         with a consistent schema.
+      3. Store data provenance metadata: source system, collection date, collection
+         method, lawful basis at the time of collection.
+      4. Build a data subject profile viewer in the DSR portal showing all data
+         categories, purposes, and retention periods.
+      5. Implement access request caching for repeated requests within a reasonable
+         window to reduce system load.
+    tools:
+      - personal-data-aggregator
+      - export-format-generator
+      - data-provenance-tracker
+      - dsr-portal
+  devsecops:
+    prose: |
+      1. Test access request responses for completeness: verify all known data stores
+         are included in the aggregation.
+      2. Validate export format compliance (machine-readable, complete, accurate).
+      3. Test that provenance metadata is correctly populated for all data sources.
+      4. Verify access response does not include data belonging to other data subjects.
+    tools:
+      - access-request-test-suite
+      - export-format-validator
+      - data-isolation-tests
+  secops:
+    prose: |
+      1. Monitor access request volumes and response times.
+      2. Audit access response completeness through sampling.
+      3. Alert on access requests from unusual patterns (potential social engineering).
+      4. Verify identity verification is applied before data disclosure.
+    tools:
+      - dsr-dashboard
+      - access-audit-sampler
+      - identity-verification-monitor
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 15"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-II"]
+    relationship: equivalent-to

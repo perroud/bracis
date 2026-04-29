@@ -1,0 +1,110 @@
+id: cscf-6.3
+family: obj-3
+title: "Database Integrity"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure the integrity of databases that store or process SWIFT transaction
+    records. Database integrity controls must detect unauthorized modifications
+    to transaction data, audit logs, and configuration records. Changes to
+    database schemas, stored procedures, and access controls must be governed
+    through change management processes.
+  parts:
+    - id: cscf-6.3.a
+      label: "6.3.a"
+      prose: >-
+        Database activity monitoring (DAM) or equivalent controls are
+        implemented to log and alert on direct database access, schema
+        changes, and bulk data modifications on databases storing SWIFT
+        transaction data.
+    - id: cscf-6.3.b
+      label: "6.3.b"
+      prose: >-
+        Database access is restricted to application service accounts
+        and authorized database administrators. Direct SQL access by
+        operators is prohibited unless through controlled, audited
+        channels.
+    - id: cscf-6.3.c
+      label: "6.3.c"
+      prose: >-
+        Database backups include integrity verification (checksums) and
+        are tested for recoverability at least quarterly.
+
+guidance:
+  prose: >-
+    Databases are the ultimate target in SWIFT attacks — modifying transaction
+    records allows attackers to redirect funds, delete evidence, and
+    manipulate balances. In the Bangladesh Bank attack, attackers modified
+    database records to remove evidence of fraudulent transactions.
+    Database activity monitoring provides visibility into who is accessing
+    what data and can detect anomalous queries (e.g., mass DELETE operations
+    on transaction logs). Direct database access should be minimized;
+    all application interactions should go through defined APIs with
+    parameterized queries. Transparent data encryption (TDE) protects
+    against offline attacks on database files.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 6.3"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-123 — Guide to General Server Security"
+    url: "https://doi.org/10.6028/NIST.SP.800-123"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy database activity monitoring (Imperva DAM, IBM Guardium,
+      Oracle Audit Vault) for all SWIFT-related databases. Enable transparent
+      data encryption (TDE) and enforce encrypted connections. Implement
+      database firewall rules restricting queries by source, type, and
+      volume. Use database migration tools (Flyway, Liquibase) with
+      version-controlled schema changes. Configure automated backup
+      integrity checks and restore testing.
+    tools:
+      - imperva-dam
+      - ibm-guardium
+      - oracle-audit-vault
+      - flyway
+      - liquibase
+      - aws-rds
+      - azure-sql
+      - postgresql
+
+  devsecops:
+    prose: >-
+      Version-control all database schemas and stored procedures. Validate
+      schema migrations in CI/CD pipelines before production deployment.
+      Scan database configurations for security misconfigurations (public
+      access, weak authentication, disabled audit logging). Automate
+      backup restore testing in pipeline jobs.
+    tools:
+      - flyway
+      - liquibase
+      - checkov
+      - dbmaestro
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor DAM alerts for anomalous database activity — bulk deletes,
+      off-hours access, schema modifications outside change windows.
+      Review database access logs weekly. Alert on direct database access
+      bypassing application layers. Verify backup integrity checksums
+      quarterly.
+    tools:
+      - splunk
+      - elastic-siem
+      - imperva-dam
+      - ibm-guardium
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-12", "CP-9", "SC-28"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.7", "A8.11", "A8.13"]
+    relationship: supports

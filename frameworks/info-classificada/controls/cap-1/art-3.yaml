@@ -1,0 +1,107 @@
+id: art-3
+family: cap-1
+title: "Classification Levels and Maximum Durations"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 3. A informação em poder dos órgãos e entidades públicas,
+    observado o seu teor e em razão de sua imprescindibilidade à segurança
+    da sociedade ou do Estado, poderá ser classificada como ultrassecreta,
+    secreta ou reservada.
+
+    § 1º Os prazos máximos de restrição de acesso à informação,
+    conforme a classificação prevista no caput, vigoram a partir da data
+    de sua produção e são os seguintes:
+
+    I - ultrassecreta: vinte e cinco anos;
+    II - secreta: quinze anos;
+    III - reservada: cinco anos.
+
+    § 2º Alternativamente aos prazos previstos no § 1º, poderá ser
+    estabelecida como termo final de restrição de acesso a ocorrência de
+    determinado evento, desde que este ocorra antes do transcurso do prazo
+    máximo de classificação.
+
+    § 3º Transcorrido o prazo de classificação ou consumado o evento que
+    defina o seu termo final, a informação tornar-se-á, automaticamente,
+    de acesso público.
+guidance:
+  prose: |
+    Article 3 establishes the three classification tiers, directly
+    implementing LAI art. 24:
+
+    **Classification levels and maximum durations:**
+    | Level          | Max Duration | Typical Use                          |
+    |----------------|--------------|--------------------------------------|
+    | Ultrassecreta  | 25 years     | State sovereignty, military ops      |
+    | Secreta        | 15 years     | Diplomatic, intelligence operations  |
+    | Reservada      | 5 years      | Internal government operations       |
+
+    **Automatic declassification:**
+    When the maximum duration expires or the defined triggering event occurs,
+    the information becomes public automatically — no manual action required.
+    This is a critical compliance requirement: systems must track expiration
+    dates and trigger declassification workflows.
+
+    **Event-based declassification:**
+    Instead of a fixed date, classification may be tied to an event (e.g.,
+    completion of a negotiation, end of a military operation). The event
+    must occur before the maximum duration; otherwise, the maximum duration
+    controls.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classification lifecycle management:**
+      1. Implement classification metadata with mandatory fields:
+         level (reservado|secreto|ultrassecreto), classification_date,
+         expiration_date or expiration_event.
+      2. Deploy automated declassification service that:
+         - Scans for expired classifications daily
+         - Transitions expired documents to public access
+         - Generates audit trail for each declassification
+      3. Enforce that no classification can be set without an expiration
+         date or event via schema validation.
+      4. Implement alerts 90 days before classification expiration for
+         review by the classifying authority.
+    tools:
+      - document-lifecycle
+      - scheduler
+      - metadata-management
+      - alerting
+  devsecops:
+    prose: |
+      **Classification expiration in CI/CD:**
+      1. Include classification expiration checks in deployment pipelines
+         for systems handling classified data.
+      2. Implement policy-as-code rules that reject deployment of data
+         stores without proper classification lifecycle metadata.
+      3. Add automated tests that verify declassification workflows
+         function correctly in staging environments.
+    tools:
+      - policy-as-code
+      - gitlab-ci
+      - integration-tests
+  secops:
+    prose: |
+      **Classification duration monitoring:**
+      1. Maintain a registry of all classified information with
+         classification dates and expiration dates/events.
+      2. Generate monthly reports of information approaching expiration
+         for review by the classifying authority.
+      3. Audit that automatic declassification is functioning correctly
+         and that no information remains classified beyond its maximum
+         legal duration.
+      4. Track event-based classifications separately and monitor for
+         triggering event occurrence.
+    tools:
+      - grc-platform
+      - classification-registry
+      - reporting-dashboard
+legal_references:
+  - framework_id: lai
+    articles: ["art-24"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2"]
+    relationship: mapped

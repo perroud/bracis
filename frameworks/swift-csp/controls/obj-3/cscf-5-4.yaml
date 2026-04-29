@@ -1,0 +1,119 @@
+id: cscf-5.4
+family: obj-3
+title: "Logging and Monitoring"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Record and monitor security events related to SWIFT operations to
+    detect suspicious behavior and support forensic investigations.
+    Logging must cover authentication events, transaction activities,
+    administrative actions, and security-relevant system events. Logs
+    must be protected from tampering and retained for the required period.
+  parts:
+    - id: cscf-5.4.a
+      label: "5.4.a"
+      prose: >-
+        Security event logging is enabled on all systems within the SWIFT
+        secure zone, capturing authentication successes and failures,
+        privilege escalation, account modifications, and policy changes.
+    - id: cscf-5.4.b
+      label: "5.4.b"
+      prose: >-
+        Logs are forwarded to a centralized, tamper-resistant log management
+        system (SIEM) outside the secure zone. Log integrity is protected
+        through signing, write-once storage, or equivalent controls.
+    - id: cscf-5.4.c
+      label: "5.4.c"
+      prose: >-
+        Logs are retained for a minimum of 12 months, with at least 3
+        months immediately available for analysis.
+    - id: cscf-5.4.d
+      label: "5.4.d"
+      prose: >-
+        Automated alerting is configured for critical security events
+        including failed authentication thresholds, unauthorized access
+        attempts, and anomalous transaction patterns.
+
+guidance:
+  prose: >-
+    Logging and monitoring enable detection of attacks in progress and
+    provide forensic evidence for incident investigation. Without
+    comprehensive logging, organizations cannot determine whether a breach
+    occurred, what was affected, or how it happened. Logs must be sent
+    to a centralized SIEM system outside the secure zone to prevent an
+    attacker from tampering with evidence. Time synchronization (NTP) is
+    critical for correlating events across systems. Organizations should
+    develop detection use cases specific to SWIFT operations (unusual
+    transaction volumes, off-hours activity, large-value transfers to
+    new beneficiaries) and tune alerting thresholds to minimize false
+    positives while catching genuine threats.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 5.4"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-92 — Guide to Computer Security Log Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-92"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized SIEM (Splunk, Elastic Security, Microsoft
+      Sentinel) with dedicated log sources for all secure zone components.
+      Use log shippers (Fluentd, Filebeat, Vector) with TLS encryption
+      for log transport. Configure NTP synchronization across all secure
+      zone systems to a common, authoritative time source. Implement
+      immutable log storage (S3 Object Lock, Azure Immutable Blob Storage,
+      WORM) for tamper resistance. Define log retention policies as
+      infrastructure-as-code.
+    tools:
+      - splunk
+      - elastic-security
+      - microsoft-sentinel
+      - fluentd
+      - filebeat
+      - vector
+      - aws-s3-object-lock
+      - azure-immutable-storage
+
+  devsecops:
+    prose: >-
+      Validate logging configurations in CI/CD pipelines. Test that all
+      required event types are captured through automated log generation
+      and verification. Enforce that no service can be deployed without
+      log shipping configured. Automate SIEM detection rule deployment
+      through version-controlled detection-as-code.
+    tools:
+      - sigma
+      - detection-as-code
+      - gitlab-ci
+      - github-actions
+      - inspec
+
+  secops:
+    prose: >-
+      Develop SWIFT-specific detection use cases: unusual transaction
+      volumes, off-hours operator activity, new beneficiary large-value
+      transfers, rapid sequential transaction approvals. Monitor SIEM
+      health to ensure log pipeline continuity. Review alerts daily and
+      tune detection rules quarterly. Conduct tabletop exercises using
+      log-based scenarios.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - ibm-qradar
+      - chronicle
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-11"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.16", "A8.17"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-10.1", "req-10.2", "req-10.3"]
+    relationship: complements

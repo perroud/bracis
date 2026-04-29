@@ -1,0 +1,130 @@
+id: crowd-19
+family: tecnologia
+title: "Platform Availability and Business Continuity"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 45. A plataforma deve manter plano de continuidade de negócios
+    e de recuperação de desastres que assegure: I — a continuidade da
+    prestação de serviços aos investidores e às sociedades empresárias
+    emissoras; II — a preservação e integridade dos dados e registros
+    da plataforma; III — a capacidade de recuperação dos sistemas
+    críticos em prazo compatível com a natureza das operações;
+    IV — testes periódicos do plano de continuidade, com frequência
+    mínima anual.
+
+    § 1º O plano de continuidade deve prever, no mínimo:
+    I — procedimentos para operação em situação de contingência;
+    II — definição de sistemas e processos críticos e seus respectivos
+    prazos máximos de recuperação; III — procedimentos para comunicação
+    com investidores, emissores e CVM em caso de indisponibilidade;
+    IV — designação de responsáveis pela execução do plano.
+
+    § 2º A plataforma deve manter cópia de segurança dos dados em local
+    distinto de suas instalações principais, com teste periódico de
+    restauração.
+guidance:
+  prose: |
+    Article 45 mandates business continuity and disaster recovery
+    planning for crowdfunding platforms, recognizing that platform
+    unavailability directly impacts investors' ability to exercise their
+    rights (especially during active offerings).
+
+    **BCP/DR plan requirements:**
+    - Service continuity for investors and issuers
+    - Data preservation and integrity
+    - Recovery within timeframes appropriate to operations
+    - Annual testing minimum
+
+    **Minimum plan content:**
+    - Contingency operation procedures
+    - Critical systems/processes with maximum recovery time objectives
+    - Communication procedures during outages (investors, issuers, CVM)
+    - Designated responsible persons
+
+    **Offsite backup:**
+    Data backups must be stored at a location separate from the main
+    facilities, with periodic restoration testing.
+
+    **Critical timing considerations:**
+    During active offering periods, platform downtime can impact
+    withdrawal deadlines, investment deadlines, and offering closure
+    dates. The BCP must account for these time-sensitive operations.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **High availability architecture:**
+      1. Deploy multi-availability-zone or multi-region architecture
+         with automatic failover for all critical platform components.
+      2. Implement database replication (synchronous for financial data,
+         asynchronous for non-critical) with automated failover.
+      3. Deploy CDN and global load balancing for platform frontend.
+      4. Implement automated backup with 3-2-1 strategy: 3 copies,
+         2 different media, 1 offsite.
+
+      **Recovery capabilities:**
+      5. Define and implement RTO/RPO targets: RTO < 4h for critical
+         systems (investment processing, withdrawals), RPO < 1h for
+         financial data.
+      6. Deploy infrastructure-as-code to enable full environment
+         recreation from scratch within RTO.
+      7. Implement automated backup restoration testing (monthly).
+    tools:
+      - terraform
+      - kubernetes
+      - postgresql-replication
+      - velero
+      - aws-s3
+      - cloudflare
+  devsecops:
+    prose: |
+      **Resilience in the development lifecycle:**
+      1. Implement chaos engineering tests in staging environments to
+         validate failover mechanisms (kill pods, simulate AZ failure,
+         corrupt data).
+      2. Load testing to establish baseline capacity and identify
+         breaking points.
+      3. Automated deployment rollback capability with health check
+         gates.
+
+      **Pipeline resilience:**
+      4. Pipeline design that supports emergency hotfix deployments
+         with expedited (but not eliminated) security checks.
+      5. Infrastructure-as-code versioning with ability to restore
+         any previous infrastructure state.
+    tools:
+      - gitlab-ci
+      - chaos-mesh
+      - k6
+      - litmus
+      - terraform
+  secops:
+    prose: |
+      **Continuity operations:**
+      1. Monitor platform availability with SLA tracking (target:
+         99.9% uptime during offering hours).
+      2. Implement automated health checks for all critical subsystems
+         with instant alerting on degradation.
+      3. Maintain communication templates for investor, issuer, and
+         CVM notification during outages.
+
+      **Testing and evidence:**
+      4. Conduct annual BCP/DR test with documented results, issues
+         found, and remediation actions.
+      5. Quarterly backup restoration verification with documented
+         success/failure and recovery time measurement.
+      6. Maintain BCP/DR documentation current with platform
+         architecture changes.
+    tools:
+      - uptime-monitoring
+      - pagerduty
+      - grc-platform
+      - siem
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-8"]
+    relationship: implements
+  - framework_id: cvm-175
+    articles: ["art-35"]
+    relationship: complements

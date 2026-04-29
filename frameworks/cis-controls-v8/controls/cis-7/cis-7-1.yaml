@@ -1,0 +1,100 @@
+id: cis-7.1
+family: cis-7
+title: "Establish and Maintain a Vulnerability Management Process"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain a documented vulnerability management process for enterprise
+    assets. Review and update documentation annually, or when significant enterprise
+    changes occur that could impact this Safeguard.
+
+guidance:
+  prose: >-
+    A vulnerability management process defines how the organization identifies, evaluates,
+    prioritizes, remediates, and reports on security vulnerabilities. The process must
+    address the full lifecycle: asset discovery, vulnerability scanning, risk-based
+    prioritization, remediation SLAs, exception management, and metrics reporting.
+    Prioritization should consider CVSS scores, exploit availability (EPSS), asset
+    criticality, network exposure, and compensating controls. The process must cover
+    all asset types: operating systems, applications, container images, infrastructure
+    configurations, libraries/dependencies, and firmware. SLAs for remediation should
+    be tiered by severity: critical (24-72 hours), high (7 days), medium (30 days),
+    low (90 days).
+
+references:
+  - citation: "CIS Controls v8.1, Control 7, Safeguard 7.1"
+    url: "https://www.cisecurity.org/controls/v8"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement vulnerability scanning at every layer of the platform stack. Use
+      infrastructure vulnerability scanners for OS and network-level CVEs, container
+      image scanners for image-level CVEs, and IaC scanners for misconfiguration
+      vulnerabilities. Integrate scanning results into a centralized vulnerability
+      management platform that correlates findings across scanners and deduplicates
+      results. Implement automated remediation where possible: automated OS patching
+      via system managers, automated base image rebuilds when upstream patches are
+      available, and automated IaC module updates via Renovate/Dependabot. Define
+      remediation SLAs as platform policies enforced through admission controllers
+      that block deployment of images with unresolved critical CVEs.
+    tools:
+      - trivy
+      - grype
+      - qualys
+      - tenable
+      - defectdojo
+      - renovate
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Embed vulnerability scanning into every stage of the CI/CD pipeline. Scan
+      dependencies during build, container images after build, and IaC configurations
+      before deployment. Use GitLab's integrated security scanning (SAST, DAST,
+      Dependency Scanning, Container Scanning) to provide vulnerability feedback
+      directly in merge requests. Configure pipeline policies that fail builds
+      exceeding vulnerability thresholds (e.g., zero critical, fewer than 5 high).
+      Implement automated merge request creation for dependency updates. Track
+      mean-time-to-remediation (MTTR) as a key DevSecOps metric. Use vulnerability
+      SLA dashboards to track compliance with remediation timelines.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - trivy
+      - snyk
+      - renovate
+
+  secops:
+    prose: >-
+      Run authenticated vulnerability scans across all enterprise assets on a weekly
+      cadence (minimum). Maintain a risk-based vulnerability prioritization process
+      that considers EPSS scores, asset criticality, and business context alongside
+      CVSS. Generate weekly vulnerability status reports for security leadership and
+      monthly executive summaries. Track remediation SLA compliance by asset owner and
+      business unit. Escalate overdue critical and high vulnerabilities to management
+      automatically. Maintain an exception/risk acceptance register with expiration
+      dates and compensating controls.
+    tools:
+      - qualys-vmdr
+      - tenable-io
+      - rapid7-insightvm
+      - defectdojo
+      - splunk
+      - jira
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "RA-5", "SI-2", "SI-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.8"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["ID.RA-01", "PR.PS-02"]
+    relationship: implements

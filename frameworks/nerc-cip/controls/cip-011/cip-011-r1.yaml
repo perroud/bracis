@@ -1,0 +1,104 @@
+id: cip-011-r1
+family: cip-011
+title: "Information Protection"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes that collectively include the applicable requirement
+    parts to protect BES Cyber System Information.
+  parts:
+    - id: cip-011-r1.1
+      label: "1.1"
+      prose: >-
+        Method(s) to identify information that meets the definition
+        of BES Cyber System Information.
+    - id: cip-011-r1.2
+      label: "1.2"
+      prose: >-
+        Method(s) to protect and securely handle BES Cyber System
+        Information, including storage, transit, and use.
+    - id: cip-011-r1.3
+      label: "1.3"
+      prose: >-
+        Action to prevent unauthorized retrieval of BES Cyber
+        System Information from a Cyber Asset prior to the release
+        for reuse or disposal.
+
+guidance:
+  prose: >-
+    CIP-011 R1 protects the information about BES Cyber Systems (not
+    the systems themselves). BES Cyber System Information (BCSI) includes
+    security procedures, configuration data, network topology diagrams,
+    floor plans of computing facilities, and other information that could
+    be used to compromise BES Cyber Systems if disclosed. Entities must
+    identify what constitutes BCSI, protect it during storage, transit,
+    and use, and ensure it is properly sanitized before media disposal
+    or reuse. This requirement applies to both digital and physical
+    information. Common failure points include: BCSI stored in unsecured
+    file shares, BCSI transmitted via unencrypted email, and media
+    disposed of without proper sanitization.
+
+references:
+  - citation: "NERC CIP-011-3 — Information Protection"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-011-3.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data classification and labeling for all repositories,
+      documents, and data stores containing BES Cyber System Information.
+      Deploy encryption at rest and in transit for all BCSI storage
+      and communication channels. Implement access controls on BCSI
+      repositories that restrict access to authorized personnel only.
+      Deploy DLP (Data Loss Prevention) tools to detect unauthorized
+      BCSI transmission. Implement secure media disposal workflows
+      with documented sanitization procedures. Use secrets management
+      tools to protect sensitive configuration data (credentials,
+      keys, certificates) related to BES Cyber Systems.
+    tools:
+      - vault
+      - terraform
+      - backstage
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Implement secret detection scanning in all CI/CD pipelines to
+      prevent BCSI from being committed to repositories. Store BCSI
+      in encrypted, access-controlled locations with audit logging.
+      Enforce merge request approval rules on repositories containing
+      BCSI. Implement pipeline checks that verify BCSI handling
+      procedures are followed (encryption, access controls, labeling).
+      Create automated data classification checks that identify
+      potential BCSI in code repositories and flag for review.
+    tools:
+      - gitlab-ci
+      - scanner_secret_detection
+      - vault
+      - gitlab-approval-rules
+
+  secops:
+    prose: >-
+      Monitor access to BCSI storage locations and alert on
+      unauthorized access attempts. Deploy DLP monitoring on
+      email, file transfers, and web traffic to detect BCSI
+      exfiltration. Track media disposal records and verify
+      sanitization compliance. Monitor for BCSI exposure in
+      public repositories, cloud storage, and other accessible
+      locations. Generate audit reports showing BCSI inventory,
+      access records, and protection compliance.
+    tools:
+      - splunk
+      - elastic-siem
+      - dlp-tools
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-28", "SC-8", "MP-6", "AC-3"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-1-4.3.4.4"]
+    relationship: supports

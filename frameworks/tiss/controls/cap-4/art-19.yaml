@@ -1,0 +1,114 @@
+id: art-19
+family: cap-4
+title: "Certificacao Digital ICP-Brasil"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 19. A autenticação de mensagens TISS entre sistemas de operadoras
+    e prestadores deve utilizar certificados digitais emitidos no âmbito
+    da ICP-Brasil (Infraestrutura de Chaves Públicas Brasileira).
+
+    Parágrafo 1. As operadoras e prestadores devem utilizar:
+    I - Certificado digital e-CNPJ para autenticação de pessoa jurídica
+    nos web services TISS;
+    II - Certificado digital e-CPF para assinatura digital de
+    profissionais de saúde em guias TISS que exijam identificação
+    individual;
+    III - Certificados tipo A1 (armazenado em software) ou A3
+    (armazenado em hardware/token) conforme política de segurança.
+
+    Parágrafo 2. A validação de certificados deve incluir:
+    I - Verificação da cadeia de certificação até a raiz ICP-Brasil;
+    II - Consulta de revogação via CRL (Certificate Revocation List)
+    ou OCSP (Online Certificate Status Protocol);
+    III - Verificação de validade temporal do certificado.
+
+    Parágrafo 3. Mensagens TISS que não contenham certificação digital
+    válida devem ser rejeitadas pelo receptor.
+guidance:
+  prose: |
+    O art. 19 torna a certificacao digital ICP-Brasil obrigatoria para
+    autenticacao no ecossistema TISS, garantindo identidade e nao-repudio.
+
+    **Tipos de certificado ICP-Brasil:**
+    - e-CNPJ A1: certificado em arquivo (PFX/P12), validade 1 ano,
+      mais facil de automatizar
+    - e-CNPJ A3: certificado em token/smartcard, validade 3 anos,
+      mais seguro
+    - e-CPF: para identificacao de pessoa fisica (medicos, dentistas)
+
+    **Uso no contexto TISS:**
+    - mTLS: autenticacao bidirecional nos web services
+    - Assinatura XML: assinatura digital em guias que exigem
+      identificacao do profissional de saude
+    - Selo temporal: timestamp assinado para nao-repudio
+
+    **Validacao obrigatoria:**
+    1. Cadeia de certificacao: validar ate raiz ICP-Brasil
+    2. Revogacao: consultar CRL ou OCSP antes de aceitar
+    3. Validade: certificado nao expirado
+    4. Uso adequado: key usage compativel com a operacao
+
+    **Desafios praticos:**
+    - Certificados A1 exigem renovacao anual (automatizar)
+    - Certificados A3 dependem de hardware (token/smartcard)
+    - CRL da ICP-Brasil pode ser lenta (implementar cache)
+    - OCSP stapling como alternativa para performance
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de certificacao digital TISS:**
+      1. Implementar PKI integration com ICP-Brasil: trust store com
+         certificados raiz e intermediarios da ICP-Brasil atualizados.
+      2. Configurar mTLS em todos os endpoints TISS com validacao
+         completa de cadeia, revogacao e validade.
+      3. Implementar OCSP stapling ou cache de CRL para performance
+         na validacao de certificados em alto volume.
+      4. Automatizar renovacao de certificados e-CNPJ A1 com alertas
+         60 dias antes do vencimento e rotacao zero-downtime.
+    tools:
+      - pki-integration
+      - mtls-configuration
+      - ocsp-stapling
+      - certificate-automation
+  devsecops:
+    prose: |
+      **Certificacao digital no pipeline:**
+      1. Implementar testes de certificacao digital no pipeline:
+         validacao de cadeia, revogacao, validade, key usage.
+      2. Criar certificados de teste (autoassinados ou de CA de teste)
+         para ambientes nao-produtivos, sem usar certificados ICP-Brasil
+         reais em testes.
+      3. Automatizar verificacao de trust store: alertar se certificados
+         raiz/intermediarios estao desatualizados.
+      4. Incluir testes de cenarios de falha: certificado expirado,
+         revogado, cadeia incompleta, key usage incorreto.
+    tools:
+      - certificate-testing
+      - test-ca
+      - trust-store-validation
+      - failure-testing
+  secops:
+    prose: |
+      **Gestao operacional de certificados ICP-Brasil:**
+      1. Manter inventario de todos os certificados ICP-Brasil em uso
+         (e-CNPJ, e-CPF), com datas de vencimento e responsaveis.
+      2. Monitorar continuamente a validade e revogacao de certificados
+         de contrapartes TISS (operadoras, prestadores).
+      3. Implementar procedimento de revogacao emergencial de
+         certificados comprometidos com comunicacao a contrapartes.
+      4. Auditar semestralmente a configuracao de mTLS e validacao
+         de certificados em todos os endpoints TISS.
+    tools:
+      - certificate-inventory
+      - certificate-monitoring
+      - revocation-procedure
+      - mtls-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312-d"]
+    relationship: mapped

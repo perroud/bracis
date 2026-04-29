@@ -1,0 +1,99 @@
+id: art-28
+family: cap-5
+title: "Analise de Operacoes Selecionadas"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 28. As operações e situações selecionadas pelo monitoramento
+    de que tratam os artigos anteriores devem ser analisadas para avaliar
+    se devem ser comunicadas ao COAF.
+
+    § 1. A análise deve ser realizada por pessoa ou área com conhecimento
+    especializado em PLD/FT e com acesso às informações cadastrais do cliente.
+
+    § 2. A análise deve ser documentada e deve incluir:
+    I - a descrição da operação ou situação selecionada;
+    II - as informações cadastrais do cliente relevantes para a análise;
+    III - as conclusões da análise; e
+    IV - a decisão sobre a necessidade de comunicação ao COAF.
+
+    § 3. As decisões de não comunicar ao COAF devem ser fundamentadas e
+    igualmente documentadas.
+guidance:
+  prose: |
+    A analise e a etapa humana (ou semi-automatizada) que transforma um alerta
+    do sistema em uma decisao fundamentada de comunicar ou nao ao COAF.
+    E onde a qualidade do julgamento dos analistas de PLD/FT e determinante.
+
+    **Quem analisa:**
+    A exigencia de "conhecimento especializado em PLD/FT" do ss 1 nao e retórica.
+    O analista precisa: entender os produtos do mercado de capitais, saber
+    identificar padroes classicos de lavagem, ter acesso ao contexto completo
+    do cliente, e ser capaz de raciocinar sobre o conjunto de evidencias.
+
+    **Documentacao de decisoes NEGATIVAS (ss 3):**
+    Este paragrafo e frequentemente ignorado e é um ponto de alta exposicao
+    regulatoria. Quando o participante decide NAO comunicar ao COAF, essa
+    decisao deve ser documentada com o mesmo rigor que a comunicacao.
+    Porque: se a CVM investigar posteriormente e descobrir que uma operacao
+    suspeita nao foi comunicada, o participante precisa demonstrar que houve
+    analise fundamentada — nao que simplesmente ignorou o alerta.
+
+    **Pratica forense:**
+    Um bom relatorio de analise deve contar a "historia" da operacao: quem
+    e o cliente, qual e seu perfil, o que foi detectado, por que e suspeito
+    (ou por que nao e), e qual a conclusao. Um relatorio de duas linhas
+    "analisado e nao suspeito" e insuficiente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de gestao de casos (case management):**
+      1. Fila de alertas priorizados por score de suspeita, com interface
+         de analise para o analista de PLD/FT.
+      2. Visao 360 do cliente: no painel de analise, o analista ve KYC completo,
+         historico de transacoes, alertas anteriores, comunicacoes ao COAF,
+         classificacao de risco — tudo em uma tela.
+      3. Formulario estruturado de relatorio de analise com os quatro campos
+         do ss 2 obrigatorios — sistema nao permite fechar o caso sem preencher.
+      4. Campo de justificativa obrigatorio para decisoes de nao comunicar (ss 3).
+      5. Workflow de escalacao: analista pode escalar caso para supervisor
+         ou compliance officer quando em duvida.
+
+      **Controle de SLA:**
+      6. Timer de SLA por categoria de alerta: alertas de alto score devem
+         ser analisados em X dias uteis.
+      7. Alertas para supervisores quando SLA esta sendo descumprido.
+    tools:
+      - case-management
+      - aml-platform
+      - workflow-engine
+      - reporting-dashboard
+  devsecops:
+    prose: |
+      **Qualidade do sistema de analise:**
+      1. Testes de obrigatoriedade dos campos do relatorio de analise.
+      2. Testes de que casos nao podem ser fechados sem justificativa documentada.
+      3. Testes de acesso: analista nao pode acessar casos de clientes fora
+         de sua fila ou jurisdicao.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - access-control
+  secops:
+    prose: |
+      **Qualidade das analises:**
+      1. Revisao por amostragem de relatorios de analise: verificar profundidade
+         e qualidade das justificativas.
+      2. KPI: tempo medio de analise por nivel de prioridade.
+      3. Calibracao periodica de analistas: revisao de casos historicos para
+         avaliar consistencia de decisoes entre analistas.
+      4. Treinamento continuo com casos reais anonimizados.
+    tools:
+      - case-management
+      - quality-assurance
+      - training-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-23"]
+    relationship: equivalent-to

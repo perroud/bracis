@@ -1,0 +1,104 @@
+id: samm-des-security-req
+family: design
+title: "Security Requirements"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Elicit, document, and manage security requirements for software systems derived from
+    threat models, regulatory obligations, organizational policy, and customer contractual
+    commitments. Integrate security requirements into the software development process
+    alongside functional requirements, ensuring they are testable, traceable, and
+    verifiable throughout the lifecycle.
+  parts:
+    - id: samm-des-security-req_smt.a
+      label: "Stream A — Software Requirements"
+      prose: >-
+        Define security requirements for software based on threat model outputs, applicable
+        regulations, data classification, and organizational security policy. Use established
+        security requirements frameworks (e.g., OWASP ASVS, NIST SP 800-53) as a baseline
+        and tailor requirements to the specific risk profile of each system. Document
+        requirements with acceptance criteria that enable objective verification. Integrate
+        security requirements into the product backlog and ensure they are addressed in
+        sprint planning and design reviews.
+    - id: samm-des-security-req_smt.b
+      label: "Stream B — Supplier Security"
+      prose: >-
+        Define and enforce security requirements for third-party software components,
+        SaaS providers, and software development vendors. Require suppliers to provide
+        software bills of materials (SBOMs), vulnerability disclosure programs, and
+        evidence of secure development practices. Include security requirements in
+        procurement contracts and assess supplier compliance before onboarding and
+        periodically thereafter. Establish procedures for handling vulnerabilities
+        discovered in third-party components, including defined SLA for remediation
+        based on severity.
+
+guidance:
+  prose: >-
+    Security requirements that exist only in documents are worthless. The test of a
+    security requirement is whether it can be verified — if you cannot write a test case
+    for it, it is not a requirement, it is a wish. At maturity level 1, the organization
+    uses a standard security requirements checklist (such as OWASP ASVS) as a baseline
+    for new projects. At level 2, security requirements are elicited from threat models,
+    tracked in the same backlog as functional requirements, and verified during testing.
+    At level 3, requirements are automatically generated from risk classification and
+    threat model outputs, supplier security assessments are systematic and evidence-based,
+    and SBOM validation is automated in the procurement and CI/CD pipeline process.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Design: Security Requirements"
+    url: "https://owaspsamm.org/model/design/security-requirements/"
+  - citation: "OWASP Application Security Verification Standard (ASVS)"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "NIST SP 800-218 — PO.1, PO.4"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Use the IDP to automate security requirement generation based on project metadata —
+      when a new service is registered in Backstage with a given data classification and
+      compliance tag, automatically generate a pre-populated security requirements checklist
+      derived from OWASP ASVS at the appropriate level. Implement SBOM generation and
+      validation as a platform service, making it available to all pipelines via a shared
+      pipeline component library. Maintain an approved component registry in the platform
+      that tracks security assessment status for all third-party libraries and container
+      base images, preventing use of unapproved components through platform-enforced
+      admission controls.
+    tools:
+      - "Backstage (Software Catalog, scaffolder templates)"
+      - "Syft (SBOM generation)"
+      - "Grype (SBOM vulnerability scanning)"
+      - "OWASP Dependency-Check"
+      - "Open Policy Agent (OPA)"
+  devsecops:
+    prose: >-
+      Integrate security requirement verification into CI/CD pipelines as automated
+      test suites aligned to OWASP ASVS levels. Generate SBOMs at build time and
+      validate them against the approved component registry. Implement dependency
+      scanning to detect third-party components with known vulnerabilities and enforce
+      SLA-based remediation timelines through pipeline gates. Use merge request checklists
+      to ensure security requirements are addressed before code merges to the main branch.
+      Automate ASVS-mapped test cases using tools like ZAP or Burp Suite in the pipeline.
+    tools:
+      - "OWASP ZAP (ASVS-mapped testing)"
+      - "Trivy / Grype (dependency & SBOM scanning)"
+      - "Syft (SBOM generation)"
+      - "Snyk (dependency security)"
+      - "GitLab Dependency Scanning"
+  secops:
+    prose: >-
+      Maintain a supplier security registry that tracks the security posture of all
+      third-party software vendors and component providers. Conduct periodic supplier
+      security assessments using questionnaires aligned to ISO 27001, SOC 2, or NIST
+      SSDF attestations. Monitor threat intelligence for vulnerabilities in third-party
+      components used by the organization and trigger emergency patching workflows
+      when critical vulnerabilities are disclosed. Maintain SLA tracking for vulnerability
+      remediation in third-party components and report compliance to risk management.
+    tools:
+      - "BitSight / SecurityScorecard (supplier assessment)"
+      - "ServiceNow (vendor risk management)"
+      - "VulnDB / NVD (vulnerability intelligence)"
+      - "DefectDojo (vulnerability tracking)"
+      - "SBOM analysis platforms (Dependency-Track)"

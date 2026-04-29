@@ -1,0 +1,119 @@
+id: rec-7
+family: assinatura
+title: "Signature Verification at Dispensation Point"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 13. O estabelecimento farmacêutico deve, previamente à dispensação,
+    verificar a autenticidade e a integridade da prescrição eletrônica,
+    mediante:
+
+    I — validação da assinatura digital do prescritor, confirmando que o
+    certificado ICP-Brasil utilizado era válido no momento da assinatura;
+
+    II — verificação do carimbo de tempo, confirmando que a prescrição foi
+    emitida dentro do prazo de validade aplicável;
+
+    III — consulta ao SNCR para confirmação de que a prescrição não foi
+    cancelada, já dispensada integralmente ou objeto de alerta de fraude;
+
+    IV — verificação de que o conteúdo da prescrição não foi alterado
+    após a assinatura digital.
+
+    Parágrafo único. A dispensação de medicamento com base em prescrição
+    cuja assinatura digital seja inválida, cujo carimbo de tempo esteja
+    ausente ou expirado, ou que apresente alerta no SNCR, é vedada.
+guidance:
+  prose: |
+    Article 13 establishes mandatory signature verification at the
+    dispensation point (pharmacy), creating a multi-layer validation
+    gate before any medication can be dispensed.
+
+    **Four-point verification at dispensation:**
+    1. Digital signature validity (ICP-Brasil certificate chain)
+    2. Timestamp verification (prescription within validity period)
+    3. SNCR status check (not cancelled, not already dispensed, no
+       fraud alerts)
+    4. Content integrity (no post-signature modifications)
+
+    **Hard block on dispensation:**
+    The regulation prohibits dispensation when any of the four checks
+    fail. This is a mandatory block, not an advisory warning.
+
+    **Pharmacy system requirements:**
+    Dispensing systems must implement all four verification steps as
+    an atomic pre-dispensation gate. The verification result must be
+    logged with the dispensation record.
+
+    **Offline scenarios:**
+    When SNCR is unavailable, the regulation does not provide an
+    explicit exception. Systems should implement queuing mechanisms
+    and verify pending dispensations when connectivity is restored.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Dispensation verification gateway:**
+      1. Implement a four-step verification pipeline as an atomic
+         pre-dispensation gate: signature validation, timestamp check,
+         SNCR status query, and content integrity verification.
+      2. Deploy the verification service at every dispensation point
+         with local caching of CRL/OCSP data for signature validation
+         when internet connectivity is intermittent.
+      3. Implement a queuing mechanism for dispensation requests during
+         SNCR outages, with automatic retry and verification when
+         connectivity is restored.
+      4. Log all verification results (pass/fail per step) with the
+         dispensation record in an immutable audit trail.
+      5. Deploy QR code or barcode scanning for prescription
+         identification, linking to the full verification workflow.
+    tools:
+      - verification-gateway
+      - queue-system
+      - rabbitmq
+      - redis-cache
+      - icp-brasil-sdk
+      - sncr-api
+  devsecops:
+    prose: |
+      **Dispensation verification testing:**
+      1. Create test cases for all verification failure scenarios
+         (invalid signature, expired timestamp, cancelled prescription,
+         tampered content) and verify hard block behavior.
+      2. Implement network failure simulation tests for SNCR outage
+         scenarios, verifying queuing and retry behavior.
+      3. Add penetration tests attempting to bypass the verification
+         gate through API manipulation or replay attacks.
+      4. Deploy load tests simulating peak dispensation volumes to
+         ensure verification latency stays within acceptable limits.
+    tools:
+      - gitlab-ci
+      - penetration-testing
+      - load-testing
+      - k6
+      - chaos-engineering
+  secops:
+    prose: |
+      **Dispensation verification monitoring:**
+      1. Monitor verification failure rates per pharmacy in real time
+         and alert on anomalous patterns (sudden spike in failures,
+         specific prescriber failures).
+      2. Track SNCR integration availability and queue depth during
+         outages to ensure no dispensations are missed.
+      3. Audit dispensation records monthly for completeness of
+         verification logs and flag any dispensations without
+         full four-step verification.
+      4. Investigate all fraud alert triggers from SNCR and
+         coordinate response with ANVISA and law enforcement.
+    tools:
+      - siem
+      - real-time-monitoring
+      - fraud-investigation
+      - compliance-dashboard
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-6", "art-10"]
+    relationship: complements
+  - framework_id: anvisa-134
+    articles: ["art-19"]
+    relationship: mapped

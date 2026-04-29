@@ -1,0 +1,91 @@
+id: cld-8.1
+family: cld
+title: "Removal of cloud service customer assets upon termination"
+class: ISO27017
+
+statement:
+  prose: >-
+    The cloud service provider shall define and enforce a policy for
+    the return or secure disposal of cloud service customer data,
+    including all copies, upon termination of the cloud service
+    agreement. The policy shall specify the procedures for returning
+    data to the cloud service customer in a portable format, the
+    timeline for data return, the methods for secure deletion of all
+    copies of the data including backups and replicas, and the
+    provision of evidence that secure deletion has been completed.
+    The cloud service customer shall verify that its exit strategy
+    includes provisions for data portability and secure deletion that
+    meet its information security requirements.
+
+guidance:
+  prose: >-
+    This cloud-specific control extends the general asset management
+    requirements to address the unique challenges of data removal
+    in cloud environments. When a cloud service agreement terminates,
+    the customer's data may exist in multiple locations including
+    primary storage, replicas across availability zones, backup
+    systems, disaster recovery sites, CDN caches, log files, and
+    analytics systems. The cloud service provider should provide a
+    comprehensive data map showing all locations where customer data
+    resides and a documented procedure for removing data from each
+    location. Cryptographic erasure may be used where physical deletion
+    is impractical, provided the customer controls the encryption keys.
+
+references:
+  - citation: "ISO/IEC 27017:2015, CLD.8.1.5"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design data architectures that facilitate clean data removal by
+      using per-tenant encryption keys, logical data isolation, and
+      well-defined data boundaries. Implement automated data lifecycle
+      management that tracks all locations where customer data is
+      stored or replicated. Build data export APIs that support
+      standard, portable formats. Implement cryptographic erasure
+      capabilities where customer-managed encryption keys can be
+      destroyed to render data unrecoverable. Test data deletion
+      procedures regularly to verify completeness.
+    tools:
+      - terraform
+      - vault
+      - aws-s3-lifecycle
+      - kubernetes
+
+  devsecops:
+    prose: >-
+      Include data portability and deletion testing in CI/CD pipelines
+      to verify that data export and deletion functions work correctly.
+      Implement automated tests that verify no data residuals remain
+      after deletion procedures execute. Build and maintain data
+      export tools that produce outputs in standard formats such as
+      JSON, CSV, or OASIS formats.
+    tools:
+      - gitlab-ci
+      - custom-scripts
+      - pytest
+
+  secops:
+    prose: >-
+      Audit data deletion operations to verify completeness across
+      all storage locations. Monitor for data residuals that persist
+      after deletion procedures complete. Track cloud service
+      termination events and verify that data removal timelines are
+      met. Collect and verify certificates of data destruction from
+      cloud service providers.
+    tools:
+      - splunk
+      - aws-cloudtrail
+      - prisma-cloud
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.10", "a8.10"]
+    relationship: derived-from
+  - framework_id: iso-27018
+    articles: ["a11.1"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["dsp-17"]
+    relationship: complements

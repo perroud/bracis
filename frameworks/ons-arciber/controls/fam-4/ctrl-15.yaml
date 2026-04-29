@@ -1,0 +1,102 @@
+id: ctrl-15
+family: fam-4
+title: "Protecao contra Malware e Codigo Malicioso no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles para prevenção, detecção e
+    resposta a malware e código malicioso em todos os sistemas do ARCiber
+    onde tecnicamente viável. Para sistemas que suportam soluções antimalware,
+    deve ser implantada solução compatível com o ambiente OT/ICS, mantida
+    atualizada e monitorada. Para sistemas onde antimalware tradicional não
+    é viável (PLCs, RTUs, sistemas de tempo real), devem ser implementados
+    controles compensatórios que reduzam o risco de infecção por código
+    malicioso, incluindo application whitelisting, controle de mídias
+    removíveis e monitoramento de integridade de arquivos.
+
+guidance:
+  prose: >-
+    Malware especifico para OT/ICS (Stuxnet, Industroyer, TRITON/TRISIS, Pipedream)
+    representa uma ameaca real e crescente ao setor eletrico. A protecao deve
+    considerar as restricoes do ambiente: (i) solucoes antimalware tradicionais
+    podem causar falhas em sistemas de tempo real — usar solucoes especificamente
+    testadas para OT (TrendMicro TXOne, Symantec SCSP, GE Achilles); (ii)
+    application whitelisting (controle de aplicacoes permitidas) e mais adequado
+    para sistemas OT que antivirus baseado em assinatura — implementar via
+    Windows Software Restriction Policies, AppLocker ou McAfee Application Control;
+    (iii) controle rigoroso de midias removiveis (USB, CD/DVD) — principal vetor
+    de infeccao inicial em ambientes OT isolados; (iv) scan de malware em
+    estacoes de transferencia de dados (malware scanning kiosks) antes de
+    introducao de qualquer midia no ARCiber. Atualizar assinaturas via processo
+    controlado e testado.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar TrendMicro TXOne ou solucao equivalente especifica para OT
+      nos sistemas Windows do ARCiber (servidores SCADA, historians, HMIs, EWS).
+      Configurar application whitelisting via AppLocker ou Windows SRP em
+      sistemas criticos do ARCiber para permitir apenas aplicacoes autorizadas.
+      Implementar kiosk de scan de malware na entrada do ARCiber para toda midia
+      removivel antes de uso nos sistemas. Desabilitar portas USB fisicas em
+      sistemas do ARCiber onde nao sejam operacionalmente necessarias (via BIOS
+      e Group Policy). Implementar monitoramento de integridade de arquivos
+      nos servidores SCADA para deteccao de modificacoes nao autorizadas.
+    tools:
+      - trendmicro-txone
+      - mcafee-app-control
+      - applocker
+      - nozomi-networks
+      - tripwire
+  devsecops:
+    prose: >-
+      Implementar processo controlado de atualizacao de assinaturas antimalware
+      para sistemas do ARCiber — atualizacoes devem ser validadas em ambiente
+      de testes antes da aplicacao em producao. Configurar pipeline de distribuicao
+      de atualizacoes de assinaturas via servidor interno (WSUS, servidor de
+      atualizacao offline) sem acesso direto do ARCiber a Internet. Automatizar
+      verificacao de que solucoes antimalware estao ativas e atualizadas em todos
+      os sistemas elegiaveis do ARCiber, com alerta para desvios. Documentar
+      excecoes (sistemas sem antimalware) com justificativa e controles
+      compensatorios.
+    tools:
+      - gitlab-ci
+      - wsus
+      - ansible
+      - trendmicro-txone
+  secops:
+    prose: >-
+      Monitorar alertas de deteccao de malware nos sistemas do ARCiber em tempo
+      real, com escalacao imediata ao RSCA e acionamento do plano de resposta a
+      incidentes para qualquer deteccao confirmada. Realizar analise forense de
+      qualquer deteccao de malware em sistema do ARCiber para determinar vetor
+      de entrada, escopo de comprometimento e impacto potencial no SIN.
+      Monitorar inteligencia de ameacas OT (CISA, ICS-CERT, ISACs setoriais)
+      para alertas especificos de campanhas direcionadas ao setor eletrico.
+      Executar scan periodico (mensal) de malware nos sistemas do ARCiber usando
+      ferramenta em modo offline quando antimalware residente nao e viavel.
+    tools:
+      - trendmicro-txone
+      - splunk
+      - virustotal
+      - mandiant-advantage
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR3.2", "62443-3-3 SR3.4"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.7"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-7", "CM-7"]
+    relationship: mapped

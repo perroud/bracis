@@ -1,0 +1,123 @@
+id: owasp-a08
+family: a08
+title: "A08:2021 — Software and Data Integrity Failures"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Software and data integrity failures relate to code and infrastructure that does not protect
+    against integrity violations. An example of this is where an application relies upon plugins,
+    libraries, or modules from untrusted sources, repositories, and content delivery networks.
+    An insecure CI/CD pipeline can introduce the potential for unauthorized access, malicious code,
+    or system compromise. Lastly, many applications now include auto-update functionality, where
+    updates are downloaded without sufficient integrity verification and applied to the previously
+    trusted application. Attackers might upload their own updates to be distributed and run on all
+    installations. Another example is where objects or data are encoded or serialized into a
+    structure that an attacker can see and modify is vulnerable to insecure deserialization — the
+    application accepts serialized objects from hostile sources and deserializes them without
+    integrity verification.
+
+guidance:
+  prose: >-
+    Software and Data Integrity Failures is a new category in 2021, largely driven by the wave of
+    software supply chain attacks in 2020-2021 (SolarWinds, Codecov, PHP source tree, ua-parser-js).
+    The common theme across these incidents is trust in external inputs — software updates, CI/CD
+    pipelines, third-party libraries — without verifying their integrity. The supply chain attack
+    surface spans every external dependency, every build tool, every CI/CD system component, and
+    every software distribution mechanism. Defense requires cryptographic verification of all
+    external inputs: code signing for artifacts, signature verification for updates, and integrity
+    checks (checksums, Sigstore signatures) for dependencies. Insecure deserialization is the
+    application-level manifestation: accepting serialized data from untrusted sources without
+    integrity and type validation enables attackers to achieve remote code execution or object
+    injection by crafting malicious serialized payloads.
+
+references:
+  - citation: "OWASP Top 10:2021 A08 Software and Data Integrity Failures"
+    url: "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/"
+  - citation: "SLSA Supply Chain Levels for Software Artifacts"
+    url: "https://slsa.dev/"
+  - citation: "Sigstore — Signing the Software Supply Chain"
+    url: "https://www.sigstore.dev/"
+  - citation: "OWASP Deserialization Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement end-to-end supply chain integrity using the SLSA (Supply Chain Levels for Software
+      Artifacts) framework as a reference, targeting SLSA Level 2 or higher. Sign all build
+      artifacts (container images, binaries, packages) using Sigstore/Cosign and verify signatures
+      before deployment. Use a private container registry that enforces signature verification
+      before allowing images to be pulled. Implement admission control (Connaisseur, Kyverno,
+      OPA Gatekeeper) to reject unsigned or unverified container images from Kubernetes clusters.
+      Pin all dependencies to specific cryptographic digests (container image SHA256, npm package
+      lockfile hashes, Python requirements.txt with hashes) rather than mutable version tags.
+      Generate and publish SBOMs (Software Bill of Materials) in CycloneDX or SPDX format for
+      all released artifacts. Implement Subresource Integrity (SRI) for all externally loaded
+      web resources (scripts, stylesheets from CDNs).
+    tools:
+      - cosign
+      - sigstore
+      - connaisseur
+      - kyverno
+      - opa
+      - syft
+      - trivy
+      - rekor
+
+  devsecops:
+    prose: >-
+      Harden CI/CD pipelines against compromise: use ephemeral, single-use runners that cannot
+      be poisoned between jobs; pin CI/CD action versions to specific SHA digests (not mutable
+      tags); implement OIDC-based authentication between CI/CD and cloud providers instead of
+      long-lived credentials; restrict pipeline modification permissions to a limited set of
+      approved users. Verify checksums and signatures of all downloaded tools and dependencies
+      in pipeline scripts. Implement CI/CD pipeline integrity through signed pipeline configurations
+      and pipeline run attestations. For deserialization: enforce using only safe, non-polyglot
+      serialization formats (JSON, Protobuf) instead of native object serialization (Java
+      serialization, Python pickle, Ruby marshal) when accepting external input. Add SAST rules
+      for insecure deserialization patterns (Java ObjectInputStream, Python pickle.loads with
+      untrusted input, PHP unserialize with user data).
+    tools:
+      - gitlab-ci
+      - cosign
+      - semgrep
+      - checkov
+      - trivy
+      - syft
+      - slsa-verifier
+
+  secops:
+    prose: >-
+      Monitor the software supply chain for anomalies: unexpected outbound connections from
+      build systems, new dependencies added without pull request review, CI/CD configuration
+      changes by non-approved accounts, and artifact integrity failures. Subscribe to security
+      advisories for all CI/CD tools, build dependencies, and infrastructure components —
+      compromises in build tooling can affect the entire software supply chain. Implement
+      binary transparency using Rekor (Sigstore's transparency log) to create a tamper-evident
+      record of all signed build artifacts. Monitor for deserialization attacks: Java deserialization
+      exploits produce characteristic JVM error patterns; ysoserial payloads trigger known
+      gadget chain executions visible in application logs and process execution monitoring.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - falco
+      - rekor
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-ssdf
+    articles: ["PW.4.1", "PW.4.4", "PS.1.1", "PS.2.1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "SA-9", "SA-10", "SA-12"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.3.2", "6.4.3", "6.5"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["2.2", "16.1", "16.2"]
+    relationship: mapped

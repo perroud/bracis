@@ -1,0 +1,141 @@
+id: sec-1798-105
+family: consumer-rights
+title: "Right to Delete Personal Information"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right to request that a business delete any personal
+    information about the consumer which the business has collected from the consumer.
+
+    (b) A business that collects personal information about consumers shall disclose, pursuant
+    to Section 1798.130, the consumer's rights to request the deletion of the consumer's
+    personal information.
+
+    (c) A business that receives a verifiable consumer request from a consumer to delete the
+    consumer's personal information pursuant to subdivision (a) of this section shall delete
+    the consumer's personal information from its records, notify any service providers or
+    contractors that maintain the consumer's personal information to delete the consumer's
+    personal information from their records, and notify all third parties to whom the business
+    has sold or shared such personal information to delete the consumer's personal information
+    unless this proves impossible or involves disproportionate effort.
+
+    (d) A business, or a service provider or contractor acting pursuant to its contract with
+    the business, another service provider, or another contractor, shall not be required to
+    comply with a consumer's request to delete the consumer's personal information if it is
+    reasonably necessary for the business, service provider, or contractor to maintain the
+    consumer's personal information in order to:
+    (1) Complete the transaction for which the personal information was collected, fulfill the
+    terms of a written warranty or product recall, provide a good or service requested by the
+    consumer, or reasonably anticipated within the context of the ongoing business relationship.
+    (2) Help to ensure security and integrity to the extent the use of the consumer's personal
+    information is reasonably necessary and proportionate for those purposes.
+    (3) Debug to identify and repair errors that impair existing intended functionality.
+    (4) Exercise free speech, ensure the right of another consumer to exercise that consumer's
+    right of free speech, or exercise another right provided for by law.
+    (5) Comply with the California Electronic Communications Privacy Act.
+    (6) Engage in public or peer-reviewed scientific, historical, or statistical research that
+    conforms or adheres to all other applicable ethics and privacy laws, when the business'
+    deletion of the information is likely to render impossible or seriously impair the
+    achievement of such research.
+    (7) To enable solely internal uses that are reasonably aligned with the expectations of the
+    consumer based on the consumer's relationship with the business and compatible with the
+    context in which the consumer provided the information.
+    (8) Comply with a legal obligation.
+    (9) Otherwise use the consumer's personal information, internally, in a lawful manner that
+    is compatible with the context in which the consumer provided the information.
+
+guidance:
+  prose: |
+    Section 1798.105 establishes the right to deletion, analogous to GDPR's "right to be
+    forgotten" (Article 17). Key technical requirements:
+
+    1. **Cascading deletion:** The business must delete PI from its own records AND direct
+       service providers, contractors, and third parties to delete it as well.
+
+    2. **Exceptions are specific:** Nine enumerated exceptions exist (legal obligation, free
+       speech, security, debugging, etc.). Businesses must document which exception applies
+       when denying a deletion request.
+
+    3. **Verification required:** Deletion requests require identity verification before
+       processing. The level of verification must be proportionate to the sensitivity of the data.
+
+    4. **45-day response window:** Same timeline as access requests — 45 days, extendable by
+       an additional 45 days with notice to the consumer.
+
+    5. **Service provider obligations:** Service providers and contractors must cooperate with
+       deletion requests from the businesses they serve.
+
+    CPRA strengthened this right by requiring notification to third parties (not just service
+    providers) and adding contractors to the obligation chain.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement cascading deletion orchestration service that propagates deletion across
+         all data stores, microservices, service providers, and third parties.
+      2. Build a data lineage map identifying where each consumer's PI resides — databases,
+         caches, message queues, object storage, backups, analytics systems, and third-party
+         integrations.
+      3. Implement soft-delete with configurable hard-delete timelines to allow for exception
+         processing before permanent erasure.
+      4. Create deletion verification service that confirms data removal across all systems
+         and generates a deletion certificate/audit record.
+      5. Build automated third-party notification system that sends deletion directives to
+         all parties who received the consumer's PI.
+      6. Implement backup data deletion strategy — either granular deletion from backups or
+         documented retention-with-isolation approach until backup expiration.
+      7. Deploy event-driven architecture (pub/sub) for deletion propagation to ensure
+         eventual consistency across all systems.
+    tools:
+      - kafka
+      - rabbitmq
+      - backstage
+      - custom-deletion-service
+      - data-lineage
+      - datahub
+
+  devsecops:
+    prose: |
+      1. Implement automated tests verifying deletion completeness — after a deletion request,
+         scan all data stores to confirm the consumer's PI is removed.
+      2. Test cascading deletion across all microservices and databases in integration tests.
+      3. Validate that deletion propagates to third-party systems via webhook/API integration tests.
+      4. Implement data retention policy tests that verify expired data is automatically purged.
+      5. Scan code for patterns that might bypass deletion (hardcoded copies, separate analytics
+         stores, denormalized data).
+      6. Test exception handling logic — verify that exempted data is correctly retained and
+         documented when an exception applies.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - postman
+      - data-integrity-validation
+      - backup-lifecycle-management
+
+  secops:
+    prose: |
+      1. Monitor deletion request fulfillment against the 45-day SLA with escalation alerts.
+      2. Audit deletion completeness — periodically verify that deleted consumers' PI does not
+         reappear in any systems (including analytics, logs, and third-party integrations).
+      3. Monitor for unauthorized retention of PI after deletion requests are processed.
+      4. Track exception usage patterns — flag if a disproportionate number of requests are
+         being denied under a single exception category.
+      5. Maintain audit trail of all deletion actions, including third-party confirmations.
+    tools:
+      - dsar-tracking
+      - siem
+      - elastic-siem
+      - data-discovery
+      - compliance-dashboard
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-iv", "art. 18-vi"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["A.7.3.6"]
+    relationship: supports

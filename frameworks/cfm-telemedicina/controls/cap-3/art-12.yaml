@@ -1,0 +1,114 @@
+id: art-12
+family: cap-3
+title: "Armazenamento Seguro de Dados de Saude"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 12. Os dados de saúde coletados e gerados em atendimentos
+    de telemedicina devem ser armazenados em sistemas seguros, com
+    proteção contra acesso não autorizado, perda, destruição ou
+    alteração indevida.
+
+    Parágrafo 1. O armazenamento deve utilizar criptografia em
+    repouso com algoritmos reconhecidos internacionalmente.
+
+    Parágrafo 2. Os dados devem ser armazenados preferencialmente
+    em território nacional, observando a legislação vigente sobre
+    transferência internacional de dados.
+
+    Parágrafo 3. Devem ser implementados mecanismos de backup e
+    recuperação de desastres que garantam a disponibilidade dos
+    dados clínicos em caso de falha de sistemas.
+
+    Parágrafo 4. O acesso aos dados armazenados deve ser controlado
+    por mecanismos de autenticação forte e registro de auditoria.
+guidance:
+  prose: |
+    O art. 12 trata da protecao de dados de saude em repouso,
+    complementando o art. 11 que trata de dados em transito.
+
+    **Criptografia em repouso (paragrafo 1):**
+    - AES-256 como padrao minimo para criptografia de disco e banco
+    - Criptografia de campo (field-level encryption) para dados
+      senssiveis como diagnosticos, prescricoes e dados biometricos
+    - Envelope encryption com chave mestra em HSM
+
+    **Localizacao de dados (paragrafo 2):**
+    A preferencia por armazenamento em territorio nacional alinha-se
+    com a LGPD. Transferencia internacional de dados de saude requer
+    base legal especifica (art. 33 da LGPD).
+
+    **Backup e DR (paragrafo 3):**
+    Dados clinicos sao criticos e devem ter:
+    - RPO (Recovery Point Objective): maximo 1 hora
+    - RTO (Recovery Time Objective): maximo 4 horas
+    - Backup georedundante em minimo 2 regioes
+    - Testes de restauracao no minimo trimestrais
+
+    **Autenticacao forte (paragrafo 4):**
+    Autenticacao multifator (MFA) e obrigatoria para acesso a dados
+    de saude. Recomenda-se FIDO2/WebAuthn ou certificado digital
+    ICP-Brasil para profissionais de saude.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de armazenamento seguro:**
+      1. Implementar criptografia em repouso AES-256 em todos os
+         bancos de dados e sistemas de armazenamento que contenham
+         dados de saude.
+      2. Utilizar envelope encryption com chave mestra armazenada
+         em HSM, com chaves de dados rotacionadas automaticamente.
+      3. Configurar armazenamento primario em regiao brasileira
+         (ex: sa-east-1 na AWS, Brazil South na Azure) com
+         replicacao para segunda regiao nacional.
+      4. Implementar estrategia de backup 3-2-1: 3 copias, 2 midias
+         diferentes, 1 offsite, com retencao conforme exigido
+         pela resolucao (minimo 20 anos para prontuario).
+      5. Implementar autenticacao multifator (MFA) obrigatoria
+         para acesso a qualquer sistema que armazene dados de saude.
+    tools:
+      - encryption-at-rest
+      - hsm
+      - backup-automation
+      - mfa-provider
+  devsecops:
+    prose: |
+      **Pipeline de seguranca de armazenamento:**
+      1. Verificar automaticamente que criptografia em repouso
+         esta habilitada em todos os recursos de armazenamento
+         via policy-as-code (OPA, Sentinel).
+      2. Testar processo de restauracao de backup como parte do
+         pipeline de infraestrutura, validando RTO e RPO.
+      3. Verificar que dados de saude nao sao armazenados em
+         regioes fora do territorio nacional sem aprovacao.
+      4. Implementar scan de configuracao que detecte bancos de
+         dados ou buckets sem criptografia habilitada.
+    tools:
+      - gitlab-ci
+      - policy-as-code
+      - backup-testing
+      - configuration-scanning
+  secops:
+    prose: |
+      **Operacao de armazenamento seguro:**
+      1. Monitorar continuamente que criptografia em repouso esta
+         ativa e operacional em todos os sistemas de armazenamento.
+      2. Executar testes de restauracao de backup trimestralmente,
+         documentando resultados e tempo de recuperacao.
+      3. Auditar logs de acesso a dados de saude, verificando que
+         acessos sao legifimos e autorizados.
+      4. Monitorar localizacao geografica de dados e alertar se
+         dados forem replicados para regioes fora do Brasil.
+    tools:
+      - encryption-monitoring
+      - backup-monitoring
+      - access-audit
+      - data-residency-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-33", "art-46", "art-47"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-2-iv", "164.308-a-7"]
+    relationship: mapped

@@ -1,0 +1,83 @@
+id: pin-2
+family: pin-mgmt
+title: "PIN Generation Requirements"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    PINs must be generated using processes and equipment that ensure the random or
+    pseudo-random nature of the PIN cannot be compromised. PIN generation must occur within
+    a secure cryptographic device (SCD) using an approved random-number generation process.
+    PINs must not be generated outside of an SCD environment. Where PINs are assigned by
+    the issuer, the generation process must ensure that it is statistically impractical to
+    determine any one PIN given knowledge of other PINs. PIN mailers must be produced in a
+    secure environment with dual control and split-knowledge principles applied throughout
+    the process.
+
+guidance:
+  prose: >-
+    PIN generation is a critical security function because a predictable or biased PIN
+    generation process could allow attackers to guess PINs with higher probability than
+    the expected 1-in-10,000 for a 4-digit PIN. The random number generator (RNG) used
+    must meet NIST SP 800-90A or equivalent standards. The entire PIN generation workflow
+    — from RNG invocation through PIN block creation to PIN mailer production — must be
+    contained within SCD boundaries. Organizations that allow cardholder-selected PINs
+    must still ensure the PIN selection interface communicates securely with the issuer's
+    HSM for PIN storage, and that trivial PINs (sequential digits, repeated digits) are
+    rejected.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 1, PIN Generation"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement PIN generation exclusively within HSM environments using FIPS 140-2
+      Level 3 certified random number generators. Configure HSM firmware to reject
+      weak PINs (e.g., 0000, 1234, repeated sequences). Deploy secure PIN mailer
+      production systems within physically secured rooms with dual-control entry.
+      Implement automated PIN offset calculation within the HSM using the issuer's
+      PIN verification key (PVK). Ensure all PIN generation APIs enforce mutual TLS
+      authentication and only accept requests from authorized issuance systems.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - atalla-hsm
+      - fips-140-2-certified-rng
+      - mutual-tls
+  devsecops:
+    prose: >-
+      Validate PIN generation code paths in CI/CD pipelines by running unit tests that
+      verify all PIN generation calls route through the HSM API exclusively. Implement
+      integration tests that confirm weak PINs are rejected by the generation process.
+      Scan code repositories for hardcoded PIN values or test PINs that could leak into
+      production. Enforce branch protection and mandatory code review for any changes to
+      PIN generation modules.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - semgrep
+      - gitlab-code-review
+  secops:
+    prose: >-
+      Audit PIN generation logs from HSM systems to verify generation volumes align with
+      expected issuance rates. Monitor for anomalous spikes in PIN generation requests
+      that could indicate unauthorized batch generation. Review physical access logs for
+      PIN mailer production facilities. Conduct periodic statistical analysis of generated
+      PINs (using PIN offset data, not cleartext PINs) to verify uniform distribution.
+    tools:
+      - splunk
+      - elastic-siem
+      - thales-crypto-command-center
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "IA-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.5.17"]
+    relationship: mapped

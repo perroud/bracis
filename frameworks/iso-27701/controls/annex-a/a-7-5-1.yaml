@@ -1,0 +1,124 @@
+id: a-7.5.1
+family: annex-a
+title: "Identify basis for PII transfer between jurisdictions"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall identify and document the basis for transfers of PII to
+    other jurisdictions, whether to other organizations or within the same organization,
+    and the appropriate safeguards that are in place. The organization shall ensure
+    that any transfer of PII to a jurisdiction outside the one in which it was
+    collected complies with applicable legislative and regulatory requirements, including
+    those that restrict transfers to jurisdictions that do not provide adequate
+    protection for PII. The organization shall implement appropriate safeguards for
+    cross-border PII transfers, which may include adequacy decisions, binding corporate
+    rules, standard contractual clauses, approved codes of conduct, certification
+    mechanisms, or explicit consent of PII principals where permitted.
+
+guidance:
+  prose: >-
+    Cross-border PII transfer is one of the most complex areas of privacy compliance
+    because requirements vary significantly across jurisdictions and are subject to
+    frequent regulatory changes (e.g., Schrems II invalidating EU-US Privacy Shield).
+    The organization must maintain a comprehensive map of all PII transfers across
+    jurisdictional boundaries, including: source jurisdiction, destination jurisdiction,
+    transfer mechanism, safeguards in place, and the legal basis relied upon. For
+    transfers from the EU/EEA, the organization must use one of the mechanisms under
+    GDPR Chapter V (adequacy decisions, SCCs, BCRs, derogations). For transfers
+    from Brazil, LGPD Article 33 specifies permitted transfer bases. The organization
+    must also consider data localization requirements in certain jurisdictions and
+    industries. Technical safeguards for cross-border transfers include encryption
+    in transit, access controls limiting who in the destination jurisdiction can
+    access PII, and audit logging of all cross-border data access. The organization
+    should implement technical controls that prevent unauthorized cross-border
+    transfers at the infrastructure level.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.5.1"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement jurisdiction-aware data routing as a platform capability.
+      Tag all PII data stores and processing workloads with jurisdiction
+      metadata. Build network policies and data gateway controls that
+      enforce data localization requirements: prevent PII from being
+      routed to cloud regions in non-approved jurisdictions. Implement
+      a transfer registry that automatically detects cross-border data
+      flows by comparing source and destination jurisdiction tags.
+      Build transfer safeguard enforcement: require encryption for all
+      cross-border transfers, implement access controls limiting data
+      access to authorized personnel in destination jurisdictions,
+      and log all cross-border data access for audit. Provide
+      infrastructure-as-code modules that deploy data processing
+      workloads in jurisdiction-compliant configurations by default.
+      Implement automated adequacy checking that validates transfer
+      destinations against current regulatory adequacy decisions.
+    tools:
+      - jurisdiction-metadata-tagging
+      - kubernetes-network-policies
+      - data-gateway-controls
+      - transfer-registry
+      - terraform-region-modules
+      - encryption-in-transit
+      - audit-logging
+
+  devsecops:
+    prose: >-
+      Integrate cross-border transfer compliance into CI/CD pipelines.
+      Build infrastructure-as-code validation that verifies data store
+      deployments comply with jurisdiction requirements: PII data stores
+      are provisioned in approved regions, cross-region replication
+      configurations only target approved jurisdictions. Implement
+      pipeline gates that require transfer impact assessment for
+      changes introducing new cross-border data flows. Build static
+      analysis rules that detect hardcoded cloud region configurations
+      and verify they align with PII jurisdiction requirements. Implement
+      automated testing of transfer safeguards: verify encryption is
+      active on cross-border connections, verify access controls are
+      properly configured, verify audit logging captures cross-border
+      access events.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - checkov
+      - terraform-compliance
+      - region-compliance-validators
+      - transfer-safeguard-tests
+
+  secops:
+    prose: >-
+      Monitor cross-border PII transfers in real time. Build SIEM
+      correlation rules that detect unauthorized data transfers:
+      PII data flowing to non-approved jurisdictions, data access
+      from non-approved geographic locations, unusual cross-border
+      data volume patterns. Monitor transfer safeguard compliance:
+      encryption status on cross-border connections, access control
+      effectiveness, audit log completeness. Alert on regulatory
+      changes affecting transfer mechanisms (e.g., adequacy decision
+      changes) and trigger transfer basis reassessment. Generate
+      periodic transfer compliance reports showing all cross-border
+      data flows, transfer mechanisms used, and safeguard status.
+      Implement geolocation-based anomaly detection for data access
+      patterns.
+    tools:
+      - splunk
+      - elastic-siem
+      - geo-ip-analysis
+      - network-flow-monitoring
+      - transfer-compliance-dashboards
+      - regulatory-change-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44", "art-45", "art-46", "art-47", "art-49"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100"]
+    relationship: supports

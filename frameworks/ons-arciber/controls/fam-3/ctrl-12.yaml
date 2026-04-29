@@ -1,0 +1,97 @@
+id: ctrl-12
+family: fam-3
+title: "Gestao de Contas Privilegiadas e Servicos no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles específicos para gerenciamento
+    de contas privilegiadas (administradores de sistemas OT, contas de serviço,
+    contas de aplicação) em todos os sistemas do ARCiber. Contas privilegiadas
+    devem ser gerenciadas em cofre digital de senhas com rotação automática,
+    auditoria de uso e aprovação just-in-time para atividades administrativas
+    críticas. O número de contas privilegiadas deve ser minimizado e cada
+    conta deve ser atribuída a um indivíduo identificável. Contas de serviço
+    e aplicação devem ter privilégios limitados ao estritamente necessário
+    para sua função.
+
+guidance:
+  prose: >-
+    Contas privilegiadas em sistemas OT/ICS representam alto risco porque
+    seu comprometimento pode resultar em controle total sobre sistemas de
+    automacao criticos. Os controles devem incluir: (i) inventario completo
+    de todas as contas privilegiadas em sistemas do ARCiber, incluindo contas
+    locais administrativas em PLCs, RTUs, HMIs e servidores SCADA;
+    (ii) eliminacao de contas de administrador genericas (admin, root) em favor
+    de contas nominais com privilegios equivalentes; (iii) rotacao de senhas
+    privilegiadas: automatica pelo cofre PAM apos cada sessao de uso ou ao
+    menos a cada 30 dias; (iv) aprovacao just-in-time para elevacao de privilegio
+    — uso de contas admin apenas para tarefas especificas, com aprovacao previa;
+    (v) gravacao de todas as sessoes privilegiadas para auditoria;
+    (vi) contas de servico (ex: conta de leitura do SCADA no historian) devem
+    ter senha longa e complexa gerenciada no cofre PAM, sem acesso interativo.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar CyberArk PAM ou BeyondTrust Privilege Management como
+      cofre central de senhas para todas as contas privilegiadas do ARCiber.
+      Configurar rotacao automatica de senhas de contas privilegiadas: diaria
+      para contas de sistema critico, semanal para contas administrativas gerais.
+      Implementar Privileged Session Manager (PSM) para gravacao completa de
+      sessoes administrativas em sistemas OT do ARCiber. Configurar aprovacao
+      just-in-time (JIT) para acessos administrativos criticos, com fluxo de
+      aprovacao pelo RSCA ou responsavel designado. Integrar o cofre PAM ao
+      SIEM para correlacao de eventos de acesso privilegiado.
+    tools:
+      - cyberark
+      - beyondtrust
+      - hashicorp-vault
+      - active-directory
+  devsecops:
+    prose: >-
+      Eliminar o uso de credenciais privilegiadas em scripts e pipelines CI/CD
+      que interagem com sistemas do ARCiber — usar secret management (HashiCorp
+      Vault, GitLab CI secrets) integrado ao cofre PAM para injecao de
+      credenciais em tempo de execucao. Implementar scans de secrets em
+      repositorios de codigo para detectar credenciais privilegiadas expostas.
+      Auditar periodicamente o uso de contas de servico nos sistemas do ARCiber
+      para detectar acessos anomaticos.
+    tools:
+      - gitlab-ci
+      - hashicorp-vault
+      - gitlab-secret-detection
+      - cyberark
+  secops:
+    prose: >-
+      Monitorar e alertar para todo acesso privilegiado nos sistemas do ARCiber,
+      especialmente fora de horarios esperados ou sem ticket de mudanca associado.
+      Revisar trimestralmente o inventario de contas privilegiadas para remover
+      contas obsoletas ou desnecessarias. Analisar logs de sessoes privilegiadas
+      gravadas em caso de incidente ou anomalia. Exigir que toda acao administrativa
+      em sistemas criticos do ARCiber seja precedida de abertura de ticket de
+      mudanca formal, criando trilha de auditoria completa.
+    tools:
+      - cyberark
+      - splunk
+      - servicenow
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR2.1", "62443-3-3 SR2.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R5", "CIP-004-R4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.2", "a8.17", "a8.18"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-6", "IA-5", "AU-9"]
+    relationship: mapped

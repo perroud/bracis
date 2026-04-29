@@ -1,0 +1,106 @@
+id: cscf-2.1
+family: obj-2
+title: "Internal Data Flow Security"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure the confidentiality, integrity, and mutual authentication of
+    data flows between SWIFT-related applications within the secure zone
+    and between the secure zone and connected back-office systems. All
+    internal data exchanges carrying SWIFT transaction data must be
+    protected using encryption and integrity controls.
+  parts:
+    - id: cscf-2.1.a
+      label: "2.1.a"
+      prose: >-
+        Data flows between SWIFT infrastructure components (messaging
+        interface, communication interface, connector) are encrypted using
+        TLS 1.2 or higher with mutual authentication.
+    - id: cscf-2.1.b
+      label: "2.1.b"
+      prose: >-
+        Data exchanged between the secure zone and back-office middleware
+        or applications uses encrypted channels with integrity verification.
+    - id: cscf-2.1.c
+      label: "2.1.c"
+      prose: >-
+        Certificates used for internal data flow encryption are managed
+        through a controlled PKI process, with automated rotation and
+        revocation capabilities.
+
+guidance:
+  prose: >-
+    Internal data flows within the secure zone carry highly sensitive financial
+    messaging data (MT, MX, ISO 20022 messages). An attacker who has gained
+    a foothold in the network could intercept or modify these messages if
+    they traverse the network in plaintext. TLS with mutual authentication
+    prevents both eavesdropping and man-in-the-middle attacks. Organizations
+    should avoid self-signed certificates in production; instead use an
+    internal Certificate Authority with proper lifecycle management. Cipher
+    suites should be restricted to strong algorithms (AES-256-GCM, ChaCha20)
+    and weak protocols (SSLv3, TLS 1.0/1.1) must be disabled.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.1"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-52 Rev. 2 — Guidelines for TLS Implementations"
+    url: "https://doi.org/10.6028/NIST.SP.800-52r2"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a service mesh (Istio, Linkerd) to enforce mTLS between all
+      services within the secure zone. Use cert-manager with a private CA
+      (Vault PKI, AWS Private CA, step-ca) for automated certificate
+      issuance and rotation. Configure TLS policies to require minimum
+      TLS 1.2 with strong cipher suites. Implement network-level encryption
+      (WireGuard, IPsec) as an additional layer for cross-subnet traffic.
+      Define and enforce encryption policies via infrastructure-as-code.
+    tools:
+      - istio
+      - linkerd
+      - cert-manager
+      - hashicorp-vault
+      - aws-private-ca
+      - step-ca
+      - wireguard
+
+  devsecops:
+    prose: >-
+      Scan IaC and application configurations for weak TLS settings in
+      CI/CD pipelines. Use tools like testssl.sh or ssl-scan in automated
+      pipelines to validate TLS configurations. Enforce that no service
+      can be deployed without mTLS sidecar injection. Alert on certificate
+      expiration approaching through pipeline-based checks.
+    tools:
+      - testssl-sh
+      - checkov
+      - trivy
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor certificate expiration and rotation events. Alert on any
+      plaintext communication detected within the secure zone. Detect
+      TLS downgrade attempts or use of deprecated cipher suites. Review
+      certificate issuance logs for unauthorized certificate generation.
+    tools:
+      - splunk
+      - elastic-siem
+      - venafi
+      - keyfactor
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-8(1)", "SC-12", "SC-13"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.20"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-4.1", "req-4.2"]
+    relationship: complements

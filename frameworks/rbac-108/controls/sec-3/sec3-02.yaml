@@ -1,0 +1,123 @@
+id: sec3-02
+family: sec-3
+title: "Resposta a Incidentes Ciberneticos e Continuidade de Operacoes de Voo"
+class: RBAC-108
+baselines: [air-operators]
+statement:
+  prose: |
+    O operador aéreo deve elaborar e manter procedimentos de resposta a incidentes cibernéticos
+    que garantam a continuidade segura das operações de voo durante e após um ataque cibernético.
+    Os procedimentos devem incluir modos de operação degradada (fallback) para sistemas críticos,
+    critérios de decisão sobre suspensão de operações e coordenação com autoridades de aviação
+    civil, e devem ser testados por meio de exercícios periódicos.
+guidance:
+  prose: |
+    A continuidade das operacoes de voo durante um incidente cibernetico e desafio unico da
+    aviacao: diferente de outros setores, uma interrupcao operacional pode ter aeronaves
+    em voo que precisam de suporte continuo, passageiros em transito e compromissos de
+    seguranca de voo que nao podem ser pausados.
+
+    **Principios de resposta em AVSEC cibernetica:**
+    1. Seguranca de voo em primeiro lugar: qualquer duvida sobre a integridade de
+       sistemas que afetam diretamente a seguranca de voo deve resultar em postura
+       conservadora (nao enviar mais aeronaves, apoio a aeronaves em voo por canais
+       alternativos).
+    2. Continuidade por canais alternativos: todo sistema critico deve ter procedimento
+       de fallback documentado e treinado (ex: planejamento de voo por telefone, boarding
+       manual, documentacao fisica de manifesto).
+    3. Comunicacao clara: todos os envolvidos na operacao devem saber que um incidente
+       cibernetico esta em curso e quais procedimentos alternativos estao em vigor.
+
+    **Cenarios cobertos pelo plano de resposta:**
+    - Ransomware no DCS durante pico de operacoes
+    - Comprometimento de sistema de planejamento de voo durante operacoes (aeronaves em ar)
+    - EFB com comportamento anomalo detectado durante pre-voo
+    - Ataque a sistema de comunicacao data link ACARS
+    - Comprometimento de credenciais de operador do OCC
+    - Interrupcao de rede que isola o OCC dos sistemas de aeroporto
+
+    **Criterios de suspensao de operacoes:**
+    Definir previamente os criterios objetivos que demandam suspensao temporaria de
+    novos voos (nao os em andamento) enquanto o incidente e contido e sistemas
+    criticos sao verificados. Estes criterios devem ser aprovados pelo SGSA e pela
+    diretoria de operacoes do operador aereo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Resiliencia e redundancia de sistemas criticos:**
+      1. Alta disponibilidade para sistemas classificados como nivel 1 e nivel 2:
+         clustering, load balancing, failover automatico com RPO e RTO definidos.
+      2. Backups imutaveis e offsite de todos os dados e configuracoes de sistemas
+         criticos, testados regularmente (restore test trimestral minimo).
+      3. Ambiente de DR (Disaster Recovery) testado anualmente, capaz de assumir
+         operacoes de DCS e OCC em caso de comprometimento do ambiente principal.
+      4. Segmentacao de rede que permita isolar sistemas comprometidos sem derrubar
+         toda a infraestrutura de operacoes (micro-segmentacao por nivel de criticidade).
+      5. Capacidade de operacao offline em sistemas criticos: EFBs com dados pre-
+         carregados, sistemas de manutencao com modo local, procedimentos de fallback
+         documentados para cada sistema nivel 1 e nivel 2.
+      6. Canal de comunicacao alternativo entre OCC e aeronaves em voo, independente
+         dos sistemas digitais principais (backup via VHF voz, SELCAL).
+    tools:
+      - ha-clustering
+      - backup-solution
+      - disaster-recovery
+      - network-segmentation
+      - offline-capability
+  devsecops:
+    prose: |
+      **Preparacao tecnica para resposta:**
+      1. Runbooks de resposta a incidentes para cada sistema critico, mantidos em
+         repositorio versionado e acessivel mesmo quando sistemas principais estao
+         indisponiveis (copia offline autorizada).
+      2. Capacidade de roll-back rapido para versao anterior de software em sistemas
+         criticos, com procedimento testado e tempo de execucao documentado.
+      3. Imagens de sistema limpas (golden images) para redeployment rapido de
+         sistemas aeronauticos comprometidos.
+      4. Ferramentas de forensics digitais pre-instaladas e configuradas em sistemas
+         criticos para coleta de evidencias sem contaminar o ambiente.
+      5. Processo de validacao de integridade de sistemas apos recovery: checksums,
+         verificacao de configuracoes, testes funcionais antes de retorno a operacao.
+    tools:
+      - gitlab-ci
+      - backup-solution
+      - forensics-tools
+      - configuration-management
+      - integrity-verification
+  secops:
+    prose: |
+      **Plano de resposta e continuidade operacional:**
+      1. Elaborar Plano de Resposta a Incidentes Ciberneticos especifico para AVSEC,
+         integrado ao PSAC, com papeis e responsabilidades definidos para: SGSA, CISO,
+         equipe de TI, operacoes de voo, manutencao e diretoria.
+      2. Definir matriz de escalacao com contatos 24x7 para cada funcao critica,
+         incluindo representantes da ANAC para incidentes de alta severidade.
+      3. Documentar procedimentos de fallback para cada sistema critico: o que fazer
+         manualmente quando o sistema digital nao esta disponivel.
+      4. Conduzir exercicios de tabletop de resposta a incidentes ciberneticos com
+         cenarios especificos de aviacao, no minimo anualmente.
+      5. Conduzir exercicios de simulacao real (functional exercise) de failover
+         de sistemas criticos, validando procedimentos de fallback operacional.
+      6. Relatorio pos-incidente (lessons learned) obrigatorio apos qualquer ativacao
+         real do plano de resposta, com atualizacao dos procedimentos se necessario.
+      7. Coordenacao com ANAC e DECEA em exercicios de gestao de crise que incluam
+         cenarios ciberneticos, conforme orientacoes das autoridades.
+    tools:
+      - incident-management
+      - soar
+      - communication-tools
+      - grc-platform
+      - tabletop-exercise-tools
+legal_references:
+  - framework_id: rbac-107
+    articles: ["sec-3"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30", "A.8.14"]
+    relationship: supports
+  - framework_id: pnsic
+    articles: ["art-7", "art-8"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-12"]
+    relationship: mapped

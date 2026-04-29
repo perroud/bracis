@@ -1,0 +1,120 @@
+id: stig-cat2-session
+family: cat-ii
+title: "Session Management and Concurrent Session Control"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must enforce session management controls including inactivity
+    timeout, concurrent session limits, and session locking. Interactive sessions
+    must lock or terminate after no more than 15 minutes of user inactivity for
+    unclassified systems (shorter intervals may be required by the AO for
+    higher-sensitivity environments). Applications accessed via web browser
+    must implement server-side session expiration consistent with the inactivity
+    timeout requirement; client-side timeout mechanisms alone are insufficient.
+    The system must limit the number of concurrent sessions for each user account
+    to the minimum necessary for authorized use. Session tokens must be generated
+    using cryptographically secure random number generators, must have sufficient
+    entropy (at least 128 bits), and must be invalidated upon logout. Sensitive
+    session state must not be stored in client-accessible storage (URL query
+    parameters, browser local storage, unencrypted cookies).
+
+guidance:
+  prose: >-
+    Session management vulnerabilities are a primary attack surface for web
+    application attacks and lateral movement within internal networks. Unattended
+    sessions that remain active allow physical access attacks (an adversary who
+    gains physical or remote screen access to an idle workstation can operate as
+    the legitimate user). Weak session tokens enable session hijacking attacks
+    where adversaries forge or predict tokens to impersonate users without
+    knowing their credentials.
+
+    STIG reviewers test session management empirically: they verify that
+    an idle session is actually terminated within the required time (not just
+    theoretically), that the server-side session is invalidated after logout
+    (not just the client cookie), and that session tokens are not predictable
+    or leaking through application logs or HTTP Referer headers.
+
+    Concurrent session limits prevent credential sharing — if each user account
+    can only have one or two active sessions, sharing credentials becomes
+    practically difficult, reinforcing the individual accountability requirement.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AC-11, AC-12, SC-23, IA-11"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222582"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "OWASP Session Management Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure Kubernetes API server token expiry and kubeconfig credential
+      rotation to limit the lifetime of privileged cluster sessions. Implement
+      session timeout enforcement in the centralized IdP (Keycloak: configure
+      SSO session idle timeout to 15 minutes, access token lifespan to match
+      the operational requirement). Use OAuth 2.0 refresh token rotation so
+      that long-lived sessions require continuous re-authentication rather than
+      relying on a single long-lived token. Configure Kubernetes kubeconfig
+      files distributed to administrators with short-lived certificates (4-8
+      hour expiry) issued by cert-manager or Vault PKI. Enforce pod-level
+      security contexts that prevent session state from being written to
+      shared volumes accessible across container boundaries.
+    tools:
+      - keycloak
+      - hashicorp-vault
+      - cert-manager
+      - dex
+      - oauth2-proxy
+
+  devsecops:
+    prose: >-
+      Include session management security tests in the DAST scan configuration:
+      test for session fixation, session token predictability, improper session
+      invalidation on logout, and concurrent session bypass. Implement SAST
+      rules that detect insecure session handling patterns (storing session
+      tokens in localStorage, using Math.random() for token generation,
+      missing HttpOnly/Secure/SameSite cookie flags). Add automated session
+      management tests to the integration test suite that verify server-side
+      session destruction on logout. Review frameworks' default session handling
+      settings in CI — flag any framework defaults that exceed the 15-minute
+      inactivity timeout or that store sessions client-side.
+    tools:
+      - gitlab-dast
+      - owasp-zap
+      - semgrep
+      - burp-suite
+      - gitlab-sast
+
+  secops:
+    prose: >-
+      Monitor authentication logs for accounts with abnormally high concurrent
+      session counts — this may indicate credential sharing or account
+      compromise with parallel attacker sessions. Alert on sessions that persist
+      beyond the configured timeout without activity, which may indicate automated
+      keepalive attacks designed to defeat session timeouts. Include session
+      management configuration review in periodic application security assessments.
+      Verify session management compliance as part of ATO assessment by conducting
+      manual and automated session testing against the application.
+    tools:
+      - splunk
+      - elastic-siem
+      - burp-suite-enterprise
+      - rapid7-insightappsec
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-11", "AC-12", "SC-23", "IA-11"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["AC.L2-3.1.10", "AC.L2-3.1.11"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["ac-11", "ac-12", "sc-23"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-05", "PR.DS-10"]
+    relationship: supports

@@ -1,0 +1,91 @@
+id: art-18
+family: cap-4
+title: "Classification Decision Requirements"
+class: LAI
+baselines: [government-transparency]
+statement:
+  prose: |
+    Art. 28. A classificação de informação em qualquer grau de sigilo
+    deverá ser formalizada em decisão que conterá, no mínimo, os seguintes
+    elementos:
+
+    I - assunto sobre o qual versa a informação;
+
+    II - fundamento da classificação, observados os critérios estabelecidos
+    no art. 24;
+
+    III - indicação do prazo de sigilo, contado em anos, meses ou dias,
+    ou do evento que defina o seu termo final, conforme limites previstos
+    no art. 24; e
+
+    IV - identificação da autoridade que a classificou.
+
+    Parágrafo único. A decisão referida no caput será mantida no mesmo
+    grau de sigilo da informação classificada.
+guidance:
+  prose: |
+    Article 28 mandates the formal elements of every classification decision:
+
+    1. **Subject matter (I):** What the information is about.
+    2. **Legal ground (II):** Which of the art. 24 categories justifies
+       classification (the eight grounds from art. 23).
+    3. **Restriction period (III):** Explicit duration in years/months/days,
+       or a terminating event, within the maximum limits.
+    4. **Classifying authority (IV):** Who made the classification decision.
+
+    **Decision confidentiality (parágrafo único):**
+    The classification decision itself is classified at the same level as
+    the information — this prevents metadata leakage about classified
+    subjects.
+
+    **System requirement:**
+    Every classification action must capture these four mandatory elements
+    as structured metadata. Free-text-only classification without structured
+    fields is non-compliant.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Structured classification metadata:**
+      1. Implement mandatory classification form with four required fields:
+         subject, legal ground (dropdown from art. 23 categories), period
+         (with validation against art. 24 limits), and authority (auto-populated
+         from authenticated user with rank verification).
+      2. Store classification decisions at the same access level as the
+         classified information (parágrafo único).
+      3. Build classification decision search and retrieval for authorized
+         reviewers (CMRI, superior authorities).
+      4. Implement validation that prevents saving classifications without
+         all four mandatory elements.
+    tools:
+      - document-management
+      - classification-engine
+      - metadata-management
+      - access-controls
+  devsecops:
+    prose: |
+      **Classification form validation:**
+      1. Test that classification submissions are rejected when any of the
+         four mandatory elements is missing.
+      2. Validate period limits against classification level (5/15/25 years).
+      3. Test that classification decisions inherit the access level of the
+         classified information.
+    tools:
+      - gitlab-ci
+      - form-validation-testing
+      - access-control-testing
+  secops:
+    prose: |
+      **Classification decision audit:**
+      1. Audit classification decisions for completeness of mandatory
+         elements.
+      2. Verify that classification periods do not exceed legal maximums.
+      3. Monitor that classification decisions are properly access-controlled
+         at the same level as the classified information.
+    tools:
+      - audit-platform
+      - compliance-monitoring
+      - access-review
+legal_references:
+  - framework_id: info-classificada
+    articles: ["art-10", "art-11"]
+    relationship: implements

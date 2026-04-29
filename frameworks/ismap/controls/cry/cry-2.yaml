@@ -1,0 +1,82 @@
+id: cry-2
+family: cry
+title: "Key Management"
+class: ISMAP
+baselines:
+  - ismap
+
+statement:
+  prose: |
+    The cloud service provider shall develop and implement a key management
+    policy that addresses the full lifecycle of cryptographic keys including
+    generation, distribution, storage, archival, retrieval, rotation, and
+    destruction. Keys shall be protected against unauthorized disclosure and
+    modification. Key management procedures shall ensure that cryptographic
+    keys used for government data are generated and stored within approved
+    boundaries. Customer-managed key options shall be provided where
+    government agencies require direct control over encryption keys.
+
+guidance:
+  prose: |
+    Key management is a critical component of ISMAP certification. Japanese
+    government agencies may require that encryption keys remain within
+    Japanese jurisdiction or under their direct control. Cloud service providers
+    must support customer-managed keys (BYOK/HYOK) and demonstrate that key
+    management procedures prevent unauthorized access. Key rotation must be
+    automated and occur at intervals compliant with CRYPTREC and organizational
+    policy. Hardware security modules (HSMs) should be used for key storage
+    of government-classified data. Auditors will verify key management
+    procedures and examine key access logs.
+
+references:
+  - citation: "ISMAP Management Criteria, CRY-02"
+    url: "https://www.ismap.go.jp/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Deploy a centralized key management service backed by HSMs for
+      high-sensitivity keys. Implement automated key rotation policies.
+      Provide customer-managed key capabilities that allow government
+      agencies to control their own encryption keys. Enforce key access
+      policies through infrastructure-as-code.
+    tools:
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - thales-luna
+
+  devsecops:
+    prose: |
+      Scan code and configuration for hardcoded cryptographic keys or
+      insecure key handling. Enforce that application code retrieves
+      keys from the approved key management service rather than local
+      storage. Validate key rotation configuration in CI/CD pipelines.
+    tools:
+      - gitleaks
+      - gitlab-ci
+      - vault
+      - trivy
+
+  secops:
+    prose: |
+      Monitor key access logs for unauthorized or anomalous key usage.
+      Alert on failed key access attempts and key operations outside
+      maintenance windows. Track key rotation compliance and certificate
+      expiration. Generate key management audit reports for ISMAP assessors.
+    tools:
+      - splunk
+      - elastic-siem
+      - venafi
+      - prisma-cloud
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a-8.24"]
+    relationship: derived-from
+  - framework_id: nist-800-53
+    articles: ["SC-12", "SC-12(1)"]
+    relationship: mapped
+  - framework_id: fedramp
+    articles: ["SC-12", "SC-12(1)"]
+    relationship: mapped

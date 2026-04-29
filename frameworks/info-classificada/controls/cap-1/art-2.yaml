@@ -1,0 +1,119 @@
+id: art-2
+family: cap-1
+title: "Definitions and Terminology"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 2. Para os efeitos deste Decreto, considera-se:
+
+    I - algoritmo de Estado — função matemática utilizada na cifração e na
+    decifração, desenvolvido pelo Estado, para uso exclusivo em interesse
+    do serviço de órgãos ou entidades do Poder Executivo federal;
+
+    II - cifração — ato de cifrar mediante uso de algoritmo simétrico ou
+    assimétrico, com recurso criptográfico, para substituir sinais de
+    linguagem clara por outros ininteligíveis por pessoas não autorizadas
+    a conhecê-la;
+
+    III - credencial de segurança — certificado que autoriza pessoa para
+    o tratamento de informação classificada;
+
+    IV - credenciamento de segurança — processo utilizado para habilitar
+    órgão ou entidade pública ou privada, e para credenciar pessoa para
+    o tratamento de informação classificada;
+
+    V - comprometimento — perda de segurança resultante do acesso não
+    autorizado;
+
+    VI - contrato sigiloso — ajuste, convênio ou termo de cooperação cujo
+    objeto ou execução implique tratamento de informação classificada;
+
+    VII - informação classificada — informação sigilosa em poder dos
+    órgãos e entidades públicas, observado o seu teor e em razão de sua
+    imprescindibilidade à segurança da sociedade ou do Estado, a qual é
+    classificada como ultrassecreta, secreta ou reservada;
+
+    VIII - marcação — aposição de marca assinalando o grau de sigilo da
+    informação classificada;
+
+    IX - necessidade de conhecer — condição segundo a qual o conhecimento
+    da informação classificada é indispensável para o adequado exercício
+    de cargo, função, emprego ou atividade;
+
+    X - recurso criptográfico — sistema, programa, processo, equipamento
+    isolado ou em rede que utiliza algoritmo simétrico ou assimétrico para
+    realizar cifração ou decifração.
+guidance:
+  prose: |
+    Article 2 provides the foundational glossary for the entire decree.
+    These definitions are legally binding and must be applied consistently.
+
+    **Critical definitions for implementation:**
+
+    - **Algoritmo de Estado (State Algorithm):** Cryptographic algorithms
+      developed by the Brazilian State (primarily ABIN) for exclusive use
+      in government. These are NOT commercial algorithms like AES or RSA.
+    - **Credencial de seguranca:** The personal certificate authorizing an
+      individual to handle classified information. Without this credential,
+      no person may access classified data regardless of their role.
+    - **Necessidade de conhecer (Need-to-know):** The cornerstone access
+      control principle — classification level alone does not grant access;
+      the person must also demonstrate that knowledge of the specific
+      information is indispensable for their role.
+    - **Comprometimento (Compromise):** Any unauthorized access event
+      constitutes a compromise, triggering incident response obligations.
+
+    **Distinction from commercial security:**
+    The decree creates a parallel security domain using state-controlled
+    cryptography, distinct from commercial cybersecurity standards. This
+    has direct implications for tooling selection.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Terminology and classification taxonomy:**
+      1. Encode the official terminology from art. 2 into all metadata
+         schemas, policy definitions, and access control configurations.
+      2. Implement need-to-know as an attribute-based access control (ABAC)
+         policy: clearance level AND project/topic assignment must both
+         match before access is granted.
+      3. Create a centralized glossary service that all systems reference
+         for classification terms, ensuring consistency across platforms.
+    tools:
+      - abac-engine
+      - metadata-registry
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Developer awareness and tooling alignment:**
+      1. Include the official definitions in developer onboarding for
+         any project involving classified information.
+      2. Map each term to concrete technical controls in the pipeline:
+         cifraçao maps to encryption-at-rest and in-transit checks,
+         marcaçao maps to metadata labeling validation.
+      3. Ensure CI/CD logs never expose classified content — implement
+         log sanitization filters aligned with classification markers.
+    tools:
+      - developer-docs
+      - log-sanitization
+      - gitlab-ci
+  secops:
+    prose: |
+      **Operational alignment with legal definitions:**
+      1. Train all security operations staff on the exact legal definitions
+         to ensure incident reports use correct terminology.
+      2. Map each definition to operational procedures: compromise triggers
+         incident response, need-to-know triggers access review.
+      3. Maintain a reference document that maps decree terminology to
+         technical control implementations.
+    tools:
+      - grc-platform
+      - training-records
+      - incident-management
+legal_references:
+  - framework_id: lai
+    articles: ["art-4"]
+    relationship: implements
+  - framework_id: gsi-in1
+    articles: ["art-2"]
+    relationship: complements

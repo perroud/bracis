@@ -1,0 +1,122 @@
+id: p2pe-ops-2
+family: p2pe-ops
+title: "Incident Response and Compromise Notification"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The solution provider shall maintain a documented incident response
+    plan specific to P2PE solution compromises, including procedures for
+    identifying, containing, eradicating, and recovering from security
+    incidents that affect the confidentiality of encrypted account data,
+    cryptographic keys, or the integrity of the decryption environment.
+    The incident response plan shall define notification procedures for
+    affected merchants, payment brands, acquirers, and PCI SSC in the
+    event of a confirmed compromise. The solution provider shall conduct
+    annual incident response testing through tabletop exercises or
+    simulated incident scenarios.
+  parts:
+    - id: p2pe-ops-2.a
+      label: "Domain 6, 6C"
+      prose: >-
+        A documented incident response plan covers P2PE-specific
+        compromise scenarios including key compromise, device tampering,
+        decryption environment breach, and application vulnerability
+        exploitation.
+    - id: p2pe-ops-2.b
+      label: "Domain 6, 6D"
+      prose: >-
+        Notification procedures and contact information are maintained
+        for all stakeholders, and annual incident response testing
+        validates the effectiveness of the plan.
+
+guidance:
+  prose: >-
+    P2PE-specific incident scenarios differ from general information
+    security incidents because they involve specialized components (HSMs,
+    POI devices, DUKPT key hierarchies) that require domain-specific
+    expertise to assess and remediate. A key compromise incident, for
+    example, may require emergency re-keying of thousands of POI devices
+    across multiple merchants — this requires pre-planned logistics,
+    communication templates, and coordination procedures. A decryption
+    environment breach is a critical event that may require immediate
+    shutdown of decryption services, impacting all merchants using the
+    P2PE solution. The incident response plan must include escalation
+    paths to the payment brands (Visa, Mastercard, etc.) and may trigger
+    a PCI Forensic Investigator (PFI) engagement. Annual testing should
+    exercise the most impactful scenarios, including multi-merchant key
+    compromise and decryption environment breach, to validate readiness.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 6 — P2PE Solution Provider Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI DSS v4.0.1, Requirement 12.10 — Incident Response"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated incident detection and response workflows using
+      a SOAR platform. Pre-configure runbooks for P2PE-specific scenarios:
+      key compromise (trigger mass re-keying), device tampering (isolate
+      affected merchant, revoke device keys), decryption environment breach
+      (failover to backup environment, preserve forensic evidence). Deploy
+      an out-of-band communication channel for incident coordination that
+      does not depend on the potentially compromised P2PE infrastructure.
+      Maintain pre-approved emergency change procedures that allow rapid
+      response without standard change management delays.
+    tools:
+      - pagerduty
+      - opsgenie
+      - splunk-soar
+      - cortex-xsoar
+      - servicenow
+      - slack-incident-channel
+      - teams-incident-channel
+
+  devsecops:
+    prose: >-
+      Integrate incident response playbook testing into the CI/CD pipeline
+      through automated tabletop exercise tooling. Build synthetic incident
+      injection capabilities that simulate compromise indicators in the
+      monitoring stack. Test automated response actions (key revocation,
+      device isolation, failover) in staging environments quarterly.
+      Maintain incident response tooling (forensic scripts, evidence
+      collection automation) in a version-controlled repository with
+      regular testing.
+    tools:
+      - gitlab-ci
+      - chaos-engineering-tools
+      - gremlin
+      - litmus-chaos
+      - custom-incident-simulation
+
+  secops:
+    prose: >-
+      Maintain a 24/7 security operations capability for P2PE incident
+      detection and initial response. Implement automated triage for
+      common P2PE alert types with escalation paths based on severity and
+      impact scope. Maintain current contact lists for all notification
+      recipients (merchants, acquirers, payment brands, PCI SSC, PFIs)
+      with quarterly verification. Conduct annual tabletop exercises with
+      participation from technical, management, legal, and communications
+      teams. Document lessons learned from exercises and real incidents,
+      and update the incident response plan accordingly.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - pagerduty
+      - servicenow
+      - forensic-toolkit
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-12.10"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-2", "IR-4", "IR-5", "IR-6", "IR-8"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A5.24", "A5.25", "A5.26", "A5.27"]
+    relationship: supports

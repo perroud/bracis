@@ -1,0 +1,96 @@
+id: upd-1
+family: upd
+title: "Securely Updateable Software"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    All software components of the consumer IoT device shall be securely updateable.
+    Where the device is not a constrained device, it shall have an update mechanism for
+    the secure installation of updates. A simple mechanism shall be available for
+    the user to check whether an update has been applied. When the device supports
+    automatic updates and/or update notifications, these shall be enabled in the
+    initialized state and configurable so that the user can enable, disable, or postpone
+    installation of security updates and/or update notifications.
+
+guidance:
+  prose: >-
+    The ability to patch software post-deployment is essential for maintaining IoT device
+    security throughout its operational lifetime. This provision requires that the update
+    mechanism itself be secure — meaning updates are authenticated and integrity-verified
+    before installation to prevent malicious firmware injection. The update process must be
+    robust against interruption (e.g., power loss during update should not brick the device).
+    Constrained devices with limited resources may use alternative mechanisms, but the
+    principle of secure updating still applies. Automatic updates should be the default
+    behavior to ensure the widest adoption of security patches, while still giving users
+    control over the timing.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.3-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement an over-the-air (OTA) update infrastructure with a secure update server,
+      code-signing PKI, and device-side signature verification. Use dual-bank (A/B) firmware
+      partitioning to enable rollback if an update fails. Implement delta updates to minimize
+      bandwidth for constrained devices. Design the update client to verify cryptographic
+      signatures before applying any update. Provide a device status API and user interface
+      element that shows the current firmware version and whether updates are available.
+      Implement automatic update scheduling with configurable user preferences for
+      notification-only, auto-install, or deferred modes.
+    tools:
+      - mender
+      - swupdate
+      - hawkbit
+      - azure-iot-hub
+      - aws-iot-device-management
+      - code-signing-hsm
+
+  devsecops:
+    prose: >-
+      Integrate firmware signing into the CI/CD pipeline so every release build is
+      automatically signed with the production code-signing key stored in an HSM. Implement
+      automated tests that verify the update mechanism rejects unsigned or tampered firmware
+      images. Test the rollback mechanism by simulating failed updates in the integration
+      test environment. Validate that the update process is resilient to power-cycle
+      interruptions. Include firmware version verification in end-to-end test suites. Generate
+      and publish SBOMs with each firmware release for vulnerability tracking.
+    tools:
+      - gitlab-ci
+      - cosign
+      - sigstore
+      - firmware-analysis-toolkit
+      - yocto
+      - buildroot
+
+  secops:
+    prose: >-
+      Monitor the device fleet for firmware version distribution and identify devices
+      running outdated or vulnerable versions. Alert on devices that have not applied
+      critical security updates within the defined SLA window. Track update success rates
+      and investigate clusters of update failures that may indicate tampering or
+      infrastructure issues. Monitor for unauthorized firmware modifications using remote
+      attestation where supported.
+    tools:
+      - azure-iot-hub
+      - aws-iot-device-management
+      - grafana
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-3.4", "SR-7.7"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SI-3", "SI-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.8", "A.8.19"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V1.14.5"]
+    relationship: complements

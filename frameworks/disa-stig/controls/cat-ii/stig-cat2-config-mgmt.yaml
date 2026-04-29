@@ -1,0 +1,125 @@
+id: stig-cat2-config-mgmt
+family: cat-ii
+title: "Configuration Management and Hardening Baselines"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must be configured according to the applicable DISA STIG or CIS
+    Benchmark hardening baseline for each component type (operating system,
+    database, web server, application server, container runtime, network device).
+    The system must maintain a documented baseline configuration and have a
+    process for controlling and documenting deviations from the baseline.
+    Unnecessary services, ports, protocols, and functions must be disabled or
+    removed. Default configurations supplied by vendors must be replaced with
+    hardened configurations before system deployment. All configuration changes
+    must be tracked, reviewed, and approved through a formal change management
+    process. Configuration compliance must be verified continuously using
+    automated scanning tools aligned with SCAP content where available.
+
+guidance:
+  prose: >-
+    Configuration management is both a technical and procedural requirement.
+    STIG reviewers evaluate whether the actual system configuration matches
+    the documented baseline, whether a process exists for managing deviations,
+    and whether any deviations have appropriate compensating controls and formal
+    risk acceptance documentation.
+
+    A common finding is systems deployed with a hardened baseline that
+    subsequently drifts as administrators make ad hoc changes to resolve
+    operational issues without going through change management. Automated
+    configuration compliance scanning is the only reliable way to detect drift
+    at the frequency required by DoD continuous monitoring requirements.
+
+    In containerized environments, the hardening baseline applies at every
+    layer: the container base image, the Kubernetes node OS, the container
+    runtime (Docker daemon, containerd), and the Kubernetes configuration itself
+    (API server flags, etcd encryption, RBAC defaults). Container images must
+    be built from approved, hardened base images and rescanned when the base
+    image is updated.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, CM-2, CM-3, CM-6, CM-7"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA STIG — Kubernetes SRG, V1R6"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "CIS Kubernetes Benchmark v1.8"
+    url: "https://www.cisecurity.org/benchmark/kubernetes"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Manage all platform component configurations as code using Terraform,
+      Ansible, or Helm, with the version-controlled repository serving as the
+      authoritative baseline. Enforce baseline compliance through automated
+      SCAP scanning (OpenSCAP, Tenable.sc with DISA STIG content) on all nodes
+      and VMs. Implement configuration drift detection using tools like Chef
+      InSpec or Ansible compliance playbooks that run on a scheduled basis and
+      alert on deviations. Harden container base images against the applicable
+      CIS Docker Benchmark before pushing to the internal registry. Apply CIS
+      Kubernetes Benchmark hardening (kube-bench) to all cluster nodes and
+      API server configurations. Disable unused Kubernetes admission controllers
+      and enable the recommended set (PodSecurity, NodeRestriction, RBAC).
+    tools:
+      - openscap
+      - kube-bench
+      - ansible
+      - terraform
+      - chef-inspec
+      - tenable-sc
+      - trivy
+
+  devsecops:
+    prose: >-
+      Implement Infrastructure-as-Code scanning in all pipelines using Checkov,
+      tfsec, or Trivy Config to validate Terraform, CloudFormation, and Kubernetes
+      manifests against DISA STIG and CIS Benchmark rules before deployment.
+      Enforce immutable infrastructure patterns so that all changes go through
+      version control and CI/CD pipelines — no manual changes to production
+      configurations. Build container images from approved, scanned base images
+      maintained in an internal registry; reject pipelines that reference
+      images from unapproved registries. Add kube-bench and container image
+      STIG scan results as pipeline artifacts for review. Block deployments
+      that introduce CAT I or CAT II configuration findings without documented
+      risk acceptance.
+    tools:
+      - checkov
+      - tfsec
+      - kube-bench
+      - trivy
+      - gitlab-ci
+      - conftest
+
+  secops:
+    prose: >-
+      Run weekly SCAP/STIG configuration compliance scans across all system
+      components and track findings in the POA&M. Maintain a configuration
+      management database (CMDB) that captures the current baseline for each
+      component type and version. Correlate configuration drift events with
+      change management records to distinguish authorized changes from
+      unauthorized modifications. Include configuration compliance scan results
+      in the ATO package and in continuous monitoring reports delivered to the AO.
+      Track STIG benchmark version updates and plan remediation cycles when
+      new STIG releases introduce additional requirements.
+    tools:
+      - openscap
+      - tenable-sc
+      - qualys
+      - servicenow-grc
+      - archer-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-3", "CM-6", "CM-7", "CM-8"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["CM.L2-3.4.1", "CM.L2-3.4.2", "CM.L2-3.4.6", "CM.L2-3.4.7"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["cm-2", "cm-6", "cm-7"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.IP-01", "PR.PS-01", "PR.PS-02"]
+    relationship: supports

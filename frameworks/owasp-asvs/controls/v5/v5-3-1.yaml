@@ -1,0 +1,100 @@
+id: v5.3.1
+family: v5
+title: "Output Encoding and Injection Prevention"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that output encoding is relevant for the interpreter and context required.
+    For example, use encoders specifically for HTML values, HTML attributes, JavaScript,
+    URL parameters, HTTP headers, SMTP, and others as the context requires, especially
+    from untrusted inputs such as names with Unicode or apostrophes. Context-aware output
+    encoding must be applied to prevent injection attacks including XSS, SQL injection,
+    OS command injection, and LDAP injection.
+
+guidance:
+  prose: >-
+    Output encoding is the primary defense against injection attacks. The core principle
+    is that untrusted data must be encoded for the specific context in which it is rendered.
+    HTML encoding prevents XSS in HTML body contexts but is insufficient for JavaScript
+    contexts, URL contexts, or CSS contexts. Each context requires its own encoding scheme.
+    Parameterized queries (prepared statements) are the encoding equivalent for SQL contexts.
+    Template engines with auto-escaping provide context-aware encoding for HTML output but
+    must be configured correctly and developers must understand when auto-escaping is
+    insufficient (e.g., in href attributes where javascript: URIs are valid). The OWASP
+    Encoder library provides context-specific encoding functions for multiple output contexts.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V5.3.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Output Encoding"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Use template engines with context-aware auto-escaping enabled by default (React JSX,
+      Angular templates, Jinja2 with autoescape, Go html/template). Enforce parameterized
+      queries exclusively for database access by using ORMs or query builders that prevent
+      raw SQL interpolation. Implement the OWASP Encoder library or equivalent for contexts
+      not covered by the template engine (JavaScript, URL, CSS, LDAP). Disable raw HTML
+      rendering in template engines (dangerouslySetInnerHTML in React, |safe in Jinja2)
+      unless explicitly approved through security review. Use typed ORM queries to prevent
+      SQL injection and parameterized LDAP queries to prevent LDAP injection.
+    tools:
+      - react
+      - angular
+      - owasp-encoder
+      - prisma
+      - sqlalchemy
+      - typeorm
+      - hibernate
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect raw string concatenation in SQL queries, HTML output,
+      OS command execution, and LDAP queries. Flag use of dangerous template directives
+      (dangerouslySetInnerHTML, |safe, v-html, [innerHTML]) without security review approval.
+      Include SQL injection, XSS, command injection, and LDAP injection payloads in DAST
+      scan configurations. Write unit tests that pass injection payloads through all input
+      paths and verify they are properly encoded in the output. Use taint analysis tools to
+      trace data flow from input sources to output sinks.
+    tools:
+      - semgrep
+      - sonarqube
+      - snyk-code
+      - owasp-zap
+      - burp-suite
+      - sqlmap
+      - gitlab-ci
+      - nuclei
+
+  secops:
+    prose: >-
+      Monitor WAF logs for injection attempt patterns across all categories (SQL, XSS,
+      command injection, LDAP). Alert on successful responses to requests containing
+      injection payloads, which may indicate WAF bypass or unprotected endpoints. Correlate
+      database error logs with web request logs to identify SQL injection exploitation.
+      Monitor process execution logs for unexpected command invocations that may indicate
+      OS command injection. Track injection attempt trends to identify targeted attack
+      campaigns.
+    tools:
+      - cloudflare-waf
+      - aws-waf
+      - modsecurity
+      - splunk
+      - elastic-siem
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: implements

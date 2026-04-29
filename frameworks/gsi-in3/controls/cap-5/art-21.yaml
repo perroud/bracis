@@ -1,0 +1,84 @@
+id: art-21
+family: cap-5
+title: "Politica de Uso de Criptografia"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 21. Os órgãos e entidades devem estabelecer política de uso de
+    criptografia para proteção da confidencialidade e integridade das
+    informações, contemplando:
+
+    I - algoritmos e protocolos criptográficos aprovados;
+    II - gestão de chaves criptográficas (geração, distribuição, armazenamento,
+    rotação e destruição);
+    III - uso de criptografia em dados em repouso e em trânsito;
+    IV - uso de certificados digitais ICP-Brasil quando aplicável.
+guidance:
+  prose: |
+    O art. 21 exige politica formal de criptografia com algoritmos aprovados,
+    gestao de chaves e uso de ICP-Brasil quando aplicavel.
+
+    **Algoritmos recomendados (ANC - Algoritmos Nacionais de Criptografia):**
+    - Simetrica: AES-256
+    - Assimetrica: RSA-4096, ECDSA P-384
+    - Hash: SHA-256, SHA-3
+    - TLS: versao 1.3 (minimo 1.2)
+    - Certificados: ICP-Brasil para servicos publicos
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.24 (Use of cryptography)
+    - NIST 800-53 rev5: SC-12 (Cryptographic Key Establishment), SC-13
+    - NIST SP 800-175B (Guideline for Using Cryptographic Standards)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack criptografico:**
+      1. TLS 1.3 obrigatorio em todas as comunicacoes externas e internas.
+      2. Criptografia em repouso: AES-256 para bancos de dados, storage, backups.
+      3. KMS centralizado (AWS KMS, Azure Key Vault, HashiCorp Vault) para
+         gestao de chaves com HSM.
+      4. Rotacao automatica de chaves: anual para dados, trimestral para servicos.
+      5. Certificados ICP-Brasil para servicos gov.br expostos ao cidadao.
+    tools:
+      - kms
+      - vault
+      - hsm
+      - certificate-manager
+      - tls-enforcer
+  devsecops:
+    prose: |
+      **Criptografia em pipelines:**
+      1. Scan de TLS em pipeline (testssl.sh, sslyze) para detectar configuracao fraca.
+      2. Deteccao de algoritmos obsoletos em codigo (MD5, SHA1, DES, RC4).
+      3. Secrets nunca em texto claro em repositorios (secret detection).
+      4. Assinatura de artefatos de build (Cosign, Notary).
+    tools:
+      - tls-scanner
+      - crypto-lint
+      - secret-detection
+      - artifact-signing
+  secops:
+    prose: |
+      **Gestao operacional de criptografia:**
+      1. Inventario de chaves criptograficas com ciclo de vida documentado.
+      2. Monitoramento de expiracoes de certificados (alerta 30/15/7 dias antes).
+      3. Auditoria anual de conformidade criptografica.
+      4. Plano de migracao para criptografia pos-quantica (horizonte 2030).
+    tools:
+      - key-inventory
+      - certificate-monitoring
+      - crypto-audit
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

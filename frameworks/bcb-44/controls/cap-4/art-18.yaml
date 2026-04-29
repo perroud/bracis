@@ -1,0 +1,108 @@
+id: art-18
+family: cap-4
+title: "Trilha de Auditoria e Integridade dos Registros"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 18. Os registros de que tratam os arts. 15, 16 e 17 devem:
+
+    I - ser mantidos de forma a garantir a integridade, autenticidade e
+    confidencialidade das informações;
+
+    II - ser acessíveis, de forma tempestiva, ao Banco Central do Brasil,
+    ao COAF e a outras autoridades competentes, conforme determinado em lei;
+
+    III - conter informações suficientes para reconstruir transações individuais
+    e fornecer, quando necessário, evidências para fins de investigação de crimes
+    de lavagem de dinheiro e de financiamento do terrorismo;
+
+    IV - ser protegidos contra alteração, destruição ou acesso não autorizado.
+guidance:
+  prose: |
+    O art. 18 define os requisitos de qualidade dos registros: nao basta existir,
+    tem que ser confiavel e imutavel.
+
+    **Integridade (inciso I e IV):**
+    Registros devem ser tecnicamente protegidos contra adulteracao. Em investigacao
+    criminal, um registro adulterado invalida toda a cadeia probatoria.
+
+    **Reconstrucao de transacoes (inciso III):**
+    O teste pratico: dado um cliente e um periodo, e possivel reconstruir
+    completamente cada transacao que ele realizou, com todos os seus detalhes?
+    Se nao, o registro e insuficiente para fins de PLD/FT.
+
+    **Acesso tempestivo (inciso II):**
+    O BCB e o COAF podem solicitar dados com prazo curto em investigacoes.
+    A IP deve ter processo documentado e testado para responder a essas
+    solicitacoes dentro do prazo, com:
+    - Endpoint seguro ou processo de export
+    - Autenticacao e autorizacao das autoridades
+    - Log de todas as divulgacoes realizadas
+    - Formato padronizado de entrega
+
+    **Protecao (inciso IV):**
+    - Controle de acesso: apenas pessoal autorizado pode acessar dados de PLD/FT
+    - Imutabilidade: registros nao podem ser alterados ou excluidos
+    - Backup: recuperacao garantida mesmo apos desastre
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de armazenamento imutavel:**
+      1. Implementar event store (ex: Apache Kafka + KSQLDB, ou banco de dados
+         append-only) para todos os registros de PLD/FT.
+      2. Hash criptografico (SHA-256) de cada registro no momento da criacao,
+         armazenado separadamente para verificacao de integridade.
+      3. Controle de acesso granular: dados de PLD/FT acessiveis apenas por
+         roles "pldft-analyst", "pldft-director", "bcb-export" (para autoridades).
+      4. API de export para autoridades com:
+         - Autenticacao por certificado digital
+         - Parametros: cliente, periodo, tipo de operacao
+         - Formato padronizado (JSON ou CSV com cabecalhos definidos)
+         - Log automatico de cada export realizado
+      5. Backup geograficamente distribuido com teste mensal de recuperacao.
+    tools:
+      - event-store
+      - cryptographic-hashing
+      - iam-system
+      - audit-logging
+      - backup-system
+  devsecops:
+    prose: |
+      **Testes de integridade:**
+      1. Testes de imutabilidade: tentar alterar um registro e verificar que
+         a operacao e bloqueada.
+      2. Testes de verificacao de hash: verificar que todos os registros
+         passam na validacao de integridade.
+      3. Testes de export: simular solicitacao de autoridade, verificar
+         que dados extraidos sao completos e integros.
+      4. Testes de acesso: verificar que apenas roles autorizadas acessam
+         dados de PLD/FT.
+      5. Teste de recuperacao de backup: restore de dados antigos para
+         verificar recuperabilidade.
+    tools:
+      - gitlab-ci
+      - security-testing
+      - access-control-testing
+  secops:
+    prose: |
+      **Monitoramento da integridade:**
+      1. Verificacao periodica de integridade dos registros: comparar hashes
+         armazenados com hashes recalculados.
+      2. Alertas imediatos se qualquer registro for deletado ou alterado.
+      3. Log de auditoria de todos os acessos a dados de PLD/FT, com quem
+         acessou, quando e quais registros.
+      4. Procedimento de resposta a solicitacao de autoridade: responsavel,
+         prazo, formato, canal seguro de entrega.
+    tools:
+      - siem
+      - audit-logging
+      - data-integrity-monitoring
+      - incident-response
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-19", "art-20"]
+    relationship: equivalent-to
+  - framework_id: bcb-85
+    articles: ["art-4"]
+    relationship: complements

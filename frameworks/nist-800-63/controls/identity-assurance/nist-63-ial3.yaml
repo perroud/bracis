@@ -1,0 +1,120 @@
+id: nist-63-ial3
+family: identity-assurance
+title: "IAL3 — In-Person Identity Proofing"
+class: SP800-63A
+
+baselines: [ial3, aal3, fal3]
+
+statement:
+  prose: >-
+    IAL3 requires in-person identity proofing or supervised remote proofing by
+    a trained representative of the CSP. All identifying attributes of the
+    applicant shall be verified by an authorized CSP representative through
+    examination of physical evidence. The CSP representative performing the
+    proofing shall be trained to detect fraudulent identity evidence and
+    presentation attacks. At IAL3, the CSP shall collect biometric data that
+    uniquely identifies the applicant and binds them to the issued credential.
+    Identity evidence must meet SUPERIOR strength requirements. The CSP shall
+    confirm address of record through direct communication with the applicant
+    or through address verification against an authoritative source. IAL3
+    proofing creates a record that enables future re-proofing of the same
+    individual through biometric comparison.
+
+guidance:
+  prose: >-
+    IAL3 is reserved for the highest-risk applications where incorrect identity
+    claims could cause significant harm — such as access to classified systems,
+    financial accounts above certain thresholds, controlled substances, voting
+    systems, or law enforcement records. The physical presence requirement is
+    the defining distinction from IAL2; it cannot be waived. Supervised remote
+    proofing is permitted as an alternative to in-person where a live video
+    connection with a trained operator is used throughout the session, but this
+    still requires the operator to actively supervise all steps in real time.
+    CSPs must retain biometric data in accordance with applicable law and
+    privacy regulations. The trained representative requirement means CSPs must
+    invest in staff training programs and certification that demonstrate
+    competence in document fraud detection and presentation attack detection.
+    Re-proofing requirements at IAL3 are more strict: subscribers must re-prove
+    their identity at defined intervals or upon significant identity attribute
+    changes.
+
+references:
+  - citation: "NIST SP 800-63A Section 4.3 — Identity Assurance Level 3"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 5.3.3 — In-Person Proofing Requirements"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 5.3.4 — Supervised Remote Identity Proofing"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+
+related_controls:
+  - id: nist-63-ial2
+    relationship: extends
+    description: "IAL3 builds on IAL2 by requiring in-person or supervised remote proofing."
+  - id: nist-63-biometrics
+    relationship: implements
+    description: "Biometric collection is mandatory at IAL3 and must use higher-assurance biometric systems."
+  - id: nist-63-aal3
+    relationship: complements
+    description: "IAL3 systems typically require AAL3 (hardware authenticators) for subsequent authentication."
+  - id: nist-63-privacy-proofing
+    relationship: implements
+    description: "IAL3 proofing must comply with privacy requirements, including consent for biometric retention."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build IAL3 enrollment workflows using in-person or supervised remote
+      proofing stations integrated with the platform IdP. For in-person proofing,
+      deploy kiosk or agent-assisted workstations with document scanners capable
+      of reading MRZ, RFID/NFC chips, and UV markings. For supervised remote
+      proofing, deploy secure video conferencing systems with screen sharing
+      disabled and real-time liveness detection APIs. Implement biometric capture
+      using FIPS 201-compliant fingerprint readers or ISO-certified facial
+      recognition systems with a False Match Rate not exceeding 1 in 100,000.
+      Issue credentials immediately following successful proofing using the
+      NIST 800-63B AAL3 authenticator requirements (hardware crypto token or
+      FIDO2 security key). Maintain an audit record of the proofing event with
+      the evidence types presented, the representative who conducted proofing,
+      and the timestamp.
+    tools:
+      - keycloak
+      - okta
+      - yubico-yubikey
+      - fips-201-compliant-readers
+      - thales-id-verification
+
+  devsecops:
+    prose: >-
+      Implement automated compliance checks in CI/CD pipelines that enforce
+      IAL3 service boundaries: any service labeled IAL3 must have integration
+      tests validating that account provisioning rejects remote self-enrollment.
+      Test that the proofing station software version and biometric library
+      meet the required certification levels. Implement supply chain validation
+      for biometric hardware by verifying firmware signatures in deployment
+      automation. Ensure audit logs from proofing sessions are ingested into
+      the immutable log store as part of the deployment pipeline. Validate
+      that encryption keys protecting biometric templates are stored in HSMs
+      and rotated per policy.
+    tools:
+      - gitlab-ci
+      - vault
+      - hashicorp-sentinel
+      - cosign
+
+  secops:
+    prose: >-
+      Monitor IAL3 proofing stations and remote proofing sessions for security
+      events including unauthorized access to the proofing workstation, tamper
+      attempts on document scanners or biometric readers, session recording
+      or exfiltration during supervised remote sessions, and attempts to bypass
+      the physical presence requirement. Maintain chain of custody for biometric
+      data with automated integrity verification. Alert immediately on any
+      modification to the proofing audit log. Conduct quarterly red team exercises
+      targeting the supervised remote proofing workflow to identify bypass
+      vulnerabilities. Validate biometric system Presentation Attack Detection
+      (PAD) capabilities against current attack vectors.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - pagerduty

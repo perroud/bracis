@@ -1,0 +1,128 @@
+id: isa-6.1
+family: ch-6
+title: "Supplier Relationships"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall define and implement information security
+    requirements for mitigating the risks associated with supplier
+    access to the organization's assets. Relevant information security
+    requirements shall be established and agreed with each supplier.
+    The organization shall regularly monitor, review, and audit
+    supplier service delivery. Changes to the provision of services
+    by suppliers shall be managed, taking into account the criticality
+    of business information, systems, and processes involved and
+    re-assessment of risks.
+
+guidance:
+  prose: >-
+    Supplier management is critical in the automotive industry due
+    to deep, multi-tier supply chains. VDA ISA requires that all
+    suppliers with access to information classified as confidential
+    or above are assessed for information security maturity. The
+    preferred mechanism is requiring suppliers to hold a valid TISAX
+    label at the appropriate assessment level. Where TISAX is not
+    feasible (e.g., non-automotive suppliers), equivalent assessment
+    or certification (ISO 27001, SOC 2) must be verified. Contracts
+    must include information security clauses covering data handling,
+    incident notification (within 24 hours), right to audit, and
+    subcontractor management. The organization must maintain a
+    supplier risk register that categorizes suppliers by criticality
+    and information access level. Sub-supplier (Tier N+1) security
+    must be addressed through flow-down requirements. At AL3,
+    auditors verify supplier assessment records, contractual
+    security clauses, monitoring procedures, and incident
+    notification mechanisms.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of supplier security management processes."
+  al2:
+    applicability: required
+    notes: "Auditor reviews supplier agreements, assessment records, and risk register."
+  al3:
+    applicability: required
+    notes: "On-site verification of supplier management effectiveness, audit records, and flow-down requirements."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 6"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.5.19, A.5.20, A.5.21, A.5.22, A.5.23"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated supplier access provisioning with
+      time-limited, least-privilege access grants controlled through
+      the identity platform. Use dedicated supplier tenants or
+      namespaces with strict network isolation and enhanced logging.
+      Maintain a machine-readable supplier inventory in version
+      control that maps each supplier to their TISAX label status,
+      access scope, and risk classification. Implement automated
+      expiration and re-certification workflows that revoke supplier
+      access when their TISAX label or equivalent certification
+      expires. Deploy API gateways with rate limiting, authentication,
+      and data loss prevention for all supplier-facing interfaces.
+      Use supply chain security tools to verify the integrity of
+      supplier-provided software components.
+    tools:
+      - backstage
+      - vault
+      - keycloak
+      - kong
+      - terraform
+      - kubernetes
+
+  devsecops:
+    prose: >-
+      Scan all supplier-provided code, libraries, and dependencies
+      for vulnerabilities and malware before integration into the
+      build pipeline. Require SBOM documentation from suppliers for
+      all delivered software components. Implement separate CI/CD
+      pipelines for supplier-contributed code with enhanced security
+      scanning and mandatory security review. Verify supplier-provided
+      artifacts using cryptographic signatures and provenance
+      attestation. Implement dependency pinning and integrity
+      verification for all external dependencies. Generate supply
+      chain compliance reports tracking supplier software component
+      security posture.
+    tools:
+      - syft
+      - grype
+      - cosign
+      - slsa
+      - trivy
+      - gitlab-ci
+      - snyk
+
+  secops:
+    prose: >-
+      Monitor all supplier access to organizational systems with
+      enhanced logging and alerting. Implement dedicated detection
+      rules for supplier account compromise indicators (unusual
+      access times, data volume anomalies, privilege escalation
+      attempts). Integrate supplier TISAX label expiration tracking
+      with SIEM alerting to flag expired certifications. Monitor
+      supplier network connections for anomalous traffic patterns
+      and data exfiltration. Establish automated supplier incident
+      notification tracking that verifies 24-hour notification SLA
+      compliance. Generate supplier security posture reports for
+      management review, including TISAX label status, incident
+      history, and access audit summaries.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - servicenow
+      - archer
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-4", "SA-9", "SA-12", "SR-1", "SR-2", "SR-3"]
+    relationship: mapped

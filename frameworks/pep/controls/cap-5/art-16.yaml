@@ -1,0 +1,122 @@
+id: art-16
+family: cap-5
+title: "Confidencialidade e Controle de Acesso"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 16. O acesso aos dados do prontuário eletrônico do paciente
+    deve ser controlado por meio de mecanismos de autenticação e
+    autorização que garantam a confidencialidade das informações
+    de saúde.
+
+    I - Cada usuário do sistema PEP deve possuir credencial individual
+    e intransferível, sendo vedado o uso de credenciais genéricas
+    ou compartilhadas;
+
+    II - O acesso aos dados clínicos deve ser restrito aos
+    profissionais diretamente envolvidos no atendimento ao paciente,
+    conforme perfil de acesso definido pela instituição;
+
+    III - O sistema deve implementar segregação de funções, garantindo
+    que profissionais acessem apenas os dados necessários ao
+    exercício de suas atribuições (princípio do menor privilégio);
+
+    IV - O paciente tem direito de acesso ao seu prontuário,
+    conforme legislação vigente, podendo solicitar cópia integral
+    ou parcial dos registros.
+guidance:
+  prose: |
+    O art. 16 estabelece os pilares de controle de acesso ao PEP,
+    alinhados com o principio de confidencialidade medica (sigilo
+    profissional) e com a LGPD.
+
+    **Credencial individual (inciso I):**
+    Logins genericos como "medico_uti", "enfermagem_cc" ou
+    "recepcao" violam diretamente este artigo. Cada profissional
+    deve ter login unico vinculado ao seu CPF e registro
+    profissional (CRM, COREN, CRF, etc.).
+
+    **Acesso restrito ao atendimento (inciso II):**
+    Um medico de um setor nao pode acessar prontuarios de pacientes
+    de outro setor sem justificativa clinica. O conceito de "quebra
+    de vidro" (break-glass) permite acesso emergencial com
+    justificativa obrigatoria e auditoria reforcada.
+
+    **Menor privilegio (inciso III):**
+    - Medico: leitura e escrita de registros clinicos
+    - Enfermeiro: leitura de prescricoes, escrita de evolucao
+    - Faturamento: leitura de dados administrativos, sem acesso
+      a detalhes clinicos
+    - Recepcao: dados demograficos, sem acesso clinico
+
+    **Direito do paciente (inciso IV):**
+    O paciente pode solicitar copia integral do prontuario. O sistema
+    deve ser capaz de gerar relatorio completo em formato legivel.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de controle de acesso:**
+      1. Implementar modelo RBAC (Role-Based Access Control) com
+         perfis granulares por categoria profissional (medico,
+         enfermeiro, tecnico, administrativo, faturamento).
+      2. Integrar com diretorio corporativo (LDAP/AD) vinculando
+         cada usuario ao seu CPF e registro profissional.
+      3. Implementar MFA obrigatorio para acesso ao PEP, com
+         segundo fator via app autenticador ou biometria.
+      4. Criar mecanismo de "quebra de vidro" (break-glass) para
+         acesso emergencial: exige justificativa obrigatoria,
+         gera alerta ao gestor de seguranca e log reforcado.
+      5. Implementar ABAC (Attribute-Based Access Control) para
+         restricoes contextuais: acesso apenas a pacientes do
+         setor, horario de trabalho, localizacao.
+    tools:
+      - identity-provider
+      - rbac-engine
+      - mfa-service
+      - break-glass-module
+      - abac-engine
+  devsecops:
+    prose: |
+      **Testes de controle de acesso:**
+      1. Implementar testes automatizados de autorizacao: para
+         cada perfil, validar que acessa APENAS os recursos
+         permitidos (teste positivo e negativo).
+      2. Testar que credenciais genericas sao rejeitadas pelo
+         sistema (validacao de vinculacao a CPF/registro).
+      3. Testar fluxo de quebra de vidro: acesso deve ser
+         concedido com justificativa e gerar log e alerta.
+      4. Testar isolamento de dados entre setores: profissional
+         do setor A nao deve ver dados do setor B.
+    tools:
+      - gitlab-ci
+      - authorization-tests
+      - rbac-tests
+      - break-glass-tests
+      - data-isolation-tests
+  secops:
+    prose: |
+      **Operacao de controle de acesso:**
+      1. Realizar revisao trimestral de perfis de acesso (access
+         review), desativando contas inativas e ajustando perfis
+         de profissionais transferidos.
+      2. Monitorar acessos via SIEM com alertas para: acesso
+         fora de horario, volume atipico de prontuarios acessados,
+         acesso a pacientes VIP, uso de quebra de vidro.
+      3. Investigar cada uso de quebra de vidro em ate 24 horas,
+         validando justificativa clinica.
+      4. Implementar processo de concessao e revogacao de acesso
+         vinculado ao ciclo de vida do profissional (admissao,
+         transferencia, desligamento).
+    tools:
+      - siem
+      - access-review
+      - break-glass-audit
+      - identity-lifecycle
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47", "art-18"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a", "164.312-d"]
+    relationship: mapped

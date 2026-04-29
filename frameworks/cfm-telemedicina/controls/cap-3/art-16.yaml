@@ -1,0 +1,117 @@
+id: art-16
+family: cap-3
+title: "Controle de Acesso e Autenticacao"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 16. As plataformas de telemedicina devem implementar
+    mecanismos robustos de controle de acesso e autenticação
+    para garantir que apenas profissionais autorizados acessem
+    dados de saúde dos pacientes.
+
+    Parágrafo 1. O acesso a dados de saúde deve ser controlado
+    pelo princípio do menor privilégio, concedendo a cada
+    profissional acesso apenas aos dados necessários para o
+    exercício de suas funções.
+
+    Parágrafo 2. A autenticação de profissionais de saúde em
+    plataformas de telemedicina deve utilizar mecanismo de
+    autenticação multifator (MFA), preferencialmente com
+    certificado digital ICP-Brasil.
+
+    Parágrafo 3. Todo acesso a dados de saúde deve ser registrado
+    em log de auditoria inalterável, contendo identificação do
+    usuário, data, hora, dados acessados e ação realizada.
+guidance:
+  prose: |
+    O art. 16 estabelece requisitos de controle de acesso e
+    autenticacao especificos para plataformas de telemedicina,
+    mais rigorosos que sistemas de TI genericos dado a
+    sensibilidade dos dados de saude.
+
+    **Menor privilegio (paragrafo 1):**
+    - Medico acessa apenas prontuarios de pacientes sob seu
+      cuidado direto
+    - Enfermeiro acessa dados conforme escopo de atuacao
+    - Administrativo acessa apenas dados necessarios para
+      agendamento e faturamento (sem dados clinicos)
+    - Acesso temporario para interconsultas, revogado
+      automaticamente apos conclusao
+
+    **Autenticacao multifator (paragrafo 2):**
+    MFA e obrigatorio, nao recomendado. Opcoes aceitas:
+    - Certificado digital ICP-Brasil (preferencial)
+    - FIDO2/WebAuthn (hardware token ou biometria)
+    - TOTP (aplicativo autenticador) como minimo aceitavel
+    - SMS NAO e aceito como segundo fator para dados de saude
+
+    **Logs de auditoria (paragrafo 3):**
+    Logs devem ser inalteraveis (append-only, WORM storage) e
+    conter detalhes suficientes para reconstruir toda sequencia
+    de acesso a dados de pacientes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de acesso e autenticacao:**
+      1. Implementar RBAC (Role-Based Access Control) granular
+         com funcoes predefinidas para cada perfil profissional
+         (medico, enfermeiro, administrativo, auditor).
+      2. Configurar MFA obrigatorio com suporte a ICP-Brasil,
+         FIDO2/WebAuthn e TOTP. Desabilitar SMS como segundo
+         fator para acesso a dados de saude.
+      3. Implementar controle de acesso contextual: medico
+         acessa apenas prontuarios de pacientes com relacao
+         de cuidado ativa (agendamento, internacao, acompanhamento).
+      4. Criar sistema de logs de auditoria em armazenamento
+         WORM (Write Once Read Many) com retencao minima de
+         5 anos e indexacao para consulta rapida.
+      5. Implementar sessao com timeout automatico (maximo 30
+         minutos de inatividade) e re-autenticacao para
+         operacoes senssiveis.
+    tools:
+      - rbac-engine
+      - mfa-provider
+      - icp-brasil-integration
+      - worm-storage
+      - audit-logging
+  devsecops:
+    prose: |
+      **Pipeline de seguranca de acesso:**
+      1. Testar que controle de acesso impede que profissionais
+         acessem dados fora de seu escopo de autorizacao.
+      2. Verificar que MFA nao pode ser desabilitado ou
+         ignorado por nenhum fluxo da aplicacao.
+      3. Validar que logs de auditoria sao gerados para toda
+         operacao de acesso a dados de saude.
+      4. Implementar testes de penetracao focados em escalacao
+         de privilegios e bypass de MFA.
+    tools:
+      - gitlab-ci
+      - access-control-testing
+      - mfa-testing
+      - penetration-testing
+  secops:
+    prose: |
+      **Operacao de controle de acesso:**
+      1. Revisar periodicamente permissoes de acesso, removendo
+         acessos orfaos e desativando contas inativas.
+      2. Monitorar logs de auditoria para detectar acessos
+         anomalos (fora de horario, volume atipico, dados nao
+         relacionados ao cuidado do paciente).
+      3. Auditar que MFA esta ativo para 100% dos usuarios com
+         acesso a dados de saude.
+      4. Implementar revisao trimestral de acessos (access review)
+         com aprovacao do gestor de cada area.
+    tools:
+      - access-review
+      - anomaly-detection
+      - audit-trail
+      - identity-governance
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-1", "164.312-a-2-i", "164.312-b", "164.312-d"]
+    relationship: mapped

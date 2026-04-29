@@ -1,0 +1,91 @@
+id: art-42
+family: cap-6
+title: "Comunicacao de Ausencia de Ocorrencias ao COAF"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 42. Os participantes devem comunicar ao COAF, anualmente, a ausência
+    de ocorrências suspeitas, quando não tiverem realizado comunicações ao
+    longo do ano.
+
+    § 1. A comunicação de ausência de ocorrências deve ser realizada até
+    o último dia útil do mês de janeiro do ano subsequente.
+
+    § 2. A comunicação de ausência de ocorrências não exime o participante
+    de realizar comunicações individuais ao COAF quando houver fundada suspeita.
+
+    § 3. O descumprimento da comunicação de ausência de ocorrências sujeita
+    o participante às mesmas sanções previstas para o descumprimento das
+    demais obrigações de comunicação.
+guidance:
+  prose: |
+    A comunicacao de ausencia de ocorrencias — coloquialmente chamada de
+    "comunicacao negativa" — serve para que o COAF saiba que o participante
+    esta ativo e acompanhando suas obrigacoes, mesmo que nao tenha identificado
+    casos suspeitos no ano.
+
+    **Por que a comunicacao negativa importa:**
+    Sem ela, o COAF nao consegue distinguir entre: (a) participante que nao
+    teve casos suspeitos (situacao normal para entidades de baixo risco),
+    (b) participante que teve casos suspeitos mas nao os reportou (violacao),
+    e (c) participante que nao esta monitorando ativamente (violacao diferente).
+    A comunicacao negativa fecha essa lacuna de informacao.
+
+    **Prazo — ultimo dia util de janeiro:**
+    A comunicacao deve ser realizada em janeiro do ano seguinte. Para participantes
+    com grande volume de operacoes, o ano inteiro sem nenhuma comunicacao ao COAF
+    pode ser sinal de que o monitoramento nao esta funcionando adequadamente.
+
+    **O ss 2 e essencial:**
+    A comunicacao negativa nao e um "cheque em branco" para o resto do ano.
+    Se em fevereiro surgir uma situacao suspeita, o participante tem obrigacao
+    de comunicar individualmente ao COAF, independentemente da comunicacao
+    negativa ja enviada.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de comunicacao negativa:**
+      1. Job agendado que verifica, em 15 de janeiro de cada ano, se o
+         participante realizou comunicacoes ao COAF no ano anterior.
+      2. Se nenhuma comunicacao foi realizada, sistema gera automaticamente
+         a comunicacao negativa para revisao e submissao pelo compliance officer.
+      3. Lembrete automatico para compliance officer em 15 e 25 de janeiro
+         se a comunicacao negativa nao foi enviada.
+      4. Registro da comunicacao negativa no arquivo de comunicacoes ao COAF.
+    tools:
+      - scheduled-jobs
+      - siscoaf-integration
+      - notification-service
+      - coaf-management
+  devsecops:
+    prose: |
+      **Testes do processo:**
+      1. Testes de que o job de verificacao identifica corretamente anos
+         sem comunicacoes ao COAF.
+      2. Testes de que a comunicacao negativa e gerada e submetida antes
+         do prazo de 31 de janeiro.
+      3. Testes de que a comunicacao negativa nao bloqueia comunicacoes
+         subsequentes no mesmo ano.
+    tools:
+      - test-automation
+      - scheduled-job-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Conformidade com comunicacao negativa:**
+      1. Calendario de conformidade com comunicacao negativa como item
+         critico de janeiro.
+      2. Verificacao no fechamento do ano de que as comunicacoes ao COAF
+         do periodo estao completas e que a comunicacao negativa sera ou
+         nao necessaria.
+      3. Registro de anos em que foi enviada comunicacao negativa vs. anos
+         com comunicacoes de suspeita para analise de tendencia.
+    tools:
+      - compliance-calendar
+      - coaf-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-30"]
+    relationship: equivalent-to

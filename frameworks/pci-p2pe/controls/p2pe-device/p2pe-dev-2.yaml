@@ -1,0 +1,122 @@
+id: p2pe-dev-2
+family: p2pe-device
+title: "POI Device Tamper Monitoring and Decommissioning"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    Deployed POI devices shall be periodically inspected for evidence of
+    tampering, including skimming overlays, cable attachments, broken seals,
+    or firmware modifications. The solution provider shall provide merchants
+    with instructions for routine tamper inspection and procedures for
+    reporting suspected tampered devices. Decommissioned POI devices shall
+    undergo secure key zeroization and physical destruction of
+    cryptographic components. The device inventory shall be updated to
+    reflect the decommissioned status, and any associated cryptographic
+    keys shall be retired according to key management procedures.
+  parts:
+    - id: p2pe-dev-2.a
+      label: "Domain 5, 5C"
+      prose: >-
+        Deployed POI devices are periodically inspected for tamper evidence,
+        and merchants are provided with inspection instructions and
+        reporting procedures for suspected tampering.
+    - id: p2pe-dev-2.b
+      label: "Domain 5, 5D"
+      prose: >-
+        Decommissioned devices undergo key zeroization and physical
+        destruction of cryptographic components, with the inventory
+        updated and associated keys retired.
+
+guidance:
+  prose: >-
+    Tamper detection at the merchant site is a critical layer of defense.
+    Even PCI PTS-approved devices with tamper-response mechanisms can be
+    defeated by sophisticated attacks. Periodic visual inspection by
+    trained merchant staff provides an additional detection layer. The
+    solution provider should supply laminated quick-reference cards with
+    photographs showing normal device appearance and examples of common
+    tampering indicators (overlay skimmers, pinhole cameras, cable
+    modifications). Inspection frequency should be risk-based — high-
+    traffic unattended devices (gas pumps, kiosks) require more frequent
+    inspection than attended POS terminals. Decommissioning must address
+    both the cryptographic state (key zeroization) and the physical state
+    (destruction of tamper-resistant security module). Devices must not be
+    resold, donated, or disposed of without complete key zeroization, as
+    residual key material could be extracted by sophisticated attackers.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 5 — Device Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI SSC — Skimming Prevention Best Practices for Merchants"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated tamper detection where POI devices support it
+      (heartbeat signals, tamper flags in transaction messages). Build a
+      monitoring dashboard that displays device health status across the
+      fleet, flagging devices that have not communicated within expected
+      intervals. Deploy a merchant self-service portal for reporting
+      suspected tamper events with automated workflow routing to the
+      security team. Implement device decommissioning workflows that
+      require confirmation of key zeroization before closing the device
+      record. Integrate with the key management system to automatically
+      retire associated keys when a device is decommissioned.
+    tools:
+      - device-management-platform
+      - grafana
+      - prometheus
+      - servicenow
+      - key-management-system
+      - asset-inventory-cmdb
+
+  devsecops:
+    prose: >-
+      Build automated tests that validate the decommissioning workflow
+      correctly triggers key zeroization and inventory updates. Test
+      tamper detection alert routing from the device management platform
+      to the security team. Implement scripts that verify zeroization was
+      successful by attempting a test transaction with the decommissioned
+      device (should fail). Scan device management code for proper
+      lifecycle state machine enforcement (e.g., cannot transition from
+      decommissioned to active without going through the full onboarding
+      process).
+    tools:
+      - gitlab-ci
+      - custom-decommission-test-suite
+      - device-emulator
+      - semgrep
+      - postman
+
+  secops:
+    prose: >-
+      Track tamper inspection compliance rates across merchants. Alert on
+      merchants that have not confirmed periodic inspections. Investigate
+      all tamper reports within defined SLAs (e.g., 4 hours for initial
+      triage). Maintain a tamper incident database for trend analysis and
+      geographic clustering of tampering events. Verify key zeroization
+      for every decommissioned device through HSM audit logs. Conduct
+      annual reviews of the decommissioned device inventory against key
+      retirement records to identify any gaps.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - key-management-system
+      - geo-analysis-tools
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.5", "req-9.4"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-device-2", "pin-device-3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-3", "CM-8", "MP-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A7.10", "A7.13", "A7.14"]
+    relationship: supports

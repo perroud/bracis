@@ -1,0 +1,120 @@
+id: art-17
+family: cap-4
+title: "Continuidade Operacional e Recuperacao de Desastres"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 17. As prestadoras devem elaborar e manter planos de continuidade
+    operacional e recuperação de desastres para cenários de incidentes
+    cibernéticos que possam comprometer a prestação dos serviços de
+    telecomunicações, incluindo:
+
+    I - identificação dos serviços e elementos de rede críticos cuja
+    interrupção causaria impacto significativo aos usuários ou à
+    infraestrutura nacional;
+
+    II - definição de objetivos de tempo de recuperação (RTO) e
+    ponto de recuperação (RPO) para cada serviço ou elemento crítico;
+
+    III - procedimentos de recuperação específicos para cenários de
+    ransomware, comprometimento de sistemas OSS/BSS e falha de
+    elementos críticos de rede por causa cibernética;
+
+    IV - testes periódicos dos planos de continuidade e recuperação,
+    com registro de resultados e atualização pós-teste;
+
+    V - garantia de que os sistemas de backup e recuperação são
+    protegidos contra o mesmo incidente cibernético que afetaria
+    os sistemas primários.
+guidance:
+  prose: |
+    O art. 17 exige planejamento especifico de continuidade para cenarios
+    ciberneticos, reconhecendo que incidentes ciberneticos diferem de
+    falhas de hardware convencionais.
+
+    **Especificidade para incidentes ciberneticos (inciso III):**
+    Planos genericos de DR nao sao suficientes para o R-Ciber.
+    Sao necessarios procedimentos especificos para:
+    - Ransomware: isolar sistemas infectados, restaurar de backups
+      verificados (air-gapped ou imutaveis), reconstruir sem reintroducao
+    - Comprometimento de OSS/BSS: operar em modo degradado com
+      processos manuais enquanto os sistemas sao recuperados
+    - Comprometimento de conta privilegiada: revogar todos os acessos,
+      reconstituir infraestrutura de identidade, revalidar todos os
+      acessos
+
+    **Backups contra ransomware (inciso V):**
+    Backup em rede acessivel pelos mesmos sistemas sera criptografado
+    junto com os dados primarios em ataque de ransomware. E necessario:
+    - Backups offline ou air-gapped
+    - Backups imutaveis (object lock, WORM)
+    - Backups em infraestrutura separada com credenciais independentes
+
+    **RTO/RPO para telecomunicacoes:**
+    Servicos de emergencia (112) e elementos criticos de core de rede
+    devem ter RTO de minutos, nao horas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de recuperacao cibernetica:**
+      1. Implementar backups imutaveis com object lock (WORM) para
+         todos os sistemas criticos OSS/BSS, com retencao por no
+         minimo 30 dias (resistente a ransomware que aguarda periodo
+         antes de agir).
+      2. Manter conjunto de sistemas de recuperacao de emergencia em
+         infraestrutura separada com credenciais e redes isoladas dos
+         sistemas primarios.
+      3. Automatizar validacao de backups via restore periodico em
+         ambiente isolado e verificacao de integridade.
+      4. Implementar Infrastructure as Code para toda a infraestrutura
+         critica, permitindo reconstrucao rapida e documentada apos
+         comprometimento.
+    tools:
+      - backup-immutable
+      - iac-terraform
+      - restore-automation
+      - isolated-recovery
+  devsecops:
+    prose: |
+      **Continuidade em aplicacoes de telecomunicacoes:**
+      1. Implementar modo de operacao degradada (graceful degradation)
+         em sistemas OSS/BSS criticos para operar com funcionalidade
+         reduzida durante incidentes.
+      2. Manter artefatos de deploy assinados e verificados em repositorio
+         imutavel para permitir reinstalacao rapida de versoes conhecidas
+         seguras.
+      3. Documentar runbooks de recuperacao por sistema, incluindo
+         tempo estimado de recuperacao e dependencias.
+      4. Testar procedimentos de recuperacao de aplicacoes trimestralmente
+         em ambiente de homologacao.
+    tools:
+      - graceful-degradation
+      - artifact-registry
+      - runbooks
+      - recovery-testing
+  secops:
+    prose: |
+      **Governanca de continuidade cibernetica:**
+      1. Realizar exercicio de recuperacao de desastre cibernetico
+         anual com cenarios realistas de ransomware e comprometimento
+         de sistemas criticos.
+      2. Manter RTO e RPO documentados e aprovados pela alta direcao
+         para todos os servicos de telecomunicacoes criticos.
+      3. Verificar periodicamente que backups estao integros, acessiveis
+         e protegiveis contra comprometimento simultaneo.
+      4. Coordenar com equipes de NOC (Network Operations Center) e
+         OSS/BSS os procedimentos de operacao em modo de emergencia
+         durante incidentes ciberneticos.
+    tools:
+      - bcm-platform
+      - dr-testing
+      - backup-validation
+      - emergency-procedures
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-5-29", "A-5-30", "A-8-13", "A-8-14"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-4"]
+    relationship: mapped

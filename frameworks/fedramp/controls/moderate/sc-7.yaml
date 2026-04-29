@@ -1,0 +1,145 @@
+id: sc-7
+family: sc
+title: "Boundary Protection"
+class: FedRAMP
+
+baselines: [low, moderate, high]
+
+parameters:
+  - id: sc-07_odp.01
+    label: "managed interfaces"
+    guidance: "FedRAMP requirement: All external and internal boundary interfaces must be identified, documented, and managed through approved security devices."
+  - id: sc-07_odp.02
+    label: "external telecommunications services"
+    guidance: "FedRAMP requirement: All external telecommunications services used at managed interfaces must be documented in the SSP."
+
+statement:
+  prose: >-
+    a. Monitor and control communications at the external managed
+       interfaces to the system and at key internal managed interfaces
+       within the system;
+    b. Implement subnetworks for publicly accessible system components
+       that are physically or logically separated from internal
+       organizational networks;
+    c. Connect to external networks or systems only through managed
+       interfaces consisting of boundary protection devices arranged
+       in accordance with an organizational security and privacy
+       architecture.
+  parts:
+    - id: sc-7_smt.a
+      label: "a."
+      prose: >-
+        FedRAMP Additional Requirement: CSPs must implement and document
+        all boundary protection mechanisms including firewalls, WAFs,
+        IDS/IPS, and network segmentation. All boundary points must be
+        identified in the SSP network diagrams.
+    - id: sc-7_smt.b
+      label: "b."
+      prose: >-
+        FedRAMP Additional Requirement: DMZ architecture is required
+        for all publicly accessible components. CSPs must document the
+        network segmentation strategy in the SSP including VLAN/subnet
+        architecture and security group configurations.
+
+guidance:
+  prose: >-
+    FedRAMP requires comprehensive boundary protection that goes beyond
+    basic firewalling. CSPs must document all system boundaries in the
+    SSP with detailed network architecture diagrams showing all trust
+    zones, data flows, and boundary protection devices. FedRAMP
+    assessors verify boundary protection through network diagram review,
+    configuration analysis, and penetration testing. For Moderate and
+    High baselines, FedRAMP requires enhanced boundary protection
+    including: deny-all/allow-by-exception policies, monitoring of
+    all boundary traffic, and separation of management and production
+    networks. CSPs leveraging cloud IaaS must document both the virtual
+    and physical boundary protections. Web Application Firewalls are
+    effectively required for all internet-facing application endpoints.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SC-7"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-41 Rev 1, Guidelines on Firewalls and Firewall Policy"
+    url: "https://doi.org/10.6028/NIST.SP.800-41r1"
+  - citation: "FedRAMP SSP Template - Network Architecture"
+    url: "https://www.fedramp.gov/documents/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement defense-in-depth boundary architecture: external WAF
+      (CloudFlare, AWS WAF) at the internet edge, ingress controller
+      with TLS termination, Kubernetes NetworkPolicies for
+      micro-segmentation, and service mesh (Istio) with mTLS for
+      encrypted east-west traffic. Define all network policies in
+      infrastructure-as-code with deny-all default and explicit
+      allow rules. Implement separate management and production
+      network segments with dedicated access controls. Deploy egress
+      filtering that restricts outbound traffic to documented and
+      approved destinations. Implement automated network architecture
+      diagram generation from IaC for SSP documentation. Deploy
+      network monitoring at all boundary points with traffic analysis
+      and anomaly detection. Implement automated drift detection for
+      network configurations that alerts on unauthorized boundary changes.
+    tools:
+      - istio
+      - calico
+      - cilium
+      - kubernetes-network-policies
+      - terraform
+      - cloudflare-waf
+      - aws-waf
+      - nginx-ingress
+
+  devsecops:
+    prose: >-
+      Validate boundary protection in CI/CD pipelines by scanning IaC
+      for network security misconfigurations: overly permissive security
+      groups, missing WAF configurations, unencrypted connections, and
+      default-allow policies. Implement pipeline policy checks that
+      require NetworkPolicy declarations for all Kubernetes deployments.
+      Automate boundary testing as part of DAST scanning to verify
+      that deployed services are only reachable through authorized
+      network paths. Generate network topology documentation from IaC
+      as pipeline artifacts for SSP inclusion. Test egress rules to
+      ensure services cannot reach unauthorized external destinations.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - checkov
+      - tfsec
+      - conftest
+      - kube-bench
+      - nuclei
+
+  secops:
+    prose: >-
+      Deploy IDS/IPS at all external boundary points with signatures
+      updated from threat intelligence feeds. Monitor east-west traffic
+      for lateral movement and data exfiltration indicators. Implement
+      network flow logging and analysis for all boundary interfaces.
+      Alert on boundary configuration changes and correlate with
+      approved change requests. Conduct quarterly boundary penetration
+      testing and document results for ConMon. Maintain updated network
+      architecture diagrams in the SSP reflecting current boundary
+      protection state. Report boundary protection effectiveness
+      metrics: blocked attacks, configuration compliance, and
+      unauthorized access attempts.
+    tools:
+      - suricata
+      - zeek
+      - palo-alto
+      - splunk
+      - elastic-siem
+      - darktrace
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["sc-l2-001"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.20", "a8.21", "a8.22"]
+    relationship: supports

@@ -1,0 +1,115 @@
+id: fci-ac-l1-001
+family: ac
+title: "Limit information system access to authorized users, processes acting on behalf of authorized users, or devices (including other information systems)"
+class: CMMC-L1
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Limit information system access to authorized users, processes acting
+    on behalf of authorized users, or devices (including other information
+    systems).
+  parts:
+    - id: fci-ac-l1-001.a
+      label: "a."
+      prose: >-
+        Identify authorized users of the information system.
+    - id: fci-ac-l1-001.b
+      label: "b."
+      prose: >-
+        Identify processes and devices authorized to access the information
+        system.
+    - id: fci-ac-l1-001.c
+      label: "c."
+      prose: >-
+        Limit information system access to the identified authorized users,
+        processes, and devices.
+
+guidance:
+  prose: >-
+    This is the foundational access control requirement from FAR 52.204-21.
+    Access must be limited to only those users, processes, and devices that
+    are explicitly authorized. This requires maintaining an authoritative
+    list of authorized entities and enforcing access decisions against that
+    list. The control applies to all system interfaces including network
+    access, local access, remote access, and wireless access. For CMMC
+    Level 1, this can be achieved through basic user account management,
+    access control lists, and device authentication. The control maps to
+    NIST SP 800-171 control 3.1.1 and NIST SP 800-53 AC-2, AC-3, AC-17.
+
+references:
+  - citation: "FAR 52.204-21, Section (b)(1)(i)"
+    url: "https://www.acquisition.gov/far/52.204-21"
+  - citation: "NIST SP 800-171 Rev 2, 3.1.1"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, AC-2, AC-3, AC-17"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management through an identity
+      provider (IdP) integrated with all platform services via OIDC/SAML.
+      Enforce RBAC or ABAC policies across all infrastructure components
+      using Open Policy Agent or Kubernetes RBAC. Maintain an authoritative
+      user directory that serves as the single source of truth for
+      authorization decisions. Implement service accounts with scoped
+      credentials for machine-to-machine communication. Deploy network
+      policies that restrict system access to authorized network segments
+      and devices. Use device certificates or attestation to verify
+      authorized devices before granting access. Automate provisioning
+      and deprovisioning workflows to ensure access grants match current
+      authorizations.
+    tools:
+      - keycloak
+      - okta
+      - kubernetes-rbac
+      - open-policy-agent
+      - hashicorp-vault
+      - terraform
+
+  devsecops:
+    prose: >-
+      Enforce access control in CI/CD pipelines by restricting pipeline
+      execution, deployment triggers, and environment access to authorized
+      users and service accounts. Implement protected branches with
+      mandatory access control lists limiting who can merge to production
+      branches. Use pipeline-generated evidence to demonstrate access
+      control enforcement (merge request approvers, deployment logs,
+      access grants). Automate access reviews by generating periodic
+      reports of active access grants compared against the authorized
+      user list. Implement just-in-time (JIT) access for elevated
+      privileges in CI/CD systems with automatic expiration.
+    tools:
+      - gitlab-protected-branches
+      - gitlab-approval-rules
+      - gitlab-ci
+      - vault
+      - boundary
+
+  secops:
+    prose: >-
+      Monitor all access events through centralized logging and SIEM
+      correlation. Alert on unauthorized access attempts, privilege
+      escalation, and access from unauthorized devices or locations.
+      Conduct quarterly access reviews comparing active access grants
+      against the authorized user register. Implement automated
+      deprovisioning triggers when personnel changes occur (termination,
+      role change, contract end). Generate compliance evidence showing
+      access control effectiveness through access review reports,
+      exception tracking, and incident analysis.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - sailpoint
+      - beyond-trust
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-17"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.18", "a8.2", "a8.3"]
+    relationship: supports

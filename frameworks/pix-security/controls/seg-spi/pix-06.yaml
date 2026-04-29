@@ -1,0 +1,93 @@
+id: pix-06
+family: seg-spi
+title: "Assinatura Digital de Mensagens"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Todas as mensagens enviadas ao SPI devem ser assinadas digitalmente pelo participante
+    remetente utilizando certificado digital ICP-Brasil. A assinatura digital garante
+    autenticidade (identificação do remetente), integridade (não-alteração do conteúdo)
+    e não-repúdio (impossibilidade de negar o envio) de cada ordem de pagamento e
+    mensagem de controle trafegada no SPI.
+guidance:
+  prose: |
+    **Requisitos de assinatura digital:**
+    - Certificado digital ICP-Brasil tipo A3 ou superior (armazenado em HSM).
+    - Assinatura no padrao XML Signature (XMLDSig) conforme especificacao do BCB.
+    - Algoritmo de assinatura: RSA-SHA256 ou ECDSA-SHA256.
+    - Cadeia de certificacao completa validavel ate a raiz ICP-Brasil.
+
+    **Fluxo de assinatura:**
+    1. Participante gera a mensagem ISO 20022.
+    2. Aplica assinatura digital com chave privada do certificado ICP-Brasil.
+    3. Envia mensagem assinada ao SPI via RSFN.
+    4. SPI valida a assinatura contra o certificado publico registrado.
+    5. Se a assinatura for invalida, a mensagem e rejeitada.
+
+    **Nao-repudio:**
+    A assinatura digital confere forca probatoria a cada transacao. O participante nao pode
+    negar ter enviado uma ordem de pagamento cuja assinatura seja valida. Isso e critico
+    para disputas e para o MED (Mecanismo Especial de Devolucao).
+
+    **Gestao de certificados:**
+    O participante deve manter certificados ICP-Brasil validos e registrados no BCB.
+    A expiracao de certificados sem renovacao oportuna resulta em incapacidade de operar
+    no SPI.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de assinatura digital:**
+      1. HSM dedicado para armazenamento de chaves privadas ICP-Brasil.
+      2. Servico centralizado de assinatura (signing service) para mensagens SPI.
+      3. Validador de assinatura digital para mensagens recebidas do SPI.
+      4. Monitoramento de validade de certificados ICP-Brasil com renovacao proativa.
+
+      **Alta disponibilidade:**
+      5. HSM em cluster com failover automatico para garantir assinatura 24x7.
+      6. Cache de certificados publicos dos demais participantes para validacao.
+      7. Logs de auditoria para cada operacao de assinatura (quem, quando, o que).
+
+      **Automacao de certificados:**
+      8. Processo automatizado de solicitacao e renovacao de certificados ICP-Brasil.
+      9. Alertas para certificados com expiracao em 90, 60, 30 e 7 dias.
+      10. Revogacao imediata em caso de comprometimento de chave privada.
+    tools:
+      - hsm
+      - signing-service
+      - cert-manager
+      - vault
+      - pki-infrastructure
+  devsecops:
+    prose: |
+      **Validacao no pipeline:**
+      1. Testes de assinatura digital em ambiente de homologacao com certificados de teste.
+      2. Validacao de formato XMLDSig em cada build que altere mensageria SPI.
+      3. Testes de cadeia de certificacao completa (raiz ICP-Brasil ate certificado final).
+      4. Mock de HSM para testes unitarios e de integracao.
+    tools:
+      - xmldsig-validator
+      - gitlab-ci
+      - hsm-simulator
+      - integration-testing
+  secops:
+    prose: |
+      **Gestao operacional de certificados:**
+      1. Inventario centralizado de todos os certificados ICP-Brasil em uso.
+      2. Monitoramento continio de revogacao (CRL/OCSP) de certificados.
+      3. Processo de resposta a comprometimento de chave privada (revogacao, emissao,
+         comunicacao ao BCB).
+      4. Auditoria semestral de conformidade de assinatura digital.
+      5. Backup seguro de chaves privadas com procedimento de recuperacao testado.
+    tools:
+      - certificate-inventory
+      - ocsp-monitor
+      - hsm-audit
+      - incident-response
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-11", "art-12"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-7"]
+    relationship: complements

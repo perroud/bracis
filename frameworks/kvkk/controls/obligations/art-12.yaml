@@ -1,0 +1,112 @@
+id: art-12
+family: obligations
+title: "Data Security Obligations"
+class: KVKK
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 12 — Data Security.
+    (1) The data controller shall:
+    (a) take all necessary technical and organizational measures to provide an
+    appropriate level of security in order to prevent the unlawful processing of
+    personal data, prevent unlawful access to personal data, and ensure the
+    retention of personal data;
+    (b) carry out or have carried out the necessary audits in connection with the
+    implementation of the provisions of this Law within his/her own institution or
+    organization.
+    (2) The data controller shall take the necessary measures to ensure that data
+    processors also provide the same level of security.
+    (3) In the event that personal data are obtained by others through unlawful means,
+    the data controller shall notify the Board and the data subject as soon as possible.
+    The Board may, where necessary, announce the data breach on its website or through
+    other methods it deems appropriate.
+    (4) The Board shall determine the criteria for the notification obligation.
+    (5) The data controller shall take the necessary measures, both technically and
+    organizationally, for the implementation of the provisions of this Law.
+
+guidance:
+  prose: >-
+    Article 12 is the primary security obligation under KVKK. Key requirements:
+    (1) Three security objectives — prevent unlawful processing, prevent unlawful
+    access, and ensure retention. (2) Controllers must audit their own compliance
+    internally. (3) Controllers must ensure processors provide equivalent security.
+    (4) Breach notification to both the Board and data subjects is mandatory and
+    must occur "as soon as possible" — the Board has clarified this as within 72
+    hours of discovery. (5) The Board may publicly disclose breaches. This is a
+    significant reputational risk that makes proactive security essential. The KVKK
+    Board has published a Decision on Adequate Measures that specifies technical
+    requirements including encryption, access logging, penetration testing, and
+    security certifications.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      PREVENT UNLAWFUL PROCESSING: Implement purpose-bound access controls using
+      policy engines (OPA). Deploy consent verification middleware on all data access
+      paths. PREVENT UNLAWFUL ACCESS: Implement defense-in-depth: network segmentation,
+      WAF, intrusion detection, endpoint protection. Deploy zero-trust architecture
+      with continuous authentication. Encrypt all personal data at rest (AES-256) and
+      in transit (TLS 1.3). Implement column-level encryption for sensitive fields.
+      ENSURE RETENTION: Deploy automated backup with encryption. Implement disaster
+      recovery with RPO/RTO targets for personal data systems. BREACH NOTIFICATION:
+      Build an automated breach detection and notification pipeline. Implement security
+      event aggregation that triggers the notification workflow when a breach is detected.
+      The notification must reach the Board within 72 hours. PROCESSOR SECURITY: Include
+      security requirements in all processor contracts and monitor compliance through
+      automated security posture assessments.
+    tools:
+      - "OPA/Kyverno for access control enforcement"
+      - "HashiCorp Vault for encryption and key management"
+      - "Falco/Sysdig for runtime security monitoring"
+      - "WAF (ModSecurity, AWS WAF, Cloudflare)"
+      - "Network segmentation (Kubernetes NetworkPolicy, Istio)"
+      - "Automated backup with encryption (Velero, Barman)"
+      - "Breach notification workflow automation"
+  devsecops:
+    prose: >-
+      Implement comprehensive security scanning in CI/CD: SAST for code vulnerabilities,
+      DAST for runtime issues, dependency scanning for known CVEs, container scanning
+      for image vulnerabilities, IaC scanning for infrastructure misconfigurations,
+      and secret detection to prevent credential leaks. Pipeline gates must block
+      deployments with critical or high severity vulnerabilities. Implement security
+      regression tests. Maintain security-focused code review requirements for any
+      code handling personal data.
+    tools:
+      - "SAST (SonarQube, Semgrep, Checkmarx)"
+      - "DAST (OWASP ZAP, Burp Suite)"
+      - "Dependency scanning (Trivy, Snyk, Dependabot)"
+      - "Container scanning (Trivy, Grype)"
+      - "IaC scanning (Checkov, tfsec, KICS)"
+      - "Secret detection (GitLeaks, detect-secrets)"
+      - "GitLab security scanning suite"
+  secops:
+    prose: >-
+      Deploy 24/7 security monitoring for all systems processing personal data.
+      Implement SIEM correlation rules for KVKK-specific threats: unauthorized access
+      to personal data, bulk data extraction, privilege escalation on data systems.
+      Maintain breach detection playbooks with the 72-hour Board notification workflow.
+      Conduct regular penetration testing and vulnerability assessments. Monitor
+      processor security posture through continuous assessment. Implement data subject
+      notification procedures for breach scenarios.
+    tools:
+      - "SIEM (Splunk/Elastic Security) with KVKK-specific rules"
+      - "SOAR (Cortex XSOAR, Splunk SOAR) for breach response"
+      - "Vulnerability management (Qualys, Nessus, Tenable)"
+      - "Penetration testing platforms (HackerOne, Bugcrowd)"
+      - "Processor security posture monitoring"
+      - "Breach notification workflow with Board integration"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-32", "art-33", "art-34"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-46", "art-48"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.2.6", "A.7.2.7"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-28", "IR-6", "AU-2"]
+    relationship: supports

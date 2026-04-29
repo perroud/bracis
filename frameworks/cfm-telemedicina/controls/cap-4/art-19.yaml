@@ -1,0 +1,118 @@
+id: art-19
+family: cap-4
+title: "Interoperabilidade entre Sistemas de Saude"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 19. As plataformas de telemedicina devem garantir
+    interoperabilidade com outros sistemas de informação em
+    saúde, permitindo troca segura de dados clínicos entre
+    instituições.
+
+    Parágrafo 1. A interoperabilidade deve ser implementada
+    utilizando padrões abertos reconhecidos internacionalmente,
+    preferencialmente HL7 FHIR, HL7 CDA ou padrões equivalentes.
+
+    Parágrafo 2. A troca de imagens diagnósticas deve utilizar
+    o padrão DICOM, garantindo preservação de metadados e
+    qualidade diagnóstica.
+
+    Parágrafo 3. As plataformas devem suportar interoperabilidade
+    com a Rede Nacional de Dados em Saúde (RNDS) do Ministério
+    da Saúde, quando aplicável.
+guidance:
+  prose: |
+    O art. 19 exige que plataformas de telemedicina nao sejam
+    silos de informacao, mas participem do ecossistema de saude
+    digital brasileiro.
+
+    **Padroes de interoperabilidade:**
+    - HL7 FHIR R4: padrao preferencial para troca de dados
+      clinicos estruturados (recursos como Patient, Encounter,
+      Observation, MedicationRequest)
+    - HL7 CDA: padrao para documentos clinicos (sumario de alta,
+      laudo, prescricao)
+    - DICOM: padrao obrigatorio para imagens diagnosticas
+      (radiologia, cardiologia, patologia digital)
+    - TISS/TUSS: padroes brasileiros para troca de informacoes
+      com operadoras de saude suplementar
+
+    **RNDS (paragrafo 3):**
+    A Rede Nacional de Dados em Saude e a infraestrutura nacional
+    de interoperabilidade em saude. Plataformas de telemedicina
+    devem se integrar para:
+    - Enviar registros de atendimento (Sumario de Atendimento)
+    - Consultar historico clinico do paciente (com consentimento)
+    - Registrar resultados de exames e prescricoes
+
+    **Beneficios da interoperabilidade:**
+    - Continuidade do cuidado entre instituicoes
+    - Reducao de exames duplicados
+    - Historico clinico completo do paciente
+    - Vigilancia epidemiologica
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de interoperabilidade:**
+      1. Implementar API FHIR R4 compliant para troca de dados
+         clinicos, com suporte aos recursos essenciais: Patient,
+         Practitioner, Encounter, Observation, Condition,
+         MedicationRequest, DiagnosticReport.
+      2. Integrar servidor DICOM (PACS) para armazenamento e
+         troca de imagens diagnosticas com preservacao de
+         metadados e qualidade.
+      3. Implementar conector com RNDS do Ministerio da Saude
+         para envio de registros de atendimento e consulta de
+         historico clinico.
+      4. Utilizar terminologias padrao: LOINC para exames,
+         SNOMED-CT para diagnosticos, CID-10 para classificacao.
+      5. Implementar camada de mapeamento de dados para traduzir
+         entre formatos internos e padroes de interoperabilidade.
+    tools:
+      - fhir-server
+      - dicom-pacs
+      - rnds-connector
+      - terminology-server
+      - data-mapping
+  devsecops:
+    prose: |
+      **Pipeline de interoperabilidade:**
+      1. Implementar validacao automatica de recursos FHIR gerados
+         pela plataforma, usando FHIR validator oficial.
+      2. Testar integracao com RNDS em ambiente de homologacao
+         como parte do pipeline de release.
+      3. Validar que imagens DICOM transmitidas preservam todos
+         os metadados e qualidade diagnostica (sem compressao
+         com perda).
+      4. Implementar testes de interoperabilidade com sistemas
+         parceiros em ambiente controlado (sandbox).
+    tools:
+      - gitlab-ci
+      - fhir-validator
+      - dicom-validation
+      - interoperability-testing
+  secops:
+    prose: |
+      **Operacao de interoperabilidade:**
+      1. Monitorar integracao com RNDS, garantindo que registros
+         de atendimento estao sendo enviados corretamente.
+      2. Auditar troca de dados entre instituicoes, verificando
+         que apenas dados autorizados pelo paciente sao
+         compartilhados.
+      3. Manter registro de todas as integracoes ativas com
+         sistemas externos, com status de conformidade.
+      4. Verificar periodicamente que padroes de interoperabilidade
+         estao atualizados (versao de FHIR, terminologias).
+    tools:
+      - integration-monitoring
+      - data-exchange-audit
+      - interoperability-registry
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-18", "art-33", "art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-e-1", "164.314"]
+    relationship: mapped

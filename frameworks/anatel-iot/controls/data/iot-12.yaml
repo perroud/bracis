@@ -1,0 +1,110 @@
+id: iot-12
+family: data
+title: "Personal Data Encryption at Rest and Deletion Capability"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve permitir a utilização de criptografia no
+    armazenamento de dados pessoais e sensíveis, utilizando protocolos
+    e algoritmos baseados em padronização internacionalmente reconhecida.
+
+    O equipamento deve facilitar a exclusão de dados pessoais armazenados,
+    permitindo que o usuário remova de forma simples e efetiva os dados
+    pessoais contidos no dispositivo, incluindo, mas não se limitando a,
+    credenciais, configurações personalizadas, registros de atividade e
+    dados de uso.
+
+    (Ato 77/2021 §5.1.6, incisos II e III)
+guidance:
+  prose: |
+    This control addresses two complementary data protection
+    requirements: encryption of stored personal data and user-accessible
+    data deletion.
+
+    **Encryption at rest:**
+    - Personal data stored on the device (user credentials, WiFi
+      passwords, usage logs, configuration data linked to a user) must
+      be encrypted using internationally standardized algorithms.
+    - Acceptable algorithms: AES-256 (GCM or CBC with HMAC), ChaCha20-
+      Poly1305.
+    - Encryption keys should be device-specific and stored in hardware-
+      backed secure storage when available.
+    - For resource-constrained devices, at minimum the credential store
+      and user configuration database must be encrypted.
+
+    **Data deletion capability:**
+    - The device must provide a user-accessible mechanism to delete all
+      personal data — typically a "factory reset" function.
+    - Factory reset must perform cryptographic erasure (destroy the
+      encryption key) or overwrite all user data partitions.
+    - The deletion must be effective: data must not be recoverable via
+      flash memory forensics after deletion.
+    - The factory reset function should be accessible via both the
+      management interface and a physical button/mechanism on the device.
+
+    **LGPD alignment:**
+    This control directly supports LGPD Art. 18 (data subject rights)
+    and Art. 16 (data elimination after processing purpose is fulfilled).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement full-disk encryption (dm-crypt/LUKS) or per-partition
+         encryption for user data partitions using AES-256-GCM.
+      2. Store encryption keys in a hardware secure element or derive
+         them from a hardware-unique key (HUK) using a KDF (HKDF-SHA256).
+      3. Implement factory reset as cryptographic erasure: destroy the
+         user data partition encryption key, making all stored data
+         irrecoverable, then reinitialize with a new key.
+      4. Expose factory reset via: (a) physical button (hold for 10+
+         seconds), (b) web management UI, (c) TR-069/USP parameter.
+      5. After factory reset, the device must return to the first-boot
+         setup state (requiring new password creation per iot-2).
+    tools:
+      - dm-crypt
+      - hardware-security-module
+      - secure-element
+      - factory-reset-handler
+  devsecops:
+    prose: |
+      1. Add automated tests that verify: (a) user data partitions are
+         encrypted (read raw flash and confirm ciphertext), (b) factory
+         reset destroys the encryption key, (c) data is irrecoverable
+         after reset.
+      2. Scan firmware for plaintext storage of personal data: grep for
+         SQLite databases, JSON config files, and log files that contain
+         user-identifiable information in the clear.
+      3. Test the factory reset flow end-to-end: configure device with
+         user data, perform reset, attempt to recover data from the
+         flash image.
+      4. Verify that the factory reset restores the device to
+         first-boot state with mandatory password change.
+    tools:
+      - gitlab-ci
+      - flash-forensics-tools
+      - integration-testing
+      - data-recovery-tools
+  secops:
+    prose: |
+      1. During penetration testing, extract the flash memory contents
+         and verify that personal data areas are encrypted — no
+         plaintext credentials, WiFi passwords, or usage logs.
+      2. Test factory reset effectiveness: perform reset, then use
+         flash forensics to verify data is cryptographically erased.
+      3. Maintain a data map documenting what personal data the device
+         stores, where it is stored, how it is encrypted, and how it
+         is deleted — required for both ANATEL and LGPD compliance.
+      4. Conduct periodic audits of the factory reset mechanism across
+         product lines to ensure effectiveness.
+    tools:
+      - flash-extraction-tools
+      - forensics-tools
+      - data-mapping-tool
+      - grc-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-18", "art-16", "art-46"]
+    relationship: complements
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

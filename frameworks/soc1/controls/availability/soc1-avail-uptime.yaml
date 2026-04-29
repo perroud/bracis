@@ -1,0 +1,90 @@
+id: soc1-avail-uptime
+family: availability
+title: "System Availability Commitments"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization maintains the availability of financial processing systems in
+    accordance with commitments made to user entities in service level agreements (SLAs)
+    and the system description. Availability commitments are defined as specific, measurable
+    uptime targets and are supported by technical controls including redundancy, failover
+    mechanisms, capacity management, and performance monitoring. The service organization
+    monitors system availability continuously, measures actual availability against committed
+    targets, and investigates and reports availability failures to user entities. Business
+    continuity and disaster recovery plans are documented, tested at least annually, and
+    maintained to ensure that availability commitments can be met following disruptive events.
+guidance:
+  prose: >-
+    Availability is a relevant principle for SOC 1 when system downtime could affect user
+    entities' ability to process or report financial transactions. For payroll processors,
+    payment processors, and other time-critical financial service organizations, failure
+    to meet availability commitments directly affects user entities' ICFR — transactions
+    cannot be processed, reported, or reconciled if the system is unavailable. Auditors
+    test availability controls by reviewing SLAs, comparing actual availability metrics
+    against commitments during the examination period, testing whether availability monitoring
+    is in place and alerting, and reviewing the disaster recovery plan and most recent test
+    results. The availability commitments in the system description must be realistic and
+    supported by evidence that they were achieved throughout the examination period.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design financial processing infrastructure for high availability using proven cloud
+      architecture patterns: multi-AZ deployments for databases and applications, auto-scaling
+      groups for application tiers, global load balancing for geographic redundancy, and
+      cross-region replication for disaster recovery. Implement real-time availability
+      monitoring using a combination of synthetic monitoring (simulated user transactions),
+      infrastructure health checks, and application performance monitoring (APM). Calculate
+      and publish availability metrics against SLA targets on a continuous basis. Implement
+      chaos engineering practices to proactively test resilience before failures occur in
+      production. Maintain capacity planning processes to ensure infrastructure can meet
+      peak processing demands (e.g., end-of-month, year-end financial processing).
+    tools:
+      - aws-route53-healthcheck
+      - cloudwatch
+      - datadog
+      - pagerduty
+      - chaos-monkey
+  devsecops:
+    prose: >-
+      Embed availability assurance into the deployment pipeline for financial processing
+      systems. Implement deployment strategies (blue-green, canary) that enable zero-downtime
+      deployments for financial processing applications. Configure GitLab deployment jobs
+      to perform pre-deployment readiness checks and post-deployment smoke tests that verify
+      system availability before marking a deployment successful. Implement automatic
+      rollback in pipelines when post-deployment availability checks fail. Require performance
+      and load testing in the staging environment before production deployment for changes
+      that could affect the processing capacity of financial systems.
+    tools:
+      - gitlab-ci
+      - k6
+      - locust
+      - datadog-apm
+      - argocd
+  secops:
+    prose: >-
+      Define explicit availability commitments in user entity SLAs, expressed as monthly
+      or annual uptime percentages with clearly defined exclusions (planned maintenance
+      windows, force majeure events). Implement continuous availability monitoring that
+      measures availability from the user entity perspective (not just internal infrastructure
+      metrics). Produce monthly availability reports that compare actual availability against
+      SLA commitments and explain any shortfalls. Conduct and document an annual business
+      continuity and disaster recovery test covering all critical financial processing
+      systems, producing a formal test report with findings and remediation actions. Notify
+      user entities of planned maintenance at least 5 business days in advance.
+    tools:
+      - pagerduty
+      - statuspage
+      - datadog
+      - splunk
+      - servicenow-bcm
+related_controls:
+  - control_id: soc1-ca-backup-recovery
+    relationship: supports
+    description: "Backup and recovery capabilities underpin disaster recovery commitments that support availability SLAs."
+  - control_id: soc1-avail-incident
+    relationship: supports
+    description: "Incident management processes determine the speed of recovery from availability events."
+  - control_id: soc1-ic-user-controls
+    relationship: supports
+    description: "Availability commitments and maintenance windows are communicated to user entities."

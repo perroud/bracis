@@ -1,0 +1,93 @@
+id: art-38
+family: xborder
+title: "Conditions for cross-border transfer of personal information"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 38: Where a personal information processor needs to provide personal information outside
+    the territory of the People's Republic of China due to business or other such needs, it shall meet
+    one of the following conditions:
+    (1) Passing a security assessment organized by the national cyberspace administration in accordance
+    with Article 40 of this Law;
+    (2) Undergoing personal information protection certification conducted by a professional institution
+    in accordance with the provisions of the national cyberspace administration;
+    (3) Entering into a contract with the overseas receiving party in accordance with a standard contract
+    formulated by the national cyberspace administration, agreeing on the rights and obligations of both
+    parties;
+    (4) Other conditions provided for by laws or administrative regulations or by the national cyberspace
+    administration.
+    The personal information processor shall adopt necessary measures to ensure that the personal
+    information processing activities of the overseas receiving party meet the standards of personal
+    information protection provided in this Law.
+
+guidance:
+  prose: >-
+    Article 38 establishes the legal framework for cross-border data transfers, which is one of the
+    most operationally significant provisions of the PIPL. Three primary mechanisms exist: (1) security
+    assessment by the Cyberspace Administration of China (CAC), which is mandatory for critical
+    information infrastructure operators and processors handling large volumes of data; (2) certification
+    by a professional institution (analogous to binding corporate rules under GDPR); and (3) standard
+    contractual clauses (SCCs) formulated by the CAC. The CAC published the "Measures for the Standard
+    Contract for Cross-Border Transfer of Personal Information" (effective June 2023) and the "Measures
+    for Security Assessment of Data Exports" (effective September 2022). Unlike GDPR's adequacy
+    decisions, PIPL does not provide for country-level adequacy determinations. The processor
+    retains ongoing responsibility to ensure overseas recipients meet PIPL protection standards.
+
+references:
+  - citation: "PIPL, Article 38"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data localization controls that prevent personal information from leaving China
+      unless one of the three transfer mechanisms is in place. Deploy data flow mapping tools
+      that identify all cross-border transfers of personal information. Build a transfer
+      mechanism registry that tracks which mechanism (security assessment, certification, or
+      SCC) applies to each transfer. Implement API gateway controls that block cross-border
+      data flows for transfers not registered in the mechanism registry. Deploy China-region
+      data processing infrastructure (cloud regions in mainland China) to minimize cross-border
+      transfer needs. Implement data minimization for cross-border flows, transferring only
+      the minimum data necessary.
+    tools:
+      - "Data localization enforcement at API gateway (Kong, Envoy)"
+      - "Data flow mapping and visualization (Cilium, custom tools)"
+      - "Transfer mechanism registry (custom compliance service)"
+      - "China cloud infrastructure (Alibaba Cloud, Tencent Cloud, Huawei Cloud)"
+      - "Cross-border data minimization pipelines"
+  devsecops:
+    prose: >-
+      Pipeline checks must detect new cross-border data flows and verify that an approved
+      transfer mechanism is in place. Infrastructure-as-code reviews must verify that
+      China-region deployments do not route personal information through non-China regions.
+      Automated tests must validate that data localization controls are functioning correctly.
+      Deployment pipelines must include cross-border transfer impact assessments for new
+      services or features that involve international data flows.
+    tools:
+      - "Cross-border data flow detection in CI (custom scanners)"
+      - "IaC validation for data residency (OPA, Kyverno)"
+      - "Data localization integration tests"
+      - "Transfer impact assessment templates in deployment pipelines"
+  secops:
+    prose: >-
+      Monitor all outbound data flows from China-region infrastructure for unauthorized
+      cross-border transfers. Alert when personal information is detected in traffic
+      destined for non-China endpoints without an approved transfer mechanism. Track
+      security assessment, certification, and SCC expiration dates with advance alerting.
+      Conduct periodic audits of cross-border data flows against the transfer mechanism
+      registry.
+    tools:
+      - "Network DLP for cross-border flow detection (Forcepoint, Zscaler)"
+      - "SIEM rules for unauthorized cross-border transfers"
+      - "Transfer mechanism expiration tracking"
+      - "Cross-border flow audit dashboards"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33"]
+    relationship: equivalent-to

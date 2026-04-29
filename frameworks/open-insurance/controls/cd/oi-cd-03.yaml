@@ -1,0 +1,79 @@
+id: oi-cd-03
+family: cd
+title: "Compartilhamento de Dados de Apolices e Contratos"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Os participantes devem compartilhar, mediante consentimento do cliente, dados
+    relativos a apólices de seguros, certificados de previdência e títulos de
+    capitalização, incluindo:
+
+    I - Dados da apólice/certificado: número, vigência, coberturas contratadas,
+    importâncias seguradas, prêmios pagos e a pagar, franquias, carências;
+    II - Dados de sinistros: histórico de sinistros, status de tramitação,
+    valores indenizados, documentação pendente;
+    III - Dados de movimentações de previdência: contribuições, resgates,
+    portabilidades, benefícios concedidos, rentabilidade;
+    IV - Dados de capitalização: prêmios pagos, sorteios, resgates, saldo
+    atualizado.
+
+    Os dados devem ser disponibilizados em formato padronizado conforme
+    especificações técnicas do Open Insurance.
+guidance:
+  prose: |
+    Os dados de apolices e contratos sao o nucleo do Open Insurance, pois permitem
+    que o cliente tenha visao consolidada de seus produtos em diferentes seguradoras
+    e facilita a portabilidade e a comparacao de ofertas.
+
+    O compartilhamento de dados de sinistros e particularmente sensivel, pois pode
+    revelar informacoes de saude (seguros de vida/saude), acidentes e prejuizos
+    patrimoniais. A granularidade do consentimento deve permitir ao cliente
+    compartilhar dados de apolices sem compartilhar historico de sinistros.
+
+    Para previdencia, os dados de portabilidade sao estrategicos, pois facilitam
+    a migracao entre planos com melhor custo-beneficio para o participante.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs de apolices, sinistros, previdencia e capitalizacao conforme
+         especificacoes do Open Insurance.
+      2. Estruturar dados de apolices em formato padronizado, mapeando campos internos
+         para o schema do Open Insurance.
+      3. Implementar filtragem granular por tipo de dado (apolice, sinistro, movimentacao)
+         conforme escopo do consentimento.
+      4. Garantir paginacao e performance para clientes com muitas apolices/sinistros.
+      5. Implementar versionamento de API para suportar evolucao do schema.
+    tools:
+      - api-gateway
+      - data-transformation
+      - etl-pipeline
+      - api-versioning
+  devsecops:
+    prose: |
+      1. Validar mapeamento de dados internos para schema do Open Insurance com
+         testes automatizados.
+      2. Testar que a filtragem por escopo de consentimento funciona corretamente
+         para cada categoria de dado.
+      3. Testes de carga para endpoints de apolices (podem retornar volumes grandes).
+      4. DAST focado em autorizacao: testar que um cliente nao acessa dados de outro.
+    tools:
+      - data-validation
+      - dast
+      - load-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar acessos a dados de sinistros (alta sensibilidade -- pode conter
+         dados de saude).
+      2. Implementar DLP para prevenir exfiltracao de dados de apolices em massa.
+      3. Auditar que dados compartilhados correspondem exatamente ao escopo do
+         consentimento vigente.
+    tools:
+      - siem
+      - dlp
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-18"]
+    relationship: complements

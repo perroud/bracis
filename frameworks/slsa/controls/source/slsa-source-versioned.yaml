@@ -1,0 +1,94 @@
+id: slsa-source-versioned
+family: source
+title: "Source: Version Controlled"
+class: SLSA
+
+baselines: [build-l1, build-l2, build-l3]
+
+statement:
+  prose: >-
+    All source code must be maintained in a version control system that tracks every
+    change to the codebase. Every revision must be uniquely identifiable (e.g., via a
+    content-addressable hash such as a Git commit SHA). The version control system must
+    support referencing a specific, immutable snapshot of the source at any point in
+    time. This ensures that the exact source used to produce an artifact can be
+    identified and retrieved for verification.
+
+guidance:
+  prose: >-
+    Version control is a prerequisite for supply-chain security. Without it, there is
+    no way to determine what source code was used to build a particular artifact. Git
+    is the de facto standard and provides content-addressable storage where every commit
+    is identified by a SHA hash of its contents. Organizations should enforce that all
+    source code — including build scripts, CI/CD configurations, and infrastructure-as-
+    code — is stored in version control. Tags and branches should be used to mark release
+    points. Force pushes and history rewriting should be restricted on protected branches
+    to maintain the integrity of the revision history.
+
+references:
+  - citation: "SLSA v1.0 — Source Requirements"
+    url: "https://slsa.dev/spec/v1.0/requirements#source-requirements"
+  - citation: "SLSA Source Track Proposal"
+    url: "https://slsa.dev/spec/v1.0/source-requirements"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Host all source code on managed Git platforms (GitHub, GitLab, Bitbucket) with
+      enforced access controls. Configure branch protection rules on all release and main
+      branches to prevent force pushes, deletions, and history rewrites. Enable signed
+      commits (GPG or SSH) for all contributors. Implement Git server-side hooks that
+      reject pushes without proper metadata. Use Git submodules or monorepo strategies
+      to ensure all dependencies within the organization's control are also version-
+      controlled. Enable repository mirroring for disaster recovery to ensure source
+      availability.
+    tools:
+      - github
+      - gitlab
+      - bitbucket
+      - gitea
+      - git-hooks
+      - terraform
+
+  devsecops:
+    prose: >-
+      Enforce branch protection policies that require pull requests for all changes to
+      protected branches. Configure CI/CD pipelines to build only from version-controlled
+      sources, rejecting any build that references unversioned inputs. Implement pre-commit
+      hooks that enforce commit message conventions and prevent accidental commits of
+      secrets or large binaries. Require that build provenance includes the exact Git
+      commit SHA of the source, enabling consumers to verify the source revision.
+      Configure pipelines to fail if the source commit cannot be resolved.
+    tools:
+      - github-actions
+      - gitlab-ci
+      - pre-commit
+      - git-secrets
+      - gitleaks
+      - commitlint
+
+  secops:
+    prose: >-
+      Monitor Git audit logs for force pushes, branch deletions, and history rewrites
+      on protected branches. Alert on repository access from unusual locations or
+      identities. Implement SIEM rules that detect unauthorized changes to branch
+      protection settings. Periodically audit repository configurations to ensure
+      protection rules are consistently applied. Verify that build provenance references
+      valid, existing Git commit SHAs as part of artifact verification workflows.
+    tools:
+      - splunk
+      - elastic-siem
+      - github-audit-log
+      - gitlab-audit-events
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-3", "SR-4"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PS.1.1", "PO.1.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.1", "16.3"]
+    relationship: supports

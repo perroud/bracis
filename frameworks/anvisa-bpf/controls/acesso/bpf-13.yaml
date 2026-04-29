@@ -1,0 +1,114 @@
+id: bpf-13
+family: acesso
+title: "Role-Based Access Control for GMP Systems"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    O acesso a sistemas computadorizados de BPF deve ser controlado por
+    meio de perfis de acesso baseados em função (role-based access control),
+    atribuindo a cada usuário apenas as permissões mínimas necessárias
+    para o desempenho de suas atividades funcionais, conforme o princípio
+    de menor privilégio.
+
+    Os perfis de acesso devem ser definidos pela área de Garantia da
+    Qualidade em conjunto com a área de TI, documentados em matriz de
+    acesso, e formalmente aprovados antes da implementação. A segregação
+    de funções deve ser implementada para operações críticas, impedindo
+    que a mesma pessoa execute e aprove a mesma atividade.
+
+    O acesso administrativo a sistemas computadorizados de BPF,
+    incluindo acesso a banco de dados, configurações de sistema e
+    gestão de usuários, deve ser restrito a pessoal autorizado e
+    monitorado continuamente. Contas genéricas ou compartilhadas não
+    são permitidas em sistemas GMP.
+guidance:
+  prose: |
+    Access control in GMP computerized systems directly supports the
+    "Attributable" principle of ALCOA+ by ensuring that every action
+    in the system can be traced to a specific individual.
+
+    Key access control requirements:
+    - Unique user accounts: each person has their own account with
+      individual credentials; shared/generic accounts are prohibited
+    - Role-based access: permissions assigned through roles matching
+      job functions, not directly to individual users
+    - Least privilege: each role has only the minimum permissions
+      required for the job function
+    - Segregation of duties: critical functions separated (e.g.,
+      operator cannot approve own batch; QC analyst cannot modify
+      methods)
+    - Privileged access management: administrative accounts separately
+      controlled with enhanced monitoring
+
+    Access control matrix should document:
+    - System functions and data accessible by each role
+    - Create/read/update/delete permissions per data type
+    - Administrative functions and who can perform them
+    - Critical functions requiring segregation of duties
+    - Approval workflow for access provisioning and changes
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement centralized identity and access management (IAM)
+         integrated with GMP systems through LDAP, SAML, or OIDC,
+         providing single source of truth for user identities and
+         role assignments.
+      2. Configure role-based access control (RBAC) with predefined
+         GMP roles mapped to job functions, enforcing least privilege
+         and segregation of duties through technical controls.
+      3. Deploy privileged access management (PAM) for administrative
+         accounts to GMP systems, databases, and infrastructure with
+         session recording, just-in-time access, and dual approval.
+      4. Implement automated access reviews generating reports of
+         current access assignments for periodic verification against
+         the approved access matrix.
+    tools:
+      - iam-platform
+      - rbac-engine
+      - pam-solution
+      - access-review-automation
+  devsecops:
+    prose: |
+      1. Implement access control testing in CI pipelines: verify that
+         RBAC configurations enforce the approved access matrix and
+         that unauthorized access attempts are blocked and logged.
+      2. Test segregation of duties enforcement: verify that conflicting
+         roles cannot be assigned to the same user and that self-
+         approval is technically prevented for critical operations.
+      3. Automate access matrix documentation generation from system
+         RBAC configurations for validation and audit purposes.
+      4. Include access control regression testing in every release
+         to verify that updates do not introduce privilege escalation
+         or bypass authorization controls.
+    tools:
+      - gitlab-ci
+      - access-control-testing
+      - rbac-validation
+      - security-testing
+  secops:
+    prose: |
+      1. Establish access management SOP defining procedures for
+         provisioning, modification, periodic review, and revocation
+         of access to GMP computerized systems.
+      2. Conduct periodic access reviews (minimum quarterly for
+         high-risk systems, semi-annually for medium-risk) verifying
+         that user access aligns with current job responsibilities.
+      3. Monitor and alert on access anomalies: privilege escalation,
+         access outside normal hours, failed authentication attempts,
+         and access to systems outside the user's functional scope.
+      4. Immediately revoke access upon role change, transfer, or
+         termination. Implement automated access revocation triggered
+         by HR system events.
+    tools:
+      - iam-platform
+      - access-review
+      - siem
+      - hr-integration
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-18"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-15", "controle-A-5-18", "controle-A-8-3"]
+    relationship: mapped

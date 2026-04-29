@@ -1,0 +1,127 @@
+id: swd-2
+family: swd
+title: "Software Verification and Validation"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    The manufacturer shall specify minimum requirements concerning
+    hardware, IT networks characteristics and IT security measures,
+    including protection against unauthorised access, necessary to run
+    the software as intended.
+
+    Software referred to in this Section shall be developed and
+    manufactured in accordance with the state of the art taking into
+    account the principles of development life cycle, risk management,
+    including information security, verification and validation. The
+    manufacturer shall set out minimum requirements concerning hardware,
+    IT networks characteristics and IT security measures, including
+    protection against unauthorised access, necessary to run the software
+    as intended.
+
+    Verification shall provide confirmation through the provision of
+    objective evidence that specified requirements have been fulfilled.
+    Validation shall demonstrate the ability of the software to meet
+    user needs and intended uses under the conditions of actual or
+    simulated use.
+guidance:
+  prose: |
+    Verification and validation (V&V) are distinct but complementary
+    activities required by EU MDR and IEC 62304:
+
+    - Verification: confirms that design outputs meet design inputs at
+      each phase (unit testing, integration testing, system testing).
+      "Did we build the product right?"
+    - Validation: confirms that the finished device meets user needs
+      and intended use in the actual or simulated use environment.
+      "Did we build the right product?"
+
+    For software medical devices, V&V must be:
+    - Planned: a V&V plan must define activities, methods, acceptance
+      criteria, and responsibilities before execution.
+    - Documented: all V&V results must be recorded with traceability
+      to the requirements being verified/validated.
+    - Independent: validation should involve users or clinical
+      stakeholders, not only the development team.
+    - Repeated: regression testing must be performed after each change
+      to ensure previously verified functionality is not degraded.
+
+    The V&V strategy must be risk-proportionate: higher-risk software
+    items (IEC 62304 Class C) require more rigorous verification and
+    validation activities.
+references:
+  - citation: "EU MDR 2017/745, Annex I, Section 17.2"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+  - citation: "IEC 62304:2006+AMD1:2015, Sections 5.6–5.8"
+    url: "https://www.iso.org/standard/71604.html"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Provision dedicated validation environments that mirror
+         production configurations, including hardware specifications,
+         network topology, and security controls documented in the
+         software requirements.
+      2. Implement automated test infrastructure supporting unit,
+         integration, system, and end-to-end test execution with
+         parallel test runners for efficient feedback cycles.
+      3. Configure test result archival in an immutable artifact store
+         with retention policies aligned to regulatory documentation
+         requirements (minimum device lifetime plus additional years
+         as required by national law).
+      4. Deploy test data management solutions that provide realistic
+         but anonymized clinical data for validation testing without
+         exposing actual patient information.
+    tools:
+      - kubernetes
+      - selenium-grid
+      - test-data-management
+      - artifact-registry
+      - minio
+  devsecops:
+    prose: |
+      1. Implement a multi-level automated test strategy: unit tests
+         (>80% code coverage for Class C software items), integration
+         tests (API contract testing), system tests (end-to-end
+         scenarios), and performance tests (load, stress, soak).
+      2. Configure pipeline gates that enforce minimum test coverage
+         thresholds, zero failing tests, and mandatory test execution
+         for safety-critical modules before merge approval.
+      3. Implement requirements-based testing with bidirectional
+         traceability: each requirement maps to test cases, and each
+         test case maps back to requirements, with coverage reports
+         generated automatically.
+      4. Establish automated regression test suites that execute on
+         every code change, with dedicated extended regression suites
+         running on scheduled pipelines for release candidates.
+    tools:
+      - gitlab-ci
+      - jest
+      - cypress
+      - k6
+      - test-coverage-reporting
+  secops:
+    prose: |
+      1. Maintain verification and validation plans and reports as
+         controlled documents within the QMS, with formal review and
+         approval by quality assurance and clinical affairs.
+      2. Conduct formal validation activities with documented
+         protocols, acceptance criteria, execution records, and
+         deviation handling for each software release.
+      3. Establish an independent validation review process where
+         validation results are reviewed by personnel not directly
+         involved in the development of the software being validated.
+      4. Implement a validation status tracking dashboard that provides
+         real-time visibility into V&V progress, open deviations, and
+         release readiness for each software version.
+    tools:
+      - quality-management-system
+      - validation-protocol-management
+      - test-management
+      - dashboard-reporting
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-13", "art-14"]
+    relationship: mapped
+  - framework_id: fda-21-cfr-11
+    articles: ["11.10"]
+    relationship: mapped

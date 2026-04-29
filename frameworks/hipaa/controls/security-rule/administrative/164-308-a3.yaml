@@ -1,0 +1,111 @@
+id: 164.308-a3
+family: security-rule-administrative
+title: "Workforce Security"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement policies and procedures to ensure that all members of the workforce have
+    appropriate access to electronic protected health information, as provided under
+    the Information Access Management standard, and to prevent those workforce members
+    who do not have access from obtaining access to electronic protected health information.
+  parts:
+    - id: 164.308-a3-ii-A
+      label: "164.308(a)(3)(ii)(A)"
+      prose: >-
+        Authorization and/or Supervision (Addressable). Implement procedures for the
+        authorization and/or supervision of workforce members who work with electronic
+        protected health information or in locations where it might be accessed.
+    - id: 164.308-a3-ii-B
+      label: "164.308(a)(3)(ii)(B)"
+      prose: >-
+        Workforce Clearance Procedure (Addressable). Implement procedures to determine
+        that the access of a workforce member to electronic protected health information
+        is appropriate.
+    - id: 164.308-a3-ii-C
+      label: "164.308(a)(3)(ii)(C)"
+      prose: >-
+        Termination Procedures (Addressable). Implement procedures for terminating
+        access to electronic protected health information when the employment of, or
+        other arrangement with, a workforce member ends or as required by determinations
+        made under the Workforce Clearance Procedure.
+
+guidance:
+  prose: >-
+    Workforce security ensures that only authorized personnel access ePHI. The standard
+    requires that organizations control which workforce members can access ePHI based on
+    their role and job function. Authorization procedures should verify that access
+    requests are appropriate before granting access. Supervision mechanisms should detect
+    and prevent unauthorized access attempts. Clearance procedures must verify that a
+    workforce member's access level is appropriate for their role before access is
+    provisioned. Termination procedures must ensure that access is promptly revoked when
+    a workforce member leaves the organization or changes roles. While the implementation
+    specifications are addressable (not required), organizations must either implement
+    them or document why an equivalent alternative measure is reasonable and appropriate.
+
+references:
+  - citation: "45 CFR 164.308(a)(3)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.308"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate the identity provider with HR systems to automate access provisioning
+      and deprovisioning based on employment status and role changes. Implement SCIM
+      (System for Cross-domain Identity Management) to synchronize user lifecycle
+      events from HR to the IdP and downstream systems. Use RBAC with predefined roles
+      mapped to job functions to control access to ePHI systems. Implement automated
+      workflows that revoke all access within defined SLAs (e.g., 24 hours) when a
+      termination event is received from HR. Deploy Just-in-Time (JIT) access for
+      administrative access to ePHI systems requiring explicit approval and time-limited
+      sessions.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - scim
+      - hashicorp-boundary
+      - teleport
+      - sailpoint
+
+  devsecops:
+    prose: >-
+      Enforce that access to repositories containing ePHI-related code is restricted
+      based on team membership linked to the IdP. Implement automated access reviews
+      as scheduled pipeline jobs that generate reports of all user access to ePHI
+      systems. Enforce that CI/CD service accounts accessing ePHI environments are
+      scoped to minimum necessary permissions and rotated regularly. Remove access
+      from CI/CD systems when team members are removed from projects. Audit pipeline
+      access logs to detect unauthorized access patterns.
+    tools:
+      - gitlab-ci
+      - gitlab-protected-environments
+      - vault
+      - aws-iam
+      - terraform
+
+  secops:
+    prose: >-
+      Conduct periodic access reviews (at least quarterly) for all users with
+      access to ePHI systems. Monitor for access by terminated users or users
+      whose roles have changed. Detect and alert on access attempts outside of
+      authorized hours or from unusual locations. Track authorization workflows
+      end-to-end to ensure all access grants followed the clearance procedure.
+      Generate compliance reports showing that termination procedures are executed
+      within defined SLAs. Monitor for privilege escalation and unauthorized role
+      changes.
+    tools:
+      - sailpoint
+      - saviynt
+      - splunk
+      - elastic-siem
+      - cyberark
+      - beyondtrust
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-5", "AC-6", "PS-4", "PS-5"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A5.18", "A6.2", "A6.5"]
+    relationship: supports

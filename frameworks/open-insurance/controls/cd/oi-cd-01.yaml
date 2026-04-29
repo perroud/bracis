@@ -1,0 +1,75 @@
+id: oi-cd-01
+family: cd
+title: "Compartilhamento de Dados Abertos de Produtos"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Os participantes obrigatórios devem disponibilizar, por meio de APIs públicas e
+    sem necessidade de autenticação, dados abertos relativos a:
+
+    I - Produtos de seguros comercializados, incluindo características, coberturas,
+    assistências, carências, franquias e prêmios de referência;
+    II - Produtos de previdência complementar aberta, incluindo planos, taxas de
+    administração, rentabilidade e regimes de tributação;
+    III - Títulos de capitalização, incluindo modalidades, séries, prazos e
+    prêmios;
+    IV - Canais de atendimento e redes referenciadas;
+    V - Informações institucionais da sociedade participante.
+
+    As APIs de dados abertos devem seguir as especificações técnicas publicadas
+    pela estrutura de governança do Open Insurance.
+guidance:
+  prose: |
+    Os dados abertos sao a primeira camada do Open Insurance e foram a Fase 1 da
+    implementacao. Nao requerem consentimento do cliente pois sao informacoes
+    publicas sobre produtos e servicos.
+
+    O objetivo e permitir comparacao de produtos entre seguradoras, promovendo
+    transparencia e concorrencia. Agregadores e comparadores de seguros podem
+    consumir essas APIs para oferecer ferramentas de comparacao ao consumidor.
+
+    As especificacoes tecnicas detalham schemas JSON, endpoints, paginacao,
+    versionamento e formatos de resposta. A conformidade com essas especificacoes
+    e obrigatoria e verificavel por testes automatizados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs REST conforme especificacoes OpenAPI do Open Insurance
+         para cada categoria de produto (seguros, previdencia, capitalizacao).
+      2. Configurar cache adequado para dados abertos (dados nao mudam com frequencia).
+      3. Implementar rate limiting para proteger a infraestrutura de abusos.
+      4. Garantir disponibilidade minima de 99,5% conforme SLA regulatorio.
+      5. Publicar documentacao OpenAPI acessivel publicamente.
+    tools:
+      - api-gateway
+      - cdn
+      - rate-limiter
+      - api-documentation
+  devsecops:
+    prose: |
+      1. Validar automaticamente no pipeline que os schemas de resposta estao
+         conforme especificacao do Open Insurance.
+      2. Testes de performance para garantir tempos de resposta dentro do SLA.
+      3. Monitorar cobertura de dados: todos os produtos ativos devem estar
+         disponiveis nas APIs.
+      4. Scanning de seguranca mesmo em APIs publicas (prevenir injection, DoS).
+    tools:
+      - openapi-validator
+      - performance-testing
+      - sast
+      - dast
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar disponibilidade das APIs de dados abertos (uptime SLA 99,5%).
+      2. Detectar e bloquear abusos (scraping excessivo, ataques de enumeracao).
+      3. Auditar que dados abertos nao expoe informacoes que deveriam ser protegidas.
+    tools:
+      - api-monitoring
+      - waf
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

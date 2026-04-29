@@ -1,0 +1,145 @@
+id: art-33
+family: cap-5
+title: "Transferência Internacional de Dados"
+class: LGPD
+statement:
+  prose: |
+    Art. 33. A transferência internacional de dados pessoais somente é permitida nos
+    seguintes casos:
+  parts:
+    - id: art-33-i
+      label: "I"
+      prose: |
+        para países ou organismos internacionais que proporcionem grau de proteção de
+        dados pessoais adequado ao previsto nesta Lei;
+    - id: art-33-ii
+      label: "II"
+      prose: |
+        quando o controlador oferecer e comprovar garantias de cumprimento dos princípios,
+        dos direitos do titular e do regime de proteção de dados previstos nesta Lei,
+        na forma de:
+        a) cláusulas contratuais específicas para determinada transferência;
+        b) cláusulas-padrão contratuais;
+        c) normas corporativas globais;
+        d) selos, certificados e códigos de conduta regularmente emitidos;
+    - id: art-33-iii
+      label: "III"
+      prose: |
+        quando a transferência for necessária para a cooperação jurídica internacional
+        entre órgãos públicos de inteligência, de investigação e de persecução, de acordo
+        com os instrumentos de direito internacional;
+    - id: art-33-iv
+      label: "IV"
+      prose: |
+        quando a transferência for necessária para a proteção da vida ou da incolumidade
+        física do titular ou de terceiro;
+    - id: art-33-v
+      label: "V"
+      prose: |
+        quando a autoridade nacional autorizar a transferência;
+    - id: art-33-vi
+      label: "VI"
+      prose: |
+        quando a transferência resultar em compromisso assumido em acordo de cooperação
+        internacional;
+    - id: art-33-vii
+      label: "VII"
+      prose: |
+        quando a transferência for necessária para a execução de política pública ou
+        atribuição legal do serviço público, sendo dada publicidade nos termos do
+        inciso I do caput do art. 23 desta Lei;
+    - id: art-33-viii
+      label: "VIII"
+      prose: |
+        quando o titular tiver fornecido o seu consentimento específico e em destaque
+        para a transferência, com informação prévia sobre o caráter internacional da
+        operação, distinguindo claramente esta de outras finalidades; ou
+    - id: art-33-ix
+      label: "IX"
+      prose: |
+        quando necessário para atender as hipóteses previstas nos incisos II, V e VI
+        do art. 7º desta Lei.
+guidance:
+  prose: |
+    O art. 33 regula a transferência de dados pessoais para fora do território brasileiro.
+    Em ambientes cloud-native, isso é criticamente relevante porque dados podem estar em
+    data centers fora do Brasil.
+
+    **Mecanismos de adequação (do mais seguro ao menos seguro):**
+
+    1. **País com nível adequado (I):** A ANPD deve publicar lista de países adequados.
+       Até o momento, não há lista oficial aprovada. A Resolução CD/ANPD nº 19/2024
+       regulamentou o tema.
+
+    2. **Cláusulas contratuais (II):** Mecanismo mais prático atualmente. Incluir
+       cláusulas-padrão aprovadas pela ANPD nos contratos com fornecedores internacionais.
+
+    3. **Normas corporativas globais / BCR (II, c):** Para empresas multinacionais.
+       Equivalente às Binding Corporate Rules do GDPR.
+
+    4. **Consentimento específico (VIII):** Deve ser específico para a transferência
+       internacional, com informação prévia sobre o caráter internacional.
+
+    **Implicações para cloud computing:**
+    - Usar cloud provider com data center no Brasil (região São Paulo da AWS, Azure,
+      GCP) não elimina o problema se dados são replicados para outras regiões.
+    - Configurar data residency para garantir que dados pessoais permaneçam em
+      região brasileira.
+    - Backups e disaster recovery em regiões fora do Brasil constituem transferência
+      internacional.
+    - CDNs que cachéiam dados pessoais em edge locations fora do Brasil constituem
+      transferência internacional.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Configurar data residency policies nos cloud providers para manter dados
+         pessoais em regiões brasileiras (sa-east-1 na AWS, brazilsouth no Azure,
+         southamerica-east1 no GCP).
+      2. Implementar data localization controls que impeçam replicação automática
+         para regiões fora do Brasil.
+      3. Auditar CDN configurations para garantir que dados pessoais não sejam
+         cacheados em edge locations internacionais.
+      4. Implementar data flow mapping para identificar todas as transferências
+         internacionais.
+      5. Manter inventário de fornecedores internacionais com mecanismos de adequação
+         documentados.
+      6. Configurar encryption in transit com chaves gerenciadas no Brasil quando
+         transferência internacional for necessária.
+    tools:
+      - cloud-resource-policies
+      - data-residency-controls
+      - data-flow-mapping
+      - vendor-management
+      - cdn-configuration
+  devsecops:
+    prose: |
+      1. Implementar policy-as-code para impedir deploy de recursos que armazenem
+         dados pessoais fora de regiões brasileiras.
+      2. Validar no pipeline CI/CD que configurações de infraestrutura respeitam
+         data residency (ex.: Terraform/Pulumi policies).
+      3. Scan de IaC para detectar regiões não permitidas em recursos que processam
+         dados pessoais.
+      4. Implementar testes de integração que validem data residency em runtime.
+    tools:
+      - opa-gatekeeper
+      - terraform-sentinel
+      - pulumi-policy
+      - cloud-custodian
+      - infrastructure-scanner
+  secops:
+    prose: |
+      1. Monitorar tráfego de rede para detectar transferências de dados pessoais
+         para destinos internacionais não autorizados.
+      2. Auditar configurações de cloud providers periodicamente para validar
+         data residency.
+      3. Monitorar SaaS tools que possam transferir dados para servidores internacionais.
+      4. Manter dashboard de conformidade de transferências internacionais.
+    tools:
+      - network-monitoring
+      - cloud-security-posture-management
+      - saas-security-posture-management
+      - compliance-dashboard
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 44", "art. 45", "art. 46", "art. 47", "art. 49"]
+    relationship: equivalent-to

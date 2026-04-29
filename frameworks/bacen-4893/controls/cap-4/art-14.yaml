@@ -1,0 +1,175 @@
+id: art-14
+family: cap-4
+title: "Requisitos Contratuais para Servicos em Nuvem"
+class: BACEN-4893
+statement:
+  prose: |
+    Art. 14. Os contratos para prestação de serviços relevantes de processamento e
+    armazenamento de dados e de computação em nuvem devem prever:
+    I - a indicação dos países e da região em cada país onde os serviços poderão
+    ser prestados e os dados poderão ser armazenados, processados e gerenciados;
+    II - a adoção de medidas de segurança para a transmissão e o armazenamento dos
+    dados referidos no art. 15;
+    III - a manutenção, enquanto o contrato estiver vigente, da segregação dos dados
+    e dos controles de acesso para proteção das informações dos clientes;
+    IV - a obrigatoriedade de notificação da instituição contratante sobre a ocorrência
+    de incidentes relevantes e as vulnerabilidades existentes ou identificadas no
+    ambiente de serviços;
+    V - que o Banco Central do Brasil terá acesso aos contratos e aos acordos firmados
+    para a prestação de serviços, à documentação e às informações referentes aos
+    serviços prestados, aos dados armazenados e às informações processadas;
+    VI - a adoção de controles que permitam o acesso, pela instituição contratante, às
+    informações sobre os serviços prestados nos termos do § 5º do art. 12;
+    VII - a possibilidade de realização de auditoria pela instituição contratante ou
+    por empresa por ela indicada; e
+    VIII - o estabelecimento de política de saída, conforme regulamentação em vigor,
+    para contingências na prestação dos serviços em nuvem.
+guidance:
+  prose: |
+    O art. 14 detalha as clausulas contratuais obrigatorias para servicos de cloud
+    computing. E critico para procurement e juridico.
+
+    **Clausulas obrigatorias nos contratos:**
+
+    **I - Localizacao geografica:**
+    O contrato deve especificar onde dados serao armazenados e processados.
+    Cuidado: provedores cloud podem mover dados entre regioes; o contrato deve
+    restringir isso.
+
+    **II - Medidas de seguranca:**
+    Criptografia em transito e em repouso, controles de acesso, protecao de dados
+    conforme art. 15.
+
+    **III - Segregacao e controle de acesso:**
+    Dados da instituicao devem ser segregados de outros clientes do provedor.
+    Controles de acesso devem garantir que apenas pessoal autorizado acesse
+    os dados.
+
+    **IV - Notificacao de incidentes:**
+    O provedor deve notificar a instituicao sobre incidentes e vulnerabilidades.
+    Deve haver SLA de notificacao definido contratualmente.
+
+    **V - Acesso pelo BCB:**
+    O contrato deve garantir que o BCB pode acessar contratos, documentacao e
+    dados. E uma clausula de auditoria regulatoria.
+
+    **VI - Acesso a informacoes:**
+    A instituicao deve ter acesso a informacoes sobre os servicos prestados.
+    Logs, metricas, relatorios de seguranca.
+
+    **VII - Auditoria:**
+    Direito de auditoria pela instituicao ou terceiro indicado. Muitos
+    provedores oferecem SOC 2 e ISO 27001 como alternativa a auditoria on-site.
+
+    **VIII - Exit strategy:**
+    Politica de saida para quando a instituicao precisar migrar para outro
+    provedor ou trazer de volta para infraestrutura propria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I - Localizacao e data residency:**
+      1. Policy-as-code que restringe deploy a regioes contratuais.
+      2. Data residency controls automatizados por provedor.
+      3. Monitoramento de localizacao de dados com alertas de desvio.
+
+      **II - Medidas de seguranca tecnica:**
+      4. Criptografia em transito (TLS 1.3) e repouso (AES-256) em todos os
+         servicos contratados.
+      5. Customer-managed keys (CMK) quando disponivel.
+      6. Private endpoints para comunicacao com servicos cloud.
+
+      **III - Segregacao:**
+      7. Dedicated tenancy para workloads mais sensiveis.
+      8. Resource isolation via VPC, accounts/subscriptions separadas.
+      9. IAM segregado por ambiente e workload.
+
+      **IV - Monitoramento de incidentes do provedor:**
+      10. Integracao com status page e alertas do provedor cloud.
+      11. Monitoramento de Security Advisories do provedor.
+      12. Processo automatizado de avaliacao de impacto de CVEs do provedor.
+
+      **VI - Acesso a informacoes:**
+      13. Cloud audit logs (CloudTrail, Activity Log) ativados e centralizados.
+      14. Exportacao de logs para SIEM proprio.
+      15. Dashboards de consumo, performance e seguranca.
+
+      **VIII - Exit strategy:**
+      16. Documentacao tecnica de portabilidade para cada servico.
+      17. Backup independente de dados criticos fora do provedor primario.
+      18. Testes periodicos de portabilidade/migracao.
+      19. Containers e IaC para minimizar vendor lock-in.
+    tools:
+      - cspm
+      - kms-hsm
+      - centralized-logging
+      - network-policies
+      - cloud-governance
+      - backup-solution
+  devsecops:
+    prose: |
+      **Enforcement de requisitos contratuais no pipeline:**
+      1. IaC policies que validam regiao, criptografia e segregacao.
+      2. Pre-deploy checks para conformidade com clausulas contratuais.
+      3. Proibicao de uso de servicos cloud nao contratados formalmente.
+
+      **Portabilidade (VIII):**
+      4. Abstraction layers para servicos cloud (ex: S3-compatible APIs).
+      5. Containerizacao de workloads para portabilidade.
+      6. IaC multi-cloud ready (Terraform, Pulumi).
+      7. Database abstraction para evitar lock-in em managed services proprietarios.
+
+      **Auditabilidade (VII):**
+      8. Audit trail completo de toda interacao com cloud APIs.
+      9. Provenance de artefatos incluindo cloud resources utilizados.
+      10. Documentacao automatizada de infraestrutura cloud.
+    tools:
+      - checkov
+      - tfsec
+      - terraform
+      - pulumi
+      - gitlab-ci
+      - opa-gatekeeper
+  secops:
+    prose: |
+      **Gestao contratual (procurement support):**
+      1. Checklist de clausulas obrigatorias para contratos cloud.
+      2. Template contratual pre-aprovado com todas as clausulas do art. 14.
+      3. Revisao juridica e de seguranca obrigatoria antes de assinatura.
+
+      **IV - Incidentes do provedor:**
+      4. Processo de recepcao e triagem de notificacoes do provedor.
+      5. SLA contratual de notificacao: tempo maximo para provedor informar.
+      6. Avaliacao de impacto para cada incidente reportado pelo provedor.
+
+      **V - Preparacao para auditoria BCB:**
+      7. Repositorio centralizado de contratos cloud acessivel ao BCB.
+      8. Documentacao de seguranca dos servicos contratados.
+      9. Relatorios de auditoria do provedor (SOC 2, ISO 27001) catalogados.
+
+      **VII - Exercicio do direito de auditoria:**
+      10. Plano anual de auditoria de provedores cloud.
+      11. Verificacao de certificacoes e relatorios de auditoria.
+      12. Pen testing em servicos cloud contratados (com autorizacao).
+
+      **VIII - Exit strategy operacional:**
+      13. Plano de saida documentado e testado para cada provedor critico.
+      14. Simulacao de migracao periodica para validar viabilidade.
+      15. Retencao de dados pos-termino contratual definida.
+    tools:
+      - grc-platform
+      - vendor-risk-management
+      - contract-management
+      - penetration-testing
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-4", "SA-9", "SA-12", "AC-20", "AU-16"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-46"]
+    relationship: complements
+  - framework_id: pci-dss-v4
+    articles: ["12.8", "12.9"]
+    relationship: complements

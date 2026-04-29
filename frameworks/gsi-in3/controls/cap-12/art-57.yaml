@@ -1,0 +1,83 @@
+id: art-57
+family: cap-12
+title: "Seguranca de Identidade em Nuvem"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 57. Os órgãos e entidades devem implementar controles de identidade
+    e acesso em ambientes de computação em nuvem, incluindo:
+
+    I - federação de identidades com o provedor de identidade do órgão;
+    II - autenticação multifator para acesso ao console de gestão cloud;
+    III - princípio do privilégio mínimo para roles e policies cloud;
+    IV - monitoramento de contas de serviço e chaves de acesso;
+    V - vedação de uso de contas root/admin para atividades rotineiras.
+guidance:
+  prose: |
+    O art. 57 exige IAM robusto em nuvem: federacao, MFA, privilegio minimo,
+    monitoramento de service accounts e vedacao de uso de root.
+
+    **Controles de identidade cloud:**
+    1. Federacao: SSO com IdP do orgao (SAML/OIDC)
+    2. MFA: obrigatorio para console de gestao
+    3. Privilegio minimo: roles IAM granulares
+    4. Service accounts: inventario, rotacao, monitoramento
+    5. Root/admin: uso apenas para emergencia, com breakglass
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.5.23 (Cloud services - identity)
+    - NIST 800-53 rev5: AC-2 (Account Management), IA-2 (MFA)
+    - CIS Cloud Benchmarks (AWS, Azure, GCP)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Cloud IAM:**
+      1. SSO federado via SAML/OIDC com IdP do orgao (nao criar usuarios locais).
+      2. MFA obrigatorio para console (hardware key preferencial).
+      3. IAM roles granulares com least privilege (IAM Access Analyzer).
+      4. Service accounts: chaves rotacionadas a cada 90 dias, uso auditado.
+      5. Root account: MFA hardware, sem access keys, alerta para qualquer uso.
+    tools:
+      - cloud-sso
+      - mfa-hardware
+      - iam-access-analyzer
+      - service-account-rotation
+      - root-account-monitoring
+  devsecops:
+    prose: |
+      **IAM em pipelines cloud:**
+      1. OIDC federation para pipelines (GitLab -> AWS/GCP sem long-lived keys).
+      2. Roles temporarias para pipeline (assume role com sessao curta).
+      3. Policy-as-code para validar IAM policies no pipeline (cfn-lint, terraform validate).
+      4. Scan de IAM overly permissive policies.
+    tools:
+      - oidc-federation
+      - temporary-roles
+      - iam-policy-validation
+      - iam-scan
+  secops:
+    prose: |
+      **Auditoria de identidade cloud:**
+      1. Revisao mensal de IAM policies e roles.
+      2. Alerta para criacao de usuarios locais (fora da federacao).
+      3. Inventario de access keys com idade > 90 dias.
+      4. Monitoramento de uso de root account (alerta imediato).
+    tools:
+      - iam-review
+      - local-user-alert
+      - access-key-audit
+      - root-usage-alert
+legal_references:
+  - framework_id: gsi-in5
+    articles: ["art-6"]
+    relationship: complements
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.23"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "IA-2"]
+    relationship: mapped

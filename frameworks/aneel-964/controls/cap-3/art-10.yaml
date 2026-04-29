@@ -1,0 +1,144 @@
+id: art-10
+family: cap-3
+title: "Protecao de Sistemas de Controle Industrial (ICS/SCADA)"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 10. Os agentes do setor elétrico devem implementar controles específicos
+    para proteção dos sistemas de controle industrial (ICS/SCADA), incluindo:
+
+    I - segmentação de rede entre sistemas de tecnologia operacional (OT) e sistemas
+    de tecnologia da informação (IT), com controles de acesso rigorosos nos pontos
+    de integração;
+
+    II - monitoramento contínuo do tráfego nas redes de controle industrial para
+    detecção de anomalias, acessos não autorizados e comportamentos suspeitos;
+
+    III - controle rigoroso de acessos lógicos e físicos a componentes críticos,
+    incluindo servidores SCADA, estações de engenharia, RTUs e PLCs;
+
+    IV - gestão de acessos remotos a sistemas de controle industrial, garantindo
+    autenticação forte, criptografia, gravação de sessão e restrição ao mínimo
+    necessário;
+
+    V - restrição ao uso de mídias removíveis e dispositivos não autorizados em
+    sistemas de controle industrial, dada a frequência de ataques via USB e
+    dispositivos físicos.
+guidance:
+  prose: |
+    O art. 10 e o cerne tecnico da ANEEL 964, estabelecendo os controles especificos
+    que diferenciam a seguranca OT da seguranca IT tradicional.
+
+    **Segmentacao IT/OT (inciso I):**
+    A segmentacao e o controle fundamental do setor eletrico. A topologia recomendada
+    inclui zonas claramente definidas:
+    - Zona corporativa IT: redes de negocio, internet, email
+    - Zona DMZ industrial: data historians, gateways de protocolo, jump servers
+    - Zona SCADA supervisoria: servidores HMI, estacoes de engenharia, SCADA servers
+    - Zona de controle: RTUs, PLCs, IEDs, relays de protecao
+
+    Data diodes (gateways unidirecionais) devem ser considerados para transferencia
+    de dados da zona OT para IT, eliminando o vetor de ataque reverso.
+
+    **Monitoramento de rede OT (inciso II):**
+    O monitoramento em redes OT deve ser PASSIVO para nao impactar protocolos
+    industriais sensiveis. Solucoes como Claroty, Nozomi Networks e Dragos
+    utilizam analise passiva de trafego para detectar anomalias sem enviar
+    pacotes que possam perturbar PLCs e RTUs.
+
+    **Acesso remoto OT (inciso IV):**
+    O acesso remoto de fornecedores e o vetor mais comum de comprometimento OT.
+    Controles obrigatorios: MFA + gravacao de sessao + aprovacao previa + tempo limitado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar arquitetura de seguranca OT em camadas:
+
+      **Segmentacao de rede:**
+      1. Firewalls industriais (Fortinet FortiGate Rugged, Palo Alto OT) entre
+         zonas IT/DMZ/OT com regras de allowlist (negar por padrao)
+      2. Data diodes (Waterfall Security, Advenica) para fluxos de dados OT->IT
+         sem risco de acesso reverso
+      3. Historian replicado em zona DMZ: AVEVA PI, Honeywell Uniformance — sem
+         acesso direto ao SCADA a partir de redes IT
+
+      **Monitoramento OT:**
+      4. Sensor de monitoramento passivo em cada segmento de rede OT
+      5. Integracao dos alertas OT com o SIEM corporativo (com contexto de ativo)
+
+      **Acesso remoto OT:**
+      6. PAM especializado para OT (CyberArk, BeyondTrust) com gravacao de sessao
+      7. Acesso via jump server dedicado na DMZ industrial
+      8. MFA obrigatoria para todo acesso remoto externo
+
+      **Controle de midia removivel:**
+      9. Bloqueio de portas USB em endpoints OT (Device Control)
+      10. Processo de sanitizacao de midias: toda midia que entra na zona OT
+          passa por um kiosk de verificacao de malware offline
+    tools:
+      - fortinet-ot
+      - palo-alto-ot
+      - waterfall-security
+      - claroty
+      - nozomi-networks
+      - cyberark
+  devsecops:
+    prose: |
+      Tratar configuracao e mudancas em sistemas OT como codigo gerenciado:
+
+      1. Baseline de configuracao segura para cada tipo de ativo OT:
+         servidores SCADA, estacoes HMI, PLCs (por modelo/fabricante)
+      2. Versionamento de configuracoes de PLCs e RTUs (quando o fornecedor
+         suportar exportacao de configuracao)
+      3. Change management automatizado: qualquer mudanca em sistemas OT criticos
+         requer MR aprovado por gestor OT + equipe de seguranca + CISO
+      4. Compliance checks automaticos: verificar desvios de baseline de
+         configuracao apos cada manutencao
+      5. Testes de regressao de seguranca em ambiente OT de homologacao antes
+         de qualquer mudanca em producao
+      6. Documentacao de regras de firewall industrial como IaC (Ansible roles
+         para firewalls industriais Fortinet/Palo Alto)
+    tools:
+      - gitlab
+      - gitlab-approval-rules
+      - ansible
+      - conftest
+      - opa
+  secops:
+    prose: |
+      Operar o programa de seguranca OT 24/7:
+
+      1. SOC com capacidade OT: analistas treinados em protocolos industriais
+         (DNP3, IEC 61850, Modbus, IEC 60870-5) e em como diferenciar
+         comportamento normal de anomalias em sistemas SCADA
+      2. Alertas baseados em comportamento: configurar regras no SIEM para
+         detectar acessos fora de horario, comandos SCADA anomalos, varreduras
+         de rede nas zonas OT, tentativas de acesso de IPs nao autorizados
+      3. Processo de revisao mensal de acessos: verificar que todos os acessos
+         a sistemas OT estao dentro do escopo autorizado, revogar acessos
+         de fornecedores que concluiram trabalhos
+      4. Exercicios de resposta a incidentes OT: simular cenarios de ataque
+         em ambiente de homologacao (ex.: comprometimento de HMI, injeccao de
+         comandos maliciosos em RTU)
+      5. Inventario de midias removiveis autorizadas: lista de dispositivos
+         aprovados com numeros de serie, em custodia controlada
+    tools:
+      - claroty
+      - nozomi-networks
+      - dragos-platform
+      - splunk
+      - cyberark
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-005-R1", "CIP-005-R2", "CIP-006-R1", "CIP-007-R1", "CIP-007-R3"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["3-3-SR-1.13", "3-3-SR-3.3", "3-3-SR-5.1", "4-2-CR-1.1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.20", "A.8.21", "A.8.22", "A.7.4"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-17", "SC-7", "MP-7"]
+    relationship: supports

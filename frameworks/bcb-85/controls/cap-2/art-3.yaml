@@ -1,0 +1,159 @@
+id: art-3
+family: cap-2
+title: "Politica de Seguranca Cibernetica"
+class: BCB-85
+statement:
+  prose: |
+    Art. 3. As instituições de pagamento referidas no art. 1 devem implementar e manter
+    política de segurança cibernética formulada com base em princípios e diretrizes que
+    busquem assegurar a confidencialidade, a integridade e a disponibilidade dos dados e
+    dos sistemas de informação utilizados.
+
+    § 1º A política mencionada no caput deve ser compatível com:
+    I - o porte, o perfil de risco e o modelo de negócio da instituição;
+    II - a natureza das operações e a complexidade dos produtos, serviços, atividades e
+    processos da instituição; e
+    III - a sensibilidade dos dados e das informações sob responsabilidade da instituição.
+
+    § 2º Admite-se a adoção de política de segurança cibernética única por instituições
+    de pagamento integrantes de um mesmo conglomerado prudencial ou de um mesmo arranjo de
+    pagamento, desde que compatível com o perfil de risco de cada instituição.
+guidance:
+  prose: |
+    O art. 3 estabelece a obrigacao fundamental: toda instituicao de pagamento regulada
+    pelo BCB deve ter uma politica de seguranca cibernetica formal, implementada e mantida
+    continuamente.
+
+    **Triade CIA como base normativa:**
+    A resolucao explicita os tres pilares classicos de seguranca da informacao:
+    - Confidencialidade: protecao contra acesso nao autorizado a dados de pagamento
+    - Integridade: protecao contra alteracao nao autorizada de transacoes e registros
+    - Disponibilidade: garantia de acesso quando necessario, critica para servicos de
+      pagamento que operam 24x7
+
+    **Proporcionalidade (ss 1):**
+    A politica deve ser proporcional a tres fatores:
+    1. Porte e perfil de risco: uma grande credenciadora exige politica mais robusta
+       que um pequeno emissor de moeda eletronica
+    2. Complexidade operacional: IPs com PIX, Open Finance, cartoes e contas de
+       pagamento precisam de cobertura mais ampla
+    3. Sensibilidade dos dados: dados de transacoes financeiras, dados pessoais e
+       dados de cartao exigem protecoes adicionais
+
+    **Politica unica para conglomerado ou arranjo (ss 2):**
+    Diferentemente da CMN 4.893 que menciona conglomerado prudencial e sistema
+    cooperativo, a BCB 85 inclui a possibilidade de politica unica por arranjo de
+    pagamento. Isso reconhece que IPs podem participar de um mesmo arranjo (ex: PIX)
+    e compartilhar uma politica comum, desde que cada IP esteja adequadamente coberta.
+
+    **Manutencao continua:**
+    "Implementar e manter" significa que a politica nao e um documento estatico. Deve ser
+    revisada periodicamente (art. 7) e atualizada conforme evolucao de ameacas,
+    mudancas tecnologicas e regulatorias.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Politica como codigo (Policy-as-Code):**
+      1. Codificar a politica de seguranca cibernetica em formatos auditaveis (OPA/Rego,
+         Kyverno, Sentinel).
+      2. Versionar a politica em repositorio Git com historico de alteracoes.
+      3. Implementar guardrails automatizados que enforcem a politica em tempo de deploy.
+
+      **Confidencialidade:**
+      4. Criptografia em transito (TLS 1.3 minimo) para todas as comunicacoes.
+      5. Criptografia em repouso (AES-256) para dados de pagamento e pessoais.
+      6. Gerenciamento de chaves com HSM ou cloud KMS com rotacao automatica.
+      7. Segmentacao de rede (VPC, subnets privadas, security groups).
+
+      **Integridade:**
+      8. Assinatura digital de artefatos de deploy (container images, binarios).
+      9. Audit trail imutavel para todas as transacoes de pagamento.
+      10. Checksums e verificacao de integridade em pipelines de dados de pagamento.
+
+      **Disponibilidade:**
+      11. Arquitetura multi-AZ ou multi-regiao para servicos de pagamento criticos.
+      12. Auto-scaling baseado em metricas de carga de transacoes.
+      13. Disaster recovery com RPO/RTO definidos e testados para servicos de pagamento.
+      14. Circuit breakers e retry patterns para resiliencia de servicos de pagamento.
+
+      **Proporcionalidade (ss 1):**
+      15. Classificacao de ativos e dados por nivel de criticidade e sensibilidade.
+      16. Controles diferenciados por classificacao (public, internal, confidential, restricted).
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - vault
+      - kms-hsm
+      - service-mesh
+      - cert-manager
+      - network-policies
+  devsecops:
+    prose: |
+      **Pipeline alinhado a politica:**
+      1. Security gates no CI/CD que validam conformidade com a politica.
+      2. SAST, DAST, SCA integrados ao pipeline como requisito obrigatorio.
+      3. Container scanning em todas as imagens antes de deploy.
+      4. IaC scanning (Checkov, tfsec, KICS) para garantir conformidade de infraestrutura.
+
+      **Versionamento da politica:**
+      5. Politica de seguranca cibernetica versionada em repositorio Git.
+      6. Pull requests com aprovacao obrigatoria para alteracoes na politica.
+      7. Changelog automatico para auditoria de evolucao da politica.
+
+      **Compliance-as-Code:**
+      8. Testes automatizados que validam controles de seguranca em cada release.
+      9. Dashboard de conformidade com status em tempo real.
+      10. Alertas automaticos quando configuracao viola a politica.
+
+      **Confidencialidade no pipeline:**
+      11. Secret scanning em todo commit (prevencao de vazamento de credenciais).
+      12. Segregacao de segredos por ambiente (dev, staging, prod).
+      13. Rotacao automatica de credenciais de CI/CD.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - checkov
+      - tfsec
+      - trivy
+      - semgrep
+  secops:
+    prose: |
+      **Monitoramento da triade CIA:**
+      1. SIEM com regras de correlacao para violacoes de confidencialidade, integridade
+         e disponibilidade em sistemas de pagamento.
+      2. DLP (Data Loss Prevention) para dados de pagamento e pessoais.
+      3. Database Activity Monitoring para acesso a dados sensiveis de transacoes.
+      4. Monitoramento de disponibilidade com SLAs definidos para servicos de pagamento.
+
+      **Gestao da politica:**
+      5. Revisao periodica da politica (minimo anual, conforme art. 7).
+      6. Gap analysis entre politica e controles implementados.
+      7. Metricas de efetividade dos controles de seguranca.
+
+      **Auditoria e conformidade:**
+      8. Auditoria independente da implementacao da politica.
+      9. Testes de penetracao periodicos para validar controles.
+      10. Inventario de ativos de informacao atualizado.
+      11. Classificacao de dados com labels e enforcement automatizado.
+    tools:
+      - siem
+      - dlp
+      - dam
+      - vulnerability-scanner
+      - asset-inventory
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-1", "PL-1", "PL-2", "SC-8", "SC-12", "SC-13", "SC-28"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.1", "A.5.2", "A.8.1"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

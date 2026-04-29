@@ -1,0 +1,139 @@
+id: art-27
+family: cap-5
+title: "Indicadores de Operacoes Suspeitas no Mercado Securitario"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 27. Sem prejuízo dos critérios previstos no art. 24, constituem indícios
+    de operações suspeitas, entre outros:
+    I - contratação de seguro, previdência ou capitalização com pagamento de prêmios
+    ou aportes incompatíveis com a capacidade financeira do cliente;
+    II - contratação e cancelamento frequente de seguros com devolução de prêmios;
+    III - solicitação de pagamento de sinistro ou resgate em favor de terceiro sem
+    justificativa aparente;
+    IV - alteração frequente de beneficiários sem justificativa plausível;
+    V - resistência do cliente em fornecer informações de identificação ou
+    documentação complementar;
+    VI - operações realizadas por interposta pessoa, quando houver indícios de que
+    o verdadeiro interessado é outro.
+guidance:
+  prose: |
+    O art. 27 fornece lista exemplificativa (nao exaustiva) de indicadores de
+    operacoes suspeitas especificos do mercado securitario. Estes indicadores
+    devem ser incorporados ao sistema de monitoramento.
+
+    **Detalhamento dos indicadores:**
+
+    1. Incompatibilidade financeira (I):
+       O indicador mais frequente no mercado de seguros. Exemplos:
+       - Assalariado com renda de R$ 5.000/mes fazendo aporte de R$ 200.000 em VGBL
+       - Aposentado por invalidez com seguro de vida de capital R$ 10.000.000
+       - MEI com faturamento de R$ 81.000/ano pagando premio anual de R$ 50.000
+       - Estudante universitario adquirindo titulo de capitalizacao de R$ 500.000
+       A verificacao exige cruzamento entre dados cadastrais (renda, profissao)
+       e dados operacionais (premios, aportes, capital segurado).
+
+    2. Contratacao e cancelamento (II) - "Insurance Churning":
+       Padrao classico de lavagem via seguros:
+       - Contrata seguro de vida com acumulacao, paga premios elevados
+       - Cancela dentro do periodo de free look ou pouco depois
+       - Recebe devolucao de premio "limpa" via transferencia bancaria
+       - Repete o ciclo em diferentes seguradoras
+       O monitoramento deve detectar este padrao mesmo entre diferentes
+       produtos e diferentes supervisionadas (quando informacao disponivel).
+
+    3. Pagamento a terceiro (III):
+       - Sinistro de seguro de vida com pedido de deposito em conta de
+         pessoa nao cadastrada como beneficiario
+       - Resgate de VGBL solicitado para conta de PJ do titular
+       - Resgate de capitalizacao por procurador
+       Qualquer desvio do fluxo normal (pagamento ao titular/beneficiario
+       cadastrado) deve gerar alerta.
+
+    4. Alteracao de beneficiarios (IV):
+       - Alteracao de beneficiario pouco antes de sinistro
+       - Multiplas alteracoes sem evento de vida que justifique (divorcio,
+         nascimento de filho, obito)
+       - Beneficiario substituido por pessoa sem vinculo familiar
+       - Padrao de alteracao similar em multiplas apolices
+
+    5. Resistencia a identificacao (V):
+       - Recusa em fornecer comprovante de renda
+       - Documentos "esquecidos" repetidamente
+       - Preferencia por operacoes que exijam menos dados
+       - Agressividade ou pressa quando questionado sobre origem de recursos
+
+    6. Interposicao de pessoa (VI) - "Front Person":
+       - Corretor que contrata em nome de terceiro nao identificado
+       - Familiar que aparece como tomador mas nao e o real interessado
+       - Funcionario que adquire produto para beneficiar PEP nao declarado
+       - Empresa de fachada como estipulante de seguro coletivo
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos indicadores:**
+      1. Cada indicador do art. 27 deve ser codificado como regra no motor de
+         monitoramento com parametros ajustaveis.
+      2. Regra de incompatibilidade financeira (I): cruzamento automatico entre
+         renda/faturamento do cadastro e valores de premios/aportes do sistema
+         de emissao.
+      3. Regra de churning (II): deteccao de padroes de contratacao-cancelamento
+         com janela temporal configuravel (30, 60, 90, 180 dias).
+      4. Regra de pagamento a terceiro (III): comparacao automatica entre
+         beneficiario cadastrado e conta destino do pagamento.
+      5. Regra de alteracao de beneficiario (IV): monitoramento de frequencia
+         de alteracoes com threshold configuravel.
+      6. Regra de resistencia (V): flag manual pelo front office com trigger
+         de investigacao automatica.
+      7. Regra de interposicao (VI): deteccao de padrao de contratacao por
+         mesmo proponente para diferentes segurados.
+    tools:
+      - transaction-monitoring-system
+      - rules-engine
+      - behavioral-analytics
+      - alert-management
+  devsecops:
+    prose: |
+      **Testes por indicador:**
+      1. Testes unitarios para cada um dos 6 indicadores com cenarios de
+         deteccao e nao-deteccao.
+      2. Testes de combinacao: cenarios que acionam multiplos indicadores
+         simultaneamente (maior risco).
+      3. Testes de false negative: cenarios reais de comunicacoes ao COAF
+         devem ser detectados pelas regras.
+
+      **Atualizacao de indicadores:**
+      4. Pipeline de deploy de novos indicadores ou ajuste de parametros
+         com backtesting automatizado.
+      5. Testes de regressao ao alterar qualquer regra de indicador.
+      6. Documentacao automatica de regras para auditoria.
+    tools:
+      - gitlab-ci
+      - unit-tests
+      - backtesting-pipeline
+      - rule-documentation
+  secops:
+    prose: |
+      **Operacao dos indicadores:**
+      1. Manual de analise para cada indicador com orientacoes especificas
+         para o analista de PLD/FT.
+      2. Treinamento de front office para identificacao de indicadores V
+         (resistencia) e VI (interposicao) que dependem de percepcao humana.
+      3. Feedback loop: resultado de investigacoes alimenta calibracao dos
+         indicadores.
+
+      **Atualizacao e melhoria:**
+      4. Inclusao de novos indicadores quando COAF ou GAFI publicam novas
+         tipologias.
+      5. Revisao semestral de efetividade de cada indicador.
+      6. Benchmarking com outras supervisionadas via informacoes setoriais.
+      7. Relatorio de alertas por indicador para compliance officer.
+    tools:
+      - investigation-manual
+      - training-platform
+      - analytics-dashboard
+      - regulatory-intelligence
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-27"]
+    relationship: equivalent-to

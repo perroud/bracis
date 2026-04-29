@@ -1,0 +1,115 @@
+id: iot-7
+family: comms
+title: "Prohibition of Backdoors and Undocumented Communication"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento não deve possuir ferramentas de teste, backdoors ou
+    mecanismos não documentados que possibilitem acesso não autorizado
+    ao dispositivo ou aos dados nele contidos. Toda comunicação
+    realizada pelo equipamento deve estar documentada na especificação
+    técnica do produto.
+
+    Backdoor é definido como mecanismo não documentado embutido no
+    software ou firmware do equipamento que possibilita o acesso ou
+    controle remoto não autorizado ao dispositivo, por meio de
+    credenciais ocultas, portas de comunicação secretas ou funções
+    de depuração não removidas.
+
+    (Ato 77/2021 §5.1.5, incisos I e II; Definição §3)
+guidance:
+  prose: |
+    This control prohibits any form of hidden access mechanism in the
+    device firmware. ANATEL explicitly defines "backdoor" and requires
+    its complete absence from certified equipment.
+
+    **What is prohibited:**
+    - Debug interfaces (JTAG, UART consoles, telnet debug shells) left
+      enabled in production firmware.
+    - Hardcoded service accounts or "manufacturer-only" access
+      credentials.
+    - Undocumented network listeners (hidden web servers, remote shells,
+      covert channels).
+    - Test stubs, factory test modes, or engineering backdoors not
+      removed from production builds.
+    - Any outbound communication not described in the product's
+      technical documentation (e.g., telemetry to undisclosed servers).
+
+    **What must be documented:**
+    - Every network connection the device initiates or accepts.
+    - Every protocol used, including purpose, destination, and
+      frequency.
+    - Every management interface and its access method.
+
+    **Verification approach:**
+    - Network traffic analysis during normal operation to detect
+      undocumented communications.
+    - Firmware binary analysis to detect hidden services, debug
+      interfaces, and unused code paths.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement separate firmware build profiles: "development" (with
+         debug interfaces enabled) and "production" (all debug/test code
+         stripped via compile-time flags).
+      2. Use build system guards (#ifdef DEBUG / feature flags) to
+         ensure debug code, JTAG enable, UART console, and test
+         endpoints are excluded from production images.
+      3. Maintain a network communication manifest in the firmware
+         documentation: every outbound/inbound connection, protocol,
+         port, destination, and purpose.
+      4. Implement runtime checks that disable debug interfaces if the
+         firmware detects it is running a production build (defense in
+         depth against build misconfiguration).
+      5. Physically disable or fuse JTAG pins on production hardware
+         where feasible.
+    tools:
+      - firmware-build-pipeline
+      - feature-flag-system
+      - jtag-disable-fuse
+      - network-traffic-manifest
+  devsecops:
+    prose: |
+      1. Add CI pipeline checks that verify production firmware images
+         do not contain debug symbols, test endpoints, or known debug
+         string patterns (e.g., "debug_mode", "factory_test",
+         "backdoor").
+      2. Run binary analysis (binwalk + strings + entropy analysis) on
+         every release candidate to detect hidden code sections.
+      3. Perform automated network behavior testing: boot the device in
+         a sandboxed network, capture all traffic for 24 hours, and
+         diff against the documented communication manifest.
+      4. Enforce code review rules requiring security team approval for
+         any code that opens network listeners or initiates outbound
+         connections.
+    tools:
+      - gitlab-ci
+      - binwalk
+      - wireshark
+      - tcpdump
+      - semgrep
+  secops:
+    prose: |
+      1. Include backdoor detection in penetration testing scope: scan
+         all ports, probe for hidden services, analyze firmware binaries
+         with Ghidra/IDA for undocumented functionality.
+      2. Conduct network traffic analysis on production devices in a
+         controlled environment — compare observed traffic against the
+         documented communication manifest.
+      3. Monitor security research publications and CVE databases for
+         reported backdoors in your device chipset, SDK, or third-party
+         libraries.
+      4. Maintain signed attestation from the development team that
+         production firmware contains no debug interfaces or test
+         backdoors, for ANATEL audit evidence.
+    tools:
+      - ghidra
+      - nmap
+      - wireshark
+      - cve-monitoring
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

@@ -1,0 +1,108 @@
+id: art-31
+family: cap-7
+title: "Retencao de Documentos e Registros"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 31. As instituições de pagamento devem manter, pelo prazo mínimo de dez anos,
+    todos os documentos, registros e informações relacionados ao programa de PLD/FT,
+    incluindo:
+
+    I - documentos de identificação e qualificação de clientes;
+
+    II - registros de operações de que tratam os arts. 15, 16 e 17;
+
+    III - resultados de análises e investigações internas, com as respectivas
+    justificativas das decisões tomadas;
+
+    IV - comunicações realizadas ao COAF, incluindo o conteúdo das comunicações
+    e os protocolos de recebimento;
+
+    V - documentos de avaliação interna de risco, política e procedimentos de
+    PLD/FT em cada versão;
+
+    VI - registros de treinamentos realizados.
+
+    Parágrafo único. Os documentos devem ser armazenados de forma segura, com
+    garantia de integridade e disponibilidade para acesso pelas autoridades
+    competentes no prazo determinado.
+guidance:
+  prose: |
+    O art. 31 consolida todos os prazos de retencao em uma obrigacao unica:
+    10 anos para tudo relacionado ao programa de PLD/FT.
+
+    **O que cobre cada inciso:**
+    - Inciso I: documentos de KYC (RG, CNH, CNPJ, comprovantes de renda)
+    - Incisos II-III: dados transacionais e resultados de analise
+    - Inciso IV: SAR/comunicacoes enviados ao COAF (os mais sensiveis)
+    - Inciso V: versoes historicas da politica e avaliacoes de risco
+    - Inciso VI: registros de treinamento
+
+    **Por que 10 anos e longo?**
+    Crimes de lavagem de dinheiro prescrevem em 12-16 anos no Brasil. O prazo
+    de 10 anos de retencao e projetado para cobrir o periodo de investigacao
+    criminal possivel apos a operacao.
+
+    **Implicacoes de armazenamento:**
+    - Volume: 10 anos de dados transacionais podem ser massivos para IPs de
+      grande porte. Estrategia de data tiering e necessaria.
+    - Custo: armazenamento de longo prazo deve ser planejado no TCO do programa.
+    - Recuperabilidade: nao basta armazenar -- deve ser possivel recuperar e
+      apresentar os dados em prazo curto quando solicitado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de retencao de longo prazo:**
+      1. Data tiering: dados recentes (0-2 anos) em armazenamento quente (SQL),
+         dados de medio prazo (2-5 anos) em armazenamento morno (data warehouse),
+         dados antigos (5-10 anos) em armazenamento frio (object storage -- S3,
+         GCS ou equivalente).
+      2. Politica de retencao automatica: sistema nao pode deletar dados abaixo
+         de 10 anos. Implementar lifecycle policy com hard stop.
+      3. Indice de recuperacao: manter indice pesquisavel de todos os documentos
+         mesmo em armazenamento frio, para recuperar dados sem necessidade de
+         restauracao completa.
+      4. Hash de integridade: cada documento deve ter hash calculado no momento
+         do armazenamento e verificado periodicamente.
+      5. Acesso de autoridades: endpoint seguro para export de documentos
+         por cliente e periodo, com log de acesso.
+    tools:
+      - data-warehouse
+      - object-storage
+      - data-lifecycle-management
+      - cryptographic-hashing
+  devsecops:
+    prose: |
+      **Garantias de retencao:**
+      1. Testes de lifecycle policy: verificar que dados nao sao deletados
+         antes de 10 anos.
+      2. Testes de recuperacao: restaurar dados de 5+ anos e verificar
+         que estao integros e legíveis.
+      3. Monitoramento de custos de armazenamento: alertar se crescimento
+         de dados ameaca o orcamento de retencao.
+    tools:
+      - gitlab-ci
+      - data-testing
+      - cost-monitoring
+  secops:
+    prose: |
+      **Gestao do acervo:**
+      1. Inventario atualizado: o que esta armazenado, onde, com que prazo.
+      2. Teste anual de recuperacao: selecionar amostra de dados antigos e
+         verificar recuperabilidade dentro do SLA.
+      3. Certificacao anual de completude: confirmar que todos os dados
+         do inciso I ao VI estao sendo retidos.
+      4. Plano de contingencia: o que fazer se o sistema de armazenamento
+         frio falhar antes dos 10 anos.
+    tools:
+      - data-governance
+      - backup-management
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-37"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: complements

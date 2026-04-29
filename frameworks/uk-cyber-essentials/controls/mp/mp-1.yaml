@@ -1,0 +1,98 @@
+id: mp-1
+family: mp
+title: "Anti-Malware Software Deployment and Configuration"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Anti-malware software must be installed on all computers and devices in scope
+    that are capable of running it. The anti-malware software must be kept up to date
+    with the latest signatures or heuristic definitions. The anti-malware software must
+    be configured to scan files automatically upon access (on-access scanning) and to
+    scan web pages accessed through a web browser. The software must prevent connections
+    to malicious websites on the internet (web filtering).
+
+guidance:
+  prose: >-
+    Modern anti-malware solutions go beyond traditional signature-based detection to
+    include behaviour-based detection, machine learning, and cloud-based threat
+    intelligence. Endpoint Detection and Response (EDR) solutions provide the strongest
+    protection by combining real-time prevention with detection and investigation
+    capabilities. The Cyber Essentials scheme accepts any of: a dedicated anti-malware
+    product, operating system built-in protection (Windows Defender), or a combination
+    of application allow-listing and sandboxing. Regardless of the approach chosen, the
+    solution must provide real-time scanning and be centrally managed.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Malware Protection"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Mitigating Malware and Ransomware Attacks"
+    url: "https://www.ncsc.gov.uk/guidance/mitigating-malware-and-ransomware-attacks"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy an enterprise EDR/anti-malware solution (CrowdStrike Falcon, Microsoft
+      Defender for Endpoint, SentinelOne) across all managed endpoints and servers.
+      Enforce installation through endpoint management (Intune, JAMF, SCCM) and prevent
+      users from disabling or uninstalling the agent. Configure automatic signature
+      updates with a maximum staleness threshold of 24 hours. Enable cloud-delivered
+      protection for real-time threat intelligence. For server workloads, deploy runtime
+      protection agents in containers and virtual machines. Implement DNS-layer security
+      (Cisco Umbrella, Cloudflare Gateway) for web filtering across all network egress
+      points.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-for-endpoint
+      - sentinelone
+      - intune
+      - jamf
+      - cisco-umbrella
+      - cloudflare-gateway
+
+  devsecops:
+    prose: >-
+      Integrate malware scanning into CI/CD pipelines for artifacts and container images.
+      Scan uploaded files and user-generated content with anti-malware APIs (ClamAV,
+      Windows Defender ATP API) before processing. Implement runtime security in container
+      orchestration platforms (Falco, Sysdig) to detect malicious activity in production
+      workloads. Ensure build agents and runner instances have anti-malware protection
+      enabled and are regularly rebuilt from clean images.
+    tools:
+      - clamav
+      - trivy
+      - falco
+      - sysdig
+      - gitlab-ci
+      - gitlab-container-scanning
+
+  secops:
+    prose: >-
+      Monitor anti-malware agent health across the fleet — alert on agents that are
+      offline, outdated, or disabled. Investigate all malware detections promptly,
+      distinguishing between potentially unwanted programs and true positives. Track
+      malware detection trends to identify targeted campaigns or recurring infection
+      vectors. Conduct periodic tests using benign test files (EICAR) to verify
+      on-access scanning is functioning. Review web filtering logs to identify blocked
+      malicious site access attempts and correlate with endpoint telemetry.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-for-endpoint
+      - splunk
+      - elastic-siem
+      - cisco-umbrella
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.7"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-4", "SC-18"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-app-control", "e8-macro-settings"]
+    relationship: complements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 10.1", "CIS 10.2", "CIS 10.7"]
+    relationship: mapped

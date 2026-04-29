@@ -1,0 +1,100 @@
+id: art-18
+family: cap-4
+title: "Mandatory Encryption for Classified Information"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 18. A cifração de informação classificada em qualquer grau de
+    sigilo, quando em trânsito ou armazenada em meio eletrônico, é
+    obrigatória e deverá utilizar recurso criptográfico baseado em
+    algoritmo de Estado ou em algoritmo de cifração de reconhecida
+    segurança, conforme regulamentação do Gabinete de Segurança
+    Institucional da Presidência da República.
+
+    Parágrafo único. A informação classificada nos graus de sigilo
+    ultrassecreto e secreto deverá utilizar recurso criptográfico baseado
+    em algoritmo de Estado.
+guidance:
+  prose: |
+    Article 18 mandates encryption for all classified information in
+    electronic form, with a critical distinction based on classification level:
+
+    **Encryption requirements by level:**
+    | Level          | Algorithm Requirement                         |
+    |----------------|-----------------------------------------------|
+    | Ultrassecreta  | State algorithm (algoritmo de Estado) REQUIRED |
+    | Secreta        | State algorithm (algoritmo de Estado) REQUIRED |
+    | Reservada      | State algorithm OR recognized secure algorithm |
+
+    **Algoritmo de Estado:**
+    These are cryptographic algorithms developed by ABIN (Agência Brasileira
+    de Inteligência) for exclusive government use. They are not commercial
+    algorithms like AES or RSA. Access to these algorithms requires
+    specific authorization from GSI/PR.
+
+    **Recognized secure algorithms (for reservada):**
+    Commercial algorithms deemed secure by GSI/PR, typically including
+    AES-256, RSA-4096, and approved elliptic curve algorithms.
+
+    **Scope: in transit AND at rest:**
+    Both data in transit (transmissão) and data at rest (armazenamento)
+    must be encrypted. There is no exception for internal networks.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Tiered encryption architecture:**
+      1. For ultrassecreta/secreta systems:
+         - Deploy GSI/PR-approved cryptographic modules implementing
+           state algorithms
+         - Use hardware security modules (HSMs) certified for classified
+           environments
+         - All storage must use state algorithm encryption
+         - All network transport must use state algorithm encryption
+      2. For reservada systems:
+         - Implement AES-256-GCM for data at rest
+         - Implement TLS 1.3 with approved cipher suites for data in transit
+         - Use FIPS 140-2/3 validated cryptographic modules
+      3. Deploy crypto-agility framework to support algorithm rotation
+         when GSI/PR updates approved algorithm lists.
+    tools:
+      - hsm
+      - state-crypto-modules
+      - tls-management
+      - encryption-at-rest
+  devsecops:
+    prose: |
+      **Encryption validation in CI/CD:**
+      1. Implement pipeline checks that verify encryption configuration
+         matches the classification level of the deployment target.
+      2. Add automated tests for encryption-at-rest and in-transit
+         compliance before deployment approval.
+      3. Scan for unencrypted storage of classified data in code,
+         configuration, and infrastructure-as-code definitions.
+    tools:
+      - encryption-scanner
+      - compliance-tests
+      - iac-scanning
+  secops:
+    prose: |
+      **Encryption compliance governance:**
+      1. Maintain a cryptographic inventory: all encryption implementations
+         mapped to classification levels and approved algorithms.
+      2. Audit encryption configurations semi-annually to verify:
+         - Correct algorithm usage per classification level
+         - Key lengths meet minimum requirements
+         - No plaintext classified data in transit or at rest
+      3. Track GSI/PR updates to approved algorithm lists and implement
+         changes within mandated timelines.
+    tools:
+      - crypto-inventory
+      - encryption-audit
+      - grc-platform
+      - regulatory-tracking
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-15"]
+    relationship: complements

@@ -1,0 +1,118 @@
+id: owasp-a09
+family: a09
+title: "A09:2021 — Security Logging and Monitoring Failures"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Security logging and monitoring failures, previously called Insufficient Logging and Monitoring,
+    make it difficult or impossible to detect, escalate, and respond to active breaches. An
+    application is vulnerable if it does not log auditable events, such as logins, failed logins,
+    and high-value transactions; it produces warnings and errors with no, inadequate, or unclear
+    log messages; logs of applications and APIs are not monitored for suspicious activity; logs
+    are only stored locally; appropriate alerting thresholds and response escalation processes
+    are not in place or effective; penetration testing and scans by DAST tools do not trigger
+    alerts; the application cannot detect, escalate, or alert for active attacks in real time
+    or near real time. Logging and monitoring failures allow attackers to dwell in compromised
+    systems for extended periods — the average dwell time in a breach exceeds 200 days before
+    external detection.
+
+guidance:
+  prose: >-
+    This category was originally contributed to the OWASP Top 10 through industry surveys because
+    detection gaps consistently rank among the most impactful enablers of security incidents.
+    Without adequate logging, organizations cannot determine the scope of a breach, cannot distinguish
+    between routine activity and attack behavior, and cannot perform forensic analysis after an
+    incident. Effective logging requires capturing the right events (authentication attempts, access
+    control failures, validation failures, high-value transactions), storing them in a tamper-evident
+    system outside the application's reach (attackers routinely clear logs), and actively monitoring
+    them with detection rules aligned to known attack patterns. Monitoring must be calibrated:
+    too many alerts create alert fatigue; too few miss real attacks. Response runbooks must be
+    maintained, tested, and updated — detection without a defined response process is insufficient.
+
+references:
+  - citation: "OWASP Top 10:2021 A09 Security Logging and Monitoring Failures"
+    url: "https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/"
+  - citation: "OWASP Logging Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+  - citation: "OWASP Application Logging Vocabulary"
+    url: "https://owasp.org/www-project-application-logging-vocabulary/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized, tamper-evident log aggregation platform (Elastic Stack, Splunk, OpenSearch,
+      Loki) that collects logs from all application services, infrastructure components, and security
+      tools. Implement structured logging (JSON format) across all services with a standardized
+      schema including: timestamp (ISO 8601), service name, trace ID (for distributed tracing
+      correlation), user ID, IP address, HTTP method, path, status code, and event type. Enforce
+      log shipping at the platform level so logs are never stored only locally — use a sidecar log
+      forwarder (Fluentd, Vector, Filebeat) that runs independent of the application. Configure log
+      retention policies compliant with regulatory requirements (minimum 12 months for PCI DSS,
+      1 year for SOC 2). Implement log integrity protection using append-only storage with immutable
+      log buckets (S3 Object Lock) to prevent tampering. Build automated alert rules for high-priority
+      security events with defined escalation paths and SLAs.
+    tools:
+      - elasticsearch
+      - splunk
+      - loki
+      - fluentd
+      - vector
+      - opentelemetry
+      - grafana
+      - prometheus
+
+  devsecops:
+    prose: >-
+      Define logging requirements as part of security requirements for every application feature:
+      what events must be logged, what data must be included, and what log levels to use.
+      Implement log review in the code review process: check that authentication events, access
+      control decisions, and security-relevant operations (password changes, MFA changes, privilege
+      elevation) are logged with sufficient context. Add automated tests that verify logging behavior:
+      trigger security events (failed login, access denied) and verify that the expected log entries
+      are produced with the correct fields. Avoid logging sensitive data (passwords, payment card
+      numbers, session tokens, PII) in log messages — implement log masking/redaction for sensitive
+      fields. Include logging as part of the security definition of done for every new feature.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - opentelemetry
+      - junit
+      - pytest
+
+  secops:
+    prose: >-
+      Build and maintain a SIEM detection rule library aligned to MITRE ATT&CK techniques relevant
+      to web application attacks: authentication brute force (T1110), credential stuffing (T1110.004),
+      IDOR enumeration patterns, SQL injection indicators, web shell activity, unusual data transfer
+      volumes. Define alert severity tiers and response SLAs: critical alerts (active breach indicators)
+      require response within 15 minutes; high severity within 4 hours. Conduct regular purple team
+      exercises where red team executes known attack patterns while blue team validates detection
+      coverage. Review and tune detection rules quarterly to reduce false positive rates below
+      10% for critical alerts. Maintain incident response runbooks for each alert type and conduct
+      tabletop exercises to validate effectiveness. Implement threat hunting as a proactive capability
+      to identify attackers who have evaded automated detection.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - crowdstrike
+      - datadog-security
+      - wazuh
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-12"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["10.1", "10.2", "10.3", "10.4", "10.5", "10.6", "10.7"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V7.1", "V7.2", "V7.3", "V7.4"]
+    relationship: mapped
+  - framework_id: cis-controls-v8
+    articles: ["8.1", "8.2", "8.3", "8.5", "8.9", "8.11"]
+    relationship: mapped

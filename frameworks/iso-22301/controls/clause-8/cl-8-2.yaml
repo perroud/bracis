@@ -1,0 +1,96 @@
+id: cl-8.2
+family: clause-8
+title: "Business impact analysis"
+class: ISO22301
+
+statement:
+  prose: >-
+    The organization shall implement and maintain a process to analyze the
+    impact of disruptions on the organization's activities. The business
+    impact analysis shall identify activities that support the provision of
+    products and services, assess the impacts over time of not performing
+    these activities, set prioritized time frames for resuming these
+    activities at a specified minimum acceptable level (taking into
+    consideration the time after which the impact of not resuming them
+    would become unacceptable), and identify dependencies and supporting
+    resources for these activities including suppliers, outsource partners
+    and other relevant interested parties.
+
+guidance:
+  prose: >-
+    The BIA is the foundation of the BCMS and determines which activities
+    are critical and what recovery priorities should be. The analysis should
+    consider financial impacts (revenue loss, penalty costs, increased
+    operating costs), reputational impacts, regulatory and legal impacts,
+    and impacts on health and safety. For each critical activity, the BIA
+    should determine the maximum tolerable period of disruption (MTPD),
+    the minimum business continuity objective (MBCO), and the recovery
+    time objective (RTO). Dependencies should be mapped comprehensively,
+    including technology systems, personnel, facilities, suppliers, and
+    information. The BIA should be reviewed at least annually and whenever
+    significant changes occur.
+
+references:
+  - citation: "ISO 22301:2019, Clause 8.2"
+    url: "https://www.iso.org/standard/75106.html"
+  - citation: "ISO/TS 22317:2015 — Business impact analysis"
+    url: "https://www.iso.org/standard/50054.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain service criticality classifications and dependency maps in the
+      platform's service catalog. Use distributed tracing and service mesh
+      telemetry to automatically discover and validate service dependencies.
+      Tag all infrastructure resources with criticality levels (Tier 1-4)
+      that correspond to BIA findings. Implement automated dependency
+      analysis tools that generate impact assessments when upstream services
+      experience degradation. Store BIA data as structured configuration
+      alongside the services it describes, with automated alerts when
+      dependency topology changes.
+    tools:
+      - backstage
+      - jaeger
+      - kiali
+      - istio
+      - terraform
+
+  devsecops:
+    prose: >-
+      Integrate service dependency documentation requirements into CI/CD
+      pipelines. Require that every production service declares its
+      criticality tier, RTO, RPO, and upstream/downstream dependencies in
+      its deployment manifest. Use automated checks to validate that
+      declared dependencies match actual runtime behavior. Generate
+      dependency impact reports as pipeline artifacts. Block deployments
+      that introduce undocumented dependencies on critical services.
+    tools:
+      - gitlab-ci
+      - syft
+      - cyclonedx
+      - dependency-track
+      - opa-conftest
+
+  secops:
+    prose: >-
+      Maintain a centralized view of critical services and their dependency
+      chains in the CMDB. Use monitoring data to validate BIA assumptions
+      about dependency impacts — correlate service degradation events with
+      downstream impact metrics. Generate automated reports that compare
+      actual recovery times during incidents with documented RTO targets.
+      Alert when dependency changes are detected that may invalidate
+      existing BIA findings.
+    tools:
+      - servicenow-cmdb
+      - datadog
+      - splunk
+      - pagerduty
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-8", "RA-3"]
+    relationship: equivalent-to
+  - framework_id: dora
+    articles: ["art-6", "art-11"]
+    relationship: supports

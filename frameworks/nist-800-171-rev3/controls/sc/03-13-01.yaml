@@ -1,0 +1,89 @@
+id: 03.13.01
+family: sc
+title: "Boundary Protection"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [sc-7]
+  - cmmc-v2: [sc.l2-3.13.1]
+statement:
+  prose: >-
+    a. Monitor and control communications at the external managed interfaces to the
+       system and at key internal managed interfaces within the system.
+    b. Implement subnetworks for publicly accessible system components that are physically
+       or logically separated from internal organizational networks.
+    c. Connect to external networks or systems only through managed interfaces consisting
+       of boundary protection devices arranged in accordance with organizational security
+       architecture.
+guidance:
+  prose: >-
+    Managed interfaces include gateways, routers, firewalls, guards, network-based
+    malicious code analysis, virtualization systems, or encrypted tunnels implemented
+    within a security architecture. Subnetworks that are physically or logically
+    separated from internal networks are referred to as demilitarized zones (DMZs).
+    Restricting or prohibiting interfaces within organizational systems includes
+    restricting external web traffic to designated web servers within managed interfaces,
+    prohibiting external traffic that appears to be spoofing internal addresses, and
+    restricting system access to specific IP addresses or address ranges. Organizations
+    consider the zero trust architecture model as part of boundary protection strategies,
+    where every access request is verified regardless of the network location of the
+    requestor. Micro-segmentation provides fine-grained boundary protection within
+    cloud and containerized environments.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using Kubernetes NetworkPolicies with default-deny
+      ingress and egress rules per namespace. Deploy a service mesh (Istio, Linkerd) for
+      workload-to-workload mTLS and fine-grained authorization policies. Use cloud VPCs
+      with private subnets for internal services, public subnets only for load balancers
+      and ingress controllers. Implement Web Application Firewalls (WAF) at all ingress
+      points. Deploy cloud-native firewalls (Security Groups, NSGs) as the first defense
+      layer. Use API gateways for all external-facing services with rate limiting,
+      authentication, and input validation. Implement zero-trust network architecture
+      where every connection is authenticated and authorized regardless of network
+      location. Deploy DNS-based filtering and egress controls to prevent data
+      exfiltration and C2 communications.
+    tools:
+      - "Kubernetes NetworkPolicy"
+      - "Istio / Linkerd (service mesh)"
+      - "Cloud VPC / Subnets / NSGs"
+      - "WAF (AWS WAF, Cloudflare, ModSecurity)"
+      - "Ingress controllers (NGINX, Envoy)"
+      - "Calico / Cilium (network policy enforcement)"
+      - "API Gateway (Kong, Ambassador)"
+  devsecops:
+    prose: >-
+      Define network boundaries as code using Terraform for cloud infrastructure and
+      Kubernetes manifests for cluster-level segmentation. Validate network configurations
+      in CI/CD pipelines using policy-as-code tools (Checkov, tfsec). Scan for exposed
+      services, open ports, and misconfigured security groups as part of the deployment
+      pipeline. Implement DAST scanning that tests boundary protection effectiveness
+      from an external perspective. Enforce that all network configuration changes go
+      through merge request review with security approval.
+    tools:
+      - "Terraform (VPC, Security Groups, NSGs)"
+      - "Kubernetes NetworkPolicy manifests"
+      - "Checkov / tfsec (network policy validation)"
+      - "DAST scanning"
+      - "Nuclei (external exposure scanning)"
+      - "Container scanning"
+  secops:
+    prose: >-
+      Monitor network boundaries using IDS/IPS and network traffic analysis. Detect and
+      alert on unauthorized lateral movement, data exfiltration attempts, and C2
+      communications. Implement DNS monitoring for malicious domain resolution. Conduct
+      regular network penetration testing to validate boundary protection effectiveness.
+      Monitor cloud security group and network ACL changes for unauthorized modifications.
+      Implement network flow analysis to detect anomalous traffic patterns.
+    tools:
+      - "IDS/IPS (Suricata, Snort, AWS Network Firewall)"
+      - "Network traffic analysis (Zeek, Darktrace)"
+      - "DNS monitoring (Cisco Umbrella, DNSFilter)"
+      - "Cloud network flow logs (VPC Flow Logs)"
+      - "SIEM (network event correlation)"
+      - "Penetration testing tools"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — SC-7"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-207"
+    url: "https://doi.org/10.6028/NIST.SP.800-207"

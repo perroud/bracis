@@ -1,0 +1,102 @@
+id: art-23
+family: custodia-controladoria
+title: "Conciliacao de Posicoes e Controladoria"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 23. O administrador deve promover a conciliação diária entre as
+    posições de ativos mantidas pelo gestor, pelo custodiante e pela entidade
+    depositária central.
+
+    Parágrafo 1. As divergências identificadas na conciliação devem ser
+    investigadas e sanadas no prazo máximo de um dia útil.
+
+    Parágrafo 2. O administrador deve manter registros detalhados das
+    conciliações realizadas, das divergências encontradas e das providências
+    adotadas para saná-las.
+
+    Parágrafo 3. A controladoria do fundo deve ser exercida de forma
+    independente da gestão, assegurando a fidedignidade dos dados e
+    informações do fundo.
+guidance:
+  prose: |
+    O art. 23 estabelece a obrigacao de conciliacao diaria tripartite: posicoes
+    do gestor, do custodiante e da depositaria central (B3/CETIP) devem ser
+    reconciliadas todos os dias.
+
+    **Conciliacao tripartite:**
+    Tres fontes independentes devem concordar: (i) sistema do gestor (OMS);
+    (ii) sistema do custodiante; (iii) sistema da depositaria central. Qualquer
+    divergencia deve ser investigada e resolvida em D+1.
+
+    **Controladoria independente:**
+    A controladoria (calculo de cotas, composicao de carteira, rentabilidade)
+    deve ser independente da gestao. O gestor nao pode controlar os dados que
+    servem de base para avaliacao de sua propria performance.
+
+    **Prazo de D+1:**
+    Divergencias devem ser sanadas em um dia util. Isso exige automacao:
+    conciliacoes manuais nao conseguem cumprir este prazo de forma consistente.
+
+    **Registros detalhados:**
+    Todo o processo de conciliacao deve ser documentado: posicoes comparadas,
+    divergencias encontradas, causa raiz, providencia adotada. Esses registros
+    sao evidencia essencial para auditoria e fiscalizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Conciliacao automatizada:**
+      1. Pipeline de conciliacao diaria automatizado: importar posicoes do
+         OMS, do custodiante e da depositaria, comparar e gerar relatorio
+         de divergencias.
+      2. Integracoes API com custodiante e B3/CETIP para coleta automatica
+         de posicoes.
+      3. Motor de conciliacao com regras de tolerancia (centavos, arredondamento)
+         e escalacao para divergencias materiais.
+
+      **Controladoria segregada:**
+      4. Sistema de controladoria com acesso independente da gestao: base de
+         dados separada, perfis de acesso distintos.
+      5. Calculo de cotas automatizado e independente do gestor.
+    tools:
+      - terraform
+      - vault
+      - git
+      - gitlab-ci
+  devsecops:
+    prose: |
+      **Integridade da conciliacao:**
+      1. Testes automatizados de conciliacao: cenarios de divergencia para
+         validar que o sistema detecta e alerta corretamente.
+      2. SAST para codigo de conciliacao: erros podem mascarar divergencias.
+      3. Audit trail imutavel de todas as conciliacoes: posicoes, divergencias,
+         resolucoes, timestamps.
+
+      **Segregacao de acesso:**
+      4. Controladoria com repositorio e pipeline independentes da gestao.
+      5. Branch protection para codigo de conciliacao com aprovadores distintos.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Monitoramento de conciliacao:**
+      1. Dashboard de conciliacao: status diario, divergencias abertas, tempo
+         medio de resolucao, divergencias recorrentes.
+      2. Alertas para divergencias nao resolvidas em D+1.
+      3. Metricas de qualidade: taxa de conciliacao automatica, divergencias
+         por tipo de ativo.
+
+      **Auditoria de controladoria:**
+      4. Auditoria trimestral de independencia da controladoria versus gestao.
+      5. Amostragem de conciliacoes para verificar completude e acuracia.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5"]
+    relationship: complements

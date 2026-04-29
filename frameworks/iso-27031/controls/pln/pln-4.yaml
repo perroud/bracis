@@ -1,0 +1,83 @@
+id: pln-4
+family: pln
+title: "Data backup and replication strategy"
+class: ISO27031
+
+statement:
+  prose: >-
+    The organization shall establish and implement data backup and replication
+    strategies that ensure critical data can be recovered within the defined
+    recovery point objectives. Backup strategies shall address the frequency,
+    scope, retention, and storage location of backups. Replication strategies
+    shall consider synchronous and asynchronous options based on RPO
+    requirements. Backup and replication mechanisms shall be tested regularly
+    to verify data integrity and recoverability.
+
+guidance:
+  prose: >-
+    Backup strategies should follow the 3-2-1 rule as a minimum: three copies
+    of data, on two different media types, with one copy offsite. For critical
+    services with near-zero RPO, synchronous replication to a geographically
+    separate location should be considered. Backup encryption should be
+    implemented both in transit and at rest. Automated backup verification
+    should confirm data integrity and completeness. Backup and replication
+    monitoring should alert on failures, and recovery testing should be
+    performed at least quarterly.
+
+references:
+  - citation: "ISO/IEC 27031:2011, Section 6.5"
+    url: "https://www.iso.org/standard/44374.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated backup pipelines using infrastructure-as-code.
+      Configure database replication (synchronous or asynchronous based on RPO)
+      across availability zones or regions. Use Velero for Kubernetes workload
+      backup and restore. Implement automated backup verification that restores
+      to an isolated environment and validates data integrity. Store backups in
+      immutable storage to protect against ransomware.
+    tools:
+      - velero
+      - terraform
+      - aws-backup
+      - azure-backup
+      - restic
+      - longhorn
+
+  devsecops:
+    prose: >-
+      Include backup configuration validation in CI/CD pipelines. Enforce that
+      all stateful services declare their backup and replication requirements in
+      deployment manifests. Automate backup testing as part of the release
+      process. Validate that application data formats remain compatible with
+      restore procedures after schema changes.
+    tools:
+      - gitlab-ci
+      - velero
+      - helm
+      - kustomize
+
+  secops:
+    prose: >-
+      Monitor backup job completion and alert on failures. Track backup
+      retention compliance and storage utilization. Conduct periodic restore
+      tests and document results. Verify that backup data is encrypted and
+      that access to backup storage is restricted and audited.
+    tools:
+      - datadog
+      - prometheus
+      - grafana
+      - splunk
+      - veeam
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.13"]
+    relationship: supports
+  - framework_id: nist-800-53
+    articles: ["CP-9", "CP-10"]
+    relationship: mapped
+  - framework_id: nist-800-34
+    articles: ["section-5.2"]
+    relationship: mapped

@@ -1,0 +1,97 @@
+id: v5.2.1
+family: v5
+title: "Sanitization and Sandboxing"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that all untrusted HTML input from WYSIWYG editors or similar is properly
+    sanitized with an HTML sanitizer library or framework feature. Untrusted data that
+    is output to HTML contexts must be sanitized to prevent cross-site scripting (XSS).
+    The application must use a well-tested sanitization library rather than custom regex
+    or string replacement approaches.
+
+guidance:
+  prose: >-
+    HTML sanitization is required whenever an application accepts rich text input and
+    renders it in a browser context. Custom sanitization using regex or string replacement
+    is fundamentally unreliable due to the complexity of HTML parsing rules, encoding
+    variations, and mutation XSS techniques. Purpose-built sanitization libraries (DOMPurify,
+    Bleach, OWASP Java HTML Sanitizer) use proper HTML parsers and maintain allow-lists of
+    safe elements and attributes. Sanitization must occur server-side; client-side
+    sanitization can be bypassed via direct API calls. The allow-list approach is essential:
+    define which HTML elements and attributes are permitted rather than trying to block
+    dangerous ones. Even sanitized HTML should be served with Content-Security-Policy
+    headers as defense in depth.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V5.2.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP XSS Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized sanitization service or shared library that all services use
+      for HTML sanitization. Use DOMPurify for JavaScript/TypeScript environments, Bleach
+      for Python, or OWASP Java HTML Sanitizer for JVM. Configure strict allow-lists
+      tailored to business requirements (e.g., only bold, italic, links, and lists for
+      comment fields). Implement Content-Security-Policy headers at the reverse proxy
+      level with strict-dynamic and nonce-based script execution. Disable inline JavaScript
+      execution via CSP. Serve user-generated content from a separate origin (sandboxed
+      domain) to contain any sanitization bypass impact.
+    tools:
+      - dompurify
+      - bleach
+      - owasp-java-html-sanitizer
+      - helmet
+      - nginx
+      - cloudflare
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that flag direct HTML output of user input without sanitization.
+      Write XSS-specific test suites using known bypass payloads from XSS cheat sheets.
+      Include automated XSS scanning in DAST pipelines targeting all endpoints that accept
+      or render user input. Validate that CSP headers are present and correctly configured
+      by parsing them in CI/CD. Scan for use of dangerous DOM APIs (innerHTML,
+      document.write, eval) in frontend code. Reject pull requests that introduce custom
+      sanitization logic instead of using the approved library.
+    tools:
+      - semgrep
+      - eslint-plugin-security
+      - owasp-zap
+      - burp-suite
+      - gitlab-ci
+      - nuclei
+      - csp-evaluator
+
+  secops:
+    prose: >-
+      Monitor CSP violation reports for attempted XSS exploitation. Configure CSP
+      report-uri to feed violations into the SIEM. Alert on patterns of CSP violations
+      from specific pages or user sessions that indicate active exploitation attempts.
+      Track WAF XSS rule triggers and correlate with application logs to identify
+      successful bypass attempts. Review sanitization library versions for known
+      vulnerabilities and ensure timely updates.
+    tools:
+      - splunk
+      - elastic-siem
+      - cloudflare-waf
+      - aws-waf
+      - report-uri
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: supports

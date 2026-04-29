@@ -1,0 +1,100 @@
+id: art-41
+family: cap-6
+title: "Bloqueio de Ativos em Casos de Sancoes"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 41. Quando identificado que cliente, contraparte ou beneficiário
+    final está sujeito a medidas financeiras restritivas previstas em lei
+    ou ato internacional ratificado pelo Brasil, os participantes devem:
+
+    I - bloquear imediatamente todos os ativos financeiros e valores mobiliários
+    mantidos em nome da pessoa designada;
+    II - impedir a realização de qualquer operação em benefício direto ou
+    indireto da pessoa designada;
+    III - comunicar ao COAF e ao Ministério da Fazenda no prazo de 24 horas;
+    IV - manter os ativos bloqueados até que as autoridades competentes
+    autorizem o desbloqueio; e
+    V - não divulgar ao designado ou a terceiros não autorizados que o
+    bloqueio foi realizado.
+guidance:
+  prose: |
+    O bloqueio de ativos em casos de sancoes e uma das obrigacoes mais criticas
+    e de maior impacto operacional da CVM 50. Diferente de um alerta de
+    monitoramento que vai para fila de analise, o bloqueio por sancao
+    e imediato e automatico.
+
+    **Fundamento legal:**
+    O bloqueio por sancoes decorre da Lei 13.810/2019 (que implementa no Brasil
+    as resolucoes do Conselho de Seguranca da ONU sobre terrorismo) e da
+    regulamentacao do Ministerio da Fazenda sobre congelamento de ativos.
+
+    **Escopo do bloqueio:**
+    O bloqueio se aplica a TODOS os ativos da pessoa designada: acoes, cotas
+    de fundos, debentures, saldo em conta, ativos em custódia — tudo.
+
+    **Inciso V — sigilo do bloqueio:**
+    O designado nao pode ser avisado que seus ativos foram bloqueados —
+    isso e tipping-off. O participante mantem os ativos bloqueados em silencio
+    ate receber orientacao das autoridades.
+
+    **Desbloqueio:**
+    O desbloqueio nao pode ser feito unilateralmente pelo participante.
+    Requer autorizacao das autoridades competentes (Ministerio da Fazenda,
+    COAF, determinacao judicial).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Capacidade de bloqueio instantaneo:**
+      1. Funcionalidade de bloqueio de conta/ativos com execucao em menos
+         de 1 segundo a partir do gatilho.
+      2. Bloqueio abrangente: todos os tipos de ativo do cliente sao bloqueados
+         por um unico comando (nao apenas "conta corrente").
+      3. Prevencao de operacoes durante bloqueio: qualquer tentativa de
+         transacao em conta bloqueada deve ser rejeitada com codigo de erro
+         interno (nao revelar motivo ao cliente).
+      4. Notificacao instantanea ao compliance officer e diretor responsavel
+         quando bloqueio e executado.
+      5. Registro imutavel do bloqueio com timestamp, ativo bloqueado, valor
+         e motivo (referencia a lista de sancoes).
+
+      **Fluxo de desbloqueio:**
+      6. Apenas usuarios com permissao especifica (diretoria + compliance)
+         podem iniciar processo de desbloqueio.
+      7. Desbloqueio requer upload de autorizacao das autoridades competentes.
+    tools:
+      - account-management
+      - sanctions-screening
+      - workflow-engine
+      - audit-trail
+  devsecops:
+    prose: |
+      **Testes de bloqueio:**
+      1. Testes de bloqueio instantaneo: latencia do bloqueio deve ser < 1 segundo.
+      2. Testes de completude: todos os tipos de ativo sao bloqueados quando
+         a funcao de bloqueio e ativada.
+      3. Testes de prevencao: tentativa de transacao em conta bloqueada
+         e rejeitada sem revelar motivo.
+      4. Testes de desbloqueio: apenas usuarios autorizados podem desbloquear,
+         e apenas com documento de autorizacao.
+    tools:
+      - test-automation
+      - performance-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de bloqueios:**
+      1. Relatorio imediato para diretoria de cada bloqueio realizado.
+      2. Processo documentado de notificacao ao COAF e MF em 24 horas.
+      3. Revisao periodica de ativos bloqueados: garantir que bloqueios
+         continuam necessarios (lista de sancoes nao foi atualizada para
+         remover o designado).
+    tools:
+      - sanctions-compliance
+      - account-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-28"]
+    relationship: equivalent-to

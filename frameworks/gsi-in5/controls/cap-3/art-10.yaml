@@ -1,0 +1,104 @@
+id: art-10
+family: cap-3
+title: "Autenticacao e Controle de Acesso"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 10. Os órgãos e entidades devem implementar mecanismos robustos de
+    autenticação e controle de acesso para as soluções de computação em nuvem:
+    I - autenticação multifator (MFA) para todos os acessos administrativos
+    e privilegiados aos ambientes de nuvem;
+    II - princípio do menor privilégio para concessão de acessos;
+    III - segregação de funções (separation of duties) para operações críticas;
+    IV - revisão periódica de acessos e permissões concedidas;
+    V - integração com serviço de diretório centralizado do órgão, quando
+    disponível;
+    VI - registro e monitoramento de todos os acessos administrativos.
+
+    Parágrafo único. As credenciais de acesso aos ambientes de nuvem devem
+    seguir a política de senhas do órgão e, quando possível, utilizar
+    autenticação federada.
+guidance:
+  prose: |
+    O art. 10 estabelece requisitos de Identity and Access Management (IAM)
+    para ambientes de nuvem na APF.
+
+    **Seis requisitos de IAM:**
+    1. MFA: obrigatorio para acessos admin (console, CLI, API)
+    2. Menor privilegio: nao conceder mais permissoes do que o necessario
+    3. Segregacao de funcoes: quem provisiona nao aprova, quem opera nao audita
+    4. Revisao periodica: certificacao de acessos (minimo semestral)
+    5. Diretorio centralizado: integracao com AD/LDAP do orgao via SAML/OIDC
+    6. Logs de acesso: rastreabilidade total de quem acessou o que e quando
+
+    **Mapeamento CSA CCM v4:**
+    - IAM-01: Identity and Access Management Policy
+    - IAM-02: Strong Password Policy
+    - IAM-04: Separation of Duties
+    - IAM-07: User Access Review
+    - IAM-12: Multi-Factor Authentication
+
+    **Mapeamento NIST SP 800-53:**
+    - AC-2: Account Management
+    - AC-6: Least Privilege
+    - IA-2: Identification and Authentication
+    - IA-5: Authenticator Management
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack de IAM para nuvem:**
+      1. Federacao de identidade: integrar provedores de nuvem com IdP do orgao
+         via SAML 2.0 ou OpenID Connect.
+      2. MFA obrigatorio: hardware token (FIDO2/WebAuthn) para administradores,
+         TOTP como minimo para demais usuarios.
+      3. IAM policies: implementar politicas de menor privilegio com roles
+         granulares por funcao (viewer, editor, admin, auditor).
+      4. Segregacao de funcoes via roles separados: quem provisiona (DevOps)
+         nao tem acesso a dados (Data Team).
+      5. Service accounts com chaves rotacionadas e escopos minimos.
+      6. Privileged Access Management (PAM): cofre de credenciais privilegiadas
+         com checkout temporario e gravacao de sessao.
+    tools:
+      - identity-provider
+      - mfa-solution
+      - pam
+      - iam-governance
+      - sso
+  devsecops:
+    prose: |
+      **IAM no pipeline:**
+      1. Validacao de que politicas IAM seguem menor privilegio (scan de IAM
+         policies para permissoes excessivas).
+      2. Testes automatizados de segregacao de funcoes.
+      3. Pipeline que exija MFA para aprovacao de deployments em producao.
+      4. Deteccao de service accounts com permissoes excessivas ou sem rotacao.
+      5. Automacao de revisao de acessos com notificacao para gestores.
+    tools:
+      - gitlab-ci
+      - iam-analyzer
+      - access-review-automation
+      - policy-validator
+  secops:
+    prose: |
+      **Operacao de IAM:**
+      1. Revisao semestral de todos os acessos a ambientes de nuvem.
+      2. Monitoramento de acessos anomalos via UEBA (User Entity Behavior Analytics).
+      3. Alertas para acessos administrativos fora do horario de expediente.
+      4. Desativacao automatica de contas inativas apos 90 dias.
+      5. Relatorio mensal de acessos privilegiados para o gestor de seguranca.
+    tools:
+      - siem
+      - ueba
+      - access-review
+      - pam
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-9"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["IAM-01", "IAM-02", "IAM-04", "IAM-07", "IAM-12"]
+    relationship: mapped

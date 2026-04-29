@@ -1,0 +1,143 @@
+id: art-10
+family: cap-4
+title: "Atualizacoes Periodicas ao BCB Durante o Incidente"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 10. A instituição deve enviar atualizações periódicas ao BCB durante
+    a gestão do incidente de segurança cibernética, observando:
+
+    I - atualizações obrigatórias a cada 24 (vinte e quatro) horas a partir
+    da notificação inicial, enquanto o incidente estiver ativo;
+    II - atualização imediata em caso de alteração relevante na classificação
+    de severidade, na estimativa de afetados ou nas informações sobre sistemas
+    comprometidos;
+    III - atualização imediata em caso de identificação de novos vetores de
+    ataque, novos sistemas comprometidos ou novas categorias de dados afetados;
+    IV - cada atualização deve conter o delta de informações em relação à
+    comunicação anterior, com indicação clara do que mudou e do que permanece
+    em investigação.
+
+    § 1. O BCB pode, a seu critério, solicitar atualizações com frequência
+    superior à prevista no caput, e a instituição deve atender no prazo indicado
+    pelo regulador.
+
+    § 2. As atualizações devem utilizar o mesmo número de protocolo da
+    notificação inicial, para garantir rastreabilidade do caso.
+guidance:
+  prose: |
+    O art. 10 transforma a notificacao de um ato unico em um processo continuo.
+    O BCB quer acompanhar a evolucao do incidente em tempo real, nao apenas tomar
+    conhecimento de sua ocorrencia.
+
+    **Atualizacoes a cada 24h (inciso I):**
+    Durante um incidente ativo, a obrigacao e diaria. "Ativo" significa que o
+    incidente nao foi formalmente encerrado. Um incidente de ransomware pode durar
+    semanas; a instituicao deve enviar atualizacoes diarias durante todo esse periodo.
+
+    **Atualizacoes imediatas (incisos II e III):**
+    Alem das diarias, eventos especificos requerem atualizacao imediata:
+    - Mudanca de severidade (ex: elevacao de Alto para Critico)
+    - Novo sistema comprometido descoberto na investigacao forense
+    - Identificacao de exfiltracao de dados que nao havia sido detectada inicialmente
+    - Novos vetores de ataque identificados (ex: descoberta de que era APT, nao um
+      incidente isolado)
+    "Imediata" significa dentro de 2 horas do evento gatilho, por analogia com o
+    prazo de notificacao de outros reguladores.
+
+    **Formato delta (inciso IV):**
+    Cada atualizacao deve deixar claro o que e novo, para que o BCB nao precise
+    reler toda a comunicacao anterior. Estrutura recomendada:
+    1. Status atual do incidente
+    2. Informacoes novas desde a ultima atualizacao
+    3. Informacoes confirmadas/alteradas
+    4. Informacoes ainda pendentes de investigacao
+    5. Proximos passos e prazo da proxima atualizacao
+
+    **Solicitacoes ad-hoc do BCB (ss 1):**
+    O BCB pode pedir atualizacao com prazo customizado. Este prazo e vinculante
+    e nao pode ser negociado unilateralmente pela instituicao. Se nao for possivel
+    cumprir, contatar o BCB proativamente para solicitar extensao.
+
+    **Numero de protocolo (ss 2):**
+    Todas as comunicacoes sobre o mesmo incidente devem ser vinculadas ao mesmo
+    protocolo. Perder o numero de protocolo ou criar novo protocolo para o mesmo
+    incidente causa confusao na supervisao do BCB e pode ser interpretado como
+    falta de controle.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de atualizacoes periodicas:**
+      1. Sistema de gestao de incidentes com:
+         - Timer para proxima atualizacao ao BCB (default: 24h)
+         - Alerta 4h antes da deadline de cada atualizacao
+         - Auto-draft de atualizacao pre-populado com dados do incidente
+         - Vinculo ao numero de protocolo BCB do incidente
+      2. Triggers de atualizacao imediata:
+         - Evento no SIEM de "novo sistema comprometido" -> alerta de atualizacao imediata
+         - Mudanca manual de severidade -> trigger de atualizacao imediata
+         - Deteccao de novo vetor de ataque pelo SOAR -> trigger automatico
+      3. Template de atualizacao com secao explicita de "delta":
+         campos "informacao_nova", "informacao_alterada", "informacao_pendente".
+      4. Dashboard de progresso do incidente para o BCB (se canal permitir):
+         link compartilhado com view somente leitura para o supervisor do BCB.
+    tools:
+      - incident-management
+      - siem
+      - soar
+      - notification-system
+      - monitoring-alerting
+  devsecops:
+    prose: |
+      **Dados para atualizacoes automaticos:**
+      1. Relatorio automatico de novos sistemas afetados via dependency mapping:
+         quando SIEM detecta comunicacao anomala de um novo host, verificacao
+         automatica no CMDB se e um novo sistema comprometido.
+      2. Metricas de impacto atualizadas automaticamente:
+         - Numero de usuarios ativos afetados (via analytics)
+         - Volume de transacoes impactadas (via APM)
+         - SLA compliance em tempo real
+      3. IOC tracking: novos IOCs identificados pelo time de seguranca
+         automaticamente adicionados ao relatorio de atualizacao.
+      4. Git timeline de mudancas correlacionada com o incidente para
+         identificar se novas evidencias de comprometimento surgiram.
+    tools:
+      - siem
+      - cmdb
+      - apm
+      - threat-intelligence
+      - gitlab-ci
+  secops:
+    prose: |
+      **Processo de atualizacao durante incidente:**
+      1. Incident commander com responsabilidade explicita de garantir envio
+         das atualizacoes ao BCB conforme os prazos do art. 10.
+      2. Reuniao diaria de atualizacao (war room) com pauta estruturada
+         para alimentar o relatorio de atualizacao ao BCB:
+         - O que foi descoberto nas ultimas 24h?
+         - O que mudou em relacao a notificacao anterior?
+         - Qual e o status atual da contencao e erradicacao?
+         - Quais sao os proximos passos?
+      3. Criterios documentados para "atualizacao imediata":
+         evitar subjetividade ao definir o que e "alteracao relevante" (inciso II).
+      4. Checklist de encerramento de incidente:
+         antes de declarar o incidente encerrado, confirmar que o BCB foi
+         informado do encerramento e que nao ha pendencias de atualizacao.
+      5. Politica de retencao: todas as atualizacoes ao BCB armazenadas pelo
+         mesmo periodo que o relatorio final (ver art. 13).
+    tools:
+      - incident-management
+      - grc-platform
+      - communication-tools
+      - soar
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-4", "art-5"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-5", "IR-6", "IR-8"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26"]
+    relationship: supports

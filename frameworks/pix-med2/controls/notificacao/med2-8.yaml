@@ -1,0 +1,98 @@
+id: med2-8
+family: notificacao
+title: "Account Holder Notification of Blocking and MED"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP recebedor deve notificar o usuário titular da conta bloqueada sobre a existência do
+    bloqueio cautelar decorrente do MED, informando: o valor bloqueado; o motivo do bloqueio
+    (suspeita de fraude em transação Pix recebida); o prazo máximo de duração do bloqueio;
+    o direito de o usuário apresentar contestação; e os canais disponíveis para contato.
+    A notificação ao titular deve ser realizada de forma tempestiva, por meio dos canais de
+    comunicação habituais do PSP (aplicativo, e-mail, SMS), observada a proteção de dados
+    pessoais e o sigilo bancário. O PSP pagador deve igualmente manter o usuário pagador
+    informado sobre o andamento do processo de devolução, incluindo o registro da notificação,
+    o bloqueio de valores e o resultado final da análise.
+guidance:
+  prose: |
+    **Receiver Account Holder Notification:**
+    The account holder whose funds are blocked has a right to be informed and to contest.
+    The PSP must balance transparency with operational security — the notification must
+    not reveal details that could help a fraudster evade the process.
+
+    **Required information:**
+    1. **Amount blocked** and which account is affected.
+    2. **Reason:** Funds are blocked due to a suspected fraud investigation under MED.
+    3. **Duration:** Maximum block period (72 hours for precautionary block).
+    4. **Right to contest:** The holder can present evidence that the transaction was
+       legitimate.
+    5. **Contact channels:** How to reach the PSP's dispute resolution team.
+
+    **Payer (victim) notification:**
+    The payer PSP must keep the fraud victim informed at each stage:
+    - Notification registered in DICT
+    - Funds blocked at receiver PSP
+    - Analysis outcome and return status
+
+    **Data protection:** Notifications must not expose personal data of the other party
+    (e.g., the receiver's notification must not include the payer's identity).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a notification orchestration service that triggers account holder
+         communications at each MED lifecycle event: block, analysis start, decision,
+         unblock/return.
+      2. Implement multi-channel delivery: push notification (app), email, SMS —
+         with delivery confirmation tracking for each channel.
+      3. Create notification templates that include all required regulatory information
+         while protecting sensitive data (no cross-party PII exposure).
+      4. Build a payer tracking interface (in-app) showing real-time MED case status:
+         notification filed, funds blocked, analysis in progress, outcome.
+      5. Implement a contestation intake system for blocked account holders: form
+         submission, document upload, case creation for review.
+    tools:
+      - notification-service
+      - template-engine
+      - multi-channel-delivery
+      - case-management
+      - document-management
+  devsecops:
+    prose: |
+      1. Test notification delivery across all channels: push, email, SMS — verify
+         delivery within acceptable timeframes.
+      2. Validate notification content: all required regulatory fields present, no
+         cross-party PII leakage.
+      3. Test the contestation flow end-to-end: submission, document upload, case
+         creation, analyst review.
+      4. Test payer tracking interface: verify status updates reflect actual MED case
+         progression in real-time.
+      5. Test accessibility: notifications must be accessible to users with disabilities
+         (screen reader compatibility, adequate contrast).
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - accessibility-testing
+      - security-testing
+  secops:
+    prose: |
+      1. Monitor notification delivery rates: percentage delivered successfully per
+         channel, time to delivery.
+      2. Track contestation volumes and resolution times: how many blocked holders
+         contest and how quickly cases are resolved.
+      3. Review notification content periodically for regulatory compliance — ensure
+         templates remain aligned with BCB requirements.
+      4. Audit payer communications: verify victims are kept informed at each stage.
+      5. Handle escalations from account holders who report not receiving notifications.
+    tools:
+      - monitoring-platform
+      - analytics-dashboard
+      - quality-assurance
+      - case-management
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20", "pix-21"]
+    relationship: extends
+  - framework_id: lgpd
+    articles: ["art-1"]
+    relationship: complements

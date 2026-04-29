@@ -1,0 +1,84 @@
+id: pr-p.03
+family: pr-p
+title: "Data Security — Encryption and Integrity"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    Data-at-rest are protected. Data-in-transit are protected. The integrity of data
+    is maintained throughout collection, processing, and storage using appropriate
+    technical safeguards.
+
+guidance:
+  prose: >-
+    Data security controls protect personal data from unauthorized access, alteration,
+    and destruction through technical safeguards. Encryption is the primary control for
+    protecting data confidentiality — data at rest should be encrypted using strong
+    algorithms (AES-256) with properly managed keys, and data in transit should be
+    protected using TLS 1.2 or higher. Integrity controls ensure that personal data is
+    not tampered with during processing — using checksums, digital signatures, and
+    database integrity constraints. Organizations should also implement data loss
+    prevention (DLP) controls that detect and prevent unauthorized exfiltration of
+    personal data. The strength of security controls should be proportional to data
+    sensitivity.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, PR.DS-P1 through PR.DS-P7"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce encryption by default across the entire platform. Enable encryption at
+      rest for all data stores (databases, object storage, file systems) using
+      platform-managed or customer-managed keys. Enforce TLS 1.2+ for all inter-service
+      communication through service mesh mTLS. Implement envelope encryption for
+      highly sensitive data with key rotation schedules. Deploy DLP controls at
+      network egress points. Implement database integrity constraints and audit
+      logging that detects unauthorized data modifications.
+    tools:
+      - vault
+      - service-mesh
+      - kms
+      - terraform
+      - dlp-tools
+
+  devsecops:
+    prose: >-
+      Enforce encryption and integrity controls through the development pipeline.
+      Implement SAST rules that detect unencrypted data storage, weak encryption
+      algorithms, and missing TLS configuration. Use secret detection to prevent
+      encryption keys from being committed to repositories. Require encrypted
+      connections in database connection strings. Build automated tests that verify
+      data is encrypted at rest and in transit. Include integrity validation in
+      data processing pipelines.
+    tools:
+      - gitlab-ci
+      - sast
+      - secret-detection
+      - tls-testing
+      - integrity-testing
+
+  secops:
+    prose: >-
+      Monitor encryption and integrity control effectiveness. Alert on unencrypted
+      data transfers, certificate expiration, and weak cipher usage. Conduct periodic
+      encryption audits across all data stores. Monitor for data integrity violations
+      through log analysis. Respond to DLP alerts indicating potential data exfiltration.
+      Track encryption coverage as a key privacy metric.
+    tools:
+      - siem
+      - vulnerability-management
+      - certificate-management
+      - dlp-tools
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-32"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-28", "SI-7"]
+    relationship: derived-from
+  - framework_id: nist-csf-v2
+    articles: ["pr.ds-01", "pr.ds-02"]
+    relationship: complements

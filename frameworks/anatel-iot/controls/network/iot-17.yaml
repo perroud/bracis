@@ -1,0 +1,112 @@
+id: iot-17
+family: network
+title: "Minimal Attack Surface and Service Hardening"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve ser configurado de forma restritiva ao invés de
+    forma permissiva. Serviços e funcionalidades não utilizados devem
+    estar desabilitados por padrão na configuração de fábrica. O
+    equipamento deve permitir ao usuário desabilitar funcionalidades
+    e serviços que não sejam essenciais para a operação pretendida.
+
+    O equipamento não deve possuir ferramentas de teste, interfaces de
+    depuração ou serviços de diagnóstico habilitados na configuração
+    de produção. Apenas os serviços estritamente necessários para a
+    operação do equipamento devem estar ativos por padrão.
+
+    (Ato 77/2021 §5.1.5, incisos III e IV; §5.1.3, inciso II)
+guidance:
+  prose: |
+    This control mandates a "secure by default" configuration posture.
+    Devices must ship with the minimum attack surface — only services
+    required for core functionality enabled, everything else disabled.
+
+    **What must be disabled by default:**
+    - UPnP (Universal Plug and Play) — major attack vector.
+    - WPS (WiFi Protected Setup) — known to be brute-forceable.
+    - Telnet — unencrypted remote access.
+    - FTP — unencrypted file transfer.
+    - SNMPv1/v2c — unencrypted management protocol.
+    - Remote management from WAN side.
+    - USB/serial debug interfaces in production firmware.
+    - Any service not essential for the device's primary function.
+
+    **User control requirements:**
+    - The device must provide a management interface where the user can
+      view all running services and disable non-essential ones.
+    - Services that are disabled should be fully stopped (not just
+      hidden from the UI) — no listening sockets, no background
+      processes.
+
+    **Verification approach:**
+    - Port scan the device in factory-default configuration and verify
+      only documented, necessary services are listening.
+    - Verify that disabling a service via the management UI actually
+      closes the associated port/socket.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Define a "minimal service set" for each product: the absolute
+         minimum services required for the device to perform its
+         primary function (e.g., for a router: DHCP server, DNS
+         forwarder, NAT, web management on LAN only).
+      2. Configure the firmware build to disable all non-essential
+         services by default — use configuration management (systemd
+         unit files, init scripts) to ensure disabled services do not
+         start at boot.
+      3. Implement a service management page in the web UI that lists
+         all available services with enable/disable toggles and
+         descriptions of each service's purpose.
+      4. For TR-069 managed devices, expose service enable/disable
+         parameters so operators can enforce hardened configurations
+         fleet-wide.
+      5. Remove unnecessary kernel modules, userspace binaries, and
+         libraries from production firmware images to reduce the
+         exploitable code surface.
+    tools:
+      - firmware-build-system
+      - systemd
+      - service-management-ui
+      - tr-069-acs
+      - buildroot-menuconfig
+  devsecops:
+    prose: |
+      1. Add a port scan test to the CI pipeline: boot the device in
+         default configuration, run nmap against all ports, and fail
+         if any undocumented port is open.
+      2. Maintain a "service baseline" document listing every allowed
+         service, port, and protocol for each product — CI validates
+         against this baseline.
+      3. Add firmware image analysis: scan for unnecessary binaries
+         (telnetd, ftpd, debug shells) and fail the build if found.
+      4. Test service disable functionality: disable each non-essential
+         service via the UI and verify the associated port closes.
+    tools:
+      - gitlab-ci
+      - nmap
+      - firmware-analysis-toolkit
+      - integration-testing
+  secops:
+    prose: |
+      1. During penetration testing, perform comprehensive port scans
+         (TCP and UDP, all 65535 ports) on factory-default devices and
+         compare against the documented service baseline.
+      2. Verify that WAN-side port scan reveals no management services
+         (SSH, HTTP/HTTPS, Telnet, SNMP) unless explicitly enabled by
+         the user.
+      3. Audit the deployed fleet via TR-069 to identify devices with
+         non-standard service configurations (e.g., UPnP enabled,
+         remote management exposed).
+      4. Document the default service configuration and port scan
+         results for ANATEL homologation evidence.
+    tools:
+      - nmap
+      - masscan
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

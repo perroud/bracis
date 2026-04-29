@@ -1,0 +1,119 @@
+id: art-17
+family: cap-3
+title: "Vedacao de Inicio de Relacao sem KYC"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 17. As instituições mencionadas no art. 1 não devem iniciar relação de negócio,
+    bem como devem encerrar a relação já existente, quando:
+    I - não for possível identificar o cliente ou o beneficiário final; ou
+    II - as informações prestadas pelo cliente forem insuficientes ou apresentarem
+    indícios de falsidade.
+
+    Parágrafo único. O encerramento da relação de que trata o caput deve observar os
+    procedimentos e prazos regulamentares aplicáveis.
+guidance:
+  prose: |
+    O art. 17 estabelece as situacoes em que a instituicao DEVE recusar ou
+    encerrar a relacao de negocio. E uma obrigacao imperativa, nao discricionaria.
+
+    **Vedacao de inicio (gateway control):**
+    A instituicao nao pode iniciar relacao de negocio quando:
+    1. Nao for possivel identificar cliente ou beneficiario final: mesmo apos
+       esgotamento de fontes e prazos razoaveis
+    2. Informacoes insuficientes ou com indicios de falsidade: documentos
+       suspeitos, dados inconsistentes, recusa em fornecer informacoes
+
+    **Encerramento obrigatorio:**
+    Para relacoes ja existentes, as mesmas condicoes aplicam-se. Se, durante
+    a vigencia da relacao, a instituicao nao conseguir mais identificar o
+    cliente ou detectar falsidade nas informacoes, DEVE encerrar a relacao.
+
+    **Procedimentos de encerramento (paragrafo unico):**
+    O encerramento deve seguir procedimentos regulamentares (ex: prazo para
+    saque de saldos, notificacao ao cliente, transferencia de produtos).
+    Nao pode ser abrupto sem observar direitos do cliente.
+
+    **Implicacao pratica:**
+    - O sistema de KYC deve ter gatilhos de bloqueio automatico
+    - Alertas criticos quando dados sao identificados como falsos
+    - Processo formal de decisao e documentacao do encerramento
+    - Comunicacao ao COAF pode ser necessaria (art. 25)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gateway controls de KYC:**
+      1. Validacao automatica de todos os campos obrigatorios no onboarding.
+         Bloqueio de prosseguimento quando dados estao incompletos.
+      2. Verificacao automatica de documentos: OCR + validacao de formato +
+         cross-check com bases oficiais.
+      3. Deteccao de documentos falsos: verificacao de digito verificador,
+         formato, consistencia interna.
+      4. Bloqueio automatico quando CPF/CNPJ esta em situacao irregular na
+         Receita Federal.
+
+      **Encerramento automatizado:**
+      5. Workflow de encerramento com etapas obrigatorias: notificacao,
+         prazo para manifestacao, liquidacao de posicoes, transferencia
+         de saldos, encerramento efetivo.
+      6. Bloqueio automatico de novas transacoes apos decisao de encerramento.
+      7. Registro completo do processo de encerramento com justificativa.
+      8. Trigger automatico de comunicacao ao COAF quando encerramento
+         e motivado por suspeita de PLD/FT.
+
+      **Monitoramento de dados:**
+      9. Processo de deteccao continua de inconsistencias cadastrais.
+      10. Alerta quando dados de cliente divergem de fontes externas.
+      11. Flag de risco quando cliente recusa fornecer informacoes solicitadas.
+    tools:
+      - kyc-system
+      - workflow-engine
+      - document-verification
+      - fraud-detection
+  devsecops:
+    prose: |
+      **Testes de gateway controls:**
+      1. Testes de bloqueio de onboarding com dados incompletos.
+      2. Testes de deteccao de documentos invalidos e falsificados.
+      3. Testes de fluxo de encerramento completo.
+      4. Testes de comunicacao ao COAF no encerramento por suspeita.
+
+      **Seguranca do processo:**
+      5. Testes de que nao ha bypass possivel nos gateway controls.
+      6. Testes de que bloqueio de onboarding nao pode ser desabilitado
+         sem aprovacao de compliance.
+      7. Testes de audit trail completo de decisoes de recusa/encerramento.
+      8. Testes de integridade dos dados de encerramento.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - gitlab-sast
+      - audit-logging
+  secops:
+    prose: |
+      **Gestao de recusas e encerramentos:**
+      1. Registro de todas as recusas de onboarding com motivo detalhado.
+      2. Registro de todos os encerramentos com justificativa e aprovacao.
+      3. Relatorio mensal de recusas e encerramentos por motivo.
+      4. Analise de tendencias para identificar tentativas coordenadas.
+
+      **Comunicacao regulatoria:**
+      5. Avaliacao de necessidade de comunicacao ao COAF em cada encerramento.
+      6. Comunicacao preventiva quando ha indicios de falsidade documental.
+      7. Retencao de evidencias de recusa/encerramento por 10 anos.
+      8. Relatorio ao diretor responsavel sobre recusas e encerramentos.
+    tools:
+      - aml-platform
+      - case-management
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "IA-12", "AC-2"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-15", "art-18"]
+    relationship: complements

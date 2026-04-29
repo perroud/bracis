@@ -1,0 +1,118 @@
+id: art-18
+family: cap-5
+title: "Backup, Recuperacao de Desastres e Disponibilidade"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 18. A instituição de saúde deve implementar e manter
+    política de backup e recuperação de desastres que garanta a
+    disponibilidade e a integridade dos dados do prontuário
+    eletrônico do paciente.
+
+    I - Backup dos dados do PEP deve ser realizado com frequência
+    compatível com a criticidade do serviço de saúde, com RPO
+    (Recovery Point Objective) máximo de 24 horas;
+
+    II - A restauração dos dados deve ser possível em prazo
+    compatível com a continuidade do atendimento, com RTO
+    (Recovery Time Objective) definido pela instituição;
+
+    III - Cópias de backup devem ser armazenadas em local físico
+    distinto do local de operação do sistema principal, protegidas
+    contra acesso não autorizado;
+
+    IV - Testes de restauração de backup devem ser realizados
+    periodicamente, com frequência mínima semestral, documentando
+    resultados e tempos de recuperação obtidos.
+guidance:
+  prose: |
+    O art. 18 trata da continuidade operacional do PEP. Em ambiente
+    hospitalar, a indisponibilidade do prontuario eletronico pode
+    comprometer diretamente o atendimento ao paciente.
+
+    **RPO de 24 horas (inciso I):**
+    Este e o MAXIMO toleravel. Para hospitais com UTI, pronto-socorro
+    e centro cirurgico, RPO de 24 horas e excessivo. Recomenda-se:
+    - UTI/PS/CC: RPO de 1 hora ou menos
+    - Enfermarias: RPO de 4 horas
+    - Ambulatorio: RPO de 24 horas
+
+    **RTO (inciso II):**
+    O RTO deve ser definido com base no impacto clinico. Sugestao:
+    - UTI/PS: RTO de 1 hora (risco a vida do paciente)
+    - Enfermarias: RTO de 4 horas
+    - Ambulatorio: RTO de 24 horas
+
+    **Separacao fisica (inciso III):**
+    Backup no mesmo datacenter nao atende ao requisito. E necessario
+    replicacao geografica (outro site, outra regiao de cloud) para
+    proteger contra desastres fisicos (incendio, inundacao).
+
+    **Testes semestrais (inciso IV):**
+    Backup que nunca foi testado nao e backup. Os testes devem
+    incluir restauracao completa em ambiente isolado e validacao
+    de integridade dos dados restaurados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de backup e DR:**
+      1. Implementar backup automatizado com politica por camada:
+         - Continuo (WAL/CDC): RPO < 1 hora para dados criticos
+         - Incremental diario: todos os dados
+         - Full semanal: snapshot completo
+      2. Replicar backups para site geograficamente distinto
+         (minimo 100km de distancia) via replicacao assincrona.
+      3. Criptografar backups em transito e em repouso com chave
+         gerenciada por KMS (nao armazenar chave junto ao backup).
+      4. Implementar DR site com capacidade de assumir operacao
+         completa do PEP em caso de desastre no site principal.
+      5. Automatizar testes de restauracao mensais com validacao
+         de integridade (checksum, contagem de registros, amostra
+         de dados).
+    tools:
+      - backup-automation
+      - geo-replication
+      - kms
+      - dr-site
+      - restore-testing
+  devsecops:
+    prose: |
+      **Validacao de backup e DR no pipeline:**
+      1. Implementar teste automatizado de restauracao de backup
+         em ambiente efemero (spin up, restore, validate, tear down).
+      2. Validar integridade dos dados restaurados: checksum,
+         contagem de registros, verificacao de assinaturas digitais.
+      3. Testar cenario de failover para DR site: verificar que
+         o PEP esta funcional e com dados atualizados.
+      4. Medir e registrar RPO e RTO reais obtidos nos testes
+         automatizados vs. SLA definido.
+    tools:
+      - gitlab-ci
+      - restore-validation
+      - failover-tests
+      - sla-measurement
+  secops:
+    prose: |
+      **Governanca de continuidade:**
+      1. Criar e manter plano de continuidade de negocios (PCN)
+         especifico para o PEP, com procedimentos de contingencia
+         manual (prontuario em papel temporario).
+      2. Realizar drill de recuperacao de desastres semestralmente,
+         simulando perda total do site principal.
+      3. Documentar resultados dos testes de backup e DR,
+         incluindo RPO/RTO obtidos e gaps identificados.
+      4. Monitorar diariamente a execucao dos backups e alertar
+         imediatamente para falhas (backup nao realizado).
+    tools:
+      - bcm-platform
+      - dr-drill
+      - backup-monitoring
+      - incident-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.308-a-7", "164.310-a-2"]
+    relationship: mapped

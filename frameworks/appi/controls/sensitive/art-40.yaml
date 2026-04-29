@@ -1,0 +1,108 @@
+id: art-40
+family: sensitive
+title: "Pseudonymously Processed Information — Obligations of Business Operators"
+class: APPI
+baselines:
+  - privacy-baseline
+
+statement:
+  prose: |
+    (1) A business operator handling personal information shall, when producing
+    pseudonymously processed information, process personal information in accordance
+    with standards prescribed by the Rules of the Personal Information Protection
+    Commission as necessary for preventing the identification of a specific individual
+    and restoring the deleted or replaced personal information.
+
+    (2) A business operator handling personal information shall, when having produced
+    pseudonymously processed information, take measures prescribed by the Rules of the
+    Personal Information Protection Commission as necessary for the security management
+    of the deleted information and the processing method-related information.
+
+    (3) A business operator that handles pseudonymously processed information
+    (hereinafter referred to as a "pseudonymously processed information handling
+    business operator") shall not handle pseudonymously processed information beyond
+    the scope necessary to achieve the purpose of utilization specified pursuant to
+    Article 17, paragraph (1), without obtaining the prior consent of the data subject.
+
+    (4) A pseudonymously processed information handling business operator shall not
+    provide pseudonymously processed information to a third party, except in the
+    following cases:
+    (i) Cases based on laws and regulations;
+    (ii) Cases in which it is entrusted pursuant to Article 23, paragraph (5), item (i).
+
+    (5) A pseudonymously processed information handling business operator shall not
+    collate pseudonymously processed information with other information in order to
+    identify a specific individual who is the data subject of the personal information
+    used to produce the pseudonymously processed information.
+
+    (6) A pseudonymously processed information handling business operator shall not
+    contact the data subject by using contact information contained in pseudonymously
+    processed information.
+
+guidance:
+  prose: |
+    Articles 40-46, introduced by the 2022 amendment, create a new category of
+    "pseudonymously processed information" — distinct from both personal information
+    and anonymously processed information. This enables internal data analytics while
+    maintaining privacy protections. Key restrictions: pseudonymously processed
+    information cannot be shared with third parties (except entrusted processors),
+    cannot be used for re-identification, and cannot be used to contact data subjects.
+    The processing standards require removing or replacing identifiers and securing the
+    mapping table. This is analogous to the GDPR's concept of pseudonymization but
+    with more prescriptive rules about what operators can and cannot do with the
+    resulting data.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Build a pseudonymization pipeline service that implements PPC-prescribed
+      processing standards. Implement tokenization and k-anonymity techniques
+      for producing pseudonymously processed information. Store mapping tables
+      (linking tokens to identifiers) in a separate, access-controlled
+      environment with encryption at rest. Enforce access controls that prevent
+      pseudonymously processed information from being joined with identifying
+      data. Build automated checks that detect re-identification attempts.
+    tools:
+      - presidio
+      - hashicorp-vault
+      - datahub
+      - open-policy-agent
+      - apache-spark
+
+  devsecops:
+    prose: |
+      Enforce that pseudonymization processing follows approved algorithms
+      through CI/CD pipeline validation. Scan code for patterns that join
+      pseudonymously processed information with identifying data. Validate
+      that mapping tables are stored separately from pseudonymized datasets.
+      Block deployments that reference both pseudonymized data and mapping
+      tables in the same service context.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - checkov
+
+  secops:
+    prose: |
+      Monitor access to pseudonymization mapping tables with enhanced logging.
+      Alert on any join operations between pseudonymized data and identifying
+      information. Audit compliance with the prohibition on contacting data
+      subjects using pseudonymously processed information. Detect unauthorized
+      third-party transfers of pseudonymously processed information.
+    tools:
+      - splunk
+      - elastic-siem
+      - hashicorp-vault
+      - wazuh
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-4", "art-89"]
+    relationship: mapped
+  - framework_id: pipl
+    articles: ["art-51"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["7.4.5"]
+    relationship: complements

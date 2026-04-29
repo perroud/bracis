@@ -1,0 +1,94 @@
+id: tds-network-3
+family: tds-network
+title: "Firewall and Network Security Control Configuration"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Firewall and network security control configurations for the 3DS
+    environment must be established, documented, and maintained. Rulesets
+    must implement a default-deny policy for both inbound and outbound
+    traffic, permitting only traffic explicitly required for 3DS operations.
+    All firewall rules must be documented with a business justification,
+    the specific protocols and ports allowed, and the authorized source and
+    destination addresses. Firewall configurations must be reviewed at least
+    every six months to remove stale, overly permissive, or unnecessary rules.
+
+guidance:
+  prose: >-
+    Firewall configuration management is critical for maintaining the
+    integrity of the 3DS network boundary. Default-deny policies ensure that
+    only explicitly authorized traffic flows are permitted, reducing the
+    attack surface. Over time, firewall rulesets tend to accumulate rules
+    that are no longer needed, creating unnecessary exposure. Regular reviews
+    catch these issues. Business justification documentation provides
+    accountability and audit trail for each rule, making reviews more
+    effective. Rulesets should be version-controlled and changes should
+    follow a formal change management process.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 2, Section 1.2 — Firewall and Router Configurations"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define all firewall rules and security group configurations as
+      infrastructure-as-code with inline comments documenting the business
+      justification for each rule. Use Terraform or Pulumi modules that
+      enforce default-deny and require explicit allow rules. Implement
+      automated compliance checks that verify no rule allows unrestricted
+      inbound access (0.0.0.0/0) to 3DS components. Use cloud-native
+      firewall managers (AWS Firewall Manager, Azure Firewall Policy) to
+      enforce consistent policies across accounts and subscriptions.
+    tools:
+      - terraform
+      - pulumi
+      - aws-firewall-manager
+      - azure-firewall
+      - gcp-firewall-policies
+      - palo-alto-panorama
+
+  devsecops:
+    prose: >-
+      Scan all IaC changes affecting firewall rules with Checkov, tfsec,
+      or OPA policies before deployment. Implement merge request rules
+      requiring security team approval for any changes to 3DS network
+      controls. Generate automated firewall rule reports every six months
+      as part of scheduled CI/CD jobs. Use policy-as-code to enforce that
+      every security group rule includes a description tag with business
+      justification.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - opa
+      - conftest
+      - bridgecrew
+
+  secops:
+    prose: >-
+      Monitor firewall logs for denied traffic patterns that may indicate
+      reconnaissance or attack attempts. Conduct bi-annual firewall rule
+      reviews with automated tooling to identify unused rules via traffic
+      analysis. Alert on any unauthorized changes to firewall configurations.
+      Maintain a formal change log linking each rule change to an approved
+      change ticket. Use firewall management platforms to visualize and
+      optimize rulesets.
+    tools:
+      - splunk
+      - elastic-siem
+      - firemon
+      - tufin
+      - algosec
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-1"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "CM-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.21"]
+    relationship: mapped

@@ -1,0 +1,121 @@
+id: stig-cat1-authentication
+family: cat-i
+title: "Weak Authentication and Missing Multifactor Authentication"
+class: DISA-STIG
+
+baselines: [cat-i]
+
+statement:
+  prose: >-
+    The system must enforce strong authentication for all user and privileged
+    access. Systems must use DoD-approved Public Key Infrastructure (PKI)
+    certificates or Common Access Card (CAC) / Personal Identity Verification
+    (PIV) credentials for interactive user authentication to privileged accounts
+    and to any system that handles Controlled Unclassified Information (CUI) or
+    classified data. Password-only authentication is prohibited for privileged
+    access. Multifactor authentication (MFA) combining something you have (smart
+    card or hardware token) with something you know (PIN) must be enforced.
+    Authentication mechanisms must not permit the use of group authenticators
+    (shared passwords) and must terminate sessions after a period of inactivity
+    consistent with the applicable STIG benchmark.
+
+guidance:
+  prose: >-
+    Weak authentication is consistently ranked among the top attack vectors
+    against DoD systems. Adversaries use credential theft, password spraying,
+    and brute force to compromise accounts protected only by passwords. The
+    requirement for CAC/PIV-based authentication eliminates entire classes of
+    credential-based attacks because the private key material never leaves the
+    hardware token and cannot be remotely extracted.
+
+    This STIG finding applies to any interactive login — including SSH, web
+    application logins, VPN authentication, database administrative interfaces,
+    and cloud management consoles. Systems must also apply inactivity session
+    timeouts (typically 15 minutes for unclassified, shorter for classified)
+    to limit exposure from unattended sessions. Authentication failures must
+    trigger account lockout after a defined number of consecutive failed attempts
+    (typically three to five), and lockout events must be logged.
+
+    For non-person entities (NPEs) and service accounts, cryptographic mutual
+    authentication using certificates or hardware security modules (HSMs)
+    replaces CAC/PIV but must still satisfy the two-factor principle.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, IA-2(1), IA-2(2), IA-5, IA-11"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DoD Instruction 8520.02 — Public Key Infrastructure (PKI) and Public Key (PK) Enabling"
+    url: "https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/852002p.pdf"
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222396"
+    url: "https://public.cyber.mil/stigs/downloads/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate CAC/PIV authentication into the centralized identity provider
+      using PKCS#11 or Smart Card middleware. Configure mutual TLS (mTLS) for
+      service-to-service authentication within the platform using Istio or Linkerd
+      service mesh with short-lived certificates issued by an internal CA (e.g.,
+      Vault PKI or cert-manager). Enforce MFA at the IdP level so that all
+      downstream services — including Kubernetes API server, GitLab, Vault, and
+      cloud consoles — inherit MFA enforcement without needing per-application
+      configuration. Implement session timeout policies in Kubernetes (e.g.,
+      kubeconfig token expiry), web application proxies, and VPN gateways.
+      Configure account lockout policies in the IdP (three failed attempts triggers
+      a 30-minute lockout) and forward lockout events to the SIEM.
+    tools:
+      - keycloak
+      - cert-manager
+      - istio
+      - linkerd
+      - hashicorp-vault
+      - openldap
+
+  devsecops:
+    prose: >-
+      Require all GitLab users to enroll MFA before accessing repositories that
+      contain CUI or are part of DoD system pipelines. Enforce MFA policy through
+      GitLab group-level settings or SAML/OIDC federation with the DoD IdP.
+      Scan pipeline configuration files to ensure that automated service accounts
+      use certificate-based authentication rather than static username/password
+      pairs. Implement pre-commit and CI checks that detect hardcoded credentials
+      or basic auth configurations being introduced into application code. Validate
+      that all deployment targets enforce MFA by checking target environment
+      authentication configurations as part of the pre-deployment security gate.
+    tools:
+      - gitlab-ci
+      - gitlab-mfa-enforcement
+      - gitlab-secret-detection
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Monitor authentication logs for patterns indicative of weak authentication
+      abuse: multiple failed attempts followed by success (successful brute force),
+      authentication from unexpected geographies or times, and use of non-PKI
+      authentication methods on systems that require CAC/PIV. Run regular
+      authentication configuration reviews to verify MFA enrollment rates and
+      identify accounts that have bypassed MFA enrollment. Conduct purple team
+      exercises specifically testing authentication bypass techniques documented
+      in the MITRE ATT&CK framework (T1078, T1110, T1621). Report MFA coverage
+      metrics to the AO as part of continuous monitoring deliverables.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - qualys
+      - archer-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-2(1)", "IA-2(2)", "IA-5", "IA-11", "AC-7"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["IA.L2-3.5.3", "IA.L2-3.5.4", "IA.L2-3.5.6"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["ia-2", "ia-2(1)", "ia-5"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-01", "PR.AA-02", "PR.AA-03"]
+    relationship: supports

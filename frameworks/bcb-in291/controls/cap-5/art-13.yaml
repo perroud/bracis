@@ -1,0 +1,160 @@
+id: art-13
+family: cap-5
+title: "Retencao de Documentacao e Registros de Incidentes"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 13. A instituição deve manter documentação completa referente a todos
+    os incidentes de segurança cibernética notificados ao BCB, incluindo:
+
+    I - cópia de todas as notificações, atualizações e relatórios enviados ao BCB,
+    com registro de data e hora de envio e número de protocolo;
+    II - registros de logs dos sistemas afetados pelo período abrangido pelo incidente
+    e dos 30 (trinta) dias anteriores à detecção;
+    III - evidências forenses coletadas durante a investigação do incidente, com
+    registro de cadeia de custódia;
+    IV - registros de todas as ações de resposta, com timestamps, responsáveis e
+    justificativas;
+    V - comunicações internas relevantes relacionadas ao incidente, incluindo
+    comunicações com a alta administração e o conselho de administração;
+    VI - decisões documentadas sobre não-notificação de incidentes que foram
+    avaliados quanto aos limiares do art. 4 e não os atingiram.
+
+    § 1. A documentação deve ser retida pelo prazo mínimo de 5 (cinco) anos
+    a contar da data de encerramento do incidente.
+
+    § 2. A documentação deve ser armazenada de forma segura, com controles
+    de acesso adequados e proteção contra alteração indevida ou destruição.
+
+    § 3. A documentação deve estar disponível para apresentação ao BCB em
+    prazo máximo de 5 (cinco) dias úteis a partir da solicitação.
+guidance:
+  prose: |
+    O art. 13 transforma a gestao de evidencias em obrigacao regulatoria permanente.
+    A documentacao do incidente e a base da supervisao do BCB e de defesa em
+    processos administrativos.
+
+    **Prazo de 5 anos (ss 1):**
+    Cinco anos a partir do encerramento. Um incidente que durou 3 meses tem sua
+    documentacao retida por 5 anos e 3 meses a partir da deteccao. Para incidentes
+    com litigios em curso, pode ser necessario reter por periodo maior.
+
+    **Inciso II - Logs dos 30 dias anteriores:**
+    Esta e a exigencia que impacta a politica de retencao de logs da instituicao.
+    Se um incidente e detectado hoje, o BCB pode exigir logs de 30 dias atras.
+    A politica de retencao de logs deve garantir disponibilidade de ao menos 30 dias
+    de logs de todos os sistemas criticos, nao apenas dos sistemas envolvidos em
+    incidentes conhecidos.
+
+    **Inciso III - Cadeia de custodia:**
+    Logs forenses sem cadeia de custodia podem ser inadmissiveis em processos
+    judiciais e questionados pelo BCB. A cadeia de custodia documenta:
+    - Quem coletou a evidencia e quando
+    - Como foi armazenada e transportada
+    - Quem teve acesso e quando
+    - Se foi alterada e por que (ex: deobfuscation para analise)
+
+    **Inciso V - Comunicacoes internas:**
+    Emails, mensagens de chat (Teams, Slack, WhatsApp corporativo), atas de reuniao
+    do war room, comunicacoes ao conselho. Estas comunicacoes sao cruciais para
+    reconstruir o processo de tomada de decisao durante o incidente.
+
+    **Inciso VI - Decisoes de nao-notificacao:**
+    Critico: a instituicao precisa registrar nao apenas o que notificou, mas
+    tambem os incidentes que avaliou e decidiu nao notificar, e por que.
+    Este registro protege a instituicao de acusacoes de ter suprimido notificacoes.
+
+    **Disponibilidade em 5 dias uteis (ss 3):**
+    A documentacao deve estar organizada e acessivel, nao arquivada de forma
+    que levaria semanas para recuperar. Backup e disaster recovery devem incluir
+    a documentacao de incidentes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao:**
+      1. Storage de retencao de longo prazo (5 anos) com:
+         - Write-once storage (WORM) para evidencias forenses e notificacoes ao BCB
+         - Criptografia em repouso e em transito
+         - Controle de acesso por role (apenas CISO, compliance e auditores)
+         - Audit log de todos os acessos
+         - Backup geograficamente distribuido
+      2. Retencao de logs de seguranca:
+         - Hot storage (30-90 dias): SIEM/SOC em tempo real
+         - Warm storage (90 dias - 1 ano): lago de logs de baixo custo
+         - Cold storage (1-5 anos): object storage com glacier/archive
+         Automatizar a movimentacao entre camadas para todos os logs de sistemas criticos.
+      3. Indexacao e busca:
+         documentacao de incidentes organizados por numero de protocolo BCB,
+         data, tipo de incidente e sistemas afetados, com busca full-text.
+      4. Teste de recuperacao trimestral:
+         simular solicitacao do BCB e verificar se documentacao e recuperavel
+         em < 5 dias uteis.
+    tools:
+      - log-aggregator
+      - worm-storage
+      - siem
+      - backup-solution
+      - access-management
+  devsecops:
+    prose: |
+      **Pipeline de preservacao de evidencias:**
+      1. Pipeline de coleta forense automatizado ao declarar incidente de nivel 1:
+         - Snapshot imutavel de logs relevantes
+         - Export de configuracoes de sistemas afetados
+         - Captura de estado de containers em execucao
+         - Preservacao de artefatos com hash criptografico para cadeia de custodia
+      2. Integracao entre incident management e evidence vault:
+         cada evidencia coletada vinculada ao ticket do incidente com metadados.
+      3. Retencao de artefatos de pipeline:
+         configuracoes de CI/CD, Dockerfiles e IaC do periodo do incidente
+         retidos como parte do contexto tecnico.
+      4. Automacao de cumprimento do ss 3:
+         script de exportacao de toda documentacao de um incidente em < 1h,
+         para atender solicitacao do BCB no prazo de 5 dias uteis.
+    tools:
+      - forensic-tools
+      - artifact-registry
+      - evidence-vault
+      - gitlab-ci
+      - log-aggregator
+  secops:
+    prose: |
+      **Gestao operacional de evidencias:**
+      1. Procedimento de coleta forense documentado:
+         - Responsavel pela coleta (analista forense ou incidente commander)
+         - Ferramentas aprovadas para coleta
+         - Procedimento de cadeia de custodia passo a passo
+         - Como calcular e registrar hashes de integridade
+      2. Indice de evidencias por incidente:
+         planilha ou sistema listando todas as evidencias coletadas,
+         localizacao de armazenamento, hash de integridade e chain of custody.
+      3. Revisao anual da politica de retencao:
+         verificar se todos os sistemas criticos tem retencao de logs de 30 dias
+         conforme exigencia do inciso II.
+      4. Testes de recuperacao documentados:
+         evidencia de que o prazo de 5 dias uteis do ss 3 e alcancavel na pratica.
+      5. Procedimento de atendimento a solicitacao do BCB:
+         quem recebe, quem aprova, quem entrega, por qual canal.
+    tools:
+      - incident-management
+      - grc-platform
+      - forensic-tools
+      - log-aggregator
+      - document-management
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-6"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-37"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-12"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-9", "AU-11", "IR-4", "IR-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.28", "A.8.15", "A.8.16"]
+    relationship: supports

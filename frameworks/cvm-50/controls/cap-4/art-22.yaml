@@ -1,0 +1,100 @@
+id: art-22
+family: cap-4
+title: "Prazo de Retencao de Registros"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 22. Os registros de operações previstos no art. 21 devem ser
+    mantidos pelo prazo mínimo de cinco anos, contados da data da operação.
+
+    § 1. Os documentos e as informações relativas ao cadastro de clientes
+    devem ser mantidos pelo prazo mínimo de dez anos, contados da data
+    de encerramento da relação de negócios.
+
+    § 2. Os registros de comunicações ao COAF devem ser mantidos pelo
+    prazo mínimo de dez anos.
+
+    § 3. Os prazos previstos neste artigo são mínimos e podem ser ampliados
+    pelo participante se assim recomendar a sua avaliação interna de risco
+    ou se determinado por autoridade competente.
+guidance:
+  prose: |
+    O prazo de retencao define por quanto tempo o participante deve manter
+    os dados disponiveis para investigacoes regulatorias e criminais.
+
+    **Tres prazos diferentes para tres tipos de registro:**
+    1. Registros de operacoes (art. 21): 5 anos da data da operacao.
+       Rationale: prazo prescricional do crime de lavagem de dinheiro.
+    2. Cadastro de clientes (KYC): 10 anos do encerramento da relacao.
+       Rationale: investigacoes de lavagem frequentemente ocorrem anos
+       apos o encerramento da relacao comercial.
+    3. Comunicacoes ao COAF: 10 anos.
+       Rationale: a comunicacao ao COAF e um ato juridico — deve ser mantida
+       como evidencia de cumprimento da obrigacao legal.
+
+    **Prazo minimo, nao maximo:**
+    O ss 3 esclarece que o participante pode manter por mais tempo se sua
+    avaliacao de risco ou determinacao regulatoria assim exigir. Em pratica,
+    muitos participantes mantam dados indefinidamente em arquivamento frio.
+
+    **Implicacoes tecnologicas:**
+    Manter dados por 10 anos implica: storage de longo prazo (tape, archival cloud),
+    capacidade de recuperar e disponibilizar dados legados, manter backward
+    compatibility de formatos de dados ao longo do tempo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de retencao:**
+      1. Politica de ciclo de vida de dados: hot storage (0-2 anos para acesso
+         rapido), warm storage (2-5 anos), cold/archival storage (5-10 anos).
+      2. Sistema de etiquetagem de dados com data de criacao e tipo de registro
+         para calculo automatico de data de expiracao por categoria.
+      3. Processo automatizado de arquivamento: dados alem do periodo de acesso
+         frequente sao movidos para storage mais barato sem perda de acessibilidade.
+      4. Politica de retencao configuravel para exceder os minimos quando
+         a avaliacao de risco ou regulacao exigirem.
+
+      **Recuperabilidade:**
+      5. Testes periodicos de recuperacao de dados arquivados: dado um ID de
+         transacao de 7 anos atras, conseguir recuperar em menos de 4 horas.
+      6. Formato de dados autossuficiente: registros antigos devem ser recuperaveis
+         mesmo que o sistema tenha sido redesenhado.
+    tools:
+      - data-lifecycle-management
+      - archival-storage
+      - data-lake
+  devsecops:
+    prose: |
+      **Testes de retencao:**
+      1. Testes de que dados criados ha X anos ainda sao recuperaveis.
+      2. Testes de que politica de retencao nao deleta dados antes do prazo.
+      3. Testes de formato: dados arquivados podem ser desserializados mesmo
+         que o schema tenha evoluido.
+      4. Monitoramento de espaco em storage para prevenir falhas de arquivamento.
+    tools:
+      - test-automation
+      - storage-monitoring
+      - gitlab-ci
+  secops:
+    prose: |
+      **Auditoria de retencao:**
+      1. Auditoria anual de que dados estao sendo retidos pelos prazos corretos.
+      2. Teste de recuperacao de dados: solicitar registros de clientes/operacoes
+         de diferentes periodos e verificar disponibilidade.
+      3. Plano de contingencia para falha de storage: como recuperar dados
+         em caso de desastre sem perder registros regulatorios.
+    tools:
+      - storage-audit
+      - disaster-recovery
+      - compliance-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-19"]
+    relationship: equivalent-to
+  - framework_id: marco-civil
+    articles: ["art-15"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-16"]
+    relationship: complements

@@ -1,0 +1,104 @@
+id: art-22
+family: cap-5
+title: "Portabilidade e Reversibilidade"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 22. Os contratos de serviços de computação em nuvem devem prever cláusulas
+    de portabilidade e reversibilidade que garantam:
+    I - a possibilidade de migração dos dados e aplicações para outro provedor de
+    serviços de computação em nuvem ou para infraestrutura própria do órgão ou
+    entidade, sem perda de dados ou funcionalidades;
+    II - a exportação dos dados em formatos abertos e interoperáveis;
+    III - prazo adequado para realização da migração, contado a partir da
+    notificação de encerramento do contrato;
+    IV - assistência técnica do provedor durante o processo de migração;
+    V - eliminação segura dos dados do provedor original após confirmação de
+    migração bem-sucedida pelo órgão ou entidade.
+
+    Parágrafo único. O órgão ou entidade deve testar periodicamente a portabilidade
+    dos dados e aplicações para validar a viabilidade da migração.
+guidance:
+  prose: |
+    O art. 22 combate o vendor lock-in, exigindo portabilidade real e testada
+    de dados e aplicacoes.
+
+    **Cinco requisitos de portabilidade:**
+    1. Migracao sem perda: dados e funcionalidades preservados integralmente
+    2. Formatos abertos: JSON, CSV, Parquet, SQL dump (nao formatos proprietarios)
+    3. Prazo de migracao: minimo 90-180 dias apos notificacao
+    4. Assistencia tecnica: provedor DEVE ajudar na migracao
+    5. Eliminacao pos-migracao: dados destruidos apos confirmacao
+
+    **Testes de portabilidade:**
+    O orgao DEVE testar se consegue efetivamente migrar. Sem testes,
+    a clausula contratual pode ser inutil na pratica.
+
+    **Mapeamento CSA CCM v4:**
+    - STA-10: Supply Chain Data Portability
+    - IPY-01: Interoperability and Portability Policy
+    - IPY-04: Data Portability
+
+    **Risco de vendor lock-in:**
+    Servicos proprietarios (AWS Lambda, Azure Functions, GCP BigQuery) criam
+    dependencia tecnica. Usar abstracoes multi-cloud reduz o risco.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura portavel:**
+      1. Usar abstracoes multi-cloud: Kubernetes ao inves de ECS/AKS nativo,
+         Terraform ao inves de CloudFormation/ARM/Deployment Manager.
+      2. Armazenar dados em formatos abertos (Parquet, Avro, JSON) ao inves
+         de formatos proprietarios do provedor.
+      3. Implementar export automatizado de dados em formatos abertos com
+         pipeline de migracao pre-configurado.
+      4. Manter documentacao tecnica de migracao atualizada (runbook de migracao).
+      5. Evitar dependencias profundas de servicos proprietarios sem wrapper
+         de abstracao.
+    tools:
+      - kubernetes
+      - terraform
+      - data-export-pipeline
+      - migration-toolkit
+      - multi-cloud-abstraction
+  devsecops:
+    prose: |
+      **Portabilidade no pipeline:**
+      1. Testes de portabilidade semestrais: exportar dados e importar em
+         provedor alternativo ou infraestrutura local.
+      2. Pipeline de migracao pre-configurado que possa ser executado a qualquer
+         momento.
+      3. Validacao de que IaC nao usa recursos proprietarios sem abstracao.
+      4. Testes de export que verifiquem integridade e completude dos dados
+         exportados.
+    tools:
+      - gitlab-ci
+      - migration-pipeline
+      - data-integrity-tests
+      - terraform
+  secops:
+    prose: |
+      **Gestao de portabilidade:**
+      1. Teste anual de portabilidade com relatorio de resultados.
+      2. Plano de migracao de emergencia (exit plan) documentado e atualizado.
+      3. Inventario de dependencias proprietarias do provedor com plano de
+         mitigacao para cada uma.
+      4. Monitoramento de custo de saida (egress charges) para estimar custo
+         real de migracao.
+      5. Documentacao de formatos de exportacao disponiveis por servico.
+    tools:
+      - exit-plan
+      - vendor-dependency-inventory
+      - cost-analysis
+      - grc-platform
+legal_references:
+  - framework_id: csa-ccm-v4
+    articles: ["STA-10", "IPY-01", "IPY-04"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements
+  - framework_id: gsi-in1
+    articles: ["art-6"]
+    relationship: derived-from

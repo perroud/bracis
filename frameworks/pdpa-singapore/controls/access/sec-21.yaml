@@ -1,0 +1,126 @@
+id: sec-21
+family: access
+title: "Access to Personal Data"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) On request of an individual, an organisation shall, as soon as reasonably
+    possible, provide the individual with —
+    (a) personal data about the individual that is in the possession or under the
+    control of the organisation; and
+    (b) information about the ways in which the personal data referred to in
+    paragraph (a) has been or may have been used or disclosed by the organisation
+    within a year before the date of the request.
+
+    (2) An organisation is not required to provide the individual with personal data
+    or other information under subsection (1) in respect of —
+    (a) opinion data kept solely for an evaluative purpose;
+    (b) any examination conducted by an educational institution, examination scripts
+    and, prior to the release of examination results, examination results;
+    (c) personal data which is subject to legal privilege;
+    (d) personal data which, if disclosed, would reveal personal data about another
+    individual;
+    (e) personal data which, if disclosed, would reveal the identity of an individual
+    who has provided personal data about another individual and the individual providing
+    the personal data does not consent to the disclosure of his or her identity; or
+    (f) personal data the disclosure of which could reasonably be expected to threaten
+    the safety or physical or mental health of an individual.
+
+    (3) An organisation shall provide the personal data in a form that is generally
+    understandable.
+
+guidance:
+  prose: |
+    Section 21 establishes the individual's right to access their personal data.
+    Key elements:
+
+    1. **Scope of access:** The individual can request both their personal data AND
+       information about how it has been used or disclosed in the past year.
+
+    2. **Timeliness:** Access must be provided "as soon as reasonably possible." The
+       PDPC's advisory guidelines suggest 30 calendar days, extendable to 60 days
+       with justification.
+
+    3. **Exceptions:** The Act provides several exceptions, notably for evaluative
+       opinions, legally privileged data, data that would reveal third parties'
+       information, and data whose disclosure could threaten safety.
+
+    4. **Format:** Data must be provided in a "generally understandable" form — not
+       raw database dumps or encoded formats that individuals cannot interpret.
+
+    Unlike the GDPR, the PDPA does not expressly require access to be free of
+    charge. Organizations may charge a reasonable fee to cover the cost of responding
+    to access requests.
+
+references:
+  - citation: "PDPA 2012, Section 21"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build an individual access request portal with identity verification,
+         request submission, and status tracking capabilities.
+      2. Implement automated data aggregation pipelines that collect personal data
+         from all systems (databases, logs, analytics, third-party services) in
+         response to access requests.
+      3. Create a data export format that presents personal data in a human-readable,
+         generally understandable form (e.g., structured PDF or HTML report).
+      4. Build exception-handling workflows for data falling under Section 21(2)
+         exceptions — automated flagging for legal review before disclosure.
+      5. Implement usage disclosure generation — automatically compile a record of
+         how personal data was used or disclosed in the past 12 months.
+      6. Track request SLAs with automated escalation at 20-day and 25-day marks.
+    tools:
+      - dsar-automation
+      - privacy-portal
+      - datahub
+      - data-export-engine
+      - backstage
+
+  devsecops:
+    prose: |
+      1. Test data export completeness — verify that access request responses include
+         data from all systems in the personal data inventory.
+      2. Validate that exception-handling logic correctly identifies and redacts data
+         subject to Section 21(2) exceptions.
+      3. Implement integration tests for the access request workflow end-to-end.
+      4. Verify that the export format is human-readable and includes all required
+         usage/disclosure information.
+      5. Test identity verification flows to prevent unauthorized access to others'
+         personal data.
+    tools:
+      - gitlab-ci
+      - playwright
+      - api-testing
+      - postman
+      - data-validation
+
+  secops:
+    prose: |
+      1. Monitor access request fulfillment against the 30-day SLA with automated
+         alerts at threshold points.
+      2. Audit access request responses for completeness — sample reviews to verify
+         all data sources were included.
+      3. Track access request volumes, response times, and exception invocations for
+         compliance reporting.
+      4. Investigate patterns of repeated access requests that may indicate adversarial
+         or fraudulent activity.
+    tools:
+      - dsar-tracking
+      - siem
+      - compliance-dashboard
+      - anomaly-detection
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-15"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100", "sec-1798-110"]
+    relationship: mapped

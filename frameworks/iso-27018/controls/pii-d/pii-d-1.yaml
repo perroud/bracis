@@ -1,0 +1,100 @@
+id: pii-d.1
+family: pii-d
+title: "Use limitation for PII in public cloud"
+class: ISO27018
+
+statement:
+  prose: >-
+    PII processed under a cloud service agreement shall be used only in accordance
+    with the cloud service customer's instructions and the terms of the agreement.
+    The public cloud PII processor shall not use PII for its own purposes, including
+    analytics, data mining, profiling, direct marketing, or service improvement,
+    unless such use is specifically authorized by the cloud service customer and
+    is consistent with the originally specified purposes. The public cloud PII
+    processor shall ensure that its personnel are bound by confidentiality
+    obligations regarding PII they may access during service delivery.
+
+guidance:
+  prose: >-
+    Use limitation is the operational enforcement of purpose limitation. While
+    purpose limitation defines what processing is permitted, use limitation ensures
+    that actual processing activities remain within those boundaries. This control
+    is particularly important for large cloud providers that operate multiple
+    services and product lines, where the temptation to cross-pollinate PII across
+    services for commercial advantage is significant. The processor must implement
+    both technical and organizational controls: technical controls prevent
+    unauthorized access to PII, and organizational controls (confidentiality
+    agreements, training, and monitoring) ensure personnel understand and respect
+    use limitations. The confidentiality obligation extends to all personnel who
+    may have access to PII, including temporary workers, contractors, and support
+    staff.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.4"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement strict service-to-service access controls that prevent cross-
+      product PII access. Each cloud service product line should operate in its
+      own blast radius with no implicit access to PII from other products.
+      Build data access governance layers that enforce per-customer, per-purpose
+      access policies. Implement attribute-based access control (ABAC) that
+      evaluates the requesting service's authorized purposes against the PII
+      record's purpose tags before granting access. Deploy break-glass
+      procedures for support access to customer PII with mandatory justification,
+      time-limited access, and full audit logging. Implement data loss prevention
+      controls that prevent PII from being exfiltrated from the processing
+      environment.
+    tools:
+      - abac-policy-engine
+      - service-mesh-access-control
+      - break-glass-access-system
+      - data-loss-prevention
+      - cross-product-isolation
+      - audit-logging
+
+  devsecops:
+    prose: >-
+      Enforce use limitation through code-level controls. Static analysis rules
+      should flag cross-service PII access that bypasses the access governance
+      layer. CI gates must validate that new services declare their PII access
+      requirements and receive explicit approval before deployment. Implement
+      mandatory security review for any code that accesses PII, with specific
+      verification that the access is consistent with documented purposes.
+      Build automated tests that verify PII cannot be accessed from unauthorized
+      service contexts. Include confidentiality agreement verification in the
+      developer onboarding pipeline.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - access-governance-validator
+      - cross-service-access-tests
+      - security-review-workflow
+      - onboarding-automation
+
+  secops:
+    prose: >-
+      Monitor for PII use outside authorized boundaries. Build detection rules
+      for cross-product PII access, bulk data exports, and access from
+      non-production environments. Track privileged access to PII and verify
+      break-glass procedures are followed correctly. Monitor for PII being used
+      in analytics, ML training, or reporting pipelines without explicit customer
+      authorization. Audit confidentiality agreement currency for all personnel
+      with PII access. Generate use limitation compliance reports per customer.
+    tools:
+      - splunk
+      - elastic-siem
+      - privileged-access-monitor
+      - dlp-monitoring
+      - confidentiality-tracker
+      - use-limitation-reports
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.b", "art-28.3.a", "art-29"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.2.1", "b-8.2.2"]
+    relationship: complements

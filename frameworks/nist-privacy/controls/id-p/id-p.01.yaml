@@ -1,0 +1,80 @@
+id: id-p.01
+family: id-p
+title: "Inventory and Mapping — Data Processing Inventory"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    Systems, products, or services that process data are inventoried.
+
+guidance:
+  prose: >-
+    Organizations should maintain a comprehensive inventory of all systems, products,
+    and services that process personally identifiable information (PII) or other sensitive
+    data. This inventory serves as the foundational element for understanding privacy
+    risk exposure. It should capture the type of data processed, the purpose of processing,
+    data flows between systems, and the legal basis for processing. The inventory must
+    be kept current and reconciled regularly against actual deployed systems, including
+    cloud services, third-party integrations, and shadow IT. Automated discovery tools
+    can supplement manual registration to ensure completeness.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, ID.IM-P1"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated data processing discovery across all infrastructure layers.
+      Tag every data store and processing service in IaC with metadata indicating data
+      classification, purpose of processing, and data controller/processor roles. Use
+      service mesh observability to trace data flows between microservices. Maintain a
+      centralized data catalog (e.g., DataHub, Amundsen, or Backstage plugin) that
+      records which systems process PII and the categories of data subjects. Enforce
+      that any new service deployment must declare its data processing activities through
+      mandatory IaC annotations or catalog registration.
+    tools:
+      - backstage-catalog
+      - datahub
+      - terraform
+      - pulumi
+      - service-mesh
+
+  devsecops:
+    prose: >-
+      Integrate data processing declarations into CI/CD pipelines. Require every service
+      repository to include a data-processing manifest that describes what personal data
+      the service handles, the processing purposes, and retention periods. Validate
+      these manifests in pre-merge checks. Use static analysis to detect code patterns
+      that handle PII (email fields, SSN patterns, health data) and flag undeclared
+      processing. Generate data processing inventory reports as pipeline artifacts.
+    tools:
+      - gitlab-ci
+      - checkov
+      - custom-policy-checks
+      - sast
+
+  secops:
+    prose: >-
+      Conduct periodic data discovery scans across databases, file shares, and cloud
+      storage to identify repositories containing PII that may not be in the formal
+      inventory. Use DLP tools to monitor data in transit and at rest. Reconcile
+      discovery results against the approved data processing inventory and investigate
+      discrepancies. Generate quarterly data processing inventory reports for the privacy
+      office. Alert on new data stores appearing that are not registered in the catalog.
+    tools:
+      - dlp-tools
+      - varonis
+      - bigid
+      - servicenow
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["id.am-01"]
+    relationship: complements
+  - framework_id: gdpr
+    articles: ["art-30"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-5", "RA-8"]
+    relationship: derived-from

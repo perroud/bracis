@@ -1,0 +1,127 @@
+id: art-19
+family: cap-3
+title: "Confirmação de Existência e Acesso a Dados Pessoais"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 19. A confirmação de existência ou o acesso a dados pessoais serão providenciados,
+    mediante requisição do titular:
+  parts:
+    - id: art-19-i
+      label: "I"
+      prose: |
+        em formato simplificado, imediatamente; ou
+    - id: art-19-ii
+      label: "II"
+      prose: |
+        por meio de declaração clara e completa, que indique a origem dos dados, a inexistência
+        de registro, os critérios utilizados e a finalidade do tratamento, observados os
+        segredos comercial e industrial, fornecida no prazo de até 15 (quinze) dias, contado
+        da data do requerimento do titular.
+  additional:
+    - id: art-19-p1
+      label: "§ 1º"
+      prose: |
+        Os dados pessoais serão armazenados em formato que favoreça o exercício do direito
+        de acesso.
+    - id: art-19-p2
+      label: "§ 2º"
+      prose: |
+        As informações e os dados poderão ser fornecidos, a critério do titular:
+        I - por meio eletrônico, seguro e idôneo para esse fim; ou
+        II - sob forma impressa.
+    - id: art-19-p3
+      label: "§ 3º"
+      prose: |
+        Quando o tratamento tiver origem no consentimento do titular ou em contrato, o
+        titular poderá solicitar cópia eletrônica integral de seus dados pessoais, observados
+        os segredos comercial e industrial, nos termos de regulamentação da autoridade
+        nacional, em formato que permita a sua utilização subsequente, inclusive em outras
+        operações de tratamento.
+guidance:
+  prose: |
+    O art. 19 regulamenta dois direitos do art. 18 (incisos I e II): confirmação de
+    existência de tratamento e acesso aos dados. Ele define dois formatos de resposta
+    com prazos distintos:
+
+    **Formato simplificado (inciso I):**
+    Resposta imediata confirmando se há ou não dados do titular nos sistemas. Pode ser
+    um simples "sim/não" com resumo básico.
+
+    **Declaração completa (inciso II):**
+    Prazo de 15 dias. Deve incluir: origem dos dados, critérios utilizados, finalidade
+    do tratamento. Respeitados segredos comercial e industrial.
+
+    **§ 1º — Formato de armazenamento:**
+    Dados devem ser armazenados em formato que facilite o exercício do direito de acesso.
+    Isso implica que sistemas devem ter capacidade de exportar dados do titular de forma
+    estruturada e legível.
+
+    **§ 3º — Cópia eletrônica integral:**
+    Quando a base legal for consentimento ou contrato, o titular pode exigir cópia
+    completa em formato reutilizável. Isso é a base da portabilidade de dados.
+
+    **Prazos práticos:**
+    A Resolução CD/ANPD nº 2/2022 detalhou os prazos: confirmação simplificada deve
+    ser imediata; declaração completa em até 15 dias corridos.
+
+    **Segredos comercial e industrial:**
+    A LGPD permite omitir informações protegidas por segredo comercial ou industrial.
+    Porém, isso não pode ser usado como pretexto para negar acesso aos dados pessoais
+    em si.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar endpoint de "confirmação simplificada" que retorne imediatamente
+         se há dados do titular no sistema (resposta sim/não com resumo).
+      2. Criar funcionalidade de exportação completa dos dados do titular (DSAR —
+         Data Subject Access Request) com prazo máximo de 15 dias.
+      3. Exportar dados em formatos estruturados e interoperáveis: JSON, CSV, XML.
+      4. Consolidar dados de múltiplos sistemas/microserviços em uma única resposta
+         (orquestração de DSAR cross-service).
+      5. Incluir metadados na exportação: origem dos dados, finalidade do tratamento,
+         data de coleta, base legal.
+      6. Implementar sistema de tracking de requisições com SLA de 15 dias e
+         notificações automáticas.
+      7. Criar canal seguro para entrega dos dados ao titular (download autenticado,
+         criptografia end-to-end).
+    tools:
+      - dsar-automation
+      - data-catalog
+      - api-gateway
+      - secure-file-transfer
+      - workflow-engine
+      - notification-service
+  devsecops:
+    prose: |
+      1. Testar que o DSAR retorna dados de todos os microserviços que armazenam
+         dados do titular (completude).
+      2. Validar que o formato de exportação é estruturado e legível por máquina.
+      3. Implementar testes de performance para garantir que a confirmação
+         simplificada responde imediatamente.
+      4. Testar que segredos comerciais são devidamente omitidos sem omitir dados
+         pessoais do titular.
+      5. Validar segurança do canal de entrega de dados.
+    tools:
+      - integration-testing
+      - api-testing
+      - performance-testing
+      - security-testing
+  secops:
+    prose: |
+      1. Monitorar SLA de atendimento de requisições — alertar quando prazo de
+         15 dias estiver próximo de expirar.
+      2. Auditar completude das respostas de DSAR.
+      3. Monitorar canal de entrega de dados para detectar acessos não autorizados.
+      4. Gerar relatórios de volume e tempo de atendimento de requisições para
+         demonstrar conformidade.
+    tools:
+      - dsar-tracking
+      - sla-monitoring
+      - siem
+      - compliance-dashboard
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 12", "art. 15", "art. 20"]
+    relationship: equivalent-to

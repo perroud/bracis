@@ -1,0 +1,102 @@
+id: v5.1.1
+family: v5
+title: "Input Validation"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that the application has defenses against HTTP parameter pollution attacks,
+    particularly if the application framework makes no distinction about the source of
+    request parameters (GET, POST, cookies, headers). Input validation must be applied
+    to all input data, including HTTP headers, query parameters, form fields, and API
+    request bodies. Validation must occur on the server side using an allow-list approach
+    defining expected data types, lengths, ranges, and character sets.
+
+guidance:
+  prose: >-
+    Input validation is the first line of defense against injection attacks, buffer overflows,
+    and logic errors. Allow-list validation (defining what is permitted) is fundamentally
+    more secure than deny-list validation (defining what is forbidden) because deny-lists
+    are inherently incomplete and can be bypassed through encoding tricks and novel attack
+    patterns. Validation must be applied server-side because client-side validation is
+    trivially bypassed. HTTP parameter pollution occurs when an application accepts the
+    same parameter from multiple sources (query string and body) with different precedence
+    rules, enabling attackers to override intended values. Input validation alone does not
+    prevent injection attacks; it must be combined with output encoding and parameterized
+    queries. But validation reduces the attack surface by rejecting clearly malicious input
+    before it reaches processing logic.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V5.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Input Validation Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement input validation at the API gateway layer using JSON Schema validation for
+      request bodies and OpenAPI specification enforcement. Deploy a centralized validation
+      library that all services consume, ensuring consistent validation rules. Use typed
+      schema definitions (Protocol Buffers, JSON Schema, Avro) for all API contracts with
+      strict validation enabled. Configure the API gateway to reject requests that do not
+      conform to the published API specification. Implement request size limits at the load
+      balancer and gateway levels. Normalize Unicode input before validation to prevent
+      homograph and normalization bypass attacks. Enable strict HTTP parameter parsing that
+      rejects requests with duplicate parameter names.
+    tools:
+      - kong
+      - envoy
+      - json-schema
+      - openapi-validator
+      - protobuf
+      - joi
+      - zod
+      - class-validator
+
+  devsecops:
+    prose: >-
+      Enforce API contract testing in CI/CD pipelines using OpenAPI specification validators.
+      Implement SAST rules that detect missing input validation on request handler parameters.
+      Write fuzz tests that send malformed, oversized, and boundary-value inputs to all
+      endpoints. Use DAST tools to automatically test for HTTP parameter pollution, type
+      confusion, and validation bypass. Scan for direct use of raw request parameters
+      without validation or sanitization. Integrate schema validation linting into
+      pre-commit hooks.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - sonarqube
+      - gitlab-ci
+      - schemathesis
+      - dredd
+
+  secops:
+    prose: >-
+      Monitor WAF logs for input validation bypass attempts: SQL injection probes, XSS
+      payloads, path traversal sequences, and format string attacks. Configure SIEM alerts
+      for high volumes of 400-series responses from individual sources, indicating input
+      fuzzing or scanning activity. Track blocked requests by attack category to identify
+      trends and targeted attack patterns. Review application logs for deserialization
+      errors or type casting failures that may indicate exploitation attempts.
+    tools:
+      - cloudflare-waf
+      - aws-waf
+      - modsecurity
+      - splunk
+      - elastic-siem
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: supports

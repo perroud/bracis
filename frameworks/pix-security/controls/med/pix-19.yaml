@@ -1,0 +1,101 @@
+id: pix-19
+family: med
+title: "Procedimento de Abertura do MED"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O MED (Mecanismo Especial de Devolução) é o procedimento operacional que permite a
+    devolução de valores em transações Pix nos casos de fraude confirmada ou suspeita
+    fundada, e de falha operacional do PSP (crédito indevido). O PSP pagador deve
+    disponibilizar canal para que o usuário solicite a abertura do MED, e deve registrar
+    a notificação de infração no DICT em até 80 dias corridos após a transação.
+guidance:
+  prose: |
+    **O que e o MED:**
+    O MED e o mecanismo criado pelo BCB para facilitar a devolucao de valores em transacoes
+    Pix quando ha fraude ou falha operacional. Diferente de um chargeback de cartao, o MED
+    opera dentro do ecossistema Pix com regras e prazos proprios.
+
+    **Hipoteses de acionamento do MED:**
+    1. **Fraude:** Confirmada ou com suspeita fundada de fraude contra o pagador.
+    2. **Falha operacional:** PSP creditou valor errado, conta errada ou transacao duplicada.
+
+    **Prazos:**
+    - Abertura: ate 80 dias corridos apos a transacao original.
+    - Bloqueio: PSP recebedor deve bloquear os recursos em ate 30 minutos apos
+      receber a notificacao.
+    - Analise: ate 7 dias corridos para o PSP recebedor analisar.
+    - Devolucao: imediata apos conclusao da analise, se procedente.
+
+    **Fluxo do MED:**
+    1. Usuario (pagador) relata fraude ao PSP pagador.
+    2. PSP pagador registra notificacao de infracicao no DICT.
+    3. DICT notifica PSP recebedor.
+    4. PSP recebedor bloqueia os recursos na conta do recebedor.
+    5. PSP recebedor analisa o caso.
+    6. Se procedente: PSP recebedor devolve os valores ao PSP pagador.
+    7. PSP pagador credita os valores ao pagador.
+    8. Se improcedente: PSP recebedor desbloqueia os valores.
+
+    **Responsabilidade do PSP pagador:**
+    Oferecer canal acessivel e eficiente para relato de fraude. Nao pode dificultar
+    ou retardar a abertura do MED.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema MED:**
+      1. Microservico dedicado para gestao de processos MED.
+      2. Integracao com DICT para registro de notificacao de infracicao.
+      3. State machine para controle de estados do MED (aberto, bloqueado, em analise,
+         devolvido, improcedente, encerrado).
+      4. Scheduler para controle de prazos regulatorios (80 dias, 30 minutos, 7 dias).
+
+      **Canal de relato:**
+      5. Funcionalidade de "relatar problema" no app vinculada ao historico de transacoes.
+      6. Formulario estruturado com campos obrigatorios para abertura do MED.
+      7. Protocolo de acompanhamento fornecido ao usuario em tempo real.
+
+      **Automacao:**
+      8. Alertas automaticos para prazos criticos (30 minutos para bloqueio).
+      9. Integracao entre MED e motor antifraude (caso ja classificado como fraude,
+         agilizar abertura).
+    tools:
+      - workflow-engine
+      - dict-client
+      - state-machine
+      - scheduler
+      - notification-service
+  devsecops:
+    prose: |
+      **Testes do fluxo MED:**
+      1. Testes end-to-end: abertura, bloqueio, analise, devolucao.
+      2. Testes de prazo: verificar que bloqueio ocorre em < 30 minutos.
+      3. Testes de timeout: prazo de analise excede 7 dias.
+      4. Testes de integracao com DICT para notificacao de infracicao.
+      5. Testes de UI: fluxo de relato de fraude no app.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - ui-testing
+      - api-simulator
+  secops:
+    prose: |
+      **Operacao MED:**
+      1. Equipe dedicada para analise de casos MED com SLA definido.
+      2. Fila priorizada: MED de alto valor ou multiplas vitimas primeiro.
+      3. Metricas: tempo medio de resolucao, taxa de procedencia, valores devolvidos.
+      4. Relatorio mensal de MED ao BCB.
+      5. Acompanhamento de contestacoes e recursos.
+    tools:
+      - case-management
+      - workflow-platform
+      - analytics-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-20", "art-21"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

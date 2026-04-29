@@ -1,0 +1,94 @@
+id: tds-network-2
+family: tds-network
+title: "Secure Communication Channels for 3DS Transactions"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    All communication channels used for 3DS transaction processing must be
+    secured using strong cryptography. TLS 1.2 or higher must be used for
+    all connections between 3DS components (3DS Server, Directory Server,
+    Access Control Server) and between 3DS components and external parties.
+    Only trusted certificates from recognized certificate authorities shall
+    be accepted. Certificate validation must include verification of the
+    certificate chain, expiration status, and revocation status. Weak cipher
+    suites and protocols must be disabled.
+
+guidance:
+  prose: >-
+    3DS transactions involve the exchange of sensitive authentication data
+    between multiple parties across public and private networks. Securing
+    these communication channels prevents interception, tampering, and
+    man-in-the-middle attacks. The EMVCo 3DS protocol specification mandates
+    mutual TLS authentication for server-to-server communications. Cipher
+    suite selection should prioritize forward secrecy (ECDHE) and
+    authenticated encryption (GCM). Organizations must monitor for and
+    promptly disable cipher suites that are found to be vulnerable.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 1 — Cryptographic Controls"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "EMVCo 3-D Secure Protocol and Core Functions Specification v2.3"
+    url: "https://www.emvco.com/emv-technologies/3d-secure/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure TLS 1.2+ on all load balancers, API gateways, and service
+      endpoints serving 3DS traffic. Implement mutual TLS (mTLS) for
+      server-to-server communication between 3DS components using a service
+      mesh or API gateway. Automate certificate provisioning and rotation
+      using cert-manager or a similar tool. Define allowed cipher suites in
+      infrastructure configuration, excluding any suites without forward
+      secrecy. Deploy OCSP stapling and CRL distribution points for
+      certificate revocation checking.
+    tools:
+      - cert-manager
+      - istio
+      - envoy
+      - nginx
+      - aws-acm
+      - azure-key-vault
+      - gcp-certificate-manager
+      - hashicorp-vault
+
+  devsecops:
+    prose: >-
+      Scan TLS configurations in CI/CD pipelines using tools like testssl.sh
+      or sslyze to verify cipher suite compliance. Implement automated
+      checks that fail builds if weak protocols (TLS 1.0, 1.1, SSLv3) or
+      weak cipher suites are configured. Monitor certificate expiration dates
+      and alert well before expiry. Include TLS configuration validation in
+      infrastructure-as-code reviews.
+    tools:
+      - gitlab-ci
+      - testssl
+      - sslyze
+      - checkov
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor TLS handshake failures and certificate errors in real time.
+      Alert on any connections using deprecated protocols or weak cipher
+      suites. Conduct quarterly reviews of TLS configurations across all
+      3DS endpoints. Maintain an inventory of all certificates used in the
+      3DS environment with expiration tracking. Investigate and remediate
+      any certificate validation failures promptly.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+      - venafi
+      - digicert
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-4"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

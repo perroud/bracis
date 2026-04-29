@@ -1,0 +1,108 @@
+id: basel-cap-output-floor
+family: capital
+title: "Output Floor (Basel IV)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks using internal models (IRB for credit risk, IMA for market risk, or internal
+    models for operational risk) must ensure that their aggregate model-based RWA is not
+    less than 72.5% of the aggregate RWA calculated using the relevant standardised
+    approaches as set out in the finalised Basel III framework (often referred to as
+    Basel IV). This output floor is phased in from 50% in 2023 to 72.5% by 2028 in most
+    jurisdictions. The floor applies at the consolidated group level and is computed by
+    comparing total internal model RWA against a floor RWA derived from the standardised
+    approaches for credit risk (SA-CR), counterparty credit risk (SA-CCR), credit
+    valuation adjustment (SA-CVA), securitisation (SEC-SA and SEC-ERBA), market risk
+    (FRTB-SA), and operational risk (SMA). Where total model RWA falls below 72.5% of
+    floor RWA, banks must add a top-up to bring RWA to the floor level, which increases
+    capital requirements accordingly.
+
+guidance:
+  prose: >-
+    The output floor is the single most consequential change of the Basel IV finalisation
+    for banks with sophisticated internal model approval (IMA/IRB). It limits the capital
+    benefit that banks can derive from internal models relative to standardised approaches,
+    thereby reducing RWA variability across banks and improving comparability of capital
+    ratios. Banks should model the floor impact across business lines and evaluate whether
+    certain portfolios previously measured under IRB become more efficiently measured under
+    the standardised approach once the floor is binding. The floor is calculated separately
+    for each risk category (credit, market, operational, CVA) but applied at the aggregate
+    level, allowing some offset across risk types. Firms should engage with supervisors on
+    model approval decisions with the floor in mind, as some models approved under Basel II
+    may no longer provide a material capital benefit post-floor. Planning should also
+    account for the interaction of the floor with the leverage ratio and stress testing
+    requirements.
+
+references:
+  - citation: "BCBS, Basel III: Finalising post-crisis reforms, December 2017"
+    url: "https://www.bis.org/bcbs/publ/d424.htm"
+  - citation: "BCBS, Calculation of RWA for credit risk (CRE), January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/CRE/01.htm"
+  - citation: "BCBS, Basel Framework — Capital Requirements Regulation (CRR3) EU implementation"
+    url: "https://www.eba.europa.eu/regulation-and-policy/own-funds-and-eligible-liabilities"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a dual-track RWA calculation platform that computes both internal model RWA
+      and standardised floor RWA for every exposure in parallel. The platform must produce
+      a daily output floor ratio at entity, legal entity, and consolidated group levels,
+      with drill-down by risk category (credit, market, operational, CVA). Automate the
+      phase-in schedule so that the applicable floor percentage (50% → 72.5%) is
+      configuration-driven and auditable. Implement capital optimisation analytics that
+      highlight portfolios where switching from IRB to SA would reduce the floor top-up
+      charge, and expose these insights to business line finance teams via self-service
+      dashboards.
+    tools:
+      - apache-spark
+      - apache-kafka
+      - dbt
+      - postgresql
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Version-control all floor RWA calculation models and standardised approach parameter
+      sets (risk weights, CCFs, correlation matrices) in dedicated repositories with strict
+      change control. Implement automated regression tests that compare floor RWA outputs
+      against regulatory benchmark portfolios provided by BCBS or national supervisors.
+      Use feature flags to manage the phased increase in the floor percentage, allowing
+      impact simulations at future floor levels (e.g., 65%, 70%, 72.5%) to be run without
+      code changes. Generate SBOM artefacts for every model release so that internal audit
+      can attest to the model inventory.
+    tools:
+      - gitlab-ci
+      - pytest
+      - apache-spark
+      - sonarqube
+      - cyclonedx
+      - opa-conftest
+
+  secops:
+    prose: >-
+      Apply privileged access management to all floor calculation configuration parameters
+      — any change to standardised approach risk weights or the phase-in schedule must go
+      through a dual-control approval workflow and be logged immutably. Run automated
+      reconciliation between the floor RWA reported to regulators and the values stored in
+      the calculation platform, alerting on any discrepancy above a materiality threshold.
+      Include floor calculation systems in the scope of internal audit's model risk
+      management review programme.
+    tools:
+      - cyberark
+      - hashicorp-vault
+      - splunk
+      - sentinel
+
+legal_references:
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12", "MEA03"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AC-5"]
+    relationship: mapped
+  - framework_id: dora
+    articles: ["art-6"]
+    relationship: complements

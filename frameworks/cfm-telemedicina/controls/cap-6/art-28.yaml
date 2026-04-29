@@ -1,0 +1,119 @@
+id: art-28
+family: cap-6
+title: "Auditoria de Servicos de Telemedicina"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 28. Os serviços de telemedicina estão sujeitos a auditoria
+    pelos Conselhos Regionais de Medicina (CRMs) e pelo Conselho
+    Federal de Medicina (CFM), devendo as instituições manter
+    registros e evidências de conformidade acessíveis.
+
+    Parágrafo 1. As instituições devem manter disponíveis para
+    auditoria:
+    I - registros de todos os atendimentos por telemedicina;
+    II - evidências de consentimento informado;
+    III - registros de verificação de credenciais médicas;
+    IV - logs de acesso a dados de saúde;
+    V - evidências de conformidade técnica da plataforma.
+
+    Parágrafo 2. A auditoria pode ser realizada presencialmente
+    ou por meio eletrônico, devendo a instituição garantir acesso
+    remoto seguro aos auditores quando solicitado.
+
+    Parágrafo 3. A recusa ou obstrução de auditoria constitui
+    infração ética sujeita a sanções previstas no Código de
+    Ética Médica.
+guidance:
+  prose: |
+    O art. 28 garante ao CFM e CRMs o poder de auditar servicos
+    de telemedicina, tanto nos aspectos medico-eticos quanto nos
+    aspectos tecnologicos.
+
+    **Evidencias exigidas:**
+    Os cinco itens do paragrafo 1 definem o escopo minimo de
+    evidencias que a instituicao deve manter. Na pratica:
+    - Registros de atendimento: prontuario eletronico completo
+    - Consentimentos: termos assinados digitalmente
+    - Credenciais: logs de verificacao de CRM
+    - Logs de acesso: trilha de auditoria inalteravel
+    - Conformidade tecnica: certificacoes, testes de seguranca,
+      relatorios de conformidade
+
+    **Auditoria remota (paragrafo 2):**
+    A possibilidade de auditoria remota exige que a instituicao
+    disponha de acesso controlado para auditores externos, com
+    perfil de acesso somente leitura e escopo limitado.
+
+    **Implicacoes para sistemas:**
+    - Dados de auditoria devem ser inalteraveis (WORM storage)
+    - Interface de consulta para auditores com acesso controlado
+    - Exportacao de evidencias em formato padronizado
+    - Retencao de logs pelo mesmo prazo do prontuario (20 anos)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de auditoria:**
+      1. Implementar armazenamento WORM (Write Once Read Many)
+         para todos os logs de auditoria, garantindo
+         inalterabilidade e retencao de 20 anos.
+      2. Criar portal de auditoria com acesso controlado para
+         auditores do CRM/CFM, com perfil somente leitura e
+         escopo limitado as evidencias exigidas.
+      3. Implementar exportacao de evidencias em formato
+         padronizado (CSV, JSON, PDF) para facilitacao de
+         auditoria.
+      4. Manter indexacao eficiente de logs e registros para
+         consulta rapida durante auditorias (por medico, por
+         paciente, por periodo, por modalidade).
+      5. Implementar acesso remoto seguro (VPN + MFA) para
+         auditores quando auditoria e realizada eletronicamente.
+    tools:
+      - worm-storage
+      - audit-portal
+      - log-indexing
+      - secure-remote-access
+      - evidence-export
+  devsecops:
+    prose: |
+      **Pipeline de auditabilidade:**
+      1. Verificar que todos os eventos auditiveis estao gerando
+         logs no formato esperado (completude de campos).
+      2. Testar que logs em armazenamento WORM nao podem ser
+         alterados ou deletados por nenhum usuario.
+      3. Validar que portal de auditoria fornece acesso apenas
+         aos dados dentro do escopo autorizado.
+      4. Implementar testes de exportacao de evidencias,
+         validando formato e completude.
+    tools:
+      - gitlab-ci
+      - log-validation
+      - worm-testing
+      - access-control-testing
+  secops:
+    prose: |
+      **Operacao de auditoria:**
+      1. Manter processo documentado para atendimento de
+         auditoria do CRM/CFM, incluindo ponto focal,
+         fluxo de aprovacao e prazos de resposta.
+      2. Verificar trimestralmente que todas as cinco categorias
+         de evidencias estao sendo geradas e armazenadas
+         corretamente.
+      3. Realizar auditoria interna semestral simulando
+         auditoria do CRM, identificando gaps antes de
+         auditoria oficial.
+      4. Manter inventario de todas as auditorias realizadas
+         e status de conformidade.
+    tools:
+      - audit-management
+      - evidence-management
+      - internal-audit
+      - compliance-tracking
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-38"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-b", "164.530-j"]
+    relationship: mapped

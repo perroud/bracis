@@ -1,0 +1,116 @@
+id: cond-2
+family: conditions
+title: "Condition 2: Processing Limitation"
+class: POPIA
+statement:
+  prose: |
+    Personal information must only be processed in a lawful and reasonable manner that
+    does not infringe on the privacy of the data subject. Processing must be limited to
+    what is adequate, relevant, and not excessive given the purpose (Sections 9-12).
+  parts:
+    - id: cond-2-a
+      label: "9(a)"
+      prose: |
+        Lawfulness of processing: Personal information may only be processed if, given
+        the purpose for which it is processed, it is adequate, relevant, and not excessive.
+    - id: cond-2-b
+      label: "10"
+      prose: |
+        Minimality: Personal information may only be processed to the extent that it is
+        adequate, relevant, and not excessive in relation to the purpose for which it is
+        processed.
+    - id: cond-2-c
+      label: "11"
+      prose: |
+        Consent, justification, and objection: Personal information may only be processed
+        if the data subject (or a competent person where the data subject is a child)
+        consents to the processing, or processing is necessary for one of the justification
+        grounds listed in Section 11(1)(a)-(f).
+    - id: cond-2-d
+      label: "11(3)"
+      prose: |
+        A data subject may object at any time to the processing of personal information
+        on reasonable grounds relating to his, her, or its particular situation, unless
+        legislation provides for such processing.
+    - id: cond-2-e
+      label: "12"
+      prose: |
+        Collection directly from data subject: Personal information must be collected
+        directly from the data subject, except in circumstances listed in Section 12(2).
+guidance:
+  prose: |
+    Processing Limitation is the most operationally impactful condition for engineering
+    teams. It mandates data minimization, lawful basis, and direct collection.
+
+    Key principles:
+
+    - **Minimality (Section 10):** Equivalent to GDPR's data minimization. Every field
+      in every form, API request, and database table must be justified. "Nice to have"
+      data collection violates this condition.
+
+    - **Consent (Section 11):** Consent must be voluntary, specific, and informed.
+      Pre-ticked boxes and bundled consent are invalid. Consent must be as easy to
+      withdraw as to give.
+
+    - **Justification grounds (Section 11(1)):** Beyond consent, processing may be
+      justified by: contractual necessity, legal obligation, protection of legitimate
+      interests of the data subject, proper performance of a public law duty, or
+      pursuit of legitimate interests of the responsible party.
+
+    - **Direct collection (Section 12):** Default is to collect from the data subject
+      directly. Third-party data enrichment requires explicit justification under
+      Section 12(2) exceptions.
+
+    - **Right to object (Section 11(3)):** Systems must implement a mechanism for data
+      subjects to object to processing, and the responsible party must cease processing
+      unless it can demonstrate compelling legitimate grounds.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement data minimization controls by default — forms, APIs, and schemas
+         should only include fields with documented purpose justification.
+      2. Build a consent management platform (CMP) that records consent state per
+         data subject, per purpose, with full audit trail.
+      3. Implement purpose-binding at the data layer — tag every PI field with its
+         lawful basis and purpose, enforce access based on declared purpose.
+      4. Create objection processing workflows that automatically propagate opt-outs
+         across all downstream systems.
+      5. Implement direct collection validation — flag and require justification for
+         any PI not collected directly from the data subject.
+    tools:
+      - consent-management-platform
+      - data-minimization-validator
+      - purpose-binding-engine
+      - objection-workflow
+  devsecops:
+    prose: |
+      1. Implement privacy linting in CI/CD to detect new PI fields without documented
+         purpose or lawful basis.
+      2. Scan API schemas for excessive data collection — flag endpoints that request
+         more data than their documented purpose requires.
+      3. Validate consent state checks in code paths that process personal information.
+      4. Test objection/opt-out workflows as part of automated regression testing.
+    tools:
+      - privacy-linter
+      - api-schema-analyzer
+      - consent-validator
+      - regression-test-suite
+  secops:
+    prose: |
+      1. Monitor for data processing activities that lack documented lawful basis.
+      2. Alert on consent state changes and ensure downstream propagation.
+      3. Track objection requests and verify processing cessation within required
+         timeframes.
+      4. Audit third-party data sources to verify direct collection compliance.
+    tools:
+      - siem
+      - consent-monitor
+      - objection-tracker
+      - data-source-auditor
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(b)", "art. 5(1)(c)", "art. 6", "art. 7", "art. 21"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 6 (I-III)", "art. 7", "art. 8"]
+    relationship: equivalent-to

@@ -1,0 +1,94 @@
+id: art-28
+family: cap-7
+title: "Niveis de Servico (SLAs) e Metricas Operacionais"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 28. As instituições participantes devem atender aos níveis de serviço
+    (SLAs) definidos nas especificações técnicas, incluindo:
+
+    I - disponibilidade mínima mensal por endpoint, segregada por
+    prioridade de API (alta, média, baixa);
+
+    II - tempo máximo de resposta (latência) por tipo de operação,
+    medido em percentis (P95, P99);
+
+    III - taxa máxima de erros por endpoint, excluindo erros do cliente
+    (HTTP 4xx);
+
+    IV - métricas de desempenho devem ser coletadas, armazenadas e
+    reportadas conforme formato definido nas especificações;
+
+    V - incidentes de indisponibilidade não-planejada devem ser
+    comunicados ao diretório dentro do prazo definido nas especificações.
+guidance:
+  prose: |
+    O art. 28 define SLAs obrigatorios do ecossistema:
+
+    **SLAs de disponibilidade (mensal):**
+    - APIs de alta prioridade (pagamentos, consentimentos): >= 99.5%
+    - APIs de prioridade media (dados de clientes): >= 95%
+    - APIs de baixa prioridade (dados abertos): >= 95%
+
+    **SLAs de latencia:**
+    - P95 <= 1000ms para endpoints de leitura
+    - P95 <= 2000ms para endpoints de escrita/pagamento
+    - Timeout maximo: 30 segundos
+
+    **Taxa de erros:**
+    - Erros de servidor (5xx) <= 0.5% do total de requisicoes
+    - Nao contam erros de cliente (4xx): 400, 401, 403, 404, 429
+
+    **Metricas de reporte:**
+    - Endpoint, metodo HTTP, status code, latencia, timestamp
+    - Formato padronizado para coleta centralizada
+    - Retencao minima de 12 meses
+
+    **Janela de manutencao:**
+    - Manutencao planejada com aviso previo ao diretorio
+    - Preferencialmente em horarios de baixo uso
+    - Nao conta para calculo de disponibilidade se notificada
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de observabilidade:**
+      1. Implementar coleta de metricas por endpoint (latencia, status,
+         volume) com Prometheus ou similar.
+      2. Configurar dashboards de SLA por endpoint e prioridade (Grafana).
+      3. Implementar alertas para degradacao de SLA (disponibilidade,
+         latencia, taxa de erros).
+      4. Configurar reporte automatizado de metricas ao diretorio.
+      5. Implementar notificacao automatica de indisponibilidade.
+    tools:
+      - prometheus
+      - grafana
+      - alertmanager
+      - metrics-exporter
+  devsecops:
+    prose: |
+      **Testes de performance e SLA:**
+      1. Executar testes de carga em pipeline para validar latencia.
+      2. Configurar SLA gates em pipeline (falhar se P95 > threshold).
+      3. Automatizar gerador de relatorios de SLA mensal.
+      4. Testar degradacao graciosa sob carga (graceful degradation).
+    tools:
+      - k6
+      - gatling
+      - performance-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de SLA e incidentes:**
+      1. Publicar relatorio mensal de SLA por endpoint.
+      2. Investigar e documentar causa-raiz de violacoes de SLA.
+      3. Comunicar incidentes de indisponibilidade ao diretorio.
+      4. Acompanhar SLAs de parceiros (transmissoras/receptoras).
+    tools:
+      - sla-dashboard
+      - incident-management
+      - status-page
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

@@ -1,0 +1,117 @@
+id: p2pe-dev-1
+family: p2pe-device
+title: "POI Device Lifecycle and Supply Chain Security"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The solution provider shall maintain documented procedures for the
+    secure lifecycle management of POI devices from procurement through
+    decommissioning. The supply chain for POI devices shall be secured to
+    prevent tampering, substitution, or unauthorized modification during
+    manufacturing, shipping, storage, and deployment. Each POI device shall
+    be uniquely identifiable by serial number, and the solution provider
+    shall maintain a complete inventory with chain-of-custody records. POI
+    devices shall be inspected upon receipt for evidence of tampering before
+    key injection or deployment to merchant locations.
+  parts:
+    - id: p2pe-dev-1.a
+      label: "Domain 5, 5A"
+      prose: >-
+        A documented supply chain security process ensures POI devices are
+        protected from tampering during manufacturing, shipping, and
+        storage, with chain-of-custody records for each device.
+    - id: p2pe-dev-1.b
+      label: "Domain 5, 5B"
+      prose: >-
+        Every POI device is uniquely identified, inventoried, and
+        inspected for tamper evidence upon receipt and before key injection
+        or deployment.
+
+guidance:
+  prose: >-
+    Supply chain attacks on POI devices are a documented threat vector —
+    attackers have intercepted devices during shipping, installed hardware
+    skimmers or modified firmware, and returned them to the supply chain.
+    Solution providers must establish trusted relationships with device
+    manufacturers and distributors, using tamper-evident packaging, sealed
+    shipping containers, and chain-of-custody documentation at every
+    handoff point. Device inspection upon receipt should include visual
+    examination for signs of opening, weighing against known baselines,
+    firmware hash verification, and security seal validation. The device
+    inventory must track the complete history of each device: manufacture
+    date, key injection date, deployment location, maintenance events,
+    and eventual decommissioning. Lost or stolen devices must be flagged
+    immediately to trigger key revocation.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 5 — Device Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI PTS POI Modular Security Requirements v6.1"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy an asset management platform that tracks every POI device
+      through its full lifecycle. Integrate with shipping carrier APIs
+      to track device location during transit. Implement barcode or RFID
+      scanning at every handoff point (manufacturer, distributor, KIF,
+      merchant) to automatically update the chain-of-custody record.
+      Build automated workflows that block key injection for devices not
+      in the approved inventory or lacking a complete chain-of-custody.
+      Maintain device firmware baseline hashes in a secure, versioned
+      repository for comparison during receipt inspection.
+    tools:
+      - asset-inventory-cmdb
+      - servicenow
+      - device-management-platform
+      - barcode-rfid-scanning
+      - hashicorp-vault
+
+  devsecops:
+    prose: >-
+      Automate firmware hash verification as part of the device onboarding
+      pipeline. Build scripts that compare received device firmware against
+      known-good hashes from the manufacturer. Integrate device inventory
+      checks into deployment workflows so that only inventoried, inspected,
+      and key-injected devices can be assigned to merchant locations. Scan
+      device management application code for proper inventory validation
+      at each lifecycle state transition.
+    tools:
+      - gitlab-ci
+      - python-hashlib
+      - custom-device-verification-scripts
+      - ansible
+      - terraform
+
+  secops:
+    prose: >-
+      Monitor device inventory for anomalies: devices appearing without
+      a matching purchase order, devices reported at unexpected locations,
+      or devices that skip lifecycle stages (e.g., deployed without
+      inspection). Alert immediately on lost or stolen device reports and
+      trigger automated key revocation workflows. Conduct quarterly
+      physical audits of device storage areas and reconcile with the
+      electronic inventory. Review shipping and handling logs for gaps in
+      chain-of-custody.
+    tools:
+      - splunk
+      - elastic-siem
+      - asset-inventory-cmdb
+      - servicenow
+      - physical-security-system
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.5", "req-12.5"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-device-1", "pin-device-2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-12", "CM-8", "PE-16"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A5.19", "A5.21", "A7.10"]
+    relationship: supports

@@ -1,0 +1,94 @@
+id: slsa-source-two-person
+family: source
+title: "Source: Two-Person Reviewed"
+class: SLSA
+
+baselines: [build-l3]
+
+statement:
+  prose: >-
+    All changes to the source must be reviewed and approved by at least one person
+    other than the author before being accepted into the canonical source repository.
+    This two-person review requirement applies to all changes that affect the artifact
+    produced by the build, including source code, build configurations, CI/CD pipeline
+    definitions, and dependency declarations. The review must be recorded and auditable.
+
+guidance:
+  prose: >-
+    Two-person review is one of the most effective controls against both insider threats
+    and compromised developer accounts. By requiring a second person to approve every
+    change, the attack surface is reduced because an attacker must compromise two
+    independent accounts to inject malicious code. The review should be meaningful — not
+    rubber-stamping — and reviewers should understand the code being approved. Branch
+    protection rules should enforce this requirement at the platform level, not rely on
+    social conventions. Organizations should implement CODEOWNERS files to ensure
+    domain-appropriate reviewers are assigned. Self-approvals and author-merged pull
+    requests must be explicitly blocked.
+
+references:
+  - citation: "SLSA v1.0 — Source Requirements"
+    url: "https://slsa.dev/spec/v1.0/requirements#source-requirements"
+  - citation: "SLSA v1.0 — Threats: Compromise Source Repo"
+    url: "https://slsa.dev/spec/v1.0/threats#d"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure branch protection rules on all release and main branches to require a
+      minimum of one approving review before merge. Enable CODEOWNERS files to enforce
+      domain-specific reviewers for critical paths (security, infrastructure, build
+      config). Block self-approval — the pull request author cannot approve their own
+      change. Require review re-approval when new commits are pushed after an existing
+      approval. Disable direct pushes and force merges to protected branches. Configure
+      merge queues to ensure all changes pass through the review pipeline.
+    tools:
+      - github
+      - gitlab
+      - bitbucket
+      - codeowners
+      - merge-queue
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement pipeline checks that verify the merge event was preceded by an
+      approved review from a non-author. Add pre-merge validation that checks
+      CODEOWNERS approval requirements are satisfied. Configure CI/CD pipelines to
+      report on review status as a required check before builds produce release
+      artifacts. Include review metadata in build provenance to enable downstream
+      verification that the two-person rule was followed. Block emergency merge
+      bypass mechanisms except with documented multi-party escalation approval.
+    tools:
+      - github-actions
+      - gitlab-ci
+      - codeowners
+      - danger-js
+      - reviewdog
+      - opa
+
+  secops:
+    prose: >-
+      Monitor for merges to protected branches that bypass the review requirement
+      (admin overrides, disabled branch protection). Alert on patterns of rubber-stamp
+      reviews (approvals within seconds of pull request creation). Audit review
+      patterns to detect collusion (same two people always reviewing each other's
+      changes). Generate compliance reports on review coverage and policy adherence.
+      Investigate any production artifacts whose provenance shows unreviewed source
+      changes as potential compromise indicators.
+    tools:
+      - splunk
+      - elastic-siem
+      - github-audit-log
+      - gitlab-audit-events
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "CM-5", "SA-11", "SA-15", "SR-4"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PO.1.1", "PW.7.1", "PW.7.2"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.2", "16.4"]
+    relationship: supports

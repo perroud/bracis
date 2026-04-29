@@ -1,0 +1,89 @@
+id: cont-3
+family: cont
+title: "Eradication and Recovery"
+class: NIST-800-61
+
+statement:
+  prose: >-
+    After an incident has been contained, organizations should eradicate the cause of the
+    incident and recover affected systems to normal operations. Eradication activities may
+    include removing malware, disabling compromised accounts, identifying and mitigating
+    exploited vulnerabilities, and resetting affected credentials. Recovery activities may
+    include restoring systems from clean backups, rebuilding compromised systems, validating
+    that systems are functioning normally, and monitoring for signs of recurrence. Eradication
+    and recovery should be performed methodically to ensure that all traces of the incident
+    are removed and that vulnerabilities that enabled the incident are addressed before systems
+    are returned to production.
+
+guidance:
+  prose: >-
+    Eradication and recovery are closely related activities that must be coordinated carefully.
+    Incomplete eradication leads to incident recurrence, while premature recovery may expose
+    systems to continued exploitation. NIST SP 800-61 Rev 3 recommends that organizations
+    develop eradication and recovery procedures for common incident types in advance. For
+    complex incidents, eradication may require rebuilding systems from scratch rather than
+    attempting to clean compromised systems. Organizations should validate the effectiveness
+    of eradication before proceeding with recovery, using techniques such as monitoring for
+    indicators of compromise and conducting vulnerability scans. Recovery should be phased,
+    with critical systems restored first and less critical systems following. Enhanced
+    monitoring should be maintained during and after recovery to detect any recurrence.
+
+references:
+  - citation: "NIST SP 800-61 Rev 3, Section 4.3"
+    url: "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Leverage immutable infrastructure patterns to enable recovery through redeployment
+      rather than remediation. Use GitOps workflows to restore infrastructure to known-good
+      states from version-controlled configurations. Implement automated rebuild procedures
+      that provision clean systems with patched and hardened configurations. Deploy blue-green
+      or canary deployment strategies that enable safe recovery with the ability to roll back
+      if issues are detected. Implement backup and restore procedures using tools that support
+      full cluster recovery. Validate recovery by running automated test suites and health
+      checks before restoring production traffic.
+    tools:
+      - "ArgoCD / Flux (GitOps recovery)"
+      - "Terraform / Pulumi (infrastructure rebuild)"
+      - "Velero (backup and restore)"
+      - "Helm (application redeployment)"
+      - "Kubernetes rolling updates (phased recovery)"
+      - "Automated test suites (validation)"
+  devsecops:
+    prose: >-
+      Implement automated deployment pipelines that support rapid redeployment of clean
+      application versions. Maintain rollback capabilities that can revert to previous
+      known-good versions. Implement database migration and rollback procedures for cases
+      where data integrity is compromised. Use dependency lockfiles and pinned versions to
+      ensure reproducible builds during recovery. Implement post-recovery validation steps
+      in CI/CD pipelines that verify application functionality and security posture.
+    tools:
+      - "GitLab CI/CD (automated redeployment)"
+      - "Database migration tools (Flyway, Alembic)"
+      - "GitLab Environments (rollback)"
+      - "Integration test suites"
+  secops:
+    prose: >-
+      Execute eradication procedures that comprehensively remove attacker access and tools.
+      Perform credential resets for all compromised and potentially compromised accounts.
+      Apply patches and configuration changes that address the vulnerabilities exploited
+      during the incident. Rebuild compromised systems from trusted media rather than
+      attempting to clean them. Implement enhanced monitoring during recovery to detect
+      recurrence. Validate eradication effectiveness through vulnerability scanning,
+      IOC monitoring, and penetration testing. Document all eradication and recovery
+      actions for post-incident review.
+    tools:
+      - "EDR (malware removal, host rebuild)"
+      - "Active Directory (credential reset)"
+      - "Vulnerability scanners (post-recovery validation)"
+      - "SIEM (enhanced monitoring)"
+      - "Backup and recovery solutions"
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["RC.RP-01", "RC.RP-02", "RS.MI-01"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "CP-10"]
+    relationship: complements

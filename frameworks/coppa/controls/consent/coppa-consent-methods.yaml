@@ -1,0 +1,131 @@
+id: coppa-consent-methods
+family: consent
+title: "Approved Verifiable Parental Consent Methods"
+class: COPPA
+
+statement:
+  prose: |
+    The FTC recognizes several methods as reasonably calculated to ensure that the person
+    providing consent is the child's parent (16 CFR § 312.5(b)):
+
+    (1) Providing a consent form to be signed by the parent and returned by postal mail,
+        fax, or electronic scan.
+    (2) Requiring the parent to use a credit card, debit card, or other online payment
+        system that provides notification of each discrete transaction to the primary
+        account holder, in connection with a monetary transaction.
+    (3) Having the parent call a toll-free telephone number staffed by trained personnel.
+    (4) Having the parent connect to trained personnel via video conference.
+    (5) Requiring the parent to provide a copy of a form of government-issued identification
+        that the operator verifies against a database, provided the identification is deleted
+        promptly after verification.
+    (6) Knowledge-based authentication that verifies the parent's identity by asking the
+        parent to answer a series of questions drawn from public databases (must meet
+        specific accuracy thresholds).
+
+    If the operator collects personal information from a child solely for internal use and
+    does not disclose it to third parties, the "email plus" method is also acceptable:
+    obtaining consent via email and then confirming via a follow-up communication
+    (confirmation email, letter, or phone call).
+
+guidance:
+  prose: |
+    The FTC applies a "sliding scale" approach to consent methods. More robust methods are
+    required when children's PI will be disclosed publicly or to third parties. Key
+    considerations:
+
+    1. **Risk-based selection:** If PI will only be used internally, the less burdensome
+       "email plus" method is acceptable. If PI will be disclosed to third parties or made
+       public, a more reliable method is required.
+
+    2. **Credit card verification:** The transaction must be monetary (even a small charge)
+       — merely collecting the credit card number is insufficient because children can
+       access a parent's card.
+
+    3. **Government ID:** Must be verified against a database (not just visually inspected),
+       and the ID image MUST be deleted promptly after verification. Retaining government
+       IDs creates additional compliance and security risk.
+
+    4. **Knowledge-based authentication:** Must use questions derived from public record
+       databases, with sufficient difficulty that a child could not answer them. The FTC
+       requires specific accuracy thresholds.
+
+    5. **Video conference / phone call:** Personnel must be trained to verify parental
+       identity and document the verification.
+
+    6. **New methods:** The FTC may approve additional methods through the 16 CFR § 312.12
+       process. Operators may petition for approval of new consent technologies.
+
+    The 2024 proposed rule updates would add biometric verification and potentially
+    digital identity verification as approved methods.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a consent method orchestrator that supports all approved VPC methods
+         and routes parents to the appropriate method based on the risk level of the
+         intended data use.
+      2. For credit card verification: integrate with a payment processor to perform a
+         nominal charge (e.g., $0.50) with immediate refund, capturing the transaction
+         confirmation as proof of consent.
+      3. For government ID verification: integrate with an identity verification service
+         (e.g., Jumio, Onfido) that verifies IDs against databases. Implement automatic
+         deletion of ID images within 24 hours of verification.
+      4. For knowledge-based authentication: integrate with a KBA provider (e.g., LexisNexis,
+         Experian) meeting FTC accuracy thresholds.
+      5. For email plus: implement the two-step flow — initial consent email with unique
+         link, followed by a delayed confirmation communication via a separate channel.
+      6. Build a method selection API that downstream services call to determine which
+         VPC method is required based on intended data use (internal-only vs. disclosure).
+      7. Store consent method metadata with each consent record for audit purposes.
+    tools:
+      - payment-processor
+      - identity-verification-service
+      - kba-provider
+      - email-service
+      - consent-management-platform
+      - telephony-platform
+
+  devsecops:
+    prose: |
+      1. Test each consent method implementation end-to-end, including edge cases (expired
+         credit card, invalid ID, failed KBA, undelivered emails).
+      2. Verify that government ID images are deleted within the configured timeframe —
+         automated cleanup tests must confirm no residual data.
+      3. Test the risk-based method selection logic — verify that high-risk disclosure
+         scenarios do not allow "email plus" consent.
+      4. Validate payment processor integration — ensure charges and refunds process
+         correctly and transaction records are stored as consent proof.
+      5. Test KBA question generation and scoring against FTC accuracy requirements.
+      6. Perform penetration testing on consent flows to verify a child cannot
+         self-consent by bypassing verification.
+    tools:
+      - integration-testing
+      - security-testing
+      - gitlab-ci
+      - penetration-testing
+      - api-testing
+
+  secops:
+    prose: |
+      1. Monitor consent method usage distribution — flag if a disproportionate number
+         of consents come from the least secure method.
+      2. Monitor government ID deletion compliance — alert if any ID images exceed the
+         retention deadline.
+      3. Track KBA failure rates — high failure rates may indicate the questions are too
+         difficult; very low failure rates may indicate they are too easy.
+      4. Audit payment processor records against consent records for consistency.
+      5. Monitor for fraud patterns — multiple children registered with the same credit
+         card, unusual geographic patterns in ID verification, etc.
+    tools:
+      - compliance-dashboard
+      - data-lifecycle-management
+      - fraud-detection
+      - audit-log
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 8 §2"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 14 §1"]
+    relationship: equivalent-to

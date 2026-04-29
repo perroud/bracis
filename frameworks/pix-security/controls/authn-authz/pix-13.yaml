@@ -1,0 +1,82 @@
+id: pix-13
+family: authn-authz
+title: "Consentimento e Autorizacao de Transacao"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP do pagador deve obter consentimento explícito e inequívoco do usuário antes de
+    debitar qualquer valor de sua conta transacional via Pix. O consentimento deve ser
+    precedido da apresentação clara do valor, da chave Pix do recebedor, do nome do
+    titular da conta de destino e da instituição recebedora. O usuário deve ter a
+    possibilidade de cancelar a operação antes da confirmação final. Para Pix agendado
+    e Pix recorrente, o consentimento deve incluir datas e valores específicos.
+guidance:
+  prose: |
+    **Requisitos de consentimento:**
+    1. **Tela de confirmacao:** Apresentar ao usuario, antes da autorizacao:
+       - Valor da transacao (ou indicacao de que o valor sera definido pelo recebedor)
+       - Chave Pix do recebedor
+       - Nome completo do titular da conta de destino
+       - Instituicao financeira/de pagamento do recebedor
+       - Data e hora da transacao
+    2. **Acao positiva:** O usuario deve realizar acao afirmativa (toque, biometria, PIN)
+       para autorizar. Nao pode ser inferido por inatividade.
+    3. **Cancelamento:** Botao de cancelamento visivel e acessivel na tela de confirmacao.
+    4. **Pix agendado:** Consentimento deve incluir a data futura de execucao.
+    5. **Pix recorrente (Pix Automatico):** Consentimento previo com valores, datas e
+       periodicidade, com possibilidade de revogacao a qualquer momento.
+
+    **Protecao contra fraude por consentimento:**
+    - O valor exibido na tela de confirmacao DEVE ser o valor efetivamente debitado.
+    - Divergencia entre valor exibido e valor debitado constitui falha grave.
+    - Tela de confirmacao nao pode ser manipulada por overlay ou injecao de UI.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de autorizacao:**
+      1. API de pre-autorizacao que retorna dados do recebedor para exibicao ao pagador.
+      2. Tela de confirmacao renderizada de forma segura (anti-overlay, anti-tapjacking).
+      3. Token de autorizacao com TTL curto (maximo 5 minutos) vinculado a sessao.
+      4. Idempotencia: mesmo token nao pode autorizar duas transacoes.
+
+      **Pix agendado e recorrente:**
+      5. Tabela de agendamentos com status (pendente, executado, cancelado).
+      6. Job scheduler para execucao de Pix agendado na data correta.
+      7. API de revogacao de consentimento recorrente acessivel ao usuario.
+    tools:
+      - api-gateway
+      - scheduler
+      - token-service
+      - secure-ui-framework
+  devsecops:
+    prose: |
+      **Testes de consentimento:**
+      1. Testes de UI: verificar que tela de confirmacao exibe todos os dados obrigatorios.
+      2. Testes de seguranca: tentativa de overlay e tapjacking na tela de confirmacao.
+      3. Testes de divergencia: verificar que valor exibido = valor debitado.
+      4. Testes de cancelamento: usuario cancela na tela de confirmacao.
+      5. Testes de timeout: token de autorizacao expira apos TTL.
+    tools:
+      - ui-testing
+      - gitlab-ci
+      - security-testing
+      - mobile-testing
+  secops:
+    prose: |
+      **Monitoramento de consentimento:**
+      1. Auditoria de transacoes para verificar que consentimento foi obtido.
+      2. Monitoramento de reclamacoes de usuarios sobre transacoes nao autorizadas.
+      3. Alerta para divergencia entre valor autorizado e valor debitado.
+      4. Relatorio de revogacoes de consentimento recorrente por periodo.
+    tools:
+      - siem
+      - complaint-management
+      - audit-log-analyzer
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-15"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

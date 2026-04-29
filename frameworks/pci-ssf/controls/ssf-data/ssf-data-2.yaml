@@ -1,0 +1,94 @@
+id: ssf-data-2
+family: ssf-data
+title: "Sensitive Data Protection in Storage and Memory"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall protect sensitive data at rest using cryptographic mechanisms
+    appropriate to the data classification. Sensitive authentication data shall not
+    be stored after authorization, even if encrypted. Primary account numbers shall
+    be rendered unreadable anywhere they are stored, using one-way hashing,
+    truncation, index tokens, or strong cryptography with associated key management.
+    Sensitive data in memory shall be overwritten as soon as it is no longer needed
+    and shall be protected from unauthorized access through memory isolation
+    mechanisms.
+
+guidance:
+  prose: >-
+    Protecting sensitive data at rest is essential because stored data is a
+    persistent target for attackers. PCI SSF aligns with PCI DSS in requiring that
+    PANs are never stored in a readable form and that sensitive authentication data
+    (full track, CVV2, PIN blocks) is never retained post-authorization. The standard
+    goes further by requiring software-level protections for data in memory, including
+    overwriting buffers after use to prevent data from persisting in memory dumps or
+    swap files. Key management for data protection must follow industry standards
+    with separation of key-encrypting keys and data-encrypting keys.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 8 — Data at Rest Protection"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 7.2-7.4"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enable encryption at rest for all storage services (databases, object stores,
+      file systems) using AES-256 or equivalent with platform-managed or
+      customer-managed keys via KMS. Deploy tokenization services for PAN storage
+      that replace sensitive values with non-reversible tokens for general use.
+      Configure database-level transparent data encryption (TDE) where applicable.
+      Implement memory-safe deployment configurations including disabled core dumps
+      and swap encryption. Use hardware security modules (HSMs) for master key
+      storage.
+    tools:
+      - vault
+      - aws-kms
+      - google-cloud-kms
+      - azure-key-vault
+      - hsm
+      - terraform
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect sensitive data stored in plaintext, improper use of
+      encryption APIs, and failure to clear sensitive data from memory. Implement
+      code review requirements for all data storage logic handling sensitive payment
+      data. Write integration tests that validate data is encrypted at rest and
+      that sensitive authentication data is not persisted. Use dependency scanning
+      to identify libraries with known vulnerabilities in encryption implementations.
+      Enforce that test environments never contain real cardholder data.
+    tools:
+      - gitlab-sast
+      - gitlab-dependency-scanning
+      - semgrep
+      - sonarqube
+      - snyk
+
+  secops:
+    prose: >-
+      Monitor database access patterns for bulk data extraction that may indicate
+      data theft. Conduct periodic scans for unencrypted sensitive data in storage
+      systems. Verify encryption key rotation schedules are being followed. Alert
+      on access to key management systems from unauthorized sources. Track and
+      report on encryption compliance across all data stores containing sensitive
+      payment data.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-macie
+      - qualys
+      - tenable
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.4", "req-3.5", "req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v6.1", "v6.2", "v8.1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.10", "A8.24"]
+    relationship: mapped

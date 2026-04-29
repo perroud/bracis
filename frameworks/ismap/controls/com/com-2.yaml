@@ -1,0 +1,85 @@
+id: com-2
+family: com
+title: "Data Transfer and Information Exchange Security"
+class: ISMAP
+baselines:
+  - ismap
+
+statement:
+  prose: |
+    The cloud service provider shall implement formal transfer policies,
+    procedures, and controls to protect the transfer of information through
+    all types of communication facilities. Information transfer agreements
+    shall be established between the organization and external parties.
+    Electronic messaging shall be appropriately protected. Confidentiality
+    or non-disclosure agreements reflecting the organization's needs for the
+    protection of information shall be identified, documented, regularly
+    reviewed, and signed by personnel and external parties.
+
+guidance:
+  prose: |
+    ISMAP requires strict controls over data transfer, particularly for
+    government information that may be subject to Japanese data sovereignty
+    requirements. Cloud service providers must ensure that government data
+    is not transferred outside approved jurisdictions without explicit
+    authorization. Transfer controls must address both automated system
+    transfers and manual data exports. Non-disclosure agreements must
+    cover all personnel with potential access to government data, including
+    subcontractors. Data transfer logging must be sufficient to reconstruct
+    the chain of custody for government information.
+
+references:
+  - citation: "ISMAP Management Criteria, COM-02"
+    url: "https://www.ismap.go.jp/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement data loss prevention (DLP) controls at network boundaries.
+      Configure egress filtering to prevent unauthorized data transfers.
+      Enforce encryption for all data transfers including API calls,
+      file transfers, and replication. Implement geographic restrictions
+      on data transfer to enforce data sovereignty requirements.
+    tools:
+      - vault
+      - istio
+      - terraform
+      - aws-macie
+
+  devsecops:
+    prose: |
+      Scan code for insecure data transfer patterns such as unencrypted
+      connections or transfers to unauthorized endpoints. Validate that
+      API integrations use approved authentication and encryption methods.
+      Enforce that CI/CD artifacts are transferred only through approved
+      channels.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - checkov
+      - trivy
+
+  secops:
+    prose: |
+      Monitor data transfer activities for unauthorized exfiltration
+      attempts. Implement DLP monitoring that detects sensitive data
+      in outbound transfers. Alert on data transfers to unapproved
+      destinations. Generate data transfer audit reports for ISMAP
+      assessors showing transfer volumes, destinations, and
+      encryption status.
+    tools:
+      - splunk
+      - elastic-siem
+      - prisma-cloud
+      - netskope
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a-5.13", "annex-a-5.14", "annex-a-6.6"]
+    relationship: derived-from
+  - framework_id: nist-800-53
+    articles: ["SC-8", "SC-12", "AC-4"]
+    relationship: mapped
+  - framework_id: fedramp
+    articles: ["SC-8", "AC-4"]
+    relationship: mapped

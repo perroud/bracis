@@ -1,0 +1,93 @@
+id: pix-17
+family: antifraude
+title: "Marcacao de Fraude no DICT e Compartilhamento de Inteligencia"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve informar ao DICT, por meio de marcação de fraude (infraction report),
+    as chaves Pix e contas transacionais envolvidas em fraudes confirmadas ou fortemente
+    suspeitas. A marcação alimenta a base de inteligência compartilhada do ecossistema
+    Pix, permitindo que outros PSPs consultem o histórico de fraude antes de efetivar
+    transações. O PSP deve consultar as marcações do DICT como insumo obrigatório para
+    seu motor antifraude.
+guidance:
+  prose: |
+    **Infraction report (marcacao de fraude):**
+    Mecanismo pelo qual um PSP informa ao DICT que uma chave ou conta esta associada
+    a atividade fraudulenta. A marcacao fica visivel para todos os participantes do
+    arranjo nas consultas ao DICT.
+
+    **Tipos de marcacao:**
+    1. **Fraude confirmada:** Investigacao concluiu que houve fraude.
+    2. **Suspeita fundada:** Indicios fortes de fraude, investigacao em andamento.
+    3. **Conta de mula (conta laranja):** Conta usada como intermediaria para lavagem.
+
+    **Obrigacoes do PSP:**
+    1. **Reportar:** Informar ao DICT toda fraude confirmada e suspeita fundada.
+    2. **Consultar:** Verificar marcacoes no DICT antes de efetivar transacoes Pix.
+    3. **Agir:** Usar marcacoes como insumo para o motor antifraude (bloquear, alertar
+       ou exigir autenticacao adicional).
+    4. **Atualizar:** Remover marcacao quando investigacao conclui que nao houve fraude.
+
+    **Impacto da marcacao:**
+    Uma chave com multiplas marcacoes de diferentes PSPs representa alto risco. O PSP
+    recebedor deve aplicar controles proporcionais ao nivel de risco indicado pelas
+    marcacoes.
+
+    **Compartilhamento de inteligencia:**
+    O DICT funciona como central de inteligencia do ecossistema Pix. A qualidade das
+    marcacoes (precisao, tempestividade) e responsabilidade de cada PSP e impacta a
+    seguranca de todo o ecossistema.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com DICT para marcacoes:**
+      1. API de envio de infraction report ao DICT com campos obrigatorios.
+      2. API de consulta de marcacoes por chave e por conta.
+      3. Cache local de marcacoes com invalidacao por evento do DICT.
+      4. Integracao com motor antifraude: marcacoes como feature de risco.
+
+      **Fluxo de reporte:**
+      5. Workflow de investigacao: suspeita -> investigacao -> confirmacao -> reporte.
+      6. Automacao: casos claros (ex: conta mula com multiplos indicios) reportados
+         automaticamente.
+      7. Revisao humana para casos ambiguos antes do reporte.
+    tools:
+      - dict-client
+      - rules-engine
+      - workflow-engine
+      - cache-layer
+  devsecops:
+    prose: |
+      **Testes de marcacao:**
+      1. Testes de envio de infraction report ao DICT (simulador).
+      2. Testes de consulta de marcacoes e impacto no score antifraude.
+      3. Testes de remocao de marcacao apos investigacao negativa.
+      4. Testes de cache: invalidacao apos nova marcacao.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - api-simulator
+  secops:
+    prose: |
+      **Gestao de marcacoes:**
+      1. Dashboard de marcacoes enviadas e recebidas.
+      2. SLA de reporte: fraude confirmada reportada em ate 24 horas.
+      3. Revisao periodica de marcacoes ativas para remover falsos positivos.
+      4. Metricas de qualidade de marcacoes (precisao, recall).
+      5. Relatorio ao BCB sobre marcacoes e acoes tomadas.
+    tools:
+      - fraud-detection-platform
+      - analytics-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-14"]
+    relationship: implements
+  - framework_id: bcb-3978
+    articles: ["art-1", "art-2"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-20"]
+    relationship: complements

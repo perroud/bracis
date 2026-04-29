@@ -1,0 +1,95 @@
+id: art-14
+family: cap-4
+title: "Financial-grade API (FAPI) e Perfis de Seguranca"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 14. As interfaces dedicadas do Open Finance devem implementar os
+    perfis de segurança Financial-grade API (FAPI), conforme especificações
+    técnicas do diretório, incluindo:
+
+    I - FAPI 1.0 Advanced (ou perfil equivalente definido nas especificações)
+    para APIs que envolvam acesso a dados de clientes ou iniciação de pagamento;
+
+    II - OAuth 2.0 Authorization Code Flow com Proof Key for Code Exchange
+    (PKCE) como fluxo obrigatório de autorização;
+
+    III - Pushed Authorization Requests (PAR) para submissão segura de
+    parâmetros de autorização;
+
+    IV - JWT-Secured Authorization Request (JAR) para assinatura dos
+    parâmetros de autorização;
+
+    V - Token binding via mTLS (certificate-bound access tokens) para
+    vinculação de tokens ao certificado do cliente.
+guidance:
+  prose: |
+    O art. 14 estabelece FAPI como padrao de seguranca obrigatorio:
+
+    **FAPI 1.0 Advanced (baseline do Open Finance Brasil):**
+    - Authorization Code Flow com PKCE (obrigatorio)
+    - Pushed Authorization Requests (PAR) - RFC 9126
+    - JWT-Secured Authorization Request (JAR) - RFC 9101
+    - Certificate-bound access tokens (mTLS) - RFC 8705
+    - ID Token como detached signature (s_hash, c_hash)
+
+    **Por que FAPI e nao OAuth 2.0 basico?**
+    OAuth 2.0 padrao tem vulnerabilidades conhecidas para cenarios financeiros:
+    - Authorization code interception (mitigado por PKCE)
+    - Parameter tampering (mitigado por JAR)
+    - Token theft (mitigado por certificate binding)
+    - Mix-up attacks (mitigado por issuer verification)
+
+    **Perfil Open Finance Brasil Security Profile:**
+    O ecossistema define um perfil proprio baseado no FAPI 1.0 Advanced
+    com extensoes especificas:
+    - Dynamic Client Registration (DCR) via diretorio
+    - Software Statement Assertion (SSA) para registro
+    - Certificados ICP-Brasil obrigatorios
+    - Scopes padronizados por tipo de dado/servico
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de stack FAPI:**
+      1. Selecionar Authorization Server com certificacao FAPI
+         (Keycloak, Curity, ForgeRock, Auth0).
+      2. Configurar PAR endpoint para submissao de parametros.
+      3. Implementar validacao de request objects assinados (JAR).
+      4. Configurar token endpoint com mTLS e certificate-bound tokens.
+      5. Implementar Dynamic Client Registration (DCR) integrado ao
+         diretorio de participantes.
+      6. Configurar scopes conforme especificacao do diretorio.
+    tools:
+      - keycloak
+      - oauth-server
+      - certificate-manager
+      - api-gateway
+  devsecops:
+    prose: |
+      **Validacao de conformidade FAPI:**
+      1. Executar FAPI Conformance Suite do OpenID Foundation em CI/CD.
+      2. Validar que todos os fluxos deprecados (implicit, ROPC) estao
+         desabilitados.
+      3. Testar certificate-bound tokens (token nao funciona sem cert).
+      4. Verificar assinaturas de request objects e ID tokens.
+    tools:
+      - fapi-conformance-suite
+      - openid-certification
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de seguranca FAPI:**
+      1. Monitorar tentativas de uso de fluxos nao-FAPI (implicit, etc).
+      2. Alertar sobre tokens desvinculados de certificados.
+      3. Auditar registros de software statements no diretorio.
+      4. Monitorar expiracao e rotacao de certificados de assinatura.
+    tools:
+      - siem
+      - certificate-monitoring
+      - oauth-monitoring
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-4"]
+    relationship: complements

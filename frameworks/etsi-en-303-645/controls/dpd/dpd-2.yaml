@@ -1,0 +1,93 @@
+id: dpd-2
+family: dpd
+title: "Transparency of Personal Data Processing"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The consumer IoT device manufacturer shall provide consumers with clear and
+    transparent information about what personal data is processed, how it is being used,
+    by whom, and for what purposes, for each device and service. This also applies to
+    third parties that can be involved, including advertisers. Where telemetry data is
+    collected from consumer IoT devices and services, the processing of personal data
+    that is collected from the device and associated services shall be kept to the minimum
+    necessary for the intended functionality.
+
+guidance:
+  prose: >-
+    Transparency is a core data protection principle. Consumers must understand what data
+    their IoT device collects before and during use. This provision requires manufacturers
+    to clearly communicate: what categories of personal data are collected, the specific
+    purposes for each data type, who has access (including third-party analytics, advertising
+    partners, and cloud service providers), and data retention periods. The information must
+    be presented in plain language accessible to non-technical users, not buried in lengthy
+    legal documents. Data minimization is explicitly required for telemetry — devices must
+    only collect the minimum data needed for their intended function, not all data that could
+    potentially be useful.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.8-3"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Create a structured privacy dashboard in the companion application that lists all data
+      types collected, their purposes, and retention periods. Implement data collection
+      controls that allow users to selectively disable non-essential data categories.
+      Design the telemetry pipeline with data minimization by default — collect aggregate
+      metrics rather than raw personal data where possible. Implement a privacy-by-design
+      architecture that separates functional data from analytics data, allowing users to
+      opt out of analytics without losing device functionality. Publish a machine-readable
+      privacy manifest alongside the human-readable privacy policy.
+    tools:
+      - consent-management-platform
+      - mobile-companion-app
+      - data-pipeline
+      - privacy-manifest
+
+  devsecops:
+    prose: >-
+      Maintain a data inventory as code that maps every data collection point in the firmware
+      and cloud services to its stated purpose and legal basis. Implement automated checks
+      that flag new data collection points added without corresponding privacy documentation.
+      Test that disabling optional data collection does not break core device functionality.
+      Validate that telemetry payloads contain only the documented data fields. Implement
+      data flow tests that verify personal data does not leak to undocumented third-party
+      endpoints.
+    tools:
+      - semgrep
+      - wireshark
+      - mitmproxy
+      - data-flow-analyzer
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor outbound network traffic from devices to verify data is only sent to documented
+      endpoints. Alert on unexpected data exfiltration patterns or connections to unknown
+      third-party services. Conduct periodic privacy audits comparing actual data flows to
+      published privacy documentation. Review third-party data sharing agreements for
+      compliance with stated purposes. Track changes to third-party privacy practices that
+      may affect the product's compliance posture.
+    tools:
+      - wireshark
+      - zeek
+      - splunk
+      - elastic-siem
+      - onetrust
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7.6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PT-3", "PT-4", "PT-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.34", "A.5.35"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V8.3.4"]
+    relationship: complements

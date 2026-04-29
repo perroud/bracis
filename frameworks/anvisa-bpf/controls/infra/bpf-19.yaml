@@ -1,0 +1,122 @@
+id: bpf-19
+family: infra
+title: "Business Continuity and Disaster Recovery for GMP Operations"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    O fabricante deve manter plano de continuidade de negócios e
+    recuperação de desastres documentado e testado para os sistemas
+    computadorizados de BPF, assegurando a continuidade das operações
+    de fabricação, controle de qualidade e liberação de lotes mesmo em
+    caso de indisponibilidade prolongada de sistemas.
+
+    O plano deve incluir: análise de impacto no negócio (BIA)
+    identificando sistemas e processos críticos, estratégias de
+    continuidade para cada cenário de falha identificado (falha de
+    hardware, falha de software, falha de energia, desastre natural,
+    incidente cibernético), procedimentos de contingência manual
+    quando aplicável, critérios de ativação do plano, e
+    procedimentos de retorno à operação normal.
+
+    Os procedimentos de contingência devem assegurar que registros
+    gerados manualmente durante a indisponibilidade de sistemas sejam
+    inseridos no sistema eletrônico após a restauração, com
+    rastreabilidade da origem manual e verificação de integridade.
+guidance:
+  prose: |
+    Business continuity planning for GMP operations must address the
+    unique requirement that pharmaceutical manufacturing cannot
+    compromise product quality or data integrity even during system
+    outages or disasters.
+
+    BIA considerations specific to pharmaceutical manufacturing:
+    - In-process batches: procedures for safely holding or continuing
+      production during system outage
+    - Environmental monitoring: contingency for monitoring during system
+      failure
+    - Quality control testing: ability to perform critical testing
+      manually
+    - Batch release: procedures for releasing product when LIMS/ERP
+      are unavailable
+    - Regulatory reporting: maintaining compliance reporting capability
+
+    Contingency manual procedures must:
+    - Be pre-approved and readily available
+    - Include blank GMP forms for manual data recording
+    - Define data transcription procedures (manual to electronic)
+    - Require second-person verification during transcription
+    - Maintain ALCOA+ principles (contemporaneous recording,
+      attributability) even in manual mode
+
+    Recovery procedures must:
+    - Verify system validated state before resuming operations
+    - Confirm data integrity through reconciliation
+    - Document any data entered manually during the outage
+    - Perform abbreviated requalification if needed
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement high-availability architecture for GMP-critical
+         systems: redundant servers, database clustering, automatic
+         failover, and load balancing to minimize unplanned downtime.
+      2. Deploy disaster recovery infrastructure in geographically
+         separate location with replicated data and tested failover
+         capability meeting defined RTO/RPO targets.
+      3. Configure automated health monitoring with predictive failure
+         detection and automated failover triggering to minimize
+         manual intervention during system failures.
+      4. Implement infrastructure resilience testing automation:
+         chaos engineering practices for GMP infrastructure to
+         validate failover and recovery mechanisms under controlled
+         conditions.
+    tools:
+      - high-availability
+      - disaster-recovery
+      - database-clustering
+      - chaos-engineering
+      - health-monitoring
+  devsecops:
+    prose: |
+      1. Implement automated disaster recovery testing in CI/CD
+         pipelines: periodic failover tests, recovery validation,
+         and data integrity verification post-recovery.
+      2. Build automated system health verification tests that run
+         post-recovery to confirm validated state is maintained and
+         all data integrity controls are operational.
+      3. Test manual contingency procedures: verify that pre-approved
+         manual forms capture all required data fields and that
+         transcription validation tools detect discrepancies.
+      4. Implement automated reconciliation tools for verifying data
+         consistency between primary and disaster recovery environments.
+    tools:
+      - gitlab-ci
+      - dr-testing
+      - health-verification
+      - data-reconciliation
+  secops:
+    prose: |
+      1. Develop and maintain business continuity plan (BCP) and
+         disaster recovery plan (DRP) specific to GMP computerized
+         systems, reviewed and updated annually.
+      2. Conduct annual BCP/DRP exercises including tabletop exercises
+         and full failover tests, documenting lessons learned and
+         updating plans accordingly.
+      3. Maintain current business impact analysis identifying
+         critical system dependencies, maximum tolerable downtime,
+         and required recovery priorities.
+      4. Train all relevant personnel on contingency procedures
+         including manual fallback operations and data transcription
+         requirements.
+    tools:
+      - bcp-management
+      - grc-platform
+      - training-management
+      - exercise-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-31", "art-28"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-29", "controle-A-5-30", "controle-A-8-14"]
+    relationship: mapped

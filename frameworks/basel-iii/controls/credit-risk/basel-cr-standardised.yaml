@@ -1,0 +1,103 @@
+id: basel-cr-standardised
+family: credit-risk
+title: "Credit Risk — Standardised Approach (SA-CR)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks that do not use an internal ratings-based approach for credit risk must calculate
+    risk-weighted assets (RWA) for credit risk using the Standardised Approach for Credit
+    Risk (SA-CR) as revised in the December 2017 Basel III finalisation. Under SA-CR, each
+    exposure is assigned a risk weight based on its exposure class and, where available, the
+    credit rating assigned by an eligible External Credit Assessment Institution (ECAI).
+    Exposure classes include: sovereigns and central banks, non-central government public
+    sector entities, multilateral development banks, banks, securities firms, covered bonds,
+    corporates (including SMEs), retail, residential real estate, commercial real estate,
+    subordinated debt and equity, and defaulted exposures. Risk weights range from 0% (for
+    eligible sovereign exposures and central bank claims denominated in domestic currency)
+    to 1250% (for certain equity and securitisation exposures). Banks must apply credit risk
+    mitigation (CRM) techniques — including financial collateral, guarantees, credit
+    derivatives, and on-balance-sheet netting — in accordance with the comprehensive and
+    simple approaches, subject to operational requirements and haircuts.
+
+guidance:
+  prose: >-
+    The revised SA-CR under Basel IV significantly changes risk weights for several
+    exposure classes relative to Basel II. Notably, unrated corporate exposures receive a
+    100% risk weight (or 85% for SMEs satisfying granularity criteria), real estate
+    exposures are split into loan-splitting and whole-loan treatments with risk weights
+    depending on LTV ratios, and bank exposures are subject to a due diligence override
+    allowing supervisors to assign higher risk weights to exposures rated below a threshold.
+    Banks must establish processes for tracking ECAI ratings assigned to their counterparties,
+    updating them when ratings change, and applying the most conservative available rating
+    in cases of multiple ratings. For real estate exposures, banks must collect and validate
+    LTV data at origination and on a periodic basis. CRM eligibility requirements are strict:
+    collateral must be legally enforceable, the bank must have a first priority claim, and
+    the asset must be sufficiently liquid.
+
+references:
+  - citation: "BCBS, Calculation of RWA for credit risk (CRE), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/CRE/01.htm"
+  - citation: "BCBS, Basel III: Finalising post-crisis reforms, December 2017, Chapter 2"
+    url: "https://www.bis.org/bcbs/publ/d424.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a credit risk data platform that ingests exposure data from loan origination
+      systems, trading systems, and off-balance-sheet facilities and maps each exposure to
+      the correct SA-CR exposure class via a configurable rules engine. Integrate with
+      ECAI rating feeds (Moody's, S&P, Fitch, DBRS) for automated rating assignment and
+      daily rating change monitoring. Implement LTV data pipelines for real estate portfolios
+      that pull updated valuations from approved valuation providers and recalculate LTV
+      ratios automatically. Publish RWA by exposure class and portfolio segment to the
+      firmwide capital dashboard with drill-down capability to individual exposure level.
+    tools:
+      - apache-kafka
+      - dbt
+      - postgresql
+      - grafana
+      - terraform
+      - apache-airflow
+
+  devsecops:
+    prose: >-
+      Maintain SA-CR risk weight lookup tables and CRM eligibility rules as versioned
+      configuration in Git. Implement automated tests that verify risk weight assignments
+      against supervisory benchmark portfolios published by the EBA, OSFI, or Fed after
+      every rule change. Build data quality checks that detect missing or stale ECAI
+      ratings, missing LTV data, or incomplete CRM documentation before RWA calculations
+      are finalised. Generate COREP/FFIEC regulatory report files automatically from the
+      platform with embedded reconciliation checks.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - sonarqube
+
+  secops:
+    prose: >-
+      Apply strict data governance controls to counterparty rating and exposure data:
+      maintain data lineage from source system to RWA output, with all transformations
+      logged and auditable. Restrict write access to risk weight tables and CRM parameter
+      configurations to the model governance team. Monitor for unusual changes in aggregate
+      RWA that could indicate data errors or manipulation. Include SA-CR calculation systems
+      in the scope of annual security and DR testing.
+    tools:
+      - splunk
+      - cyberark
+      - hashicorp-vault
+      - qualys
+
+legal_references:
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AC-5"]
+    relationship: mapped
+  - framework_id: dora
+    articles: ["art-6"]
+    relationship: complements

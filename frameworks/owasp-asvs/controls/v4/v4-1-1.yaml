@@ -1,0 +1,100 @@
+id: v4.1.1
+family: v4
+title: "General Access Control Design"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that the application enforces access control rules on a trusted service layer,
+    especially if client-side access control is present and could be bypassed. All access
+    control decisions must be made server-side, and the application must deny access by
+    default. Access control must fail securely, denying access on any exception or error
+    in the authorization logic.
+
+guidance:
+  prose: >-
+    Access control is the enforcement of authorization decisions. Client-side access control
+    (hiding UI elements, disabling buttons) is a usability feature, not a security control.
+    Every access control decision must be enforced server-side because any client-side check
+    can be trivially bypassed. The deny-by-default principle ensures that new functionality
+    is protected even if developers forget to add explicit authorization rules. Failing
+    securely means that if the authorization system throws an exception, encounters a
+    timeout, or returns an unexpected response, the result is denial of access rather than
+    grant. Centralized access control logic (policy decision point pattern) is preferred
+    over scattered authorization checks throughout the codebase, which are prone to
+    inconsistency and omission.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V4.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Access Control Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized policy decision point (PDP) using Open Policy Agent, Casbin,
+      or equivalent. Enforce authorization at the API gateway layer as the first line of
+      defense, with additional fine-grained checks at the service level. Use attribute-based
+      access control (ABAC) or relationship-based access control (ReBAC) for complex
+      authorization models rather than flat RBAC. Deploy an authorization sidecar or middleware
+      that intercepts all requests and evaluates policies before they reach application code.
+      Implement deny-by-default at the gateway: all routes require explicit authorization
+      policy attachment. Configure fail-closed behavior so authorization service timeouts
+      result in access denial.
+    tools:
+      - opa
+      - casbin
+      - keycloak
+      - kong
+      - envoy
+      - istio
+      - spicedb
+      - cerbos
+
+  devsecops:
+    prose: >-
+      Write automated tests that verify server-side enforcement: send requests directly to
+      API endpoints without valid authorization tokens and confirm denial. Test that removing
+      client-side UI restrictions does not grant additional access. Implement SAST rules to
+      detect authorization checks that rely on client-provided data without server-side
+      validation. Use policy-as-code testing (OPA conftest, Rego unit tests) to validate
+      authorization policies before deployment. Include IDOR (Insecure Direct Object
+      Reference) testing in DAST scans targeting all CRUD endpoints.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - conftest
+      - opa
+      - gitlab-ci
+      - nuclei
+
+  secops:
+    prose: >-
+      Monitor for access control violations: repeated 403 responses from a single user
+      (potential authorization probing), successful access to resources outside a user's
+      normal pattern, or privilege escalation indicators. Configure SIEM alerts for
+      authorization bypass patterns. Audit access control policy changes and require
+      approval workflows for policy modifications. Conduct periodic access reviews comparing
+      actual access patterns against defined policies. Track authorization decision logs
+      to identify overly permissive policies.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog-security
+      - opa-decision-logs
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-6"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A8.3"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["7.2.1", "7.2.2"]
+    relationship: implements

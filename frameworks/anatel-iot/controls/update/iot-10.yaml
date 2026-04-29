@@ -1,0 +1,109 @@
+id: iot-10
+family: update
+title: "Manufacturer Support and Update Policy"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O fornecedor deve possuir política clara de suporte ao produto,
+    especialmente quanto a atualizações de software e firmware. O
+    fornecedor deve comunicar ao consumidor, de forma clara e
+    acessível, a duração do período de suporte ao produto, incluindo
+    a disponibilidade de atualizações de segurança.
+
+    As atualizações devem ser liberadas de forma escalonada (rollout
+    gradual) e disponibilizadas sem custo adicional ao consumidor.
+    O período mínimo de suporte para atualizações de segurança é de
+    2 (dois) anos após o lançamento do produto no mercado brasileiro.
+
+    (Ato 77/2021 §6.1.1 a §6.1.4; Ato 2436/2023 §7)
+guidance:
+  prose: |
+    This control establishes mandatory manufacturer obligations for
+    ongoing security support of IoT/CPE devices after sale. It
+    ensures consumers can make informed purchase decisions and that
+    devices do not become permanently vulnerable after a short period.
+
+    **Key obligations:**
+    - **Published support policy:** The manufacturer must publicly
+      disclose the support duration for each product model, including
+      the end-of-security-updates date.
+    - **Minimum 2-year security updates:** From the product launch date
+      in the Brazilian market, the manufacturer must provide security
+      patches for at least 2 years — at no additional cost.
+    - **Gradual rollout:** Updates must be deployed in phases (e.g., 1%,
+      10%, 50%, 100%) to detect issues before full fleet deployment.
+    - **Clear communication:** Changelogs must be available in
+      Portuguese, explaining what was fixed and any security
+      implications.
+
+    **Practical implications for manufacturers:**
+    - The 2-year clock starts at product launch, not at individual
+      device sale — so devices sold near end-of-life may have reduced
+      support remaining.
+    - The policy must be communicated at point of sale (packaging,
+      product page, manual).
+    - Failure to maintain the update infrastructure (e.g., shutting
+      down update servers) constitutes non-compliance.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Design the OTA update infrastructure for long-term operation:
+         use cloud-hosted update servers with SLA guarantees covering
+         the minimum 2-year support period per product.
+      2. Implement staged rollout capability in the update server:
+         configure deployment waves (canary → 10% → 50% → 100%) with
+         automatic rollback triggers based on error telemetry.
+      3. Build a product lifecycle management system that tracks launch
+         dates, support end dates, and triggers alerts 6 months before
+         end-of-support.
+      4. Implement a "support status" parameter in the device firmware
+         that the device can query from the update server — enabling
+         the device to display its support status to the user.
+    tools:
+      - ota-update-server
+      - cloud-infrastructure
+      - product-lifecycle-management
+      - feature-flag-system
+  devsecops:
+    prose: |
+      1. Maintain firmware build pipelines for all supported products
+         — even products nearing end-of-support must have a functional
+         CI/CD pipeline for emergency security patches.
+      2. Implement automated staged rollout in the deployment pipeline:
+         canary deployment with health check gates before wider release.
+      3. Create automated tests that verify the update server correctly
+         serves the right firmware version to the right device model
+         and hardware revision.
+      4. Maintain a product support matrix in the repository: model,
+         launch date, support end date, latest firmware version,
+         pipeline status.
+    tools:
+      - gitlab-ci
+      - ota-deployment-pipeline
+      - canary-release-system
+      - product-support-matrix
+  secops:
+    prose: |
+      1. Monitor the product support matrix and trigger end-of-life
+         planning processes 12 months before support expiry.
+      2. Verify update server availability via synthetic monitoring —
+         alert if the update endpoint becomes unreachable.
+      3. Track update adoption rates across the fleet: if a critical
+         security update has <80% adoption after 30 days, investigate
+         and take remedial action (forced updates via ACS).
+      4. Maintain documentation of the support policy, rollout
+         procedures, and update delivery metrics for ANATEL compliance
+         evidence.
+    tools:
+      - fleet-management-dashboard
+      - synthetic-monitoring
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,169 @@
+id: sec-1798-150
+family: enforcement
+title: "Private Right of Action for Data Breaches"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) Any consumer whose nonencrypted and nonredacted personal information, as defined in
+    subparagraph (A) of paragraph (1) of subdivision (d) of Section 1798.81.5, or whose email
+    address in combination with a password or security question and answer that would permit
+    access to the account, is subject to an unauthorized access and exfiltration, theft, or
+    disclosure as a result of the business's violation of the duty to implement and maintain
+    reasonable security procedures and practices appropriate to the nature of the information
+    to protect the personal information may institute a civil action for any of the following:
+
+    (1) To recover damages in an amount not less than one hundred dollars ($100) and not
+    greater than seven hundred and fifty dollars ($750) per consumer per incident or actual
+    damages, whichever is greater.
+
+    (2) Injunctive or declaratory relief.
+
+    (3) Any other relief the court deems proper.
+
+    (b) In assessing the amount of statutory damages, the court shall consider any one or more
+    of the relevant circumstances presented by any of the parties to the case, including, but
+    not limited to, the nature and seriousness of the misconduct, the number of violations, the
+    persistence of the misconduct, the length of time over which the misconduct occurred, the
+    willfulness of the defendant's misconduct, and the defendant's assets, liabilities, and
+    net worth.
+
+    (c) Actions pursuant to this section may be brought by a consumer on behalf of themselves
+    and others similarly situated in a class action.
+
+    (d) Prior to initiating any action against a business for statutory damages on an individual
+    basis only, a consumer shall provide a business 30 days' written notice identifying the
+    specific provisions of this title the consumer alleges have been or are being violated. In
+    the event a cure is possible, if within the 30 days the business actually cures the noticed
+    violation and provides the consumer an express written statement that the violations have
+    been cured and that no further violations shall occur, no action for individual statutory
+    damages or class action damages may be initiated against the business. No notice shall be
+    required prior to an individual consumer initiating an action solely for actual pecuniary
+    damages suffered as a result of the alleged violations of this title. If a business continues
+    to violate this title in breach of the express written statement provided to the consumer
+    under this section, the consumer may initiate an action against the business to enforce the
+    written statement and may pursue statutory damages for each breach of the express written
+    statement, as well as any other violation of this title that postdates the written statement.
+
+    (e) No action may be brought under this section on the basis of the business's or any
+    other person's alleged failure to comply with any provision of this title other than
+    Section 1798.150 and this section.
+
+guidance:
+  prose: |
+    Section 1798.150 is the ONLY section of CCPA/CPRA that provides a private right of action
+    (consumers can sue directly). All other enforcement is through the CPPA or Attorney General.
+    Key aspects:
+
+    1. **Limited scope:** The private right of action applies ONLY to data breaches resulting
+       from failure to implement "reasonable security procedures and practices." It does NOT
+       cover other CCPA/CPRA violations.
+
+    2. **Covered data:** Only applies to nonencrypted and nonredacted personal information as
+       defined in Section 1798.81.5(d)(1)(A) — name plus SSN, driver's license, financial
+       account, medical info, health insurance, or email+password.
+
+    3. **Statutory damages:** $100-$750 per consumer per incident. In a class action with
+       millions of consumers, this creates massive potential liability.
+
+    4. **30-day cure period:** For individual statutory damages, the consumer must give 30 days'
+       written notice, allowing the business to cure. This does NOT apply to actual damages
+       or to class actions in all circumstances.
+
+    5. **Encryption as safe harbor:** If PI is encrypted, the private right of action does not
+       apply — making encryption a critical defensive measure.
+
+    6. **"Reasonable security" standard:** This references California's existing data security
+       law (Section 1798.81.5) and effectively incorporates industry-standard security practices
+       (commonly interpreted as the CIS Controls or similar frameworks).
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement encryption at rest for ALL personal information covered by Section
+         1798.81.5(d)(1)(A) — this is the primary technical defense against private right
+         of action liability.
+      2. Deploy encryption in transit (TLS 1.2+) for all data flows containing PI.
+      3. Implement comprehensive access controls with least-privilege principles for all
+         systems storing covered PI.
+      4. Build automated breach detection systems — intrusion detection, anomaly detection,
+         and data exfiltration monitoring.
+      5. Implement data tokenization/pseudonymization for PI in non-production environments
+         and analytics systems.
+      6. Deploy web application firewall (WAF) and API security gateway to prevent
+         unauthorized access vectors.
+      7. Implement network segmentation isolating systems containing covered PI from
+         general-purpose infrastructure.
+      8. Build automated incident response pipeline — detection, containment, notification,
+         and remediation.
+    tools:
+      - vault
+      - cert-manager
+      - kubernetes
+      - istio
+      - falco
+      - waf
+      - api-gateway
+      - encryption-service
+
+  devsecops:
+    prose: |
+      1. Implement comprehensive security scanning in CI/CD: SAST, DAST, SCA, container
+         scanning, secret detection, and IaC scanning.
+      2. Enforce encryption-at-rest policies via infrastructure-as-code — fail deployments
+         that create unencrypted data stores containing PI.
+      3. Implement automated penetration testing for applications handling covered PI.
+      4. Scan for hardcoded credentials, API keys, and secrets in source code.
+      5. Validate that all database connections use TLS and that encryption keys are properly
+         managed (not hardcoded, rotated on schedule).
+      6. Implement dependency vulnerability scanning with defined SLAs for critical/high
+         severity patches.
+      7. Test incident response procedures through automated tabletop exercises and
+         chaos engineering for security scenarios.
+    tools:
+      - trivy
+      - semgrep
+      - sonarqube
+      - gitlab-sast
+      - gitlab-dast
+      - snyk
+      - owasp-zap
+      - checkov
+      - tfsec
+
+  secops:
+    prose: |
+      1. Implement 24/7 security monitoring with SOC coverage for breach detection.
+      2. Deploy SIEM with correlation rules specifically targeting unauthorized access to
+         PI data stores.
+      3. Conduct regular penetration tests and vulnerability assessments of systems
+         containing covered PI.
+      4. Implement data loss prevention (DLP) controls monitoring for PI exfiltration.
+      5. Maintain documented incident response plan with specific runbooks for PI breaches.
+      6. Conduct regular "reasonable security" assessments against industry frameworks
+         (CIS Controls, NIST CSF) to maintain defensible security posture.
+      7. Implement backup verification and disaster recovery testing for PI systems.
+      8. Monitor dark web and threat intelligence feeds for indicators of data exposure.
+    tools:
+      - wazuh
+      - elastic-siem
+      - crowdstrike
+      - velociraptor
+      - nessus
+      - dlp
+      - threat-intelligence
+      - incident-response-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 32", "art. 82"]
+    relationship: intersects-with
+  - framework_id: lgpd
+    articles: ["art. 42", "art. 46"]
+    relationship: intersects-with
+  - framework_id: nist-800-53-rev5
+    articles: ["sc-8", "sc-12", "sc-13", "sc-28", "ir-1", "ir-4", "ir-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: supports

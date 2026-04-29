@@ -1,0 +1,121 @@
+id: art-10
+family: chap-2
+title: "Detection"
+class: DORA
+
+statement:
+  prose: >-
+    Financial entities shall have in place mechanisms to promptly detect
+    anomalous activities, in accordance with Article 17, including ICT
+    network performance issues and ICT-related incidents, and to identify
+    potential material single points of failure.
+  parts:
+    - id: art-10.1
+      label: "1."
+      prose: >-
+        All mechanisms referred to in the first subparagraph shall be
+        regularly tested in accordance with Article 25. The detection
+        mechanisms shall enable multiple layers of control, define alert
+        thresholds and criteria to trigger and initiate ICT-related
+        incident response processes, including automatic alert mechanisms
+        for staff in charge of ICT-related incident response.
+    - id: art-10.2
+      label: "2."
+      prose: >-
+        Financial entities shall devote sufficient resources and capabilities
+        to monitor user activity, the occurrence of ICT anomalies and
+        ICT-related incidents, in particular cyber-attacks.
+    - id: art-10.3
+      label: "3."
+      prose: >-
+        Financial entities shall put in place procedures to log,
+        categorise and analyse, on the basis of priority ranking,
+        ICT-related incidents and shall establish adequate alert and
+        automatic response mechanisms.
+
+guidance:
+  prose: >-
+    Detection requires multi-layered monitoring that covers network traffic,
+    system behavior, user activity, and application performance. The
+    requirement for multiple layers of control means that no single detection
+    mechanism should be the sole line of defense. Alert thresholds must be
+    calibrated to minimize false positives while ensuring genuine incidents
+    are detected promptly. Detection mechanisms must themselves be tested
+    regularly through purple team exercises and detection engineering
+    validation. The allocation of sufficient resources implies dedicated
+    SOC capabilities proportionate to the entity's risk profile.
+
+references:
+  - citation: "DORA Regulation (EU) 2022/2554, Article 10"
+    url: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy comprehensive observability stack covering metrics (Prometheus),
+      logs (Loki/Elasticsearch), and traces (Jaeger/Tempo) across all
+      platform components. Implement anomaly detection using baseline
+      behavioral analysis on network traffic patterns, API call volumes,
+      and resource utilization. Deploy runtime security monitoring (Falco)
+      on all Kubernetes nodes to detect anomalous system calls, container
+      escapes, and privilege escalations in real-time. Establish automated
+      alerting with severity-based routing to on-call teams. Implement
+      single-point-of-failure analysis as part of architecture review
+      processes and surface findings in the service catalog. Use distributed
+      tracing to detect performance degradation across microservice chains.
+    tools:
+      - prometheus
+      - grafana
+      - loki
+      - elasticsearch
+      - falco
+      - jaeger
+      - pagerduty
+
+  devsecops:
+    prose: >-
+      Integrate detection validation into CI/CD pipelines by running
+      detection rule tests against known attack patterns as part of the
+      security testing suite. Implement pipeline-generated synthetic
+      security events to validate SIEM detection rules remain functional
+      after infrastructure changes. Require all services to emit
+      structured security-relevant logs in a standardized format. Enforce
+      logging standards through pipeline policy checks that fail builds
+      missing required log instrumentation. Deploy DAST scanners that
+      validate detection mechanisms trigger appropriate alerts during
+      automated penetration testing.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - atomic-red-team
+      - falco
+      - fluentd
+      - vector
+
+  secops:
+    prose: >-
+      Operate a Security Operations Center (SOC) with 24/7 monitoring
+      capability proportionate to the entity's risk profile. Implement
+      SIEM with correlation rules covering the MITRE ATT&CK framework
+      mapped to financial sector threat actors. Deploy User and Entity
+      Behavior Analytics (UEBA) to detect insider threats and compromised
+      accounts. Establish tiered alert handling with defined escalation
+      paths and response time SLAs. Conduct regular detection engineering
+      reviews to tune alert thresholds and reduce false positive rates.
+      Test detection mechanisms quarterly through purple team exercises
+      and document results for regulatory evidence.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - crowdstrike
+      - darktrace
+      - pagerduty
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.16"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-4", "AU-6", "IR-4"]
+    relationship: supports

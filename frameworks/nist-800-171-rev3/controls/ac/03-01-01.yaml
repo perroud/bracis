@@ -1,0 +1,99 @@
+id: 03.01.01
+family: ac
+title: "Account Management"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [ac-2]
+  - cmmc-v2: [ac.l2-3.1.1]
+statement:
+  prose: >-
+    a. Define and document the types of accounts allowed and specifically prohibited for
+       use within the system.
+    b. Assign account managers.
+    c. Require prerequisites and criteria for group and role membership.
+    d. Specify authorized users of the system, group and role membership, and access
+       authorizations (i.e., privileges) and other attributes as required for each account.
+    e. Require approvals by designated personnel or roles for requests to create accounts.
+    f. Create, enable, modify, disable, and remove accounts in accordance with policy,
+       procedures, prerequisites, and criteria.
+    g. Monitor the use of accounts.
+    h. Notify account managers and designated personnel or roles when accounts are no
+       longer required, when users are terminated or transferred, and when system usage
+       or need-to-know changes for an individual.
+    i. Authorize access to the system based on a valid access authorization, intended
+       system usage, and other attributes as required.
+    j. Review accounts for compliance with account management requirements at a defined
+       frequency.
+    k. Establish and implement a process for changing shared or group account
+       authenticators (if deployed) when individuals are removed from the group.
+    l. Align account management processes with personnel termination and transfer processes.
+guidance:
+  prose: >-
+    Account management includes the identification of account types (individual, shared,
+    group, system, guest, anonymous, emergency, developer, temporary, and service),
+    establishment of conditions for group and role membership, specification of authorized
+    users and access privileges, management of account lifecycles, and periodic review of
+    accounts. Organizations may prohibit certain account types (shared, group, emergency,
+    anonymous, temporary, guest) due to increased risk. Account management is coordinated
+    with personnel termination/transfer processes to ensure accounts are promptly disabled
+    or removed when no longer needed. The use of automated mechanisms to support account
+    management is recommended. Shared or group account authenticators are changed when
+    members leave the group to prevent unauthorized access by former members.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management through an IdP (Okta, Azure Entra ID,
+      Keycloak) integrated with all platform services via SAML 2.0 or OIDC. Define
+      account types, roles, and permissions declaratively using Infrastructure-as-Code.
+      Automate the full account lifecycle (provisioning, modification, deprovisioning)
+      through SCIM protocols synchronized with HR systems. Implement Kubernetes
+      ServiceAccounts with minimal privileges for workload identities. Enforce automatic
+      expiration policies on temporary and service accounts. Use dynamic secrets via
+      HashiCorp Vault for machine-to-machine authentication, rotating credentials
+      automatically. Deploy admission controllers to block workloads using default or
+      overprivileged service accounts.
+    tools:
+      - "Okta / Azure Entra ID / Keycloak"
+      - "SCIM provisioning"
+      - "Kubernetes RBAC / ServiceAccounts"
+      - "Terraform IAM modules"
+      - "HashiCorp Vault (dynamic secrets)"
+      - "Kyverno / OPA Gatekeeper (admission control)"
+  devsecops:
+    prose: >-
+      Enforce account management through version-controlled access configurations. All
+      IAM changes must go through merge request review with security approval. Implement
+      CI pipeline checks validating IAM configurations against organizational policy
+      using policy-as-code. Automate service account credential rotation via CI/CD
+      pipelines integrated with HashiCorp Vault. Track all account-related changes through
+      Git commit history for full auditability. Implement branch protection rules to
+      prevent unauthorized changes to access management configurations. Scan for hardcoded
+      credentials and overprivileged service accounts in pipeline stages.
+    tools:
+      - "GitLab/GitHub Access Management"
+      - "SAML SSO integration"
+      - "HashiCorp Vault"
+      - "Terraform"
+      - "CI/CD pipelines for account automation"
+      - "Checkov / tfsec (IAM policy validation)"
+      - "Trivy (service account scanning)"
+  secops:
+    prose: >-
+      Monitor account activity through centralized SIEM integration. Configure alerts
+      for anomalous account behavior: off-hours access, privilege escalation attempts,
+      dormant account usage, and impossible travel. Conduct periodic access reviews
+      (minimum quarterly) comparing active accounts against authorized user lists from
+      HR systems. Implement automated workflows for account termination upon personnel
+      offboarding. Generate compliance evidence showing account creation/deletion
+      timelines, approval chains, and periodic review completion. Monitor for shared
+      credential usage patterns.
+    tools:
+      - "SIEM (Splunk, Elastic Security, Microsoft Sentinel)"
+      - "SOAR platforms (Cortex XSOAR, Tines)"
+      - "Identity Governance (SailPoint, Saviynt)"
+      - "PAM solutions (CyberArk, BeyondTrust)"
+      - "Audit log aggregation"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — AC-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"

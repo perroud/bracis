@@ -1,0 +1,83 @@
+id: pin-10
+family: pin-transport
+title: "PIN Translation Controls"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Where PIN blocks are translated from one encryption key to another during transmission
+    through a payment network, the translation must occur exclusively within a secure
+    cryptographic device (SCD). The translation process must decrypt the PIN block under the
+    inbound key and immediately re-encrypt it under the outbound key within the same SCD
+    operation — the cleartext PIN must never exist outside the SCD boundary, even
+    momentarily in host memory. The SCD performing translation must enforce that the inbound
+    and outbound keys are different (preventing null translation). All PIN translation
+    operations must be logged with sufficient detail for audit purposes, including
+    timestamps, key identifiers (not key values), source and destination identifiers, and
+    transaction reference numbers.
+
+guidance:
+  prose: >-
+    PIN translation is one of the highest-risk operations in the payment chain because it
+    is the point where the cleartext PIN is most accessible — albeit only within the HSM.
+    A compromised HSM at a translation point could expose PINs for all transactions routed
+    through it. Organizations must minimize the number of translation points in their
+    network and ensure that each translation HSM is under rigorous physical and logical
+    access control. The prohibition on null translation (same key in and out) prevents an
+    attacker from using the translation function as a PIN decryption oracle. Audit logging
+    of translation operations is essential for incident investigation — if a key is later
+    determined to be compromised, the translation logs identify which transactions were
+    affected.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 3, PIN Translation"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure PIN translation HSMs to enforce that inbound and outbound key identifiers
+      must differ for every translation operation. Implement HSM firmware rules that reject
+      translation requests where source and destination keys are identical. Deploy
+      translation HSMs in hardened, access-controlled environments with tamper-evident
+      enclosures. Implement real-time monitoring of translation throughput with automatic
+      scaling alerts. Maintain a network topology map of all PIN translation points with
+      documented key relationships for each link.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - futurex-hsm
+      - hsm-monitoring-platform
+  devsecops:
+    prose: >-
+      Implement integration tests that verify PIN translation produces different
+      ciphertext when translating between different key pairs. Test that the HSM rejects
+      null translation attempts (same key for input and output). Validate translation
+      audit log completeness by parsing logs and verifying all required fields are
+      populated. Scan HSM configuration deployment scripts for correct parameter settings.
+    tools:
+      - gitlab-sast
+      - integration-test-framework
+      - log-validation-scripts
+  secops:
+    prose: >-
+      Monitor PIN translation volumes per HSM and per key pair to detect anomalous
+      routing patterns. Alert on translation failures or rejections that could indicate
+      key synchronization issues or attack attempts. Audit translation logs weekly to
+      verify completeness and consistency. Investigate any gap in translation log
+      sequence numbers as potential evidence of log tampering.
+    tools:
+      - splunk
+      - elastic-siem
+      - thales-crypto-command-center
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-4.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped

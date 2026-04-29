@@ -1,0 +1,99 @@
+id: art-2
+family: cap-1
+title: "Definicoes Aplicaveis"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 2. Para fins desta Resolução, consideram-se:
+
+    I - lavagem de dinheiro: os crimes previstos na Lei n. 9.613, de 3 de março de 1998;
+
+    II - financiamento do terrorismo: os crimes previstos na Lei n. 13.260, de 16 de
+    março de 2016;
+
+    III - beneficiário final: a pessoa natural que, em última instância, possui, controla
+    ou se beneficia de forma significativa de uma pessoa jurídica ou arranjo legal, ou
+    a pessoa natural em nome de quem uma transação é realizada;
+
+    IV - pessoa politicamente exposta (PEP): agente público que exerce ou exerceu
+    funções públicas relevantes no Brasil ou no exterior, bem como seus familiares,
+    representantes e estreitos colaboradores;
+
+    V - abordagem baseada em risco: metodologia que calibra a intensidade dos
+    procedimentos de PLD/FT em função do risco identificado de lavagem de dinheiro
+    e de financiamento do terrorismo.
+guidance:
+  prose: |
+    O art. 2 define os termos fundamentais do programa de PLD/FT para IPs.
+    Cada definicao tem implicacoes diretas nos controles tecnicos.
+
+    **Beneficiario final (inciso III):**
+    Para PJ: pessoa natural com participacao acionaria igual ou superior a 25% do
+    capital social, ou que exerca controle de fato (independente de participacao
+    minoritaria). Para arranjos legais (trusts, fundos): o settlor, trustee ou
+    beneficiario identificado.
+
+    **PEP (inciso IV):**
+    Lista nao exaustiva inclui: presidentes, ministros, governadores, prefeitos de
+    municipios com populacao acima de 100 mil habitantes, parlamentares, magistrados,
+    militares de alta patente, dirigentes de estatais, embaixadores.
+    Familiares de PEP ate 2 grau (pais, filhos, conjuges, irmaos).
+
+    **Abordagem baseada em risco (inciso V):**
+    E o principio organizador de todo o programa -- nao existe "tudo ou nada". A
+    intensidade dos controles deve ser proporcional ao risco de cada cliente, produto,
+    canal e jurisdicao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao das definicoes no sistema:**
+      1. Modelar entidade "BeneficiarioFinal" no banco de dados com campos:
+         - tipo_vinculo (participacao_acionaria, controle_de_fato, procuracao)
+         - percentual_participacao (decimal)
+         - data_inicio_vinculo, data_fim_vinculo
+         - documentos_comprobatorios (array de referencias)
+      2. Modelar entidade "PEP" com campos:
+         - nivel_exposicao (proprio, familiar_1grau, familiar_2grau, colaborador)
+         - cargo_exercido, orgao, periodo_inicio, periodo_fim
+         - pais_jurisdicao
+         - fonte_identificacao (lista_bcb, declaracao_cliente, screening_automatico)
+      3. Implementar motor de scoring de risco com variaveis de entrada para cada
+         definicao relevante (PEP aumenta o score, beneficiario final em jurisdicao
+         de risco aumenta o score).
+    tools:
+      - kyc-platform
+      - aml-screening
+      - data-modeling
+  devsecops:
+    prose: |
+      **Testes das definicoes no sistema:**
+      1. Testes unitarios para calculo de beneficiario final (cadeia societaria de
+         varios niveis, participacao direta e indireta).
+      2. Testes de identificacao de PEP (matching de listas, familiares, colaboradores).
+      3. Testes do motor de risco para cada variavel definida no art. 2.
+      4. Testes de borda: participacao exatamente em 25%, PEP com mandato expirado
+         (mantido como PEP por 5 anos apos o termino, per regulamentacao COAF).
+    tools:
+      - gitlab-ci
+      - test-automation
+      - sonarqube
+  secops:
+    prose: |
+      **Auditoria das definicoes:**
+      1. Revisao anual das definicoes de PEP e beneficiario final contra as
+         orientacoes atualizadas do COAF e FATF.
+      2. Verificacao de que as listas de PEP utilizadas no sistema estao atualizadas.
+      3. Monitoramento de clientes cujo status de PEP muda (ex: eleicao, nomeacao).
+      4. Auditoria do percentual de clientes PJ sem beneficiario final identificado.
+    tools:
+      - aml-platform
+      - sanctions-screening
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-2"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: complements

@@ -1,0 +1,93 @@
+id: art-40
+family: xborder
+title: "Data localization for critical information infrastructure operators"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 40: Critical information infrastructure operators and personal information processors that
+    process personal information reaching the volume specified by the national cyberspace administration
+    shall store personal information collected and generated within the territory of the People's
+    Republic of China domestically. Where it is truly necessary to provide such information outside the
+    territory of the People's Republic of China, a security assessment organized by the national
+    cyberspace administration shall be passed. Where laws or administrative regulations or the national
+    cyberspace administration provide that such security assessment is not required, such provisions
+    shall prevail.
+    Article 41: The competent authorities of the People's Republic of China shall handle requests from
+    foreign judicial or law enforcement agencies for the provision of personal information stored within
+    the territory of the People's Republic of China in accordance with relevant laws and international
+    treaties and agreements concluded or acceded to by the People's Republic of China, or in accordance
+    with the principle of equality and reciprocity. Without the approval of the competent authorities of
+    the People's Republic of China, personal information processors shall not provide personal information
+    stored within the territory of the People's Republic of China to foreign judicial or law enforcement
+    agencies.
+
+guidance:
+  prose: >-
+    Article 40 establishes a mandatory data localization requirement for two categories of processors:
+    (1) critical information infrastructure (CII) operators, and (2) processors whose data volume
+    exceeds the threshold set by the CAC. The CAC's "Measures for Security Assessment of Data Exports"
+    (September 2022) specifies the thresholds: processors handling personal information of more than
+    1 million individuals, or processors that have transferred personal information of more than
+    100,000 individuals or sensitive personal information of more than 10,000 individuals abroad since
+    January 1 of the preceding year. Article 41 imposes a government approval requirement for
+    responding to foreign judicial or law enforcement requests for personal information stored in
+    China. This is a blocking statute analogous to GDPR Article 48, but with explicit criminal
+    liability implications. Organizations cannot comply with foreign court orders or subpoenas
+    for China-stored personal information without Chinese government approval.
+
+references:
+  - citation: "PIPL, Articles 40–41"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy dedicated China-region infrastructure for storing personal information collected
+      from Chinese individuals. Implement data residency enforcement that prevents personal
+      information from being replicated to non-China regions. Build volume monitoring systems
+      that track the number of individuals whose personal information is processed and alert
+      when approaching CAC thresholds (1 million individuals, 100,000 transferred abroad,
+      10,000 sensitive transferred abroad). Implement blocking controls for foreign legal
+      requests that require Chinese government approval routing. Deploy backup and disaster
+      recovery within China to avoid cross-border data movement for resilience purposes.
+    tools:
+      - "China cloud infrastructure (Alibaba Cloud, Tencent Cloud, Huawei Cloud)"
+      - "Data residency enforcement (OPA policies, network segmentation)"
+      - "Volume monitoring with threshold alerting (custom metrics)"
+      - "Foreign legal request workflow with government approval gate"
+      - "In-China backup and DR solutions"
+  devsecops:
+    prose: >-
+      Infrastructure-as-code must enforce China-region data residency for personal information
+      workloads. Pipeline checks must verify that database replication does not cross Chinese
+      borders. CI/CD must include volume threshold monitoring integration. Deployment pipelines
+      must validate that backup and DR configurations keep data within China. Security reviews
+      must verify that foreign legal request handling routes through government approval.
+    tools:
+      - "IaC validation for China data residency (Terraform, Pulumi with OPA)"
+      - "Database replication boundary validation"
+      - "Volume threshold monitoring integration tests"
+      - "DR configuration compliance validation"
+  secops:
+    prose: >-
+      Monitor data replication and transfer logs for any unauthorized cross-border movement
+      from China-region infrastructure. Track data volume metrics against CAC thresholds with
+      advance warning alerts. Alert on foreign legal requests that bypass the government
+      approval process. Conduct periodic audits of China-region infrastructure to verify
+      data localization compliance. Monitor third-party services and SaaS tools for
+      unauthorized data replication outside China.
+    tools:
+      - "Data replication monitoring across regions"
+      - "Volume threshold dashboards with alerting"
+      - "Foreign legal request audit trail"
+      - "Third-party data localization verification tools"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9"]
+    relationship: supports

@@ -1,0 +1,123 @@
+id: art-31
+family: cap-6
+title: "Ciberseguranca de Sistemas de IA Medica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 31. Sistemas de IA médica devem atender a requisitos de
+    cibersegurança que protejam a integridade, confidencialidade e
+    disponibilidade do sistema e dos dados processados:
+
+    I - controle de acesso robusto a sistemas de IA médica, incluindo
+    autenticação multifator para acesso administrativo e ao pipeline
+    de treinamento;
+
+    II - criptografia de dados de saúde em trânsito e em repouso,
+    utilizando algoritmos e comprimentos de chave reconhecidos como
+    seguros;
+
+    III - segmentação de rede que isole sistemas de IA médica de
+    redes não confiáveis e limite movimentação lateral;
+
+    IV - gestão de vulnerabilidades específica para componentes de
+    ML: bibliotecas de ML, frameworks de inferência, APIs de modelo
+    e infraestrutura de treinamento;
+
+    V - registro e monitoramento de eventos de segurança (logs)
+    para todos os componentes do pipeline de ML, com retenção
+    adequada e proteção contra adulteração.
+guidance:
+  prose: |
+    O art. 31 estende requisitos tradicionais de ciberseguranca ao
+    contexto especifico de IA, reconhecendo que pipelines de ML tem
+    superficie de ataque propria.
+
+    **Superficie de ataque de IA medica:**
+
+    - Pipeline de treinamento: acesso a dados sensiiveis, manipulacao
+      de dados de treinamento, substituicao de modelo treinado.
+
+    - API de inferencia: injecao de inputs adversariais, negacao de
+      servico, extracao de modelo, exfiltracao de dados.
+
+    - Model registry: substituicao de modelo por versao maliciosa,
+      acesso nao autorizado a pesos do modelo.
+
+    - Infraestrutura de ML: GPUs compartilhadas, notebooks Jupyter
+      expostos, secrets em codigo, buckets S3 publicos.
+
+    **Bibliotecas de ML (inciso IV):**
+    TensorFlow, PyTorch, scikit-learn e outras bibliotecas tem CVEs
+    proprias. Gestao de vulnerabilidades deve incluir esses
+    componentes, nao apenas dependencias tradicionais.
+
+    **Supply chain de ML:**
+    Modelos pre-treinados (Hugging Face, ONNX Zoo) podem conter
+    backdoors. Modelos de terceiros usados em IA medica devem ser
+    verificados antes do uso.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de seguranca para ML:**
+      1. Implementar zero-trust architecture para pipeline de ML:
+         autenticacao de todo componente, autorizacao granular por
+         recurso, criptografia end-to-end.
+      2. Configurar segmentacao de rede dedicada para sistemas de IA:
+         rede de treinamento isolada, rede de inferencia com acesso
+         restrito, rede de dados com controle rigoroso.
+      3. Implementar gestao de secrets especifica para ML: API keys,
+         credenciais de model registry, tokens de acesso a dados —
+         em vault centralizado, nunca em codigo.
+      4. Configurar monitoring de seguranca especifico para infraestrutura
+         de ML: deteccao de acesso anomalo a dados, uso anormal de GPU,
+         transferencia suspeita de modelos.
+    tools:
+      - zero-trust
+      - network-segmentation
+      - secrets-management
+      - security-monitoring
+  devsecops:
+    prose: |
+      **Seguranca no pipeline de ML:**
+      1. Implementar scanning de vulnerabilidades em dependencias de ML
+         no CI/CD: TensorFlow, PyTorch, ONNX, scikit-learn e todas
+         as bibliotecas do pipeline.
+      2. Automatizar verificacao de integridade de modelos: hash do
+         modelo no registry deve corresponder ao modelo em producao.
+      3. Implementar SAST e DAST especificos para APIs de inferencia:
+         testar injecao, autenticacao, rate limiting.
+      4. Scan de secrets no pipeline de ML: credenciais em notebooks,
+         tokens em configuracao, chaves em codigo.
+    tools:
+      - gitlab-ci
+      - dependency-scanning
+      - model-integrity
+      - sast-dast
+      - secret-detection
+  secops:
+    prose: |
+      **Operacao de seguranca de IA:**
+      1. Incluir componentes de ML no programa de gestao de
+         vulnerabilidades: scan periodico, patch management,
+         monitoramento de CVEs.
+      2. Implementar monitoramento SIEM para eventos de seguranca
+         de IA: acessos a dados de treinamento, modificacoes de
+         modelo, consultas anomalas a API.
+      3. Realizar pen test anual especifico para pipeline de ML,
+         alem de pen test de aplicacao convencional.
+      4. Manter plano de resposta a incidentes que contemple cenarios
+         especificos de IA: modelo comprometido, dados de treinamento
+         vazados, ataque adversarial em producao.
+    tools:
+      - vulnerability-management
+      - siem
+      - pen-test
+      - incident-response
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-15"]
+    relationship: mapped

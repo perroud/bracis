@@ -1,0 +1,98 @@
+id: pm-1
+family: pm
+title: "Timely Patching of Operating Systems"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    All operating systems and firmware on devices in scope must be licensed and
+    supported by the vendor, receiving regular security updates. Security patches
+    for operating systems must be applied within 14 days of release where the patch
+    fixes a vulnerability with a severity rated as critical or high. Operating systems
+    that are no longer supported by the vendor (end-of-life) must be removed from
+    the network or isolated from the internet and other networked devices.
+
+guidance:
+  prose: >-
+    Unpatched operating systems are a primary attack vector for both opportunistic
+    and targeted attacks. The 14-day patching window is a key requirement of Cyber
+    Essentials — organisations must have processes in place to identify, test, and
+    deploy critical and high-severity OS patches within this timeframe. For Cyber
+    Essentials Plus, the Certification Body will verify that patch levels are current
+    during the technical assessment. End-of-life operating systems that cannot receive
+    patches represent an unacceptable risk and must be replaced or fully isolated from
+    the network.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Security Update Management"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Vulnerability Management"
+    url: "https://www.ncsc.gov.uk/guidance/vulnerability-management"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralised patch management platforms (WSUS, SCCM/MECM, Intune for
+      Windows; Landscape for Ubuntu; Satellite for RHEL; Jamf for macOS) with automated
+      patch approval and deployment workflows. Implement maintenance windows for
+      automatic OS patching with staggered rollouts (dev, staging, production). Use
+      immutable infrastructure patterns for server workloads — rebuild from patched
+      base images rather than patching in place. Configure automated node recycling
+      in Kubernetes clusters to pick up patched node images. Maintain an accurate
+      inventory of all operating systems in use, including versions and support status.
+    tools:
+      - wsus
+      - sccm
+      - intune
+      - jamf
+      - ansible
+      - terraform
+      - packer
+
+  devsecops:
+    prose: >-
+      Automate base image rebuilds in CI/CD pipelines triggered by upstream OS patch
+      releases. Implement automated vulnerability scanning of OS packages in container
+      images as a pipeline gate. Use Renovate or Dependabot to create automated merge
+      requests when new base image versions are available. Track operating system
+      versions across all deployment environments and fail deployments that use
+      unsupported OS versions. Implement canary deployments for OS updates to detect
+      compatibility issues before full rollout.
+    tools:
+      - gitlab-ci
+      - renovate
+      - dependabot
+      - trivy
+      - grype
+      - packer
+
+  secops:
+    prose: >-
+      Run vulnerability scans at least weekly to identify systems missing critical
+      and high-severity OS patches. Generate patch compliance dashboards showing the
+      percentage of systems patched within the 14-day window. Escalate systems that
+      exceed the patching SLA to the responsible team and track remediation. Maintain
+      a risk register for any systems that cannot be patched within SLA, documenting
+      compensating controls. Monitor for end-of-life operating systems and report them
+      to asset owners for replacement or isolation planning.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - splunk
+      - servicenow-vuln-response
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.19"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5", "CM-8"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-patch-os"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 7.1", "CIS 7.3", "CIS 7.4"]
+    relationship: mapped

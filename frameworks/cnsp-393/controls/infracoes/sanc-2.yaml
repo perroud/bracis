@@ -1,0 +1,106 @@
+id: sanc-2
+family: infracoes
+title: "Obstruction of Supervision and Inspection"
+class: CNSP-393
+baselines: [supervisionadas-susep]
+statement:
+  prose: |
+    Constitui infração grave, independentemente de outras sanções aplicáveis, embaraçar
+    ou dificultar a ação fiscalizadora da SUSEP, incluindo:
+
+    I — recusar, retardar ou deixar de fornecer à SUSEP documentos, dados ou informações
+    solicitados no exercício de suas atribuições legais e regulamentares;
+
+    II — prestar informações falsas, incompletas ou enganosas à SUSEP;
+
+    III — impedir ou dificultar o acesso de servidores da SUSEP às dependências, sistemas,
+    documentos, livros e registros da supervisionada;
+
+    IV — destruir, inutilizar ou tornar indisponível documentação que deveria ser
+    preservada para fins de fiscalização;
+
+    V — deixar de manter sistemas de informação, registros contábeis e controles
+    internos adequados que permitam a fiscalização pela SUSEP.
+guidance:
+  prose: |
+    This control addresses the mandatory obligation to cooperate with SUSEP's
+    supervisory activities. Obstruction of supervision is automatically classified
+    as a serious infraction, regardless of the underlying matter being investigated.
+
+    **Qualified forms of obstruction:**
+    - Refusal or delay in providing requested documents and data
+    - False, incomplete, or misleading information submitted to SUSEP
+    - Denial of physical or logical access to premises, systems, and records
+    - Destruction or unavailability of records required for inspection
+    - Failure to maintain adequate information systems and internal controls
+
+    **Technology-specific implications:**
+    Data retention policies, system availability, and audit trail integrity are
+    directly relevant. If SUSEP requests access to system logs, transaction records,
+    or configuration data and the entity cannot produce them, this constitutes
+    obstruction regardless of the reason (technical failure, insufficient retention,
+    or intentional deletion).
+
+    **Escalation risk:**
+    Obstruction during an investigation of a light or medium infraction can escalate
+    the overall case to serious severity, significantly increasing potential penalties.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Regulatory access and data preservation infrastructure:**
+      1. Implement centralized log aggregation with immutable storage (WORM)
+         and minimum 5-year retention for all systems within SUSEP's supervisory
+         scope.
+      2. Deploy read-only audit access roles that can be provisioned to SUSEP
+         inspectors on demand without requiring system modifications.
+      3. Implement automated data retention policies enforced at the storage
+         layer to prevent accidental or intentional deletion of regulated records.
+      4. Maintain disaster recovery procedures that ensure regulatory records
+         remain accessible even during system failures or migrations.
+      5. Create a regulatory data export capability that can produce SUSEP-required
+         reports in standard formats within contractual SLA timelines.
+    tools:
+      - elasticsearch
+      - s3-object-lock
+      - vault
+      - backup-systems
+      - data-retention-policies
+  devsecops:
+    prose: |
+      **Audit trail integrity in development:**
+      1. Enforce signed commits and branch protection rules to ensure
+         traceability of all code changes affecting regulated systems.
+      2. Implement pipeline stages that validate audit logging is active
+         and properly configured before deploying to production.
+      3. Block deployments that would disable, reduce, or bypass audit
+         logging on systems within SUSEP's supervisory scope.
+      4. Maintain automated tests verifying that regulatory data export
+         functions produce complete and accurate outputs.
+    tools:
+      - gitlab-ci
+      - signed-commits
+      - compliance-pipeline
+      - audit-log-validation
+  secops:
+    prose: |
+      **SUSEP inspection readiness program:**
+      1. Maintain a documented inspection response playbook with designated
+         personnel, communication protocols, and data retrieval procedures.
+      2. Conduct semi-annual inspection readiness drills simulating SUSEP
+         data requests across all critical systems.
+      3. Monitor data retention compliance continuously and alert when
+         retention policies approach expiration thresholds.
+      4. Maintain a pre-approved access provisioning workflow for SUSEP
+         inspectors that can be activated within 24 hours of notification.
+    tools:
+      - grc-platform
+      - siem
+      - data-retention-monitor
+      - access-management
+legal_references:
+  - framework_id: susep-638
+    articles: ["art-30", "art-31"]
+    relationship: complements
+  - framework_id: cnsp-381
+    articles: ["art-17"]
+    relationship: complements

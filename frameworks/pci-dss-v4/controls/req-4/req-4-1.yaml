@@ -1,0 +1,108 @@
+id: req-4.1
+family: req-4
+title: "Protect Cardholder Data with Strong Cryptography During Transmission"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for protecting cardholder data with strong cryptography
+    during transmission over open, public networks are defined and understood. PAN is
+    protected with strong cryptography during transmission over open, public networks.
+    Trusted keys and certificates are managed. Certificates used to safeguard PAN
+    during transmission over open, public networks are confirmed as valid and are not
+    expired or revoked.
+  parts:
+    - id: req-4.1.a
+      label: "4.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 4
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-4.1.b
+      label: "4.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 4 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Cardholder data transmitted over open, public networks (internet, wireless, cellular,
+    satellite) is vulnerable to interception. Strong cryptography must be applied to
+    protect the confidentiality and integrity of PAN during transmission. TLS 1.2 or
+    higher is required; SSL and early TLS are not considered strong cryptography. For
+    wireless networks transmitting cardholder data, industry best practices for strong
+    encryption must be used (WPA3 or WPA2 with AES). Organizations must manage
+    certificates and keys properly, including validation of certificate chains, monitoring
+    for expiration, and revocation checking. End-to-end encryption of cardholder data
+    from the point of interaction (POI) to the environment where it is decrypted provides
+    the strongest protection.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 4"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "NIST SP 800-52 Rev. 2 - Guidelines for TLS Implementations"
+    url: "https://doi.org/10.6028/NIST.SP.800-52r2"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ for all external and internal communications handling
+      cardholder data. Use a service mesh (Istio, Linkerd) to enforce mutual TLS
+      (mTLS) between all microservices in the CDE. Automate certificate lifecycle
+      management using cert-manager in Kubernetes with Let's Encrypt or an internal
+      CA. Implement TLS termination at the ingress controller with strict cipher
+      suite configurations (only AEAD ciphers). Configure infrastructure-as-code
+      to enforce minimum TLS versions on load balancers, API gateways, and database
+      connections. Use network policies to block any unencrypted traffic within the CDE.
+    tools:
+      - cert-manager
+      - istio
+      - linkerd
+      - nginx-ingress
+      - traefik
+      - aws-acm
+      - azure-key-vault
+      - lets-encrypt
+      - step-ca
+
+  devsecops:
+    prose: >-
+      Integrate TLS configuration scanning into CI/CD pipelines. Use testssl.sh or
+      sslyze in pipeline stages to validate TLS versions and cipher suites on
+      deployed endpoints. Enforce that no application code uses deprecated SSL/TLS
+      libraries or disables certificate verification. Scan IaC templates for
+      insecure TLS configurations (TLS < 1.2, weak cipher suites). Monitor
+      certificate expiration dates in pipelines and alert 30 days before expiry.
+      Implement automated certificate rotation testing in staging environments.
+    tools:
+      - gitlab-ci
+      - testssl.sh
+      - sslyze
+      - checkov
+      - tfsec
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor for TLS downgrade attacks and expired certificates using continuous
+      scanning tools. Alert on any cleartext transmission of data matching PAN
+      patterns. Track certificate inventory with expiration dates and automated
+      renewal status. Monitor for certificate transparency log entries related to
+      organizational domains. Detect and alert on connections using deprecated
+      protocols (SSLv3, TLS 1.0, TLS 1.1) through network monitoring. Conduct
+      periodic external vulnerability scans that validate TLS configurations on
+      all public-facing endpoints.
+    tools:
+      - qualys-ssl-labs
+      - splunk
+      - elastic-siem
+      - censys
+      - certificate-transparency-logs
+      - hardenize
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-17"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.26"]
+    relationship: supports

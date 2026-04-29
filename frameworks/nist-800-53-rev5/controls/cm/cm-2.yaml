@@ -1,0 +1,106 @@
+id: cm-2
+family: cm
+title: "Baseline Configuration"
+class: SP800-53
+baselines: [low, moderate, high]
+parameters:
+  - id: cm-02_odp.01
+    label: "frequency"
+    guidance: "Organization-defined frequency for reviewing and updating the baseline configuration"
+  - id: cm-02_odp.02
+    label: "events"
+    guidance: "Organization-defined circumstances requiring baseline configuration review and update"
+statement:
+  prose: >-
+    a. Develop, document, and maintain under configuration control, a current baseline configuration
+       of the system; and
+    b. Review and update the baseline configuration of the system:
+       1. [Assignment: organization-defined frequency];
+       2. When required due to [Assignment: organization-defined circumstances]; and
+       3. When system components are installed or upgraded.
+  parts:
+    - id: cm-2_smt.a
+      label: "a."
+      prose: >-
+        Develop, document, and maintain under configuration control, a current baseline
+        configuration of the system; and
+    - id: cm-2_smt.b
+      label: "b."
+      prose: >-
+        Review and update the baseline configuration of the system:
+        1. [Assignment: organization-defined frequency];
+        2. When required due to [Assignment: organization-defined circumstances]; and
+        3. When system components are installed or upgraded.
+guidance:
+  prose: >-
+    Baseline configurations for systems and system components include connectivity, operational,
+    and communications aspects of systems. Baseline configurations are documented, formally reviewed,
+    and agreed-upon specifications for systems or configuration items within those systems. Baseline
+    configurations serve as a basis for future builds, releases, or changes to systems and include
+    security and privacy features, operational features, and other features of systems. Changes
+    to baseline configurations can be made, for example, due to the installation of new or updated
+    hardware, software, or firmware components; changes to the security, privacy, or other
+    requirements of a system; or activities performed to address vulnerabilities. Maintaining
+    baseline configurations requires creating new baselines as organizational systems change over
+    time. Baseline configurations of systems reflect the current enterprise architecture.
+enhancements:
+  - id: cm-2.2
+    title: "Automation Support for Accuracy and Currency"
+    baselines: [moderate, high]
+  - id: cm-2.3
+    title: "Retention of Previous Configurations"
+    baselines: [moderate, high]
+  - id: cm-2.7
+    title: "Configure Systems and Components for High-Risk Areas"
+    baselines: [moderate, high]
+references:
+  - citation: "NIST SP 800-128"
+    url: "https://doi.org/10.6028/NIST.SP.800-128"
+  - citation: "NIST SP 800-124 Rev. 2"
+    url: "https://doi.org/10.6028/NIST.SP.800-124r2"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define infrastructure baseline configurations as Infrastructure-as-Code (IaC) stored in
+      version-controlled Git repositories. Use Terraform modules, Helm charts, and Kubernetes
+      manifests as the authoritative source for all system configurations. Implement GitOps
+      workflows (ArgoCD, Flux) that continuously reconcile running state against declared baselines.
+      Use golden images (AMIs, container base images) built through automated pipelines with
+      hardening applied (CIS Benchmarks). Maintain a Software Bill of Materials (SBOM) for each
+      baseline. Tag and version all baseline configurations with semantic versioning.
+    tools:
+      - "Terraform / OpenTofu"
+      - "Helm"
+      - "ArgoCD / Flux"
+      - "Packer (golden images)"
+      - "CIS Benchmarks"
+      - "Syft / Trivy (SBOM)"
+      - "Git (version control)"
+  devsecops:
+    prose: >-
+      Enforce baseline configuration management through merge request workflows. All configuration
+      changes must go through code review and CI/CD validation before merging. Implement automated
+      drift detection in pipelines that compare running configurations against the declared baseline.
+      Use Conftest or Checkov to validate configurations against organizational policies before
+      deployment. Maintain previous baseline versions through Git history, enabling rollback to
+      any prior known-good state. Generate and store SBOMs as CI artifacts for every release.
+    tools:
+      - "GitLab CI/CD"
+      - "GitLab Merge Requests"
+      - "Conftest / Checkov / tfsec"
+      - "Terraform plan (drift detection)"
+      - "SBOM generation (Syft, CycloneDX)"
+      - "Container image scanning"
+  secops:
+    prose: >-
+      Monitor for configuration drift from established baselines using continuous compliance
+      scanning. Alert on unauthorized configuration changes detected through integrity monitoring.
+      Conduct periodic configuration audits comparing deployed systems against documented baselines.
+      Track baseline change history and correlate configuration changes with security events to
+      identify configuration-related incidents.
+    tools:
+      - "CSPM (Prisma Cloud, Wiz, AWS Config)"
+      - "File integrity monitoring (OSSEC, Wazuh)"
+      - "AWS Config Rules / Azure Policy / GCP Security Health Analytics"
+      - "CIS-CAT"
+      - "GitLab Audit Events"

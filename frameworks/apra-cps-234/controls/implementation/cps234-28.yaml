@@ -1,0 +1,121 @@
+id: cps234-28
+family: implementation
+title: "Control Implementation"
+class: CPS234
+
+statement:
+  prose: >-
+    An APRA-regulated entity must implement information security
+    controls to protect its information assets, including those
+    managed by related parties and third parties, commensurate with
+    the criticality and sensitivity of those information assets, and
+    with the stage at which those assets exist within their lifecycle.
+  parts:
+    - id: cps234-28.a
+      label: "a."
+      prose: >-
+        Information security controls must address, at a minimum:
+        physical security, access management, data and infrastructure
+        integrity, change management, and security of the technology
+        operating environment.
+    - id: cps234-28.b
+      label: "b."
+      prose: >-
+        Controls must be designed and implemented to protect
+        information assets throughout their entire lifecycle,
+        including creation, storage, transmission, use, and
+        destruction.
+
+guidance:
+  prose: >-
+    Control implementation is the operational realization of the
+    information security policy framework. APRA expects controls
+    to be layered (defense-in-depth), proportionate (calibrated to
+    asset classification), and lifecycle-aware (covering assets from
+    creation through destruction). Controls must not be limited to
+    technology — they include administrative controls (policies,
+    procedures, training) and physical controls (facility security,
+    media handling). The effectiveness of controls must be verifiable
+    through testing and audit. Controls must extend to third-party
+    and related-party environments where the entity's information
+    assets reside.
+
+references:
+  - citation: "APRA Prudential Standard CPS 234, Paragraph 28"
+    url: "https://www.legislation.gov.au/F2018L01745/latest/text"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement layered security controls across the platform stack.
+      Network layer: service mesh with mTLS (Istio/Linkerd), network
+      policies (Calico/Cilium), and WAF for internet-facing services.
+      Identity layer: zero-trust authentication and authorization
+      with short-lived credentials, MFA enforcement, and
+      just-in-time access. Data layer: encryption at rest (KMS),
+      encryption in transit (TLS 1.3), and secrets management (Vault).
+      Compute layer: hardened base images, runtime protection (Falco),
+      and immutable infrastructure. Deploy all controls as code with
+      automated compliance verification. Implement data lifecycle
+      management including automated retention and destruction.
+    tools:
+      - istio
+      - calico
+      - vault
+      - cert-manager
+      - falco
+      - kyverno
+      - open-policy-agent
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement security controls at every pipeline stage. Source:
+      branch protection, CODEOWNERS, signed commits. Build: SAST,
+      SCA, secret detection, license compliance. Test: DAST,
+      container scanning, IaC scanning. Deploy: image signing and
+      verification, deployment approval gates, canary deployments.
+      Runtime: vulnerability monitoring, dependency update automation.
+      Enforce immutable artifacts — build once, deploy many times
+      with the same verified artifact. Implement automated rollback
+      on security control failures. Track control coverage metrics
+      per service and report gaps.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-container-scanning
+      - gitlab-dependency-scanning
+      - gitlab-secret-detection
+      - trivy
+      - cosign
+      - checkov
+
+  secops:
+    prose: >-
+      Operate continuous control monitoring through SIEM rules that
+      detect control failures in real time. Implement automated
+      control effectiveness metrics: access control violations,
+      encryption compliance, patch currency, configuration drift.
+      Monitor data lifecycle compliance including retention and
+      destruction policy adherence. Detect unauthorized access
+      attempts, privilege escalations, and data exfiltration
+      indicators. Maintain a control register mapping each control
+      to the information assets it protects and the policy
+      requirement it satisfies. Generate periodic control
+      effectiveness reports for governing body review.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - falco
+      - grc-platform
+      - nessus
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a8.1", "a8.5", "a8.9", "a8.24"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "SC-1", "SC-8", "SC-28", "MP-6"]
+    relationship: supports

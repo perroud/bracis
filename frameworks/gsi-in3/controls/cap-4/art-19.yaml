@@ -1,0 +1,75 @@
+id: art-19
+family: cap-4
+title: "Seguranca DNS"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 19. Os órgãos e entidades devem implementar controles de segurança para
+    o serviço de resolução de nomes (DNS), incluindo:
+
+    I - uso de DNSSEC para proteção contra ataques de envenenamento de cache;
+    II - filtragem DNS para bloqueio de domínios maliciosos;
+    III - monitoramento de consultas DNS anômalas;
+    IV - redundância de servidores DNS.
+guidance:
+  prose: |
+    O art. 19 trata da seguranca DNS, vetor frequente de ataques (DNS spoofing,
+    tunneling, exfiltracao de dados via DNS).
+
+    **Controles DNS obrigatorios:**
+    1. DNSSEC: assinatura criptografica de registros DNS
+    2. Filtragem: bloquear dominios de C2, phishing, malware
+    3. Monitoramento: detectar DNS tunneling e exfiltracao
+    4. Redundancia: minimo 2 servidores DNS em locais distintos
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.20 (Network security)
+    - NIST 800-53 rev5: SC-20 (Secure Name/Address Resolution)
+    - CIS Controls v8: 9.2 (DNS Filtering)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **DNS seguro:**
+      1. DNSSEC habilitado em todos os dominios do orgao.
+      2. DNS-over-HTTPS (DoH) ou DNS-over-TLS (DoT) para resolucao interna.
+      3. DNS sinkhole para bloqueio de dominios maliciosos (Pi-hole, Quad9).
+      4. DNS redundante com anycast (Route 53, Cloudflare DNS).
+      5. Split-horizon DNS: resolucao diferente para interno vs. externo.
+    tools:
+      - dnssec
+      - dns-filtering
+      - dns-sinkhole
+      - anycast-dns
+  devsecops:
+    prose: |
+      **DNS em infraestrutura como codigo:**
+      1. Registros DNS gerenciados via Terraform/Pulumi (versionado em Git).
+      2. Validacao automatica de registros DNS em pipeline.
+      3. Deteccao de subdomain takeover em pipeline de seguranca.
+      4. DNSSEC key rotation automatizada.
+    tools:
+      - dns-iac
+      - subdomain-takeover-scanner
+      - dnssec-automation
+  secops:
+    prose: |
+      **Monitoramento DNS:**
+      1. Analise de logs DNS para detectar tunneling e exfiltracao.
+      2. Alerta para volume anomalo de consultas DNS.
+      3. Blocklist atualizada com feeds de threat intelligence.
+      4. Teste periodico de resolucao DNSSEC.
+    tools:
+      - dns-log-analysis
+      - dns-anomaly-detection
+      - threat-intel-feeds
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.20"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-20", "SC-21", "SC-22"]
+    relationship: mapped

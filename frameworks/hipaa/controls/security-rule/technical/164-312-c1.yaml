@@ -1,0 +1,98 @@
+id: 164.312-c1
+family: security-rule-technical
+title: "Integrity"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement policies and procedures to protect electronic protected health information
+    from improper alteration or destruction.
+  parts:
+    - id: 164.312-c2
+      label: "164.312(c)(2)"
+      prose: >-
+        Mechanism to Authenticate Electronic Protected Health Information (Addressable).
+        Implement electronic mechanisms to corroborate that electronic protected health
+        information has not been altered or destroyed in an unauthorized manner.
+
+guidance:
+  prose: >-
+    Integrity controls ensure that ePHI is not improperly modified or destroyed. This
+    encompasses both the protection of data from unauthorized changes and mechanisms to
+    detect when changes have occurred. Electronic mechanisms for verifying integrity
+    include checksums, digital signatures, message authentication codes (MACs), and
+    hash-based verification. File integrity monitoring (FIM) tools can detect unauthorized
+    changes to files containing ePHI. Database integrity controls should prevent
+    unauthorized modifications through transaction controls, referential integrity
+    constraints, and audit trails that capture all modifications with before/after values.
+    Backup integrity verification ensures that backups are not corrupted and can be
+    reliably restored.
+
+references:
+  - citation: "45 CFR 164.312(c)(1)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.312"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy file integrity monitoring (FIM) on all systems storing ePHI using AIDE,
+      OSSEC, or Wazuh. Implement database-level integrity controls including
+      transactional consistency, referential integrity constraints, and row-level
+      audit trails that capture modifications with before/after state. Use immutable
+      infrastructure patterns where system components are replaced rather than
+      modified in place. Implement container image signing (Cosign/Sigstore) and
+      verification through admission controllers to ensure only verified images run
+      in the ePHI environment. Deploy backup integrity verification through automated
+      restore testing. Use cryptographic hashing to verify data integrity during
+      transfers between systems.
+    tools:
+      - wazuh
+      - aide
+      - ossec
+      - cosign
+      - sigstore
+      - opa-gatekeeper
+      - velero
+      - postgresql-audit
+
+  devsecops:
+    prose: >-
+      Enforce data integrity controls in application code through code review and
+      automated scanning. Verify that applications implement proper transaction
+      management and do not allow partial updates to ePHI. Include integrity
+      verification tests in CI/CD pipelines that validate data consistency after
+      migrations and deployments. Sign all deployment artifacts and verify signatures
+      before deployment. Implement database migration testing that verifies data
+      integrity before and after schema changes.
+    tools:
+      - gitlab-ci
+      - cosign
+      - sigstore
+      - flyway
+      - liquibase
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor file integrity monitoring alerts and investigate unauthorized changes.
+      Verify backup integrity through periodic restore testing and hash comparison.
+      Detect unauthorized database modifications through audit trail analysis.
+      Monitor for data corruption indicators and alert on integrity check failures.
+      Track all authorized changes to ePHI through change management workflows and
+      verify that only authorized changes were applied. Conduct periodic integrity
+      audits comparing production data against expected states.
+    tools:
+      - wazuh
+      - ossec
+      - splunk
+      - elastic-siem
+      - tripwire
+      - qualys-fim
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "SC-8", "SC-13"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.4", "A8.9"]
+    relationship: supports

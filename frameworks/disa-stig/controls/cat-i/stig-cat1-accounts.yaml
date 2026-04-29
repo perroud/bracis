@@ -1,0 +1,118 @@
+id: stig-cat1-accounts
+family: cat-i
+title: "Default, Shared, and Generic Accounts"
+class: DISA-STIG
+
+baselines: [cat-i]
+
+statement:
+  prose: >-
+    The system must not contain default accounts, shared accounts, or generic
+    accounts used for operational access. Default vendor-supplied accounts
+    (such as "admin", "guest", "root", "sa", or application-specific defaults)
+    must be renamed, disabled, or removed. Accounts must be individual,
+    traceable to a specific person or automated process, and must not be shared
+    among multiple users or system functions. Service accounts used by
+    applications must be dedicated to a single application or service and must
+    not be reused across multiple systems without documented authorization.
+
+guidance:
+  prose: >-
+    Default and shared accounts are a leading cause of initial access in
+    adversarial intrusions against DoD systems. When accounts are shared,
+    attribution of actions to specific individuals becomes impossible,
+    undermining both accountability and non-repudiation — two foundational
+    security principles. Default credentials are published in vendor
+    documentation and are actively scanned for by automated attack tools,
+    including those used by nation-state actors targeting DoD networks.
+
+    This STIG requirement applies to all accounts on all components of
+    the system: operating systems, databases, applications, network devices,
+    middleware, and cloud services. The reviewer must verify through system
+    account listings, interviews with administrators, and configuration
+    inspection that no default credentials remain and no accounts are
+    shared. Service accounts must be inventoried and documented with their
+    associated system and responsible owner.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, IA-2, AC-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA STIG — General Purpose Operating System SRG, V1R14, SV-204435r960960"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-171 Rev 2, 3.5.3"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce identity management at the platform level through a centralized
+      identity provider (IdP) — such as Keycloak, Okta, or Microsoft Entra ID —
+      that issues individual, non-shared accounts for all human users. Automate
+      the detection of default credentials using CIS Benchmark scanning and SCAP
+      content applied to every VM, container base image, and managed service.
+      Implement secrets management (HashiCorp Vault, AWS Secrets Manager) to
+      ensure service accounts use dynamically generated credentials rather than
+      static shared passwords. Enforce account naming conventions through
+      infrastructure-as-code templates that reject generic account names
+      (admin, guest, operator) at provisioning time. Maintain a machine-readable
+      service account inventory in your CMDB and reconcile it automatically
+      against what is observed in the environment on a scheduled basis.
+    tools:
+      - keycloak
+      - hashicorp-vault
+      - openscap
+      - ansible
+      - terraform
+      - backstage
+
+  devsecops:
+    prose: >-
+      Scan all infrastructure-as-code, Helm charts, Kubernetes manifests, and
+      Dockerfiles in CI/CD pipelines for hardcoded credentials and generic account
+      definitions. Enforce secret detection in every merge request to prevent
+      default credentials from being committed. Implement policy-as-code checks
+      (OPA/Conftest) that reject deployments referencing disabled service accounts
+      or default usernames. Integrate container scanning to identify images with
+      known default credentials (e.g., Docker Hub images with default root
+      passwords). Require all service account credentials to be injected at
+      runtime from a secrets store — never baked into container images or stored
+      in environment variable files checked into source control.
+    tools:
+      - gitlab-secret-detection
+      - trivy
+      - conftest
+      - opa
+      - checkov
+      - hadolint
+
+  secops:
+    prose: >-
+      Run continuous account enumeration across all systems and compare against
+      the authoritative account inventory; alert on any new or unknown accounts.
+      Use SIEM correlation rules to detect login events from accounts matching
+      generic naming patterns or previously disabled default accounts. Conduct
+      quarterly privileged account reviews to validate that no shared accounts
+      are in use. Include default account checks in vulnerability assessments
+      and penetration testing scopes. Document all service accounts in the system
+      security plan (SSP) with their purpose, owner, and credential management
+      process, and verify this documentation during continuous authorization reviews.
+    tools:
+      - splunk
+      - elastic-siem
+      - tenable
+      - cyberark
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "AC-2", "AC-17"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["IA.L1-3.5.1", "IA.L1-3.5.2", "IA.L2-3.5.3"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["ia-2", "ac-2"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-01", "PR.AA-05"]
+    relationship: supports

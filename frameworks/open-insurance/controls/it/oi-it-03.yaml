@@ -1,0 +1,81 @@
+id: oi-it-03
+family: it
+title: "Versionamento e Evolucao de APIs"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O versionamento de APIs do Open Insurance deve seguir política definida pela
+    governança do ecossistema, que inclui:
+
+    I - Versionamento semântico (major.minor.patch) para especificações técnicas;
+    II - Coexistência de versões: versões major anteriores devem permanecer
+    disponíveis por período de transição definido pela governança (mínimo 6 meses);
+    III - Backward compatibility: alterações minor e patch não devem quebrar
+    consumidores existentes;
+    IV - Comunicação de mudanças: novas versões devem ser comunicadas com
+    antecedência mínima de 3 meses para mudanças major;
+    V - Deprecação: versões depreciadas devem retornar header Sunset com data
+    de descontinuação conforme RFC 8594;
+    VI - Changelog: cada versão deve ter documentação de mudanças acessível
+    publicamente.
+
+    Participantes que não atualizarem para versões vigentes dentro do prazo de
+    transição podem ser sancionados.
+guidance:
+  prose: |
+    O versionamento e critico em ecossistemas multi-participantes. Mudancas nao
+    coordenadas podem quebrar integracoes entre dezenas de participantes
+    simultaneamente.
+
+    A politica de coexistencia de versoes permite que participantes migrem
+    gradualmente. Durante o periodo de transicao, ambas as versoes (antiga e nova)
+    devem estar operacionais.
+
+    O header Sunset (RFC 8594) e um padrao HTTP que informa aos consumidores a data
+    em que um endpoint sera descontinuado. Isso permite automacao: consumidores
+    podem detectar endpoints proximos da descontinuacao e priorizar migracao.
+
+    Mudancas breaking (nova versao major) tipicamente incluem: alteracao de schema
+    de resposta, remocao de campos, mudanca de endpoints, alteracao de fluxos de
+    autenticacao. Essas mudancas exigem planejamento e testes extensivos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar versionamento de API no path (ex: /open-insurance/v1/, /v2/).
+      2. Configurar roteamento no API Gateway para direcionar trafego para versao
+         correta conforme path.
+      3. Implementar header Sunset em endpoints de versoes depreciadas.
+      4. Manter ambas as versoes em operacao durante periodo de transicao.
+      5. Automatizar geracao de changelog a partir de diffs de especificacao.
+    tools:
+      - api-gateway
+      - api-versioning
+      - api-documentation
+      - changelog-generator
+  devsecops:
+    prose: |
+      1. Testes de backward compatibility automatizados quando mudancas minor/patch
+         sao implementadas.
+      2. Testes de breaking changes para detectar incompatibilidades nao intencionais.
+      3. Pipeline dedicado para deploy de novas versoes com validacao de coexistencia.
+      4. Validar que header Sunset esta presente em endpoints depreciados.
+    tools:
+      - contract-testing
+      - backward-compatibility-testing
+      - api-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar cronograma de deprecacao e garantir migracao dentro do prazo.
+      2. Alertar quando versoes consumidas estao proximas da descontinuacao.
+      3. Auditar que versoes depreciadas sao efetivamente removidas apos periodo
+         de transicao.
+    tools:
+      - api-monitoring
+      - compliance-calendar
+      - alerting
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4"]
+    relationship: complements

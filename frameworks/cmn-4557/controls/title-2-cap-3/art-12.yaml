@@ -1,0 +1,139 @@
+id: art-12
+family: title-2-cap-3
+title: "Identificacao e Mensuracao do Risco de Mercado"
+class: CMN-4557
+statement:
+  prose: |
+    Art. 12. A estrutura de gerenciamento de riscos deve contemplar, relativamente ao risco
+    de mercado, sistemas e procedimentos para:
+    I - a identificação, a mensuração, a avaliação, o monitoramento, o reporte, o controle e
+    a mitigação do risco de mercado;
+    II - a segregação das atividades de gestão de riscos das atividades de negociação;
+    III - o cálculo do valor em risco (VaR) e a realização de testes de estresse;
+    IV - o estabelecimento de limites operacionais e procedimentos para o caso de violação.
+guidance:
+  prose: |
+    O art. 12 define os requisitos para gestao do risco de mercado. Risco de mercado e a
+    possibilidade de perdas por flutuacao nos valores de mercado de posicoes.
+
+    **Fatores de risco de mercado:**
+    - Taxas de juros (pre, pos, cupom cambial, cupom de inflacao)
+    - Taxas de cambio (USD, EUR, outras moedas)
+    - Precos de acoes (carteira proprietaria, derivativos de equity)
+    - Precos de commodities (ouro, petroleo, agricolas)
+    - Spreads de credito (risco de credito em instrumentos negociaveis)
+    - Volatilidade implicita (opcoes)
+
+    **Segregacao front/middle/back (inciso II):**
+    Principio fundamental de controle interno:
+    - Front-office: executa operacoes, gera receita
+    - Middle-office (risco): mensura e monitora riscos, independente do front
+    - Back-office: liquidacao, contabilizacao, reconciliacao
+    A segregacao impede que traders avaliem seus proprios riscos.
+
+    **VaR e stress testing (inciso III):**
+
+    **Value-at-Risk (VaR):**
+    Medida estatistica da perda maxima esperada em um horizonte de tempo com nivel de
+    confianca definido. Tipicamente: VaR 99% 1 dia ou VaR 99% 10 dias.
+    Metodologias: parametrico (delta-normal), simulacao historica, Monte Carlo.
+
+    **Stress testing de mercado:**
+    - Cenarios historicos: crise de 2008, taper tantrum 2013, COVID 2020
+    - Cenarios hipoteticos: alta de 500bps na Selic, depreciacao de 40% do BRL
+    - Cenarios regulatorios: cenarios padronizados definidos pelo BCB
+
+    **Limites operacionais (inciso IV):**
+    - Limite de VaR (por mesa, trader, produto, agregado)
+    - Limite de stop-loss (perda acumulada maxima em periodo)
+    - Limite de concentracao (exposicao maxima a fator de risco)
+    - Limite de nocional (volume maximo de operacoes)
+    - Limite de stress (perda maxima em cenario de estresse)
+    - Procedimento de violacao: notificacao, escalacao, liquidacao forcada
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Market risk engine:**
+      1. VaR engine com suporte a parametrico, simulacao historica e Monte Carlo.
+      2. Pricing library para valoracao de instrumentos financeiros (renda fixa,
+         derivativos, cambio, acoes, commodities).
+      3. Market data infrastructure com feeds real-time e end-of-day (B3, Bloomberg,
+         Refinitiv, ANBIMA).
+      4. P&L attribution engine para decomposicao de resultado por fator de risco.
+
+      **Calculo e monitoramento:**
+      5. Calculo de VaR diario com processamento nocturno e validacao matinal.
+      6. Intraday risk monitoring para posicoes de trading.
+      7. Real-time limit monitoring com alertas automatizados.
+      8. Greeks calculation (delta, gamma, vega, theta, rho) para derivativos.
+
+      **Infraestrutura de mercado:**
+      9. Grid computing para Monte Carlo VaR (milhoes de simulacoes).
+      10. Time series database para dados de mercado historicos.
+      11. Mark-to-market automatizado para toda a carteira de negociacao.
+      12. Scenario analysis engine para stress testing customizado.
+    tools:
+      - risk-engine
+      - pricing-library
+      - market-data-platform
+      - grid-computing
+      - time-series-db
+  devsecops:
+    prose: |
+      **Sistemas de mercado no pipeline:**
+      1. CI/CD para pricing libraries com testes de acuracia contra benchmarks.
+      2. Regression testing rigoroso: mudanca em pricing nao pode alterar resultados
+         sem justificativa documentada.
+      3. Performance testing: VaR deve ser calculado dentro da janela de processamento.
+      4. Integration testing: posicoes do front-office devem reconciliar com risk engine.
+
+      **Qualidade de dados de mercado:**
+      5. Market data quality checks: outliers, gaps, stale prices.
+      6. Multiple source reconciliation para dados de mercado criticos.
+      7. Fallback procedures quando fonte primaria de dados falha.
+      8. Monitoring de latencia de dados de mercado real-time.
+
+      **Segregacao no pipeline (inciso II):**
+      9. Repositorios separados para front-office e middle-office.
+      10. Access control diferenciado: traders nao podem alterar modelos de risco.
+      11. Deployment independente de sistemas de front e middle-office.
+      12. Audit trail de mudancas em parametros de risco.
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - data-quality-platform
+      - vault
+  secops:
+    prose: |
+      **Governanca de risco de mercado:**
+      1. Politica de risco de mercado aprovada pelo comite de riscos.
+      2. Limites de mercado aprovados pelo conselho com revisao anual.
+      3. Processo de excecao de limites com alcada definida.
+      4. Segregacao de funcoes front/middle/back verificada por auditoria.
+
+      **Monitoramento diario:**
+      5. Relatorio diario de VaR e P&L para CRO e gestores de risco.
+      6. Monitoramento de utilizacao de limites (VaR, stop-loss, stress).
+      7. Backtesting diario: comparacao VaR vs. P&L realizado.
+      8. Tratamento formal de excecoes de backtesting (zona verde/amarela/vermelha).
+
+      **Stress testing e reporting:**
+      9. Stress testing semanal/mensal com cenarios aprovados.
+      10. Relatorio de risco de mercado mensal para comite de riscos.
+      11. Relatorio trimestral para conselho de administracao.
+      12. Validacao independente de modelos de VaR (anual).
+    tools:
+      - risk-management-platform
+      - grc-platform
+      - reporting-platform
+      - model-validation-platform
+legal_references:
+  - framework_id: basel-iii
+    articles: ["pillar-1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "AC-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.3", "A.8.1"]
+    relationship: supports

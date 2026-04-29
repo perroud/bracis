@@ -1,0 +1,122 @@
+id: art-13
+family: cap-3
+title: "Consentimento Informado para IA"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 13. O uso de sistema de inteligência artificial em atividade médica
+    requer consentimento informado do paciente ou de seu representante legal:
+
+    I - o consentimento deve ser específico, livre e esclarecido, informando
+    ao paciente que sistema de IA será utilizado, para qual finalidade e
+    quais dados serão processados;
+
+    II - o paciente deve ser informado sobre seu direito de recusar o uso
+    de IA, sem que isso acarrete prejuízo à qualidade de seu atendimento;
+
+    III - o consentimento para uso de IA em atividade médica é distinto
+    do consentimento geral para tratamento, devendo ser obtido de forma
+    separada e documentado no prontuário;
+
+    IV - quando dados clínicos do paciente forem utilizados para
+    treinamento ou aperfeiçoamento de modelos de IA, consentimento
+    adicional específico deve ser obtido, em conformidade com a LGPD;
+
+    V - em situações de urgência ou emergência em que não for possível
+    obter consentimento, o uso de IA é permitido desde que registrado
+    no prontuário e comunicado ao paciente ou representante tão logo
+    possível.
+guidance:
+  prose: |
+    O art. 13 cria regime de consentimento em camadas para IA medica,
+    mais exigente que o consentimento geral para tratamento.
+
+    **Camadas de consentimento:**
+
+    1. Consentimento para uso de IA no atendimento (incisos I-III):
+       o paciente deve saber que IA sera usada, para que, e pode recusar.
+       Este consentimento e obrigatorio para sistemas de risco medio+.
+
+    2. Consentimento para uso de dados em treinamento (inciso IV):
+       consentimento separado e adicional, em conformidade com a LGPD
+       (art. 11 — tratamento de dados sensiveis de saude). O paciente
+       pode consentir com o uso de IA no atendimento mas recusar que
+       seus dados sejam usados para treinamento.
+
+    3. Excecao de emergencia (inciso V): em urgencia/emergencia, o
+       consentimento pode ser postergado mas nunca dispensado. O uso
+       de IA deve ser registrado e comunicado assim que possivel.
+
+    **Forma do consentimento:**
+    A Resolucao exige consentimento documentado no prontuario. Pode
+    ser em formato digital (assinatura eletronica) desde que atenda
+    requisitos legais de validade. Consentimento verbal e insuficiente.
+
+    **Recusa sem prejuizo (inciso II):**
+    A instituicao deve ter protocolo para atender o paciente que
+    recusa IA com o mesmo padrao de qualidade. Na pratica, isso
+    significa que o medico deve estar capacitado a realizar o
+    diagnostico/tratamento sem assistencia de IA.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de gestao de consentimento:**
+      1. Implementar servico de gestao de consentimento (consent
+         management platform) integrado ao PEP/EMR, com suporte a
+         consentimento em camadas: uso de IA e uso de dados para
+         treinamento como consentimentos separados.
+      2. Configurar workflow de consentimento que bloqueie invocacao
+         de modelo de IA medica ate que consentimento valido seja
+         registrado no sistema.
+      3. Implementar mecanismo de revogacao de consentimento que
+         desative imediatamente o uso de IA para o paciente.
+      4. Criar interface de consentimento digital com linguagem
+         acessivel, suportando multiplos idiomas e niveis de
+         alfabetizacao em saude.
+    tools:
+      - consent-management
+      - emr-integration
+      - workflow-engine
+      - digital-signature
+  devsecops:
+    prose: |
+      **Validacao de consentimento no pipeline:**
+      1. Implementar testes de integracao que verifiquem que toda
+         chamada a API de modelo de IA medica inclui token de
+         consentimento valido do paciente.
+      2. Automatizar verificacao de que fluxo de consentimento esta
+         implementado em todas as interfaces que invocam IA medica.
+      3. Implementar teste de cenario de emergencia: verificar que
+         sistema funciona em modo emergencia (sem consentimento previo)
+         com registro automatico para comunicacao posterior.
+      4. Validar que revogacao de consentimento efetivamente desativa
+         IA para o paciente em todos os pontos de integracao.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - consent-validation
+      - scenario-testing
+  secops:
+    prose: |
+      **Governanca de consentimento:**
+      1. Auditar periodicamente que consentimentos estao sendo obtidos
+         e registrados conforme art. 13: amostragem de prontuarios.
+      2. Verificar que pacientes que recusaram IA estao recebendo
+         atendimento equivalente (sem penalizacao).
+      3. Monitorar taxa de consentimento/recusa por sistema e por
+         unidade para identificar problemas de comunicacao.
+      4. Manter registro de consentimentos para treinamento (inciso IV)
+         separado, com rastreabilidade ate o dataset utilizado.
+    tools:
+      - grc-platform
+      - audit-tools
+      - consent-dashboard
+      - patient-rights
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-13", "art-86"]
+    relationship: mapped

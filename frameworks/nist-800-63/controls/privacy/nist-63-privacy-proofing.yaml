@@ -1,0 +1,132 @@
+id: nist-63-privacy-proofing
+family: privacy
+title: "Privacy During Identity Proofing"
+class: SP800-63A
+
+baselines: [ial1, ial2, ial3, aal1, aal2, aal3, fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    The CSP SHALL provide explicit notice to the applicant at the time of
+    collection and use of any PII, including the purpose for collection, the
+    authorities which authorize the collection, the uses of the PII, and the
+    rights of the applicant with respect to the PII. The CSP SHALL NOT use PII
+    collected during identity proofing for any purpose other than identity
+    proofing, authentication, authorization, attribute assertions, and fraud
+    mitigation, or as required by law or legal process, without the explicit
+    consent of the subscriber. The CSP SHALL employ appropriately tailored
+    privacy controls and risk management measures. The CSP SHALL use the
+    minimum set of attributes necessary to accomplish the intended purpose.
+    The CSP SHALL provide subscriber notice when PII is used in ways other than
+    those described in the privacy notice provided at enrollment. The CSP SHALL
+    provide subscribers with access to their identity proofing records, subject
+    to security and privacy protections, upon request. The CSP SHALL implement
+    and document a privacy risk management process, including Privacy Impact
+    Assessments (PIAs) as appropriate.
+
+guidance:
+  prose: >-
+    Privacy is an explicit design requirement of the 800-63 suite, not an
+    afterthought. NIST integrated privacy requirements throughout the revision
+    3 series because identity systems are by definition PII-processing systems.
+    The notice requirement is not satisfied by a generic privacy policy buried
+    in a Terms of Service document — it must be contextual, specific to the
+    proofing session, and presented at the point of data collection. The
+    purpose limitation principle means that a CSP who collects a government
+    ID for identity proofing cannot use that information for marketing or
+    analytics without separate consent. CSPs must conduct Privacy Impact
+    Assessments (PIAs) before deploying identity proofing systems, as required
+    by the Privacy Act of 1974 and the E-Government Act of 2002 for federal
+    agencies. State and local governments should follow the same best practice.
+    The subscriber's right to access their proofing records must be implemented
+    as a functional process — the subscriber must be able to request and receive
+    their proofing data, subject only to security-appropriate redaction.
+
+references:
+  - citation: "NIST SP 800-63A Section 4.2 — Privacy Requirements"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63-3 Section 9 — Privacy Considerations"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"
+  - citation: "Privacy Act of 1974 — 5 U.S.C. § 552a"
+    url: "https://www.govinfo.gov/content/pkg/USCODE-2018-title5/pdf/USCODE-2018-title5-partI-chap5-subchapII-sec552a.pdf"
+  - citation: "E-Government Act of 2002 — Section 208 (Privacy Impact Assessment)"
+    url: "https://www.congress.gov/107/plaws/publ347/PLAW-107publ347.pdf"
+  - citation: "NIST Privacy Framework Version 1.0"
+    url: "https://doi.org/10.6028/NIST.CSWP.01162020"
+
+related_controls:
+  - id: nist-63-ial1
+    relationship: complements
+    description: "Even IAL1 systems must provide appropriate privacy notice for any attributes collected."
+  - id: nist-63-ial2
+    relationship: implements
+    description: "IAL2 proofing sessions must satisfy privacy notice and consent requirements."
+  - id: nist-63-ial3
+    relationship: implements
+    description: "IAL3 proofing has heightened privacy requirements due to biometric data collection."
+  - id: nist-63-biometrics
+    relationship: complements
+    description: "Biometric collection requires explicit consent and a specific privacy notice."
+  - id: nist-63-data-minimization
+    relationship: implements
+    description: "Privacy-by-design during proofing requires data minimization as a core principle."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a consent management service that captures, stores, and
+      makes auditable the subscriber's consent for each category of data
+      collection and use during identity proofing. The consent UI must
+      present the privacy notice in plain language, specific to the proofing
+      context (not the generic platform privacy policy). Store consent records
+      with immutable timestamps and link them to the proofing session ID.
+      Implement a subscriber self-service portal where subscribers can view
+      their proofing record, the data collected, the consents given, and
+      submit data access or deletion requests. For federal systems, implement
+      the Privacy Act Statement as a SORN (System of Records Notice) reference
+      in the consent form. Integrate the consent management service with the
+      data lifecycle management system to enforce retention limits: proofing
+      data must be purged or anonymized after the retention period expires.
+    tools:
+      - keycloak
+      - postgres
+      - vault
+      - kafka
+      - backstage
+
+  devsecops:
+    prose: >-
+      Include privacy compliance checks in the CI/CD pipeline: validate that
+      all proofing session flows display the privacy notice before collecting
+      PII, that consent records are created before any PII is stored, and
+      that the consent service is not bypassed in error paths. Implement
+      data flow analysis in code review to detect new data collection points
+      that are not covered by the existing privacy notice. Include automated
+      PII detection scanning (using regex or ML-based PII classifiers) in
+      the codebase to identify accidental PII logging. Validate that test
+      environments do not use real subscriber PII from production proofing
+      sessions — enforce synthetic test data usage.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - presidio
+      - open-policy-agent
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor for unauthorized access to proofing session data: alert on any
+      access to proofing records outside of the consent management service
+      API. Audit data retention compliance by querying for proofing records
+      that have exceeded the defined retention period. Monitor consent record
+      integrity — any modification to a consent record after creation should
+      trigger an alert. Implement DLP (Data Loss Prevention) controls that
+      detect exfiltration of proofing data (government ID scans, biometric
+      templates). Maintain audit trails of all subscriber data access and
+      deletion requests, including the outcome of each request and the
+      timeframe for fulfillment.
+    tools:
+      - splunk
+      - crowdstrike
+      - microsoft-purview
+      - elastic-siem

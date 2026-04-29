@@ -1,0 +1,107 @@
+id: samm-ops-operational-mgmt
+family: operations
+title: "Operational Management"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Manage the security of operational data, system interfaces, and legacy software
+    components throughout the operational software lifecycle. Implement data protection
+    controls appropriate to data classification and regulatory requirements. Define
+    procedures for secure decommissioning of software systems and data. Manage the
+    security risks introduced by legacy and unsupported software components that cannot
+    be immediately replaced.
+  parts:
+    - id: samm-ops-operational-mgmt_smt.a
+      label: "Stream A — Data Protection"
+      prose: >-
+        Identify all data assets processed by operational software systems and classify
+        them by sensitivity and regulatory category. Implement data protection controls
+        appropriate to each classification: encryption at rest and in transit, access
+        controls enforcing least privilege, data masking for non-production environments,
+        and data retention policies enforced through automated deletion or archival.
+        Define and test data breach response procedures aligned to applicable regulatory
+        notification requirements (GDPR 72-hour notification, HIPAA breach rule, etc.).
+        Maintain data flow maps for all sensitive data processed by software systems.
+    - id: samm-ops-operational-mgmt_smt.b
+      label: "Stream B — System Decommissioning / Legacy"
+      prose: >-
+        Define procedures for the secure decommissioning of software systems, including
+        data destruction or transfer, access revocation, certificate and key invalidation,
+        and removal of external integrations. Maintain an inventory of legacy software
+        components and systems that are no longer actively maintained or use end-of-life
+        libraries, and assess and track the risk posed by each. Implement compensating
+        controls for legacy systems that cannot be immediately replaced — network
+        segmentation, WAF protection, enhanced monitoring — and document these in the
+        risk register with target remediation dates.
+
+guidance:
+  prose: >-
+    Operational management closes the loop on the software security lifecycle —
+    without it, insecure data practices and undead legacy systems silently accumulate
+    risk. At maturity level 1, the organization classifies data assets and has a basic
+    data retention policy. At level 2, data protection controls are systematically
+    implemented based on classification, legacy inventory is maintained, and decommissioning
+    procedures exist. At level 3, data protection is enforced automatically through
+    platform controls, the legacy risk register is actively managed with tracked
+    remediation timelines, and the organization can demonstrate data lifecycle
+    compliance to auditors with minimal manual evidence collection.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Operations: Operational Management"
+    url: "https://owaspsamm.org/model/operations/operational-management/"
+  - citation: "OWASP Data Protection Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Data_Protection_Cheat_Sheet.html"
+  - citation: "GDPR Article 5 — Data Protection Principles"
+    url: "https://gdpr.eu/article-5-how-to-process-personal-data/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data classification as a platform service — services registered in
+      the software catalog with data classification metadata automatically receive
+      pre-configured encryption, access control, and audit logging defaults appropriate
+      to their data tier. Enforce encryption-at-rest policies through platform-managed
+      storage provisioning that enables encryption by default with no opt-out. Implement
+      data masking pipelines as platform services that automatically mask production
+      data copies used in non-production environments. Provide automated data retention
+      enforcement through platform-managed lifecycle policies on data stores.
+    tools:
+      - "Hashicorp Vault (encryption as a service)"
+      - "Macie / Google DLP (data classification)"
+      - "Faker / DataMasker (data masking)"
+      - "Crossplane (platform-managed storage with encryption)"
+      - "Backstage (data classification in catalog)"
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect hardcoded sensitive data, insecure data storage
+      patterns, and missing encryption implementations. Use pipeline stages to validate
+      that non-production environments use masked or synthetic data rather than
+      production data copies. Automate the generation of data flow documentation from
+      application metadata and data classification tags, making it easier to maintain
+      accurate data maps. Implement automated checks that verify data retention settings
+      match policy requirements for each data store type used by the application.
+    tools:
+      - "Semgrep (data handling anti-pattern rules)"
+      - "GitLeaks / TruffleHog (sensitive data detection)"
+      - "GitLab SAST (credential detection)"
+      - "Terratest (infrastructure data protection testing)"
+      - "SOPS / Sealed Secrets (encrypted configuration)"
+  secops:
+    prose: >-
+      Maintain a comprehensive data asset inventory mapping data flows, processing systems,
+      regulatory categories, and retention requirements for all sensitive data assets.
+      Implement data loss prevention (DLP) monitoring to detect unauthorized data
+      exfiltration attempts through application and network layers. Conduct annual data
+      protection impact assessments (DPIAs) for high-risk data processing activities.
+      Manage the legacy software risk register with SecOps ownership — ensuring compensating
+      controls are reviewed quarterly and remediation timelines are tracked. Coordinate
+      with legal and compliance teams on data breach notification obligations and maintain
+      ready-to-execute notification procedures.
+    tools:
+      - "Varonis / Microsoft Purview (data governance)"
+      - "Netskope / Zscaler (DLP)"
+      - "ServiceNow (data asset inventory)"
+      - "OneTrust / TrustArc (DPIA management)"
+      - "Splunk (data access monitoring)"

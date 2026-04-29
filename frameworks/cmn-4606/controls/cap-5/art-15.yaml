@@ -1,0 +1,126 @@
+id: art-15
+family: cap-5
+title: "Retencao de Documentacao"
+class: CMN-4606
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 15. As instituições devem manter a documentação relativa à política de
+    conformidade e às atividades desenvolvidas pela função de conformidade pelo
+    prazo mínimo de cinco anos, contados da data da elaboração do documento ou
+    do encerramento das atividades às quais se referem, o que for maior.
+
+    Parágrafo único. A documentação de que trata o caput deve estar disponível
+    para consulta pelo Banco Central do Brasil.
+guidance:
+  prose: |
+    O art. 15 estabelece os requisitos de retencao e disponibilidade da documentacao
+    de compliance — criticos para auditorias regulatorias e para defesa em processos
+    administrativos.
+
+    **O que deve ser retido (escopo da documentacao):**
+    - Politica de conformidade: todas as versoes vigentes ao longo do tempo
+    - Atas de aprovacao do conselho: registro de cada aprovacao/revisao da politica
+    - Relatorios semestrais ao conselho (art. 9, V e art. 13, V)
+    - Registros de atividades da funcao de conformidade (art. 9, VI)
+    - Resultados de testing de controles
+    - Relatorios de avaliacao de mudancas regulatorias
+    - Registros de treinamentos realizados
+    - Denuncias recebidas e resultado das investigacoes
+    - Declaracoes de conflito de interesses
+    - Comunicacoes ao BCB (designacao do CCO, afastamento, etc.)
+    - Contratos com prestadores de servicos de compliance
+
+    **Prazo: 5 anos, contados do maior entre:**
+    - Data de elaboracao do documento
+    - Data de encerramento das atividades a que se refere
+
+    **Exemplo pratico:**
+    Uma investigacao de denuncia concluida em 2024 deve ter seus registros retidos
+    ate pelo menos 2029 (5 anos do encerramento). Uma versao da politica aprovada
+    em 2020 e substituida em 2022 deve ser retida ate 2027 (5 anos da elaboracao).
+
+    **Disponibilidade para o BCB (paragrafo unico):**
+    O BCB pode solicitar qualquer documento a qualquer momento. A instituicao
+    precisa ter os documentos indexados, organizados e recuperaveis em prazo
+    razoavel (o BCB geralmente define prazo na solicitacao). Documentos que
+    "nao foram encontrados" sao tratados como inexistentes — exposicao maxima.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao de documentos:**
+      1. Armazenamento WORM (Write Once Read Many): todos os documentos de compliance
+         armazenados em storage imutavel que impede alteracao ou exclusao antes
+         do fim do prazo de retencao.
+      2. Politica de retencao automatizada: metadados de cada documento incluem
+         data de criacao, data de encerramento da atividade e data de expiracao
+         do prazo de retencao — sistema bloqueia exclusao antes da expiracao.
+      3. Indexacao e busca: motor de busca full-text sobre o acervo de compliance,
+         permitindo recuperar qualquer documento por tipo, data, versao ou palavras-chave.
+      4. Perfil de acesso BCB: role especifica no sistema para acessos de supervisao
+         do BCB, com escopo limitado aos documentos de compliance, log de todos
+         os acessos realizados.
+      5. Backup e redundancia: replicacao geografica dos documentos de compliance
+         com RPO de 1 hora e RTO de 4 horas para garantir disponibilidade permanente.
+      6. Auditoria de retencao: relatorio trimestral verificando que nenhum documento
+         foi excluido antes do prazo e que todos os documentos obrigatorios existem.
+    tools:
+      - document-management
+      - immutable-storage
+      - search-platform
+      - identity-governance
+      - backup-platform
+  devsecops:
+    prose: |
+      **Pipeline de gestao do ciclo de vida de documentos:**
+      1. Classificacao automatica: cada documento gerado pela plataforma de GRC
+         e automaticamente classificado por tipo e politica de retencao aplicavel.
+      2. Teste de retencao: pipeline de verificacao periodica que confirma que
+         documentos obrigatorios existem, estao acessiveis e dentro do prazo de
+         retencao correto.
+      3. Alertas de expiracao proxima: notificacao ao CCO 90 dias antes de
+         documentos atingirem o prazo de retencao (para revisao se ha obrigacao
+         de extensao do prazo).
+      4. Pipeline de acesso BCB: quando o BCB solicita documentos, workflow
+         automatizado de producao, empacotamento e entrega segura com registro
+         de protocolo.
+      5. Assinatura digital de documentos: todos os documentos gerados recebem
+         assinatura digital com timestamp certificado, garantindo autenticidade
+         por toda a vida de retencao.
+    tools:
+      - gitlab-ci
+      - document-lifecycle
+      - digital-signature
+      - monitoring-alerting
+      - secure-file-transfer
+  secops:
+    prose: |
+      **Gestao operacional de retencao:**
+      1. Inventario de documentos de compliance: catalogo completo de todos os
+         tipos de documentos gerados pela funcao de conformidade, com politica
+         de retencao especifica para cada tipo.
+      2. Processo de organizacao do acervo: nomenclatura padrao para todos os
+         documentos, estrutura de pastas por ano/tipo/assunto, indexacao obrigatoria.
+      3. Procedimento de atendimento ao BCB: fluxo de resposta a solicitacoes de
+         documentos pelo BCB — quem recebe a solicitacao, quem coleta os documentos,
+         prazo de entrega, registro do atendimento.
+      4. Revisao anual do acervo: verificacao de que todos os documentos obrigatorios
+         estao retidos, nao ha gaps no historico e os documentos expirados foram
+         descartados conforme politica de retencao.
+      5. Treinamento sobre retencao: colaboradores da funcao de conformidade
+         treinados sobre a politica de retencao, o que deve ser retido e como.
+    tools:
+      - document-management
+      - grc-platform
+      - compliance-calendar
+      - training-platform
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-31"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-9"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-21"]
+    relationship: complements

@@ -1,0 +1,129 @@
+id: pms-1
+family: pms
+title: "Post-Market Surveillance System"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    For each device, manufacturers shall plan, establish, document,
+    implement, maintain and update a post-market surveillance system in
+    a manner that is proportionate to the risk class and appropriate for
+    the type of device. That system shall be an integral part of the
+    manufacturer's quality management system.
+
+    The post-market surveillance system shall be suited to actively and
+    systematically gathering, recording and analysing relevant data on
+    the quality, performance and safety of a device throughout its entire
+    lifetime, and to drawing the necessary conclusions and to determining,
+    implementing and monitoring any preventive and corrective actions.
+
+    Data gathered by the manufacturer's post-market surveillance system
+    shall in particular be used to: (a) update the benefit-risk
+    determination and to improve the risk management; (b) update the
+    design and manufacturing information, the instructions for use and
+    the labelling; (c) update the clinical evaluation; (d) update the
+    summary of safety and clinical performance; (e) identify needs for
+    preventive, corrective or field safety corrective actions;
+    (f) identify options to improve the usability, performance and
+    safety of the device; (g) contribute to the post-market surveillance
+    of other devices when relevant.
+guidance:
+  prose: |
+    Articles 83–85 establish the post-market surveillance (PMS) framework.
+    PMS is not optional — it is a mandatory, ongoing obligation that
+    continues throughout the device's entire lifecycle. For software
+    medical devices, PMS encompasses:
+
+    - Systematic collection of field performance data, including error
+      logs, crash reports, usage analytics, and system health metrics.
+    - Customer complaint handling and analysis.
+    - Analysis of similar devices and competitive intelligence.
+    - Literature monitoring for relevant safety information.
+    - Monitoring of emerging cybersecurity threats.
+    - Trend analysis and statistical evaluation of collected data.
+
+    PMS outputs feed directly into risk management (updating the risk
+    management file), clinical evaluation (updating the clinical
+    evaluation report), and CAPA processes. The PMS plan must define
+    data sources, collection methods, analysis procedures, and
+    reporting frequencies.
+
+    For Class IIa, IIb, and III devices, manufacturers must produce
+    Periodic Safety Update Reports (PSUR).
+references:
+  - citation: "EU MDR 2017/745, Articles 83–85"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+  - citation: "MDCG 2020-7 — Post-market clinical follow-up plan and report templates"
+    url: "https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2020_7_guidance_pmcf_plan_template_en_0.pdf"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement centralized telemetry and observability platforms
+         that collect device performance data, error rates, crash
+         reports, and usage patterns in compliance with data protection
+         requirements and user consent.
+      2. Deploy automated anomaly detection systems that identify
+         deviations from expected device performance baselines,
+         triggering investigation workflows when thresholds are
+         exceeded.
+      3. Configure data pipelines that aggregate PMS data from multiple
+         sources (telemetry, support tickets, complaint systems, field
+         reports) into a unified analytics platform for trend analysis.
+      4. Implement data retention and archival policies for PMS data
+         aligned with regulatory requirements (minimum 10 years after
+         last device placed on market).
+    tools:
+      - elasticsearch
+      - grafana
+      - prometheus
+      - datadog
+      - data-pipeline
+  devsecops:
+    prose: |
+      1. Implement structured error reporting in the device software
+         that captures relevant diagnostic information (error codes,
+         stack traces, environment context) while protecting patient
+         privacy through data minimization and anonymization.
+      2. Configure automated issue creation from production telemetry
+         alerts, linking field observations to investigation workflows
+         in the development issue tracker.
+      3. Implement feedback loops from PMS data to the development
+         backlog: field-reported issues trigger requirements review,
+         risk reassessment, and prioritized corrective development.
+      4. Establish automated PMS reporting pipelines that generate
+         periodic safety data summaries from collected telemetry and
+         complaint data for inclusion in PSUR and PMS reports.
+    tools:
+      - sentry
+      - gitlab-issues
+      - gitlab-ci
+      - analytics-pipeline
+      - reporting-tooling
+  secops:
+    prose: |
+      1. Maintain a documented PMS plan for each device that defines
+         data sources, collection methods, indicators, thresholds,
+         analysis procedures, reporting responsibilities, and
+         frequencies.
+      2. Produce PMS reports (for Class I) or Periodic Safety Update
+         Reports (for Class IIa, IIb, III) at the intervals required
+         by MDR Article 86, documenting conclusions and actions taken.
+      3. Implement a complaint handling process that captures, records,
+         investigates, and responds to all customer complaints, with
+         trend analysis feeding into the PMS system.
+      4. Establish processes for monitoring published literature,
+         databases (MAUDE, BfArM, EUDAMED), and competitor field
+         safety notices for information relevant to the device's
+         safety and performance.
+    tools:
+      - eqms-platform
+      - complaint-management
+      - literature-monitoring
+      - regulatory-intelligence
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-20", "art-21"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["9.1", "10.1"]
+    relationship: complements

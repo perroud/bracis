@@ -1,0 +1,87 @@
+id: pin-6
+family: pin-crypto
+title: "Cryptographic Key Distribution"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Cryptographic keys used for PIN protection must be distributed in a manner that
+    prevents unauthorized disclosure. Key distribution must employ one of the following
+    approved methods: (a) manual distribution using key components with dual control and
+    split knowledge, where key components are transported separately by different key
+    custodians via independent secure channels; (b) electronic distribution using
+    key-encrypting keys (KEKs) that are themselves managed under dual control and split
+    knowledge; or (c) public-key cryptography using certificates from a trusted certificate
+    authority, where the private key resides exclusively within an SCD. At no point during
+    distribution may a complete cleartext key be accessible to any single individual or
+    transmitted over any single channel.
+
+guidance:
+  prose: >-
+    Key distribution is historically one of the most vulnerable phases of the key lifecycle.
+    Manual key loading using paper components (printed key shares) is still common for
+    initial key injection into HSMs, but it introduces human handling risks. Remote key
+    distribution (RKD) using public-key infrastructure is increasingly preferred because it
+    eliminates physical transport of key components. For DUKPT (Derived Unique Key Per
+    Transaction) deployments, initial key injection into PIN entry devices must occur in a
+    certified key injection facility (KIF). Organizations must maintain chain-of-custody
+    documentation for all key distribution events, including courier identities, transport
+    routes, and delivery confirmation timestamps.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 2, Key Distribution"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "ANSI X9.24 Part 1 — Retail Financial Services Symmetric Key Management"
+    url: "https://webstore.ansi.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement remote key loading (RKL) infrastructure using TR-34 or equivalent
+      protocols for electronic key distribution to PIN entry devices. Deploy a centralized
+      key distribution server that communicates with HSMs via secure authenticated channels.
+      For manual key distribution, implement a key component management system that tracks
+      custodian assignments, transport status, and loading confirmation. Ensure all key
+      injection facilities meet PCI PIN Annex A requirements for physical security.
+      Implement certificate-based mutual authentication between key distribution endpoints.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - futurex-key-management
+      - remote-key-loading-server
+      - pki-infrastructure
+  devsecops:
+    prose: >-
+      Validate key distribution API implementations in CI/CD pipelines using test key
+      hierarchies that simulate production distribution flows. Scan for any code that
+      transmits key material in cleartext over network connections. Test mutual TLS
+      configuration for key distribution channels. Implement integration tests for
+      remote key loading protocols (TR-34) using test device simulators.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - semgrep
+      - wireshark-automated-tests
+  secops:
+    prose: >-
+      Audit all key distribution events in the key management system. Monitor for
+      unauthorized key export operations from HSMs. Review key custodian logs to verify
+      split knowledge was maintained during manual distribution. Track chain-of-custody
+      documentation for all physically transported key components. Alert on any key
+      distribution to unregistered or decommissioned devices.
+    tools:
+      - splunk
+      - elastic-siem
+      - thales-crypto-command-center
+      - venafi
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-28"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.5.14"]
+    relationship: mapped

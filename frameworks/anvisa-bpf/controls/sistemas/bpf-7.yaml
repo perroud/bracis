@@ -1,0 +1,115 @@
+id: bpf-7
+family: sistemas
+title: "Change Management for Computerized Systems"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    Todas as mudanças em sistemas computadorizados utilizados em atividades
+    de BPF devem ser gerenciadas por meio de procedimento formal de controle
+    de mudanças que avalie o impacto na validação, integridade de dados,
+    qualidade do produto e conformidade regulatória antes da implementação.
+
+    O procedimento de controle de mudanças deve incluir: descrição da mudança,
+    justificativa, avaliação de impacto e risco, aprovação pela Garantia da
+    Qualidade antes da implementação, plano de testes de requalificação,
+    critérios de aceitação, plano de reversão, e documentação de evidências
+    de execução.
+
+    Mudanças de emergência que não sigam o fluxo padrão devem ser
+    documentadas retrospectivamente com justificativa para a urgência e
+    submetidas a avaliação de impacto e aprovação da Garantia da Qualidade
+    no prazo máximo definido em procedimento.
+guidance:
+  prose: |
+    Change management for GMP computerized systems must balance operational
+    agility with regulatory compliance. Every change, regardless of size,
+    has the potential to impact the validated state of the system.
+
+    Change categories typically used:
+    - Standard changes: pre-approved, low-risk, routine (e.g., OS patches
+      with vendor validation statement)
+    - Minor changes: low impact, require abbreviated impact assessment
+    - Major changes: significant impact on validated state, require full
+      requalification
+    - Emergency changes: bypass standard approval flow, require
+      retrospective documentation
+
+    Impact assessment must evaluate:
+    - Effect on validated state (does revalidation apply?)
+    - Effect on data integrity controls (audit trail, access control)
+    - Effect on integrated systems (upstream/downstream data flows)
+    - Effect on product quality and patient safety
+    - Regulatory notification requirements
+
+    All changes must maintain a complete audit trail from request through
+    implementation and post-implementation review.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement GitOps-based change management where all system
+         configuration changes are tracked in version control with
+         merge request workflows enforcing quality approval before
+         deployment to GMP environments.
+      2. Configure automated impact assessment workflows that evaluate
+         change scope against system classification, data flow maps,
+         and validation documentation to determine requalification
+         requirements.
+      3. Implement staged deployment pipelines (dev → QA → staging →
+         production) with quality gate approvals required before
+         promotion to each GMP-classified environment.
+      4. Deploy automated rollback capabilities for all GMP system
+         changes, with tested rollback procedures and defined criteria
+         for triggering rollback.
+    tools:
+      - gitlab-ci
+      - gitops
+      - change-management
+      - deployment-pipeline
+      - rollback-automation
+  devsecops:
+    prose: |
+      1. Enforce merge request workflows requiring quality assurance
+         approval for all changes to GMP-classified systems, with
+         automated checks verifying impact assessment completion.
+      2. Implement automated regression testing triggered by every
+         change to verify that the validated state is maintained after
+         modification.
+      3. Generate change documentation artifacts automatically from
+         CI/CD pipeline execution: change description, test results,
+         deployment evidence, and approval records.
+      4. Implement automated post-implementation verification tests
+         confirming system functionality and data integrity controls
+         remain operational after deployment.
+    tools:
+      - gitlab-ci
+      - merge-request-approval
+      - regression-testing
+      - change-documentation
+  secops:
+    prose: |
+      1. Establish change control SOP for GMP computerized systems
+         defining change categories, approval workflows, impact
+         assessment requirements, and documentation standards.
+      2. Conduct periodic change control effectiveness reviews
+         evaluating: change success rates, emergency change frequency,
+         retrospective documentation compliance, and requalification
+         adequacy.
+      3. Monitor for unauthorized changes through configuration drift
+         detection comparing production system state against approved
+         baseline configurations.
+      4. Audit change control records for completeness, timeliness
+         of approval, and adequacy of impact assessment and testing
+         documentation.
+    tools:
+      - grc-platform
+      - configuration-management
+      - drift-detection
+      - audit-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-29", "art-30"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-32"]
+    relationship: mapped

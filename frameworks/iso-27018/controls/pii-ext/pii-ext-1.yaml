@@ -1,0 +1,104 @@
+id: pii-ext.1
+family: pii-ext
+title: "Geographic location and cross-border PII transfer"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall specify and document the countries in which
+    PII may be stored and processed, including storage by sub-processors. The public
+    cloud PII processor shall not transfer PII to a jurisdiction outside the scope
+    authorized by the cloud service customer without prior agreement. Where PII is
+    transferred across borders, the public cloud PII processor shall ensure that
+    adequate safeguards are in place consistent with applicable data protection laws,
+    including but not limited to standard contractual clauses, binding corporate
+    rules, or adequacy decisions. The cloud service customer shall be able to
+    specify geographic restrictions on PII storage and processing.
+
+guidance:
+  prose: >-
+    Geographic data residency is a critical concern in cloud computing because PII
+    may be stored and processed in jurisdictions with different levels of data
+    protection. The customer must be able to control where its PII resides to
+    comply with regulatory requirements (e.g., GDPR restrictions on transfers to
+    non-adequate countries, data localization laws). The processor must provide
+    both transparency (clear documentation of all locations) and control (the
+    ability to restrict locations). This includes not only primary storage
+    locations but also backup sites, disaster recovery facilities, CDN edge nodes,
+    and any sub-processor locations. The processor must implement technical controls
+    that enforce geographic restrictions, not merely contractual commitments. When
+    cross-border transfers are authorized, appropriate transfer mechanisms must be
+    documented and implemented.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.12"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data residency controls as a core platform capability. Build
+      geographic configuration per customer tenant that specifies permitted
+      storage and processing regions. Enforce geographic restrictions at the
+      infrastructure layer: database replication must respect regional boundaries,
+      object storage must be region-locked, CDN caching must exclude non-
+      authorized regions, and backup systems must store data only in permitted
+      locations. Implement network routing controls that prevent PII from
+      traversing unauthorized jurisdictions. Build data residency dashboards
+      showing real-time PII location across all storage tiers. Implement
+      cross-border transfer management that validates transfer mechanisms before
+      allowing PII to move between jurisdictions.
+    tools:
+      - data-residency-engine
+      - geographic-fencing
+      - region-locked-storage
+      - network-routing-controls
+      - data-residency-dashboard
+      - cross-border-transfer-manager
+      - replication-boundary-enforcement
+
+  devsecops:
+    prose: >-
+      Enforce geographic compliance in the deployment pipeline. Infrastructure-
+      as-code must declare the deployment region, and CI gates must validate it
+      against the customer's geographic restrictions. Block deployments to
+      unauthorized regions. Build tests that verify data replication does not
+      cross geographic boundaries. Static analysis should flag hardcoded
+      region configurations that bypass the data residency engine. Include
+      geographic compliance review in the architecture review process for any
+      feature that affects PII storage or processing locations.
+    tools:
+      - gitlab-ci
+      - terraform
+      - pulumi
+      - region-compliance-validator
+      - replication-boundary-tests
+      - iac-region-linter
+      - architecture-review-checklist
+
+  secops:
+    prose: >-
+      Monitor for PII appearing in unauthorized geographic locations. Build
+      network-level detection for PII data flows crossing geographic boundaries.
+      Track data replication and backup activities to verify geographic
+      compliance. Alert on configuration changes that could affect PII
+      geographic placement. Audit sub-processor geographic compliance. Monitor
+      CDN and edge caching to verify PII is not cached in unauthorized regions.
+      Generate geographic compliance reports showing PII distribution across
+      all locations.
+    tools:
+      - splunk
+      - elastic-siem
+      - network-flow-analysis
+      - geographic-compliance-monitor
+      - replication-auditor
+      - cdn-cache-inspector
+      - geographic-compliance-reports
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44", "art-45", "art-46", "art-49"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.5.1"]
+    relationship: complements

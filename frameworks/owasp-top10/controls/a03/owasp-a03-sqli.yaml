@@ -1,0 +1,108 @@
+id: owasp-a03-sqli
+family: a03
+title: "A03:2021 — SQL Injection"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    SQL injection occurs when untrusted data is sent to an SQL interpreter as part of a command,
+    allowing attackers to manipulate the intended query logic. Attackers can use SQL injection
+    to bypass authentication mechanisms, extract sensitive data from the database (including all
+    data in all tables), modify database data (insert, update, delete), execute administrative
+    operations on the database (such as shutting down the DBMS), recover the content of a given
+    file from the DBMS file system, and in some cases issue OS commands to the underlying server.
+    SQL injection variants include classic (error-based), blind (boolean-based and time-based),
+    out-of-band, and second-order injection where the payload is stored and executed later.
+
+guidance:
+  prose: >-
+    SQL injection has been a persistent top-ranking vulnerability for over two decades precisely
+    because it is simple to exploit when present and the consequences are complete data compromise.
+    The definitive prevention is the exclusive use of parameterized queries (prepared statements)
+    with bound parameters throughout the entire application — including stored procedures, ORM
+    queries, and search functions. Parameterized queries prevent injection because the SQL structure
+    is defined separately from the data; user input can never alter the query structure. If dynamic
+    table names or column names are required (unavoidable in some applications), use an explicit
+    allowlist validation approach. Input validation and stored procedures are not substitutes for
+    parameterization — they are defense-in-depth measures that reduce risk but do not eliminate it.
+    All database accounts used by applications should operate under least privilege, limiting the
+    impact of successful injection.
+
+references:
+  - citation: "OWASP SQL Injection Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+  - citation: "CWE-89: Improper Neutralization of Special Elements in SQL Commands"
+    url: "https://cwe.mitre.org/data/definitions/89.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce parameterized query patterns at the infrastructure level by deploying a database
+      proxy that parses and validates query structure, rejecting queries containing dynamic SQL
+      patterns. Implement database activity monitoring (DAM) to detect anomalous query patterns
+      in real-time. Apply strict database account least privilege: the application database user
+      should have only SELECT, INSERT, UPDATE, DELETE privileges on specific tables — never DDL
+      (DROP, ALTER, CREATE), DBA roles, or EXECUTE on system stored procedures (xp_cmdshell must
+      be disabled). Use separate database accounts for read-only operations (reporting) and
+      write operations. Enable database-level audit logging for all queries from application
+      accounts to facilitate forensic analysis. Deploy connection pooling with query timeout
+      enforcement to limit time-based blind injection effectiveness.
+    tools:
+      - postgresql
+      - proxysql
+      - vault
+      - aws-rds
+      - cloudflare-waf
+      - aws-waf
+
+  devsecops:
+    prose: >-
+      Implement a zero-tolerance policy for dynamic SQL construction in code review. Configure
+      Semgrep with SQL injection rules for the specific language and ORM combination in use
+      (e.g., Python SQLAlchemy, Java Hibernate, Ruby ActiveRecord, Node.js Sequelize). Run
+      sqlmap against all endpoints that interact with a database in authorized testing environments
+      to perform comprehensive SQL injection testing including blind, time-based, and out-of-band
+      vectors. Add automated parameterized query tests: verify that SQL injection payloads in
+      input fields return application errors, not database data. Scan for SQL injection in
+      GraphQL queries, REST search endpoints, filter parameters, sort parameters, and pagination
+      parameters — these are commonly overlooked attack surfaces.
+    tools:
+      - semgrep
+      - sqlmap
+      - burp-suite
+      - owasp-zap
+      - codeql
+      - sonarqube
+      - gitlab-sast
+
+  secops:
+    prose: >-
+      Enable the database's built-in audit logging to capture all queries, especially those
+      from application service accounts. Configure SIEM rules to detect SQL injection indicators:
+      queries containing UNION SELECT, information_schema access, xp_cmdshell calls, or high
+      rates of database errors from specific application instances. Monitor for unusual data
+      access volumes: a single request returning an abnormally large number of rows is indicative
+      of successful extraction. Implement an IDS/IPS rule set for SQL injection signatures on
+      the database network segment. Conduct periodic penetration testing focused on injection
+      vectors in new application features. Treat any confirmed SQL injection as a critical incident
+      requiring immediate data breach assessment.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - crowdstrike
+      - aws-rds-logs
+      - datadog
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-10(3)"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4", "6.3.2"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V5.3.4", "V5.3.5"]
+    relationship: mapped

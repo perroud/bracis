@@ -1,0 +1,82 @@
+id: oi-cc-04
+family: cc
+title: "Granularidade e Escopo do Consentimento"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O consentimento no Open Insurance deve ser granular, permitindo ao cliente
+    selecionar especificamente quais categorias de dados autoriza compartilhar.
+
+    As categorias de dados devem ser apresentadas de forma clara e compreensível,
+    agrupadas em escopos definidos:
+    I - Dados cadastrais (identificação, contato, qualificação);
+    II - Dados de apólices de seguros (por ramo ou produto);
+    III - Dados de sinistros;
+    IV - Dados de previdência (contribuições, resgates, benefícios);
+    V - Dados de capitalização (prêmios, sorteios, resgates).
+
+    O cliente não pode ser obrigado a consentir com o compartilhamento de todas
+    as categorias de dados como condição para uso de um serviço. O consentimento
+    deve ser unbundled -- cada categoria deve poder ser autorizada independentemente.
+
+    A finalidade específica do compartilhamento deve ser vinculada ao consentimento
+    e não pode ser alterada sem novo consentimento.
+guidance:
+  prose: |
+    A granularidade do consentimento e uma exigencia tanto do Open Insurance quanto
+    da LGPD (principio da necessidade -- art. 6, III). O cliente deve ter controle
+    fino sobre quais dados compartilha.
+
+    O conceito de "unbundled consent" significa que a receptora nao pode condicionar
+    um servico ao consentimento total. Exemplo: se o cliente quer cotacao de seguro
+    auto, a receptora nao pode exigir consentimento para acessar dados de previdencia.
+
+    Os escopos OAuth 2.0 devem mapear diretamente para as categorias de dados,
+    permitindo que o Authorization Server filtre dados retornados pelas APIs com
+    base nos escopos autorizados.
+
+    A vinculacao de finalidade e implementada no consentimento e verificada a cada
+    acesso. A receptora declara a finalidade ao solicitar consentimento e nao pode
+    usar os dados para outra finalidade sem novo consentimento.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Definir escopos OAuth 2.0 granulares mapeados para cada categoria de dado
+         (ex: openinsurance:dados_cadastrais, openinsurance:apolices, etc.).
+      2. Implementar tela de consentimento com checkboxes independentes por categoria.
+      3. Configurar API Gateway para filtrar respostas com base nos escopos do token.
+      4. Armazenar finalidade declarada pela receptora junto ao consentimento.
+      5. Implementar validacao de finalidade em cada request de API.
+    tools:
+      - oauth2-server
+      - consent-management
+      - api-gateway
+      - identity-provider
+  devsecops:
+    prose: |
+      1. Testar que APIs retornam apenas dados dentro do escopo autorizado.
+      2. Testar cenarios de unbundled consent -- selecionar apenas algumas categorias
+         e verificar que dados nao autorizados nao sao retornados.
+      3. Testar que a finalidade e validada em cada request.
+      4. Testar que nao ha "scope escalation" -- receptora nao consegue acessar
+         dados alem do autorizado.
+    tools:
+      - security-testing
+      - integration-testing
+      - dast
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar padroes de solicitacao de escopo por receptora (detectar
+         receptoras que sempre pedem escopo maximo).
+      2. Auditar que finalidades declaradas sao consistentes com o uso real dos dados.
+      3. Alertar sobre tentativas de acesso a dados fora do escopo.
+    tools:
+      - siem
+      - consent-analytics
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-8", "art-9"]
+    relationship: complements

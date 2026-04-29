@@ -1,0 +1,150 @@
+id: art-16
+family: cap-4
+title: "Comunicacao Previa ao Banco Central"
+class: BACEN-4893
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 16. As instituições referidas no art. 1 devem comunicar ao Banco Central do
+    Brasil a contratação de serviços relevantes de processamento e armazenamento de dados
+    e de computação em nuvem com as seguintes informações:
+    I - a denominação da empresa contratada;
+    II - os serviços contratados;
+    III - a indicação dos países e das regiões em cada país onde os serviços poderão
+    ser prestados e os dados poderão ser armazenados, processados e gerenciados.
+
+    § 1º A comunicação de que trata o caput deve ser realizada até sessenta dias
+    após a contratação dos serviços.
+
+    § 2º A instituição contratante deve, previamente ao início da prestação dos
+    serviços referidos no caput, assegurar-se de que o Banco Central do Brasil tenha
+    acesso aos contratos e aos acordos firmados com o prestador de serviços, bem como
+    à documentação e às informações referentes aos serviços prestados, aos dados
+    armazenados e às informações processadas.
+
+    § 3º As alterações contratuais que impliquem modificação das informações de que
+    tratam os incisos I, II e III do caput devem ser comunicadas ao Banco Central do
+    Brasil até sessenta dias após a alteração contratual.
+guidance:
+  prose: |
+    O art. 16 estabelece a obrigacao de comunicacao ao BCB sobre contratacao de servicos
+    relevantes de nuvem. Nao e uma autorizacao previa — e uma comunicacao obrigatoria
+    pos-contratacao.
+
+    **Prazo de comunicacao (ss 1):**
+    60 dias apos a contratacao. Esse prazo e contado a partir da assinatura do contrato,
+    nao do inicio da prestacao dos servicos. A comunicacao intempestiva e passivel de
+    sancao administrativa.
+
+    **Informacoes obrigatorias:**
+    I - Denominacao da empresa: razao social completa, CNPJ (ou equivalente estrangeiro).
+    II - Servicos contratados: descricao dos servicos de processamento, armazenamento e
+    computacao. Deve ser especifico o suficiente para o BCB entender o que esta sendo
+    terceirizado.
+    III - Localizacao: paises e regioes onde os dados serao armazenados e processados.
+    Deve incluir todas as regioes possiveis (primaria e DR).
+
+    **Acesso do BCB (ss 2):**
+    O BCB deve ter acesso a:
+    - Contratos e acordos com o provedor
+    - Documentacao dos servicos
+    - Dados armazenados e informacoes processadas
+    Isso deve ser garantido ANTES do inicio da prestacao dos servicos. Na pratica,
+    significa que o contrato deve conter clausulas que permitam o acesso do BCB.
+
+    **Alteracoes contratuais (ss 3):**
+    Qualquer alteracao que modifique provedor, servicos ou localizacao deve ser comunicada
+    em ate 60 dias. Mudanca de regiao de cloud (ex: de Sao Paulo para Virginia) deve ser
+    comunicada.
+
+    **Implicacao pratica:**
+    A instituicao precisa de um processo formal de gestao de contratos de nuvem que
+    inclua a comunicacao ao BCB como etapa obrigatoria. Nao comunicar e infracoes
+    administrativa.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de contratos de nuvem:**
+      1. Registro centralizado de todos os contratos de servicos de nuvem com
+         metadados regulatorios (provedor, servicos, localizacao, data de contratacao).
+      2. Workflow automatizado de aprovacao de novos contratos de nuvem com etapa
+         de comunicacao ao BCB.
+      3. Alertas automaticos quando prazo de 60 dias para comunicacao esta proximo.
+      4. Monitoramento de regioes de deploy para detectar divergencias do comunicado.
+
+      **Rastreabilidade de localizacao (III):**
+      5. Cloud resource tagging com regiao e pais obrigatorios.
+      6. Policy enforcement que impede deploy em regioes nao comunicadas ao BCB.
+      7. Inventario automatizado de regioes utilizadas por provedor de nuvem.
+      8. Drift detection para identificar recursos provisionados em regioes nao autorizadas.
+
+      **Acesso do BCB (ss 2):**
+      9. Ambiente segregado para acesso de auditoria do BCB (read-only).
+      10. Documentacao tecnica dos servicos em formato acessivel.
+      11. Exportacao de logs e evidencias sob demanda do regulador.
+    tools:
+      - cmdb
+      - cloud-asset-inventory
+      - policy-engine
+      - tagging-policies
+      - compliance-scanner
+  devsecops:
+    prose: |
+      **Controle de regioes no pipeline:**
+      1. IaC policy que valida regioes de deploy contra lista de regioes comunicadas ao BCB.
+      2. Bloqueio automatico de deploy em regioes nao comunicadas.
+      3. Pre-deploy check que verifica conformidade com comunicacao ao BCB.
+      4. Alerta para equipe de compliance quando nova regiao e solicitada.
+
+      **Rastreabilidade:**
+      5. Logs de deploy com regiao, provedor e servico para auditoria.
+      6. Evidencias automaticas de conformidade com localizacao comunicada.
+      7. Pipeline de IaC com validacao de provider/region contra allowlist regulatoria.
+
+      **Alteracoes contratuais (ss 3):**
+      8. Deteccao automatica de mudanca de regiao ou provedor em IaC.
+      9. Workflow de aprovacao obrigatorio para mudancas de regiao/provedor.
+      10. Integracao com sistema de gestao de contratos para rastreabilidade.
+    tools:
+      - checkov
+      - opa-gatekeeper
+      - terraform
+      - gitlab-ci
+      - policy-engine
+  secops:
+    prose: |
+      **Processo de comunicacao ao BCB:**
+      1. Processo formal documentado para comunicacao de contratacao de servicos de nuvem.
+      2. Template padronizado com todas as informacoes exigidas (incisos I a III).
+      3. Controle de prazo de 60 dias com alerta antecipado (30, 45, 55 dias).
+      4. Registro de todas as comunicacoes realizadas com protocolo do BCB.
+
+      **Monitoramento de conformidade:**
+      5. Revisao periodica do inventario de servicos de nuvem vs. comunicacoes ao BCB.
+      6. Verificacao de que todos os contratos possuem clausula de acesso do regulador.
+      7. Simulacao de auditoria do BCB: capacidade de apresentar contratos e documentacao.
+
+      **Alteracoes (ss 3):**
+      8. Monitoramento de alteracoes contratuais que exijam nova comunicacao.
+      9. Processo de comunicacao para alteracoes com mesmo prazo de 60 dias.
+      10. Registro historico de todas as comunicacoes e alteracoes.
+
+      **Retencao de evidencias:**
+      11. Retencao de todas as comunicacoes ao BCB por 5 anos (minimo).
+      12. Retencao de contratos e aditivos com provedores de nuvem.
+      13. Retencao de evidencias de localizacao de dados.
+    tools:
+      - grc-platform
+      - contract-management
+      - compliance-scanner
+      - ticketing-system
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-4", "AC-20"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-35"]
+    relationship: complements

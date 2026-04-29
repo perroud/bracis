@@ -1,0 +1,99 @@
+id: art-15
+family: cap-3
+title: "Reproduction and Copying Restrictions"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 15. A reprodução de informação classificada em qualquer grau de
+    sigilo terá o mesmo grau de sigilo do documento original.
+
+    § 1º A reprodução total ou parcial de informação classificada nos
+    graus de sigilo ultrassecreto e secreto condiciona-se à autorização
+    expressa da autoridade classificadora ou da autoridade hierarquicamente
+    superior.
+
+    § 2º A reprodução de informação classificada no grau de sigilo
+    reservado poderá ser feita por servidor autorizado, mediante registro
+    da quantidade de cópias e dos respectivos destinatários.
+
+    § 3º As cópias serão autenticadas pela autoridade classificadora ou
+    pela autoridade hierarquicamente superior.
+
+    § 4º Serão destruídas, observado o disposto no art. 17, todas as
+    cópias que não tiverem mais utilidade.
+guidance:
+  prose: |
+    Article 15 controls the reproduction (copying) of classified
+    information with restrictions proportional to the classification level:
+
+    **Reproduction rules:**
+    | Level          | Who Authorizes           | Requirements          |
+    |----------------|--------------------------|-----------------------|
+    | Ultrassecreta  | Classifying authority    | Express authorization |
+    | Secreta        | Classifying authority    | Express authorization |
+    | Reservada      | Authorized public servant| Copy count + log      |
+
+    **Key principles:**
+    - Copies inherit the original's classification level
+    - All copies must be authenticated by the classifying authority
+    - Unnecessary copies must be destroyed per art. 17 procedures
+    - Copy count and distribution must be tracked
+
+    **Digital implications:**
+    Digital "reproduction" includes: file copying, cloning, replication,
+    backup, screenshot, print, export, and any operation that creates a
+    new instance of the classified data.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Digital reproduction controls:**
+      1. Implement copy/download restrictions based on classification level:
+         - Ultrassecreta/secreta: disable copy, download, print, screenshot
+           by default; require explicit approval workflow for each operation
+         - Reservada: allow authorized copy with automatic logging of
+           copy count and recipient
+      2. Deploy DRM (Digital Rights Management) for ultrassecreta and
+         secreta documents to prevent unauthorized reproduction.
+      3. Implement copy tracking: every digital reproduction creates an
+         audit record with who, when, why, and copy destination.
+      4. Enforce copy authentication through digital signatures.
+    tools:
+      - drm
+      - copy-control
+      - audit-logging
+      - digital-signature
+  devsecops:
+    prose: |
+      **Repository reproduction controls:**
+      1. Implement fork/clone restrictions on classified repositories:
+         ultrassecreta/secreta repositories cannot be forked without
+         explicit authorization workflow.
+      2. Track all git clone operations for classified repositories.
+      3. Implement automated destruction of local clones when access
+         is revoked (via device management integration).
+    tools:
+      - repository-controls
+      - clone-tracking
+      - device-management
+  secops:
+    prose: |
+      **Copy control governance:**
+      1. Maintain a copy registry for all classified documents: original,
+         number of copies, recipients, and status of each copy.
+      2. Audit copy registries quarterly to verify all copies are
+         accounted for and unnecessary copies have been destroyed.
+      3. Verify that ultrassecreta/secreta reproduction authorizations
+         are properly documented and traceable.
+      4. Conduct spot checks for unauthorized copies of classified material.
+    tools:
+      - copy-registry
+      - audit-management
+      - grc-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-3", "MP-5"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: complements

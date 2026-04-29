@@ -1,0 +1,88 @@
+id: art-33
+family: cap-5
+title: "Consolidacao de Monitoramento em Grupos Economicos"
+class: CVM-50
+baselines: [grupos-economicos]
+statement:
+  prose: |
+    Art. 33. Os participantes que façam parte de grupos econômicos ou
+    conglomerados devem adotar procedimentos consolidados de monitoramento
+    de PLD/FT, incluindo:
+
+    I - compartilhamento de informações de clientes e alertas de PLD/FT
+    entre as entidades do grupo, observadas as restrições legais aplicáveis;
+    II - identificação de clientes comuns ao grupo e consolidação de suas
+    exposições e padrões de comportamento; e
+    III - adoção de políticas e parâmetros de monitoramento harmonizados
+    em todo o grupo.
+guidance:
+  prose: |
+    O monitoramento consolidado em grupos economicos resolve um problema
+    estrutural: um criminoso pode usar multiplas entidades do mesmo grupo
+    para fragmentar suas operacoes, de modo que cada entidade individualmente
+    veja apenas transacoes abaixo dos thresholds.
+
+    **Exemplo pratico:**
+    Um grupo economico tem uma corretora, uma gestora de fundos e uma
+    distribuidora. O cliente A opera R$ 40.000/mes na corretora (abaixo do
+    threshold de R$ 50.000 para PF), R$ 40.000/mes na gestora, e R$ 40.000/mes
+    na distribuidora. Individualmente, nenhuma entidade veria o threshold
+    violado. Consolidado, o cliente opera R$ 120.000/mes — muito acima.
+
+    **Restricoes legais de compartilhamento:**
+    O compartilhamento de informacoes de PLD/FT dentro do grupo e permitido
+    para fins de PLD/FT, mas deve observar a LGPD e eventuais restricoes
+    contratuais. O compartilhamento deve ser limitado ao necessario e
+    protegido contra acesso por areas nao relacionadas a PLD/FT.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma consolidada de grupo:**
+      1. Data lake compartilhado de PLD/FT para entidades do grupo com
+         controles de acesso por entidade.
+      2. Algoritmo de vinculacao de clientes: identificar o mesmo individuo/empresa
+         em multiplas entidades do grupo pelo CPF/CNPJ.
+      3. Visao consolidada de exposicao: dado um CPF/CNPJ, mostrar total
+         de operacoes em todas as entidades do grupo no periodo.
+      4. Propagacao de alertas: quando uma entidade gera alerta para um cliente,
+         as demais entidades do grupo recebem notificacao para revisao.
+
+      **Privacidade por design:**
+      5. Dados de clientes de entidade A nao sao acessiveis a analistas
+         de entidade B, mas o score consolidado de risco e compartilhado.
+    tools:
+      - data-lake
+      - entity-resolution
+      - aml-platform
+      - api-gateway
+  devsecops:
+    prose: |
+      **Testes de consolidacao:**
+      1. Testes de vinculacao: mesmo CPF em duas entidades deve ser vinculado.
+      2. Testes de threshold consolidado: transacoes individuais abaixo do
+         threshold que somadas superam deve gerar alerta.
+      3. Testes de privacidade: analista de entidade A nao pode ver detalhes
+         de operacoes em entidade B.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - privacy-testing
+  secops:
+    prose: |
+      **Governanca do monitoramento consolidado:**
+      1. Politica de compartilhamento de informacoes intragrupo documentada
+         e aprovada pelo DPO (conforme LGPD).
+      2. Revisao trimestral de efetividade do monitoramento consolidado.
+      3. Relatorio de alertas gerados somente pela visao consolidada (que
+         nao teriam sido gerados na visao individual).
+    tools:
+      - grc-platform
+      - reporting-dashboard
+      - data-governance
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-30"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-26"]
+    relationship: complements

@@ -1,0 +1,111 @@
+id: req-2.1
+family: req-2
+title: "Apply Secure Configurations to All System Components"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for applying secure configurations to all system components
+    are defined and understood. Vendor-supplied defaults and other security parameters
+    are changed before or immediately upon installation of system components. Default
+    accounts, passwords, SNMP community strings, and other security-relevant defaults
+    are managed and changed. Primary functions requiring different security levels are
+    managed to prevent co-existence on the same system component where such co-existence
+    would weaken the security of either function.
+  parts:
+    - id: req-2.1.a
+      label: "2.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 2
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-2.1.b
+      label: "2.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 2 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    System components often ship with vendor default configurations that prioritize
+    ease of use over security. Default accounts, passwords, SNMP community strings,
+    and unnecessary services create known attack vectors. Organizations must establish
+    hardening standards for every type of system component in the CDE, apply these
+    standards before deployment, and verify compliance continuously. Hardening standards
+    should be based on industry-accepted sources such as CIS Benchmarks, DISA STIGs,
+    or vendor security guides. System components should be configured to perform only
+    their intended primary function; mixing functions on a single component increases
+    the attack surface and complicates security management.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 2"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build hardened golden images for all system components using automated image
+      pipelines (Packer, Docker multi-stage builds). Derive container base images from
+      minimal distributions (distroless, Alpine) with only required packages installed.
+      Use CIS Benchmark-aligned hardening scripts applied during image build. Store all
+      system configurations as code in version-controlled repositories. Enforce
+      immutable infrastructure patterns where system components are replaced rather than
+      patched in place. Use configuration management tools (Ansible, Chef, Puppet) to
+      enforce secure defaults across the fleet. Implement admission controllers in
+      Kubernetes to reject pods running as root, using default service accounts, or
+      mounting host paths.
+    tools:
+      - packer
+      - docker
+      - ansible
+      - cis-benchmarks
+      - kyverno
+      - opa-gatekeeper
+      - falco
+      - terraform
+
+  devsecops:
+    prose: >-
+      Integrate CIS Benchmark scanning into CI/CD pipelines using tools like InSpec,
+      Lynis, or OpenSCAP. Scan container images for default credentials, unnecessary
+      packages, and misconfigured services before they reach the registry. Enforce
+      that Dockerfiles do not set default passwords or expose unnecessary ports.
+      Use GitLab container scanning and dependency scanning to detect known
+      vulnerabilities in base images. Implement policy-as-code checks that verify
+      configuration hardening standards are met before deployment proceeds.
+    tools:
+      - gitlab-ci
+      - inspec
+      - openscap
+      - lynis
+      - trivy
+      - grype
+      - hadolint
+      - dockle
+
+  secops:
+    prose: >-
+      Continuously monitor system configurations against hardening baselines using
+      configuration compliance scanners. Alert on configuration drift where a system
+      component reverts to default or insecure settings. Audit default account usage
+      across all system components and ensure default credentials are disabled or
+      changed. Monitor for SNMP traffic using default community strings. Maintain
+      an inventory of all system components with their hardening status and last
+      assessment date.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - wazuh
+      - osquery
+      - aws-config
+      - azure-policy
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-6", "CM-7", "SA-22"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.19"]
+    relationship: supports

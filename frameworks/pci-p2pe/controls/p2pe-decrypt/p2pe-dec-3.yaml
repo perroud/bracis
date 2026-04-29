@@ -1,0 +1,119 @@
+id: p2pe-dec-3
+family: p2pe-decrypt
+title: "Decryption Environment Compliance and Monitoring"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The decryption environment shall comply with all applicable PCI DSS
+    requirements as a Level 1 service provider environment. Continuous
+    monitoring shall be implemented to detect unauthorized access, data
+    exfiltration, or anomalous decryption patterns. The solution provider
+    shall maintain evidence of PCI DSS compliance for the decryption
+    environment, including current Report on Compliance (ROC) or
+    Self-Assessment Questionnaire (SAQ) as applicable. Audit logs from
+    the decryption environment shall be retained for a minimum of one year,
+    with at least three months immediately available for analysis.
+  parts:
+    - id: p2pe-dec-3.a
+      label: "Domain 3, 3E"
+      prose: >-
+        The decryption environment maintains current PCI DSS compliance
+        validation (ROC or applicable SAQ) and undergoes annual
+        reassessment by a QSA.
+    - id: p2pe-dec-3.b
+      label: "Domain 3, 3F"
+      prose: >-
+        Continuous monitoring detects anomalous decryption patterns, and
+        audit logs are retained for at least one year with three months
+        immediately accessible for forensic analysis.
+
+guidance:
+  prose: >-
+    Because the decryption environment processes cleartext account data,
+    it is fully in scope for PCI DSS. The solution provider must maintain
+    a current PCI DSS Report on Compliance (ROC) for this environment,
+    validated by a Qualified Security Assessor (QSA). Continuous monitoring
+    goes beyond basic log collection — it includes behavioral analytics
+    that can detect insider threats, compromised credentials, or
+    application-level attacks that might not trigger traditional signature-
+    based alerts. Anomalous decryption patterns include sudden spikes in
+    volume, decryption requests from unexpected source addresses, or
+    decryption of data associated with expired or revoked devices. Log
+    retention requirements align with PCI DSS Requirement 10.7 but
+    solution providers should consider longer retention for forensic
+    investigation capability.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 3 — Decryption Environment"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI DSS v4.0.1, Requirement 10 — Log and Monitor All Access"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized SIEM with dedicated data streams for the
+      decryption environment. Implement log shipping via secure, encrypted
+      channels to an immutable log store (WORM storage or append-only
+      object storage). Configure automated compliance dashboards that track
+      PCI DSS control status in real time. Implement tiered log storage
+      with hot storage (3 months, immediately queryable), warm storage
+      (9 months, queryable within minutes), and cold archive (additional
+      retention as required by jurisdiction). Use infrastructure-as-code
+      to ensure monitoring configuration is version-controlled and auditable.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-s3-object-lock
+      - azure-immutable-blob
+      - terraform
+      - grafana
+      - prometheus
+
+  devsecops:
+    prose: >-
+      Include compliance validation tests in deployment pipelines that
+      verify logging is active, log destinations are reachable, and
+      monitoring alerts are functional. Implement synthetic decryption
+      transactions that exercise the monitoring pipeline end-to-end.
+      Scan IaC templates for logging and monitoring configuration drift.
+      Automate PCI DSS evidence collection for the decryption environment
+      to reduce assessment preparation effort.
+    tools:
+      - gitlab-ci
+      - checkov
+      - inspec
+      - chef-compliance
+      - openscap
+      - aws-config
+
+  secops:
+    prose: >-
+      Implement UEBA (User and Entity Behavior Analytics) for the
+      decryption environment to detect insider threats and compromised
+      accounts. Create detection rules for anomalous decryption volumes,
+      geographic anomalies, and off-hours administrative access. Conduct
+      monthly review of decryption environment access logs and quarterly
+      review of full audit trail. Maintain incident response runbooks
+      specific to decryption environment compromise scenarios. Participate
+      in annual tabletop exercises simulating a decryption environment
+      breach.
+    tools:
+      - splunk-ueba
+      - elastic-ml
+      - microsoft-sentinel
+      - crowdstrike
+      - recorded-future
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-10.1", "req-10.2", "req-10.7", "req-12.4"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-11", "SI-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.16", "A8.17"]
+    relationship: supports

@@ -1,0 +1,109 @@
+id: basel-liq-lcr
+family: liquidity
+title: "Liquidity Coverage Ratio (LCR)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain sufficient unencumbered high-quality liquid assets (HQLA) to
+    cover their total net cash outflows over a 30-calendar-day stress scenario. The
+    Liquidity Coverage Ratio (LCR) must be at least 100% at all times: LCR = Stock of
+    HQLA / Total net cash outflows over the next 30 calendar days ≥ 100%. HQLA are
+    categorised as Level 1 assets (coins and banknotes, central bank reserves, and
+    Level 1 sovereign or central bank securities, subject to a 0% haircut), Level 2A
+    assets (certain government and central bank securities, GSE debt, and corporate bonds
+    with a 15% haircut), and Level 2B assets (certain residential mortgage-backed
+    securities, lower-rated corporate bonds, and listed equities, subject to haircuts of
+    25-50%). Level 2 assets are capped at 40% of total HQLA, and Level 2B assets at 15%.
+    Net cash outflows are calculated as total expected outflows minus the minimum of total
+    expected inflows and 75% of total expected outflows.
+
+guidance:
+  prose: >-
+    The LCR is designed to ensure that banks have sufficient liquidity to survive a
+    significant stress scenario lasting 30 days without requiring central bank or
+    government support. Banks must assess outflow rates for each liability category
+    (retail deposits, unsecured wholesale funding, secured funding, committed credit and
+    liquidity facilities) and inflow rates for each asset category, applying the rates
+    specified in the Basel III LCR standard or more conservative national supervisory
+    requirements. Banks should maintain the HQLA buffer in entities that have direct
+    access to the market and manage intra-group liquidity carefully, as HQLA held in a
+    subsidiary may not be freely transferable to the parent. Daily LCR monitoring is a
+    supervisory expectation for significant institutions. Internal early warning indicators
+    (EWI) should be calibrated to trigger the contingency funding plan before the LCR
+    approaches 100%. In periods of stress, supervisors may permit LCR to fall below 100%
+    temporarily, but banks must immediately notify their supervisor and present a plan for
+    restoration.
+
+references:
+  - citation: "BCBS, Basel III: The Liquidity Coverage Ratio and liquidity risk monitoring tools, January 2013"
+    url: "https://www.bis.org/publ/bcbs238.htm"
+  - citation: "BCBS, Frequently asked questions on Basel III's January 2013 Liquidity Coverage Ratio framework"
+    url: "https://www.bis.org/publ/bcbs264.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement an intraday liquidity monitoring platform that aggregates cash flows from
+      payments systems, correspondent banking feeds, securities settlement systems, and
+      internal funding desks in real time. Calculate the LCR on a daily basis (or intraday
+      for G-SIBs) by classifying all assets against HQLA eligibility criteria, applying
+      regulatory haircuts and caps, and calculating expected outflows and inflows by
+      counterparty type using automated counterparty classification. Expose LCR by entity,
+      currency, and maturity bucket in a risk dashboard accessible to Treasury and ALCO.
+      Implement automated collateral management integrations so that HQLA pledged as
+      collateral is immediately reflected in the unencumbered HQLA stock.
+    tools:
+      - apache-kafka
+      - apache-flink
+      - postgresql
+      - grafana
+      - prometheus
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain LCR calculation logic — including HQLA classification rules, outflow rate
+      tables, inflow rate tables, and cap calculations — as versioned code with unit tests
+      for each regulatory scenario. Automate comparison of LCR outputs against the previous
+      day's values and flag material unexplained movements (>5% shift) for human review
+      before submission. Use infrastructure-as-code for the data pipelines feeding the LCR
+      calculation engine so that environment changes are traceable and reproducible.
+      Implement data quality checks at ingestion to detect and quarantine stale or
+      erroneous position data.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - terraform
+      - apache-airflow
+
+  secops:
+    prose: >-
+      Classify LCR data as highly sensitive given its market and liquidity implications;
+      restrict access to LCR calculation results to Finance, Risk, Treasury, and senior
+      management on a need-to-know basis. Log all access to HQLA inventory data and LCR
+      reports, and alert on any access outside business hours or from unusual locations.
+      Include LCR systems in the scope of the IT disaster recovery plan with recovery time
+      objectives (RTOs) consistent with regulatory reporting deadlines. Test DR scenarios
+      quarterly, ensuring that the LCR calculation can be performed on backup systems
+      within the regulatory reporting window.
+    tools:
+      - splunk
+      - cyberark
+      - hashicorp-vault
+      - pagerduty
+      - iso-22301
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-11", "art-12"]
+    relationship: complements
+  - framework_id: iso-22301
+    articles: ["cl-8.4", "cl-8.5"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-7", "CP-9"]
+    relationship: mapped

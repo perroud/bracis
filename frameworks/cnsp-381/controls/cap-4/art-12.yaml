@@ -1,0 +1,163 @@
+id: art-12
+family: cap-4
+title: "Requisitos para Contratação de Serviços de Nuvem"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 12. As supervisionadas devem assegurar que suas políticas, estratégias e
+    estruturas para gerenciamento de riscos previstas na regulamentação em vigor
+    contemplem a contratação de serviços de processamento e armazenamento de dados
+    e de computação em nuvem, no País ou no exterior.
+
+    § 1º As supervisionadas devem assegurar que a contratação dos serviços referidos
+    no caput não cause prejuízo ao seu regular funcionamento nem embaraço à atuação
+    da SUSEP.
+
+    § 2º As supervisionadas devem prever alternativas para a continuidade dos negócios,
+    no caso de impossibilidade de manutenção ou extinção do contrato de prestação de
+    serviços de processamento e armazenamento de dados e de computação em nuvem.
+guidance:
+  prose: |
+    O art. 12 é o artigo central do Capítulo 4, estabelecendo os requisitos
+    fundamentais para contratação de serviços de nuvem.
+
+    **Integração com gestão de riscos (caput):**
+    A contratação de serviços de nuvem deve estar integrada às políticas de gestão
+    de riscos já existentes na entidade. Não pode ser tratada como decisão puramente
+    técnica — é decisão de negócio com implicações regulatórias.
+
+    Aspectos a contemplar na gestão de riscos:
+    - Risco operacional: indisponibilidade do provedor, perda de dados
+    - Risco de concentração: dependência excessiva de um único provedor
+    - Risco regulatório: não conformidade com requisitos da SUSEP
+    - Risco de continuidade: incapacidade de operar sem o provedor
+    - Risco reputacional: vazamento de dados por falha do provedor
+
+    **"No País ou no exterior":**
+    A resolução permite contratação tanto nacional quanto internacional, mas
+    com requisitos adicionais para dados no exterior (art. 14).
+
+    **§ 1º — Não prejudicar funcionamento nem embaraçar SUSEP:**
+    Dois requisitos negativos:
+    1. Regular funcionamento: a contratação de nuvem não pode causar interrupções
+       ou degradação de serviços aos segurados
+    2. Atuação da SUSEP: a SUSEP deve conseguir exercer sua fiscalização mesmo
+       com dados em nuvem. O provedor não pode impedir acesso da SUSEP aos dados.
+
+    **§ 2º — Alternativas de continuidade:**
+    Exige plano de saída (exit plan) para cada contratação de nuvem:
+    - Impossibilidade de manutenção: falência do provedor, indisponibilidade
+      prolongada, violação contratual
+    - Extinção do contrato: término, rescisão, não renovação
+    O plano deve incluir: migração para outro provedor, internalização,
+    alternativa temporária.
+
+    **Em inspeções, a SUSEP verifica:**
+    1. Integração da nuvem na política de gestão de riscos
+    2. Inventário de serviços de nuvem contratados
+    3. Análise de risco para cada contratação
+    4. Plano de saída documentado para cada provedor
+    5. Testes periódicos do plano de continuidade
+    6. Capacidade de a SUSEP acessar dados e informações
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Governança de cloud:**
+      1. Cloud Governance Framework:
+         - Políticas de aprovação para contratação de novos serviços de nuvem
+         - Catálogo de serviços aprovados por classificação de dados
+         - Processo formal de avaliação de novos provedores/serviços
+      2. Landing zone segura por provedor de nuvem:
+         - AWS: Control Tower, SCPs, GuardDuty, Config Rules
+         - Azure: Management Groups, Azure Policy, Defender for Cloud
+         - GCP: Organization Policies, Security Command Center
+      3. Multi-cloud strategy para evitar vendor lock-in:
+         - Abstração de infraestrutura via IaC (Terraform, Pulumi)
+         - Containerização para portabilidade (Kubernetes)
+         - APIs padronizadas para serviços críticos
+
+      **Continuidade e exit plan (§ 2º):**
+      4. Backup cross-cloud: cópias de dados em provedor diferente do principal.
+      5. Exportação periódica de dados para formato portável.
+      6. Testes semestrais de migração/failover entre provedores.
+      7. Documentação de dependências específicas de cada provedor (serviços
+         proprietários, APIs, formatos de dados).
+    tools:
+      - terraform
+      - kubernetes
+      - cloud-governance
+      - backup-cross-cloud
+      - cloud-asset-inventory
+  devsecops:
+    prose: |
+      **IaC com portabilidade:**
+      1. Toda infraestrutura de nuvem provisionada via Infrastructure-as-Code:
+         - Terraform/Pulumi para recursos de nuvem
+         - Helm charts para workloads Kubernetes
+         - GitOps para gestão de estado desejado
+      2. Abstração de serviços proprietários quando possível:
+         - Containers ao invés de serverless proprietário para cargas críticas
+         - Bancos de dados open-source ao invés de serviços gerenciados proprietários
+         - Object storage com API S3-compatible como padrão
+
+      **Controles no pipeline:**
+      3. Verificação automática de compliance de recursos cloud no pipeline:
+         - Checkov/tfsec para análise de configurações de IaC
+         - OPA/Gatekeeper para políticas de admissão em Kubernetes
+         - Bloqueio de provisionamento de recursos fora de regiões aprovadas
+      4. Inventário automático de recursos cloud provisionados via pipeline.
+      5. Alertas quando recurso é provisionado fora do catálogo aprovado.
+    tools:
+      - terraform
+      - checkov
+      - opa-gatekeeper
+      - gitlab-ci
+      - helm
+      - gitops
+  secops:
+    prose: |
+      **Gestão de riscos de nuvem:**
+      1. Assessment de risco obrigatório antes de cada nova contratação de nuvem:
+         - Classificação dos dados que serão processados/armazenados
+         - Avaliação de risco operacional, regulatório e de continuidade
+         - Aprovação formal pelo diretor responsável (art. 18)
+      2. Revisão semestral dos riscos de nuvem com atualização do mapa de riscos.
+      3. Monitoramento contínuo da postura de segurança do provedor:
+         - Verificação de certificações (SOC 2, ISO 27001, CSA STAR)
+         - Monitoramento de incidentes públicos do provedor
+         - Revisão de relatórios de auditoria do provedor
+
+      **Plano de saída (§ 2º):**
+      4. Exit plan documentado para cada provedor de nuvem:
+         - Cenários de ativação (falência, indisponibilidade, rescisão)
+         - Processo de migração com cronograma estimado
+         - Provedor alternativo identificado e pré-qualificado
+         - Teste anual do plano de saída
+      5. Cláusulas contratuais que garantam:
+         - Direito de exportação de dados em formato aberto
+         - Prazo mínimo de transição após rescisão
+         - Cooperação do provedor na migração
+         - Destruição certificada de dados após migração
+
+      **Acesso da SUSEP (§ 1º):**
+      6. Garantir que contratos permitam acesso da SUSEP a dados e sistemas.
+      7. Processo de resposta a solicitações da SUSEP sobre dados em nuvem.
+    tools:
+      - grc-platform
+      - cloud-security-posture
+      - vendor-risk-management
+      - contract-management
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-9", "art-10"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-46", "art-33"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-12", "CP-1", "CP-2", "CP-6", "RA-3"]
+    relationship: supports

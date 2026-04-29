@@ -1,0 +1,125 @@
+id: nist-63-enrollment
+family: identity-assurance
+title: "Enrollment and Identity Proofing Process"
+class: SP800-63A
+
+baselines: [ial2, ial3, aal2, aal3, fal2, fal3]
+
+statement:
+  prose: >-
+    The CSP shall perform a risk assessment to identify the appropriate IAL
+    for a given transaction prior to enrollment. The enrollment process shall
+    include the following steps: (1) the applicant provides an identity claim
+    and presents identity evidence; (2) the CSP validates the authenticity of
+    each piece of identity evidence; (3) the CSP verifies that the identity
+    evidence belongs to the applicant; (4) the CSP creates an enrollment record
+    and binds it to a subscriber account; and (5) the CSP confirms the address
+    of record. The CSP shall employ appropriately trained personnel to perform
+    in-person identity proofing and validation of identity evidence. The
+    enrollment record shall include sufficient information to re-identify
+    the subscriber in subsequent transactions. The CSP shall retain records
+    of the proofing process in accordance with applicable records retention
+    policies, but not longer than is necessary to fulfill the purpose.
+
+guidance:
+  prose: >-
+    The enrollment process is the gateway to all subsequent authenticated
+    interactions at IAL2 and above. CSPs must ensure the proofing workflow
+    is both rigorous and accessible — overly burdensome proofing processes
+    create digital exclusion for vulnerable populations. NIST 800-63A Section 10
+    (Usability Considerations) requires CSPs to evaluate the user experience
+    of their proofing process. Organizations deploying enrollment must evaluate
+    evidence strength using the 800-63A classification (SUPERIOR, STRONG,
+    FAIR, WEAK) and ensure the combination of evidence presented meets the
+    required IAL threshold. Address confirmation is a distinct step from
+    identity verification: verifying that the subscriber's address of record
+    matches the one on the identity document (or an authoritative record)
+    establishes the communication channel for future recovery actions.
+    CSPs must re-proof identities when there is reason to believe that the
+    subscriber's binding to the credential may be compromised.
+
+references:
+  - citation: "NIST SP 800-63A Section 5 — Identity Resolution, Validation, and Verification"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 4 — Identity Assurance Levels"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 8 — Threats and Security Considerations"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63A Section 10 — Usability Considerations"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+
+related_controls:
+  - id: nist-63-ial1
+    relationship: complements
+    description: "IAL1 requires no formal enrollment proofing; this control governs IAL2 and IAL3 enrollment."
+  - id: nist-63-ial2
+    relationship: supports
+    description: "The enrollment process implements the IAL2 proofing requirements."
+  - id: nist-63-ial3
+    relationship: supports
+    description: "IAL3 enrollment adds in-person and biometric requirements to the base enrollment process."
+  - id: nist-63-biometrics
+    relationship: complements
+    description: "Biometric collection is an optional enrollment step at IAL2 and mandatory at IAL3."
+  - id: nist-63-privacy-proofing
+    relationship: implements
+    description: "The enrollment process must embed privacy notice, consent, and data minimization."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design the enrollment service as a standalone, auditable microservice
+      within the platform identity layer. The enrollment service should expose
+      a webhook or event stream that downstream identity providers (Keycloak,
+      Okta) subscribe to, receiving the enrollment result and identity claims
+      as a verified assertion. Implement idempotent enrollment sessions with
+      session state persistence so that applicants can resume an interrupted
+      proofing process. Store identity evidence references (not full copies)
+      in an encrypted, access-controlled vault with separate key management.
+      Build enrollment audit trails using an append-only log store (e.g.,
+      Kafka with immutable topic compaction disabled). Implement re-enrollment
+      triggers based on configurable policies: credential compromise events,
+      name change requests, periodic re-proofing intervals defined by the IAL.
+      Expose enrollment status APIs for downstream systems to query whether
+      a subscriber account has been verified at a given IAL.
+    tools:
+      - keycloak
+      - okta
+      - vault
+      - kafka
+      - postgres
+
+  devsecops:
+    prose: >-
+      Implement integration tests in CI/CD that simulate the complete enrollment
+      workflow for each IAL tier. Include negative test cases: rejected evidence,
+      mismatched biometrics, failed liveness checks, and address mismatch.
+      Validate that the enrollment service correctly refuses to issue IAL2+
+      credentials when proofing steps are skipped or fail validation. Include
+      static analysis rules that flag direct access to PII in the enrollment
+      data store without going through the access-controlled enrollment service
+      API. Scan enrollment session tokens for proper expiration and binding
+      to prevent session fixation attacks against the proofing workflow.
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - vault
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor enrollment sessions for attack patterns including document forgery
+      attempts, injection of manipulated document images into the verification
+      API, and identity enumeration (using proofing to discover whether a
+      specific identity is enrolled in the system). Alert on bulk enrollment
+      activity from the same IP range or device fingerprint. Maintain a risk
+      score for each enrollment session and automatically escalate high-risk
+      enrollments for manual review. Conduct periodic audits of the enrollment
+      audit trail for gaps, modifications, or missing events that may indicate
+      tampering. Implement threat intelligence integration to check claimed
+      identities against known fraud databases during enrollment.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - threatconnect

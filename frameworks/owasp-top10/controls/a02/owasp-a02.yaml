@@ -1,0 +1,115 @@
+id: owasp-a02
+family: a02
+title: "A02:2021 — Cryptographic Failures"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Cryptographic Failures (previously known as Sensitive Data Exposure) focuses on failures
+    related to cryptography, or lack thereof, that often lead to exposure of sensitive data.
+    Common weaknesses include data transmitted in cleartext (HTTP, SMTP, FTP), use of old or
+    weak cryptographic algorithms or protocols (MD5, SHA1, RC4, DES, SSL/early TLS), use of
+    default crypto keys, weak keys generated or reused, use of deprecated hash functions without
+    a salt (or with a predictable salt), deprecated padding methods (PKCS1v1.5), encryption
+    errors treated as exploitable opportunities, not enforcing encryption such as missing security
+    HTTP headers or directives in email, storing passwords using weak or unsalted hash functions,
+    lack of certificate validation, using predictable initialization vectors for encryption, and
+    hardcoded cryptographic material in source code.
+
+guidance:
+  prose: >-
+    The first step is to determine the protection needs of data in transit and at rest. Passwords,
+    credit card numbers, health records, personal information, and business secrets require extra
+    protection, especially if that data falls under privacy laws or regulations. For all such data,
+    classify data processed, stored, or transmitted by an application and identify which data is
+    sensitive under applicable privacy laws, regulatory requirements, or business needs. Do not
+    store sensitive data unnecessarily. Discard it as soon as possible or use PCI DSS compliant
+    tokenization or truncation. Data that is not retained cannot be stolen. Encrypt all sensitive
+    data at rest and in transit using strong, up-to-date algorithms (AES-256 for symmetric, RSA-2048+
+    or ECC P-256+ for asymmetric, TLS 1.2+ for transport). Ensure passwords are stored using
+    adaptive and salted hashing algorithms (Argon2, bcrypt, scrypt). Avoid deprecated cryptographic
+    functions.
+
+references:
+  - citation: "OWASP Top 10:2021 A02 Cryptographic Failures"
+    url: "https://owasp.org/Top10/A02_2021-Cryptographic_Failures/"
+  - citation: "OWASP Cryptographic Storage Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html"
+  - citation: "OWASP Transport Layer Security Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2 as the minimum across all services — disable SSLv2, SSLv3, TLS 1.0, and
+      TLS 1.1 at the load balancer and service mesh layer. Use Kubernetes Network Policies and
+      service mesh mTLS (Istio, Linkerd) to encrypt all inter-service traffic and prevent cleartext
+      communication between services. Centralize secret management using HashiCorp Vault or the
+      cloud provider's KMS — never store secrets in environment variables, ConfigMaps, or source
+      code. Implement automatic certificate rotation using cert-manager with short-lived certificates
+      (90 days or less). Enforce HSTS headers with a minimum max-age of one year and preload
+      submission for public-facing domains. Use hardware security modules (HSMs) or cloud KMS for
+      cryptographic key operations on sensitive data. Implement data classification policies and
+      enforce encryption requirements per classification tier.
+    tools:
+      - vault
+      - cert-manager
+      - istio
+      - linkerd
+      - aws-kms
+      - gcp-kms
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Run secret detection scanning in CI/CD for all commits, branches, and merge requests —
+      block pipelines when secrets (API keys, certificates, passwords, private keys) are detected
+      in source code. Use GitLab Secret Detection or TruffleHog to scan the entire git history,
+      not just new commits, to find previously committed secrets. Implement SAST rules targeting
+      use of deprecated cryptographic functions (MD5, SHA1 for passwords, DES, RC4, ECB mode AES)
+      and weak key sizes. Add dependency scanning to detect libraries with known cryptographic
+      vulnerabilities. Include TLS configuration checks in infrastructure-as-code scanning (Checkov,
+      Trivy) to catch disabled TLS or weak cipher suites in cloud resource configurations.
+    tools:
+      - gitlab-secret-detection
+      - trufflehog
+      - semgrep
+      - gitlab-sast
+      - checkov
+      - trivy
+      - testssl
+      - sslscan
+
+  secops:
+    prose: >-
+      Continuously scan internet-facing endpoints for TLS configuration weaknesses using tools
+      like testssl.sh or SSL Labs API — alert on deprecated protocols, weak cipher suites, or
+      certificates within 30 days of expiration. Monitor certificate transparency logs for
+      unauthorized certificates issued for your domains. Enable logging for all key management
+      operations in KMS (key creation, key usage, key deletion, key rotation) and alert on
+      anomalous access patterns. Implement DLP policies to detect transmission of unencrypted
+      sensitive data patterns (credit card numbers, SSNs, health data) in network traffic.
+      Review encryption settings in databases, object stores, and backup systems quarterly.
+    tools:
+      - testssl
+      - aws-certificate-manager
+      - cloudflare
+      - splunk
+      - elastic-siem
+      - crowdstrike
+
+legal_references:
+  - framework_id: owasp-asvs
+    articles: ["V6.1", "V6.2", "V6.3", "V6.4", "V9.1"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["4.2", "6.2.4"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["3.10", "3.11"]
+    relationship: mapped

@@ -1,0 +1,100 @@
+id: tds-network-1
+family: tds-network
+title: "3DS Environment Network Segmentation"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    The 3DS environment must be segmented from all other networks and systems.
+    Network security controls (firewalls, routers with access control lists,
+    or other technologies) must be implemented between the 3DS environment and
+    any untrusted network, including the internet and other internal networks
+    not part of the 3DS environment. All inbound and outbound traffic to the
+    3DS environment must be restricted to that which is necessary for 3DS
+    transaction processing, and all other traffic must be denied by default.
+    Network segmentation must be validated at least annually and after any
+    significant change to the network configuration.
+
+guidance:
+  prose: >-
+    Network segmentation is the foundational security control for protecting
+    3DS components. The 3DS environment includes all system components that
+    participate in or can affect the security of 3-D Secure transactions,
+    including 3DS Servers, Directory Servers, and Access Control Servers.
+    Effective segmentation prevents lateral movement from compromised systems
+    outside the 3DS boundary. The segmentation scope must consider all
+    communication paths, including management networks, backup networks, and
+    out-of-band channels. Annual validation should include penetration testing
+    that specifically attempts to breach segmentation boundaries.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 1 — Protect 3DS Systems and Applications"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 1.1 — Network Segmentation"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy 3DS components in dedicated network segments using cloud VPCs,
+      subnets, or on-premises VLANs. Define infrastructure-as-code templates
+      that enforce network boundaries with security groups and network ACLs.
+      Use Kubernetes network policies (Calico or Cilium) to isolate 3DS
+      namespaces from all other workloads. Implement a service mesh with
+      mTLS for all inter-service communication within the 3DS environment.
+      Automate drift detection to alert on any unauthorized changes to
+      segmentation controls.
+    tools:
+      - terraform
+      - pulumi
+      - calico
+      - cilium
+      - istio
+      - aws-vpc
+      - azure-vnet
+      - gcp-vpc
+
+  devsecops:
+    prose: >-
+      Integrate network segmentation validation into CI/CD pipelines. Use
+      IaC scanning tools (Checkov, tfsec) to verify that security group
+      rules and network ACLs enforce proper segmentation before deployment.
+      Implement automated connectivity tests that verify 3DS components
+      cannot communicate with non-3DS segments except through explicitly
+      allowed paths. Block merge requests that modify network configurations
+      without security team approval.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - conftest
+      - opa
+      - bridgecrew
+
+  secops:
+    prose: >-
+      Monitor all traffic crossing 3DS network boundaries using flow logs
+      and SIEM correlation rules. Alert on any unexpected traffic patterns
+      or connection attempts from non-3DS segments. Conduct annual
+      penetration tests specifically targeting segmentation controls.
+      Maintain a network diagram that is updated after every change and
+      reviewed quarterly. Use network flow analysis to identify and
+      investigate anomalous east-west traffic.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-vpc-flow-logs
+      - azure-network-watcher
+      - gcp-flow-logs
+      - palo-alto-cortex
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-1"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-32"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.22"]
+    relationship: mapped

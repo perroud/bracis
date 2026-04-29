@@ -1,0 +1,119 @@
+id: art-37
+family: rights
+title: "Right to Suspension of Processing"
+class: PIPA-KR
+baselines: [privacy-baseline]
+statement:
+  prose: |
+    Article 37 (Suspension of Processing of Personal Information)
+    (1) A data subject may request the personal information processor to suspend the
+    processing of his/her own personal information. However, in any of the following
+    cases, the personal information processor may refuse the request:
+
+    1. Where there are special provisions in a statute or it is unavoidable to comply
+       with statutory obligations;
+    2. Where there is concern that it may cause harm to the life or body of a third party;
+    3. Where it is not possible to provide services agreed upon under a contract with
+       the data subject without processing such personal information and the data subject
+       has not clearly expressed his/her intent to terminate the contract.
+
+    (2) Upon receiving a request under paragraph (1), a personal information processor
+    shall, without delay, suspend the processing of the personal information in
+    accordance with the request and notify the data subject of the results.
+
+    (3) Where a personal information processor suspends the processing of personal
+    information under paragraph (2), the personal information processor shall destroy
+    the personal information without delay unless there are special provisions in
+    other statutes.
+
+    (4) A personal information processor shall take necessary measures to prevent
+    the personal information from being processed until the suspension of processing
+    is completed.
+guidance:
+  prose: |
+    Article 37 provides a right to suspend processing that is distinct from both
+    the deletion right (Article 36) and GDPR's restriction of processing (Article 18).
+
+    Key distinctions:
+
+    - **Broader than GDPR restriction:** GDPR's restriction right under Article 18
+      requires specific grounds (accuracy contested, unlawful processing, etc.).
+      PIPA's suspension right is unconditional — the data subject can request
+      suspension for any reason.
+
+    - **Destruction consequence (para. 3):** After suspension, the personal
+      information must be destroyed unless retention is required by statute. This
+      is a significant operational consequence — suspension effectively becomes
+      deletion in most cases.
+
+    - **Refusal grounds (para. 1):** Three narrow exceptions allow refusal:
+      statutory obligations, harm to third-party life/body, and contractual
+      necessity (only if the data subject has not expressed intent to terminate).
+
+    - **Contractual context (para. 1, item 3):** If the data subject requests
+      suspension but has not indicated they want to terminate the contract, the
+      processor may refuse. However, if the data subject clearly wants to end
+      the relationship, suspension and destruction must proceed.
+
+    - **Processing freeze (para. 4):** During the suspension process, all
+      processing must stop immediately. This is more absolute than GDPR's
+      restriction, which allows certain limited processing.
+
+    Practical impact: This right creates significant operational challenges for
+    systems with complex data dependencies. Organizations must design for the
+    possibility that any data subject can request immediate processing cessation.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement immediate processing suspension capabilities at the data
+         subject level: the ability to freeze all processing of a specific
+         individual's data across all systems within minutes.
+      2. Design data dependency maps that identify which services and processes
+         will be affected by a suspension request.
+      3. Build automated destruction workflows that trigger after suspension
+         unless statutory retention applies.
+      4. Implement exception evaluation workflows for the three refusal grounds.
+      5. Create processing freeze mechanisms at the database and application
+         layers (row-level flags, API filters, event suppression).
+    tools:
+      - processing-suspension-engine
+      - data-dependency-mapper
+      - automated-destruction-workflow
+      - exception-evaluator
+      - processing-freeze-flags
+  devsecops:
+    prose: |
+      1. Test that processing suspension takes effect across all data processing
+         pipelines within the required timeframe.
+      2. Validate that suspended data is not processed by batch jobs, analytics
+         pipelines, or background workers.
+      3. Test the destruction workflow that follows suspension.
+      4. Validate exception evaluation logic for each refusal ground.
+    tools:
+      - suspension-propagation-tester
+      - batch-processing-validator
+      - destruction-workflow-tester
+      - exception-logic-tester
+  secops:
+    prose: |
+      1. Monitor for processing of suspended personal information across all
+         systems (violation detection).
+      2. Track suspension requests, response times, and outcomes.
+      3. Verify that destruction occurs after suspension unless statutory
+         retention applies.
+      4. Audit refusal decisions for proper documentation and justification.
+    tools:
+      - processing-monitor
+      - suspension-tracker
+      - destruction-verifier
+      - refusal-audit
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-18", "art-21"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: mapped
+  - framework_id: pdpa-thailand
+    articles: ["sec-34"]
+    relationship: equivalent-to

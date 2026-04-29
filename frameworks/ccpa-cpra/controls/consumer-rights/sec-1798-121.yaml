@@ -1,0 +1,137 @@
+id: sec-1798-121
+family: consumer-rights
+title: "Right to Limit Use and Disclosure of Sensitive Personal Information"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right, at any time, to direct a business that collects
+    sensitive personal information about the consumer to limit its use of the consumer's
+    sensitive personal information to that use which is necessary to perform the services or
+    provide the goods reasonably expected by an average consumer who requests those goods or
+    services, to perform the services set forth in paragraph (2) of subdivision (e) of Section
+    1798.140, and as authorized by regulations adopted pursuant to subparagraph (C) of paragraph
+    (19) of subdivision (a) of Section 1798.185. A business that uses or discloses a consumer's
+    sensitive personal information for purposes other than those specified in this subdivision
+    shall provide notice to consumers, pursuant to subdivision (a) of Section 1798.135, that this
+    information may be used, or disclosed to a service provider or contractor, for additional,
+    specified purposes and that consumers have the right to limit the use or disclosure of their
+    sensitive personal information.
+
+    (b) A business that has received direction from a consumer not to use or disclose the
+    consumer's sensitive personal information for purposes other than those specified in
+    subdivision (a) of this section shall be prohibited from using or disclosing the consumer's
+    sensitive personal information for any other purpose after its receipt of the consumer's
+    direction, unless the consumer subsequently provides consent for the use or disclosure of
+    the consumer's sensitive personal information for additional purposes.
+
+    (c) A business that collects a consumer's sensitive personal information shall not be
+    required to comply with subdivision (a) if the consumer's sensitive personal information
+    is collected or processed without the purpose of inferring characteristics about the
+    consumer.
+
+guidance:
+  prose: |
+    Section 1798.121 is entirely a CPRA addition (not in original CCPA) and introduces the
+    concept of "sensitive personal information" (SPI) with special use-limitation rights. Key
+    aspects:
+
+    1. **Sensitive Personal Information (SPI) categories** (per Section 1798.140):
+       - Social Security number, driver's license, state ID, passport number
+       - Account log-in credentials (username + password/security question)
+       - Financial account details (with access codes)
+       - Precise geolocation
+       - Racial or ethnic origin
+       - Religious or philosophical beliefs
+       - Union membership
+       - Contents of mail, email, and text messages (unless business is intended recipient)
+       - Genetic data
+       - Biometric data for identification
+       - Health information
+       - Sex life or sexual orientation data
+
+    2. **Purpose limitation:** Consumers can restrict SPI use to only what is necessary to
+       provide the requested service/goods. No secondary uses (profiling, advertising,
+       analytics) without consumer consent.
+
+    3. **Inference exception:** If SPI is collected/processed without the purpose of inferring
+       characteristics about the consumer (e.g., payment processing that touches financial data),
+       the limitation right does not apply.
+
+    4. **Persistent direction:** Once a consumer limits SPI use, the business must comply
+       until the consumer provides subsequent consent for broader use.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement data classification system that identifies and tags Sensitive Personal
+         Information (SPI) across all data stores, distinguishing SPI from general PI.
+      2. Build SPI use-limitation preference store, separate from the sale/sharing opt-out,
+         that controls whether SPI can be used beyond necessary service delivery.
+      3. Implement purpose-based access controls (PBAC) that restrict SPI access to only
+         those services and processes necessary for the consumer's requested goods/services.
+      4. Create SPI processing audit trail that logs every access to and use of SPI, including
+         the purpose and legal basis for each processing activity.
+      5. Build a "Limit the Use of My Sensitive Personal Information" workflow in the privacy
+         portal, complementing the opt-out mechanism.
+      6. Implement data flow controls that prevent SPI from entering profiling, advertising,
+         analytics, or other secondary-use pipelines when a consumer has exercised this right.
+      7. Deploy encryption and access controls specifically for SPI at rest and in transit,
+         with stricter key management than general PI.
+    tools:
+      - data-classification
+      - datahub
+      - vault
+      - consent-management-platform
+      - privacy-portal
+      - opa
+      - feature-flags
+
+  devsecops:
+    prose: |
+      1. Implement automated SPI detection scanning in CI/CD — flag code changes that
+         introduce new SPI collection or processing without privacy review.
+      2. Test SPI purpose-limitation enforcement — verify that SPI marked for limitation
+         cannot be accessed by analytics, advertising, or profiling services.
+      3. Validate SPI classification accuracy — test that all 12 SPI categories are
+         correctly identified and tagged across data stores.
+      4. Test that SPI use-limitation preferences persist through deployments, migrations,
+         and system changes.
+      5. Implement policy-as-code checks (OPA/Rego) that validate SPI access patterns
+         against permitted purposes.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - opa
+      - trivy
+      - custom-privacy-linters
+      - integration-testing
+
+  secops:
+    prose: |
+      1. Monitor SPI access patterns — alert on access from services or users not authorized
+         for SPI processing.
+      2. Audit SPI processing against stated purposes — flag any secondary use of SPI for
+         consumers who have exercised their limitation right.
+      3. Monitor for SPI leakage into non-essential systems (logs, analytics, marketing tools).
+      4. Track SPI use-limitation request volumes and enforcement effectiveness.
+      5. Implement enhanced incident response procedures for SPI breaches, given the elevated
+         sensitivity classification.
+    tools:
+      - siem
+      - elastic-siem
+      - dlp
+      - data-discovery
+      - compliance-dashboard
+      - wazuh
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 9"]
+    relationship: intersects-with
+  - framework_id: lgpd
+    articles: ["art. 11"]
+    relationship: intersects-with
+  - framework_id: iso-27701
+    articles: ["A.7.2.1", "A.7.4.5"]
+    relationship: supports

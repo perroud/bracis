@@ -1,0 +1,95 @@
+id: uac-3
+family: uac
+title: "Multi-Factor Authentication for User and Administrative Access"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Multi-factor authentication must be used where it is available, particularly
+    for administrator accounts, accounts accessing cloud services, and accounts
+    accessible from the internet. Where multi-factor authentication is not available,
+    strong passwords or passphrases with a minimum of eight characters must be used,
+    and brute-force protection must be enabled. Multi-factor authentication combines
+    something the user knows (password) with a second factor — something the user has
+    (a trusted device, a hardware token) or something the user is (biometric).
+
+guidance:
+  prose: >-
+    Multi-factor authentication is one of the most effective controls against account
+    compromise through phishing, credential stuffing, and password spraying. The Cyber
+    Essentials scheme strongly recommends MFA for all accounts and mandates it where
+    the technology supports it. Phishing-resistant MFA methods (FIDO2 hardware keys,
+    Windows Hello for Business) provide stronger protection than SMS or email-based
+    one-time passwords. Organisations should work toward passwordless authentication
+    wherever feasible to eliminate password-based attacks entirely.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: User Access Control"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Multi-Factor Authentication for Online Services"
+    url: "https://www.ncsc.gov.uk/guidance/multi-factor-authentication-online-services"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce MFA for all user accounts through the identity provider (Azure AD, Okta,
+      Google Workspace). Configure conditional access policies that require MFA for all
+      sign-ins, or at minimum for sign-ins from untrusted locations and devices. Deploy
+      FIDO2 hardware security keys (YubiKey) for privileged accounts and high-value
+      targets. Implement phishing-resistant authentication methods (passkeys, Windows Hello)
+      as the primary MFA mechanism. Disable legacy authentication protocols that do not
+      support MFA (e.g., POP3, IMAP with basic auth, legacy SMTP relay).
+    tools:
+      - azure-ad
+      - okta
+      - google-workspace
+      - yubikey
+      - duo
+      - fido2
+
+  devsecops:
+    prose: >-
+      Enforce MFA for all developer tooling — source code repositories, CI/CD systems,
+      artifact registries, container registries, and cloud consoles. Configure GitLab to
+      require MFA for all group members and contributors. Implement SSH certificate
+      authentication or FIDO2 SSH keys as alternatives to password-based SSH access.
+      Use OIDC federation for CI/CD pipeline access to cloud providers rather than
+      long-lived credentials. Integrate MFA status checks into deployment pipelines to
+      verify that deploying users have MFA enabled.
+    tools:
+      - gitlab-mfa
+      - yubikey
+      - fido2
+      - oidc
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor MFA enrollment rates across the organisation and escalate accounts that
+      have not enrolled. Track MFA bypass events (legacy authentication, app passwords)
+      and work to eliminate them. Alert on MFA fatigue attacks (repeated MFA prompts in
+      a short period). Monitor for new MFA method registrations on accounts as a potential
+      indicator of account takeover. Generate compliance reports showing MFA coverage
+      by account type (standard, administrative, service) and authentication method
+      (FIDO2, authenticator app, SMS).
+    tools:
+      - microsoft-entra-id
+      - splunk
+      - elastic-siem
+      - crowdstrike-falcon
+      - okta
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.5", "A5.17"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2(1)", "IA-2(2)", "IA-2(6)"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-mfa"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 6.3", "CIS 6.4", "CIS 6.5"]
+    relationship: mapped

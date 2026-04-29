@@ -1,0 +1,109 @@
+id: art-3
+family: disposicoes-gerais
+title: "Classificacao dos Fundos de Investimento"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 3. Os fundos de investimento serão classificados em categorias, conforme
+    os anexos normativos desta Resolução, de acordo com a composição de sua
+    carteira e a política de investimento adotada.
+
+    Parágrafo 1. Os fundos de investimento podem ser classificados nas seguintes
+    categorias: I - Fundos de Investimento Financeiro; II - Fundos de
+    Investimento em Direitos Creditórios (FIDC); III - Fundos de Investimento
+    Imobiliário (FII); IV - Fundos de Investimento em Participações (FIP);
+    V - Fundos de Investimento nas Cadeias Produtivas Agroindustriais (FIAGRO).
+
+    Parágrafo 2. Os fundos de investimento financeiro podem ser classificados
+    em classes e subclasses, conforme definido no Anexo Normativo I.
+guidance:
+  prose: |
+    O art. 3 estabelece a taxonomia oficial dos fundos de investimento no Brasil.
+    A classificacao determina qual anexo normativo e aplicavel e, consequentemente,
+    quais regras especificas de investimento, limites de concentracao e requisitos
+    de divulgacao o fundo deve observar.
+
+    **Estrutura modular:**
+    A CVM 175 adota uma arquitetura de parte geral + anexos normativos. Todos os
+    fundos seguem a parte geral. Cada categoria tem um anexo especifico:
+    - Anexo I: Fundos de investimento financeiro (renda fixa, acoes, multimercado,
+      cambial, ETF)
+    - Anexo II: FIDC (direitos creditorios)
+    - Anexo III: FII (imobiliario)
+    - Anexo IV: FIP (participacoes)
+    - Anexo V: FIAGRO (agroindustria)
+
+    **Classes e subclasses (Anexo I):**
+    Fundos financeiros podem ter classes e subclasses com patrimonio segregado,
+    permitindo estruturas mais eficientes (master-feeder, fundo guarda-chuva).
+    Cada classe tem CNPJ proprio e patrimonio segregado.
+
+    **Impacto na tecnologia:**
+    A classificacao do fundo define os limites de investimento que sistemas de
+    gestao de carteira e risco devem enforcar automaticamente. Sistemas de
+    compliance devem validar que a carteira do fundo esta aderente a sua
+    classificacao e politica de investimento.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Taxonomia como codigo:**
+      1. Implementar taxonomia de fundos em arquivo de configuracao versionado
+         (YAML/JSON) refletindo as categorias, classes e subclasses da CVM 175.
+      2. Cada fundo no sistema deve ter metadado de categoria/classe/subclasse
+         vinculado ao anexo normativo aplicavel.
+      3. Regras de validacao automatica: carteira do fundo versus limites
+         permitidos para sua classificacao.
+
+      **Segregacao por classe:**
+      4. Para fundos com classes e subclasses (Anexo I), garantir segregacao
+         patrimonial em nivel de infraestrutura (databases, buckets, chaves).
+      5. APIs e servicos devem respeitar os limites de cada classe/subclasse
+         sem permitir acesso cruzado entre patrimonios.
+    tools:
+      - git
+      - terraform
+      - vault
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Validacao de classificacao no pipeline:**
+      1. Testes automatizados para verificar se a carteira de cada fundo
+         respeita os limites de sua categoria/classe/subclasse.
+      2. Pipeline de CI/CD que valida alteracoes em regras de classificacao
+         e limites antes de deploy em producao.
+      3. Cobertura de testes para todos os cenarios de enquadramento e
+         desenquadramento por categoria.
+
+      **Rastreabilidade de reclassificacao:**
+      4. Audit trail para qualquer alteracao de categoria, classe ou subclasse.
+      5. Revisao obrigatoria (merge request com aprovacao) para alteracoes
+         em regras de classificacao.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de enquadramento:**
+      1. Alertas automaticos quando a carteira de um fundo se aproxima dos
+         limites de sua classificacao (pre-desenquadramento).
+      2. Dashboard de enquadramento por categoria: quantos fundos estao
+         conformes, quantos estao em desenquadramento.
+      3. Relatorio periodico de aderencia da carteira a politica de investimento.
+
+      **Auditoria de classificacao:**
+      4. Verificar que cada fundo esta corretamente classificado e observa
+         o anexo normativo correspondente.
+      5. Evidencias de que sistemas validam limites automaticamente.
+    tools:
+      - grc-platform
+      - siem
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-2"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-2"]
+    relationship: complements

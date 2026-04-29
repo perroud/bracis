@@ -1,0 +1,95 @@
+id: 164.312-b
+family: security-rule-technical
+title: "Audit Controls"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement hardware, software, and/or procedural mechanisms that record and examine
+    activity in information systems that contain or use electronic protected health
+    information.
+
+guidance:
+  prose: >-
+    Audit controls are essential for detecting unauthorized access, tracking user
+    activities, and maintaining accountability. Organizations must implement audit
+    logging on all systems that contain or process ePHI. Audit logs must capture
+    sufficient detail to determine who accessed what information, when, and from where.
+    The logs must be reviewed regularly to detect security incidents, policy violations,
+    and anomalous activity patterns. Log integrity must be protected to prevent
+    tampering that could conceal unauthorized access. Audit logs should be retained
+    for a period consistent with the organization's record retention requirements
+    (HHS recommends a minimum of six years for HIPAA-related documentation). Automated
+    log analysis tools (SIEM) should be deployed to enable timely detection of security
+    events given the volume of audit data generated.
+
+references:
+  - citation: "45 CFR 164.312(b)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.312"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized logging platform (ELK, Loki/Grafana, Splunk) that
+      aggregates audit logs from all ePHI systems. Implement structured logging
+      standards that capture user identity, action, resource accessed, timestamp,
+      source IP, and success/failure for every access to ePHI. Use Kubernetes audit
+      logging for API server events and Falco for runtime audit events. Configure
+      immutable log storage using WORM (Write Once Read Many) capabilities or
+      object storage with retention locks. Implement log shipping via Fluentd/Fluent
+      Bit with guaranteed delivery. Ensure audit logs themselves are protected with
+      access controls limiting who can read and who can never modify logs.
+    tools:
+      - elasticsearch
+      - logstash
+      - kibana
+      - fluentd
+      - fluentbit
+      - loki
+      - grafana
+      - falco
+      - vector
+      - aws-cloudtrail
+      - azure-monitor
+
+  devsecops:
+    prose: >-
+      Enforce audit logging standards in application code through shared logging
+      libraries and linting rules. Include audit log validation in CI/CD pipeline
+      test stages that verify applications emit required audit fields for ePHI
+      access events. Scan code for logging anti-patterns such as logging ePHI
+      content or suppressing audit events. Implement pipeline stages that verify
+      log shipping is functional before production promotion. Test log retention
+      policies in CI/CD to ensure compliance with six-year retention requirements.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - eslint
+      - log-validation-tests
+
+  secops:
+    prose: >-
+      Implement continuous audit log monitoring with SIEM correlation rules specific
+      to ePHI access patterns. Create dashboards showing ePHI access volumes, access
+      by user, access by time of day, and anomaly indicators. Alert on unauthorized
+      access attempts, bulk data access, access from unusual sources, and audit log
+      tampering attempts. Conduct periodic audit log reviews (at minimum weekly) with
+      documented findings. Verify log integrity through cryptographic hash chain
+      validation. Ensure six-year log retention with tiered storage (hot/warm/cold)
+      for cost optimization while maintaining accessibility requirements.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - sumo-logic
+      - datadog
+      - aws-cloudtrail
+      - azure-sentinel
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-11", "AU-12"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.15"]
+    relationship: supports

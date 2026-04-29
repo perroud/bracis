@@ -1,0 +1,827 @@
+id: disa-stig_to_nist-800-53
+title: "DISA STIG to NIST SP 800-53 Rev 5 Control Mapping"
+source_framework: disa-stig
+target_framework: nist-800-53-rev5
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+
+mappings:
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT I — Default, Shared, and Generic Accounts
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat1-accounts
+    target_controls:
+      - id: ac-2
+        relationship: derived-from
+        confidence: 0.90
+        rationale: >
+          STIG CAT I accounts control prohibits default, shared, and generic
+          accounts, requiring individual traceability. NIST AC-2 comprehensively
+          addresses account management including defining allowed and prohibited
+          account types, assigning account managers, monitoring account use, and
+          aligning account management with personnel processes. The STIG
+          requirement is a direct implementation of the account management
+          controls defined in AC-2, tailored for DoD environments.
+      - id: ia-2
+        relationship: derived-from
+        confidence: 0.85
+        rationale: >
+          STIG CAT I accounts control requires individual, traceable accounts
+          and prohibits shared authenticators. NIST IA-2 requires unique
+          identification and authentication of organizational users and
+          devices. Both controls converge on the fundamental principle that
+          every user must be uniquely identifiable, enabling accountability
+          and non-repudiation.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          STIG CAT I accounts control requires dedicated service accounts
+          per application and prohibits credential reuse. NIST AC-6 enforces
+          least privilege for users and processes. Eliminating shared and
+          generic accounts is a prerequisite for implementing least privilege,
+          as privilege assignments require individual account attribution.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT I — Weak Authentication and Missing Multifactor Authentication
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat1-authentication
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          STIG CAT I authentication control mandates CAC/PIV-based MFA,
+          prohibits password-only authentication for privileged access, and
+          requires cryptographic mutual authentication for service accounts.
+          NIST IA-2 requires unique identification and authentication of
+          organizational users. The STIG control directly implements IA-2
+          with DoD-specific parameters (CAC/PIV, FIPS-approved PKI), making
+          it a concrete realization of the NIST requirement.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG CAT I authentication control requires account lockout after
+          failed attempts and inactivity session timeouts. NIST AC-2 includes
+          monitoring account use and disabling inactive accounts. Both controls
+          address the lifecycle behavior of accounts, though from different
+          angles — authentication enforcement versus account management.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT I authentication control prohibits group authenticators
+          and requires separate privileged and unprivileged authentication
+          paths. NIST AC-6 enforces least privilege. Strong, individual
+          authentication is a prerequisite for enforcing least privilege,
+          as privilege decisions depend on verified identity.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT I — Unencrypted Data Transmission and Storage
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat1-encryption
+    target_controls:
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          STIG CAT I encryption control requires FIPS 140-2/140-3 validated
+          encryption for all data in transit and prohibits unencrypted
+          protocols. NIST SC-7 monitors and controls communications at
+          system boundaries. Both controls address data protection at
+          network boundaries, though SC-7 focuses on boundary architecture
+          and flow control while the STIG control focuses on cryptographic
+          protection of data crossing those boundaries.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT I encryption control requires disabling deprecated
+          algorithms and protocols (TLS 1.0/1.1, DES, RC4). NIST SI-4
+          monitors systems for attacks and unauthorized connections.
+          Cryptographic enforcement complements system monitoring by
+          ensuring that even intercepted traffic is unreadable, while
+          monitoring detects attempts to use prohibited protocols.
+      - id: cm-6
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG CAT I encryption control mandates specific TLS versions,
+          cipher suites, and key management configurations. NIST CM-6
+          establishes and documents secure configuration settings. The
+          cryptographic configuration requirements in the STIG are a
+          subset of the broader configuration management addressed by
+          CM-6, specifically applied to cryptographic parameters.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Audit Logging and Monitoring
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-audit
+    target_controls:
+      - id: au-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          STIG CAT II audit control specifies required event types for
+          logging (logon/logoff, privilege escalation, account changes,
+          object access, policy changes, system events, cryptographic
+          functions). NIST AU-2 requires identifying and specifying event
+          types for logging. The STIG control directly implements AU-2
+          by defining the specific event types that must be logged in
+          DoD systems, providing the concrete parameters for the NIST
+          requirement.
+      - id: au-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG CAT II audit control requires centralized log management,
+          retention for one year with three months immediately available,
+          and alert on storage capacity at 75 percent. NIST AU-6 requires
+          reviewing and analyzing audit records for inappropriate or unusual
+          activity and reporting findings. The STIG control implements AU-6
+          by defining specific retention periods, availability requirements,
+          and alerting thresholds.
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          STIG CAT II audit control requires alerting responsible personnel
+          on security events and transmitting logs to centralized systems
+          for analysis. NIST SI-4 monitors systems for attacks and
+          indicators of potential attacks. Audit logging provides the
+          data foundation for system monitoring, making these controls
+          deeply interconnected in operational practice.
+      - id: ir-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT II audit control requires protection of logs from
+          unauthorized modification and retention for forensic analysis.
+          NIST IR-4 implements incident handling including detection,
+          analysis, containment, and recovery. Comprehensive, tamper-
+          resistant audit logs are essential for incident detection and
+          post-incident forensic investigation.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Access Control and Identity Management
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-access-control
+    target_controls:
+      - id: ac-6
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          STIG CAT II access control requires enforcing least privilege,
+          separating privileged from unprivileged accounts, and using
+          distinct accounts for different roles. NIST AC-6 employs the
+          principle of least privilege for users and processes. The STIG
+          control directly implements AC-6 with specific operational
+          requirements including separate accounts for each role, annual
+          access reviews, and 35-day inactivity disabling.
+      - id: ac-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG CAT II access control requires documented RBAC role
+          definitions, annual access control list reviews, PAM for
+          privileged access, and disabling unused accounts within 35 days.
+          NIST AC-2 addresses account management lifecycle including
+          monitoring use, periodic review, and disabling inactive accounts.
+          The STIG control implements the operational aspects of AC-2 with
+          DoD-specific timelines and enforcement mechanisms.
+      - id: ac-3
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          STIG CAT II access control mandates RBAC enforcement and
+          requires that access control be technically enforced, not just
+          documented in policy. NIST AC-3 enforces approved authorizations
+          for logical access to information and system resources. The STIG
+          control implements AC-3 by requiring technical enforcement of
+          RBAC with logged and monitored privileged access.
+      - id: ac-1
+        relationship: derived-from
+        confidence: 0.70
+        rationale: >
+          STIG CAT II access control requires documented role definitions
+          and formal access review processes. NIST AC-1 requires developing
+          and disseminating access control policy and procedures. The STIG
+          access control requirements are derived from the broader policy
+          framework established by AC-1, translating policy into specific
+          technical enforcement requirements.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Configuration Management and Hardening Baselines
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-config-mgmt
+    target_controls:
+      - id: cm-6
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          STIG CAT II configuration management requires configuring systems
+          according to DISA STIG or CIS Benchmark hardening baselines,
+          documenting deviations, and continuously verifying compliance
+          using automated SCAP scanning. NIST CM-6 requires establishing
+          and documenting configuration settings reflecting the most
+          restrictive mode, implementing those settings, and monitoring
+          changes. Both controls address the same core objective with
+          near-identical scope.
+      - id: cm-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG CAT II configuration management requires maintaining a
+          documented baseline configuration with a process for controlling
+          deviations. NIST CM-2 requires developing, documenting, and
+          maintaining under configuration control a current baseline
+          configuration. The STIG control directly implements CM-2 by
+          specifying DISA STIGs and CIS Benchmarks as the baseline sources.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT II configuration management requires continuous
+          configuration compliance verification using automated scanning.
+          NIST SI-4 monitors systems for attacks and unauthorized changes.
+          Automated configuration compliance scanning is a form of system
+          monitoring that detects unauthorized configuration drift, which
+          may indicate compromise or policy violation.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Patch Management and Vulnerability Remediation
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-patch
+    target_controls:
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          STIG CAT II patch management requires monthly vulnerability
+          scanning using DISA-approved tools, subscribing to vulnerability
+          feeds, and monitoring CISA KEV catalog. NIST SI-4 monitors
+          systems for attacks and indicators of potential attacks.
+          Vulnerability scanning is a key component of system monitoring
+          that identifies exploitable weaknesses before adversaries can
+          leverage them.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          STIG CAT II patch management requires applying patches within
+          defined timelines (21/30/90 days based on severity) and
+          maintaining an SBOM for all platform components. NIST CM-2
+          maintains baseline configurations updated when system components
+          are installed or upgraded. Patching is the operational mechanism
+          by which the baseline configuration is updated to remediate
+          known vulnerabilities.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT II patch management addresses vulnerability remediation
+          including configuration-related vulnerabilities. NIST CM-6
+          establishes and monitors secure configuration settings. Patch
+          management and configuration management are complementary: patches
+          fix known vulnerabilities while hardened configurations prevent
+          exploitation of unpatched systems.
+      - id: ir-4
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG CAT II patch management requires implementing compensating
+          controls when patches cannot be applied within timelines. NIST
+          IR-4 implements incident handling including preparation and
+          containment. Effective patch management reduces incident
+          likelihood, and compensating controls serve as containment
+          measures for unpatched vulnerabilities.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Network Segmentation and Boundary Protection
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-network
+    target_controls:
+      - id: sc-7
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          STIG CAT II network segmentation requires separating security
+          domains, deny-by-default firewall rules, DMZ architecture,
+          disabling unnecessary ports, and encrypted remote administration.
+          NIST SC-7 monitors and controls communications at external and
+          internal managed interfaces and implements subnetworks for
+          publicly accessible components. The STIG control directly
+          implements SC-7 with DoD-specific requirements for network
+          architecture and boundary protection.
+      - id: ac-3
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG CAT II network segmentation requires access control lists
+          and host-based firewalls configured to deny traffic by default.
+          NIST AC-3 enforces approved authorizations for logical access.
+          Network-level access control (firewalls, ACLs, Network Policies)
+          is a layer of access enforcement that intersects with the broader
+          logical access enforcement addressed by AC-3.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT II network segmentation requires disabling unnecessary
+          ports, protocols, and services at network and host levels. NIST
+          CM-6 establishes secure configuration settings for system
+          components. Network configuration hardening (port/protocol
+          restrictions, firewall rules) is a specific domain within the
+          broader configuration management addressed by CM-6.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Malware Defense and Anti-Malware Protection
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-malware
+    target_controls:
+      - id: si-4
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          STIG CAT II malware defense requires real-time scanning, daily
+          signature updates, application allowlisting, malware detection
+          reporting to SIEM within one hour, and DNS-based security
+          controls. NIST SI-4 monitors systems for attacks and indicators
+          of potential attacks. Anti-malware protection is a primary
+          implementation mechanism for system monitoring, providing both
+          signature-based and behavioral detection of malicious activity.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT II malware defense requires configuring application
+          allowlisting, AppArmor/SELinux policies, and endpoint protection
+          settings. NIST CM-6 establishes secure configuration settings.
+          Anti-malware configuration (scan policies, allowlisting rules,
+          update schedules) is a subset of the secure configuration
+          settings managed under CM-6.
+      - id: sr-3
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG CAT II malware defense requires scanning for malware in
+          container images and rejecting packages with malware flags from
+          package ecosystems. NIST SR-3 addresses supply chain controls
+          to protect against supply chain risks. Malware scanning of
+          third-party artifacts is a supply chain defense mechanism that
+          complements the broader supply chain risk management of SR-3.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT II — Session Management and Concurrent Session Control
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat2-session
+    target_controls:
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG CAT II session management requires concurrent session limits
+          per user account and inactivity timeouts. NIST AC-2 includes
+          monitoring account use, defining usage conditions, and managing
+          inactivity. Both controls address the behavior of authenticated
+          sessions, though AC-2 frames it from an account lifecycle
+          perspective while the STIG control focuses on session-level
+          enforcement.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT II session management requires server-side session
+          expiration and secure session state storage. NIST AC-3 enforces
+          approved authorizations for logical access. Session management
+          is a critical component of access enforcement — a session that
+          persists beyond its authorized scope or is hijacked effectively
+          bypasses access controls.
+      - id: ia-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT II session management requires session token
+          invalidation upon logout and regeneration upon authentication.
+          NIST IA-2 requires unique identification and authentication of
+          users. Secure session management ensures that authentication
+          decisions remain valid throughout the session lifecycle and that
+          session tokens cannot be used to bypass re-authentication
+          requirements.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT III — Security Documentation and System Security Plan
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat3-documentation
+    target_controls:
+      - id: ac-1
+        relationship: derived-from
+        confidence: 0.75
+        rationale: >
+          STIG CAT III documentation requires a System Security Plan
+          describing security control implementation status. NIST AC-1
+          requires developing, documenting, and disseminating access
+          control policy and procedures. The SSP documentation requirement
+          is derived from the broader policy and procedure framework that
+          AC-1 establishes as a governance foundation for all access
+          controls.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT III documentation requires documenting the system
+          boundary, architecture, and data flows in the SSP. NIST CM-2
+          requires developing and maintaining a current baseline
+          configuration. The SSP architectural documentation and the
+          baseline configuration are complementary artifacts that together
+          define what the system is and how it is configured.
+      - id: ir-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT III documentation requires maintaining an Incident
+          Response Plan and Contingency Plan as part of the system
+          documentation package. NIST IR-4 implements incident handling
+          capability consistent with the incident response plan. The
+          documented IRP required by the STIG is the foundational artifact
+          that IR-4 operationalizes.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT III — Security Awareness Training and Role-Based Training
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat3-training
+    target_controls:
+      - id: ac-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG CAT III training requires verifying training completion
+          before authorizing user accounts and revoking access for users
+          who fail to complete annual training. NIST AC-2 manages account
+          lifecycle including establishing prerequisites for account
+          creation. Training completion as an account prerequisite is a
+          specific implementation of the AC-2 requirement for account
+          management prerequisites and criteria.
+      - id: ac-1
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG CAT III training requires annual cybersecurity awareness
+          training and role-based training for personnel with security
+          responsibilities. NIST AC-1 requires developing access control
+          policy and procedures and disseminating them to relevant
+          personnel. Training ensures that personnel understand the
+          policies and procedures established under AC-1, making training
+          a dissemination and enforcement mechanism for policy.
+      - id: si-4
+        relationship: complements
+        confidence: 0.50
+        rationale: >
+          STIG CAT III training requires training on social engineering,
+          phishing awareness, and insider threat awareness. NIST SI-4
+          monitors systems for attacks. Trained personnel serve as a
+          human layer of system monitoring, detecting social engineering
+          attempts and anomalous behavior that automated monitoring may
+          miss.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # CAT III — Login Warning Banners and Legal Notices
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-cat3-banners
+    target_controls:
+      - id: ac-1
+        relationship: derived-from
+        confidence: 0.70
+        rationale: >
+          STIG CAT III banners require displaying a DoD-approved warning
+          banner at every login interface. NIST AC-1 requires developing
+          and disseminating access control policy. The login banner is a
+          specific policy dissemination mechanism derived from AC-1,
+          communicating monitoring and acceptable use policies to all
+          users at the point of access.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG CAT III banners require that the banner remain visible
+          until acknowledged by the user and that no system information
+          be disclosed before authentication. NIST AC-2 manages account
+          types and access authorizations. The banner establishes user
+          consent to monitoring before account access is granted, serving
+          as a governance control that supports the account management
+          framework.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG CAT III banners require suppressing system-identifying
+          information (OS version, hostname) before authentication. NIST
+          AC-3 enforces approved authorizations for logical access. The
+          pre-authentication information suppression requirement is a
+          defensive measure that prevents reconnaissance by unauthorized
+          parties, complementing the access enforcement of AC-3.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # APP-SEC — Input Validation and Injection Prevention
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-app-input-validation
+    target_controls:
+      - id: si-4
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG app-sec input validation requires server-side validation,
+          parameterized queries, and output encoding to prevent injection
+          attacks (SQL, XSS, command injection). NIST SI-4 monitors systems
+          for attacks. Input validation is both a preventive control and
+          a detection mechanism — WAF integration and injection attempt
+          logging enable detection of active exploitation, intersecting
+          with the monitoring objectives of SI-4.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG app-sec input validation requires configuring WAF rules,
+          API gateway schema validation, and application security settings.
+          NIST CM-6 establishes secure configuration settings. Application
+          security configuration (input validation rules, WAF policies,
+          output encoding settings) is a domain within the broader
+          configuration management addressed by CM-6.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG app-sec input validation prevents unauthorized access to
+          backend systems through injection attacks that bypass application
+          access controls. NIST AC-3 enforces approved authorizations for
+          logical access. Input validation is a defensive layer that
+          prevents attackers from circumventing access enforcement
+          mechanisms through code injection.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # APP-SEC — Error Handling and Information Disclosure Prevention
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-app-error-handling
+    target_controls:
+      - id: si-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG app-sec error handling requires logging detailed error
+          information internally while preventing disclosure to users.
+          NIST SI-4 monitors systems for attacks. Internal error logging
+          provides forensic data for detecting and investigating attacks,
+          while suppressing external error details denies attackers
+          reconnaissance information, complementing the monitoring
+          objectives of SI-4.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG app-sec error handling requires suppressing stack traces,
+          internal IP addresses, and server version information in error
+          responses. NIST AC-3 enforces approved authorizations for
+          logical access. Information disclosure through error messages
+          enables attackers to map system architecture and identify
+          exploitable vulnerabilities, undermining access enforcement by
+          revealing the internal structure that access controls protect.
+      - id: cm-6
+        relationship: intersects-with
+        confidence: 0.60
+        rationale: >
+          STIG app-sec error handling requires configuring web servers to
+          suppress version information, removing disclosing HTTP headers
+          (Server, X-Powered-By), and implementing custom error pages.
+          NIST CM-6 establishes secure configuration settings. Error
+          handling configuration is a specific category of secure
+          configuration settings that falls within the scope of CM-6.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # APP-SEC — Session Token Generation and Secure Cookie Attributes
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-app-session-tokens
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          STIG app-sec session tokens require CSPRNG-generated tokens with
+          128+ bits of entropy, Secure/HttpOnly/SameSite cookie attributes,
+          token regeneration on authentication, and CSRF protection. NIST
+          IA-2 requires unique identification and authentication of users.
+          Secure session token management implements the continuous
+          authentication assurance aspect of IA-2 by ensuring that
+          session tokens reliably represent authenticated identity
+          throughout the session lifecycle.
+      - id: ac-3
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG app-sec session tokens require invalidation on logout and
+          protection against session hijacking and CSRF. NIST AC-3 enforces
+          approved authorizations for logical access. Session tokens are
+          the mechanism through which access authorization persists after
+          initial authentication — compromised tokens bypass all access
+          enforcement, making token security integral to access control.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          STIG app-sec session tokens require the Secure cookie attribute
+          to prevent transmission over unencrypted connections and SameSite
+          to prevent cross-site request forgery. NIST SC-7 controls
+          communications at system boundaries. Cookie security attributes
+          are a boundary protection mechanism at the application layer,
+          controlling how session credentials traverse network boundaries.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # APP-SEC — Third-Party Library and Dependency Security
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-app-dependencies
+    target_controls:
+      - id: sr-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG app-sec dependencies require maintaining a third-party
+          component inventory, integrity verification, vulnerability
+          evaluation, SBOM in CycloneDX/SPDX format, and license
+          compliance assessment. NIST SR-3 requires establishing processes
+          to identify and address weaknesses in supply chain elements.
+          The STIG control directly implements SR-3 with specific
+          requirements for SBOM generation, dependency verification, and
+          supply chain risk management.
+      - id: cm-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG app-sec dependencies require maintaining an inventory of
+          all third-party libraries including transitive dependencies and
+          keeping them current with vendor patches. NIST CM-2 maintains
+          baseline configurations under configuration control. The
+          dependency inventory and SBOM are components of the system
+          baseline configuration, documenting what software components
+          constitute the system.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          STIG app-sec dependencies require evaluating components for
+          known vulnerabilities, monitoring CVE feeds, and correlating
+          against SBOM inventory. NIST SI-4 monitors systems for attacks.
+          Continuous vulnerability monitoring of dependencies is a form
+          of system monitoring that detects exploitable conditions
+          introduced through the supply chain.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # INFRA — Container Security and Hardening
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-infra-containers
+    target_controls:
+      - id: cm-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG infra containers require hardened base images, non-root
+          execution, read-only filesystems, dropped capabilities, and
+          vulnerability scanning before production registry admission.
+          NIST CM-6 establishes and documents secure configuration settings
+          for system components. The STIG container hardening requirements
+          directly implement CM-6 for the container runtime environment,
+          specifying the restrictive configuration settings that must be
+          applied to every container.
+      - id: cm-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          STIG infra containers require building from minimal, DISA-
+          approved or CIS Benchmark-hardened base images and pulling only
+          from authorized internal registries. NIST CM-2 maintains baseline
+          configurations under configuration control. The approved base
+          image and internal registry requirement directly implements
+          baseline configuration control for the container layer.
+      - id: si-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG infra containers require runtime security monitoring (Falco)
+          for anomalous process execution, file system changes, and
+          unexpected network connections within containers. NIST SI-4
+          monitors systems for attacks. Container runtime monitoring is
+          a specialized form of system monitoring tailored to the
+          ephemeral, dynamic nature of containerized workloads.
+      - id: sr-3
+        relationship: intersects-with
+        confidence: 0.65
+        rationale: >
+          STIG infra containers require SBOM generation for container
+          images, vulnerability scanning, and controlled internal
+          registries that vet images from public sources. NIST SR-3
+          addresses supply chain controls. Container image provenance
+          and supply chain integrity verification is a critical domain
+          within the broader supply chain risk management of SR-3.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # INFRA — Kubernetes Cluster Security and Hardening
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-infra-kubernetes
+    target_controls:
+      - id: cm-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          STIG infra Kubernetes requires configuration according to DISA
+          Kubernetes STIG including API server audit logging, RBAC
+          enforcement, PodSecurity admission, anonymous access disabling,
+          etcd encryption, and TLS for all communications. NIST CM-6
+          establishes secure configuration settings. The STIG Kubernetes
+          hardening requirements directly implement CM-6 for the
+          Kubernetes platform, specifying the restrictive settings for
+          every cluster component.
+      - id: ac-3
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          STIG infra Kubernetes requires RBAC for all API server access,
+          restricting cluster-admin to designated administrators, and
+          PodSecurity admission enforcement at the Restricted level.
+          NIST AC-3 enforces approved authorizations for logical access.
+          Kubernetes RBAC and admission control are direct implementations
+          of access enforcement at the container orchestration layer.
+      - id: au-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          STIG infra Kubernetes requires enabling API server audit logging
+          with a documented audit policy capturing all interactions,
+          including authentication/authorization events and Secret access.
+          NIST AU-2 identifies and specifies event types for logging.
+          The Kubernetes audit policy directly implements AU-2 for the
+          container orchestration platform.
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG infra Kubernetes requires network policies to restrict
+          pod-to-pod communication and restricting node access to
+          approved bastion hosts. NIST SC-7 monitors and controls
+          communications at managed interfaces. Kubernetes Network
+          Policies and node access restrictions implement boundary
+          protection at the container orchestration layer.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # INFRA — Cloud Service Security and FedRAMP Authorization
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: stig-infra-cloud
+    target_controls:
+      - id: cm-6
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          STIG infra cloud requires configuring cloud deployments in
+          accordance with applicable DISA cloud STIGs, enforcing encryption
+          at rest and in transit, implementing IaC for all provisioning,
+          and detecting manual configuration drift. NIST CM-6 establishes
+          secure configuration settings. Cloud security configuration
+          according to DISA STIGs directly implements CM-6 for cloud
+          service environments.
+      - id: sc-7
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          STIG infra cloud requires access controls preventing public
+          exposure of sensitive data, security group configurations, and
+          logging of data-plane operations. NIST SC-7 monitors and controls
+          communications at system boundaries. Cloud boundary protection
+          through security groups, VPC configurations, and storage access
+          controls implements SC-7 in cloud environments.
+      - id: au-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          STIG infra cloud requires enabling logging for all management-
+          plane and data-plane operations (CloudTrail, Azure Activity Log,
+          GCP Cloud Audit Logs). NIST AU-2 identifies and specifies event
+          types for logging. Cloud audit logging requirements directly
+          implement AU-2 for the cloud service layer.
+      - id: ia-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          STIG infra cloud requires MFA for all human access to cloud
+          accounts and privileged access through PAM solutions. NIST IA-2
+          requires unique identification and authentication of users.
+          Cloud authentication requirements implement IA-2 for the cloud
+          management plane, ensuring that cloud console and API access
+          is protected by strong authentication.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          STIG infra cloud requires privileged access to cloud management
+          consoles through PAM with just-in-time elevation. NIST AC-6
+          employs the principle of least privilege. PAM-controlled cloud
+          access with JIT privilege elevation implements least privilege
+          for cloud administrative operations.

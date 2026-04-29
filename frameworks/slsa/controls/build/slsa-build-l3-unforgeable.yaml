@@ -1,0 +1,100 @@
+id: slsa-build-l3-unforgeable
+family: build
+title: "Build L3: Unforgeable Provenance"
+class: SLSA
+
+baselines: [build-l3]
+
+statement:
+  prose: >-
+    The provenance must be unforgeable — it must not be possible for a build tenant or
+    any single individual to falsify the provenance without detection. The provenance
+    signing mechanism must be controlled by the build platform in a way that tenants
+    cannot access or manipulate. The provenance must accurately reflect the build that
+    actually occurred, and any attempt to produce false provenance must be detectable
+    through the platform's security controls and transparency mechanisms.
+
+guidance:
+  prose: >-
+    Unforgeable provenance is the ultimate guarantee of SLSA Build L3. It means that
+    even if an attacker fully compromises the build tenant's code and configuration,
+    they cannot produce provenance that misrepresents what was built. This requires that
+    the provenance generation and signing occur in a security domain separate from the
+    build execution environment. The signing keys or identity credentials must be
+    inaccessible to the tenant. Transparency logs (Rekor) provide an additional layer
+    of protection by creating an immutable, publicly auditable record of all provenance
+    attestations. Any forged provenance would need to either bypass the platform's
+    isolated signing mechanism or create an entry in the transparency log that could be
+    detected through log monitoring.
+
+references:
+  - citation: "SLSA v1.0 Specification — Build L3"
+    url: "https://slsa.dev/spec/v1.0/levels#build-l3"
+  - citation: "Sigstore Transparency Log (Rekor)"
+    url: "https://docs.sigstore.dev/logging/overview/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy provenance signing infrastructure in an isolated control plane separate from
+      build execution environments. Use Tekton Chains, which generates and signs provenance
+      in the Tekton controller namespace, inaccessible to build tasks. Implement keyless
+      signing via Sigstore so that signing credentials are ephemeral and tied to platform
+      identity, not stored secrets. Record all provenance attestations in Rekor transparency
+      log for public verifiability. Deploy a private Sigstore instance for internal artifacts
+      if public transparency is not desired. Implement monitoring that compares provenance
+      claims against build platform audit logs to detect inconsistencies.
+    tools:
+      - tekton-chains
+      - sigstore
+      - cosign
+      - fulcio
+      - rekor
+      - spiffe-spire
+      - vault
+
+  devsecops:
+    prose: >-
+      Verify that provenance signing occurs outside the tenant-controlled build environment
+      by auditing the pipeline architecture. Implement verification pipelines that cross-check
+      provenance claims against build platform logs (build duration, resource consumption,
+      source inputs). Add policy checks using slsa-verifier that validate provenance was
+      signed by the expected platform identity and recorded in the transparency log. Include
+      provenance unforgeability verification in the artifact promotion pipeline — reject any
+      artifact whose provenance cannot be independently verified against the transparency log.
+    tools:
+      - slsa-verifier
+      - cosign
+      - rekor
+      - conftest
+      - opa
+      - tekton-chains
+
+  secops:
+    prose: >-
+      Continuously monitor Rekor transparency logs for provenance entries related to the
+      organization's artifacts. Alert on provenance entries with unexpected builder identities,
+      anomalous timestamps, or mismatched source references. Implement log-based anomaly
+      detection that compares the rate and pattern of provenance generation against historical
+      baselines. Conduct periodic integrity audits that independently reproduce builds and
+      compare outputs against recorded provenance. Investigate any discrepancies between
+      provenance claims and build platform audit logs as potential compromise indicators.
+    tools:
+      - rekor
+      - slsa-verifier
+      - cosign
+      - splunk
+      - elastic-siem
+      - falco
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-4", "SR-4(3)", "SI-7", "SI-7(1)", "AU-10"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PS.1.1", "PS.2.1", "PS.3.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.4", "16.6"]
+    relationship: supports

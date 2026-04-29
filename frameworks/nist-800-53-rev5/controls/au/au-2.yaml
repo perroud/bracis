@@ -1,0 +1,121 @@
+id: au-2
+family: au
+title: "Event Logging"
+class: SP800-53
+baselines: [low, moderate, high]
+parameters:
+  - id: au-02_odp.01
+    label: "event types"
+    guidance: >-
+      Organization-defined event types that the system is capable of logging in support
+      of the audit function
+  - id: au-02_odp.02
+    label: "frequency"
+    guidance: "Organization-defined frequency or situation requiring logging review and update"
+statement:
+  prose: >-
+    a. Identify the types of events that the system is capable of logging in support of the audit function:
+       [Assignment: organization-defined event types that the system is capable of logging];
+    b. Coordinate the event logging function with other organizational entities requiring audit-related
+       information to guide and inform the selection criteria for events to be logged;
+    c. Specify the following event types for logging within the system: [Assignment: organization-defined
+       event types (subset of the event types defined in AU-2a.) along with the frequency of (or situation
+       requiring) logging for each identified event type];
+    d. Provide a rationale for why the event types selected for logging are deemed to be adequate to
+       support after-the-fact investigations of incidents; and
+    e. Review and update the event types selected for logging [Assignment: organization-defined frequency].
+  parts:
+    - id: au-2_smt.a
+      label: "a."
+      prose: >-
+        Identify the types of events that the system is capable of logging in support of the
+        audit function: [Assignment: organization-defined event types that the system is capable of logging];
+    - id: au-2_smt.b
+      label: "b."
+      prose: >-
+        Coordinate the event logging function with other organizational entities requiring
+        audit-related information to guide and inform the selection criteria for events to be logged;
+    - id: au-2_smt.c
+      label: "c."
+      prose: >-
+        Specify the following event types for logging within the system: [Assignment: organization-defined
+        event types (subset of the event types defined in AU-2a.) along with the frequency of (or situation
+        requiring) logging for each identified event type];
+    - id: au-2_smt.d
+      label: "d."
+      prose: >-
+        Provide a rationale for why the event types selected for logging are deemed to be adequate
+        to support after-the-fact investigations of incidents; and
+    - id: au-2_smt.e
+      label: "e."
+      prose: "Review and update the event types selected for logging [Assignment: organization-defined frequency]."
+guidance:
+  prose: >-
+    An event is an observable occurrence in a system. The types of events that require logging are
+    those events that are significant and relevant to the security of systems and the privacy of
+    individuals. Event logging requirements can be derived from applicable laws, executive orders,
+    directives, regulations, policies, standards, and guidelines. Organizations define event types
+    by considering the monitoring and auditing appropriate for each of the controls to be implemented.
+    For completeness, event logging includes all protocols that are operational and supported by the
+    system. To balance monitoring and auditing requirements with other system needs, event logging
+    considers event types that are both adequate for supporting security and privacy requirements
+    and achievable from a system design perspective. The types of events logged include both events
+    related to the security and privacy of systems and events related to the operation of systems.
+    Events that contribute to security-relevant situations include failed authentication attempts,
+    access to sensitive files, changes to user accounts and privileges, session timeouts, network
+    connection failures, and modifications to system configurations.
+enhancements:
+  - id: au-2.1
+    title: "Compilation of Audit Records from Multiple Sources"
+    baselines: []
+  - id: au-2.2
+    title: "Selection of Audit Events by Component"
+    baselines: []
+references:
+  - citation: "NIST SP 800-92"
+    url: "https://doi.org/10.6028/NIST.SP.800-92"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement structured logging across all platform components using a standardized format (JSON).
+      Deploy centralized log collection using Fluentd, Fluent Bit, or Vector as daemonsets on
+      Kubernetes clusters. Capture Kubernetes audit logs, API server events, admission controller
+      decisions, and container runtime events. Configure cloud provider audit logging (CloudTrail,
+      Cloud Audit Logs, Azure Monitor) for all control plane operations. Define a logging taxonomy
+      that categorizes event types and their required log levels. Use log aggregation pipelines
+      that enrich events with context (namespace, pod, service, user identity).
+    tools:
+      - "Fluentd / Fluent Bit / Vector"
+      - "Kubernetes Audit Logging"
+      - "AWS CloudTrail / GCP Cloud Audit Logs / Azure Monitor"
+      - "OpenTelemetry Collector"
+      - "Loki / Elasticsearch"
+      - "GitLab Audit Events API"
+  devsecops:
+    prose: >-
+      Configure CI/CD pipeline logging to capture all build, test, and deployment events with
+      immutable audit trails. Enable GitLab Audit Events for all group and project activities.
+      Implement application-level structured logging as a non-functional requirement enforced
+      through pipeline quality gates. Use GitLab CI artifacts to preserve build and deployment
+      logs. Ensure all infrastructure-as-code changes generate audit events through the merge
+      request workflow. Stream CI/CD events to centralized logging for correlation with runtime events.
+    tools:
+      - "GitLab Audit Events"
+      - "GitLab CI/CD Job Logs"
+      - "Structured logging libraries (Winston, Serilog, Zap)"
+      - "OpenTelemetry SDK"
+      - "Terraform audit logging"
+  secops:
+    prose: >-
+      Aggregate all event logs into a SIEM for centralized analysis and correlation. Define detection
+      rules aligned with MITRE ATT&CK tactics for the event types being logged. Establish log
+      retention policies that meet organizational and regulatory requirements (minimum 1 year for
+      federal systems). Monitor log pipeline health to detect gaps in coverage. Conduct periodic
+      reviews of logged event types to ensure alignment with evolving threat landscape and
+      organizational risk posture.
+    tools:
+      - "SIEM (Splunk, Elastic Security, Chronicle, Sentinel)"
+      - "MITRE ATT&CK mapping"
+      - "Log retention management"
+      - "GitLab Security Dashboard"
+      - "Sigma rules"

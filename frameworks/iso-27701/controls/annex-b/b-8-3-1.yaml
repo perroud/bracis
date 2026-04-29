@@ -1,0 +1,122 @@
+id: b-8.3.1
+family: annex-b
+title: "Obligations to PII principals"
+class: ISO27701
+baselines: [pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization acting as a PII processor shall provide the PII controller with
+    the means to comply with its obligations relating to PII principals, including
+    facilitating the exercise of PII principal rights. The organization shall assist
+    the PII controller in fulfilling rights requests from PII principals, including
+    access, rectification, erasure, restriction of processing, data portability,
+    and objection to processing. The organization shall implement technical and
+    organizational measures to enable the PII controller to respond to PII principal
+    requests within required timeframes. The organization shall inform the PII
+    controller about any requests received directly from PII principals and shall
+    not respond to PII principals directly unless authorized by the PII controller.
+    The organization shall provide the PII controller with the information necessary
+    to demonstrate that PII principal obligations are being met.
+
+guidance:
+  prose: >-
+    PII processors have derivative obligations regarding PII principal rights: they
+    must help the controller fulfill its obligations. This requires implementing
+    technical capabilities for rights fulfillment and making them available to the
+    controller through APIs, administrative interfaces, or documented procedures.
+    The processor must be able to: export all PII for a specific principal (access),
+    modify PII as instructed (rectification), delete PII completely (erasure),
+    flag PII for restricted processing (restriction), export PII in a structured
+    format (portability), and cease specific processing activities (objection).
+    These capabilities must operate within the controller's required SLAs, which are
+    driven by regulatory deadlines (30 days GDPR, 15 days LGPD). The processor
+    should provide self-service capabilities where possible, enabling controllers
+    to fulfill rights requests without requiring manual processor intervention.
+    The processor must never assume authority to respond directly to PII principals
+    unless explicitly authorized, as the controller is responsible for the
+    relationship with PII principals.
+
+references:
+  - citation: "ISO/IEC 27701:2019, B.8.3.1"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build self-service rights fulfillment APIs for PII controllers (customers).
+      Implement a customer-facing administrative interface or API that enables
+      controllers to: query all PII for a specific principal, request data exports
+      in structured formats (JSON, CSV), submit rectification instructions, trigger
+      erasure workflows, flag principals for processing restriction, and receive
+      processing status updates. Build these capabilities as platform primitives
+      that work consistently across all data stores and processing services.
+      Implement automated PII discovery that spans all systems where the
+      customer's PII may reside, including caches, search indexes, and
+      analytics stores. Build SLA tracking for rights fulfillment operations
+      with automated escalation. Provide webhook notifications to controllers
+      when rights operations complete. Implement a request forwarding mechanism
+      for direct-from-principal requests: log the request, notify the controller,
+      and await instructions.
+    tools:
+      - customer-admin-api
+      - pii-discovery-service
+      - rights-fulfillment-orchestrator
+      - webhook-notification-system
+      - sla-tracking
+      - self-service-portal
+
+  devsecops:
+    prose: >-
+      Implement comprehensive testing of rights fulfillment capabilities.
+      Build integration tests that verify end-to-end rights workflows from
+      the controller's perspective: submit request through customer API,
+      verify execution across all data stores, verify response within SLA.
+      Test edge cases: partial data export when PII exists in some systems
+      but not others, erasure with active processing (graceful handling),
+      rectification propagation across asynchronous systems. Build
+      performance tests that verify rights fulfillment can scale to meet
+      SLA requirements under load. Implement contract tests between the
+      customer-facing API and internal services to ensure rights capabilities
+      remain functional as services evolve. Track rights API availability
+      and response time as deployment quality gates.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - api-integration-tests
+      - performance-tests
+      - contract-testing
+      - sla-validation-tests
+
+  secops:
+    prose: >-
+      Monitor rights fulfillment operations for compliance and performance.
+      Track per-customer rights request metrics: request volumes, types,
+      fulfillment times, SLA adherence. Alert when rights fulfillment
+      operations fail or exceed SLA thresholds. Monitor for direct-from-
+      principal requests and verify they are forwarded to the controller
+      without direct response. Detect incomplete rights fulfillment:
+      erasure operations that do not reach all data stores, export
+      operations that miss data sources. Build audit trails for all rights
+      operations that controllers can access for their compliance evidence.
+      Generate periodic reports showing rights fulfillment capability
+      status, SLA performance, and any incidents affecting rights
+      processing.
+    tools:
+      - splunk
+      - elastic-siem
+      - rights-sla-monitoring
+      - per-customer-audit-trails
+      - operation-completeness-verification
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28.3.e"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18", "art-39"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.105"]
+    relationship: supports

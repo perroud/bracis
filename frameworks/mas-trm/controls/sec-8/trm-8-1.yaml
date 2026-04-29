@@ -1,0 +1,126 @@
+id: trm-8-1
+family: sec-8
+title: "System Reliability, Availability and Recoverability"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall ensure the reliability, availability, and
+    recoverability of its critical IT systems through capacity planning,
+    redundancy, disaster recovery, and business continuity arrangements.
+  parts:
+    - id: trm-8-1.1
+      label: "8.1.1"
+      prose: >-
+        The institution shall establish availability and recovery targets
+        for critical systems, including recovery time objectives (RTO) and
+        recovery point objectives (RPO), that are aligned with business
+        requirements and regulatory expectations.
+    - id: trm-8-1.2
+      label: "8.1.2"
+      prose: >-
+        The institution shall implement system redundancy, failover
+        capabilities, and load balancing for critical systems to minimize
+        single points of failure. Capacity planning shall be conducted
+        regularly to ensure systems can handle peak loads and growth
+        projections.
+    - id: trm-8-1.3
+      label: "8.1.3"
+      prose: >-
+        The institution shall establish and maintain disaster recovery plans
+        for critical systems. These plans shall be tested at least annually
+        through simulation exercises, and test results shall be documented
+        and reviewed by management. Recovery procedures shall be updated
+        based on test findings.
+    - id: trm-8-1.4
+      label: "8.1.4"
+      prose: >-
+        The institution shall implement data backup procedures that ensure
+        critical data can be restored within defined RPO targets. Backup
+        integrity shall be verified through regular restoration testing.
+        Backups shall be stored in geographically separate locations with
+        appropriate security controls.
+
+guidance:
+  prose: >-
+    Reliability, availability, and recoverability are essential for maintaining
+    customer trust and meeting regulatory expectations. Availability targets
+    should be expressed in measurable terms (e.g., 99.95% uptime) and monitored
+    continuously. DR testing must go beyond tabletop exercises to include
+    actual failover tests that validate RTO/RPO targets under realistic
+    conditions. Backup verification is critical; unverified backups are
+    unreliable backups. Cloud environments introduce new failure modes that
+    must be accounted for in DR planning, including region-level outages and
+    provider-level incidents.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 8"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "MAS Business Continuity Management Guidelines"
+    url: "https://www.mas.gov.sg/regulation/guidelines/guidelines-on-business-continuity-management"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement infrastructure redundancy through multi-availability-zone
+      or multi-region deployments defined in infrastructure-as-code.
+      Configure auto-scaling policies for critical workloads based on
+      capacity planning metrics. Implement automated disaster recovery
+      through infrastructure-as-code that can recreate entire environments
+      in a secondary region. Deploy backup automation with cross-region
+      replication and automated integrity verification. Use chaos
+      engineering practices (Chaos Monkey, Litmus) to validate resilience
+      mechanisms. Monitor SLIs/SLOs through platform observability to
+      track availability against targets.
+    tools:
+      - terraform
+      - kubernetes
+      - velero
+      - grafana
+      - prometheus
+      - litmus-chaos
+
+  devsecops:
+    prose: >-
+      Integrate reliability testing into CI/CD pipelines through automated
+      load testing, failover testing, and chaos experiments in staging
+      environments. Configure deployment strategies (blue-green, canary)
+      that enable rapid rollback if reliability is degraded. Implement
+      health check endpoints and readiness probes that are validated by
+      the deployment pipeline. Automate backup testing by scheduling
+      periodic restoration tests in CI/CD and reporting results. Generate
+      DR test evidence from automated test executions.
+    tools:
+      - gitlab-ci
+      - k6
+      - grafana
+      - argocd
+      - velero
+
+  secops:
+    prose: >-
+      Monitor system availability continuously against defined SLA/SLO
+      targets and generate alerts when availability degrades below
+      thresholds. Track DR test results and remediation of findings in
+      the GRC platform. Coordinate annual DR exercises and document
+      results including actual RTO/RPO achieved versus targets. Monitor
+      backup job completion and integrity verification results. Generate
+      compliance reports on availability performance, DR readiness, and
+      backup effectiveness.
+    tools:
+      - grafana
+      - prometheus
+      - pagerduty
+      - grc-platform
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-1", "CP-2", "CP-4", "CP-6", "CP-9", "CP-10"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.29", "a5.30", "a8.13", "a8.14"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-11", "art-12"]
+    relationship: supports

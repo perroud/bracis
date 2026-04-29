@@ -1,0 +1,106 @@
+id: art-5
+family: cap-2
+title: "Componente Organizacional"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 5. O componente organizacional do Padrão TISS estabelece o
+    conjunto de regras operacionais, fluxos e procedimentos administrativos
+    que disciplinam a troca de informações na saúde suplementar.
+
+    Parágrafo 1. O componente organizacional define:
+    I - Fluxos de processamento das transações TISS entre operadoras
+    e prestadores;
+    II - Prazos máximos para resposta a cada tipo de transação;
+    III - Regras de elegibilidade e verificação de beneficiários;
+    IV - Procedimentos para solicitação de autorização prévia;
+    V - Regras para apresentação de contas e cobrança.
+
+    Parágrafo 2. As operadoras devem publicar e manter atualizados os
+    manuais operacionais que detalham a implementação do componente
+    organizacional em seus sistemas.
+guidance:
+  prose: |
+    O componente organizacional e o alicerce do TISS, definindo as regras
+    de negocio que governam todas as transacoes.
+
+    **Fluxos principais:**
+    1. Elegibilidade: verificacao se beneficiario esta ativo no plano
+    2. Autorizacao previa: solicitacao e resposta para procedimentos
+       que exigem aprovacao da operadora
+    3. Execucao: registro do atendimento realizado
+    4. Cobranca: envio de lote de guias para faturamento
+    5. Pagamento: demonstrativo de retorno da operadora
+    6. Recurso de glosa: contestacao de itens nao pagos
+
+    **Prazos regulamentares:**
+    - Elegibilidade: resposta em tempo real (online)
+    - Autorizacao de urgencia: resposta em ate 2 horas
+    - Autorizacao eletiva: resposta em ate 5 dias uteis
+    - Pagamento: conforme contrato, nao superior a 30 dias
+    - Recurso de glosa: ate 30 dias para analise
+
+    **Manuais operacionais:**
+    Cada operadora deve publicar manual detalhando como implementou
+    o componente organizacional, incluindo particularidades de seus
+    sistemas e processos internos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos fluxos organizacionais:**
+      1. Modelar cada fluxo TISS (elegibilidade, autorizacao, execucao,
+         cobranca, pagamento, recurso de glosa) como workflow engine
+         com estados, transicoes e timeouts configurados.
+      2. Implementar SLA monitoring para cada tipo de transacao,
+         com alertas quando prazos regulamentares estiverem proximos
+         de ser excedidos.
+      3. Criar APIs internas que exponham status de cada transacao
+         em tempo real para dashboards operacionais.
+      4. Implementar filas de processamento (RabbitMQ, Kafka) com
+         dead-letter queue para transacoes que falharam.
+    tools:
+      - workflow-engine
+      - sla-monitoring
+      - message-queue
+      - api-gateway
+  devsecops:
+    prose: |
+      **Validacao de fluxos no pipeline:**
+      1. Implementar testes de integracao para cada fluxo TISS,
+         validando sequencia de estados e prazos.
+      2. Criar testes de carga que simulem volume real de transacoes
+         TISS para validar capacidade de processamento dentro dos
+         prazos regulamentares.
+      3. Automatizar geracao de relatorios de SLA por tipo de
+         transacao e por operadora/prestador.
+      4. Incluir validacao de regras de negocio do componente
+         organizacional como testes automatizados.
+    tools:
+      - integration-tests
+      - load-testing
+      - sla-reports
+      - business-rules-engine
+  secops:
+    prose: |
+      **Governanca dos fluxos operacionais:**
+      1. Manter manual operacional TISS publicado e acessivel a todos
+         os prestadores contratados.
+      2. Monitorar indicadores de SLA por tipo de transacao e tomar
+         acoes corretivas para desvios.
+      3. Auditar periodicamente se os fluxos implementados estao em
+         conformidade com o componente organizacional vigente.
+      4. Reportar metricas de conformidade operacional TISS a ANS
+         quando solicitado.
+    tools:
+      - operational-manual
+      - sla-dashboard
+      - audit-tools
+      - regulatory-reporting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1101"]
+    relationship: mapped

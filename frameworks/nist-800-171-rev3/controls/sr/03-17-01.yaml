@@ -1,0 +1,95 @@
+id: 03.17.01
+family: sr
+title: "Supply Chain Risk Management Plan"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [sr-2, sr-3]
+  - cmmc-v2: [sr.l2-3.17.1]
+statement:
+  prose: >-
+    a. Develop a plan for managing supply chain risks associated with the research and
+       development, design, manufacturing, acquisition, delivery, integration, operations,
+       maintenance, and disposal of systems, system components, or system services.
+    b. Protect against supply chain threats by employing security safeguards as part of
+       a comprehensive, defense-in-breadth information security strategy.
+    c. Establish a process or processes to identify and address weaknesses or deficiencies
+       in the supply chain elements and processes.
+    d. Review and update the supply chain risk management plan on a defined frequency or
+       when there are significant changes to the supply chain.
+guidance:
+  prose: >-
+    Supply chain risk management (SCRM) plans address the management and implementation
+    of controls within the supply chain. The plans provide the basis for determining
+    whether a technology, product, service, or component can be trusted. SCRM plans
+    include an assessment of supply chain risks; a set of mitigating strategies and
+    controls; and a process for evaluating the effectiveness of the strategies and
+    controls. Organizations may develop a standalone SCRM plan or integrate supply
+    chain risk management into existing risk management and acquisition plans.
+    The plan includes protections against: unauthorized production, tampering, theft,
+    insertion of counterfeits, insertion of malicious software or hardware, and poor
+    development practices. Organizations consider the use of Software Bills of Materials
+    (SBOMs) and Hardware Bills of Materials (HBOMs) to maintain visibility into supply
+    chain components. SCRM plans align with NIST SP 800-161 Rev. 1 guidance.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement software supply chain security through mandatory SBOM generation for all
+      artifacts using Syft or Trivy. Deploy signed container images with Sigstore (cosign)
+      and verify signatures at deployment time using Kyverno or OPA admission controllers.
+      Implement dependency pinning with hash verification for all package managers.
+      Deploy container registries with vulnerability scanning and image signing (Harbor).
+      Use SLSA framework practices: hermetic builds, provenance generation, and build
+      attestation. Implement private package registries to proxy and cache upstream
+      dependencies with vulnerability gates. Restrict base images to an approved catalog
+      maintained by the platform team. Implement supply chain levels for software
+      artifacts (SLSA Level 3+).
+    tools:
+      - "Sigstore (cosign, Rekor, Fulcio)"
+      - "SLSA framework"
+      - "Syft / Trivy (SBOM generation)"
+      - "Harbor (container registry with signing)"
+      - "Kyverno / OPA (image verification)"
+      - "Renovate / Dependabot (dependency updates)"
+      - "in-toto (supply chain attestation)"
+  devsecops:
+    prose: >-
+      Integrate supply chain security checks into every CI/CD pipeline. Run dependency
+      scanning to detect vulnerable and malicious packages. Generate SBOMs for every
+      build and store as pipeline artifacts. Implement container image scanning before
+      pushing to registries. Verify the provenance and integrity of third-party
+      dependencies. Implement merge request policies that require security review for
+      dependency updates. Use lock files and hash-pinned dependencies to prevent
+      dependency confusion attacks. Sign all build artifacts and container images
+      in the pipeline. Track the provenance of all third-party components.
+    tools:
+      - "Dependency Scanning (Snyk, Dependency-Check)"
+      - "Container Scanning (Trivy, Grype)"
+      - "License Compliance scanning"
+      - "SBOM generation (CycloneDX, SPDX)"
+      - "cosign (image signing in CI)"
+      - "Socket.dev (malicious package detection)"
+  secops:
+    prose: >-
+      Monitor for supply chain compromise indicators: unexpected dependency changes,
+      modified package checksums, new maintainers on critical packages, and
+      typosquatting. Track CVEs in all deployed dependencies and prioritize remediation
+      based on exploitability and exposure. Maintain a software asset inventory tied to
+      SBOMs for rapid impact assessment when new supply chain vulnerabilities are
+      disclosed. Subscribe to security advisories for all critical dependencies.
+      Implement processes for rapid response to supply chain incidents. Conduct periodic
+      supply chain risk assessments of critical vendors and components.
+    tools:
+      - "Dependency-Track (SBOM management)"
+      - "Vulnerability management platforms"
+      - "OSV.dev / NVD (vulnerability databases)"
+      - "Socket.dev (malicious package detection)"
+      - "SIEM (supply chain anomaly detection)"
+      - "Vendor risk management platforms"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — SR-2, SR-3"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-161 Rev. 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-161r1"
+  - citation: "Executive Order 14028"
+    url: "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/"

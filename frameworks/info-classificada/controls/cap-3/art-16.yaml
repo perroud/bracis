@@ -1,0 +1,107 @@
+id: art-16
+family: cap-3
+title: "Secure Transport of Classified Information"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 16. O transporte de informação classificada em qualquer grau de
+    sigilo deverá observar medidas de segurança que garantam a integridade
+    da informação e impeçam o acesso não autorizado.
+
+    § 1º O transporte de informação classificada nos graus de sigilo
+    ultrassecreto e secreto deverá ser feito por portador devidamente
+    credenciado, acompanhado de protocolo de entrega.
+
+    § 2º A informação classificada nos graus de sigilo ultrassecreto e
+    secreto, quando transportada, será acondicionada em dois envelopes:
+
+    I - o envelope externo não conterá qualquer indicação do grau de
+    sigilo ou do conteúdo;
+
+    II - o envelope interno será fechado, lacrado e conterá a indicação
+    do grau de sigilo e do destinatário.
+
+    § 3º A informação classificada no grau de sigilo reservado poderá
+    ser transportada por qualquer meio que garanta a sua segurança.
+guidance:
+  prose: |
+    Article 16 establishes physical transport security procedures using
+    a double-envelope system for higher classification levels:
+
+    **Transport requirements by level:**
+    | Level          | Courier                  | Packaging              |
+    |----------------|--------------------------|------------------------|
+    | Ultrassecreta  | Credentialed courier     | Double envelope system |
+    | Secreta        | Credentialed courier     | Double envelope system |
+    | Reservada      | Any secure means         | Standard secure        |
+
+    **Double envelope system:**
+    - Outer envelope: no classification markings, no content indication
+    - Inner envelope: sealed, classification marked, addressee indicated
+    - This prevents casual observers from knowing the content is classified
+
+    **Digital transport equivalents:**
+    The double-envelope concept translates to:
+    - Outer layer: encrypted transport (TLS/VPN) — no metadata reveals content
+    - Inner layer: content encryption with classification metadata only
+      visible after authenticated decryption
+
+    **Delivery protocol:**
+    A signed delivery receipt (protocolo de entrega) is required for
+    ultrassecreta and secreta materials.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Digital double-envelope transport:**
+      1. Implement layered encryption for classified data in transit:
+         - Outer layer: transport encryption (TLS 1.3, IPsec) hiding all
+           content and classification metadata
+         - Inner layer: content encryption where classification metadata
+           is only visible after authenticated decryption
+      2. Deploy secure file transfer system with delivery receipts:
+         sender receives cryptographic proof of delivery.
+      3. Implement transfer authorization workflow for ultrassecreta and
+         secreta data: each transfer requires pre-approval.
+      4. Log all classified data transfers with complete chain of custody.
+    tools:
+      - encrypted-transport
+      - secure-file-transfer
+      - delivery-receipt
+      - chain-of-custody
+  devsecops:
+    prose: |
+      **Artifact transport security:**
+      1. Implement signed artifact delivery for classified deployments:
+         each artifact transfer includes cryptographic delivery receipt.
+      2. Use encrypted channels for all artifact transfers between
+         environments (dev, staging, production).
+      3. Implement transfer approval gates in CI/CD for classified
+         artifacts moving between security zones.
+    tools:
+      - artifact-signing
+      - encrypted-channels
+      - approval-gates
+  secops:
+    prose: |
+      **Transport security governance:**
+      1. Maintain a registry of approved transport methods for each
+         classification level.
+      2. Track all transport events: origin, destination, courier/method,
+         departure time, arrival time, delivery confirmation.
+      3. Verify credentialed courier credentials before each transport
+         of ultrassecreta/secreta materials.
+      4. Conduct periodic transport security audits including spot checks
+         on packaging and delivery documentation.
+    tools:
+      - transport-registry
+      - courier-management
+      - delivery-tracking
+      - audit-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-5", "PE-16"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-13"]
+    relationship: complements

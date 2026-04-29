@@ -1,0 +1,82 @@
+id: art-24
+family: cap-5
+title: "Backup e Recuperacao de Dados"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 24. Os órgãos e entidades devem implementar política de backup e
+    recuperação de dados, contemplando:
+
+    I - definição de periodicidade e tipo de backup (completo, incremental,
+    diferencial) conforme a criticidade do ativo;
+    II - armazenamento de cópias de segurança em local distinto do original;
+    III - criptografia das cópias de segurança;
+    IV - testes periódicos de restauração;
+    V - definição de RPO (Recovery Point Objective) e RTO (Recovery Time
+    Objective) para cada sistema crítico.
+guidance:
+  prose: |
+    O art. 24 exige backup com RPO/RTO definidos, armazenamento off-site,
+    criptografia e testes periodicos de restauracao.
+
+    **Parametros obrigatorios:**
+    - RPO: maximo de dados que pode ser perdido (tempo)
+    - RTO: maximo de tempo para restaurar o servico
+    - Off-site: copias em localizacao geografica distinta
+    - Criptografia: backup DEVE ser criptografado
+    - Teste: validar restauracao periodicamente
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.13 (Information backup)
+    - NIST 800-53 rev5: CP-9 (System Backup)
+    - CIS Controls v8: 11.1 (Data Recovery)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Estrategia de backup 3-2-1:**
+      1. 3 copias de cada dado critico.
+      2. 2 tipos de midia diferentes (disco + object storage).
+      3. 1 copia off-site (regiao diferente ou cloud diferente).
+      4. Imutabilidade: backup imutavel por periodo de retencao (anti-ransomware).
+      5. RPO/RTO por tier: Tier 1 (RPO 1h, RTO 4h), Tier 2 (RPO 24h, RTO 24h),
+         Tier 3 (RPO 7d, RTO 72h).
+    tools:
+      - backup-solution
+      - object-storage
+      - cross-region-replication
+      - immutable-backup
+  devsecops:
+    prose: |
+      **Backup de codigo e configuracao:**
+      1. Repositorios Git com mirror para segundo destino (GitLab mirroring).
+      2. Backup de CI/CD variables e secrets do Vault.
+      3. Backup de configuracao de infraestrutura (Terraform state).
+      4. Teste automatico de restauracao de repositorio em pipeline.
+    tools:
+      - git-mirroring
+      - vault-backup
+      - terraform-state-backup
+      - restore-test-pipeline
+  secops:
+    prose: |
+      **Operacao de backup:**
+      1. Monitoramento diario de jobs de backup (sucesso/falha).
+      2. Teste de restauracao mensal para sistemas Tier 1.
+      3. Teste de restauracao trimestral para sistemas Tier 2/3.
+      4. Relatorio de compliance: % de sistemas com backup conforme RPO/RTO.
+      5. Exercicio anual de DR (Disaster Recovery) completo.
+    tools:
+      - backup-monitoring
+      - restore-testing
+      - dr-exercise
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.13"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-9", "CP-9(1)", "CP-10"]
+    relationship: mapped

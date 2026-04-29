@@ -1,0 +1,119 @@
+id: art-4
+family: cap-1
+title: "Obrigacoes do Fabricante de SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 4. O fabricante de SaMD é responsável por:
+
+    I - garantir que o SaMD atenda aos requisitos essenciais de segurança
+    e eficácia aplicáveis à sua classe de risco durante todo o ciclo de
+    vida do produto;
+
+    II - manter Sistema de Gestão da Qualidade (SGQ) compatível com a
+    classe de risco do SaMD, contemplando processos de projeto,
+    desenvolvimento, fabricação, distribuição e pós-mercado;
+
+    III - designar Responsável Técnico (RT) legalmente habilitado
+    perante o conselho profissional competente;
+
+    IV - comunicar à ANVISA quaisquer eventos adversos, queixas técnicas
+    ou desvios de qualidade relacionados ao SaMD;
+
+    V - manter documentação técnica atualizada e disponível para
+    inspeção pela ANVISA a qualquer momento;
+
+    VI - garantir rastreabilidade de todas as versões do SaMD liberadas
+    para uso clínico no território brasileiro.
+guidance:
+  prose: |
+    O art. 4 consolida as obrigacoes nucleares do fabricante de SaMD,
+    que se estendem por todo o ciclo de vida do produto -- do projeto
+    a descontinuacao.
+
+    **Sistema de Gestao da Qualidade (SGQ):**
+    O SGQ para SaMD deve ser compativel com a classe de risco. Na pratica,
+    fabricantes de SaMD Classe III e IV devem implementar SGQ baseado em
+    ISO 13485:2016, sujeito a inspecao de Boas Praticas de Fabricacao.
+
+    **Responsavel Tecnico:**
+    O RT deve ser profissional com registro ativo no conselho competente
+    (ex: CRM para software de diagnostico medico, COREN para software
+    de enfermagem, CRF para software farmaceutico).
+
+    **Rastreabilidade de versoes:**
+    O fabricante deve manter registro completo de quais versoes do SaMD
+    estao em uso clinico, por quais instituicoes, permitindo recall
+    direcionado em caso de problema de seguranca.
+
+    **Notificacao de eventos adversos:**
+    O fabricante deve notificar a ANVISA via Sistema de Notificacoes
+    em Vigilancia Sanitaria (NOTIVISA) dentro dos prazos legais:
+    - Evento adverso grave: 72 horas
+    - Queixa tecnica: 30 dias
+    - Desvio de qualidade: 30 dias
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para SGQ e rastreabilidade:**
+      1. Implementar sistema de gestao de configuracao que mantenha
+         registro imutavel de todas as versoes de SaMD (build artifacts,
+         source code snapshots, configuration baselines).
+      2. Configurar artifact registry com retencao permanente para
+         versoes de SaMD liberadas para uso clinico (nao permitir
+         garbage collection de artifacts regulados).
+      3. Manter infraestrutura de logs com retencao minima de 5 anos
+         para todos os eventos de deploy e atualizacao de SaMD.
+      4. Implementar mecanismo de feature flags que permita desativar
+         funcionalidades especificas de SaMD em caso de evento adverso,
+         sem necessidade de recall completo da versao.
+    tools:
+      - artifact-registry
+      - feature-flags
+      - immutable-logging
+      - scm
+  devsecops:
+    prose: |
+      **Pipeline de qualidade e rastreabilidade:**
+      1. Implementar pipeline de release que gera automaticamente
+         pacote de documentacao tecnica: SBOM, test reports, scan
+         results, change log, risk assessment delta.
+      2. Criar gate de release que exige aprovacao do RT antes de
+         deploy de qualquer versao de SaMD em producao.
+      3. Automatizar notificacao interna quando scanners detectam
+         vulnerabilidades criticas em SaMD em producao (trigger para
+         avaliacao de evento adverso).
+      4. Manter pipeline de rollback testado e documentado para
+         reverter versao de SaMD em producao em menos de 4 horas.
+    tools:
+      - gitlab-ci
+      - syft
+      - cosign
+      - rollback-pipeline
+  secops:
+    prose: |
+      **Governanca do fabricante:**
+      1. Documentar e manter atualizado o SGQ compativel com a classe
+         de risco de cada SaMD, com revisao anual pela direcao.
+      2. Implementar processo formal de notificacao NOTIVISA com
+         fluxo de triagem, investigacao e reporte dentro dos prazos
+         legais (72h para eventos adversos graves).
+      3. Manter registro de RT atualizado junto a ANVISA e garantir
+         que toda documentacao tecnica esteja sob responsabilidade
+         do RT designado.
+      4. Realizar auditoria interna semestral de conformidade com
+         obrigacoes do fabricante, incluindo rastreabilidade de versoes
+         e prontidao para inspecao ANVISA.
+    tools:
+      - grc-platform
+      - notivisa-integration
+      - qms-platform
+      - audit-management
+legal_references:
+  - framework_id: hipaa
+    articles: ["164-308-a-1"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-48"]
+    relationship: complements

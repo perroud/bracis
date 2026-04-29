@@ -1,0 +1,700 @@
+id: nist-800-63_to_nist-800-53
+title: "NIST SP 800-63 Digital Identity to NIST SP 800-53 Rev 5 Control Mapping"
+source_framework: nist-800-63
+target_framework: nist-800-53-rev5
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+
+mappings:
+  # ──────────────────────────────────────────────────────────────────────
+  # Authentication Family
+  # ──────────────────────────────────────────────────────────────────────
+
+  # AAL1 — Single-Factor Authentication
+  - source_control: nist-63-aal1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          AAL1 defines the minimum authentication assurance for single-factor
+          authentication. NIST 800-53 IA-2 requires unique identification and
+          authentication of organizational users, and directly references
+          SP 800-63B for authentication assurance levels. AAL1 implements the
+          baseline tier of the IA-2 authentication requirement.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          AAL1 requires that the claimant controls an authenticator bound to the
+          subscriber's account. AC-2 governs account management including account
+          creation, activation, and the binding of credentials to accounts. Both
+          controls share the requirement for a valid credential-to-account binding.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          AAL1 requires reauthentication at least every 30 days, generating
+          authentication events that must be logged. AU-2 requires identifying and
+          logging security-relevant events. Authentication successes, failures, and
+          reauthentication events at AAL1 are security-relevant events under AU-2.
+
+  # AAL2 — Multi-Factor Authentication
+  - source_control: nist-63-aal2
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          AAL2 requires multi-factor authentication using two distinct authentication
+          factors (something you know, have, or are). IA-2 requires authentication of
+          organizational users and explicitly references SP 800-63B. AAL2 directly
+          implements the moderate-assurance tier of IA-2 and is the level most commonly
+          mandated for federal systems accessing PII.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          AAL2 establishes the authentication assurance prerequisite for access
+          enforcement. AC-3 enforces approved authorizations for logical access. The
+          strength of access enforcement depends on the authentication assurance
+          level — AAL2 MFA provides the identity confidence necessary for AC-3 to
+          make meaningful authorization decisions.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          AAL2 multi-factor authentication supports least privilege enforcement by
+          providing higher-assurance identity verification. AC-6 employs the principle
+          of least privilege. Strong authentication at AAL2 ensures that privilege
+          assignments are tied to verified identities, reducing the risk of privilege
+          escalation through credential compromise.
+      - id: au-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          AAL2 requires reauthentication at least every 12 hours or 30 minutes of
+          inactivity, producing authentication events. AU-2 requires logging
+          security-relevant events. MFA authentication events including factor type,
+          success/failure, and session management are high-value audit data.
+
+  # AAL3 — Hardware Cryptographic Authentication
+  - source_control: nist-63-aal3
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          AAL3 requires hardware-based cryptographic authenticators with verifier
+          impersonation resistance. IA-2 requires identification and authentication
+          of organizational users at the level specified by the system's risk
+          assessment. AAL3 implements the highest tier of IA-2 authentication and
+          is required for high-impact systems.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          AAL3 hardware cryptographic authentication provides the highest identity
+          assurance for access enforcement decisions. AC-3 enforces approved
+          authorizations. Access control decisions for high-impact resources depend
+          on the cryptographic proof of identity that AAL3 provides.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          AAL3 hardware-based authentication directly supports least privilege by
+          ensuring privileged access is bound to a physical hardware token that
+          cannot be duplicated or remotely compromised. AC-6 requires that users
+          operate at the minimum privilege level necessary.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          AAL3 requires verifier impersonation resistance using cryptographic
+          channel binding (e.g., TLS token binding). SC-7 monitors and controls
+          communications at managed interfaces. The cryptographic channel binding
+          at AAL3 strengthens the boundary protection by preventing man-in-the-middle
+          attacks at authentication interfaces.
+      - id: au-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          AAL3 reauthentication every 12 hours or 15 minutes of inactivity generates
+          high-frequency authentication events. AU-2 requires identifying event types
+          for logging. Hardware authenticator events (including attestation
+          verification and cryptographic challenge-response) are critical audit data.
+
+  # Authenticator Types — TOTP, FIDO2, PKI
+  - source_control: nist-63-authenticator-types
+    target_controls:
+      - id: ia-2
+        relationship: derived-from
+        confidence: 0.90
+        rationale: >
+          The authenticator type taxonomy (memorized secrets, look-up secrets,
+          OTP devices, cryptographic authenticators, FIDO2) is derived from the
+          IA-2 requirement to authenticate organizational users. IA-2 defines the
+          requirement; the authenticator types in SP 800-63B define the approved
+          mechanisms to satisfy it.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Authenticator type configuration (e.g., enabling FIDO2, disabling SMS OTP,
+          requiring TOTP seed entropy) constitutes security configuration settings.
+          CM-6 requires establishing and documenting configuration settings using the
+          most restrictive mode consistent with operational requirements. Authenticator
+          type selection and configuration is a CM-6 concern.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          The set of approved authenticator types constitutes part of the system's
+          baseline configuration. CM-2 requires maintaining a baseline configuration
+          under configuration control. Changes to the approved authenticator types
+          (e.g., deprecating SMS, adding passkeys) are baseline configuration changes.
+
+  # Look-Up Secrets and Recovery Codes
+  - source_control: nist-63-lookup-secrets
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          Look-up secrets (recovery codes, printed token lists) are an authenticator
+          type defined by SP 800-63B for AAL1 and AAL2 scenarios. IA-2 requires
+          authentication of organizational users. Look-up secrets implement a specific
+          mechanism for satisfying IA-2 when primary authenticators are unavailable.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Look-up secrets serve as account recovery mechanisms and must be bound to
+          specific subscriber accounts. AC-2 governs account management, including
+          the lifecycle of credentials and recovery mechanisms. Recovery code
+          generation, distribution, and invalidation after use are account management
+          activities.
+
+  # Memorized Secret Requirements — Password Rules
+  - source_control: nist-63-memorized-secrets
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          Memorized secrets (passwords) are the most common authenticator type.
+          SP 800-63B specifies minimum 8-character length, no composition rules, no
+          periodic rotation, and mandatory breach-database screening. IA-2 requires
+          user authentication; memorized secret requirements define the implementation
+          constraints for password-based authentication under IA-2.
+      - id: cm-6
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          Password policy configuration (minimum length, blocklist enforcement,
+          rate limiting, hash algorithm selection) constitutes security configuration
+          settings. CM-6 requires configuration settings that reflect the most
+          restrictive mode. Password policy parameters are directly governed by both
+          SP 800-63B requirements and CM-6 configuration management.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Memorized secret lifecycle (initial issuance, reset, compromise notification)
+          is part of account management. AC-2 governs account creation and credential
+          binding. Password resets and forced changes after compromise are AC-2
+          account management activities.
+
+  # Reauthentication Requirements
+  - source_control: nist-63-reauthentication
+    target_controls:
+      - id: ia-2
+        relationship: derived-from
+        confidence: 0.85
+        rationale: >
+          Reauthentication requirements (30 days for AAL1, 12 hours / 30 min idle for
+          AAL2, 12 hours / 15 min idle for AAL3) are derived from the IA-2 requirement
+          for continuous authentication assurance. IA-2 requires authentication of users;
+          reauthentication ensures that assurance does not degrade over time.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          Reauthentication enforces session lifecycle management, which intersects
+          with account management. AC-2 includes requirements for managing active
+          sessions and disabling inactive accounts. Session timeout enforcement is
+          where reauthentication and account management converge.
+      - id: au-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Reauthentication events (session expiry, idle timeout, step-up prompts) are
+          security-relevant events that must be logged. AU-2 requires identifying event
+          types for the audit function. Reauthentication successes and failures are
+          critical for detecting session hijacking and unauthorized access attempts.
+
+  # Verifier Impersonation Resistance
+  - source_control: nist-63-verifier-requirements
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          Verifier impersonation resistance (required at AAL2 and AAL3) ensures that
+          the authenticator can verify it is communicating with the legitimate verifier,
+          preventing phishing attacks. IA-2 requires user authentication; verifier
+          impersonation resistance strengthens the authentication channel against
+          man-in-the-middle attacks.
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          Verifier impersonation resistance requires cryptographic binding between the
+          authentication protocol and the transport channel (e.g., TLS token binding,
+          WebAuthn origin verification). SC-7 monitors and controls communications at
+          managed interfaces. Both controls address the integrity of the communication
+          channel at authentication boundaries.
+      - id: si-4
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Detecting verifier impersonation attempts (phishing, credential relay) requires
+          system monitoring. SI-4 requires monitoring systems for attacks and unauthorized
+          connections. Failed verifier impersonation resistance checks are attack
+          indicators that should trigger SI-4 monitoring alerts.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Federation Family
+  # ──────────────────────────────────────────────────────────────────────
+
+  # Assertion Content and Binding
+  - source_control: nist-63-assertions
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          Assertions carry the authentication result from the IdP to the RP, including
+          the subscriber identifier, AAL level, and session metadata. IA-2 requires
+          identification and authentication of users. In federated architectures,
+          assertions are the mechanism by which IA-2 authentication is conveyed
+          across trust boundaries.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          Assertion claims (roles, groups, entitlements) carry authorization context
+          that the RP uses for access enforcement. AC-3 enforces approved authorizations.
+          The assertion is the vehicle that delivers the authorization data on which
+          AC-3 decisions depend in federated systems.
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.65
+        rationale: >
+          Assertions must be bound to a secure channel (TLS) for transmission between
+          IdP and RP. SC-7 controls communications at managed interfaces. The assertion
+          transmission channel is a managed interface that must satisfy SC-7 boundary
+          protection requirements.
+      - id: au-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Assertion issuance, validation, and rejection are security-relevant events
+          that must be logged by both the IdP and RP. AU-2 requires event logging.
+          Assertion validation failures (expired, invalid signature, audience mismatch)
+          are critical security events.
+
+  # FAL1 — Bearer Assertions
+  - source_control: nist-63-fal1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          FAL1 defines bearer assertion requirements where possession of the assertion
+          is sufficient to authenticate. IA-2 requires user identification and
+          authentication. FAL1 implements the baseline federation tier of IA-2 using
+          signed assertions transmitted over authenticated protected channels.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          FAL1 bearer assertions require an authenticated protected channel (TLS) for
+          transmission because the assertion itself has no holder-of-key binding.
+          SC-7 requires boundary protection including monitoring and controlling
+          communications. The TLS channel protecting bearer assertions is a managed
+          interface under SC-7.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          FAL1 assertions carry identity claims that the RP uses for access enforcement
+          decisions. AC-3 enforces approved authorizations. The RP must validate the
+          assertion signature and claims before making AC-3 access decisions based
+          on the federated identity.
+
+  # FAL2 — Signed and Encrypted Assertions
+  - source_control: nist-63-fal2
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          FAL2 requires assertions to be signed and encrypted, preventing assertion
+          interception and tampering. IA-2 requires user authentication at the level
+          appropriate to the system's risk. FAL2 implements a higher-assurance tier
+          of federated authentication under IA-2 by adding cryptographic protections
+          to the assertion itself.
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          FAL2 assertion encryption provides data-in-transit protection independent
+          of the transport channel. SC-7 controls communications at managed interfaces.
+          FAL2 and SC-7 intersect at the requirement for cryptographic protection of
+          identity data crossing trust boundaries — FAL2 at the assertion layer,
+          SC-7 at the network layer.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          FAL2 encrypted assertions ensure that only the intended RP can read the
+          identity claims used for access enforcement. AC-3 enforces authorized
+          access. The encryption guarantees that authorization data is not exposed
+          to intermediate parties.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          FAL2 assertion decryption and signature verification events must be logged
+          to detect assertion manipulation attempts. AU-2 requires logging
+          security-relevant events. Decryption failures or signature mismatches are
+          critical indicators of federation-level attacks.
+
+  # FAL3 — Holder-of-Key Assertions
+  - source_control: nist-63-fal3
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          FAL3 requires holder-of-key assertions where the subscriber must demonstrate
+          possession of a cryptographic key bound to the assertion. IA-2 requires user
+          authentication. FAL3 implements the highest-assurance federated
+          authentication under IA-2, combining assertion cryptography with
+          subscriber-held key proof.
+      - id: sc-7
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          FAL3 cryptographic key proof between the subscriber and RP creates an
+          authenticated channel that is distinct from the transport layer. SC-7
+          controls communications at managed interfaces. FAL3 and SC-7 intersect at
+          the requirement for verifiable authentication at communication boundaries.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          FAL3 holder-of-key binding provides the strongest assurance that the entity
+          presenting the assertion is the authenticated subscriber. AC-3 enforces
+          approved authorizations. The cryptographic proof prevents assertion theft
+          or replay, strengthening the identity foundation of AC-3 decisions.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          FAL3 provides the highest-assurance identity binding for federated systems,
+          supporting least privilege enforcement for high-impact federated resources.
+          AC-6 requires least privilege. Cryptographic key proof ensures that
+          federated privilege assignments cannot be transferred or impersonated.
+
+  # OpenID Connect and SAML Implementation
+  - source_control: nist-63-oidc-saml
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          OIDC and SAML are the primary protocol implementations for SP 800-63C
+          federation requirements. IA-2 requires identification and authentication of
+          users. OIDC/SAML provide the concrete protocol mechanisms (ID tokens, SAML
+          assertions, authorization code flow) that implement federated IA-2
+          authentication.
+      - id: cm-6
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          OIDC/SAML configuration (redirect URIs, signing algorithms, token lifetimes,
+          scope definitions, claim mappings) constitutes security configuration
+          settings. CM-6 requires configuration settings that reflect the most
+          restrictive mode. Federation protocol configuration is directly governed
+          by both SP 800-63C requirements and CM-6 configuration management.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          OIDC/SAML federation traffic crosses trust boundaries between IdPs and RPs.
+          SC-7 monitors and controls communications at managed interfaces. Federation
+          endpoints (authorization, token, SAML SSO) are managed interfaces that must
+          satisfy SC-7 boundary protection requirements including TLS and endpoint
+          authentication.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          The set of configured federation protocols, registered RPs, trusted IdPs,
+          and signing key configurations form part of the system's baseline
+          configuration. CM-2 requires maintaining a baseline configuration under
+          configuration control. Federation configuration changes (adding RPs,
+          rotating keys, upgrading protocol versions) are baseline changes.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Identity Assurance Family
+  # ──────────────────────────────────────────────────────────────────────
+
+  # Biometric Collection and Use
+  - source_control: nist-63-biometrics
+    target_controls:
+      - id: ia-2
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          Biometrics serve as a binding mechanism between a physical person and a
+          digital credential in the 800-63 framework, used at IAL2/IAL3 for identity
+          proofing and at AAL3 as an authentication factor. IA-2 requires user
+          identification and authentication. Biometric verification complements
+          IA-2 by providing a physical-to-digital identity binding.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Biometric enrollment creates a binding between a physical person and a
+          subscriber account. AC-2 governs account management including identity
+          verification during account creation. Biometric identity proofing
+          strengthens the account creation process by verifying the applicant's
+          physical identity.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Biometric collection events (enrollment, verification, false match/reject
+          outcomes) are security-relevant events. AU-2 requires identifying event
+          types for the audit function. Biometric match failures and presentation
+          attack detections are critical security events that must be logged.
+
+  # Enrollment and Identity Proofing Process
+  - source_control: nist-63-enrollment
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          Enrollment and identity proofing establish the initial identity binding
+          that all subsequent authentication depends on. IA-2 requires identification
+          and authentication of organizational users. Without proper enrollment and
+          proofing, IA-2 authentication is meaningless — you are authenticating an
+          unverified identity.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          Enrollment is the process of creating a subscriber account and binding
+          verified identity evidence to it. AC-2 governs account management including
+          account creation, prerequisites, and criteria. Both controls address the
+          same activity — account creation — from different perspectives: identity
+          assurance (800-63A) and account lifecycle (800-53).
+      - id: ac-1
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Enrollment procedures must be documented and formalized as part of the
+          organization's access control policy. AC-1 requires developing, documenting,
+          and disseminating access control policy and procedures. Identity proofing
+          procedures are a component of the overall access control procedure set.
+
+  # IAL1 — Self-Asserted Identity
+  - source_control: nist-63-ial1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.75
+        rationale: >
+          IAL1 allows self-asserted identity with no requirement for identity evidence
+          validation. IA-2 requires identification of organizational users. IAL1
+          implements the lowest tier of identity assurance under IA-2, where the system
+          does not verify that the claimed identity corresponds to a real person.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          IAL1 self-asserted identity means the account is created without verified
+          identity evidence. AC-2 governs account management including prerequisites
+          and criteria for account creation. At IAL1, the AC-2 account creation
+          criteria do not include identity proofing — only authenticator binding.
+
+  # IAL2 — Remote Identity Proofing
+  - source_control: nist-63-ial2
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          IAL2 requires remote identity proofing with validated identity evidence
+          (government ID, knowledge-based verification, biometric comparison). IA-2
+          requires identification and authentication. IAL2 implements the moderate
+          tier of the identification component of IA-2, providing reasonable assurance
+          that the subscriber is who they claim to be.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          IAL2 remote identity proofing defines the evidence requirements for creating
+          a verified subscriber account. AC-2 governs account creation prerequisites
+          and criteria. IAL2 proofing requirements and AC-2 account creation criteria
+          intersect — the proofing outcome determines whether the account creation
+          criteria are met.
+      - id: ac-1
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          IAL2 proofing procedures must be documented as part of the access control
+          policy. AC-1 requires documented access control policy and procedures.
+          Identity proofing at IAL2 is a formal procedure that must be governed by
+          organizational policy.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          IAL2 proofing sessions (evidence submission, verification outcomes,
+          fraud signals) generate security-relevant events. AU-2 requires logging
+          event types. Identity proofing attempts, successes, and failures are
+          critical audit events for fraud detection.
+
+  # IAL3 — In-Person Identity Proofing
+  - source_control: nist-63-ial3
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          IAL3 requires in-person identity proofing with supervised biometric
+          collection and physical evidence inspection. IA-2 requires identification
+          and authentication. IAL3 implements the highest tier of identification
+          under IA-2, providing the strongest assurance of real-world identity.
+      - id: ac-2
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          IAL3 in-person proofing creates the highest-assurance account binding.
+          AC-2 governs account management prerequisites. IAL3 proofing and AC-2
+          intersect at the account creation point — IAL3 defines what evidence
+          and procedures are required, AC-2 defines the organizational process
+          for managing the resulting account.
+      - id: ac-1
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          IAL3 in-person proofing requires documented procedures for the proofing
+          agent, including evidence inspection, biometric collection, and
+          environmental requirements. AC-1 requires documented access control
+          procedures.
+      - id: au-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          IAL3 in-person proofing generates detailed audit records (evidence types
+          examined, biometric samples collected, proofing agent identity, physical
+          location). AU-2 requires identifying event types for logging. IAL3
+          proofing events are among the most detailed audit records in the identity
+          lifecycle.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Privacy Family
+  # ──────────────────────────────────────────────────────────────────────
+
+  # Data Minimization in Identity Systems
+  - source_control: nist-63-data-minimization
+    target_controls:
+      - id: ac-6
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          Data minimization (collect only the minimum set of attributes necessary)
+          is the privacy analog of least privilege (allow only the minimum access
+          necessary). AC-6 employs the principle of least privilege. Both controls
+          embody the same design principle — minimization — applied to different
+          domains: data collection vs. access permissions.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Data minimization requires that RPs request only necessary attributes
+          and that IdPs enforce per-RP attribute release policies. AC-3 enforces
+          approved authorizations. Attribute release policies are a form of access
+          enforcement applied to identity data — the IdP enforces which data the
+          RP is authorized to receive.
+      - id: ac-1
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Data minimization requirements must be documented as organizational
+          policy, including retention periods, attribute release policies, and
+          pairwise pseudonymous identifier configurations. AC-1 requires developing
+          and documenting access control policy. Data minimization policy is a
+          component of the overall access control policy framework.
+      - id: au-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Data minimization compliance must be monitored through audit record review
+          to detect scope creep in attribute release. AU-6 requires reviewing and
+          analyzing audit records. Reviewing attribute release patterns against
+          per-RP minimization policies is an AU-6 activity.
+
+  # Privacy During Identity Proofing
+  - source_control: nist-63-privacy-proofing
+    target_controls:
+      - id: ac-1
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          Privacy during identity proofing requires explicit notice, purpose
+          limitation, and documented privacy risk management processes. AC-1
+          requires developing, documenting, and disseminating access control policy
+          and procedures. Privacy notice requirements and purpose limitation policies
+          are part of the access control policy framework that AC-1 governs.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Privacy during proofing requires that PII collected during enrollment
+          is used only for identity proofing, authentication, and fraud mitigation.
+          AC-2 governs account management. The subscriber's proofing data is part
+          of the account record, and its use restrictions are account management
+          constraints.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          Privacy proofing requires collecting the minimum set of attributes
+          necessary and limiting access to proofing records. AC-6 employs least
+          privilege. Access to subscriber proofing data must follow least privilege
+          — only personnel with a legitimate need should access proofing records.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Privacy proofing requires logging access to proofing records, consent
+          events, and data deletion requests. AU-2 requires identifying event types
+          for the audit function. Proofing data access and consent management events
+          are security and privacy-relevant events under AU-2.
+      - id: au-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          Privacy compliance during proofing must be verified through audit record
+          review, including retention policy enforcement and unauthorized access
+          detection. AU-6 requires reviewing and analyzing audit records to detect
+          inappropriate activity. Unauthorized proofing data access is inappropriate
+          activity that AU-6 review should detect.

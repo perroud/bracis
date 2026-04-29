@@ -1,0 +1,97 @@
+id: ctrl-21
+family: fam-6
+title: "Plano de Resposta a Incidentes Ciberneticos do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve estabelecer, documentar, testar e manter um Plano de
+    Resposta a Incidentes Cibernéticos (PRIC) específico para o ARCiber, que
+    defina os procedimentos para detecção, contenção, erradicação e recuperação
+    de incidentes cibernéticos que afetem ou possam afetar os sistemas do
+    Ambiente Regulado Cibernético. O PRIC deve contemplar a coordenação com
+    o ONS e a notificação à ANEEL conforme prazos e procedimentos estabelecidos
+    nos Procedimentos de Rede. O PRIC deve ser exercitado por meio de simulações
+    ao menos anualmente e revisado após cada incidente significativo.
+
+guidance:
+  prose: >-
+    A resposta a incidentes em ambientes OT/ICS do setor eletrico e mais complexa
+    que em IT por considerar: (i) seguranca de pessoas — acoes de contencao nao
+    podem colocar em risco operadores ou a integridade fisica do sistema eletrico;
+    (ii) continuidade do SIN — isolamento de sistema comprometido pode causar
+    impacto na confiabilidade da rede eletrica; (iii) coordenacao operacional —
+    toda acao de resposta no ARCiber deve ser coordenada com o Centro de Operacoes
+    do agente e com o ONS quando houver risco ao SIN; (iv) forense especializada
+    — preservacao de evidencias em sistemas OT sem causar interrupcao operacional.
+    O PRIC deve definir: classificacao de incidentes ciberneticos por severidade;
+    fluxo de escalacao interno e externo (ONS, ANEEL, CTIR Gov, autoridades);
+    procedimentos de comunicacao com midias e partes interessadas; criterios de
+    ativacao do plano de continuidade de negocio (BCM).
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar plataforma de Orquestracao, Automacao e Resposta de Seguranca
+      (SOAR) com playbooks especificos para incidentes no ARCiber (Cortex XSOAR,
+      Splunk SOAR, ou IBM SOAR). Desenvolver playbooks automatizados para os
+      cenarios de incidente mais provaveis no ARCiber: malware em estacao de
+      engenharia, acesso nao autorizado via VPN, anomalia de protocolo industrial,
+      ransomware em servidor SCADA. Integrar o SOAR com o SIEM (alertas automaticos)
+      e com o sistema de tickets (ServiceNow) para abertura automatica de incidentes.
+      Manter playbooks versionados no repositorio GitLab com historico de atualizacoes.
+    tools:
+      - cortex-xsoar
+      - splunk-soar
+      - servicenow
+      - gitlab
+      - pagerduty
+  devsecops:
+    prose: >-
+      Automatizar o fluxo de notificacao de incidentes — ao atingir limiar de
+      severidade definido, o sistema deve notificar automaticamente o RSCA,
+      o responsavel operacional e, quando aplicavel, iniciar o processo de
+      comunicacao ao ONS. Implementar sistema de comunicacao de crise com canal
+      alternativo (fora do ARCiber) para coordenacao durante incidentes que
+      possam comprometer os sistemas de comunicacao principais. Criar e manter
+      ferramentas forenses especializadas para analise de sistemas OT em
+      imagens de disco isoladas do ambiente de producao.
+    tools:
+      - pagerduty
+      - slack-secure
+      - cortex-xsoar
+      - gitlab
+  secops:
+    prose: >-
+      Realizar exercicios de simulacao de incidentes ciberneticos (tabletop e
+      funcionais) no ARCiber ao menos anualmente, com participacao do RSCA,
+      equipe operacional, TI e alta administracao. Documentar licoes aprendidas
+      de cada exercicio e incidente real e atualizar o PRIC em consequencia.
+      Manter lista de contatos de emergencia atualizada: ONS (Centro de Operacoes),
+      ANEEL (ouvidoria regulatoria), CTIR Gov, fabricantes de sistemas criticos,
+      equipe de resposta a incidentes externa (DFIR OT). Revisar e aprovar o
+      PRIC anualmente com chancela da alta administracao.
+    tools:
+      - servicenow
+      - archer
+      - cortex-xsoar
+      - pagerduty
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 12", "art. 13", "art. 14", "art. 15"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-1 cl.4.3.6"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-008-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a5.26", "a5.27", "a5.24"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-2", "IR-3", "IR-4", "IR-8"]
+    relationship: mapped

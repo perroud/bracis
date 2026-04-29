@@ -1,0 +1,120 @@
+id: art-27
+family: cap-5
+title: "Governanca de Retreinamento de Modelos"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 27. O retreinamento de modelos de IA médica deve seguir processo
+    formal e documentado:
+
+    I - o retreinamento deve ser justificado por evidência de degradação
+    de performance, mudança no contexto clínico ou disponibilidade de
+    dados mais representativos;
+
+    II - o modelo retreinado deve ser submetido a validação clínica
+    completa conforme art. 23 antes de substituir o modelo em produção;
+
+    III - deve haver comparação formal entre modelo atual e modelo
+    retreinado, demonstrando que o retreinamento resulta em melhoria
+    ou manutenção de performance para todos os subgrupos;
+
+    IV - o modelo anterior deve ser preservado como fallback durante
+    período de transição, permitindo rollback em caso de problemas
+    com o modelo retreinado;
+
+    V - o retreinamento não deve utilizar dados que não atendam aos
+    requisitos de base legal, consentimento e representatividade
+    previstos nesta Resolução.
+guidance:
+  prose: |
+    O art. 27 disciplina o retreinamento, que e uma das operacoes
+    mais criticas e frequentes no ciclo de vida de modelos de IA.
+
+    **Riscos do retreinamento nao governado:**
+
+    - Regression silenciosa: modelo retreinado melhora na media mas
+      piora para subgrupo especifico. Sem comparacao desagregada,
+      a regressao passa despercebida.
+
+    - Incorporacao de bias: novos dados de treinamento podem introduzir
+      vieses nao presentes nos dados originais.
+
+    - Perda de explicabilidade: mudanca de features ou importancia
+      relativa pode invalidar explicacoes anteriores.
+
+    - Incompatibilidade de infraestrutura: novo modelo pode ter
+      requisitos de hardware/latencia diferentes.
+
+    **Fallback (inciso IV):**
+    Blue-green deployment para modelos de IA: manter modelo anterior
+    em producao como fallback, executando em paralelo durante periodo
+    de transicao. Se modelo retreinado apresentar problemas, rollback
+    imediato para versao anterior.
+
+    **Retreinamento automatico vs manual:**
+    A Resolucao nao proibe retreinamento automatico, mas exige que
+    todo retreinamento passe por validacao clinica antes de producao.
+    Na pratica, retreinamento automatico dispara pipeline de validacao,
+    e deploy so ocorre apos aprovacao do medico responsavel.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retreinamento governado:**
+      1. Implementar pipeline de retreinamento com gates obrigatorios:
+         validacao clinica, comparacao com modelo atual, aprovacao do
+         medico responsavel, periodo de canary deployment.
+      2. Configurar blue-green deployment para modelos: manter versao
+         anterior ativa como fallback durante transicao.
+      3. Implementar comparacao automatizada entre modelo atual e
+         retreinado: metricas globais e por subgrupo, com flag de
+         regressao quando qualquer subgrupo degradar.
+      4. Automatizar preservacao de versoes de modelo com metadados
+         completos: dataset utilizado, hiperparametros, metricas,
+         data de treinamento.
+    tools:
+      - ml-pipeline
+      - blue-green-deployment
+      - model-comparison
+      - model-versioning
+  devsecops:
+    prose: |
+      **Pipeline de retreinamento:**
+      1. Implementar pipeline de CI/CD especifico para retreinamento
+         com validacao clinica, comparacao de performance e aprovacao
+         como gates sequenciais.
+      2. Automatizar deteccao de regressao por subgrupo: bloquear
+         deploy se modelo retreinado degradar em qualquer subgrupo
+         alem de limiar aceitavel.
+      3. Implementar canary deployment: novo modelo recebe percentual
+         crescente de trafego, com monitoramento em tempo real.
+      4. Automatizar rollback: se metricas de canary degradarem,
+         reverter automaticamente para modelo anterior.
+    tools:
+      - gitlab-ci
+      - ml-pipeline
+      - canary-deployment
+      - automated-rollback
+  secops:
+    prose: |
+      **Governanca de retreinamento:**
+      1. Manter registro de todos os retreinamentos: justificativa,
+         dados utilizados, resultados de validacao, aprovacao.
+      2. Auditar que retreinamentos seguiram processo formal:
+         validacao clinica, comparacao, aprovacao medica.
+      3. Monitorar frequencia de retreinamento por modelo: muito
+         frequente pode indicar instabilidade do modelo.
+      4. Verificar conformidade de dados de retreinamento com
+         LGPD e consentimento conforme art. 24.
+    tools:
+      - grc-platform
+      - retraining-registry
+      - audit-tools
+      - data-compliance
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-15"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["manage-2", "manage-3"]
+    relationship: mapped

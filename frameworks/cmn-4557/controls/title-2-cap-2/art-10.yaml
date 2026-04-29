@@ -1,0 +1,139 @@
+id: art-10
+family: title-2-cap-2
+title: "Risco de Contraparte"
+class: CMN-4557
+statement:
+  prose: |
+    Art. 10. A estrutura de gerenciamento de riscos deve contemplar procedimentos para o
+    gerenciamento do risco de contraparte, incluindo:
+    I - identificação e mensuração da exposição ao risco de contraparte em operações com
+    derivativos, operações compromissadas e operações de empréstimo de títulos e valores
+    mobiliários;
+    II - utilização de mecanismos de mitigação do risco de contraparte, incluindo acordos
+    de compensação, chamadas de margem e exigência de colateral;
+    III - avaliações de estresse para o risco de contraparte.
+guidance:
+  prose: |
+    O art. 10 trata do risco de contraparte, que e o risco de que a contraparte em uma
+    operacao financeira nao cumpra suas obrigacoes antes da liquidacao final.
+
+    **Diferenca entre risco de credito e risco de contraparte:**
+    - Risco de credito: o tomador nao paga o emprestimo (exposicao conhecida)
+    - Risco de contraparte: a contraparte falha em operacao bilateral (exposicao flutuante,
+      depende de variaveis de mercado)
+
+    **Operacoes abrangidas (inciso I):**
+
+    **Derivativos:**
+    - Swaps (juros, cambio, credito)
+    - Opcoes (vanilla e exoticas)
+    - Futuros e forwards
+    - Exposicao potencial futura (PFE) alem da exposicao corrente (MTM)
+
+    **Operacoes compromissadas (repos):**
+    - Compra/venda com compromisso de recompra/revenda
+    - Risco de que contraparte nao devolva titulo/caixa no vencimento
+
+    **Emprestimo de titulos:**
+    - Risco de que tomador nao devolva titulo emprestado
+    - Necessidade de colateral adequado
+
+    **Mecanismos de mitigacao (inciso II):**
+
+    **Acordos de compensacao (netting):**
+    - Compensacao bilateral de obrigacoes com mesma contraparte
+    - Reduce exposicao bruta para exposicao liquida
+    - Requer acordo legal valido (ISDA Master Agreement no Brasil: contrato CMN)
+
+    **Chamadas de margem:**
+    - Margem inicial: deposito ao inicio da operacao
+    - Margem de variacao: ajuste diario conforme MTM
+    - Margin call: chamada adicional quando limite de margem e atingido
+
+    **Colateral:**
+    - Titulos publicos federais (preferidos)
+    - Cash margin
+    - Haircuts aplicados conforme tipo e liquidez do colateral
+
+    **Stress testing de contraparte (inciso III):**
+    - Cenarios de default de contraparte mais exposta (wrong-way risk)
+    - Cenarios de estresse de mercado que aumentem exposicao a contraparte
+    - CVA (Credit Valuation Adjustment) stress
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Counterparty risk engine:**
+      1. MTM engine para calculo diario de exposicao corrente de derivativos.
+      2. PFE (Potential Future Exposure) engine com simulacao de Monte Carlo.
+      3. CVA/DVA calculator para ajuste de valoracao por risco de contraparte.
+      4. Netting engine que aplica acordos de compensacao para exposicao liquida.
+
+      **Collateral management:**
+      5. Collateral management system para controle de margem e colateral.
+      6. Margin call engine automatizado com calculo diario e notificacao.
+      7. Haircut engine com parametros atualizados por tipo de colateral.
+      8. Collateral optimization: alocar colateral de menor custo/maior liquidez.
+
+      **Monitoramento:**
+      9. Dashboard de exposicao de contraparte com MTM, PFE, CVA por contraparte.
+      10. Alertas quando exposicao a contraparte atinge percentual do limite.
+      11. Wrong-way risk monitoring: correlacao entre exposicao e creditworthiness.
+      12. Central counterparty (CCP) monitoring para operacoes em bolsa/clearing.
+    tools:
+      - risk-engine
+      - collateral-management
+      - pricing-library
+      - market-data-platform
+      - monitoring-alerting
+  devsecops:
+    prose: |
+      **Modelos de contraparte no pipeline:**
+      1. CI/CD para modelos de PFE e CVA com backtesting automatizado.
+      2. Versionamento de pricing libraries e modelos de simulacao.
+      3. Performance testing: simulacao de Monte Carlo deve executar dentro do SLA.
+      4. Integration testing entre trading system, risk engine e collateral management.
+
+      **Qualidade de dados:**
+      5. Data quality checks para dados de mercado que alimentam pricing.
+      6. Reconciliacao entre trading system e risk engine (posicoes, MTM).
+      7. Validacao de acordos de netting no sistema versus contratos legais.
+      8. Monitoring de completude dos dados de colateral e margem.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - performance-testing
+      - data-quality-platform
+  secops:
+    prose: |
+      **Governanca de risco de contraparte:**
+      1. Limites de exposicao por contraparte aprovados pelo comite de riscos.
+      2. Processo de aprovacao de novas contrapartes para derivativos.
+      3. Revisao periodica de contrapartes e seus ratings.
+      4. Due diligence de contrapartes antes de operar.
+
+      **Monitoramento operacional:**
+      5. Monitoramento diario de MTM e PFE por contraparte.
+      6. Monitoramento de chamadas de margem e disputas de colateral.
+      7. Relatorio mensal de risco de contraparte para comite de riscos.
+      8. Monitoramento de wrong-way risk e concentracao de contraparte.
+
+      **Stress testing e CVA:**
+      9. Stress testing trimestral de risco de contraparte.
+      10. Cenario de default da maior contraparte (impacto em P&L e capital).
+      11. CVA sensitivities reportadas para comite de riscos.
+      12. Validacao independente de modelos de PFE e CVA.
+    tools:
+      - risk-management-platform
+      - grc-platform
+      - reporting-platform
+      - collateral-management
+legal_references:
+  - framework_id: basel-iii
+    articles: ["pillar-1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20"]
+    relationship: supports

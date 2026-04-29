@@ -1,0 +1,98 @@
+id: art-16
+family: cap-4
+title: "Jurisdicao e Legislacao Aplicavel"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 16. Os contratos de serviços de computação em nuvem firmados por órgãos e
+    entidades da administração pública federal devem prever que a legislação
+    brasileira será aplicável ao tratamento dos dados, independentemente da
+    localização do provedor de serviços ou de suas subsidiárias.
+
+    Parágrafo 1. Os contratos devem conter cláusula que garanta que ordens judiciais
+    ou solicitações de acesso a dados por autoridades estrangeiras não serão
+    atendidas pelo provedor sem prévia autorização do órgão ou entidade contratante.
+
+    Parágrafo 2. O órgão ou entidade deve avaliar os riscos jurídicos associados
+    à legislação do país de origem do provedor de serviços, incluindo legislações
+    que possam obrigar o provedor a fornecer acesso a dados a governos estrangeiros.
+guidance:
+  prose: |
+    O art. 16 protege a soberania juridica dos dados da APF, exigindo que
+    legislacao brasileira prevaleca e que provedores nao entreguem dados a
+    governos estrangeiros.
+
+    **Tres requisitos:**
+    1. Legislacao brasileira aplicavel: independente da sede do provedor
+    2. Bloqueio de acesso por autoridades estrangeiras: sem autorizacao do orgao
+    3. Avaliacao de riscos juridicos: analise de leis do pais do provedor
+
+    **Risco CLOUD Act (EUA):**
+    O CLOUD Act permite que governo americano solicite dados de provedores
+    americanos (AWS, Azure, GCP) mesmo que armazenados fora dos EUA.
+    Este artigo busca mitigar esse risco via clausula contratual.
+
+    **Risco FISA Section 702 (EUA):**
+    Permite vigilancia de comunicacoes de nao-americanos por agencias dos EUA.
+
+    **Mapeamento CSA CCM v4:**
+    - STA-05: Supply Chain Data Security Assessment
+    - DSP-14: Data Jurisdiction
+
+    **Mitigacao:**
+    BYOK/HYOK e criptografia forte tornam o risco do CLOUD Act teorico,
+    pois o provedor nao teria acesso as chaves de descriptografia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Mitigacao tecnica de riscos jurisdicionais:**
+      1. Implementar HYOK para dados sensiveis, garantindo que provedor nao
+         tenha acesso as chaves de descriptografia.
+      2. Criptografia client-side antes de enviar dados para nuvem.
+      3. Avaliar provedores nacionais (SERPRO, RNP, Dataprev) como alternativa
+         para dados mais sensiveis.
+      4. Segmentacao de dados: dados sensiveis em nuvem privada/nacional,
+         dados publicos em nuvem publica internacional.
+    tools:
+      - hyok
+      - client-side-encryption
+      - national-cloud-providers
+      - data-segmentation
+  devsecops:
+    prose: |
+      **Validacao de clausulas contratuais:**
+      1. Checklist automatizado de clausulas obrigatorias em contratos de nuvem.
+      2. Pipeline de aprovacao juridica para novos contratos de nuvem.
+      3. Validacao de que dados sensiveis nao utilizam servicos de provedores
+         com riscos jurisdicionais sem mitigacao tecnica adequada.
+      4. Testes de criptografia client-side e HYOK.
+    tools:
+      - contract-checklist
+      - compliance-pipeline
+      - encryption-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento juridico:**
+      1. Acompanhar evolucao de legislacoes de acesso a dados em paises de
+         sede dos provedores (CLOUD Act, FISA, GDPR, etc.).
+      2. Registrar e investigar qualquer solicitacao de acesso a dados por
+         autoridades estrangeiras.
+      3. Manter inventario de riscos juridicos por provedor/pais.
+      4. Relatorio semestral de riscos jurisdicionais para o gestor de seguranca.
+    tools:
+      - legal-monitoring
+      - grc-platform
+      - incident-management
+      - risk-register
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-33", "art-34"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["STA-05", "DSP-14"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-4"]
+    relationship: derived-from

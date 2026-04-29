@@ -1,0 +1,90 @@
+id: res-1
+family: res
+title: "Make Systems Resilient to Outages"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Where a device relies on a network connection for its operation, it shall maintain
+    reasonable local functionality in the case of a loss of network access. The device
+    shall recover cleanly in the case of a loss of power and in the case of a loss of
+    network connection, returning to a known good state. The device shall connect to
+    networks in an orderly fashion, taking into account the number of devices this can
+    involve, and not overwhelm infrastructure with reconnection attempts.
+
+guidance:
+  prose: >-
+    Consumer IoT devices must remain functional and safe even when connectivity is
+    interrupted. A smart lock that cannot open when the cloud is down, or a thermostat that
+    stops controlling temperature during an internet outage, represents both a security and
+    safety risk. This provision requires graceful degradation: devices should maintain core
+    functionality locally where possible and recover to a known, secure state after power
+    loss or network disruption. The reconnection behavior is also regulated — devices must
+    implement exponential backoff and jitter to prevent "thundering herd" scenarios where
+    thousands of devices simultaneously reconnect after an outage and overwhelm the backend
+    infrastructure.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.9-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design the device firmware with a clear separation between local functionality and
+      cloud-dependent features. Implement local data caching and offline operation modes for
+      core device functions. Use a watchdog timer and clean shutdown procedures to ensure the
+      device recovers to a known good state after power loss. Implement exponential backoff
+      with random jitter for network reconnection attempts. Store persistent state in
+      non-volatile memory to survive power cycles. Design the cloud backend with rate limiting
+      and connection queuing to handle mass reconnection events gracefully. Test device
+      behavior under network partition scenarios including partial connectivity.
+    tools:
+      - watchdog-timer
+      - nvram
+      - mqtt-client
+      - connection-manager
+      - circuit-breaker
+
+  devsecops:
+    prose: >-
+      Implement chaos engineering tests that simulate network outages, power cycles, and
+      partial connectivity during CI/CD. Verify that the device maintains local functionality
+      during simulated cloud outages. Test reconnection behavior to ensure exponential backoff
+      is correctly implemented. Validate that the device recovers to a secure state after
+      ungraceful shutdowns. Stress-test the backend infrastructure with simulated mass
+      reconnection events. Include power-cycle resilience in the automated regression test
+      suite.
+    tools:
+      - chaos-mesh
+      - toxiproxy
+      - pytest
+      - gitlab-ci
+      - locust
+
+  secops:
+    prose: >-
+      Monitor device fleet connectivity patterns and alert on mass disconnection events
+      that may indicate infrastructure problems or DDoS attacks. Track device reconnection
+      patterns to identify devices not implementing proper backoff. Monitor backend
+      infrastructure capacity during recovery events. Maintain incident playbooks for mass
+      device outage scenarios. Analyze device logs for evidence of crash-reboot loops that
+      may indicate firmware corruption.
+    tools:
+      - grafana
+      - prometheus
+      - splunk
+      - elastic-siem
+      - pagerduty
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7.1", "SR-7.2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-10", "SC-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.14", "A.5.29", "A.5.30"]
+    relationship: mapped

@@ -1,0 +1,85 @@
+id: am-1
+family: am
+title: "Inventory of Assets"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall identify and document all assets associated
+    with the cloud services, including information assets, software assets,
+    physical assets, and services. An inventory of these assets shall be
+    maintained and kept up to date. The inventory shall include ownership,
+    location, and classification of each asset. The asset inventory shall
+    be reviewed at regular intervals.
+
+guidance:
+  prose: >-
+    A comprehensive asset inventory is foundational to all other security
+    controls — you cannot protect what you do not know exists. For cloud
+    providers, the asset inventory must cover not only traditional IT
+    assets but also virtual machines, containers, serverless functions,
+    APIs, data stores, network configurations, and cryptographic keys.
+    Asset ownership must be clearly assigned, and the inventory must be
+    continuously updated to reflect the dynamic nature of cloud environments.
+
+references:
+  - citation: "C5:2020, AM-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated asset discovery and inventory management using
+      cloud-native tools (AWS Config, Azure Resource Graph, GCP Asset
+      Inventory). Use infrastructure-as-code to ensure all provisioned
+      resources are tracked in the IaC state and tagged with ownership,
+      classification, and cost center metadata. Deploy a service catalog
+      (e.g., Backstage) that maintains a real-time inventory of all
+      platform services, their owners, and dependencies. Enforce mandatory
+      tagging policies through admission controllers.
+    tools:
+      - backstage
+      - terraform
+      - aws-config
+      - azure-resource-graph
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Integrate asset tagging validation into CI/CD pipelines so that
+      deployments are blocked if resources lack required metadata (owner,
+      classification, environment). Scan IaC templates for untagged
+      resources and enforce tagging policies as pre-commit checks.
+      Maintain a software bill of materials (SBOM) for all deployed
+      applications to track software asset dependencies.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - syft
+      - trivy
+
+  secops:
+    prose: >-
+      Correlate the asset inventory with vulnerability scan results and
+      security event data to ensure complete coverage. Alert on assets
+      detected in the environment that are not present in the inventory
+      (shadow IT detection). Generate periodic asset inventory reconciliation
+      reports comparing IaC state, cloud provider APIs, and the CMDB.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-config
+      - servicenow
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.9"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["CM-8"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["UEM-04"]
+    relationship: mapped

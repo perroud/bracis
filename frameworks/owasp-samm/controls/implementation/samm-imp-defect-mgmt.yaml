@@ -1,0 +1,107 @@
+id: samm-imp-defect-mgmt
+family: implementation
+title: "Defect Management"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Implement a structured process for tracking, prioritizing, and remediating security
+    defects discovered through automated scanning, security testing, penetration testing,
+    and vulnerability disclosure. Define and enforce SLA-based remediation timelines by
+    vulnerability severity. Conduct root cause analysis on significant security defects
+    to drive process improvements that prevent recurrence of vulnerability classes.
+  parts:
+    - id: samm-imp-defect-mgmt_smt.a
+      label: "Stream A — Defect Tracking"
+      prose: >-
+        Maintain a centralized vulnerability tracking system that consolidates findings
+        from all security scanning sources — SAST, DAST, SCA, penetration testing,
+        and bug bounty programs. Assign ownership to each vulnerability, classify by
+        severity using a consistent scoring methodology (CVSS, organization-defined
+        impact), and set remediation due dates based on defined SLAs. Track remediation
+        progress and escalate overdue vulnerabilities through defined management channels.
+        Produce regular vulnerability metrics reports for security and engineering leadership.
+    - id: samm-imp-defect-mgmt_smt.b
+      label: "Stream B — Metrics and Feedback"
+      prose: >-
+        Analyze vulnerability data to identify patterns — recurring vulnerability classes,
+        high-density components, or teams with elevated defect rates. Use pattern analysis
+        to generate targeted interventions: additional training for teams with recurring
+        injection flaws, library replacement for components with persistent vulnerabilities,
+        or architecture changes to eliminate systemic weaknesses. Feed defect metrics back
+        into the security program to measure the effectiveness of training, tooling, and
+        process improvements over time.
+
+guidance:
+  prose: >-
+    Defect management without metrics is a triage operation with no feedback loop.
+    The goal is not just to fix vulnerabilities — it is to understand why they occur
+    and eliminate the conditions that produce them. At maturity level 1, the organization
+    tracks security vulnerabilities in an issue tracker with severity labels and assigns
+    owners. At level 2, SLAs are defined and monitored, findings from multiple sources
+    are consolidated into a single view, and metrics are generated monthly. At level 3,
+    root cause analysis is performed on all high-severity findings, metrics drive training
+    and tooling investments, SLA compliance is reported to leadership, and recurring
+    vulnerability classes trigger process changes rather than just individual remediation.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Implementation: Defect Management"
+    url: "https://owaspsamm.org/model/implementation/defect-management/"
+  - citation: "CVSS v4.0 — Common Vulnerability Scoring System"
+    url: "https://www.first.org/cvss/"
+  - citation: "NIST SP 800-218 — RV.1, RV.2"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate security vulnerability tracking into the IDP by surfacing DefectDojo
+      or GitLab Security Dashboard data in Backstage, giving each team a real-time
+      view of their outstanding security findings without requiring context-switching
+      to a separate tool. Implement automated ticket creation: when a pipeline scanner
+      identifies a vulnerability above a defined threshold, automatically create a
+      GitLab or Jira issue with severity, SLA due date, and suggested remediation
+      guidance pre-populated. Provide platform-level SLA alerting that notifies team
+      leads when vulnerability remediation SLAs are approaching expiry. Build a
+      security debt scorecard accessible in the IDP that ranks teams by vulnerability
+      density and SLA compliance.
+    tools:
+      - "DefectDojo (vulnerability management)"
+      - "Backstage (security scorecard plugin)"
+      - "GitLab Security Dashboard"
+      - "Jira (issue tracking integration)"
+      - "Prometheus / Grafana (SLA metrics)"
+  devsecops:
+    prose: >-
+      Configure CI/CD pipeline scanners to automatically create issues in the project
+      tracker when new vulnerabilities are discovered, with severity-based SLA due dates
+      calculated at creation time. Implement pipeline checks that block deployment when
+      SLA-overdue vulnerabilities remain unresolved in the project backlog. Use GitLab's
+      vulnerability management features to track vulnerability status through the
+      remediation lifecycle — detected, confirmed, in-progress, resolved. Generate
+      weekly vulnerability summary reports from pipeline data and distribute to
+      engineering leads. Automate false-positive management workflows to reduce
+      alert fatigue without losing signal.
+    tools:
+      - "GitLab Vulnerability Management"
+      - "DefectDojo (finding aggregation)"
+      - "Trivy / Semgrep / Snyk (scanner integration)"
+      - "GitLab Issues / Jira (ticket automation)"
+      - "Grafana (SLA compliance dashboards)"
+  secops:
+    prose: >-
+      Operate a vulnerability management program that aggregates findings from all
+      security testing activities — automated scanning, penetration testing, bug bounty,
+      and threat hunting — into a unified risk register. Conduct weekly vulnerability
+      triage meetings for critical and high findings, with SecOps, engineering leads,
+      and product owners participating. Produce monthly KPI reports covering SLA
+      compliance rates, mean time to remediate (MTTR) by severity, and vulnerability
+      trend data. Conduct quarterly root cause analysis workshops for recurring
+      vulnerability classes and track remediation of systemic issues.
+    tools:
+      - "DefectDojo (centralized vulnerability management)"
+      - "Tenable.io / Qualys (vulnerability scanning)"
+      - "HackerOne / Bugcrowd (bug bounty)"
+      - "ServiceNow (risk register)"
+      - "Splunk (vulnerability metrics)"

@@ -1,0 +1,88 @@
+id: soc1-ca-backup-recovery
+family: control-activities
+title: "Backup and Recovery of Financial Data"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization implements backup and recovery controls to ensure the availability
+    and integrity of financial data processed on behalf of user entities. Data backups are
+    performed on a defined schedule, backup completion is verified, and backup integrity is
+    tested through periodic restoration exercises. Backup data is retained for a period
+    consistent with regulatory requirements and user entity service level agreements. Backup
+    media and recovery procedures are protected from unauthorized access and stored in a
+    manner that ensures availability in the event of a primary site failure. Recovery
+    procedures are documented, tested at least annually, and recovery time objectives (RTOs)
+    and recovery point objectives (RPOs) are defined and verified through testing.
+guidance:
+  prose: >-
+    Backup and recovery controls support the processing integrity objective by ensuring that
+    financial data is not lost due to system failures, human error, or disasters. Auditors
+    test these controls by reviewing backup job logs to confirm backups completed successfully
+    during the examination period, examining restoration test results, and verifying that
+    backup data is protected from unauthorized access. A common finding is that backups
+    are performed but never tested — auditors will specifically look for evidence of periodic
+    restoration testing, not just backup completion logs. Service organizations should define
+    explicit RPOs and RTOs for financial processing systems, obtain user entity agreement
+    on these commitments, and demonstrate through testing that they can be met. Backup
+    scope must cover all data necessary to reconstruct financial processing transactions.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated, policy-driven backup for all financial data stores. Use cloud-native
+      backup services with point-in-time recovery capabilities (e.g., AWS RDS automated backups,
+      GCP Cloud SQL backups) for relational databases. Implement cross-region replication
+      for critical financial data to meet RTO/RPO commitments. Automate backup verification
+      by implementing post-backup integrity checks (checksum validation, row count comparison).
+      Schedule automated restoration tests in isolated environments and generate documented
+      results. Encrypt backup data at rest and in transit using service-managed or
+      customer-managed keys. Implement backup monitoring with alerting on failure and
+      log all backup operations to an immutable audit log.
+    tools:
+      - aws-rds-backup
+      - aws-backup
+      - velero
+      - pgbackrest
+      - aws-s3-glacier
+  devsecops:
+    prose: >-
+      Include backup and recovery validation in the CI/CD pipeline for database schema
+      changes. Before applying schema migrations to production financial databases, test
+      that the current backup can be restored with the new schema to prevent lock-in situations.
+      Implement infrastructure-as-code for backup policies and retention schedules to ensure
+      they are version-controlled and consistently applied. Include backup policy configuration
+      in IaC scanning to detect deviations from required backup frequencies. Use GitLab
+      scheduled pipelines to execute automated restoration tests and publish results as
+      pipeline artifacts for audit evidence.
+    tools:
+      - terraform
+      - gitlab-scheduled-pipelines
+      - checkov
+      - liquibase
+      - flyway
+  secops:
+    prose: >-
+      Define and document RPOs and RPTs for all financial processing systems, aligned with
+      user entity SLAs. Maintain a backup policy that specifies backup frequency, retention
+      periods, storage locations, encryption requirements, and access controls for each
+      system tier. Monitor backup job completion daily and investigate and remediate failures
+      promptly. Conduct and document backup restoration tests at least annually for each
+      financial processing system, including the time taken, data verified, and any issues
+      encountered. Retain backup logs, restoration test results, and backup policy documents
+      for audit examination.
+    tools:
+      - pagerduty
+      - splunk
+      - servicenow
+      - zerto
+      - commvault
+related_controls:
+  - control_id: soc1-ca-processing-integrity
+    relationship: supports
+    description: "Backup ensures financial transaction data can be recovered to maintain processing completeness."
+  - control_id: soc1-avail-uptime
+    relationship: supports
+    description: "Recovery capabilities support system availability commitments to user entities."
+  - control_id: soc1-avail-incident
+    relationship: supports
+    description: "Recovery procedures are invoked as part of incident management for data loss events."

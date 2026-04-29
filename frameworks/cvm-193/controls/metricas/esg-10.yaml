@@ -1,0 +1,129 @@
+id: esg-10
+family: metricas
+title: "GHG Emissions Disclosure (Scope 1, 2, 3)"
+class: CVM-193
+baselines: [companhias-abertas]
+statement:
+  prose: |
+    A entidade deve divulgar suas emissões absolutas brutas de gases de efeito
+    estufa (GEE) geradas durante o período de reporte, expressa em toneladas
+    métricas de CO₂ equivalente, classificadas em:
+
+    (a) Escopo 1 — emissões diretas de GEE provenientes de fontes de propriedade
+    ou controladas pela entidade;
+
+    (b) Escopo 2 — emissões indiretas de GEE associadas à geração de energia
+    elétrica, vapor, aquecimento ou resfriamento adquiridos ou consumidos pela
+    entidade, divulgadas com base na abordagem baseada em localização (e, se
+    aplicável, na abordagem baseada em mercado);
+
+    (c) Escopo 3 — todas as demais emissões indiretas de GEE que ocorrem na
+    cadeia de valor da entidade, tanto a montante quanto a jusante, incluindo
+    as 15 categorias do GHG Protocol.
+
+    A entidade deve utilizar o GHG Protocol Corporate Standard como base
+    metodológica para mensuração e deve divulgar as metodologias de cálculo,
+    fatores de emissão e premissas utilizados.
+
+    Referência: IFRS S2, §29(a); Resolução CVM nº 193/2023, art. 1º.
+guidance:
+  prose: |
+    GHG emissions disclosure is the cornerstone metric of IFRS S2. This is
+    where sustainability reporting becomes most concrete and auditable.
+
+    **Scope 1 (direct):**
+    - Combustion of fossil fuels in owned/controlled equipment.
+    - Process emissions from chemical reactions.
+    - Fugitive emissions (refrigerant leaks, methane from operations).
+
+    **Scope 2 (energy indirect):**
+    - Must report location-based approach (grid average emission factors).
+    - May additionally report market-based approach (contractual instruments
+      like renewable energy certificates).
+
+    **Scope 3 (value chain):**
+    - Most complex and typically largest category.
+    - IFRS S2 requires disclosure of material Scope 3 categories.
+    - The entity must explain which of the 15 GHG Protocol Scope 3
+      categories are material and the basis for exclusions.
+
+    **Methodology transparency:**
+    - Emission factors must be disclosed (source, vintage).
+    - Calculation methodologies must be described.
+    - Organizational and operational boundaries must be defined.
+    - Base year and recalculation policy must be stated.
+
+    **Transition relief:**
+    - CVM 193 allows phased implementation. Scope 3 may have a longer
+      transition period, but entities should start building measurement
+      capabilities immediately.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Emissions data infrastructure:**
+      1. Build a centralized GHG data collection platform ingesting
+         activity data from operational systems: energy consumption,
+         fuel purchases, fleet management, process data.
+      2. Implement automated emissions calculation engines applying
+         GHG Protocol methodology with configurable emission factors
+         (IPCC, national inventories, supplier-specific).
+      3. Data pipelines for Scope 3: supplier data collection portals,
+         spend-based estimation models, life cycle assessment integrations.
+
+      **Calculation transparency:**
+      4. Version-controlled emission factor databases with source
+         attribution and vintage tracking.
+      5. Automated documentation of calculation methodology: boundary
+         definitions, consolidation approach, factor selections,
+         estimation methods.
+    tools:
+      - git
+      - terraform
+      - gitlab-ci
+      - vault
+  devsecops:
+    prose: |
+      **Emissions calculation integrity:**
+      1. Automated tests for emissions calculations: unit conversion
+         checks, boundary completeness, factor application logic.
+      2. SAST scanning on emissions calculation code to prevent errors
+         that could misstate emissions (incorrect unit conversions,
+         wrong factor lookups).
+      3. Regression tests to detect unexpected changes in emissions
+         outputs when calculation code or factors are updated.
+
+      **Data pipeline security:**
+      4. Secret detection on emissions data pipelines to prevent leakage
+         of sensitive operational data (fuel consumption, process
+         efficiency metrics).
+      5. Dependency scanning on emissions calculation libraries and
+         third-party data connectors.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-dependency-scanning
+  secops:
+    prose: |
+      **Emissions monitoring:**
+      1. Real-time emissions tracking dashboards with drill-down by
+         scope, facility, business unit.
+      2. Automated alerts for data quality issues: missing activity
+         data, outlier emissions values, incomplete Scope 3 categories.
+      3. Monthly emissions reports with trend analysis and variance
+         explanations.
+
+      **Assurance readiness:**
+      4. Maintain complete audit trail from raw activity data through
+         calculation to reported emissions figures.
+      5. Reconciliation tools comparing emissions disclosures to
+         underlying activity data and financial records (energy costs,
+         fuel expenses).
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-175
+    articles: ["art-27"]
+    relationship: complements

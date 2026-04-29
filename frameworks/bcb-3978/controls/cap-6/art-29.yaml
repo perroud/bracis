@@ -1,0 +1,116 @@
+id: art-29
+family: cap-6
+title: "Confidencialidade das Comunicacoes"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 29. As instituições mencionadas no art. 1, seus administradores e colaboradores
+    não podem dar ciência aos clientes ou a terceiros sobre a comunicação de que tratam
+    os arts. 25 a 28.
+
+    Parágrafo único. A vedação de que trata o caput abrange qualquer informação relativa
+    à existência ou ao conteúdo da comunicação realizada ao COAF.
+guidance:
+  prose: |
+    O art. 29 estabelece a proibicao absoluta de tipping-off, que e um dos
+    pilares do regime de PLD/FT.
+
+    **Proibicao absoluta:**
+    Ninguem na instituicao pode informar ao cliente ou a terceiros que uma
+    comunicacao foi feita ao COAF. Esta proibicao e:
+    - Aplicavel a instituicao, seus administradores e TODOS os colaboradores
+    - Abrange a existencia da comunicacao (que foi feita)
+    - Abrange o conteudo da comunicacao (o que foi reportado)
+    - Nao tem excecoes (nem o conselho de administracao pode ser informado
+      de comunicacoes especificas, salvo o diretor responsavel)
+
+    **Consequencias da violacao:**
+    O tipping-off e crime previsto no art. 11 da Lei 9.613/1998:
+    - Pena: reclusao de 1 a 5 anos e multa
+    - Aplicavel a qualquer pessoa que revelar a comunicacao
+    - A instituicao pode ser punida administrativamente pelo BCB
+
+    **Implicacao operacional:**
+    - Dados de comunicacoes ao COAF devem ser segregados
+    - Acesso restrito a equipe de PLD/FT
+    - Nao pode haver flag visivel no cadastro do cliente
+    - Treinamento obrigatorio sobre tipping-off para todos os colaboradores
+    - Atendentes nao podem ter acesso a informacoes de comunicacoes
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Segregacao de dados de comunicacao:**
+      1. Banco de dados separado (ou schema isolado) para comunicacoes ao COAF.
+      2. Controle de acesso RBAC com perfil especifico para dados de comunicacao.
+      3. Nenhum campo no cadastro do cliente visivel a atendentes que indique
+         que comunicacao foi feita.
+      4. API de consulta de comunicacoes separada da API de consulta de clientes.
+
+      **Prevencao de vazamento:**
+      5. Logs de acesso a dados de comunicacao com auditoria em tempo real.
+      6. DLP (Data Loss Prevention) configurado para detectar exfiltracao de
+         dados de comunicacao.
+      7. Bloqueio de exportacao de dados de comunicacao em formatos nao aprovados.
+      8. Criptografia de dados de comunicacao em repouso com chave dedicada.
+
+      **Protecao contra acesso indevido:**
+      9. Autenticacao multi-fator (MFA) para acesso ao modulo de comunicacoes.
+      10. Session timeout curto (15 minutos) para tela de comunicacoes.
+      11. Monitoramento de acessos anomalos ao modulo de comunicacoes.
+      12. Alerta ao compliance officer quando acesso incomum e detectado.
+    tools:
+      - identity-governance
+      - dlp
+      - vault
+      - siem
+  devsecops:
+    prose: |
+      **Testes de segregacao:**
+      1. Testes de controle de acesso: perfis nao autorizados nao devem
+         visualizar dados de comunicacao.
+      2. Testes de que interfaces de atendimento nao exibem flags de
+         comunicacao ao COAF.
+      3. Testes de que logs de comunicacao nao aparecem em sistemas
+         operacionais de agencia.
+      4. Testes de tentativa de acesso nao autorizado (penetration testing).
+
+      **Protecao de dados:**
+      5. Testes de criptografia de dados de comunicacao.
+      6. Testes de DLP para deteccao de exfiltracao.
+      7. Testes de audit trail de acessos.
+      8. Testes de timeout de sessao.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - penetration-testing
+  secops:
+    prose: |
+      **Monitoramento de tipping-off:**
+      1. Monitoramento de acessos a dados de comunicacao por colaboradores
+         que nao fazem parte da equipe de PLD/FT.
+      2. Alerta quando atendente acessa perfil de cliente imediatamente apos
+         comunicacao ser gerada (possivel vazamento).
+      3. Investigacao de incidentes de acesso indevido.
+      4. Canal de denuncia para suspeitas de tipping-off.
+
+      **Treinamento e conscientizacao:**
+      5. Treinamento obrigatorio sobre tipping-off para todos os colaboradores.
+      6. Reforco periodico da proibicao de tipping-off.
+      7. Sancoes internas claras para violacao.
+      8. Teste de conhecimento sobre tipping-off em treinamentos de PLD/FT.
+    tools:
+      - siem
+      - identity-governance
+      - training-platform
+      - whistleblower-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-6", "AU-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.10", "A.5.12", "A.5.15"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

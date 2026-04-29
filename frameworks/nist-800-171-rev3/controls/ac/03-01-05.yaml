@@ -1,0 +1,84 @@
+id: 03.01.05
+family: ac
+title: "Least Privilege"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [ac-6]
+  - cmmc-v2: [ac.l2-3.1.5]
+statement:
+  prose: >-
+    a. Employ the principle of least privilege, allowing only authorized accesses for
+       users (or processes acting on behalf of users) that are necessary to accomplish
+       assigned organizational tasks.
+    b. Restrict privileged accounts on the system to designated personnel or roles.
+    c. Authorize access to security functions and security-relevant information for
+       designated personnel or roles.
+    d. Prevent non-privileged users from executing privileged functions.
+    e. Log the execution of privileged functions.
+guidance:
+  prose: >-
+    Organizations employ least privilege for specific duties and systems. The principle
+    of least privilege is applied to all system components. Least privilege requires that
+    each subject (user, process, device) is granted the minimum level of access (or
+    permissions) needed to perform its authorized functions. The application of least
+    privilege limits the scope of the entity's actions, which limits the potential damage
+    from security incidents. Privileged accounts include system administration accounts,
+    developer accounts, and accounts with elevated permissions. Restricting privileged
+    accounts to specific personnel or roles prevents day-to-day users from accessing
+    privileged information or functions. Security functions include establishing system
+    accounts, configuring access authorizations, configuring firewall rules, setting
+    intrusion detection parameters, and configuring audit policies. Non-privileged users
+    are users who do not possess appropriate authorizations. Circumventing intrusion
+    detection and prevention mechanisms or malicious code protection mechanisms are
+    examples of privileged functions that require protection from non-privileged users.
+    Logging the use of privileged functions provides an accountability mechanism.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement just-in-time (JIT) privilege elevation for administrative access using
+      PAM solutions. Run all workloads with non-root containers and read-only root
+      filesystems. Use Kubernetes Pod Security Standards (restricted profile) to enforce
+      least privilege at the pod level. Implement cloud IAM policies with explicit deny
+      statements and condition keys to restrict privilege scope. Deploy separate admin
+      and operator accounts with distinct permission sets. Use Kubernetes RBAC with
+      fine-grained ClusterRoles rather than cluster-admin. Implement break-glass
+      procedures for emergency access with full audit logging.
+    tools:
+      - "PAM (CyberArk, BeyondTrust, HashiCorp Boundary)"
+      - "Kubernetes Pod Security Standards"
+      - "Cloud IAM (least privilege policies)"
+      - "Falco (runtime privilege monitoring)"
+      - "Kyverno / OPA (enforce non-root, read-only fs)"
+      - "HashiCorp Vault (dynamic, scoped credentials)"
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code for overly permissive IAM policies and security group
+      rules. Implement CI checks that fail builds containing wildcard IAM permissions
+      (e.g., Action: "*", Resource: "*"). Enforce that CI/CD pipeline service accounts
+      use scoped, short-lived tokens rather than long-lived credentials. Review and
+      validate Kubernetes RBAC configurations in merge request pipelines. Implement
+      automatic detection of privilege escalation paths in cloud configurations.
+    tools:
+      - "Checkov / tfsec (IAM least privilege checks)"
+      - "AWS IAM Access Analyzer"
+      - "Bridgecrew"
+      - "Trivy (Kubernetes RBAC audit)"
+      - "CI/CD scoped tokens"
+      - "Conftest (OPA for IaC)"
+  secops:
+    prose: >-
+      Monitor and alert on all privileged function execution. Track privilege escalation
+      attempts across all systems. Conduct quarterly privilege reviews to identify and
+      remove unnecessary elevated permissions. Implement UEBA to detect anomalous
+      privileged account usage patterns. Generate reports on privileged access usage,
+      dormant privileged accounts, and privilege creep across the environment.
+    tools:
+      - "PAM session recording and monitoring"
+      - "SIEM (privileged access alerts)"
+      - "UEBA (anomalous privilege usage)"
+      - "Identity Governance (access certification)"
+      - "Cloud Security Posture Management"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — AC-6"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"

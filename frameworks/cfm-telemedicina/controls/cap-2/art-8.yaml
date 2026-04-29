@@ -1,0 +1,109 @@
+id: art-8
+family: cap-2
+title: "Telecirurgia Assistida por Robos"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 8. A telecirurgia assistida por robôs consiste na realização
+    de procedimento cirúrgico comandado a distância por médico, por
+    meio de sistema robótico controlado remotamente.
+
+    Parágrafo 1. A telecirurgia somente pode ser realizada em
+    estabelecimento de saúde que disponha de infraestrutura adequada,
+    incluindo equipe médica presencial de suporte e mecanismo de
+    conversão imediata para cirurgia convencional.
+
+    Parágrafo 2. O sistema robótico utilizado deve possuir registro
+    na ANVISA e certificação técnica que garanta segurança, precisão
+    e confiabilidade do procedimento.
+
+    Parágrafo 3. A conexão de rede utilizada para telecirurgia deve
+    garantir latência ultrabaixa, redundância de conexão e mecanismo
+    automático de segurança (failsafe) em caso de perda de comunicação.
+guidance:
+  prose: |
+    O art. 8 regula a modalidade mais critica da telemedicina em termos
+    de requisitos tecnologicos. Falhas em telecirurgia podem causar
+    danos irreversiveis ao paciente.
+
+    **Requisitos criticos de infraestrutura:**
+    - Latencia: maxima de 150ms (preferencialmente < 50ms) para
+      movimentos cirurgicos precisos
+    - Redundancia: minimo de duas conexoes independentes (fibra + 5G
+      dedicado, por exemplo) com failover automatico em < 100ms
+    - Failsafe: o sistema robotico deve assumir posicao segura
+      automaticamente em caso de perda de comunicacao
+    - Equipe local: obrigatorio ter cirurgiao presencial capaz de
+      converter para cirurgia convencional em menos de 60 segundos
+
+    **Registro ANVISA (paragrafo 2):**
+    O sistema robotico deve possuir registro vigente na ANVISA como
+    equipamento medico. A plataforma de comunicacao que controla o
+    robo tambem esta sujeita a requisitos de certificacao.
+
+    **Responsabilidade:**
+    O medico que comanda o robo a distancia permanece como cirurgiao
+    responsavel. A equipe local possui responsabilidade subsidiaria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de telecirurgia:**
+      1. Implementar conexao de rede com latencia garantida < 150ms,
+         jitter < 10ms e perda de pacotes < 0.01%, com monitoramento
+         continuo e alerta instantaneo.
+      2. Configurar redundancia de conexao com minimo duas redes
+         independentes e failover automatico em < 100ms.
+      3. Implementar mecanismo de failsafe no sistema robotico:
+         posicao segura automatica em caso de perda de comunicacao
+         por mais de 200ms consecutivos.
+      4. Manter monitoramento em tempo real de todas as metricas
+         de rede durante procedimento cirurgico, com registro
+         timestamped para auditoria pos-operatoria.
+      5. Implementar sistema de verificacao pre-operatoria que
+         valide conectividade, latencia e redundancia antes de
+         autorizar inicio do procedimento.
+    tools:
+      - network-monitoring
+      - redundancy-management
+      - failsafe-controller
+      - latency-monitoring
+  devsecops:
+    prose: |
+      **Testes de seguranca para telecirurgia:**
+      1. Implementar testes de failover que simulem perda de
+         conexao primaria e validem tempo de comutacao.
+      2. Criar testes de stress de rede que validem comportamento
+         do sistema sob degradacao progressiva de qualidade.
+      3. Testar mecanismo de failsafe em cenarios de perda total
+         de comunicacao, validando que robo assume posicao segura.
+      4. Implementar testes de integridade de comandos cirurgicos
+         transmitidos (nenhum comando deve ser corrompido ou perdido).
+    tools:
+      - gitlab-ci
+      - network-simulation
+      - failover-testing
+      - command-integrity-testing
+  secops:
+    prose: |
+      **Operacao de telecirurgia:**
+      1. Verificar antes de cada procedimento que toda infraestrutura
+         atende requisitos minimos de latencia, redundancia e failsafe.
+      2. Manter registro completo de metricas de rede durante todo
+         procedimento para auditoria pos-operatoria.
+      3. Verificar que sistema robotico possui registro ANVISA vigente
+         e certificacao tecnica atualizada.
+      4. Auditar que equipe local de suporte esta presente e preparada
+         para conversao a cirurgia convencional quando necessario.
+    tools:
+      - pre-operative-checklist
+      - network-monitoring
+      - audit-trail
+      - equipment-certification
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-1", "164.312-e-1"]
+    relationship: mapped

@@ -1,0 +1,87 @@
+id: oi-sa-05
+family: sa
+title: "Criptografia e Protecao de Dados em Transito e Repouso"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Os dados compartilhados no ecossistema Open Insurance devem ser protegidos por
+    criptografia em trânsito e, quando armazenados pela receptora, em repouso.
+
+    Requisitos de criptografia:
+    I - Trânsito: TLS 1.2 ou superior com cipher suites aprovadas pelo ecossistema,
+    com mTLS obrigatório entre participantes;
+    II - Payloads sensíveis: assinatura digital (JWS) e, quando aplicável,
+    criptografia de payloads (JWE) conforme perfil FAPI;
+    III - Tokens: JWT (JSON Web Token) assinados com algoritmos RS256 ou PS256,
+    com chaves rotacionadas periodicamente;
+    IV - Repouso: dados de clientes recebidos via Open Insurance devem ser cifrados
+    com AES-256 ou equivalente;
+    V - Chaves criptográficas: gerenciadas em HSM ou solução de KMS com controle
+    de acesso rigoroso.
+
+    Algoritmos criptográficos obsoletos ou considerados fracos devem ser
+    desabilitados (ex: TLS 1.0/1.1, RC4, SHA-1, RSA-1024).
+guidance:
+  prose: |
+    A criptografia e a ultima linha de defesa dos dados compartilhados. Mesmo que
+    outras camadas de seguranca sejam comprometidas, dados cifrados permanecem
+    protegidos.
+
+    O perfil FAPI exige assinatura de payloads criticos (authorization requests,
+    tokens, respostas de consentimento) para garantir integridade e nao-repudio.
+    A criptografia de payloads (JWE) e exigida para dados especialmente sensiveis.
+
+    A rotacao periodica de chaves e essencial:
+    - Chaves de assinatura JWT: rotacao minima trimestral
+    - Certificados mTLS: rotacao conforme validade ICP-Brasil
+    - Chaves de criptografia em repouso: rotacao anual minima
+
+    O uso de HSM para armazenamento de chaves privadas e considerado obrigatorio
+    para participantes de grande porte e altamente recomendado para todos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Configurar TLS 1.2+ com cipher suites fortes (ECDHE+AES-256-GCM, ECDHE+CHACHA20).
+      2. Implementar assinatura JWS em todos os payloads criticos conforme FAPI.
+      3. Implementar JWE para payloads que contem dados sensiveis de clientes.
+      4. Configurar KMS/HSM para gerenciamento de chaves criptograficas.
+      5. Implementar rotacao automatica de chaves com publicacao via JWKS endpoint.
+      6. Cifrar dados de clientes em repouso com AES-256.
+      7. Desabilitar TLS 1.0/1.1 e cipher suites fracas.
+    tools:
+      - hsm
+      - kms
+      - tls-configuration
+      - certificate-manager
+      - encryption
+  devsecops:
+    prose: |
+      1. Scanning automatico de configuracao TLS para detectar cipher suites fracas.
+      2. Testar que conexoes TLS 1.0/1.1 sao rejeitadas.
+      3. Validar assinaturas JWS em testes de integracao.
+      4. Testar rotacao de chaves sem interrupcao de servico.
+      5. Secret scanning para detectar chaves criptograficas em codigo.
+    tools:
+      - tls-scanner
+      - secret-detection
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar configuracao TLS periodicamente (TLS observatory).
+      2. Alertar sobre uso de algoritmos ou cipher suites depreciados.
+      3. Auditar rotacao de chaves e certificados conforme politica.
+      4. Monitorar acessos ao HSM/KMS para detectar uso nao autorizado.
+    tools:
+      - tls-monitoring
+      - hsm-monitoring
+      - siem
+      - compliance-scanner
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4", "art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

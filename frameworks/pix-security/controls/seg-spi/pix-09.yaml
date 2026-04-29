@@ -1,0 +1,94 @@
+id: pix-09
+family: seg-spi
+title: "Seguranca da Conexao RSFN"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    A conexão entre o participante e o SPI deve ocorrer exclusivamente pela RSFN (Rede
+    do Sistema Financeiro Nacional), com autenticação mútua (mTLS) por certificado digital
+    ICP-Brasil, redundância de enlaces, monitoramento de disponibilidade e conformidade
+    com os padrões técnicos definidos pelo operador da rede. O participante direto deve
+    manter no mínimo dois enlaces independentes com a RSFN para garantir continuidade
+    operacional do canal Pix.
+guidance:
+  prose: |
+    **RSFN -- Rede do Sistema Financeiro Nacional:**
+    Rede privada de comunicacao de dados que interliga as instituicoes financeiras, as
+    instituicoes de pagamento participantes e o Banco Central do Brasil. E o unico meio
+    de acesso ao SPI.
+
+    **Requisitos de conexao:**
+    1. **mTLS obrigatorio:** Autenticacao mutua com certificado ICP-Brasil em ambos os
+       lados (participante e BCB).
+    2. **Redundancia:** Minimo dois enlaces independentes (provedor, rota fisica e
+       infraestrutura distintas).
+    3. **Disponibilidade:** SLA de 99,998% de uptime (maximo ~10 minutos de
+       indisponibilidade por mes).
+    4. **Latencia:** Tempo de ida e volta (RTT) maximo definido pelo BCB.
+    5. **Banda:** Capacidade suficiente para suportar o volume transacional de pico.
+
+    **Participante indireto:**
+    Conecta-se ao SPI por meio do participante direto que o patrocina. A seguranca do
+    enlace entre participante indireto e direto e responsabilidade de ambos.
+
+    **Failover:**
+    Em caso de falha de um enlace, o trafego deve migrar automaticamente para o enlace
+    alternativo sem interrupcao perceptivel ao usuario final.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Conectividade RSFN:**
+      1. Dois enlaces RSFN com provedores de telecomunicacao distintos.
+      2. Roteamento automatico com failover em menos de 30 segundos.
+      3. Monitoramento de ambos os enlaces com health checks a cada 5 segundos.
+      4. BGP ou equivalente para roteamento dinamico entre enlaces.
+
+      **Seguranca de rede:**
+      5. Firewall dedicado para trafego RSFN com regras restritivas (allowlist).
+      6. Segmentacao de rede: trafego RSFN em VLAN/VPC dedicada.
+      7. IDS/IPS monitorando trafego RSFN para detectar anomalias.
+      8. Registro de todo trafego RSFN para auditoria.
+
+      **Certificados:**
+      9. Certificados ICP-Brasil instalados em ambos os endpoints.
+      10. Renovacao automatica com janela de sobreposicao (certificado novo ativado
+          antes do antigo expirar).
+    tools:
+      - network-infrastructure
+      - firewall
+      - ids-ips
+      - bgp-routing
+      - cert-manager
+  devsecops:
+    prose: |
+      **Testes de conectividade:**
+      1. Testes automatizados de failover RSFN em ambiente de homologacao.
+      2. Testes de carga simulando volume de pico sobre ambos os enlaces.
+      3. Verificacao automatica de configuracao TLS e certificados em cada deploy.
+      4. Chaos engineering: simulacao de falha de enlace para validar failover.
+    tools:
+      - chaos-engineering
+      - load-testing
+      - gitlab-ci
+      - network-testing
+  secops:
+    prose: |
+      **Operacao de rede RSFN:**
+      1. NOC (Network Operations Center) monitorando enlaces RSFN 24x7.
+      2. Escalation automatico para falha de enlace.
+      3. Teste mensal de failover em horario de baixo trafego.
+      4. Relatorio mensal de disponibilidade dos enlaces RSFN.
+      5. Auditoria semestral de seguranca de rede RSFN.
+    tools:
+      - noc-platform
+      - network-monitoring
+      - incident-management
+      - siem
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-9", "art-18", "art-19"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-3", "art-12"]
+    relationship: complements

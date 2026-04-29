@@ -1,0 +1,86 @@
+id: rmf-c-02
+family: rmf-categorize
+title: "Categorization Review and Approval"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Review and approve the security categorization results for the information system.
+    The authorizing official or designated representative reviews the categorization
+    to ensure it accurately reflects the potential impact on organizational operations,
+    organizational assets, individuals, other organizations, and the Nation. The review
+    validates that all information types have been identified, impact levels are appropriately
+    assigned, and adjustments to provisional impact levels from NIST SP 800-60 are justified
+    and documented.
+
+guidance:
+  prose: >-
+    Categorization review serves as a quality gate ensuring that the risk basis for all
+    subsequent RMF activities is sound. The reviewer verifies that the system boundary is
+    well-defined, all information types are accounted for, and the impact determination
+    methodology was correctly applied. The review should also consider the system's operating
+    environment, interconnections with other systems, and any aggregation effects that may
+    elevate impact. Categorization approval is documented and retained as part of the system
+    security plan. Disagreements between the system owner and the authorizing official
+    regarding categorization are resolved through the organizational risk management process.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Categorize Step — Task C-2"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "CNSSI 1253, Security Categorization and Control Selection for National Security Systems"
+    url: "https://www.cnss.gov/CNSS/issuances/Instructions.cfm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement an automated categorization review workflow in the platform governance
+      tooling. When a system owner submits a categorization, the system should route it
+      to the assigned authorizing official for review and approval. Track the review
+      status, capture approval with digital signature or authenticated workflow action,
+      and timestamp the decision. Store the approved categorization as immutable metadata
+      associated with the system record. Prevent changes to infrastructure provisioning
+      that would exceed the approved categorization (e.g., processing higher-sensitivity
+      data than categorized) by enforcing data classification labels at the infrastructure
+      layer.
+    tools:
+      - backstage
+      - jira
+      - servicenow
+
+  devsecops:
+    prose: >-
+      Implement a merge request-based categorization review process. The system owner
+      creates or updates the categorization metadata file and submits it as a merge
+      request requiring approval from the authorizing official or designated
+      representative. Use CODEOWNERS to enforce that categorization files can only be
+      merged with AO approval. Maintain an audit trail of all categorization changes
+      through version control history. Block pipeline execution for production
+      deployments if the categorization has not been approved within the governance
+      workflow.
+    tools:
+      - gitlab-merge-requests
+      - gitlab-codeowners
+      - gitlab-approval-rules
+
+  secops:
+    prose: >-
+      Configure the GRC platform to enforce categorization review and approval
+      workflows. Track approval status, reviewer identity, approval date, and any
+      conditions or exceptions noted during review. Generate alerts when categorizations
+      are pending review beyond the defined SLA. Conduct annual categorization
+      revalidation reviews to ensure that categorizations remain accurate as systems
+      evolve. Produce audit reports showing categorization review history and any
+      instances where categorization was changed after initial approval, with
+      documented justification for each change.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "CA-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.12"]
+    relationship: mapped

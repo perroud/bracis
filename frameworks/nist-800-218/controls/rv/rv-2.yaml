@@ -1,0 +1,91 @@
+id: rv-2
+family: rv
+title: "Assess, Prioritize, and Remediate Vulnerabilities"
+class: SP800-218
+statement:
+  prose: >-
+    Help ensure that vulnerabilities are remediated in accordance with risk to reduce the
+    window of opportunity for attackers. Assess, prioritize, and remediate vulnerabilities
+    based on their severity, exploitability, exposure, and business impact.
+  parts:
+    - id: rv-2_smt.a
+      label: "a."
+      prose: >-
+        Assess each vulnerability using a standardized severity scoring methodology (CVSS, SSVC)
+        that considers exploitability, impact, exposure, and environmental factors specific to
+        the organization's deployment context.
+    - id: rv-2_smt.b
+      label: "b."
+      prose: >-
+        Define and enforce remediation timelines based on severity, with critical vulnerabilities
+        requiring emergency remediation, and track compliance with remediation SLAs across
+        the organization.
+    - id: rv-2_smt.c
+      label: "c."
+      prose: >-
+        Remediate vulnerabilities through patches, updates, configuration changes, or
+        compensating controls, and verify that remediations are effective and do not introduce
+        new vulnerabilities.
+guidance:
+  prose: >-
+    Not all vulnerabilities are equal — effective vulnerability management requires risk-based
+    prioritization. Organizations should consider not only the CVSS score but also
+    exploitability (is there a public exploit?), exposure (is the vulnerable component
+    reachable from the internet?), and business impact (what data or functionality is at risk?).
+    CISA's Stakeholder-Specific Vulnerability Categorization (SSVC) provides a decision-tree
+    framework for prioritization. Remediation timelines should be proportional to risk: critical
+    exploitable vulnerabilities in internet-facing systems demand hours, while low-severity
+    findings in internal tools may tolerate weeks. All remediations should be verified through
+    rescanning or testing.
+references:
+  - citation: "NIST SP 800-218 Section 2.4"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "CISA SSVC"
+    url: "https://www.cisa.gov/stakeholder-specific-vulnerability-categorization-ssvc"
+  - citation: "CISA KEV Catalog"
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated vulnerability prioritization in the platform's vulnerability
+      management system using contextual data (SBOM, deployment topology, network exposure).
+      Enforce remediation SLAs through platform policies that track vulnerability age and
+      escalate when deadlines approach or expire. Provide automated patching pipelines for
+      common remediation scenarios (dependency updates, base image updates). Integrate CISA KEV
+      catalog checks to automatically elevate vulnerabilities with known exploitation.
+    tools:
+      - "DefectDojo (prioritization)"
+      - "Renovate / Dependabot (auto-patching)"
+      - "CISA KEV Integration"
+      - "GitLab Security Policies"
+      - "Backstage Scorecards (SLA tracking)"
+  devsecops:
+    prose: >-
+      Automate vulnerability remediation workflows: dependency vulnerabilities trigger automated
+      update merge requests, container vulnerabilities trigger base image rebuild pipelines, and
+      code vulnerabilities create pre-populated fix tickets assigned to responsible teams.
+      Enforce remediation SLAs in pipeline policies that can block deployments of software
+      exceeding maximum vulnerability age. Implement automated verification scanning after
+      remediation to confirm fixes are effective. Track CISA KEV entries and auto-escalate
+      matching vulnerabilities.
+    tools:
+      - "Renovate / Dependabot"
+      - "GitLab Auto-Remediation"
+      - "Snyk Fix (auto-fix PRs)"
+      - "Trivy (verification scanning)"
+      - "GitLab CI/CD (SLA enforcement)"
+      - "Jira / GitLab Issues (tracking)"
+  secops:
+    prose: >-
+      Monitor vulnerability remediation progress against defined SLAs and escalate overdue
+      findings. Report on organizational remediation metrics including mean time to remediate
+      (MTTR), SLA compliance rates, and vulnerability backlog trends. Verify that remediations
+      are deployed to all affected environments. Conduct risk acceptance reviews for
+      vulnerabilities that cannot be remediated within defined timelines and enforce
+      time-bounded exception approvals.
+    tools:
+      - "DefectDojo"
+      - "GitLab Security Dashboard"
+      - "SIEM (Splunk, Elastic Security)"
+      - "GRC Platforms (ServiceNow, Archer)"
+      - "CISA KEV Catalog"

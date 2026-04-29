@@ -1,0 +1,108 @@
+id: art-17
+family: cap-4
+title: "Registro de Operacoes PIX e Pagamentos Instantaneos"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 17. As instituições de pagamento participantes do arranjo PIX ou de outros
+    arranjos de pagamento instantâneo devem manter registros adicionais para fins
+    de PLD/FT, incluindo:
+
+    I - os dados de identificação do pagador e do recebedor, incluindo a chave PIX
+    utilizada quando aplicável;
+
+    II - o valor, a data, a hora e o tipo de operação PIX (transferência, pagamento,
+    Pix Saque, Pix Troco, Pix Cobrança);
+
+    III - dados de iniciação da transação: canal, dispositivo, IP de origem
+    e localização geográfica, quando disponível;
+
+    IV - qualquer dado adicional do DICT (Diretório de Identificadores de Contas
+    Transacionais) relevante para a identificação das partes.
+
+    Parágrafo único. Os registros de operações PIX devem estar integrados ao
+    sistema de monitoramento de PLD/FT da instituição para possibilitar a
+    detecção de padrões suspeitos.
+guidance:
+  prose: |
+    O art. 17 e especifico para o ecossistema PIX -- o arranjo de pagamento
+    instantaneo brasileiro que domina a IP do BCB.
+
+    **Por que o PIX exige tratamento especial:**
+    - Disponibilidade 24x7x365 (sem horario de corte)
+    - Velocidade de liquidacao (segundos)
+    - Volume altissimo de transacoes
+    - Possibilidade de operacoes de qualquer valor (inclusive baixo, abaixo dos
+      limiares do art. 16)
+    - Facilidade de uso por dispositivos moveis em qualquer localidade
+
+    **Tipos de PIX relevantes para PLD/FT:**
+    - Pix Saque: saque de especie em estabelecimento comercial → risco de placement
+    - Pix Troco: parte em especie → idem
+    - Pix Cobranca: pagamento de boletos e cobranças via PIX
+    - PIX entre entidades distintas: possivel fragmentacao de valores
+
+    **DICT (Diretorio de Identificadores de Contas Transacionais):**
+    O DICT do BCB armazena as chaves PIX (CPF, CNPJ, email, telefone, chave aleatoria).
+    A IP deve registrar qual chave foi usada em cada transacao para auditoria.
+
+    **Integracao com monitoramento (paragrafo unico):**
+    Nao basta registrar -- os dados do PIX devem alimentar o sistema de monitoramento
+    em tempo real ou quasi-real para detectar padroes suspeitos no volume
+    caracteristico do PIX.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de dados PIX para PLD/FT:**
+      1. Capturar todos os campos obrigatorios (incisos I-IV) em cada evento
+         PIX, armazenando em tabela especifica de "operacoes_pix_pldft".
+      2. Enriquecer transacoes com dados do DICT via API do BCB: validar
+         chave de destino e registrar dados do recebedor.
+      3. Stream de eventos PIX para o motor de monitoramento AML em tempo
+         quasi-real (latencia < 5 segundos do liquidacao ao alerta).
+      4. Armazenar IP e fingerprint de dispositivo para cada transacao PIX
+         iniciada pelo canal digital.
+      5. Modulo de deteccao de fragmentacao PIX: identificar quando um pagador
+         realiza multiplas transacoes menores para o mesmo recebedor dentro de
+         janela de tempo (ex: 10 transacoes de R$ 1.000 em 1 hora).
+    tools:
+      - pix-monitoring
+      - event-streaming
+      - transaction-monitoring
+      - aml-platform
+  devsecops:
+    prose: |
+      **Integracao e testes PIX:**
+      1. Testes de integracao com o SPI (Sistema de Pagamentos Instantaneos)
+         do BCB para verificar captura correta de dados.
+      2. Testes de todos os tipos de PIX: transferencia, pagamento, saque, troco.
+      3. Testes de latencia do stream de eventos: garantir que o monitoramento
+         recebe dados dentro do SLA.
+      4. Testes de carga: simular picos de transacoes PIX (Black Friday, fim
+         de mes) e verificar que o registro e monitoramento aguentam.
+    tools:
+      - gitlab-ci
+      - load-testing
+      - api-testing
+  secops:
+    prose: |
+      **Monitoramento de PIX em PLD/FT:**
+      1. Dashboard em tempo real de volume, valor e padroes de PIX.
+      2. Alertas de anomalias: picos de volume, transacoes para recebedores
+         novos, fragmentacao detectada.
+      3. Relatorio diario de PIX Saque e Pix Troco (especie -- risco especifico).
+      4. Revisao semanal de clientes com alto volume de PIX para contas
+         multiplas (possivel smurfing digital).
+    tools:
+      - pix-monitoring
+      - aml-platform
+      - siem
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-19"]
+    relationship: equivalent-to
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

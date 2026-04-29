@@ -1,0 +1,131 @@
+id: art-10
+family: cap-3
+title: "Terceirizacao da Funcao de Conformidade"
+class: CMN-4606
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 10. As atribuições da função de conformidade de que trata o art. 9
+    podem ser exercidas por estrutura de outra empresa do mesmo conglomerado
+    ou de empresa prestadora de serviços, desde que:
+
+    I - a instituição mantenha a responsabilidade pelas atividades terceirizadas;
+
+    II - o prestador de serviços tenha capacidade técnica comprovada para a
+    execução das atividades;
+
+    III - o prestador de serviços não esteja impedido por conflito de interesses;
+
+    IV - seja assegurado o acesso do Banco Central do Brasil ao prestador de
+    serviços e às informações sobre as atividades por ele desenvolvidas;
+
+    V - a instituição mantenha documentação sobre as atividades desenvolvidas
+    pelo prestador de serviços.
+guidance:
+  prose: |
+    O art. 10 admite que a funcao de conformidade seja exercida por terceiros —
+    via terceirizacao interna (outra empresa do grupo) ou externa (fornecedor).
+    Porem impoe cinco condicoes rigorosas que nao eliminam a responsabilidade da IF.
+
+    **Terceirizacao interna (conglomerado):**
+    Modelo comum em grandes grupos financeiros: a holding tem uma equipe centralizada
+    de compliance que presta servicos para todas as subsidiarias. Eficiente em custo
+    e consistencia, mas requer formalizacao contratual mesmo entre entidades do grupo.
+
+    **Terceirizacao externa:**
+    Tipica em instituicoes de menor porte (S4/S5) que nao tem escala para manter
+    equipe interna. Consultorias especializadas em compliance financeiro podem
+    exercer as funcoes do art. 9.
+
+    **I. Responsabilidade intransferivel:**
+    A terceirizacao nao transfere a responsabilidade regulatoria. Se o prestador
+    falhar, a IF responde perante o BCB. A IF deve ter supervisao ativa (nao pode
+    terceirizar e esquecer).
+
+    **II. Capacidade tecnica comprovada:**
+    O prestador deve demonstrar conhecimento da regulamentacao brasileira do SFN,
+    experiencia setorial e qualificacao tecnica. A IF deve fazer due diligence
+    antes da contratacao e periodicamente.
+
+    **III. Ausencia de conflito de interesses:**
+    O prestador nao pode ter relacoes que comprometam sua independencia. Ex: uma
+    consultoria que tambem presta servicos de negocio para a IF nao deveria exercer
+    a funcao de compliance (conflito entre auditar e assessorar o mesmo cliente).
+
+    **IV. Acesso irrestrito do BCB:**
+    O BCB pode inspecionar diretamente o prestador de servicos, sem necessidade de
+    intermediacao da IF. O contrato deve prever essa clausula explicitamente.
+
+    **V. Documentacao das atividades:**
+    A IF deve manter registro do que o prestador faz: atividades realizadas, datas,
+    resultados, achados, relatorios entregues. Nao basta o contrato — precisa do
+    registro de execucao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para modelo terceirizado:**
+      1. Plataforma de GRC acessivel ao prestador: o fornecedor de compliance acessa
+         o sistema da IF com permissoes adequadas, nao opera em sistema proprio
+         desconectado.
+      2. Portal do prestador: ambiente seguro e auditado onde o prestador registra
+         suas atividades, sobe evidencias e entrega relatorios.
+      3. Segregacao de ambientes: mesmo terceirizando, o CCO da IF mantem acesso
+         aos dados e pode verificar o trabalho do prestador a qualquer momento.
+      4. Acesso BCB: a plataforma tem perfil de acesso especifico para o BCB
+         (somente leitura, com escopo limitado ao compliance), ativavel mediante
+         solicitacao de supervisao.
+      5. Continuidade: plano de contingencia documentado para o caso de interrupcao
+         do servico do prestador, garantindo que as obrigacoes do art. 9 continuem
+         sendo cumpridas.
+    tools:
+      - grc-platform
+      - vendor-portal
+      - identity-governance
+      - access-management
+      - continuity-management
+  devsecops:
+    prose: |
+      **Controles DevSecOps para terceirizacao:**
+      1. Onboarding tecnico do prestador: provisionamento controlado de acessos
+         via pipeline, com aprovacao do CCO, auditoria de todo acesso concedido.
+      2. Monitoramento de atividades do prestador: logs completos de todos os
+         acessos e acoes realizadas pelo prestador no ambiente da IF.
+      3. Offboarding automatizado: ao terminar contrato ou credencial expirar,
+         revogacao automatica de todos os acessos do prestador.
+      4. SLA monitoring: alertas automaticos quando prestador nao cumpre SLAs
+         contratados (ex: relatorio nao entregue no prazo, acoes em atraso).
+      5. Pipeline de compliance review: mesmo com funcao terceirizada, os gates
+         de compliance no pipeline CI/CD sao configurados pela IF e geridos
+         conjuntamente com o prestador.
+    tools:
+      - identity-management
+      - audit-logging
+      - sla-monitoring
+      - access-lifecycle-management
+      - gitlab-ci
+  secops:
+    prose: |
+      **Gestao operacional da terceirizacao:**
+      1. Due diligence pre-contratacao: avaliacao de capacidade tecnica, historico
+         regulatorio do prestador, referencias e eventual conflito de interesses.
+      2. Contrato com clausulas especificas: responsabilidade da IF (inciso I),
+         capacidade tecnica (II), conflito de interesses (III), acesso BCB (IV)
+         e documentacao (V) — todos os cinco incisos mapeados em clausulas contratuais.
+      3. Modelo de governanca: comite de supervisao da terceirizacao com reunioes
+         mensais, revisao de SLAs, escalacao de problemas ao CCO.
+      4. Supervisao ativa do CCO: o CCO da IF, mesmo com funcao terceirizada, mantem
+         revisao das entregas, questionamento dos resultados e responsabilidade final.
+      5. Revisao anual do prestador: avaliacao formal de desempenho, capacidade
+         tecnica, eventuais conflitos surgidos e decisao de renovacao/substituicao.
+      6. Plano de saida: procedimento documentado para internalizar a funcao ou
+         migrar para outro prestador em caso de rescisao.
+    tools:
+      - vendor-management
+      - contract-management
+      - grc-platform
+      - audit-management
+      - continuity-planning
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-27"]
+    relationship: complements

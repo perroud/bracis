@@ -1,0 +1,126 @@
+id: art-25
+family: cap-5
+title: "Deteccao e Mitigacao de Vieses Algoritmicos"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 25. Desenvolvedores e operadores de sistemas de IA médica devem
+    implementar processo contínuo de detecção e mitigação de vieses
+    algorítmicos:
+
+    I - avaliação sistemática de vieses deve ser realizada em todas as
+    etapas do ciclo de vida do modelo: dados de treinamento, treinamento,
+    validação e operação em produção;
+
+    II - métricas de equidade devem ser calculadas e monitoradas por
+    subgrupo demográfico relevante, incluindo, no mínimo: equalized odds,
+    demographic parity e calibração por subgrupo;
+
+    III - quando viés significativo for detectado, o desenvolvedor deve
+    implementar técnicas de mitigação apropriadas, documentando a abordagem
+    utilizada e seu impacto nas métricas de equidade e performance;
+
+    IV - o médico usuário deve ser informado sobre vieses residuais
+    conhecidos do sistema e suas implicações clínicas;
+
+    V - vieses que resultem em discriminação sistemática de subgrupos
+    de pacientes constituem violação dos princípios éticos do art. 4
+    e devem levar à desativação imediata do sistema até mitigação.
+guidance:
+  prose: |
+    O art. 25 trata de vieses algoritmicos com abordagem tecnica e
+    operacional, nao apenas principiologica.
+
+    **Tipos de vies em IA medica:**
+
+    - Vies de dados: dataset de treinamento nao representativo ou
+      com rotulos enviesados (ex: diagnosticos historicamente
+      subnotificados em populacoes marginalizadas).
+
+    - Vies de modelo: arquitetura ou hiperparametros que amplificam
+      desigualdades presentes nos dados.
+
+    - Vies de medicao: instrumentos de medicao com performance
+      diferencial por grupo (ex: oximetro com menor precisao em
+      peles escuras — estudo NEJM 2020).
+
+    - Vies de automacao: medicos que confiam mais na IA para
+      pacientes de grupos especificos, amplificando desigualdades.
+
+    **Metricas de equidade (inciso II):**
+
+    - Equalized odds: mesma taxa de verdadeiro positivo e falso
+      positivo entre subgrupos.
+    - Demographic parity: mesma taxa de predicao positiva entre
+      subgrupos.
+    - Calibracao por subgrupo: quando o modelo diz "70% de
+      probabilidade", isso se verifica igualmente para todos os
+      subgrupos.
+
+    **Mitigacao vs desativacao (incisos III e V):**
+    Vieses residuais conhecidos sao aceitaveis se documentados e
+    comunicados. Discriminacao sistematica (impacto clinico adverso
+    significativo em subgrupo) exige desativacao imediata.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de fairness:**
+      1. Implementar framework de fairness-aware ML na plataforma:
+         calculo automatico de equalized odds, demographic parity e
+         calibracao por subgrupo para todo modelo em producao.
+      2. Configurar monitoramento continuo de metricas de equidade
+         em producao, com alertas automaticos quando limiar de
+         equidade for violado.
+      3. Implementar toolkit de mitigacao de bias: re-sampling,
+         re-weighting, adversarial debiasing, calibracao pos-hoc —
+         disponivel como servico para equipes de ML.
+      4. Criar dashboard de equidade com visualizacao por subgrupo,
+         tendencias temporais e comparacao com limiares aceitaveis.
+    tools:
+      - fairness-toolkit
+      - bias-monitoring
+      - mitigation-tools
+      - equity-dashboard
+  devsecops:
+    prose: |
+      **Deteccao de bias no pipeline:**
+      1. Implementar testes de fairness obrigatorios no pipeline de
+         CI/CD: nenhum modelo passa para producao sem avaliacao de
+         equidade por subgrupo.
+      2. Automatizar deteccao de bias em dados de treinamento antes
+         do treinamento: verificar distribuicao, rotulagem e
+         representatividade.
+      3. Implementar gate de equidade: bloquear deploy quando
+         diferenca de performance entre subgrupos exceder limiar.
+      4. Documentar automaticamente vieses residuais e tecnicas de
+         mitigacao aplicadas como parte do model card.
+    tools:
+      - gitlab-ci
+      - fairness-tests
+      - bias-detection
+      - model-cards
+  secops:
+    prose: |
+      **Governanca de equidade:**
+      1. Auditar metricas de equidade periodicamente para todos os
+         modelos em producao, com relatorio ao comite de governanca.
+      2. Investigar denuncias de discriminacao algoritmica com
+         protocolo definido: coleta de evidencias, analise tecnica,
+         decisao de continuidade ou desativacao.
+      3. Manter registro de vieses identificados, mitigacoes
+         aplicadas e vieses residuais comunicados aos medicos.
+      4. Reportar ao CRM eventuais desativacoes por discriminacao
+         sistematica conforme inciso V.
+    tools:
+      - grc-platform
+      - bias-audit
+      - discrimination-investigation
+      - regulatory-reporting
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-10", "art-71"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["map-2", "measure-2", "manage-1"]
+    relationship: mapped

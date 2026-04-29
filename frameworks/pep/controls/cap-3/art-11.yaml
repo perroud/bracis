@@ -1,0 +1,106 @@
+id: art-11
+family: cap-3
+title: "Validade Juridica do PEP com Assinatura Digital"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 11. O prontuário eletrônico do paciente que atenda aos
+    requisitos do NGS2 -- assinatura digital com certificado ICP-Brasil
+    e carimbo de tempo -- tem a mesma validade jurídica do prontuário
+    em papel assinado manualmente pelo profissional de saúde.
+
+    Parágrafo 1. Documentos médicos gerados a partir do PEP com
+    assinatura digital ICP-Brasil são válidos para todos os fins
+    legais, incluindo processos éticos, civis, penais e
+    administrativos.
+
+    Parágrafo 2. A instituição de saúde é responsável por manter a
+    infraestrutura tecnológica que garanta a verificabilidade das
+    assinaturas digitais e carimbos de tempo ao longo de todo o
+    período de guarda do prontuário.
+guidance:
+  prose: |
+    O art. 11 confere ao PEP com NGS2 a mesma forca probatoria do
+    documento em papel. E o artigo que fundamenta juridicamente a
+    transicao total para o eletronico.
+
+    **Equiparacao legal:**
+    Com NGS2, o PEP e equivalente ao papel para TODOS os fins:
+    - Processos eticos no CRM (defesa profissional)
+    - Processos civis (erro medico, responsabilidade)
+    - Processos penais (lesao corporal, homicidio culposo)
+    - Processos administrativos (auditoria de operadoras)
+
+    **Responsabilidade da instituicao (paragrafo 2):**
+    A instituicao assume o onus de manter a infraestrutura funcional
+    para verificacao de assinaturas e carimbos de tempo por 20+ anos.
+    Isso inclui migracoes de tecnologia, atualizacao de algoritmos
+    criptograficos e preservacao de cadeias de certificacao.
+
+    **Risco de nao conformidade:**
+    Se a instituicao nao conseguir provar a validade da assinatura
+    digital em juizo (ex.: cadeia de certificacao perdida, carimbo
+    de tempo invalido), o documento eletronico perde valor probatorio
+    e a instituicao fica sem prova documental.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Preservacao de validade juridica a longo prazo:**
+      1. Implementar Long-Term Validation (LTV) para assinaturas
+         digitais: incorporar todas as evidencias de validacao
+         (certificados da cadeia, respostas OCSP, LCR) ao
+         documento assinado no momento da assinatura.
+      2. Implementar re-timestamp periodico (a cada 5 anos ou
+         antes da depreciacao do algoritmo de hash) para estender
+         a validade probatoria das assinaturas.
+      3. Manter repositorio de cadeias de certificacao historicas
+         da ICP-Brasil para validacao futura de assinaturas antigas.
+      4. Implementar servico de verificacao de assinatura digital
+         acessivel para auditorias internas e externas.
+    tools:
+      - ltv-signature
+      - certificate-archive
+      - signature-verification-service
+      - re-timestamp-scheduler
+  devsecops:
+    prose: |
+      **Testes de validade a longo prazo:**
+      1. Testar verificacao de assinaturas com certificados
+         expirados mas com carimbo de tempo valido.
+      2. Simular cenario de cadeia de certificacao indisponivel
+         e validar que LTV permite verificacao offline.
+      3. Testar processo de re-timestamp: assinatura antiga
+         recebe novo carimbo de tempo sem invalidar original.
+      4. Criar testes de regressao para o servico de verificacao
+         de assinatura digital.
+    tools:
+      - gitlab-ci
+      - ltv-validation-tests
+      - signature-verification-tests
+      - long-term-tests
+  secops:
+    prose: |
+      **Governanca de validade juridica:**
+      1. Manter politica de preservacao digital que defina
+         responsabilidades e processos para garantir validade
+         juridica dos registros por 20+ anos.
+      2. Monitorar publicacoes da ICP-Brasil sobre depreciacao
+         de algoritmos e planejar migracoes com antecedencia.
+      3. Realizar auditoria anual de verificabilidade de
+         assinaturas: selecionar amostra de registros antigos
+         e verificar que assinaturas ainda sao validaveis.
+      4. Manter seguro de responsabilidade civil para cobertura
+         de riscos relacionados a perda de validade documental.
+    tools:
+      - digital-preservation-policy
+      - crypto-monitoring
+      - signature-audit
+      - risk-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312"]
+    relationship: mapped

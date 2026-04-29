@@ -1,0 +1,144 @@
+id: art-2
+family: cap-1
+title: "Definicoes e Categorias de Incidentes Ciberneticos"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 2. Para fins desta Instrução Normativa, os incidentes de segurança
+    cibernética são classificados nas seguintes categorias:
+
+    I - incidentes de acesso não autorizado: acessos a sistemas, redes ou dados
+    sem autorização prévia, incluindo comprometimento de credenciais;
+    II - incidentes de código malicioso: infecção por malware, ransomware, spyware,
+    ou qualquer software com fins maliciosos;
+    III - incidentes de disponibilidade: ataques ou falhas que comprometam a
+    disponibilidade de sistemas críticos, incluindo ataques de negação de serviço;
+    IV - incidentes de vazamento de dados: exposição não autorizada de informações
+    confidenciais, pessoais ou sensíveis;
+    V - incidentes de integridade: alteração não autorizada de dados, sistemas ou
+    configurações;
+    VI - fraude cibernética: uso de meios cibernéticos para obtenção de vantagem
+    ilícita, incluindo engenharia social e phishing;
+    VII - outros incidentes de relevância regulatória: demais eventos que, a critério
+    da instituição ou do BCB, sejam relevantes para a estabilidade do sistema
+    financeiro ou para a proteção dos clientes.
+guidance:
+  prose: |
+    O art. 2 establece taxonomia operacional de incidentes para fins de classificacao
+    e notificacao. Esta taxonomia e exaustiva para as categorias mais comuns, mas
+    aberta pela categoria VII.
+
+    **Categoria I - Acesso nao autorizado:**
+    Abrange comprometimento de contas privilegiadas (admin), acesso indevido a bases
+    de dados de clientes, uso de credenciais de funcionarios desligados, acesso via
+    vulnerabilidades de autenticacao. O incidente se materializa no acesso, nao na
+    exfiltracao de dados (que configuraria adicionalmente a categoria IV).
+
+    **Categoria II - Codigo malicioso:**
+    Ransomware merece destaque especial pelo impacto na disponibilidade e potencial
+    de exfiltracao de dados combinado. Um ransomware pode configurar simultaneamente
+    as categorias II, III e IV. A notificacao deve indicar todas as categorias aplicaveis.
+
+    **Categoria III - Disponibilidade:**
+    DDoS (Distributed Denial of Service) e o exemplo classico. Inclui tambem falhas
+    em sistemas de terceiros que impactem a disponibilidade (ex: CDN, DNS, cloud provider).
+    A materialidade e avaliada pelo tempo de indisponibilidade e pelo volume de clientes
+    afetados.
+
+    **Categoria IV - Vazamento de dados:**
+    Inclui vazamentos ativos (exfiltracao) e passivos (exposicao por misconfiguracao,
+    bucket S3 publico, endpoint desprotegido). O vazamento de dados de clientes ativa
+    obrigacoes cumulativas com a LGPD (notificacao a ANPD).
+
+    **Categoria V - Integridade:**
+    Inclui alteracao de saldos, manipulacao de registros de transacoes, adulteracao
+    de configuracoes de sistemas criticos. Pode ter impacto financeiro direto.
+
+    **Categoria VI - Fraude cibernetica:**
+    BEC (Business Email Compromise), SIM swap, phishing direcionado (spear phishing),
+    vishing, smishing. Relevante quando o canal cibernetico e o meio da fraude,
+    nao apenas o vetor de acesso.
+
+    **Multiplas categorias:**
+    Um unico incidente pode se enquadrar em varias categorias simultaneamente.
+    A notificacao deve listar todas as categorias aplicaveis para que o BCB possa
+    categorizar adequadamente para fins de analise sistemica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Taxonomia no sistema de incidentes:**
+      1. Configurar no sistema de gestao de incidentes as sete categorias da IN 291
+         como campos padronizados de classificacao (multi-select para permitir
+         multiplas categorias por incidente).
+      2. Motor de classificacao automatica no SOAR:
+         - Alertas de EDR com IOC de malware -> categoria II
+         - Alertas de DLP com exfiltracao detectada -> categoria IV
+         - Alertas de WAF de brute force bem-sucedido -> categoria I
+         - Alertas de DDoS (NetFlow anomaly) -> categoria III
+         - Alertas de integridade (file integrity monitoring) -> categoria V
+      3. Regras de correlacao no SIEM para detectar patterns multi-categoria
+         (ex: malware + DLP alert = categorias II + IV simultaneamente).
+      4. Metricas de volume por categoria para analise de tendencias e relatorio
+         anual ao BCB.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - edr
+      - dlp
+      - waf
+      - fim
+  devsecops:
+    prose: |
+      **Deteccao especifica por categoria no pipeline:**
+      1. Categoria I: secret scanning e credencial rotation obrigatoria apos qualquer
+         exposicao detectada no codigo.
+      2. Categoria II: container scanning e dependency scanning para detectar
+         componentes com malware conhecido antes do deploy.
+      3. Categoria IV: SAST com regras especificas para deteccao de exposicao de dados
+         (logging de dados sensiveis, endpoints sem autenticacao, queries sem sanitizacao).
+      4. Categoria V: file integrity monitoring em configuracoes criticas de producao,
+         com alertas integrados ao fluxo de incidentes.
+      5. Labels de repositorio indicando quais categorias de incidente sao mais
+         provaveis para o sistema (baseado em analise de risco).
+    tools:
+      - gitlab-ci
+      - secret-detection
+      - sast
+      - container-scanning
+      - dependency-scanning
+      - fim
+  secops:
+    prose: |
+      **Processo de classificacao por categoria:**
+      1. Playbook especifico para cada categoria de incidente com:
+         - Sinais de identificacao
+         - Acoes imediatas de contencao
+         - Evidencias a coletar
+         - Criterios de materialidade para notificacao ao BCB
+      2. Treinamento diferenciado por categoria:
+         - Categoria I: IAM forensics, log analysis
+         - Categoria II: malware analysis, sandboxing
+         - Categoria III: DDoS mitigation, availability tracking
+         - Categoria IV: DLP forensics, data mapping
+         - Categoria VI: fraud investigation techniques
+      3. Decision tree documentada para determinar se incidente ativa obrigacao
+         cumulativa de notificacao a ANPD (categorias I, IV e VI com dados pessoais).
+      4. Exercicio de simulacao semestral cobrindo ao menos tres categorias distintas.
+    tools:
+      - soar
+      - siem
+      - incident-management
+      - malware-sandbox
+      - forensic-tools
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-3"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46", "art-48"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-5"]
+    relationship: supports

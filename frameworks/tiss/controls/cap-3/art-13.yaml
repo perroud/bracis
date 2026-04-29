@@ -1,0 +1,113 @@
+id: art-13
+family: cap-3
+title: "Controle de Acesso Baseado em Perfis"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 13. Os sistemas que processam transações TISS devem implementar
+    controle de acesso baseado em perfis (RBAC), garantindo que cada
+    usuário acesse apenas os dados e funcionalidades necessários para
+    o exercício de suas atribuições.
+
+    Parágrafo 1. Os perfis de acesso devem incluir, no mínimo:
+    I - Administrador: configuração do sistema e gestão de usuários;
+    II - Operador de autorização: solicitação e análise de autorizações;
+    III - Operador de faturamento: envio e acompanhamento de cobranças;
+    IV - Auditor: consulta a transações e relatórios sem alteração;
+    V - Beneficiário: consulta a seus próprios dados assistenciais.
+
+    Parágrafo 2. O princípio do menor privilégio deve ser aplicado,
+    concedendo a cada usuário apenas as permissões estritamente
+    necessárias para suas funções.
+
+    Parágrafo 3. O acesso a dados de beneficiários por profissionais
+    de saúde deve ser restrito ao vínculo assistencial direto com o
+    paciente.
+guidance:
+  prose: |
+    O art. 13 implementa o principio do menor privilegio no contexto
+    TISS, onde dados de saude exigem controle granular.
+
+    **Matriz de acesso TISS:**
+    - Administrador: CRUD em configuracoes, sem acesso a dados clinicos
+    - Operador de autorizacao: leitura/escrita em guias de autorizacao
+    - Operador de faturamento: leitura/escrita em lotes e cobrancas
+    - Medico auditor: leitura em todas as guias, sem alteracao
+    - Profissional de saude: leitura/escrita em guias do paciente
+      atendido
+    - Beneficiario: leitura de seus proprios dados
+
+    **Vinculo assistencial:**
+    O acesso de profissionais de saude aos dados do paciente deve ser
+    condicionado a existencia de vinculo assistencial comprovavel
+    (agendamento, internacao, encaminhamento). Este requisito alinha
+    o TISS com o principio da necessidade (art. 6, III, LGPD).
+
+    **Segregacao de funcoes (SoD):**
+    - Quem autoriza nao pode faturar
+    - Quem fatura nao pode auditar
+    - Quem administra nao pode operar transacoes
+
+    **Break-glass:**
+    Mecanismo de emergencia para acesso em situacoes criticas
+    (urgencia medica), com registro obrigatorio e auditoria
+    posterior de toda acao realizada.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de RBAC para sistemas TISS:**
+      1. Implementar RBAC centralizado com os perfis minimos definidos
+         no art. 13, usando Identity Provider com suporte a claims/roles.
+      2. Configurar attribute-based access control (ABAC) para regras
+         de vinculo assistencial: profissional so acessa dados do
+         paciente se existir agendamento ou internacao ativa.
+      3. Implementar break-glass procedure com registro automatico
+         em log de auditoria protegido e alerta ao gestor.
+      4. Enforcar segregacao de funcoes (SoD) via policy engine
+         (OPA, Cedar) impedindo acumulo de perfis conflitantes.
+    tools:
+      - rbac-engine
+      - abac-engine
+      - policy-engine
+      - break-glass-system
+  devsecops:
+    prose: |
+      **Validacao de controle de acesso no pipeline:**
+      1. Implementar testes automatizados de autorizacao que validem
+         cada perfil RBAC contra a matriz de acesso TISS.
+      2. Criar testes negativos: usuario com perfil X nao deve
+         conseguir realizar acao Y (ex: operador de faturamento
+         nao acessa dados clinicos).
+      3. Automatizar auditoria de SoD: verificar se algum usuario
+         acumula perfis conflitantes.
+      4. Incluir verificacao de break-glass: registros devem existir
+         e alertas devem ser disparados em testes.
+    tools:
+      - authorization-testing
+      - negative-testing
+      - sod-audit
+      - break-glass-testing
+  secops:
+    prose: |
+      **Gestao operacional de acesso TISS:**
+      1. Realizar recertificacao trimestral de acessos: validar que
+         cada usuario possui apenas os perfis necessarios.
+      2. Monitorar uso de break-glass em tempo real com revisao
+         obrigatoria por gestor em ate 24 horas.
+      3. Auditar logs de acesso a dados de beneficiarios, verificando
+         existencia de vinculo assistencial em cada consulta.
+      4. Reportar metricas de acesso (usuarios ativos por perfil,
+         acessos break-glass, violacoes de SoD) mensalmente.
+    tools:
+      - access-recertification
+      - break-glass-monitoring
+      - access-audit
+      - access-metrics
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312-a-1"]
+    relationship: mapped

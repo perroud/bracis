@@ -1,0 +1,83 @@
+id: id.am-01
+family: id
+title: "Asset Management - Inventories of hardware managed by the organization are maintained"
+class: CSF2
+
+statement:
+  prose: >-
+    Inventories of hardware managed by the organization are maintained.
+
+guidance:
+  prose: >-
+    Maintaining accurate hardware inventories is essential for understanding the attack
+    surface and ensuring all assets receive appropriate security controls. Hardware
+    inventories must include physical servers, network devices, end-user devices,
+    IoT devices, and virtual machines. In cloud environments, the inventory extends
+    to compute instances, managed services, and serverless function configurations.
+    The inventory should record the asset owner, location (physical or cloud region),
+    operating system, network address, purpose, and classification. Automated discovery
+    tools should supplement manual registration to detect shadow IT. The inventory
+    must be reconciled regularly against actual deployed assets.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, ID.AM-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated asset discovery across all infrastructure layers. Use cloud
+      provider asset inventory APIs (AWS Config, Azure Resource Graph, GCP Cloud Asset
+      Inventory) for cloud resources. Use Kubernetes API for cluster workload inventory.
+      Aggregate all asset data into a centralized CMDB or service catalog (Backstage).
+      Enforce asset registration through IaC policies: any resource created without
+      proper tagging (owner, team, environment, classification) is automatically flagged
+      and quarantined. Implement drift detection to identify assets that exist in
+      production but not in the IaC codebase.
+    tools:
+      - aws-config
+      - azure-resource-graph
+      - gcp-cloud-asset-inventory
+      - backstage-catalog
+      - terraform
+      - pulumi
+
+  devsecops:
+    prose: >-
+      Enforce that all infrastructure code includes mandatory resource tagging. Use
+      pre-deployment checks (Checkov, tfsec) to reject IaC that creates untagged
+      resources. Maintain infrastructure inventories as code artifacts alongside
+      application code. Implement CI/CD pipeline steps that register newly deployed
+      assets in the CMDB automatically. Generate asset reports as pipeline artifacts
+      after each deployment.
+    tools:
+      - checkov
+      - tfsec
+      - terraform
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Run continuous network discovery scans to detect unmanaged assets. Compare
+      discovery results against the approved inventory and investigate discrepancies.
+      Alert on new assets appearing on the network that are not in the CMDB. Generate
+      monthly asset inventory reconciliation reports. Track asset lifecycle from
+      provisioning through decommissioning, ensuring decommissioned assets are
+      properly sanitized and removed from all systems.
+    tools:
+      - qualys
+      - tenable
+      - nmap
+      - forescout
+      - servicenow-cmdb
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PM-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.9"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-1.1"]
+    relationship: equivalent-to

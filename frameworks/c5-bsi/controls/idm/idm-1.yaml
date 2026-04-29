@@ -1,0 +1,91 @@
+id: idm-1
+family: idm
+title: "Access Control Policy"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall establish, document, and review an access
+    control policy based on business and security requirements. Access
+    to information and information processing facilities shall be
+    restricted in accordance with the access control policy. The
+    principle of least privilege shall be applied so that users are
+    only given the minimum level of access necessary to perform their
+    duties. Access rights shall be reviewed at regular intervals to
+    ensure they remain appropriate.
+
+guidance:
+  prose: >-
+    Access control is one of the most critical security domains for
+    cloud providers. The access control policy must define rules for
+    logical access to cloud infrastructure, management planes, customer
+    data, and administrative functions. It should mandate the principle
+    of least privilege, role-based access control, mandatory multi-factor
+    authentication for privileged accounts, and regular access reviews.
+    The policy must also address temporary and emergency access
+    procedures, including just-in-time (JIT) access provisioning.
+
+references:
+  - citation: "C5:2020, IDM-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity and access management (IAM) with
+      RBAC or ABAC policies enforced across all platform services. Use
+      policy-as-code (OPA/Rego) to define and enforce access control
+      policies consistently. Implement just-in-time (JIT) privilege
+      elevation for administrative access with automatic expiration.
+      Deploy automated access review workflows that periodically prompt
+      managers to certify their team members' access rights. Enforce
+      MFA for all administrative and privileged access.
+    tools:
+      - okta
+      - azure-ad
+      - vault
+      - open-policy-agent
+      - kubernetes-rbac
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce least-privilege access in CI/CD pipelines by using
+      short-lived, scoped credentials for deployment operations. Implement
+      pipeline-level RBAC that restricts who can trigger production
+      deployments. Use secret management tools to avoid hardcoding
+      credentials and rotate them automatically. Scan IaC templates
+      for overly permissive IAM policies before deployment.
+    tools:
+      - gitlab-ci
+      - vault
+      - checkov
+      - tfsec
+      - gitleaks
+
+  secops:
+    prose: >-
+      Monitor all access events and alert on anomalous patterns such
+      as access outside normal hours, access from unusual locations, or
+      privilege escalation. Implement user and entity behavior analytics
+      (UEBA) to detect compromised accounts. Generate periodic access
+      review reports and track remediation of excessive privileges.
+      Monitor for dormant accounts and trigger deprovisioning workflows.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - sailpoint
+      - crowdstrike
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a8.2", "a8.3"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["AC-1", "AC-2", "AC-3", "AC-6"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["IAM-01", "IAM-02", "IAM-04"]
+    relationship: mapped

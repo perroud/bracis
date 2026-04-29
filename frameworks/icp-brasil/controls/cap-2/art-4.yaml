@@ -1,0 +1,109 @@
+id: art-4
+family: cap-2
+title: "Simple Electronic Signature Requirements"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 4. da Lei 14.063/2020. A assinatura eletrônica simples, de que trata
+    o inciso II do caput do art. 2º desta Lei:
+
+    I - permitirá a identificação do seu signatário;
+
+    II - anexará ou associará dados a outros dados em formato eletrônico do
+    signatário.
+
+    § 1º É admitida a assinatura eletrônica simples em interações com ente
+    público de menor impacto e que não envolvam informações protegidas por
+    grau de sigilo.
+
+    § 2º O nível de exigência para a obtenção de assinatura eletrônica
+    simples será estabelecido por ato do titular do Poder ou do órgão de
+    cada ente público, observados os princípios da proporcionalidade e
+    razoabilidade.
+guidance:
+  prose: |
+    Article 4 defines the requirements and use cases for simple electronic
+    signatures, the lowest assurance level in the Brazilian framework.
+
+    **Core requirements:**
+    - Must identify the signer (authentication)
+    - Must associate data with the signer (attribution)
+
+    **Permitted use cases:**
+    - Low-impact interactions with government entities
+    - Documents that do not contain classified information
+    - Informational requests, public consultations, service scheduling
+
+    **Implementation in practice:**
+    The most common implementation is authentication via the gov.br platform,
+    which provides identity verification at bronze, silver, and gold levels.
+    A bronze-level gov.br account satisfies simple signature requirements.
+
+    **Limitations:**
+    - Cannot be used for documents with any classification level
+    - Cannot be used where specific regulation requires advanced or qualified
+    - Each government body defines which interactions accept simple signatures
+    - Does not carry automatic legal presumption (parties must accept it)
+
+    **Proportionality principle:**
+    Government bodies should not require higher signature levels than
+    necessary for the risk level of the interaction, avoiding unnecessary
+    barriers to digital government services.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implement simple signature capabilities:**
+      1. Integrate with gov.br Login (OpenID Connect) for citizen
+         authentication, supporting at minimum bronze-level accounts.
+      2. Implement session-based signature mechanism that captures user
+         identity, IP address, timestamp, and user-agent as signature
+         evidence.
+      3. Generate signature receipts (comprovante de assinatura) with
+         unique identifier, signer data, and timestamp.
+      4. Store signature evidence in tamper-evident audit log with
+         integrity protection (hash chain or similar).
+    tools:
+      - identity-provider
+      - gov-br-integration
+      - audit-log
+      - evidence-store
+  devsecops:
+    prose: |
+      **Simple signature integration in development workflows:**
+      1. Create reusable SDK/library for simple signature that
+         encapsulates gov.br authentication and evidence collection.
+      2. Include automated tests for simple signature flows in CI/CD
+         pipelines, testing both creation and verification.
+      3. Implement policy checks that prevent simple signatures on
+         document types requiring higher assurance levels.
+      4. Version the mapping of document types to permitted signature
+         levels as infrastructure-as-code configuration.
+    tools:
+      - gitlab-ci
+      - sdk-library
+      - policy-as-code
+      - integration-testing
+  secops:
+    prose: |
+      **Operational controls for simple signatures:**
+      1. Monitor for misuse of simple signatures on documents that
+         require advanced or qualified levels.
+      2. Maintain audit trail of all simple signature events with
+         sufficient evidence for non-repudiation.
+      3. Conduct periodic review of which interactions accept simple
+         signatures, ensuring alignment with risk classification.
+      4. Report simple signature usage metrics to compliance team
+         for regulatory reporting.
+    tools:
+      - siem
+      - audit-trail
+      - compliance-monitoring
+      - reporting-dashboard
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-3", "art-7"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

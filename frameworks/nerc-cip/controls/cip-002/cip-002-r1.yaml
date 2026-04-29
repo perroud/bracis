@@ -1,0 +1,116 @@
+id: cip-002-r1
+family: cip-002
+title: "BES Cyber System Categorization"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement a process that considers each of the
+    following assets for purposes of parts 1.1 through 1.3: Control Centers and
+    backup Control Centers; Transmission stations and substations; Generation
+    resources; Systems and facilities critical to system restoration; and Special
+    Protection Systems and Remedial Action Schemes. The Responsible Entity shall
+    categorize and document each BES Cyber System as High, Medium, or Low Impact
+    based on the criteria contained in CIP-002 Attachment 1.
+  parts:
+    - id: cip-002-r1.1
+      label: "1.1"
+      prose: >-
+        Identify each BES Cyber System associated with each asset that meets
+        criteria in CIP-002 Attachment 1, Section 1 (High Impact Rating).
+    - id: cip-002-r1.2
+      label: "1.2"
+      prose: >-
+        Identify each BES Cyber System associated with each asset that meets
+        criteria in CIP-002 Attachment 1, Section 2 (Medium Impact Rating).
+    - id: cip-002-r1.3
+      label: "1.3"
+      prose: >-
+        Identify each asset that contains a Low Impact BES Cyber System per
+        CIP-002 Attachment 1, Section 3 (Low Impact Rating).
+
+guidance:
+  prose: >-
+    CIP-002-5.1a R1 is the foundational requirement for all NERC CIP standards.
+    Accurate identification and categorization of BES Cyber Systems directly
+    determines which subsequent CIP requirements apply. The categorization must
+    be based on the potential impact that a compromise of the BES Cyber System
+    could have on the reliable operation of the Bulk Electric System. Entities
+    must maintain a current and comprehensive inventory that is reviewed at least
+    every 15 calendar months. The impact categorization drives the applicability
+    of all other CIP standards: High and Medium Impact systems face the most
+    stringent requirements, while Low Impact systems have a reduced but still
+    mandatory set of obligations.
+
+references:
+  - citation: "NERC CIP-002-5.1a — BES Cyber System Categorization"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-002-5.1a.pdf"
+  - citation: "NERC CIP-002 Attachment 1 — Impact Rating Criteria"
+    url: "https://www.nerc.com/pa/Stand/Pages/CIPStandards.aspx"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a centralized, machine-readable asset inventory (CMDB) that
+      captures all BES Cyber Systems and their impact categorization. Use
+      Infrastructure-as-Code to declare and version the inventory of operational
+      technology (OT) and information technology (IT) assets that support BES
+      operations. Implement automated discovery tools that continuously scan
+      network segments associated with control centers, substations, and
+      generation facilities to detect unregistered BES Cyber Assets. Tag all
+      infrastructure resources (VMs, containers, network devices) with their
+      CIP impact rating so that downstream policy enforcement can reference the
+      categorization. Integrate the asset inventory with the internal developer
+      portal to provide real-time visibility into categorization status and
+      review deadlines.
+    tools:
+      - backstage
+      - terraform
+      - ansible
+      - servicenow-cmdb
+      - nmap
+      - grafana
+
+  devsecops:
+    prose: >-
+      Store BES Cyber System categorization records as version-controlled YAML
+      or JSON artifacts in a Git repository with mandatory merge request
+      approvals. Implement CI pipeline validation that ensures every
+      categorization change includes required metadata (asset type, impact
+      rating, justification, reviewer). Create automated checks that flag
+      categorization records older than 15 months for mandatory review.
+      Enforce branch protection rules on the categorization repository so
+      that only authorized personnel can approve changes. Integrate
+      categorization data into deployment pipelines so that systems touching
+      High or Medium Impact BES Cyber Systems automatically trigger enhanced
+      security controls.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Continuously monitor the BES Cyber System inventory for completeness
+      and accuracy using automated reconciliation between the CMDB and
+      network discovery scans. Generate alerts when new assets are detected
+      in BES-associated network segments that have not been categorized.
+      Produce periodic reports for compliance teams showing categorization
+      status, upcoming review deadlines, and any discrepancies between
+      declared and discovered assets. Map categorization records to
+      downstream CIP requirement applicability so that audit evidence
+      generation is automated per impact level.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - tenable
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "PM-5", "CM-8"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-1-4.2"]
+    relationship: supports

@@ -1,0 +1,93 @@
+id: art-32
+family: cap-5
+title: "Bloqueio de Operacoes Suspeitas"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 32. Quando houver fundada suspeita de que uma operação está relacionada
+    à lavagem de dinheiro ou ao financiamento do terrorismo, os participantes
+    devem, antes da sua realização:
+
+    I - comunicar ao COAF na forma do art. 36 e seguintes; e
+    II - abster-se de realizar a operação até que a comunicação ao COAF seja
+    efetuada, salvo se o retardo for capaz de causar dano irreparável ou
+    antecipado pelo cliente.
+
+    Parágrafo único. O participante que deixar de realizar a operação deve
+    comunicar ao cliente que a operação não será executada, sem, contudo,
+    revelar que uma comunicação ao COAF foi realizada ou que uma investigação
+    está em curso.
+guidance:
+  prose: |
+    O art. 32 estabelece a sequencia de acao quando ha suspeita ANTES da
+    realizacao da operacao: comunicar e (preferencialmente) bloquear.
+
+    **A logica do bloqueio preventivo:**
+    Se o participante suspeita que a operacao e uma lavagem de dinheiro,
+    realizá-la faria o participante um instrumento ativo do crime. O bloqueio
+    preventivo evita cumplicidade.
+
+    **A excecao — dano irreparavel:**
+    A lei reconhece que em alguns casos o bloqueio causa prejuizo legitimo
+    ao cliente (ex: operacao de hedging de risco real que nao pode esperar).
+    Nesse caso, a operacao pode ser executada, mas a comunicacao ao COAF
+    deve ser feita imediatamente apos.
+
+    **Tipping-off via comunicacao de bloqueio (paragrafo unico):**
+    Quando o participante bloqueia a operacao, ele PRECISA avisar o cliente
+    que a operacao nao sera executada — o cliente tem o direito de saber.
+    O que o participante NAO pode fazer e revelar que uma comunicacao ao COAF
+    foi feita ou que ha uma investigacao em curso. A mensagem ao cliente deve
+    ser neutra: "a operacao nao pode ser processada no momento" — sem explico
+    o motivo verdadeiro.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Workflow de bloqueio preventivo:**
+      1. Capacidade de bloquear operacoes especificas de um cliente enquanto
+         a analise de suspeita esta em curso, sem bloquear todo o cliente.
+      2. Notificacao ao cliente de bloqueio com texto neutro pre-aprovado pelo
+         juridico — nao pode mencionar COAF, investigacao ou PLD/FT.
+      3. Interface para compliance aprovar ou liberar a operacao bloqueada.
+      4. Timer de urgencia: se a comunicacao ao COAF nao for realizada em X horas,
+         alertar diretoria.
+
+      **Audit trail:**
+      5. Log imutavel de cada bloqueio: timestamp, motivo (interno), analista
+         responsavel, decisao final (comunicou ao COAF + bloqueou, ou liberou).
+      6. O texto da comunicacao ao cliente deve ser armazenado — sem mencionar
+         a causa real — para evidencia em caso de questionamento.
+    tools:
+      - aml-platform
+      - workflow-engine
+      - notification-service
+      - audit-trail
+  devsecops:
+    prose: |
+      **Testes de bloqueio:**
+      1. Testes de bloqueio seletivo: garantir que apenas a operacao especifica
+         e bloqueada, nao todo o cliente.
+      2. Testes de notificacao: mensagem ao cliente nao pode conter mencao
+         a PLD/FT, COAF ou investigacao.
+      3. Testes de desbloqueio: apenas compliance com permissao adequada
+         pode liberar operacao bloqueada.
+    tools:
+      - test-automation
+      - gitlab-ci
+  secops:
+    prose: |
+      **Controle de bloqueios:**
+      1. Relatorio de operacoes bloqueadas: tempo de bloqueio, desfecho
+         (comunicado ao COAF e bloqueado definitivamente, ou analisado e liberado).
+      2. KPI: tempo entre bloqueio e comunicacao ao COAF.
+      3. Auditoria de mensagens enviadas a clientes apos bloqueio para verificar
+         conformidade com proibicao de tipping-off.
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - audit-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-24"]
+    relationship: equivalent-to

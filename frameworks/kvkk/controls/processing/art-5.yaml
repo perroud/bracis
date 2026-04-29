@@ -1,0 +1,92 @@
+id: art-5
+family: processing
+title: "Conditions for Processing Personal Data"
+class: KVKK
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 5 — Conditions for Processing Personal Data.
+    (1) Personal data may not be processed without the explicit consent of the data
+    subject.
+    (2) Personal data may be processed without the explicit consent of the data subject
+    where one of the following conditions exists:
+    (a) it is expressly provided for by law;
+    (b) it is necessary for the protection of life or physical integrity of the data
+    subject or another person, where the data subject is unable to give consent due to
+    physical impossibility or whose consent is not legally recognized;
+    (c) it is necessary for the processing of personal data of the parties to a contract,
+    provided that it is directly related to the conclusion or performance of that contract;
+    (d) it is necessary for the data controller to comply with a legal obligation;
+    (e) the data have been made public by the data subject;
+    (f) it is necessary for the establishment, exercise, or defense of a right;
+    (g) it is necessary for the legitimate interests of the data controller, provided
+    that the fundamental rights and freedoms of the data subject are not harmed.
+
+guidance:
+  prose: >-
+    Article 5 establishes explicit consent as the default legal basis for processing
+    personal data, with seven enumerated exceptions. This is structurally different from
+    GDPR, which treats consent as one of six co-equal legal bases. Under KVKK, explicit
+    consent is the primary basis, and the exceptions are truly exceptions. Key distinctions:
+    (1) KVKK requires "explicit" consent by default — not merely "unambiguous" consent as
+    in GDPR. (2) The legitimate interests basis (5.2.g) exists but is narrower, requiring
+    that fundamental rights are "not harmed" rather than GDPR's balancing test. (3) The
+    vital interests exception (5.2.b) is limited to physical impossibility or lack of
+    legal capacity. Organizations must design consent mechanisms that meet the explicit
+    consent standard (specific, informed, freely given) and document which exception
+    applies when consent is not obtained.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a centralized consent management service that supports KVKK explicit consent
+      requirements. The service must: (1) capture specific purpose for each consent grant,
+      (2) record the information provided to the data subject at time of consent, (3) verify
+      free will (no bundled consent, no pre-ticked boxes), (4) support granular consent
+      withdrawal. For each processing activity, the system must record which legal basis
+      applies — explicit consent or one of the seven exceptions — and prevent processing
+      when no valid basis exists. Implement consent verification middleware that checks
+      consent status before any personal data access.
+    tools:
+      - "Consent management platforms (OneTrust, Cookiebot, custom API)"
+      - "API gateway middleware for consent verification"
+      - "Event-driven consent propagation (Kafka/NATS)"
+      - "Legal basis registry with enforcement hooks"
+      - "OPA policies for consent-gated data access"
+  devsecops:
+    prose: >-
+      Pipeline gates must verify that every data processing endpoint has a documented
+      legal basis. Automated tests must validate that consent collection flows capture
+      all three KVKK elements (specificity, information, free will). Code review
+      automation must flag personal data access that bypasses the consent verification
+      middleware. Integration tests must verify consent withdrawal propagates correctly
+      and stops downstream processing.
+    tools:
+      - "Custom CI checks for legal basis documentation"
+      - "Integration tests for consent flow validation"
+      - "Semgrep rules for consent bypass detection"
+      - "E2E tests for consent withdrawal propagation"
+  secops:
+    prose: >-
+      Monitor for personal data processing without a valid legal basis. Alert when
+      data is accessed after consent has been withdrawn. Audit consent records for
+      completeness and validity. Track consent rates and withdrawal patterns to identify
+      potential coercion or dark patterns. Generate regular reports on legal basis
+      distribution across processing activities.
+    tools:
+      - "SIEM rules for consent-less processing detection"
+      - "Consent analytics dashboards"
+      - "Automated consent record auditing"
+      - "SOAR playbooks for consent violation response"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.2.3", "A.7.2.4"]
+    relationship: supports

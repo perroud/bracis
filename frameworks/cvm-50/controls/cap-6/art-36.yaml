@@ -1,0 +1,98 @@
+id: art-36
+family: cap-6
+title: "Obrigacao de Comunicacao ao COAF"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 36. Os participantes devem comunicar ao COAF as operações ou situações
+    que, após análise, apresentem sérios indícios de estarem relacionadas com
+    os crimes de lavagem de dinheiro ou de financiamento do terrorismo.
+
+    § 1. A comunicação deve ser realizada de forma espontânea e independentemente
+    de comunicação ao cliente.
+
+    § 2. A comunicação ao COAF é obrigatória quando os indícios de PLD/FT
+    forem suficientemente sérios para fundamentar tal comunicação, independentemente
+    do resultado de qualquer investigação criminal em curso.
+
+    § 3. Os participantes não podem ser responsabilizados civil ou criminalmente
+    por comunicações realizadas de boa-fé ao COAF, mesmo que não resultem
+    em investigação ou processo.
+guidance:
+  prose: |
+    O art. 36 estabelece a obrigacao central de comunicacao ao COAF — o
+    Conselho de Controle de Atividades Financeiras, a Unidade de Inteligencia
+    Financeira (FIU) do Brasil.
+
+    **A natureza da comunicacao:**
+    A comunicacao ao COAF e feita via sistema SISCOAF (Sistema de Controle
+    de Atividades Financeiras) e e sigilosa — nem o cliente nem o publico
+    sabe que a comunicacao foi feita (proibicao de tipping-off, art. 23 ss 3).
+
+    **Criterio de comunicacao — "serios indicios":**
+    O padrao e "serios indicios" — nao e necessaria prova, nao e necessaria
+    certeza. O participante nao e delegado ou juiz. O COAF e o orgao habilitado
+    para investigar. O participante comunica a suspeita fundamentada.
+
+    **Autonomia da comunicacao (ss 2):**
+    A obrigacao de comunicar nao espera investigacao criminal. Mesmo que a
+    Policia Federal ja esteja investigando o cliente, o participante tem
+    obrigacao autonoma de comunicar ao COAF se tiver suspeitas.
+
+    **Protecao juridica (ss 3):**
+    O participante que comunica de boa-fe tem imunidade civil e criminal.
+    Isso elimina o pretexto de "nao vou comunicar porque posso ser processado
+    pelo cliente". A protecao pressupoe boa-fe — comunicacao sem fundamento
+    ou com proposito de prejudicar nao esta coberta.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de comunicacao ao COAF:**
+      1. Integracao com SISCOAF para submissao eletronica de comunicacoes.
+      2. Template padronizado de comunicacao com todos os campos exigidos pelo
+         COAF: identificacao do cliente, descricao da operacao, data, valor,
+         razao da suspeita.
+      3. Fila prioritaria de comunicacoes com SLA configurado: X horas para
+         comunicacao urgente (sancoes), Y dias para comunicacao padrao.
+      4. Controle de duplicidade: sistema deve verificar se comunicacao similar
+         ja foi enviada para evitar duplicatas.
+      5. Arquivo de todas as comunicacoes enviadas com numero de protocolo
+         do SISCOAF e confirmacao de recebimento.
+    tools:
+      - siscoaf-integration
+      - coaf-reporting
+      - workflow-engine
+      - document-management
+  devsecops:
+    prose: |
+      **Testes de integracao com SISCOAF:**
+      1. Testes de integracao com ambiente de sandbox do SISCOAF.
+      2. Testes de validacao de campos: comunicacao sem campos obrigatorios
+         deve ser rejeitada pelo sistema.
+      3. Testes de confirmacao de recebimento: verificar que numero de protocolo
+         e registrado corretamente.
+      4. Testes de retry: em caso de falha na comunicacao, sistema deve tentar
+         novamente e alertar operador se falhas persistirem.
+    tools:
+      - integration-testing
+      - gitlab-ci
+      - api-testing
+  secops:
+    prose: |
+      **Gestao de comunicacoes ao COAF:**
+      1. Relatorio mensal de comunicacoes realizadas: numero, tipos de suspeita,
+         clientes envolvidos.
+      2. KPI: tempo medio entre identificacao da suspeita e comunicacao ao COAF.
+      3. Revisao da qualidade das comunicacoes com base em feedback do COAF
+         (quando disponivel).
+      4. Processo de aprovacao de comunicacoes: analista propoe, supervisor
+         aprova, compliance officer tem visibilidade de todas.
+    tools:
+      - coaf-management
+      - reporting-dashboard
+      - workflow-engine
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-25", "art-26"]
+    relationship: equivalent-to

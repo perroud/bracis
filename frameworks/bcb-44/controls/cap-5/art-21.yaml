@@ -1,0 +1,100 @@
+id: art-21
+family: cap-5
+title: "Analise de Operacoes e Situacoes Suspeitas"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 21. As operações selecionadas para análise aprofundada devem ser objeto
+    de investigação interna pela instituição de pagamento, contemplando:
+
+    I - exame da documentação e das informações cadastrais do cliente;
+
+    II - análise do histórico de operações do cliente;
+
+    III - entrevista ou contato com o cliente, quando necessário e possível;
+
+    IV - consulta a fontes externas de informações de domínio público;
+
+    V - análise de conexões com outras partes envolvidas nas operações.
+
+    Parágrafo único. O resultado da análise deve ser documentado e arquivado
+    pela instituição por, no mínimo, dez anos, independentemente de a operação
+    ter sido ou não comunicada ao COAF.
+guidance:
+  prose: |
+    O art. 21 define o processo de investigacao interna -- o que acontece
+    depois que um alerta e gerado.
+
+    **Cinco etapas da investigacao interna:**
+    1. Revisar o cadastro: os dados cadastrais sao consistentes com as operacoes?
+    2. Analisar o historico: e a primeira vez que o cliente faz isso, ou e padrao?
+    3. Contatar o cliente: quando necessario (e quando possivel sem alertar
+       inadvertidamente um criminoso).
+    4. Busca em fontes abertas: noticias, registros publicos, processos judiciais,
+       informacoes em redes sociais.
+    5. Conexoes: a contraparte ou pessoas relacionadas estao em investigacao?
+
+    **Documentacao obrigatoria (paragrafo unico):**
+    A documentacao deve ser mantida por 10 anos INDEPENDENTE do resultado.
+    Isso significa que casos encerrados como "falso positivo" tambem devem ser
+    arquivados com a justificativa da conclusao.
+
+    **Contacto com o cliente (inciso III):**
+    Cuidado: em alguns casos, contatar o cliente pode alertar um criminoso
+    e destruir evidencias. A decisao de contatar deve considerar o risco de
+    "tipping off" (proibido pela Lei 9.613/98 e pelos SARs confidenciais).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de gestao de casos:**
+      1. Sistema de case management para alertas de PLD/FT com:
+         - Dados do cliente agregados (cadastro, historico, scores)
+         - Timeline de operacoes relacionadas ao alerta
+         - Historico de casos anteriores do mesmo cliente
+         - Campos para registro de cada etapa da investigacao (incisos I-V)
+         - Status do caso: aberto, em analise, encerrado (com ou sem SAR)
+         - Responsavel pelo caso com log de tempo de analise
+      2. Integracao com fontes externas de informacao:
+         - API de noticias (Google News, Reuters) para adverse media
+         - Consulta a processos judiciais (CNJ, TRF)
+         - Verificacao de sancoes e watchlists
+      3. Secao de "investigacao de conexoes": visualizacao de grafo de relacionamentos
+         entre o cliente suspeito e contrapartes.
+      4. Arquivamento automatico apos decisao: documentos, notas e conclusao
+         armazenados com prazo de retencao de 10 anos.
+    tools:
+      - case-management
+      - aml-platform
+      - adverse-media-monitoring
+      - graph-analytics
+  devsecops:
+    prose: |
+      **Qualidade e auditoria do processo de analise:**
+      1. Verificar que cada caso encerrado tem todos os campos de documentacao
+         preenchidos (validacao no momento do fechamento do caso).
+      2. Testes de integracao entre sistema de monitoramento (geracao de alertas)
+         e case management (gestao da investigacao).
+      3. Auditoria de tempo de analise: garantir que SLA de analise esta sendo
+         cumprido.
+    tools:
+      - gitlab-ci
+      - workflow-testing
+      - audit-logging
+  secops:
+    prose: |
+      **KPIs de qualidade da investigacao:**
+      1. Tempo medio de analise por caso (SLA: tipicamente 5-10 dias uteis).
+      2. Percentual de casos documentados com todas as etapas preenchidas.
+      3. Distribuicao de decisoes: SAR, falso positivo, encerrado sem SAR.
+      4. Backlog de casos em atraso (risco de perda de prazo para COAF).
+      5. Auditoria trimestral: revisar amostra de casos encerrados como
+         falso positivo para verificar qualidade da decisao.
+    tools:
+      - aml-platform
+      - case-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-24"]
+    relationship: equivalent-to

@@ -1,0 +1,84 @@
+id: art-41
+family: cap-8
+title: "Retencao e Protecao de Logs"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 41. Os registros de eventos de segurança devem ser retidos e protegidos,
+    observando:
+
+    I - período mínimo de retenção de um ano para registros de segurança da
+    informação;
+    II - período de retenção estendido para registros de auditoria conforme
+    legislação aplicável;
+    III - proteção contra alteração, exclusão ou acesso não autorizado;
+    IV - armazenamento em local distinto dos sistemas que geraram os registros;
+    V - procedimentos para disponibilização de registros para fins de
+    investigação e auditoria.
+guidance:
+  prose: |
+    O art. 41 define retencao minima de 1 ano para logs de seguranca, com
+    protecao contra tampering e armazenamento separado.
+
+    **Retencao obrigatoria:**
+    - Logs de seguranca: minimo 1 ano
+    - Logs de auditoria: conforme legislacao (ate 5 anos em alguns casos)
+    - Logs de acesso a dados pessoais (LGPD): 5 anos
+
+    **Protecao obrigatoria:**
+    - Imutabilidade: logs nao podem ser alterados
+    - Separacao: armazenados fora do sistema que os gerou
+    - Acesso: restrito a equipe de seguranca e auditoria
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.15 (Logging - retention)
+    - NIST 800-53 rev5: AU-9 (Protection of Audit Information), AU-11 (Audit Record Retention)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Armazenamento de logs imutavel:**
+      1. S3 com Object Lock (WORM) para logs de seguranca.
+      2. Lifecycle policies: hot (30 dias), warm (1 ano), cold/archive (5 anos).
+      3. Cross-account log archive: logs em conta AWS/cloud separada.
+      4. Criptografia em repouso para logs armazenados.
+      5. Acesso restrito via IAM policy (somente equipe de seguranca e auditoria).
+    tools:
+      - immutable-storage
+      - lifecycle-policies
+      - cross-account-archive
+      - log-encryption
+  devsecops:
+    prose: |
+      **Retencao de logs de pipeline:**
+      1. Logs de pipeline retidos por minimo 1 ano.
+      2. Audit events do GitLab exportados para armazenamento de longo prazo.
+      3. Backup de logs de seguranca (SAST, DAST, dependency scan) por 1 ano.
+    tools:
+      - pipeline-log-retention
+      - gitlab-audit-export
+      - security-log-archive
+  secops:
+    prose: |
+      **Gestao de retencao:**
+      1. Politica formal de retencao de logs por tipo e classificacao.
+      2. Monitoramento de compliance de retencao (logs nao excluidos antes do prazo).
+      3. Procedimento para disponibilizacao de logs para investigacao.
+      4. Teste anual de recuperacao de logs antigos.
+    tools:
+      - retention-policy
+      - retention-compliance
+      - log-retrieval-procedure
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-9", "AU-11"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-37"]
+    relationship: complements

@@ -1,0 +1,107 @@
+id: art-11
+family: cap-3
+title: "Autenticacao de Usuarios e Sistemas"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 11. Os sistemas que processam transações TISS devem implementar
+    mecanismos robustos de autenticação para usuários e sistemas
+    participantes, garantindo a identificação inequívoca de cada
+    entidade que acessa, envia ou recebe dados de saúde.
+
+    Parágrafo 1. A autenticação de sistemas deve utilizar certificados
+    digitais emitidos no âmbito da ICP-Brasil (Infraestrutura de Chaves
+    Públicas Brasileira), tipo e-CNPJ para pessoas jurídicas.
+
+    Parágrafo 2. A autenticação de usuários individuais deve utilizar,
+    no mínimo, autenticação de dois fatores para acesso a dados de
+    beneficiários e transações TISS.
+
+    Parágrafo 3. As credenciais de acesso são pessoais e intransferíveis,
+    sendo o titular responsável por todas as ações realizadas com suas
+    credenciais.
+guidance:
+  prose: |
+    O art. 11 trata de dois niveis de autenticacao: sistema-a-sistema
+    (machine-to-machine) e usuario-a-sistema (human-to-machine).
+
+    **Autenticacao sistema-a-sistema:**
+    - Certificados ICP-Brasil e-CNPJ (tipo A1 em software ou A3 em
+      hardware/token)
+    - Mutual TLS (mTLS) para web services TISS
+    - Validacao de cadeia de certificacao ate raiz ICP-Brasil
+    - Verificacao de revogacao via CRL ou OCSP
+
+    **Autenticacao de usuarios:**
+    - MFA obrigatorio (algo que sabe + algo que possui)
+    - Metodos aceitos: token OTP, SMS, app autenticador, biometria
+    - Sessao com timeout configurable (maximo 30 minutos de
+      inatividade para sistemas com dados de saude)
+    - Bloqueio apos tentativas falhas (maximo 5)
+
+    **Segregacao de credenciais:**
+    - Usuarios nao devem compartilhar credenciais
+    - Contas de servico devem ter credenciais proprias
+    - Rotacao periodica de senhas e certificados
+
+    **Alinhamento com LGPD:**
+    A identificacao do usuario que acessou dados de saude e requisito
+    para rastreabilidade (art. 37, LGPD) e responsabilizacao
+    (art. 42, LGPD).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de autenticacao TISS:**
+      1. Implementar PKI integration com ICP-Brasil para validacao
+         de certificados e-CNPJ em endpoints TISS (mTLS).
+      2. Configurar Identity Provider (IdP) com suporte a MFA
+         obrigatorio para todos os usuarios de sistemas TISS.
+      3. Implementar service accounts com credenciais rotativas
+         (certificate rotation automatica) para integracao M2M.
+      4. Configurar session management com timeout de 30 minutos
+         de inatividade e re-autenticacao para operacoes criticas.
+    tools:
+      - pki-management
+      - identity-provider
+      - mfa-provider
+      - session-management
+  devsecops:
+    prose: |
+      **Seguranca de autenticacao no pipeline:**
+      1. Implementar testes automatizados de autenticacao: MFA
+         enforcement, timeout de sessao, bloqueio por tentativas.
+      2. Incluir verificacao de certificados ICP-Brasil no pipeline
+         (validade, cadeia, revogacao).
+      3. Automatizar rotacao de credenciais de servico e certificados
+         com zero-downtime deployment.
+      4. Implementar scanning de codigo para detectar credenciais
+         hardcoded ou mecanismos de autenticacao inseguros.
+    tools:
+      - auth-testing
+      - certificate-validation
+      - credential-rotation
+      - secret-scanning
+  secops:
+    prose: |
+      **Monitoramento de autenticacao:**
+      1. Monitorar em tempo real tentativas de autenticacao falhas,
+         brute force e credential stuffing em sistemas TISS.
+      2. Implementar alertas para login de usuarios em horarios ou
+         locais atipicos (UEBA - User Entity Behavior Analytics).
+      3. Auditar periodicamente contas ativas, removendo acessos de
+         usuarios desligados ou inativos (recertificacao trimestral).
+      4. Manter registro de todos os certificados ICP-Brasil em uso,
+         com alertas de vencimento e revogacao.
+    tools:
+      - siem
+      - ueba
+      - access-recertification
+      - certificate-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-42", "art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312-d"]
+    relationship: mapped

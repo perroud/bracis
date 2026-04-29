@@ -1,0 +1,508 @@
+id: swift-csp_to_pci-dss-v4
+title: "SWIFT CSP to PCI DSS v4.0 Control Mapping"
+source_framework: swift-csp
+target_framework: pci-dss-v4
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+
+mappings:
+  # obj-1 — Secure Your Environment
+
+  - source_control: cscf-1.1
+    target_controls:
+      - id: req-1.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          SWIFT CSP cscf-1.1 (Restrict Internet Access) requires protecting the
+          SWIFT secure zone through firewalls, proxies, and network security
+          controls with default-deny policies. PCI DSS req-1.1 (Install and
+          Maintain Network Security Controls) requires the same for the CDE.
+          Both mandate network security controls at environment boundaries,
+          default-deny posture, documented traffic flows, and periodic rule
+          reviews. The controls are semantically equivalent with the only
+          difference being the protected environment (SWIFT secure zone vs CDE).
+      - id: req-2.1
+        relationship: complements
+        confidence: 0.68
+        rationale: >
+          SWIFT CSP cscf-1.1 requires hardening of firewall and proxy systems
+          at the secure zone boundary, which complements PCI DSS req-2.1 (Apply
+          Secure Configurations). Both expect vendor defaults changed and
+          unnecessary services disabled on network security controls, though
+          PCI DSS req-2.1 applies broadly to all system components, not just
+          boundary devices.
+
+  - source_control: cscf-1.2
+    target_controls:
+      - id: req-1.1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          SWIFT CSP cscf-1.2 (Segregation of SWIFT Environment) requires
+          network segmentation isolating the secure zone from general IT via
+          firewalls, ACLs, and controlled data flows. PCI DSS req-1.1 requires
+          the same segmentation for the CDE from untrusted networks. Both mandate
+          explicit allow-listing of protocols and ports, controlled access paths,
+          and dedicated operator workstations. The concept of a secure zone in
+          SWIFT maps directly to the CDE in PCI DSS.
+
+  - source_control: cscf-1.3
+    target_controls:
+      - id: req-2.1
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          SWIFT CSP cscf-1.3 (Virtualization Platform Protection) requires
+          hardening hypervisors according to CIS benchmarks, disabling unnecessary
+          services, and restricting administrative access. PCI DSS req-2.1
+          (Apply Secure Configurations) requires hardening all system components
+          using industry-accepted standards and removing vendor defaults. The
+          controls intersect on system hardening requirements, though cscf-1.3
+          is specific to virtualization platforms while req-2.1 covers all
+          system components.
+      - id: req-8.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          SWIFT CSP cscf-1.3 requires multi-factor authentication for
+          administrative access to the hypervisor management plane. PCI DSS
+          req-8.1 requires MFA for all access into the CDE. The SWIFT control
+          complements PCI DSS authentication requirements by specifying MFA
+          at the virtualization management layer, a specific component type
+          within the broader PCI DSS scope.
+
+  - source_control: cscf-1.4
+    target_controls:
+      - id: req-1.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          SWIFT CSP cscf-1.4 (Restriction of Internet Access) requires
+          controlling and limiting internet access from operator PCs, including
+          web filtering, content inspection, and email isolation. PCI DSS
+          req-1.1 controls traffic at the CDE boundary. cscf-1.4 complements
+          req-1.1 by addressing endpoint-level internet access restrictions
+          for operators within the secure zone, a defense-in-depth layer
+          beyond network boundary controls.
+      - id: req-5.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          SWIFT CSP cscf-1.4 prevents phishing and drive-by downloads through
+          browser isolation and web filtering, which complements PCI DSS
+          req-5.1 (Protect All Systems from Malicious Software) including
+          its anti-phishing requirements. Both address malware delivery vectors
+          but from different angles: cscf-1.4 focuses on internet access
+          restriction while req-5.1 focuses on endpoint malware detection
+          and prevention.
+
+  # obj-2 — Know and Limit Access / Reduce Attack Surface
+
+  - source_control: cscf-2.1
+    target_controls:
+      - id: req-4.1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          SWIFT CSP cscf-2.1 (Internal Data Flow Security) requires encryption
+          with TLS 1.2+, mutual authentication, and integrity controls for all
+          internal data flows carrying SWIFT transaction data. PCI DSS req-4.1
+          (Protect Cardholder Data with Strong Cryptography During Transmission)
+          requires TLS 1.2+ for PAN during transmission, certificate management,
+          and strong cipher suites. Both mandate encrypted data-in-transit
+          with proper certificate lifecycle management. The scope differs
+          (SWIFT messages vs cardholder data) but the technical requirements
+          are equivalent.
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          SWIFT CSP cscf-2.1 addresses the confidentiality and integrity of
+          financial messaging data, complementing PCI DSS req-3.1 (Protect
+          Stored Account Data) which focuses on data at rest. Together they
+          cover the full data lifecycle: cscf-2.1 protects data in transit
+          while req-3.1 protects data at rest.
+
+  - source_control: cscf-2.2
+    target_controls:
+      - id: req-6.1
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          SWIFT CSP cscf-2.2 (Security Updates) requires structured patch
+          management with defined timelines (critical within 1 month, high
+          within 2 months), maintaining vendor-supported versions, and applying
+          security patches promptly. PCI DSS req-6.1 (Develop and Maintain
+          Secure Systems and Software) requires vulnerability identification,
+          prioritization, and remediation with defined SLAs. Both mandate
+          timely patching, vulnerability management processes, and maintaining
+          current software versions within their respective environments.
+
+  - source_control: cscf-2.3
+    target_controls:
+      - id: req-2.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          SWIFT CSP cscf-2.3 (System Hardening) requires hardening all systems
+          according to CIS benchmarks, disabling default accounts, removing
+          unnecessary services, and implementing application whitelisting.
+          PCI DSS req-2.1 (Apply Secure Configurations) requires changing
+          vendor defaults, removing unnecessary functionality, and using
+          hardening standards like CIS Benchmarks. Both controls are
+          semantically equivalent in their intent and technical requirements
+          for reducing attack surface through system hardening.
+
+  - source_control: cscf-2.4a
+    target_controls:
+      - id: req-4.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          SWIFT CSP cscf-2.4a (Back Office Data Flow Security) requires
+          encryption, mutual authentication, and message integrity for
+          data flows between back-office and the SWIFT secure zone. PCI DSS
+          req-4.1 requires strong cryptography during data transmission.
+          The controls intersect on encryption-in-transit requirements,
+          though cscf-2.4a adds message-level integrity (digital signatures,
+          HMACs) beyond what PCI DSS typically requires for transmission
+          protection.
+      - id: req-1.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SWIFT CSP cscf-2.4a specifies controlled integration interfaces
+          between back-office and the secure zone, complementing PCI DSS
+          req-1.1 network security controls. The SWIFT control extends
+          network boundary protection to the application integration layer
+          with authentication and integrity controls for inter-zone
+          data exchanges.
+
+  - source_control: cscf-2.6
+    target_controls:
+      - id: req-8.1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          SWIFT CSP cscf-2.6 (Operator Session Confidentiality) requires
+          encrypted sessions (SSH, RDP with TLS, HTTPS), session timeouts,
+          and privileged session management. PCI DSS req-8.1 requires strong
+          authentication, session management, and MFA for CDE access. Both
+          address session security but from different angles: cscf-2.6
+          emphasizes transport encryption and session recording while
+          req-8.1 emphasizes authentication strength and account lifecycle.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          SWIFT CSP cscf-2.6 requires encrypted remote sessions with strong
+          cipher suites and disabled unencrypted protocols, complementing
+          PCI DSS req-4.1 cryptographic transmission requirements. cscf-2.6
+          extends the encryption requirement specifically to interactive
+          operator sessions rather than just data transmission.
+
+  - source_control: cscf-2.7
+    target_controls:
+      - id: req-11.1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          SWIFT CSP cscf-2.7 (Vulnerability Scanning) requires quarterly
+          vulnerability scanning of all systems, severity-based remediation
+          timelines (critical within 30 days, high within 60 days), and
+          post-change scanning. PCI DSS req-11.1 (Test Security of Systems
+          and Networks Regularly) requires quarterly internal and external
+          vulnerability scans, remediation and rescanning, and scans after
+          significant changes. Both controls are equivalent in requiring
+          regular vulnerability scanning with structured remediation SLAs.
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          SWIFT CSP cscf-2.7 vulnerability scanning complements PCI DSS
+          req-6.1 vulnerability management by providing the detection
+          mechanism that feeds the broader vulnerability management process.
+          Scanning identifies the vulnerabilities that req-6.1 requires
+          organizations to prioritize and address.
+
+  - source_control: cscf-2.8a
+    target_controls:
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          SWIFT CSP cscf-2.8a (Critical Activity Outsourcing) requires
+          security assessments of third-party providers, contractual security
+          requirements, right-to-audit clauses, and incident notification
+          timelines. PCI DSS req-12.1 includes TPSP management with written
+          agreements, vendor risk assessments, and monitoring of provider
+          security posture. Both address third-party risk management with
+          contractual security obligations, though in their respective
+          domain contexts (SWIFT operations vs cardholder data).
+
+  # obj-3 — Detect and Respond
+
+  - source_control: cscf-3.1
+    target_controls:
+      - id: req-9.1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          SWIFT CSP cscf-3.1 (Physical Security) requires physical access
+          controls (badge readers, biometrics), access logging, visitor
+          management, and protection of operator workstations from
+          unauthorized physical access. PCI DSS req-9.1 (Restrict Physical
+          Access to Cardholder Data) requires the same controls for CDE
+          facilities including badge systems, visitor logging, escort
+          requirements, and media security. Both controls are equivalent
+          in their physical security requirements for sensitive environments.
+
+  - source_control: cscf-4.1
+    target_controls:
+      - id: req-8.1
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          SWIFT CSP cscf-4.1 (Password Policy) requires minimum 12-character
+          passwords with complexity, account lockout after 5 failed attempts,
+          secrets management for service accounts with 90-day rotation. PCI DSS
+          req-8.1 requires 12-character passwords, lockout after 10 attempts,
+          and strong authentication management. Both controls enforce password
+          policies aligned with NIST SP 800-63B, though SWIFT is slightly
+          stricter on lockout threshold (5 vs 10 attempts).
+
+  - source_control: cscf-4.2
+    target_controls:
+      - id: req-8.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          SWIFT CSP cscf-4.2 (Multi-Factor Authentication) requires MFA for
+          all interactive access to SWIFT systems, including operator and
+          administrative access, with individually assigned tokens. PCI DSS
+          req-8.1 requires MFA for all access into the CDE. Both mandate
+          MFA using at least two independent authentication factors (knowledge,
+          possession, inherence). Both discourage SMS OTP and prefer hardware
+          tokens. The controls are equivalent in their MFA requirements for
+          access to sensitive financial environments.
+
+  - source_control: cscf-5.1
+    target_controls:
+      - id: req-7.1
+        relationship: equivalent-to
+        confidence: 0.94
+        rationale: >
+          SWIFT CSP cscf-5.1 (Logical Access Control) requires RBAC, least
+          privilege, segregation of duties, quarterly access reviews, and
+          separation of privileged from standard accounts. PCI DSS req-7.1
+          (Restrict Access by Business Need to Know) requires RBAC, least
+          privilege, default deny, and semi-annual access reviews. Both
+          controls enforce access restriction based on job function, formal
+          authorization, and periodic review. The SWIFT control adds explicit
+          four-eyes principle for transaction creation/approval, which goes
+          beyond but aligns with PCI DSS segregation of duties.
+
+  - source_control: cscf-5.2
+    target_controls:
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          SWIFT CSP cscf-5.2 (Token Management) requires secure lifecycle
+          management of cryptographic keys and certificates, including HSM
+          storage for private keys and automated rotation. PCI DSS req-3.1
+          (Protect Stored Account Data) includes key management requirements
+          for encryption keys protecting cardholder data at rest. Both
+          address cryptographic key management but in different contexts:
+          cscf-5.2 for SWIFT authentication tokens and message signing
+          keys, req-3.1 for data encryption keys.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          SWIFT CSP cscf-5.2 certificate and key management complements
+          PCI DSS req-4.1 certificate management requirements for
+          transmission encryption. Both require trusted certificates,
+          expiration tracking, and controlled lifecycle processes.
+          cscf-5.2 adds HSM-specific requirements and SWIFT PKI
+          integration that extend the general PCI DSS certificate
+          management scope.
+
+  - source_control: cscf-5.4
+    target_controls:
+      - id: req-10.1
+        relationship: equivalent-to
+        confidence: 0.95
+        rationale: >
+          SWIFT CSP cscf-5.4 (Logging and Monitoring) requires security event
+          logging on all secure zone systems, centralized tamper-resistant log
+          management (SIEM), 12-month retention with 3 months immediately
+          available, NTP synchronization, and automated alerting for critical
+          events. PCI DSS req-10.1 (Log and Monitor All Access) requires
+          identical controls: audit logs on all CDE components, centralized
+          protected log storage, 12-month retention with 3 months hot,
+          NTP synchronization, and failure detection. These controls are
+          nearly identical in scope and technical requirements.
+
+  - source_control: cscf-6.1
+    target_controls:
+      - id: req-5.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          SWIFT CSP cscf-6.1 (Malware Protection) requires anti-malware with
+          real-time scanning, daily signature updates, EDR/application
+          whitelisting, and removable media scanning. PCI DSS req-5.1
+          (Protect All Systems from Malicious Software) requires anti-malware
+          on all affected components, automatic updates, active real-time
+          protection, and anti-phishing mechanisms. Both mandate comprehensive
+          malware defenses with multiple detection methods (signature,
+          behavioral, heuristic) and centralized management.
+
+  - source_control: cscf-6.2
+    target_controls:
+      - id: req-11.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          SWIFT CSP cscf-6.2 (Software Integrity) requires file integrity
+          monitoring (FIM) on all secure zone systems, software verification
+          against checksums/signatures, and application control blocking
+          unauthorized installations. PCI DSS req-11.1 includes FIM
+          requirements (detecting unexpected file changes) and intrusion
+          detection. Both require monitoring file integrity on critical
+          systems, though cscf-6.2 adds SWIFT-specific software verification
+          against SWIFT-published checksums.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SWIFT CSP cscf-6.2 software integrity verification complements
+          PCI DSS req-6.2 (Bespoke and Custom Software Security) by addressing
+          the integrity of deployed software. While req-6.2 focuses on
+          secure development practices, cscf-6.2 ensures that deployed
+          software has not been tampered with post-deployment through
+          FIM and code signing verification.
+
+  - source_control: cscf-6.3
+    target_controls:
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.76
+        rationale: >
+          SWIFT CSP cscf-6.3 (Database Integrity) requires database activity
+          monitoring (DAM), restricted database access, and backup integrity
+          verification for SWIFT transaction databases. PCI DSS req-3.1
+          (Protect Stored Account Data) requires protection of stored data
+          including encryption and key management. Both address database
+          security but with different emphasis: cscf-6.3 focuses on integrity
+          monitoring and access control, req-3.1 on data encryption and
+          minimization. They intersect on database access restriction and
+          data protection requirements.
+      - id: req-10.1
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          SWIFT CSP cscf-6.3 database activity monitoring complements PCI DSS
+          req-10.1 audit logging by extending monitoring specifically to
+          database-level operations (schema changes, bulk modifications,
+          direct SQL access). This provides a deeper layer of visibility
+          beyond the general audit logging that req-10.1 requires.
+
+  - source_control: cscf-6.4
+    target_controls:
+      - id: req-10.1
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          SWIFT CSP cscf-6.4 (Logging and Monitoring — transaction anomaly
+          detection) requires transaction-level monitoring for anomalous
+          patterns including unusual volumes, off-hours activity, and new
+          counterparties. PCI DSS req-10.1 requires audit log review to
+          identify anomalies and suspicious activity. Both require anomaly
+          detection, but cscf-6.4 specializes in financial transaction
+          behavioral analytics while req-10.1 addresses broader security
+          event monitoring.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.68
+        rationale: >
+          SWIFT CSP cscf-6.4 transaction monitoring with behavioral analytics
+          complements PCI DSS req-11.1 network intrusion detection. Both
+          aim to detect malicious activity but at different layers: cscf-6.4
+          operates at the application/transaction layer while req-11.1
+          operates at the network layer.
+
+  - source_control: cscf-7.1
+    target_controls:
+      - id: req-12.1
+        relationship: equivalent-to
+        confidence: 0.89
+        rationale: >
+          SWIFT CSP cscf-7.1 (Cyber Incident Response Planning) requires a
+          documented incident response plan with defined roles, communication
+          procedures, annual testing through tabletop exercises, lessons
+          learned incorporation, and reporting to SWIFT CSIRT. PCI DSS
+          req-12.1 includes incident response plan requirements with annual
+          testing, defined roles, breach notification procedures, and
+          coordination with payment brands. Both mandate formal incident
+          response capabilities with regular testing and continuous
+          improvement based on lessons learned.
+
+  - source_control: cscf-7.2
+    target_controls:
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          SWIFT CSP cscf-7.2 (Security Training) requires annual security
+          awareness training covering social engineering, phishing, and
+          SWIFT-specific threats, with role-specific training for operators
+          and administrators. PCI DSS req-12.1 includes security awareness
+          education as an ongoing activity with personnel screening. Both
+          require security training programs with tracking and enforcement,
+          though cscf-7.2 is more detailed in specifying SWIFT-specific
+          training content and access suspension for non-completion.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SWIFT CSP cscf-7.2 security training complements PCI DSS req-6.2
+          (Bespoke and Custom Software Security) which requires annual
+          secure coding training for developers. Both mandate role-specific
+          training, but cscf-7.2 targets operators and administrators
+          while req-6.2 targets software development personnel.
+
+  - source_control: cscf-7.3a
+    target_controls:
+      - id: req-11.1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          SWIFT CSP cscf-7.3a (Penetration Testing) requires annual
+          penetration testing by qualified testers covering network
+          segmentation validation, lateral movement, privilege escalation,
+          and application-level attacks, with risk-rated findings and
+          retesting. PCI DSS req-11.1 requires annual penetration testing
+          covering CDE perimeter and critical systems, both network and
+          application layers, segmentation validation, and remediation
+          retesting. Both controls are equivalent in scope and requirements
+          for penetration testing programs.
+
+  - source_control: cscf-7.4a
+    target_controls:
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          SWIFT CSP cscf-7.4a (Scenario Risk Assessment) requires annual
+          scenario-based risk assessments covering realistic attack scenarios,
+          with documented likelihood and impact ratings, mapped to existing
+          controls, and presented to senior management. PCI DSS req-12.1
+          requires formal risk assessment that identifies critical assets,
+          threats, and vulnerabilities, conducted annually. Both require
+          annual risk assessments driving security investment priorities,
+          though cscf-7.4a is more prescriptive in requiring scenario-based
+          methodology and MITRE ATT&CK mapping.

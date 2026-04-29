@@ -1,0 +1,103 @@
+id: med2-11
+family: responsabilidade
+title: "Receiver PSP Responsibilities"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP do usuário recebedor tem as seguintes responsabilidades no âmbito do MED 2.0:
+    (i) executar o bloqueio cautelar dos recursos na conta do usuário recebedor no prazo
+    regulamentar após o recebimento da notificação de infração via DICT; (ii) quando
+    aplicável, iniciar o processo de bloqueio em cascata ao identificar que os recursos
+    foram transferidos para outras contas; (iii) realizar a análise de mérito da notificação
+    de infração dentro do prazo estabelecido; (iv) notificar o titular da conta bloqueada
+    sobre o bloqueio e seus direitos; (v) processar a contestação do titular, quando
+    apresentada; (vi) efetuar a devolução dos recursos ao PSP pagador quando a análise
+    concluir pela procedência da notificação; (vii) desbloquear os recursos quando a análise
+    concluir pela improcedência; e (viii) monitorar as contas sob sua gestão para identificar
+    padrões de recebimento de valores fraudulentos.
+guidance:
+  prose: |
+    **Receiver PSP Role in MED 2.0:**
+    The receiver PSP is at the center of the MED execution. It must act swiftly to block
+    funds while ensuring fair treatment of the account holder.
+
+    **Operational flow:**
+    1. **Receive notification** via DICT → start 30-minute blocking clock.
+    2. **Execute block** on the receiver's account (proportional to credited amount).
+    3. **Cascade check:** If funds have moved, initiate cascade blocking (med2-1).
+    4. **Notify account holder** of the block and their rights (med2-8).
+    5. **Analyze merit:** Evaluate whether the fraud claim is legitimate. Consider:
+       account behavior, transaction context, holder's contestation if any.
+    6. **Decision:**
+       - Procedente → return funds to payer PSP via SPI.
+       - Improcedente → unblock funds.
+       - Parcialmente procedente → return available balance.
+    7. **Ongoing monitoring:** Flag accounts with repeated MED incidents for enhanced
+       monitoring or closure.
+
+    **Due diligence obligation:** The receiver PSP must proactively monitor its accounts
+    for mule-like behavior. Failure to detect and act on patterns of fraudulent
+    fund reception exposes the PSP to shared liability.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build an automated blocking service that receives DICT notifications and
+         executes account blocks within the 30-minute window — zero manual intervention
+         for standard cases.
+      2. Implement cascade detection logic: when a block is executed, check whether
+         outgoing transfers from the account match the timeframe and amount pattern
+         of the flagged transaction, and trigger cascade requests.
+      3. Build a merit analysis workflow with automated enrichment: pull account
+         history, fraud scores, prior MED involvement, and DICT markers into the
+         analysis case.
+      4. Implement the contestation processing flow: receive holder's evidence,
+         route to analyst, integrate into the merit analysis.
+      5. Build automated return settlement: upon favorable decision, generate the SPI
+         return transaction, confirm settlement, and update the case record.
+    tools:
+      - dict-api-client
+      - blocking-service
+      - workflow-engine
+      - spi-client
+      - case-management
+  devsecops:
+    prose: |
+      1. Test automated blocking: verify block execution within 30 minutes for various
+         notification types and account states.
+      2. Test cascade detection: simulate transfers from blocked accounts and verify
+         cascade requests are generated correctly.
+      3. Test merit analysis workflow: cases with sufficient evidence for procedente,
+         improcedente, and parcialmente procedente outcomes.
+      4. Test contestation integration: holder submits evidence, analyst reviews,
+         decision is updated.
+      5. Test return settlement: verify SPI return transactions are generated correctly
+         and confirmed by the payer PSP.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - e2e-testing
+      - workflow-testing
+  secops:
+    prose: |
+      1. Monitor blocking execution times: percentage of blocks completed within the
+         30-minute window, average time, and outliers.
+      2. Track analysis outcomes: procedente, improcedente, parcialmente procedente
+         rates and trends.
+      3. Monitor accounts with repeated MED incidents: flag for enhanced due diligence
+         or account restriction.
+      4. Conduct monthly audits of merit analysis quality: sample cases and review
+         analyst decisions for consistency.
+      5. Report receiver PSP performance metrics to BCB.
+    tools:
+      - monitoring-platform
+      - analytics-dashboard
+      - quality-assurance
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20", "pix-22"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21", "art-22"]
+    relationship: implements

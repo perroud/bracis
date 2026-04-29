@@ -1,0 +1,81 @@
+id: ac-2
+family: ac
+title: "Network and System Access Restrictions"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    The organization shall implement network and system access controls to
+    restrict unauthorized access to information systems. Network segmentation
+    shall separate critical systems from general-purpose networks. Remote
+    access shall be controlled through secure channels with strong
+    authentication. Access to operating systems, applications, and databases
+    shall be restricted based on authorized roles, and session management
+    controls shall be implemented including automatic timeout and lockout
+    after failed authentication attempts.
+
+guidance:
+  prose: |
+    Network access control under K-ISMS-P extends beyond perimeter security
+    to include internal network segmentation and micro-segmentation for
+    critical assets. KISA expects organizations to demonstrate that personal
+    information processing systems are isolated from general office networks.
+    Remote access controls are particularly scrutinized, requiring VPN or
+    equivalent encrypted channels with multi-factor authentication. Database
+    access must be controlled through application layers rather than direct
+    database connections wherever possible.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 2.5 — Network Access Control"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement network segmentation using virtual private clouds (VPCs),
+      network policies, and service meshes. Deploy zero-trust network
+      architecture with identity-based access rather than network-based
+      trust. Use infrastructure-as-code to define and enforce network
+      security policies consistently. Implement private endpoints for
+      database and storage services to prevent public network exposure.
+    tools:
+      - istio
+      - calico
+      - terraform
+      - cilium
+
+  devsecops:
+    prose: |
+      Scan infrastructure-as-code for overly permissive network configurations
+      such as open security groups or public-facing databases. Enforce network
+      policy validation in CI/CD pipelines before deployment. Implement
+      automated testing of network segmentation rules. Prevent deployment
+      of services that bypass the defined network architecture.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - kube-bench
+
+  secops:
+    prose: |
+      Monitor network traffic for unauthorized access attempts and lateral
+      movement. Deploy intrusion detection and prevention systems (IDS/IPS)
+      at network segment boundaries. Conduct periodic network penetration
+      testing to verify segmentation effectiveness. Alert on new network
+      connections that violate the established baseline.
+    tools:
+      - suricata
+      - wazuh
+      - elastic-siem
+      - nessus
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a.8.20", "annex-a.8.21", "annex-a.8.22"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-4", "AC-17", "SC-7"]
+    relationship: mapped

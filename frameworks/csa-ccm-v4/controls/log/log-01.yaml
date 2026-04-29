@@ -1,0 +1,104 @@
+id: log-01
+family: log
+title: "Logging and Monitoring Policy"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Establish, document, approve, communicate, apply, evaluate, and maintain
+    policies and procedures for logging and monitoring. The logging and
+    monitoring policy shall address the purpose, scope, roles,
+    responsibilities, management commitment, coordination among
+    organizational entities, and compliance. Logging and monitoring
+    requirements shall include the types of events to be logged, the
+    logging and monitoring facilities to be used, the retention period
+    for log data, and protection of log information.
+
+guidance:
+  prose: >-
+    The logging and monitoring policy should define the categories of
+    events that must be logged across all system components: authentication
+    events, authorization decisions, administrative actions, data access,
+    configuration changes, security events, and system errors. Log
+    retention periods should meet the longest applicable regulatory
+    requirement (typically 1-7 years). Log integrity must be protected
+    through write-once storage, cryptographic verification, or
+    centralized immutable log aggregation. The policy should mandate
+    centralized log collection, correlation, and analysis using SIEM
+    capabilities. Clock synchronization across all logging sources must
+    be maintained to enable accurate event correlation.
+
+references:
+  - citation: "CSA CCM v4.0 LOG-01"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized log aggregation infrastructure that collects
+      logs from all platform components: cloud provider audit trails,
+      Kubernetes audit logs, service mesh access logs, application logs,
+      and infrastructure metrics. Implement structured logging standards
+      with mandatory fields (timestamp, source, severity, user, action,
+      resource, outcome). Enforce log shipping as a platform requirement
+      for all deployed workloads through sidecar injection or node-level
+      agents. Protect log data integrity through write-once storage
+      policies and separate access controls for log administration
+      versus log viewing.
+    tools:
+      - elastic-stack
+      - loki
+      - fluentbit
+      - vector
+      - cloudtrail
+      - stackdriver
+
+  devsecops:
+    prose: >-
+      Enforce structured logging requirements in application code through
+      shared logging libraries and linting rules. Include log output
+      validation in CI/CD pipelines to verify that required events are
+      being logged correctly. Validate that infrastructure-as-code
+      enables appropriate audit logging for all provisioned resources.
+      Implement automated testing that verifies log generation for
+      security-relevant operations. Ensure logging configurations do
+      not include sensitive data (PII, credentials, tokens) through
+      automated scanning.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - sonarqube
+
+  secops:
+    prose: >-
+      Configure SIEM to ingest, normalize, and correlate logs from all
+      platform sources. Implement detection rules for security-relevant
+      log patterns including authentication failures, privilege escalation,
+      data exfiltration indicators, and configuration tampering. Monitor
+      for log gaps or missing sources that could indicate evasion
+      attempts. Maintain log retention in compliance with regulatory
+      requirements. Conduct regular reviews of logging coverage to
+      identify gaps. Generate compliance reports demonstrating log
+      integrity and retention adherence.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - microsoft-sentinel
+      - sumo-logic
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8-15", "a8-17"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-1", "AU-2", "AU-3", "AU-6", "AU-11"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC7.2", "CC7.3"]
+    relationship: mapped
+  - framework_id: gdpr
+    articles: ["art-30", "art-33"]
+    relationship: supports

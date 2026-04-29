@@ -1,0 +1,99 @@
+id: med2-5
+family: antifraude-med
+title: "Enhanced Real-Time Anti-Fraud Engine for MED 2.0"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Os PSPs participantes do Pix devem implementar mecanismos antifraude aprimorados capazes de
+    identificar, em tempo real, transações com indícios de fraude que possam ensejar o acionamento
+    do MED. O motor antifraude deve ser capaz de: analisar o comportamento transacional do usuário
+    e detectar anomalias; verificar marcações de fraude no DICT associadas à chave Pix de destino
+    antes da efetivação da transação; avaliar o risco da transação considerando valor, horário,
+    dispositivo, geolocalização e histórico do usuário; e, quando aplicável, recomendar ou aplicar
+    automaticamente o bloqueio preventivo da transação antes de sua liquidação no SPI. O PSP deve
+    manter registros detalhados das análises antifraude realizadas para cada transação Pix.
+guidance:
+  prose: |
+    **Enhanced Anti-Fraud Requirements:**
+    MED 2.0 demands that PSPs go beyond reactive fraud handling. The anti-fraud engine
+    must operate proactively — before, during, and after transaction settlement.
+
+    **Pre-settlement capabilities:**
+    1. **DICT pre-check:** Query DICT for fraud markers on the destination Pix key
+       before confirming the transaction. If markers exist, warn the user or block.
+    2. **Behavioral analysis:** Compare the transaction against the user's normal
+       patterns (amount, frequency, time of day, device, location).
+    3. **Risk scoring:** Assign a risk score combining all signals. High-risk
+       transactions should trigger additional authentication or a cooling-off period.
+
+    **Post-settlement capabilities:**
+    4. **Continuous monitoring:** Detect patterns that become visible only after
+       multiple transactions (e.g., fan-out to mule accounts).
+    5. **Retroactive flagging:** If a receiver account is later marked as a mule,
+       retroactively flag all recent incoming transactions for review.
+
+    **Logging:** Every fraud analysis must be logged with: transaction ID, signals
+    evaluated, risk score, decision (allow/warn/block), timestamp.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Deploy a real-time fraud scoring microservice that evaluates every outgoing Pix
+         transaction in under 100ms, combining behavioral analytics, DICT markers, device
+         fingerprinting, and geolocation data.
+      2. Implement a pre-settlement DICT query integration that checks destination key
+         fraud markers before forwarding the transaction to the SPI.
+      3. Build configurable risk thresholds with three tiers: allow (low risk), warn
+         (medium risk — show user warning and require confirmation), block (high risk —
+         require additional authentication or manual review).
+      4. Implement a transaction analysis log that stores the complete fraud evaluation
+         for every Pix transaction, with a minimum retention of 5 years.
+      5. Build a feedback loop: outcomes of MED cases (procedente/improcedente) feed
+         back into the fraud model to improve accuracy over time.
+    tools:
+      - ml-scoring-engine
+      - dict-api-client
+      - event-streaming
+      - feature-store
+      - model-registry
+  devsecops:
+    prose: |
+      1. Benchmark fraud scoring latency: p99 must be under 100ms to avoid impacting
+         Pix transaction SLAs.
+      2. Test DICT pre-check integration with various marker states (clean, flagged,
+         high-risk, blocked key).
+      3. Validate risk threshold behavior: transactions at each risk tier follow the
+         correct flow (allow/warn/block).
+      4. Test model accuracy with labeled datasets: precision, recall, F1 score.
+      5. Implement A/B testing infrastructure for fraud model updates to measure
+         impact before full rollout.
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - ml-testing
+      - a-b-testing
+      - integration-testing
+  secops:
+    prose: |
+      1. Monitor fraud engine performance in real-time: scoring latency, throughput,
+         error rates, model drift indicators.
+      2. Track fraud detection metrics: true positive rate, false positive rate,
+         detection-to-block time, user complaint rate.
+      3. Review blocked and warned transactions daily to identify false positives and
+         tune thresholds.
+      4. Produce monthly fraud intelligence reports: emerging patterns, new attack
+         vectors, model performance trends.
+      5. Coordinate with BCB and peer PSPs on shared fraud intelligence through
+         DICT markers and bilateral channels.
+    tools:
+      - ml-monitoring
+      - fraud-analytics
+      - alerting-system
+      - threat-intelligence
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-17", "pix-18"]
+    relationship: extends
+  - framework_id: bcb-85
+    articles: ["art-1"]
+    relationship: complements

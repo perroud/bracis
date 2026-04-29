@@ -1,0 +1,112 @@
+id: art-9
+family: cap-2
+title: "Componente de Seguranca"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 9. O componente de segurança do Padrão TISS estabelece os
+    requisitos de segurança da informação aplicáveis a todas as transações
+    TISS, visando garantir a confidencialidade, integridade e
+    disponibilidade dos dados de saúde.
+
+    Parágrafo 1. Os requisitos de segurança incluem:
+    I - Autenticação de usuários e sistemas participantes;
+    II - Criptografia de dados em trânsito e em repouso;
+    III - Controle de acesso baseado em perfis e funções;
+    IV - Registro de trilhas de auditoria de todas as transações;
+    V - Proteção contra acesso não autorizado e alteração indevida;
+    VI - Plano de contingência e continuidade para sistemas TISS.
+
+    Parágrafo 2. O componente de segurança deve ser implementado em
+    conformidade com a LGPD e demais normas de proteção de dados
+    pessoais sensíveis de saúde.
+guidance:
+  prose: |
+    O componente de seguranca e transversal a todos os demais
+    componentes, definindo requisitos que devem ser implementados em
+    cada camada do sistema TISS.
+
+    **Requisitos de seguranca por camada:**
+
+    **Transporte:**
+    - TLS 1.2+ para todas as comunicacoes
+    - Certificados ICP-Brasil para autenticacao mutua
+    - Perfect Forward Secrecy habilitado
+
+    **Aplicacao:**
+    - Autenticacao forte para usuarios que operam sistemas TISS
+    - Controle de acesso role-based (RBAC) por tipo de transacao
+    - Validacao de entrada em todas as mensagens XML
+
+    **Dados:**
+    - Criptografia at-rest para dados de saude (AES-256)
+    - Mascaramento de dados sensiveis em ambientes nao-produtivos
+    - Backup criptografado com teste periodico de restauracao
+
+    **Auditoria:**
+    - Log de todas as transacoes TISS (quem, quando, o que, de onde)
+    - Retencao minima de 5 anos para logs de transacoes de saude
+    - Protecao contra adulteracao de logs (append-only, WORM)
+
+    **Alinhamento LGPD:**
+    Dados de saude sao dados pessoais sensiveis (art. 5, II, LGPD).
+    Seu tratamento exige base legal especifica (art. 11, LGPD) e
+    medidas de seguranca reforcadas (art. 46, LGPD).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao da camada de seguranca TISS:**
+      1. Configurar TLS 1.3 preferencialmente (TLS 1.2 minimo) em
+         todos os endpoints TISS, com cipher suites aprovados.
+      2. Implementar WAF (Web Application Firewall) na frente dos
+         endpoints TISS com regras especificas para protecao de
+         XML (XXE, SSRF, XPath injection).
+      3. Implementar criptografia at-rest (AES-256-GCM) para todo
+         armazenamento de dados de saude (banco, arquivos, backups).
+      4. Configurar sistema de logs centralizado (ELK, Loki) com
+         retencao de 5 anos e protecao contra adulteracao.
+    tools:
+      - waf
+      - tls-configuration
+      - encryption-at-rest
+      - centralized-logging
+  devsecops:
+    prose: |
+      **Seguranca no pipeline para sistemas TISS:**
+      1. Implementar SAST e DAST especificos para vulnerabilidades
+         XML (XXE, DTD injection, XPath injection, billion laughs).
+      2. Incluir secret scanning para detectar credenciais, chaves
+         e certificados expostos em codigo-fonte.
+      3. Automatizar verificacao de configuracao TLS e cipher suites
+         como teste de conformidade no pipeline.
+      4. Implementar testes de penetracao automatizados nos endpoints
+         TISS como parte do ciclo de release.
+    tools:
+      - sast
+      - dast
+      - secret-scanning
+      - penetration-testing
+  secops:
+    prose: |
+      **Operacao de seguranca para sistemas TISS:**
+      1. Monitorar tentativas de acesso nao autorizado a endpoints
+         TISS em tempo real via SIEM/SOC.
+      2. Implementar alertas para anomalias em transacoes TISS
+         (volume atipico, horarios incomuns, origens suspeitas).
+      3. Realizar testes de penetracao semestrais nos sistemas TISS,
+         incluindo testes de API e XML parsing.
+      4. Manter plano de contingencia especifico para sistemas TISS,
+         com RTO e RPO definidos e testados.
+    tools:
+      - siem
+      - anomaly-detection
+      - pentest-tools
+      - dr-plan
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47", "art-48"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312", "164-308"]
+    relationship: mapped

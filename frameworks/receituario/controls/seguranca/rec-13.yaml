@@ -1,0 +1,145 @@
+id: rec-13
+family: seguranca
+title: "Information Security Requirements for Prescription Systems"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 24. Os sistemas de prescrição eletrônica e dispensação devem
+    implementar controles de segurança da informação que garantam:
+
+    I — confidencialidade dos dados de saúde do paciente, com criptografia
+    de dados em trânsito (TLS 1.2 ou superior) e em repouso (AES-256 ou
+    equivalente);
+
+    II — integridade dos dados da prescrição, impedindo alterações não
+    autorizadas após a assinatura digital;
+
+    III — disponibilidade do sistema, com índice mínimo de 99,5% de
+    disponibilidade mensal e tempo máximo de recuperação de 4 (quatro)
+    horas;
+
+    IV — autenticação forte de todos os usuários do sistema, incluindo
+    autenticação multifator para prescritores e farmacêuticos;
+
+    V — controle de acesso baseado em funções (RBAC), com segregação
+    de perfis para prescritores, farmacêuticos, administradores e
+    auditores;
+
+    VI — trilha de auditoria inalterável para todas as operações
+    realizadas no sistema, incluindo consultas a dados de pacientes.
+guidance:
+  prose: |
+    Article 24 establishes comprehensive information security requirements
+    for prescription and dispensation systems, covering the CIA triad
+    plus authentication, authorization, and audit.
+
+    **Encryption requirements:**
+    - In transit: minimum TLS 1.2 (TLS 1.3 recommended)
+    - At rest: minimum AES-256 for patient health data and prescription
+      content
+    - Key management must follow industry best practices (HSM-backed
+      key storage recommended)
+
+    **Availability SLA:**
+    - Minimum 99.5% monthly uptime (~3.6 hours maximum downtime/month)
+    - Maximum RTO of 4 hours
+    - This is demanding for healthcare systems and requires robust
+      high-availability architecture
+
+    **Authentication:**
+    - Multi-factor authentication mandatory for prescribers and
+      pharmacists
+    - The ICP-Brasil digital certificate counts as one factor
+    - A second factor (OTP, biometric, hardware token) is required
+
+    **Access control:**
+    - Role-Based Access Control (RBAC) with minimum four roles:
+      prescriber, pharmacist, administrator, auditor
+    - Principle of least privilege
+    - Segregation of duties (prescribers cannot dispense, pharmacists
+      cannot prescribe)
+
+    **Audit trail:**
+    - Immutable logging of all system operations
+    - Includes read operations (patient data access), not just writes
+    - Must support regulatory inspection and forensic investigation
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Security infrastructure for prescription systems:**
+      1. Deploy TLS 1.3 termination at all ingress points with
+         automatic certificate management (ACME/Let's Encrypt or
+         enterprise CA) and HSTS headers.
+      2. Implement AES-256 transparent data encryption (TDE) for
+         the prescription database, with HSM-backed key management
+         for encryption keys.
+      3. Deploy a high-availability architecture with active-active
+         or active-passive failover meeting 99.5% uptime SLA:
+         multi-AZ deployment, automated failover, health checks.
+      4. Implement MFA using TOTP, WebAuthn/FIDO2, or hardware
+         tokens for prescriber and pharmacist authentication, in
+         addition to ICP-Brasil digital certificate.
+      5. Deploy RBAC with predefined roles (prescriber, pharmacist,
+         admin, auditor) enforced at API gateway and database levels.
+      6. Implement centralized, append-only audit logging with
+         tamper-evident storage (cryptographic chaining) for all
+         system operations including read access.
+    tools:
+      - tls-termination
+      - hsm
+      - vault
+      - postgresql-tde
+      - keycloak
+      - webauthn
+      - opa-gatekeeper
+      - elasticsearch-audit
+  devsecops:
+    prose: |
+      **Security testing pipeline:**
+      1. Run SAST on every commit to detect security vulnerabilities
+         in prescription system code (injection, authentication
+         bypass, insecure crypto).
+      2. Deploy DAST against staging environments to test encryption,
+         authentication, and authorization enforcement.
+      3. Implement dependency scanning to detect known vulnerabilities
+         in third-party libraries used by the prescription system.
+      4. Add secret detection to prevent accidental commit of
+         encryption keys, API tokens, or database credentials.
+      5. Run penetration tests quarterly against the full prescription
+         and dispensation workflow.
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - secret-detection
+      - penetration-testing
+  secops:
+    prose: |
+      **Security operations for prescription systems:**
+      1. Monitor system availability 24/7 with automated alerting
+         when uptime drops below 99.5% SLA threshold.
+      2. Review audit logs daily for suspicious access patterns
+         (bulk patient data access, off-hours operations, privilege
+         escalation attempts).
+      3. Conduct quarterly access reviews verifying RBAC assignments
+         and removing stale accounts.
+      4. Run vulnerability scans monthly and patch critical
+         vulnerabilities within 72 hours.
+    tools:
+      - siem
+      - uptime-monitoring
+      - vulnerability-scanner
+      - access-review-platform
+      - patch-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["clausula-8"]
+    relationship: mapped
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-19", "art-20"]
+    relationship: mapped

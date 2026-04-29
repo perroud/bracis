@@ -1,0 +1,82 @@
+id: oi-si-02
+family: si
+title: "Endosso e Alteracoes Contratuais via Iniciador"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Além da contratação inicial, o Open Insurance pode permitir que iniciadores de
+    serviços realizem, em nome do cliente, operações de endosso e alterações
+    contratuais em apólices existentes, incluindo:
+
+    I - Endosso de aumento ou redução de cobertura;
+    II - Inclusão ou exclusão de bens segurados;
+    III - Alteração de dados cadastrais vinculados à apólice;
+    IV - Cancelamento de apólice a pedido do segurado;
+    V - Portabilidade de planos de previdência entre EAPCs.
+
+    Cada operação de endosso ou alteração requer consentimento específico do
+    cliente e autenticação junto à seguradora/EAPC que emitiu o contrato.
+
+    O iniciador deve informar ao cliente sobre as consequências da alteração
+    solicitada (ex: impacto no prêmio, período de carência, perda de benefícios)
+    antes da confirmação.
+guidance:
+  prose: |
+    O endosso e alteracoes contratuais via terceiros sao funcionalidades de fase
+    avancada do Open Insurance. A implementacao tende a ser posterior a contratacao
+    via terceiros, por envolver maior complexidade operacional.
+
+    A portabilidade de previdencia via Open Insurance e particularmente
+    transformadora: atualmente, a portabilidade exige contato direto com a EAPC
+    de destino, que negocia com a EAPC de origem. Com o Open Insurance, o processo
+    pode ser iniciado por um terceiro (comparador, consultor financeiro digital).
+
+    As consequencias de alteracoes contratuais devem ser informadas de forma clara
+    ao cliente, incluindo:
+    - Impacto financeiro (aumento ou reducao de premio)
+    - Impacto em coberturas (carencias, exclusoes)
+    - Prazos de efetivacao
+    - Irreversibilidade (se aplicavel)
+
+    O iniciador nao pode realizar alteracoes que prejudiquem o cliente sem
+    informacao clara e consentimento especifico para aquela alteracao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs de endosso conforme especificacao do Open Insurance.
+      2. Implementar simulacao de endosso (dry-run) para que o iniciador possa
+         apresentar ao cliente as consequencias antes da confirmacao.
+      3. Implementar fluxo de confirmacao em duas etapas: simulacao > confirmacao.
+      4. Garantir atomicidade das operacoes de endosso (tudo-ou-nada).
+      5. Implementar APIs de portabilidade de previdencia conforme especificacao.
+    tools:
+      - api-gateway
+      - transaction-management
+      - workflow-engine
+  devsecops:
+    prose: |
+      1. Testes end-to-end de fluxos de endosso (simulacao > confirmacao > efetivacao).
+      2. Testes de atomicidade: verificar que operacoes parciais sao revertidas.
+      3. Testes de portabilidade de previdencia com cenarios complexos.
+      4. Testes de seguranca para prevenir alteracoes nao autorizadas.
+    tools:
+      - e2e-testing
+      - integration-testing
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar operacoes de endosso para detectar alteracoes suspeitas
+         (cancelamentos em massa, alteracoes de alto valor).
+      2. Auditar que informacoes de consequencias estao sendo apresentadas ao
+         cliente antes da confirmacao.
+      3. Monitorar portabilidades de previdencia para detectar fraudes.
+    tools:
+      - fraud-detection
+      - siem
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-9"]
+    relationship: complements

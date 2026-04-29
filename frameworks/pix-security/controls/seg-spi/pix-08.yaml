@@ -1,0 +1,91 @@
+id: pix-08
+family: seg-spi
+title: "Integridade de Mensagens ISO 20022"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Todas as mensagens trafegadas no SPI devem seguir o padrão ISO 20022 conforme
+    especificação técnica definida pelo Banco Central do Brasil. A integridade de cada
+    mensagem deve ser garantida por assinatura digital e validação de schema XML. O
+    participante deve implementar controles para detectar e rejeitar mensagens corrompidas,
+    duplicadas, fora de sequência ou com campos obrigatórios ausentes, garantindo que
+    apenas mensagens válidas e íntegras sejam processadas.
+guidance:
+  prose: |
+    **Padrao ISO 20022 no Pix:**
+    O SPI utiliza mensagens ISO 20022 em formato XML para todas as operacoes:
+    - pacs.008: Ordem de pagamento (credito)
+    - pacs.002: Status de pagamento
+    - pacs.004: Devolucao
+    - camt.053: Extrato
+    - camt.060: Solicitacao de extrato
+    - pain.013: Iniciacao de pagamento (Pix Cobranca)
+    - pain.014: Status de iniciacao de pagamento
+
+    **Controles de integridade:**
+    1. **Validacao de schema:** Toda mensagem deve ser validada contra o XSD oficial
+       publicado pelo BCB antes de processamento.
+    2. **Assinatura digital:** Conforme controle pix-06, cada mensagem e assinada.
+    3. **Idempotencia:** Mensagens duplicadas (mesmo EndToEndId) devem ser detectadas
+       e tratadas sem duplo processamento.
+    4. **Sequenciamento:** Mensagens fora de ordem devem ser enfileiradas ou rejeitadas.
+    5. **Campos obrigatorios:** Ausencia de campos obrigatorios resulta em rejeicao.
+
+    **EndToEndId:**
+    Identificador unico de ponta a ponta que acompanha a transacao desde o pagador ate
+    o recebedor. Formato de 32 caracteres definido pelo BCB. Critico para rastreabilidade
+    e para o MED.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Processamento de mensagens:**
+      1. Parser XML com validacao de schema (XSD) integrado ao pipeline de mensageria.
+      2. Servico de deduplicacao por EndToEndId com TTL configuravel.
+      3. Dead letter queue para mensagens invalidas com alerta operacional.
+      4. Versionamento de schemas ISO 20022 com suporte a multiplas versoes durante
+         periodos de transicao.
+
+      **Idempotencia e sequenciamento:**
+      5. Tabela de idempotencia com EndToEndId como chave primaria.
+      6. Processamento em ordem para mensagens relacionadas (pagamento + status).
+      7. Retry com backoff exponencial para mensagens temporariamente rejeitadas.
+      8. Monitoramento de mensagens na dead letter queue com escalonamento automatico.
+    tools:
+      - message-queue
+      - xml-parser
+      - database
+      - dead-letter-queue
+      - idempotency-service
+  devsecops:
+    prose: |
+      **Validacao no pipeline:**
+      1. Testes com biblioteca de mensagens ISO 20022 validas e invalidas.
+      2. Testes de idempotencia: envio da mesma mensagem multiplas vezes.
+      3. Testes de campo obrigatorio: mensagens com campos faltantes.
+      4. Fuzz testing em parser XML para detectar vulnerabilidades (XXE, XSS).
+      5. Atualizacao automatica de schemas XSD quando BCB publica novas versoes.
+    tools:
+      - gitlab-ci
+      - xml-validator
+      - fuzz-testing
+      - schema-registry
+  secops:
+    prose: |
+      **Monitoramento de integridade:**
+      1. Alerta para taxa elevada de mensagens rejeitadas por falha de validacao.
+      2. Monitoramento de tentativas de injecao via mensagens XML malformadas.
+      3. Auditoria de mensagens na dead letter queue para identificar padroes de erro.
+      4. Relatorio de integridade de mensagens por periodo.
+    tools:
+      - siem
+      - monitoring-stack
+      - alerting
+      - audit-log-analyzer
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-16", "art-17"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-7"]
+    relationship: complements

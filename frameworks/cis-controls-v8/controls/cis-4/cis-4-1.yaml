@@ -1,0 +1,100 @@
+id: cis-4.1
+family: cis-4
+title: "Establish and Maintain a Secure Configuration Process"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain a secure configuration process for enterprise assets
+    (end-user devices, including portable and mobile; non-computing/IoT devices;
+    and servers) and software (operating systems and applications). Review and update
+    documentation annually, or when significant enterprise changes occur that could
+    impact this Safeguard.
+
+guidance:
+  prose: >-
+    Default configurations for enterprise assets and software are typically oriented
+    toward ease of deployment and use, not security. Attackers exploit default credentials,
+    open ports, unnecessary services, and overly permissive permissions. A secure
+    configuration process establishes hardened baselines derived from industry benchmarks
+    (CIS Benchmarks, DISA STIGs, vendor hardening guides) and applies them consistently
+    across all assets. Configuration management must be automated to prevent configuration
+    drift. Exceptions must be documented, risk-assessed, and approved. The process should
+    cover initial deployment, ongoing maintenance, and decommissioning of assets.
+
+references:
+  - citation: "CIS Controls v8.1, Control 4, Safeguard 4.1"
+    url: "https://www.cisecurity.org/controls/v8"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define golden images and base configurations as code for all platform components.
+      Use configuration management tools (Ansible, Chef, Puppet) or immutable
+      infrastructure patterns (Packer, container base images) to enforce secure baselines.
+      Apply CIS Benchmarks to OS images, container runtimes, and Kubernetes clusters.
+      Use Kubernetes admission controllers to enforce pod security standards, preventing
+      privileged containers, host network access, and writable root filesystems.
+      Implement automated configuration drift detection that compares running
+      configurations against declared desired state and triggers remediation pipelines.
+      Use GitOps (Flux, ArgoCD) to ensure all runtime configurations match their
+      version-controlled declarations.
+    tools:
+      - ansible
+      - packer
+      - kyverno
+      - opa-gatekeeper
+      - argocd
+      - flux
+      - cis-cat-pro
+      - inspec
+
+  devsecops:
+    prose: >-
+      Integrate configuration validation into CI/CD pipelines. Scan Dockerfiles,
+      Kubernetes manifests, Terraform modules, and Helm charts against CIS Benchmarks
+      and organizational policies before deployment. Use tools like Checkov, tfsec,
+      and kube-linter to catch misconfigurations early. Enforce that container images
+      are built from approved, hardened base images. Implement pipeline policies that
+      prevent deploying configurations with critical or high-severity findings. Maintain
+      a library of approved Terraform modules and Helm charts that embed secure defaults.
+    tools:
+      - checkov
+      - tfsec
+      - kube-linter
+      - trivy-config
+      - hadolint
+      - conftest
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Run continuous configuration assessment scans across all enterprise assets.
+      Use vulnerability management platforms that include configuration audit
+      capabilities (Qualys Policy Compliance, Tenable Audit). Monitor SIEM for
+      configuration change events and alert on deviations from approved baselines.
+      Generate monthly compliance reports showing configuration posture across the
+      enterprise. Maintain an exception register for approved deviations with
+      expiration dates and compensating controls.
+    tools:
+      - qualys-policy-compliance
+      - tenable-audit
+      - cis-cat-pro
+      - splunk
+      - wazuh
+      - osquery
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-1", "CM-2", "CM-6", "CM-7"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.9"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.PS-01"]
+    relationship: implements

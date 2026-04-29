@@ -1,0 +1,83 @@
+id: pw-4
+family: pw
+title: "Reuse Existing, Well-Secured Software When Feasible"
+class: SP800-218
+statement:
+  prose: >-
+    Lower the costs of software development, expedite software development, and decrease the
+    likelihood of introducing additional security vulnerabilities by reusing existing well-secured
+    software rather than duplicating functionality. Manage risks associated with reused software
+    components, including open-source and third-party dependencies.
+  parts:
+    - id: pw-4_smt.a
+      label: "a."
+      prose: >-
+        Maintain a curated catalog of approved, well-secured software components, libraries,
+        and frameworks that development teams should reuse when their functionality meets
+        project requirements.
+    - id: pw-4_smt.b
+      label: "b."
+      prose: >-
+        Evaluate the security of third-party and open-source components before adoption, including
+        vulnerability history, maintenance status, license compliance, and community health.
+    - id: pw-4_smt.c
+      label: "c."
+      prose: >-
+        Monitor all reused components for newly discovered vulnerabilities and update or replace
+        components promptly when security issues are identified.
+guidance:
+  prose: >-
+    Reusing well-secured software reduces the attack surface by leveraging components that have
+    been vetted and hardened through broad use and scrutiny. However, reuse introduces supply
+    chain risks — vulnerabilities in widely used libraries (Log4Shell, for example) can have
+    cascading impact. Organizations must balance the benefits of reuse with supply chain risk
+    management. This includes maintaining an inventory of all dependencies (SBOM), monitoring
+    for vulnerabilities, evaluating the security posture of upstream projects, and having a
+    process to rapidly update or replace compromised components.
+references:
+  - citation: "NIST SP 800-218 Section 2.3"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "OpenSSF Scorecard"
+    url: "https://scorecard.dev/"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a curated internal package registry of approved libraries and components.
+      Configure dependency proxies that cache and scan all external dependencies before they
+      reach developers. Implement automated dependency health scoring using OpenSSF Scorecard
+      or similar tools. Provide golden software templates that use approved dependencies by
+      default. Enforce that only approved base images and libraries from the internal registry
+      can be used in production builds.
+    tools:
+      - "Artifactory / Nexus (curated registry)"
+      - "GitLab Dependency Proxy"
+      - "OpenSSF Scorecard"
+      - "Backstage Software Templates"
+      - "Renovate / Dependabot"
+  devsecops:
+    prose: >-
+      Integrate Software Composition Analysis (SCA) into CI/CD pipelines to continuously
+      monitor dependencies for known vulnerabilities. Enforce policies that block builds using
+      deprecated, unmaintained, or severely vulnerable dependencies. Automate dependency update
+      proposals using tools like Renovate or Dependabot. Generate and validate SBOMs for every
+      build, tracking all direct and transitive dependencies. Implement license compliance
+      checks to prevent use of incompatibly licensed components.
+    tools:
+      - "Snyk / Grype (SCA)"
+      - "Trivy (dependency scanning)"
+      - "Renovate / Dependabot"
+      - "Syft (SBOM)"
+      - "FOSSA / Licensee (license compliance)"
+      - "GitLab Dependency Scanning"
+  secops:
+    prose: >-
+      Monitor vulnerability feeds and threat intelligence for newly disclosed vulnerabilities
+      affecting reused components. Maintain a centralized dependency inventory across all
+      software products. Prioritize remediation based on exploitability, exposure, and business
+      impact. Track mean time to remediate dependency vulnerabilities and report on organizational
+      patching velocity.
+    tools:
+      - "SIEM (Splunk, Elastic Security)"
+      - "DefectDojo"
+      - "NIST NVD / OSV.dev"
+      - "GitLab Security Dashboard"

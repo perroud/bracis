@@ -1,0 +1,113 @@
+id: art-49
+family: distribuicao-suitability
+title: "Adequacao ao Perfil do Investidor (Suitability)"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 49. O distribuidor de cotas do fundo de investimento deve verificar a
+    adequação do investimento ao perfil do investidor (suitability) previamente
+    à realização de qualquer aplicação.
+
+    Parágrafo 1. A verificação de adequação deve considerar, no mínimo:
+    I - a situação financeira do investidor; II - o período pelo qual o
+    investidor deseja manter o investimento; III - os objetivos do investimento;
+    IV - o nível de tolerância a risco do investidor; V - o nível de
+    conhecimento financeiro do investidor.
+
+    Parágrafo 2. O distribuidor não pode recomendar ou permitir a aplicação
+    em fundo inadequado ao perfil do investidor, salvo se o investidor
+    manifestar expressamente sua ciência e vontade de prosseguir com a
+    aplicação, após ser alertado sobre a inadequação.
+
+    Parágrafo 3. A análise de perfil do investidor (API) deve ser revisada
+    periodicamente e sempre que houver alteração relevante na situação do
+    investidor.
+guidance:
+  prose: |
+    O art. 49 estabelece a obrigacao de suitability -- verificar se o fundo
+    e adequado ao perfil do investidor antes da aplicacao.
+
+    **Cinco dimensoes obrigatorias:**
+    A analise de perfil deve avaliar: situacao financeira, horizonte de
+    investimento, objetivos, tolerancia a risco e conhecimento financeiro.
+    Essas cinco dimensoes classificam o investidor em perfis (conservador,
+    moderado, arrojado, sofisticado).
+
+    **Vedacao de aplicacao inadequada:**
+    Se o fundo nao e adequado ao perfil, o distribuidor NAO PODE permitir
+    a aplicacao sem alerta expresso e ciencia documentada do investidor.
+    O opt-in do investidor nao exime o distribuidor de responsabilidade.
+
+    **Revisao periodica:**
+    O perfil do investidor muda ao longo do tempo (idade, patrimonio,
+    conhecimento). A API deve ser revisada periodicamente e sempre que
+    houver alteracao relevante.
+
+    **Impacto em sistemas:**
+    Plataformas de distribuicao devem implementar: questionario de API,
+    classificacao automatica de perfil, bloqueio/alerta para aplicacoes
+    inadequadas, registro de ciencia do investidor, revisao periodica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de suitability:**
+      1. Questionario de API digital integrado a plataforma de distribuicao:
+         perguntas padronizadas cobrindo as cinco dimensoes obrigatorias.
+      2. Motor de classificacao de perfil: algoritmo que classifica o
+         investidor com base nas respostas (conservador, moderado, arrojado).
+      3. Mapeamento fundo-perfil: cada fundo classificado por nivel de risco,
+         cruzado com perfil do investidor para verificacao de adequacao.
+
+      **Bloqueio automatico:**
+      4. Hard block para aplicacao em fundo inadequado: investidor deve
+         ativamente reconhecer inadequacao e manifestar ciencia.
+      5. Registro imutavel da manifestacao de ciencia com timestamp e IP.
+      6. Revisao automatica de API: lembrete periodico para atualizacao.
+    tools:
+      - git
+      - vault
+      - terraform
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Validacao de suitability:**
+      1. Testes automatizados de motor de classificacao: verificar que
+         respostas diferentes geram perfis corretos.
+      2. Testes de bloqueio: simular tentativa de aplicacao inadequada e
+         verificar que o sistema bloqueia e exige ciencia.
+      3. SAST para codigo de classificacao: erros podem permitir aplicacoes
+         inadequadas.
+
+      **Protecao de dados de API:**
+      4. Secret detection para dados pessoais de investidores em codigo/logs.
+      5. Criptografia de respostas do questionario de API em repouso.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de suitability:**
+      1. Dashboard de suitability: percentual de aplicacoes adequadas vs.
+         inadequadas com ciencia, APIs desatualizadas, bloqueios acionados.
+      2. Alertas para: APIs expiradas, concentracao de aplicacoes inadequadas,
+         padroes anomalos.
+      3. Metricas de qualidade: taxa de adequacao, tempo medio de preenchimento
+         de API, taxa de atualizacao.
+
+      **Auditoria de suitability:**
+      4. Amostragem de aplicacoes para verificar se suitability foi realizado.
+      5. Verificar que manifestacoes de ciencia estao documentadas.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - siem
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-3", "art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-46"]
+    relationship: complements

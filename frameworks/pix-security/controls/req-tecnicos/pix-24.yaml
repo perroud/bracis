@@ -1,0 +1,98 @@
+id: pix-24
+family: req-tecnicos
+title: "SLAs de Disponibilidade e Tempo de Resposta"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP participante do arranjo Pix deve garantir disponibilidade de seus serviços
+    Pix compatível com a operação 24x7x365 do SPI. O BCB define SLAs mínimos de
+    disponibilidade, tempo de resposta para liquidação e tempo máximo de processamento
+    ponta-a-ponta. O descumprimento sistemático dos SLAs sujeita o PSP a penalidades
+    previstas no regulamento, incluindo multas proporcionais ao impacto e restrições
+    operacionais.
+guidance:
+  prose: |
+    **SLAs do arranjo Pix:**
+
+    1. **Disponibilidade do canal:**
+       - Meta: 99,5% de disponibilidade mensal (minimo).
+       - PSPs de grande porte: expectativa de 99,9%+.
+       - Indisponibilidade planejada: deve ser comunicada ao BCB com antecedencia e
+         limitada a janelas de menor trafego.
+
+    2. **Tempo de processamento (PSP):**
+       - Tempo maximo para o PSP processar uma transacao (debitar/creditar): poucos
+         segundos conforme especificacao do BCB.
+       - Timeout: transacao nao respondida no prazo e rejeitada automaticamente pelo SPI.
+
+    3. **Tempo ponta-a-ponta:**
+       - Meta: ate 10 segundos para o usuario perceber a conclusao do pagamento.
+       - Inclui: app pagador + PSP pagador + SPI + PSP recebedor + notificacao.
+
+    4. **Monitoramento pelo BCB:**
+       - O BCB monitora os SLAs de cada PSP em tempo real.
+       - Rankings de performance sao publicados periodicamente.
+       - Degradacao sistematica resulta em notificacao, plano de acao e penalidades.
+
+    **Janelas de manutencao:**
+    O Pix opera sem janela de manutencao programada. Toda manutencao deve ser feita
+    com zero downtime (blue-green, canary, rolling update).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de alta disponibilidade:**
+      1. Deploy em multiplas zonas de disponibilidade (multi-AZ).
+      2. Load balancing com health checks automaticos.
+      3. Zero-downtime deployment: blue-green ou canary releases.
+      4. Auto-scaling baseado em metricas de TPS e latencia.
+
+      **Monitoramento de SLA:**
+      5. SLI (Service Level Indicators) para cada componente do canal Pix.
+      6. SLO (Service Level Objectives) alinhados aos SLAs do BCB.
+      7. Error budget tracking: consumo de error budget como trigger para freeze de deploy.
+      8. Dashboard de SLA em tempo real acessivel a equipe e a gestao.
+
+      **Performance:**
+      9. Otimizacao de latencia em cada camada (app, API, banco, SPI).
+      10. Database tuning para queries de pagamento (indices, particionamento).
+      11. Connection pooling e caching estrategico.
+    tools:
+      - kubernetes
+      - load-balancer
+      - prometheus
+      - grafana
+      - database-tuning
+  devsecops:
+    prose: |
+      **Testes de performance:**
+      1. Load testing: simular volume de pico (2x a 5x do pico historico).
+      2. Stress testing: identificar ponto de ruptura da infraestrutura.
+      3. Soak testing: operacao prolongada para detectar memory leaks e degradacao.
+      4. Performance regression: comparar latencia entre releases.
+      5. SLA gate no pipeline: deploy bloqueado se latencia p99 exceder threshold.
+    tools:
+      - k6
+      - gatling
+      - gitlab-ci
+      - performance-benchmarking
+  secops:
+    prose: |
+      **Gestao de disponibilidade:**
+      1. Relatorio mensal de disponibilidade para o BCB.
+      2. Post-mortem para cada incidente de indisponibilidade.
+      3. SLA review trimestral com plano de melhoria.
+      4. Comunicacao proativa ao BCB em caso de degradacao.
+      5. Acompanhamento de ranking de performance publicado pelo BCB.
+    tools:
+      - sla-management
+      - incident-management
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-18", "art-19", "art-25"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

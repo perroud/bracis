@@ -1,0 +1,125 @@
+id: art-8
+family: cap-2
+title: "Requisitos do Consentimento"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 8º O consentimento previsto no inciso I do art. 7º desta Lei deverá ser fornecido
+    por escrito ou por outro meio que demonstre a manifestação de vontade do titular.
+  additional:
+    - id: art-8-p1
+      label: "§ 1º"
+      prose: |
+        Caso o consentimento seja fornecido por escrito, esse deverá constar de cláusula
+        destacada das demais cláusulas contratuais.
+    - id: art-8-p2
+      label: "§ 2º"
+      prose: |
+        Cabe ao controlador o ônus da prova de que o consentimento foi obtido em
+        conformidade com o disposto nesta Lei.
+    - id: art-8-p3
+      label: "§ 3º"
+      prose: |
+        É vedado o tratamento de dados pessoais mediante vício de consentimento.
+    - id: art-8-p4
+      label: "§ 4º"
+      prose: |
+        O consentimento deverá referir-se a finalidades determinadas, e as autorizações
+        genéricas para o tratamento de dados pessoais serão nulas.
+    - id: art-8-p5
+      label: "§ 5º"
+      prose: |
+        O consentimento pode ser revogado a qualquer momento mediante manifestação expressa
+        do titular, por procedimento gratuito e facilitado, ratificados os tratamentos
+        realizados sob amparo do consentimento anteriormente manifestado enquanto não houver
+        requerimento de eliminação, nos termos do inciso VI do caput do art. 18 desta Lei.
+    - id: art-8-p6
+      label: "§ 6º"
+      prose: |
+        Em caso de alteração de informação referida nos incisos I, II, III ou V do art. 9º
+        desta Lei, o controlador deverá informar ao titular, com destaque de forma
+        específica do teor das alterações, podendo o titular, nos casos em que o seu
+        consentimento é exigido, revogá-lo caso discorde da alteração.
+guidance:
+  prose: |
+    O art. 8º detalha os requisitos de validade do consentimento, que é uma das dez bases
+    legais do art. 7º. O consentimento na LGPD é mais rigoroso do que o padrão contratual
+    comum.
+
+    **Requisitos cumulativos para validade:**
+    1. Livre — sem coerção ou condicionamento
+    2. Informado — titular sabe exatamente o que está consentindo
+    3. Inequívoco — demonstrável (escrito, clique, assinatura digital)
+    4. Específico — por finalidade determinada (§ 4º)
+    5. Destacado — em cláusula separada se por escrito (§ 1º)
+
+    **Ônus da prova (§ 2º):** O controlador deve conseguir demonstrar que obteve
+    consentimento válido. Isso exige registro técnico: timestamp, IP, versão do termo,
+    ação do usuário, contexto.
+
+    **Vício de consentimento (§ 3º):** Consentimento obtido por erro, dolo, coação ou
+    estado de perigo é nulo. Dark patterns que induzem o titular a consentir são vício
+    de consentimento. Exemplo: pré-marcar checkboxes, dificultar recusa, usar linguagem
+    confusa.
+
+    **Autorizações genéricas nulas (§ 4º):** "Autorizo o tratamento dos meus dados" sem
+    especificar finalidades é nulo. O consentimento deve ser granular por finalidade.
+
+    **Revogação facilitada (§ 5º):** Deve ser tão fácil revogar quanto consentir. Se o
+    consentimento foi dado com um clique, a revogação deve ser possível com um clique.
+    Exigir ligação telefônica ou carta para revogar consentimento dado online viola o § 5º.
+
+    **Alteração de finalidade (§ 6º):** Se o controlador muda a finalidade, os meios de
+    tratamento ou o compartilhamento, deve notificar o titular e permitir revogação.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar Consent Management Platform (CMP) com granularidade por finalidade,
+         registrando: timestamp, IP, user-agent, versão do termo, ação do usuário.
+      2. Armazenar consentimentos em tabela imutável (append-only) para cumprir § 2º.
+      3. Implementar mecanismo de revogação com no máximo dois cliques (§ 5º).
+      4. Criar sistema de notificação ao titular quando houver alteração de finalidade (§ 6º).
+      5. Implementar versionamento de termos de consentimento, vinculando cada consentimento
+         à versão específica do termo aceito.
+      6. Garantir que checkboxes de consentimento não sejam pré-marcados (vício — § 3º).
+      7. Implementar consentimento granular separado para cada finalidade (§ 4º).
+    tools:
+      - consent-management-platform
+      - immutable-audit-log
+      - notification-service
+      - version-control-for-terms
+  devsecops:
+    prose: |
+      1. Criar testes automatizados que verifiquem que nenhum checkbox de consentimento
+         está pré-marcado (dark pattern detection).
+      2. Validar no pipeline que toda coleta de dados com base legal "consentimento" passa
+         pela CMP.
+      3. Testar que a revogação de consentimento efetivamente cessa o tratamento.
+      4. Implementar testes de regressão para garantir que novas funcionalidades não coletam
+         dados sem consentimento quando essa é a base legal aplicável.
+      5. Validar que registros de consentimento são imutáveis (sem UPDATE/DELETE).
+    tools:
+      - ui-testing
+      - accessibility-testing
+      - integration-testing
+      - compliance-as-code
+      - database-audit
+  secops:
+    prose: |
+      1. Auditar registros de consentimento para verificar completude (timestamp, IP,
+         versão do termo, ação).
+      2. Monitorar taxas de revogação de consentimento e alertar sobre anomalias.
+      3. Auditar que tratamentos cessam efetivamente após revogação.
+      4. Verificar que alterações de finalidade geram notificações aos titulares (§ 6º).
+      5. Investigar padrões de consentimento suspeitos (consentimento em massa em
+         intervalos muito curtos pode indicar bot ou dark pattern).
+    tools:
+      - consent-audit
+      - siem
+      - compliance-dashboard
+      - anomaly-detection
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 7", "considerando 32", "considerando 42", "considerando 43"]
+    relationship: equivalent-to

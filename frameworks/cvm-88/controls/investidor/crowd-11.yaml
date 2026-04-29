@@ -1,0 +1,125 @@
+id: crowd-11
+family: investidor
+title: "Investor Withdrawal Right"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 25. O investidor pode desistir do investimento, sem qualquer
+    ônus ou penalidade, no prazo de 5 (cinco) dias contados da confirmação
+    do investimento.
+
+    § 1º A plataforma deve disponibilizar mecanismo simples e acessível
+    para o exercício do direito de desistência, com confirmação imediata
+    ao investidor.
+
+    § 2º Os recursos devem ser integralmente devolvidos ao investidor
+    no prazo de 5 (cinco) dias úteis contados da solicitação de
+    desistência, sem qualquer desconto ou retenção.
+
+    § 3º A plataforma deve informar o investidor sobre o direito de
+    desistência de forma clara e destacada no momento da confirmação do
+    investimento.
+
+    § 4º O prazo de desistência previsto no caput pode ser estendido para
+    7 (sete) dias no caso de investidores que não sejam qualificados,
+    quando houver alteração substâncial nas condições da oferta após a
+    confirmação do investimento.
+guidance:
+  prose: |
+    Article 25 establishes the investor's right of withdrawal (cooling-off
+    period), a fundamental consumer protection mechanism in crowdfunding.
+
+    **Standard cooling-off period:**
+    5 calendar days from investment confirmation, during which the investor
+    can cancel with no penalties or costs.
+
+    **Extended cooling-off:**
+    7 days for non-qualified investors when there are substantial changes
+    to offering conditions after investment confirmation (e.g., change in
+    valuation, material business plan modifications).
+
+    **Platform obligations:**
+    - Provide a simple, accessible cancellation mechanism
+    - Deliver immediate cancellation confirmation
+    - Refund all funds within 5 business days of cancellation request
+    - Clearly inform investors of the withdrawal right at the point of
+      investment confirmation
+
+    **No deductions:**
+    The refund must be complete — no administrative fees, processing
+    charges, or other deductions are permitted.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Withdrawal mechanism implementation:**
+      1. Build a self-service withdrawal button prominently displayed in
+         the investor dashboard during the cooling-off period with a
+         single-click cancellation flow.
+      2. Implement countdown timer showing remaining days for withdrawal
+         right, visible on the investment confirmation page and dashboard.
+      3. Deploy automated refund processing triggered by withdrawal
+         request, with 5-business-day SLA enforcement.
+
+      **Notification system:**
+      4. Send investment confirmation with clear withdrawal right
+         information via email and in-app notification.
+      5. Implement offering change detection that automatically extends
+         the cooling-off period to 7 days when substantial changes occur,
+         with re-notification to affected investors.
+      6. Send immediate cancellation confirmation upon withdrawal request.
+    tools:
+      - postgresql
+      - redis
+      - payment-gateway
+      - notification-service
+      - kubernetes
+  devsecops:
+    prose: |
+      **Withdrawal flow testing:**
+      1. End-to-end tests for the complete withdrawal lifecycle:
+         invest -> confirm -> withdraw -> refund, including edge cases
+         (withdrawal at deadline, concurrent withdrawals).
+      2. SAST scanning for refund processing code to detect
+         vulnerabilities that could cause partial refunds or delayed
+         processing.
+      3. Performance testing for withdrawal processing under load
+         (scenario: many investors withdrawing simultaneously if
+         negative news breaks about an offering).
+
+      **UX compliance:**
+      4. Automated accessibility testing for withdrawal mechanism
+         (must be "simple and accessible" per regulation).
+      5. A/B testing framework for withdrawal UI to optimize clarity
+         without discouraging legitimate investments.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - cypress
+      - k6
+  secops:
+    prose: |
+      **Withdrawal monitoring:**
+      1. Monitor withdrawal request processing times — alert if any
+         refund approaches the 5-business-day SLA.
+      2. Track withdrawal rates per offering as an early warning
+         indicator (high withdrawal rates may signal issuer problems).
+      3. Monitor for fraudulent withdrawal patterns (invest-withdraw
+         cycles, testing payment systems).
+
+      **Compliance evidence:**
+      4. Generate withdrawal compliance reports showing average
+         processing time, SLA compliance rate, and refund completeness.
+      5. Maintain audit trail of all withdrawals, refunds, and any
+         exceptions for CVM inspection.
+    tools:
+      - siem
+      - grc-platform
+      - payment-monitoring
+legal_references:
+  - framework_id: cvm-135
+    articles: ["art-25"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

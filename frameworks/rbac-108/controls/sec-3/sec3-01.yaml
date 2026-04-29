@@ -1,0 +1,117 @@
+id: sec3-01
+family: sec-3
+title: "Notificacao de Incidentes Ciberneticos a ANAC"
+class: RBAC-108
+baselines: [air-operators]
+statement:
+  prose: |
+    O operador aéreo deve notificar a Agência Nacional de Aviação Civil (ANAC) sobre
+    incidentes cibernéticos que afetem ou possam afetar a segurança da aviação civil,
+    a regularidade das operações de voo ou a integridade de sistemas críticos aeronáuticos.
+    A notificação deve ser realizada em prazo definido pelo regulador, conter as informações
+    mínimas especificadas e ser seguida de relatório complementar com análise de causa raiz
+    e medidas de mitigação adotadas.
+guidance:
+  prose: |
+    A obrigacao de notificacao de incidentes e elemento central do regime regulatorio AVSEC
+    cibernetico do RBAC 108, alinhado com as recomendacoes do ICAO Doc 8973 e a Circular
+    ICAO 330 sobre ciber ameacas a aviacao.
+
+    **Criterios de notificacao obrigatoria:**
+    - Qualquer incidente cibernetico que resulte ou possa resultar em risco a seguranca de voo
+    - Comprometimento confirmado de sistemas classificados como nivel 1 (seguranca de voo)
+    - Ataques bem-sucedidos a sistemas de comunicacao aeronave-terra
+    - Comprometimento de dados de manutencao ou aeronavegabilidade
+    - Ransomware ou interrupcao significativa de sistemas DCS ou OCC
+    - Tentativas de ataque a sistemas EFB em operacao
+    - Qualquer incidente que resulte em relatorio obrigatorio ao SIPAER
+
+    **Prazos (conforme instrucoes complementares ANAC):**
+    - Notificacao inicial (early warning): 2 horas apos deteccao para incidentes com
+      impacto real ou potencial a seguranca de voo
+    - Notificacao formal: 24 horas para demais incidentes significativos
+    - Relatorio complementar: 30 dias com analise de causa raiz e remediacoes
+
+    **Canal de notificacao:**
+    Utilizacao do canal oficial ANAC para notificacao AVSEC, conforme instrucoes
+    vigentes. Em caso de incidente com risco imediato a seguranca de voo, notificar
+    tambem o Centro de Controle de Area (CCA) responsavel, se aplicavel.
+
+    **Articulacao com outras obrigacoes:**
+    Incidentes com dados pessoais: notificacao adicional a ANPD (LGPD).
+    Incidentes em infraestrutura critica: articulacao com GSI/PR e DSIC.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de suporte a deteccao e notificacao:**
+      1. SIEM com regras de correlacao especificas para sistemas aeronauticos, capaz de
+         gerar alertas de alta prioridade para eventos suspeitos em sistemas nivel 1.
+      2. Playbooks automatizados no SOAR para triagem inicial de incidentes em sistemas
+         aeronauticos, com escalacao automatica para o SGSA.
+      3. Canal de comunicacao seguro e redundante entre o SOC e o SGSA para notificacao
+         interna urgente (nao dependente de sistemas potencialmente comprometidos).
+      4. Template digital de notificacao a ANAC pre-preenchido com informacoes do
+         operador, disponivel offline em caso de comprometimento de sistemas principais.
+      5. Sistema de registro de incidentes com campos obrigatorios alinhados ao formato
+         de notificacao ANAC, garantindo que todas as informacoes necessarias sejam
+         coletadas durante a resposta.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - secure-communication
+      - log-management
+  devsecops:
+    prose: |
+      **Integracao de alertas de seguranca nos pipelines:**
+      1. Alertas automaticos de seguranca em pipelines de sistemas criticos configurados
+         para notificacao imediata ao time de SecOps e ao SGSA.
+      2. Monitoramento de integridade de builds de software aeronautico para detectar
+         comprometimento de supply chain (builds inesperados, artefatos nao assinados).
+      3. Mecanismo de roll-back rapido para versao anterior segura de software em
+         sistemas criticos, testado periodicamente.
+      4. Logs estruturados e imutaveis de todas as atividades em sistemas aeronauticos
+         criticos, com retencao minima de 5 anos para fins forenses e regulatorios.
+      5. Processo de preservacao de evidencias forenses integrado ao runbook de
+         resposta a incidentes em sistemas de software aeronautico.
+    tools:
+      - siem
+      - gitlab-ci
+      - artifact-registry
+      - log-management
+      - forensics-tools
+  secops:
+    prose: |
+      **Processo de notificacao e gestao de incidentes:**
+      1. Procedimento documentado de notificacao a ANAC com responsabilidades claras:
+         quem notifica, por qual canal, com quais informacoes, em quanto tempo.
+      2. Arvore de decisao para determinar se um incidente atinge os criterios de
+         notificacao obrigatoria ao regulador.
+      3. Exercicios de simulacao de notificacao a ANAC realizados ao menos uma vez
+         por ano, com avaliacao de aderencia ao procedimento e tempo de resposta.
+      4. Registro centralizado de todos os incidentes ciberneticos, incluindo os nao
+         notificados a ANAC, com justificativa documentada para nao-notificacao.
+      5. Processo de producao do relatorio complementar (pos-incidente) em 30 dias,
+         com analise de causa raiz (RCA), linha do tempo, sistemas afetados,
+         impacto e medidas de remediacao.
+      6. Articulacao com equipe juridica para comunicacao a ANPD (LGPD) quando
+         o incidente envolver dados pessoais de passageiros ou colaboradores.
+    tools:
+      - incident-management
+      - grc-platform
+      - communication-tools
+      - forensics-tools
+      - audit-management
+legal_references:
+  - framework_id: rbac-107
+    articles: ["sec-3"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26"]
+    relationship: supports
+  - framework_id: gsi-in3
+    articles: ["art-10", "art-11"]
+    relationship: mapped
+  - framework_id: pnsic
+    articles: ["art-7"]
+    relationship: complements

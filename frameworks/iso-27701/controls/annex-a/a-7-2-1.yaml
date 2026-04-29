@@ -1,0 +1,111 @@
+id: a-7.2.1
+family: annex-a
+title: "Identify and document purpose"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall identify and document the specific purposes for which the
+    PII will be processed. The organization shall ensure that the identified purposes
+    are lawful and are communicated to PII principals before the PII is processed.
+    The purpose specification shall be documented at a level of detail sufficient to
+    determine what PII processing is and is not within scope, and shall be reviewed
+    and updated when processing activities change. The organization shall ensure that
+    PII is not processed for purposes that are incompatible with the originally
+    identified and documented purposes, unless a lawful basis for the new purpose
+    exists and the PII principal has been informed.
+
+guidance:
+  prose: >-
+    Purpose identification and documentation is the foundational control for PII
+    controllers. Every processing activity must have a clearly defined, documented
+    purpose that is established before processing begins. This is not merely a
+    compliance exercise: well-defined purposes drive data minimization (you only
+    collect what is needed for the stated purpose), retention policies (data is kept
+    only as long as the purpose requires), and access controls (access is granted
+    only to those who need it for the stated purpose). The documentation must be
+    specific enough to be meaningful — "business purposes" or "service improvement"
+    are too vague. Instead, specify concrete purposes such as "processing customer
+    orders and delivering purchased products" or "detecting fraudulent transactions
+    on payment accounts." Purpose documentation should be maintained in a Records
+    of Processing Activities (ROPA) or equivalent registry. When purposes change or
+    expand, a compatibility assessment must be performed and documented before the
+    new processing begins.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.2.1"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a purpose registry as a core platform service. Every data pipeline,
+      API endpoint, and storage system that processes PII must be tagged with one or
+      more declared purposes from the registry. Use Kubernetes labels, database
+      metadata, and API gateway annotations to enforce purpose tagging at the
+      infrastructure level. Build admission controllers that reject deployments of
+      PII-processing services without valid purpose declarations. Implement purpose-
+      bound access control through the policy engine: services can only access PII
+      tagged with purposes they are authorized to process. Build a purpose
+      compatibility assessment workflow that evaluates proposed new uses of existing
+      PII against the original declared purposes. Expose the purpose registry
+      through the developer portal so teams can self-service purpose lookups
+      and registrations.
+    tools:
+      - purpose-registry-service
+      - kubernetes-labels-and-annotations
+      - open-policy-agent
+      - kyverno
+      - backstage-catalog
+      - api-gateway-metadata
+
+  devsecops:
+    prose: >-
+      Require purpose declarations in the PII processing manifest for every
+      repository. CI pipeline gates must validate that declared purposes exist
+      in the purpose registry and are approved. Implement static analysis rules
+      that detect new PII collection points and verify they have documented
+      purposes. Code review automation should flag data access patterns that
+      appear inconsistent with declared purposes (e.g., marketing service
+      accessing medical records). Build pipeline stages that generate and
+      validate purpose-to-data-flow mappings, ensuring all PII processing
+      paths have documented purpose justification. Track purpose coverage
+      metrics as part of the compliance dashboard.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - semgrep
+      - custom-purpose-validators
+      - pii-manifest-schema
+      - compliance-metrics
+
+  secops:
+    prose: >-
+      Monitor for PII processing that occurs outside declared purposes. Build
+      SIEM correlation rules that detect data access patterns inconsistent with
+      purpose registrations: services accessing PII categories outside their scope,
+      data flowing to destinations not authorized for the declared purpose, bulk
+      exports without purpose justification. Alert on new PII processing activities
+      that are not in the purpose registry. Generate periodic purpose compliance
+      reports showing processing activities mapped to declared purposes, with
+      anomalies highlighted for investigation. Monitor for purpose creep by
+      tracking gradual expansion of data access patterns over time.
+    tools:
+      - splunk
+      - elastic-siem
+      - data-access-monitoring
+      - purpose-compliance-dashboards
+      - anomaly-detection
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.b", "art-13", "art-14"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-6", "art-7", "art-9"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100"]
+    relationship: supports

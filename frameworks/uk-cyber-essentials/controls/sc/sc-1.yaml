@@ -1,0 +1,98 @@
+id: sc-1
+family: sc
+title: "Removal of Unnecessary Software, Services, and Accounts"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Computers and network devices must be configured to minimise the number of
+    unnecessary services running, and unnecessary software and user accounts must
+    be removed or disabled. Only software that is needed for the organisation's
+    business purposes should be installed. Default or unnecessary user accounts
+    (including guest accounts) must be removed or disabled. Unnecessary services,
+    particularly those that allow remote access (such as Remote Desktop Protocol),
+    must be disabled if not required.
+
+guidance:
+  prose: >-
+    Every installed application, running service, and active account represents a
+    potential attack surface. Reducing the number of components to only those
+    required for business operations significantly limits the opportunities available
+    to an attacker. This control requires a systematic approach: maintain an inventory
+    of approved software and services, regularly audit systems for deviations, and
+    promptly remove anything that is not explicitly required. Default accounts are
+    particularly dangerous because their credentials are often publicly known.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Secure Configuration"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Secure by Default"
+    url: "https://www.ncsc.gov.uk/collection/developers-collection/principles/secure-by-default"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build minimal base images (container and VM) that include only the required
+      runtime dependencies. Use CIS Hardened Images or DISA STIG-compliant images as
+      starting points. Implement application allow-listing through AppLocker, Windows
+      Defender Application Control (WDAC), or equivalent controls on Linux (fapolicyd).
+      Enforce software installation policies through endpoint management that restrict
+      installation to approved packages only. Automate server hardening using Ansible
+      playbooks or Chef cookbooks that remove default accounts, disable unnecessary
+      services, and enforce minimal configurations.
+    tools:
+      - ansible
+      - chef
+      - packer
+      - cis-benchmarks
+      - applocker
+      - wdac
+      - terraform
+
+  devsecops:
+    prose: >-
+      Scan container images in CI/CD pipelines for unnecessary packages, default
+      credentials, and running services. Enforce minimal base images (distroless,
+      Alpine, scratch) through pipeline policies. Implement image scanning that
+      fails builds when unnecessary SUID binaries, shells, or package managers are
+      present in production images. Use multi-stage Docker builds to ensure build
+      tools are not included in final images. Audit Infrastructure-as-Code for
+      services enabled beyond the documented baseline.
+    tools:
+      - trivy
+      - grype
+      - dockle
+      - hadolint
+      - gitlab-ci
+      - gitlab-container-scanning
+
+  secops:
+    prose: >-
+      Maintain a software inventory and conduct periodic reconciliation against
+      the approved software list. Use endpoint detection and response (EDR) tools
+      to identify unauthorised software installations and running services. Monitor
+      for newly created local accounts on endpoints and servers. Audit disabled
+      accounts periodically to ensure they have not been re-enabled. Generate
+      compliance reports showing the number of systems with unapproved software
+      or services.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-for-endpoint
+      - qualys
+      - osquery
+      - splunk
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.19"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7", "CM-11", "AC-2"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-app-control"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.3", "CIS 2.5", "CIS 4.1", "CIS 5.3"]
+    relationship: mapped

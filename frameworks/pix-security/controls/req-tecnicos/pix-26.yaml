@@ -1,0 +1,91 @@
+id: pix-26
+family: req-tecnicos
+title: "Logs, Auditoria e Retencao de Dados Transacionais"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve manter registros completos de todas as transações Pix processadas,
+    incluindo logs de aplicação, trilhas de auditoria, mensagens ISO 20022 enviadas e
+    recebidas, decisões do motor antifraude, operações de chave Pix e processos MED.
+    Os registros devem ser armazenados de forma segura, íntegra e imutável, com retenção
+    mínima de 5 anos, e devem estar disponíveis para consulta pelo BCB e órgãos de
+    fiscalização quando solicitado.
+guidance:
+  prose: |
+    **Dados que devem ser registrados:**
+    1. **Transacoes Pix:** EndToEndId, valor, data/hora, chave pagador, chave recebedor,
+       PSP pagador, PSP recebedor, status, motivo de rejeicao (se aplicavel).
+    2. **Mensagens SPI:** Mensagens ISO 20022 completas (pacs.008, pacs.002, pacs.004).
+    3. **Decisoes antifraude:** Score de risco, regras ativadas, decisao (aprovar,
+       bloquear, step-up), motivo.
+    4. **Operacoes de chave:** Registro, exclusao, portabilidade, reivindicacao.
+    5. **MED:** Todas as etapas (abertura, bloqueio, analise, devolucao).
+    6. **Autenticacao:** Tentativas de login, MFA, dispositivos.
+    7. **Acesso ao DICT:** Consultas realizadas, dados retornados.
+
+    **Requisitos de armazenamento:**
+    - Imutabilidade: logs nao podem ser alterados apos gravacao (WORM ou equivalente).
+    - Integridade: hash de verificacao para detectar adulteracao.
+    - Confidencialidade: dados pessoais criptografados em repouso.
+    - Disponibilidade: acesso rapido para investigacoes e auditorias.
+    - Retencao: minimo 5 anos para transacoes, 10 anos para dados fiscais.
+
+    **Acesso pelo BCB:**
+    O BCB pode solicitar acesso a registros a qualquer momento para fins de fiscalizacao.
+    O PSP deve ser capaz de fornecer os dados em formato padronizado e em tempo habil.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de logs:**
+      1. Log aggregation centralizado (ELK, Loki, Splunk) com retencao configuravel.
+      2. Armazenamento WORM (Write Once Read Many) para logs regulatorios.
+      3. Hash chain (tipo blockchain) ou assinatura de blocos para garantir integridade.
+      4. Criptografia de logs em repouso com chaves gerenciadas por KMS.
+
+      **Estrutura de dados:**
+      5. Schema de log padronizado para todas as operacoes Pix.
+      6. Indexacao por EndToEndId, chave Pix, CPF/CNPJ e data para buscas eficientes.
+      7. Lifecycle management: hot (30 dias) -> warm (1 ano) -> cold (5+ anos).
+      8. Exportacao em formato padronizado para atender solicitacoes do BCB.
+    tools:
+      - log-aggregation
+      - worm-storage
+      - kms
+      - data-lifecycle
+      - search-engine
+  devsecops:
+    prose: |
+      **Qualidade de logs:**
+      1. Linting de logs no pipeline: verificar que campos obrigatorios estao presentes.
+      2. Testes de retencao: verificar que dados antigos nao sao excluidos prematuramente.
+      3. Testes de integridade: verificar hash chain de logs.
+      4. Sanitizacao de logs: garantir que dados sensiveis sao mascarados.
+      5. Structured logging obrigatorio em todos os servicos Pix.
+    tools:
+      - gitlab-ci
+      - log-linting
+      - data-quality-testing
+  secops:
+    prose: |
+      **Gestao de logs:**
+      1. Monitoramento de integridade de logs (alertas para adulteracao).
+      2. Revisao periodica de politica de retencao.
+      3. Processo de atendimento a solicitacoes do BCB (SLA < 48 horas).
+      4. Auditoria anual de conformidade de logs e retencao.
+      5. Testes de restauracao de logs historicos (verificar acessibilidade).
+    tools:
+      - siem
+      - compliance-scanner
+      - audit-platform
+      - storage-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-46"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-3", "art-11"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-11"]
+    relationship: complements

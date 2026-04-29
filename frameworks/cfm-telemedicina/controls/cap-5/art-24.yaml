@@ -1,0 +1,118 @@
+id: art-24
+family: cap-5
+title: "Assinatura Digital e Certificacao ICP-Brasil"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 24. Documentos médicos gerados em atendimentos de
+    telemedicina, incluindo prescrições, atestados e laudos,
+    devem ser assinados digitalmente pelo médico responsável.
+
+    Parágrafo 1. A assinatura digital deve utilizar certificado
+    digital no padrão ICP-Brasil (Infraestrutura de Chaves
+    Públicas Brasileira), garantindo autenticidade, integridade
+    e validade jurídica do documento.
+
+    Parágrafo 2. Prescrições eletrônicas emitidas por telemedicina
+    devem observar a regulamentação vigente do Ministério da Saúde
+    e da ANVISA sobre prescrição digital, incluindo a utilização
+    de assinatura avançada ou qualificada.
+
+    Parágrafo 3. Atestados médicos digitais emitidos por telemedicina
+    devem conter todos os elementos obrigatórios do atestado
+    presencial, acrescidos da indicação de que o atendimento foi
+    realizado por telemedicina.
+guidance:
+  prose: |
+    O art. 24 exige assinatura digital ICP-Brasil para documentos
+    medicos, conferindo validade juridica equivalente a assinatura
+    manuscrita.
+
+    **Tipos de assinatura no contexto juridico brasileiro:**
+    - Assinatura qualificada (ICP-Brasil): maior valor juridico,
+      presuncao de autenticidade. Obrigatoria para laudos e
+      prescricoes de medicamentos controlados.
+    - Assinatura avancada (ex: Gov.br nivel prata/ouro): aceita
+      para prescricoes de medicamentos nao controlados.
+    - Assinatura simples: insuficiente para documentos medicos.
+
+    **Prescricao eletronica (paragrafo 2):**
+    A prescricao digital segue regras adicionais:
+    - Portaria MS 467/2020: autorizou prescricao digital durante
+      COVID-19, incorporada posteriormente a pratica regular
+    - Medicamentos controlados (Portaria SVS 344/98): exigem
+      assinatura qualificada ICP-Brasil
+    - Antimicrobianos: exigem assinatura avancada no minimo
+    - Plataformas de prescricao devem ter integracao com
+      drogarias para dispensacao segura
+
+    **Atestado digital (paragrafo 3):**
+    Deve conter: identificacao do medico (CRM), identificacao
+    do paciente, CID (quando autorizado), periodo de afastamento,
+    data, e indicacao explicita de telemedicina.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de assinatura digital:**
+      1. Implementar modulo de assinatura digital com suporte
+         a certificado ICP-Brasil (A1, A3, A4) integrado a
+         plataforma de telemedicina.
+      2. Criar fluxo de prescricao eletronica com validacao
+         automatica de tipo de medicamento versus nivel de
+         assinatura exigido (controlado = qualificada).
+      3. Implementar geracao de atestados digitais com template
+         que inclua todos os campos obrigatorios, incluindo
+         indicacao automatica de modalidade de telemedicina.
+      4. Integrar com plataformas de verificacao de assinatura
+         para que destinatarios (farmacias, empresas) possam
+         validar autenticidade dos documentos.
+      5. Implementar carimbo do tempo (timestamp authority)
+         em assinaturas para garantir prova de existencia
+         temporal do documento.
+    tools:
+      - icp-brasil-signer
+      - prescription-module
+      - document-generator
+      - timestamp-authority
+      - signature-verification
+  devsecops:
+    prose: |
+      **Pipeline de assinatura digital:**
+      1. Testar fluxo de assinatura com certificados ICP-Brasil
+         de teste, validando que assinatura e aplicada
+         corretamente em todos os tipos de documento.
+      2. Verificar que prescricoes de medicamentos controlados
+         exigem assinatura qualificada (nao apenas avancada).
+      3. Validar que documentos assinados sao verificaveis por
+         ferramentas padrao de verificacao ICP-Brasil.
+      4. Testar integridade de documentos assinados: qualquer
+         alteracao deve invalidar a assinatura.
+    tools:
+      - gitlab-ci
+      - signature-testing
+      - document-integrity
+      - certificate-validation
+  secops:
+    prose: |
+      **Operacao de assinatura digital:**
+      1. Monitorar validade de certificados digitais de medicos,
+         alertando 30 dias antes da expiracao.
+      2. Auditar que 100% dos documentos medicos (prescricoes,
+         atestados, laudos) possuem assinatura digital valida.
+      3. Verificar que prescricoes de medicamentos controlados
+         utilizam assinatura qualificada ICP-Brasil.
+      4. Manter registro de todos os documentos assinados com
+         metadados de certificado utilizado.
+    tools:
+      - certificate-monitoring
+      - document-audit
+      - prescription-monitoring
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-c-1", "164.312-e-2-i"]
+    relationship: mapped

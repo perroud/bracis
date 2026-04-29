@@ -1,0 +1,106 @@
+id: cip-005-r2
+family: cip-005
+title: "Interactive Remote Access"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes that collectively include the applicable requirement
+    parts for managing Interactive Remote Access to BES Cyber Systems.
+  parts:
+    - id: cip-005-r2.1
+      label: "2.1"
+      prose: >-
+        For all Interactive Remote Access sessions, utilize an
+        Intermediate System such that the Cyber Asset initiating
+        Interactive Remote Access does not directly access an
+        applicable Cyber Asset.
+    - id: cip-005-r2.2
+      label: "2.2"
+      prose: >-
+        For all Interactive Remote Access sessions, utilize
+        encryption that terminates at an Intermediate System.
+    - id: cip-005-r2.3
+      label: "2.3"
+      prose: >-
+        Require multi-factor authentication for all Interactive
+        Remote Access sessions.
+
+guidance:
+  prose: >-
+    CIP-005 R2 specifically addresses remote access to BES Cyber Systems,
+    which presents elevated risk compared to local access. The requirement
+    mandates three layers of protection: an Intermediate System (jump host
+    or bastion) that prevents direct access to BES Cyber Assets, encrypted
+    sessions to protect data in transit, and multi-factor authentication
+    to verify user identity. The Intermediate System creates an additional
+    inspection and logging point while preventing the remote user's device
+    from having direct network connectivity to BES Cyber Assets. This
+    is particularly important for vendor remote access and work-from-home
+    scenarios that became more prevalent. All three elements must be
+    present simultaneously for every Interactive Remote Access session.
+
+references:
+  - citation: "NERC CIP-005-7 — Electronic Security Perimeter(s)"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-005-7.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy hardened bastion hosts (Intermediate Systems) as the
+      mandatory entry point for all remote access to BES Cyber System
+      environments. Implement encrypted VPN tunnels or SSH jump hosts
+      that terminate at the Intermediate System. Configure multi-factor
+      authentication on the Intermediate System using hardware tokens,
+      TOTP, or push-based authenticators. Deploy session recording and
+      logging on Intermediate Systems for full audit trail. Automate
+      Intermediate System provisioning and hardening through
+      Infrastructure-as-Code to ensure consistent security posture.
+    tools:
+      - terraform
+      - vault
+      - keycloak
+      - teleport
+      - wireguard
+
+  devsecops:
+    prose: >-
+      Enforce that all CI/CD pipeline connections to BES Cyber System
+      environments route through Intermediate Systems. Store bastion
+      host configurations as version-controlled code with mandatory
+      approval for changes. Implement automated compliance checks
+      that verify MFA is required on all remote access paths. Create
+      pipeline gates that validate encrypted connections for any
+      deployment targeting BES Cyber System environments. Monitor
+      and alert on direct remote access attempts that bypass
+      Intermediate Systems.
+    tools:
+      - gitlab-ci
+      - vault
+      - checkov
+      - teleport
+
+  secops:
+    prose: >-
+      Monitor all Interactive Remote Access sessions through
+      Intermediate System logs. Alert on remote access attempts
+      that bypass the Intermediate System. Verify MFA compliance
+      for every remote session through authentication logs.
+      Correlate remote access sessions with authorized access
+      records. Generate reports showing remote access patterns,
+      session durations, and any anomalous activity. Track vendor
+      remote access sessions separately with enhanced monitoring.
+    tools:
+      - splunk
+      - elastic-siem
+      - teleport
+      - cyberark
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-17", "IA-2", "SC-8", "SC-13"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.1", "3-3-5.2"]
+    relationship: supports

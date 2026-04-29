@@ -1,0 +1,88 @@
+id: pin-1
+family: pin-mgmt
+title: "PIN Processing Requirements"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    PINs used in transactions at attended and unattended point-of-interaction (POI) terminals
+    and for cardholder verification in card-not-present environments must be processed in a
+    manner that ensures the PIN is protected at all times. PINs must only exist in cleartext
+    within a secure cryptographic device (SCD). The online PIN must be encrypted immediately
+    upon entry at the point of interaction using an approved encryption algorithm and must
+    remain encrypted during transit to the issuer or its agent for PIN verification. At no
+    point in the transaction process may the cleartext PIN be accessible outside of an SCD.
+
+guidance:
+  prose: >-
+    This control establishes the foundational principle of PCI PIN security: cleartext PINs
+    must never exist outside of a secure cryptographic device. The PIN must be encrypted at
+    the earliest possible point — the moment the cardholder enters it — and must remain
+    encrypted throughout the entire transaction lifecycle until it reaches the issuer's HSM
+    for verification. This applies to all transaction types including ATM, POS, unattended
+    terminals, and remote PIN entry scenarios. Organizations must map every point in the
+    transaction flow where PIN data exists and verify that SCD protection is maintained at
+    each stage.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 1"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design payment processing infrastructure so that PIN data never traverses
+      application-layer components in cleartext. All PIN handling must occur within
+      HSM-backed services. Deploy hardware security modules (HSMs) certified to FIPS
+      140-2 Level 3 or PCI PTS HSM requirements at all PIN processing points. Implement
+      API gateways that route PIN block data exclusively to HSM-integrated services.
+      Use infrastructure-as-code to enforce that no compute instance outside the HSM
+      boundary has access to PIN decryption keys. Implement network segmentation to
+      isolate PIN processing zones from general-purpose infrastructure.
+    tools:
+      - thales-payshield
+      - atalla-hsm
+      - utimaco-hsm
+      - aws-cloudhsm
+      - hashicorp-vault-enterprise
+      - kubernetes-network-policies
+  devsecops:
+    prose: >-
+      Implement static analysis rules that detect any code path storing or logging
+      cleartext PIN data. Enforce code review gates for all changes to PIN processing
+      modules. Run SAST scans with custom rules targeting PIN handling patterns such
+      as cleartext PIN variables, insecure PIN block formats, or logging of PIN data.
+      Add pre-commit hooks to reject commits containing PIN-related debug logging.
+      Test PIN encryption in CI/CD staging environments using test PINs and validate
+      that encryption output matches expected PIN block formats.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - sonarqube
+      - gitlab-code-review
+      - gitleaks
+  secops:
+    prose: >-
+      Monitor all systems in the PIN processing chain for unauthorized access attempts.
+      Configure SIEM rules to alert on any log entries containing patterns that could
+      indicate PIN data exposure. Conduct regular penetration testing targeting PIN
+      processing endpoints. Monitor HSM health and audit logs for anomalous PIN
+      translation or decryption volumes. Implement DLP controls to detect PIN data
+      exfiltration attempts across network boundaries.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - palo-alto-ngfw
+      - varonis
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1", "req-4.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped

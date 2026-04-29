@@ -1,0 +1,78 @@
+id: art-28
+family: cap-6
+title: "Revisao de Codigo e Analise Estatica"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 28. Os órgãos e entidades devem implementar processos de revisão de
+    código e análise estática de segurança, contemplando:
+
+    I - revisão de código por pares (peer review) antes da integração;
+    II - uso de ferramentas de análise estática de segurança (SAST) no pipeline
+    de integração contínua;
+    III - correção de vulnerabilidades críticas antes da implantação em produção;
+    IV - registro e rastreabilidade das revisões realizadas.
+guidance:
+  prose: |
+    O art. 28 exige revisao de codigo por pares e SAST automatizado.
+    Vulnerabilidades criticas devem ser corrigidas antes de producao.
+
+    **Processo obrigatorio:**
+    1. Peer review: todo codigo revisado por pelo menos 1 outro desenvolvedor
+    2. SAST: scan automatico em CI/CD
+    3. Fix before merge: vulnerabilidades criticas bloqueiam merge
+    4. Audit trail: registro de quem revisou, quando, resultado
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.28 (Secure coding)
+    - NIST 800-53 rev5: SA-11 (Developer Testing and Evaluation)
+    - OWASP Code Review Guide
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de revisao:**
+      1. Merge request obrigatoria para toda mudanca de codigo.
+      2. SAST integrado no pipeline (Semgrep, SonarQube, CodeQL).
+      3. CODEOWNERS para areas criticas (autenticacao, criptografia, pagamentos).
+      4. Minimo 1 aprovador para codigo geral, 2 para codigo critico.
+      5. Auto-merge bloqueado se SAST detecta vulnerabilidades.
+    tools:
+      - merge-request-workflow
+      - sast-scanner
+      - codeowners
+      - approval-rules
+  devsecops:
+    prose: |
+      **SAST no pipeline:**
+      1. GitLab SAST com regras customizadas para padrao do orgao.
+      2. Semgrep rules para vulnerabilidades especificas do governo (ex: SQL injection
+         em consultas LDAP, XSS em portais gov.br).
+      3. SonarQube quality gate: zero vulnerabilidades criticas/altas para merge.
+      4. Relatorio de SAST como artefato do pipeline.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - sonarqube
+      - quality-gate
+  secops:
+    prose: |
+      **Governanca de revisao:**
+      1. Metricas: % de merge requests com revisao, tempo medio de revisao.
+      2. Auditoria trimestral de efetividade da revisao de codigo.
+      3. Treinamento de revisores em seguranca (como identificar vulnerabilidades).
+      4. Catalogo de padrao de vulnerabilidades mais encontradas no orgao.
+    tools:
+      - review-metrics
+      - reviewer-training
+      - vulnerability-catalog
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.28"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-11(1)"]
+    relationship: mapped

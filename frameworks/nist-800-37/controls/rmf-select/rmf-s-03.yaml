@@ -1,0 +1,87 @@
+id: rmf-s-03
+family: rmf-select
+title: "Control Allocation and Documentation in the System Security Plan"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Allocate security and privacy controls to the information system and to the environment
+    of operation and document the controls in the system security plan. The system security
+    plan describes the control implementation or the planned implementation for each selected
+    control, including common controls inherited from organizational entities. The plan
+    provides a comprehensive description of the security and privacy requirements for the
+    system and documents how those requirements are met or planned to be met.
+
+guidance:
+  prose: >-
+    The system security plan (SSP) is the primary artifact documenting the system's security
+    posture. It captures the system description, authorization boundary, categorization,
+    selected and tailored controls, control implementation details, and interconnections.
+    Each control entry in the SSP must specify whether the control is implemented by the
+    system (system-specific), inherited from a common control provider, or hybrid (partially
+    inherited, partially system-specific). For each control, the implementation description
+    must be specific enough to be assessable — vague descriptions like "encryption is used"
+    are insufficient. The SSP is a living document maintained throughout the system lifecycle.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Select Step — Task S-5"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "NIST SP 800-18 Rev 1, Guide for Developing Security Plans"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-18/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Generate the system security plan programmatically from authoritative data sources:
+      system registration metadata (Backstage), infrastructure-as-code configurations
+      (Terraform/Pulumi), policy-as-code enforcement rules (OPA), and common control
+      inheritance mappings. Use OSCAL SSP format for machine-readable plans that can be
+      validated and compared automatically. Maintain the SSP as code in the system's
+      governance repository and update it automatically when infrastructure changes are
+      deployed. Provide a continuous compliance dashboard that shows SSP completeness
+      and identifies controls with missing or outdated implementation descriptions.
+    tools:
+      - oscal-tools
+      - compliance-trestle
+      - backstage
+      - terraform
+
+  devsecops:
+    prose: >-
+      Treat the system security plan as a version-controlled artifact maintained
+      alongside the system code. Use OSCAL SSP format and automated generation tools
+      to produce the SSP from pipeline metadata, scanning results, and infrastructure
+      configurations. Implement a CI pipeline job that validates the SSP against the
+      selected baseline and flags controls with missing implementation descriptions.
+      Require SSP updates as part of the merge request process when changes affect
+      control implementations. Link control implementation evidence (scan reports,
+      configuration snapshots) directly from the SSP.
+    tools:
+      - gitlab-ci
+      - compliance-trestle
+      - oscal-tools
+      - gitlab-pages
+
+  secops:
+    prose: >-
+      Maintain system security plans in the GRC platform as the authoritative record
+      of control allocation and implementation. Ensure each control entry specifies
+      the implementation status (implemented, partially implemented, planned, not
+      applicable), the responsible party, and the implementation description. Conduct
+      SSP quality reviews to verify that implementation descriptions are specific,
+      assessable, and current. Track SSP version history and require approval workflows
+      for significant changes. Generate SSP completeness metrics and report on systems
+      with incomplete or outdated plans.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+      - xacta
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-2", "PL-7", "CA-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.1", "A5.37"]
+    relationship: mapped

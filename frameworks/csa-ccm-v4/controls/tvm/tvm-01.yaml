@@ -1,0 +1,107 @@
+id: tvm-01
+family: tvm
+title: "Threat and Vulnerability Management Policy"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Establish, document, approve, communicate, apply, evaluate, and maintain
+    policies and procedures for threat and vulnerability management. The
+    threat and vulnerability management policy shall define the process
+    for identifying, evaluating, treating, and reporting security
+    vulnerabilities and threats in a timely manner. The policy shall
+    include vulnerability scanning requirements, remediation timelines,
+    and threat intelligence integration.
+
+guidance:
+  prose: >-
+    The threat and vulnerability management policy should define
+    vulnerability scanning frequency (continuous for external-facing,
+    weekly minimum for internal), remediation SLAs based on severity
+    (critical within 24-72 hours, high within 30 days, medium within
+    90 days), and exception handling procedures. It should mandate
+    the use of multiple vulnerability identification methods including
+    automated scanning, penetration testing, bug bounty programs, and
+    threat intelligence feeds. The policy should address cloud-specific
+    vulnerability management including cloud configuration assessment,
+    container image scanning, serverless function analysis, and
+    Infrastructure-as-Code review. Risk acceptance processes should
+    require documented justification and management approval with
+    defined expiration dates.
+
+references:
+  - citation: "CSA CCM v4.0 TVM-01"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy automated vulnerability scanning across all platform layers:
+      host OS, container images, Kubernetes configurations, cloud
+      infrastructure, and application dependencies. Implement continuous
+      cloud security posture management (CSPM) to identify configuration
+      vulnerabilities. Automate patching of platform components through
+      immutable infrastructure rebuilds. Maintain vulnerability feeds
+      for all platform technologies and automate scanning on published
+      CVEs. Implement automated admission policies that block deployment
+      of images with critical vulnerabilities. Provide vulnerability
+      dashboards in the developer portal for service-level visibility.
+    tools:
+      - trivy
+      - grype
+      - prowler
+      - wiz
+      - prisma-cloud
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning at every stage of the CI/CD
+      pipeline: dependency check at build, container scan before
+      registry push, IaC scan before apply, and DAST against deployed
+      services. Implement automated PR creation for dependency
+      vulnerability fixes. Block deployments when critical
+      vulnerabilities are detected without approved exceptions.
+      Maintain vulnerability scan results as pipeline artifacts
+      for audit purposes. Include vulnerability remediation in
+      sprint planning and track SLA compliance. Generate SBOMs
+      for all releases to enable rapid impact assessment of
+      newly discovered vulnerabilities.
+    tools:
+      - snyk
+      - trivy
+      - dependabot
+      - renovate
+      - semgrep
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Maintain a centralized vulnerability management platform that
+      aggregates findings from all scanning tools and tracks
+      remediation progress. Integrate threat intelligence feeds to
+      prioritize vulnerabilities with known exploitation. Monitor
+      for zero-day vulnerability disclosures affecting organizational
+      assets and trigger emergency response procedures. Generate
+      vulnerability management reports for governance showing
+      SLA compliance, risk trends, and remediation velocity.
+      Conduct regular penetration testing and red team exercises
+      to validate vulnerability management effectiveness.
+    tools:
+      - tenable
+      - qualys
+      - rapid7
+      - splunk
+      - crowdstrike
+      - hackerone
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8-8"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "RA-5", "SI-2", "SI-5"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC7.1"]
+    relationship: mapped

@@ -1,0 +1,200 @@
+id: art-10
+family: cap-3
+title: "Conteudo Minimo da Politica de Seguranca Cibernetica"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 10. A política de segurança cibernética deve contemplar, no mínimo:
+    I - procedimentos e controles de autenticação de usuários em sistemas
+    e aplicações relevantes;
+    II - mecanismos de criptografia para proteção de dados em trânsito e
+    em repouso;
+    III - mecanismos de prevenção e detecção de intrusão em sistemas e
+    redes de comunicação;
+    IV - mecanismos de prevenção de vazamento de informações;
+    V - realização de testes periódicos de segurança cibernética;
+    VI - manutenção de trilhas de auditoria de sistemas críticos;
+    VII - definição de métricas e indicadores de segurança cibernética.
+guidance:
+  prose: |
+    O art. 10 detalha os sete componentes obrigatorios da PSC. Junto com o
+    art. 5 (conteudo minimo da PSI), forma o corpo de requisitos tecnicos
+    que a CVM verifica em fiscalizacoes.
+
+    **I — Autenticacao:**
+    Autenticacao multifator (MFA) e expectativa minima para sistemas criticos.
+    Sistemas de negociacao, custodia e acesso a dados de investidores devem
+    ter autenticacao forte. Senhas devem seguir politica robusta (complexidade,
+    rotacao, bloqueio por tentativas).
+
+    **II — Criptografia:**
+    Dados em transito: TLS 1.2+ obrigatorio para todas as comunicacoes.
+    Dados em repouso: criptografia de bancos de dados, backups e storage
+    que contenham dados sensiveis. Gestao de chaves com rotacao periodica.
+
+    **III — Prevencao e deteccao de intrusao:**
+    IDS/IPS em pontos criticos da rede. HIDS em servidores criticos. EDR/XDR
+    com capacidade de deteccao comportamental. Monitoramento 24x7 para
+    entidades de grande porte.
+
+    **IV — Prevencao de vazamento (DLP):**
+    Controles para prevenir exfiltracao de dados de investidores, informacoes
+    privilegiadas e dados proprietarios. DLP em endpoints, e-mail, web e
+    nuvem. Classificacao de dados como pre-requisito.
+
+    **V — Testes periodicos:**
+    Vulnerability assessment e penetration testing com periodicidade definida.
+    Detalhado no art. 14.
+
+    **VI — Trilhas de auditoria:**
+    Logs de sistemas criticos com integridade garantida, retencao adequada
+    e capacidade de correlacao. Sobreposicao intencional com art. 5, VII —
+    reforça a importancia.
+
+    **VII — Metricas e indicadores:**
+    KPIs de seguranca cibernetica: MTTD, MTTR, numero de incidentes,
+    vulnerabilidades abertas, cobertura de patching, taxa de phishing.
+    Devem ser reportados periodicamente a diretoria (art. 20).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I — Autenticacao:**
+      1. MFA obrigatorio para todos os acessos a sistemas criticos.
+      2. SSO via Identity Provider centralizado (Okta, Azure AD, Keycloak).
+      3. Autenticacao baseada em certificado para acessos machine-to-machine.
+      4. Politica de senhas: minimo 12 caracteres, bloqueio apos 5 tentativas.
+
+      **II — Criptografia:**
+      5. TLS 1.3 para comunicacoes externas, TLS 1.2+ para internas.
+      6. Criptografia de dados em repouso (AES-256) para bancos de dados e
+         storage com dados sensiveis.
+      7. Gestao de chaves via HSM ou KMS gerenciado (AWS KMS, GCP KMS, Vault).
+      8. Rotacao automatica de chaves criptograficas.
+      9. Certificados TLS gerenciados com renovacao automatica (cert-manager).
+
+      **III — Prevencao e deteccao de intrusao:**
+      10. IDS/IPS em perimetro e segmentos criticos.
+      11. EDR/XDR em todos os endpoints e servidores.
+      12. Network Detection and Response (NDR) para trafego east-west.
+
+      **IV — Prevencao de vazamento:**
+      13. DLP em endpoints, e-mail gateway e proxy web.
+      14. Data classification labels aplicados automaticamente.
+      15. Monitoramento de acessos a dados classificados como confidenciais.
+
+      **VI — Trilhas de auditoria:**
+      16. Centralizacao de logs em SIEM com armazenamento imutavel.
+      17. Retencao minima de 5 anos para logs de sistemas criticos.
+      18. Monitoramento de integridade de logs (hash chain).
+
+      **VII — Metricas:**
+      19. Dashboard de KPIs de seguranca cibernetica atualizado em tempo real.
+      20. Relatorio automatico mensal para diretoria.
+    tools:
+      - identity-provider
+      - vault
+      - kms
+      - cert-manager
+      - edr-xdr
+      - ids-ips
+      - dlp-solution
+      - siem
+  devsecops:
+    prose: |
+      **Autenticacao no desenvolvimento (I):**
+      1. MFA obrigatorio para acesso a repositorios e pipelines.
+      2. Tokens de CI/CD com escopo minimo e rotacao automatica.
+      3. Service accounts com autenticacao por certificado ou OIDC.
+
+      **Criptografia no pipeline (II):**
+      4. Validacao de configuracao TLS em DAST (detectar TLS fraco).
+      5. Secret scanning para chaves criptograficas hardcoded.
+      6. IaC scanning para verificar criptografia em recursos de nuvem
+         (bancos sem encryption, S3 buckets publicos).
+
+      **Deteccao de vulnerabilidades (III, V):**
+      7. SAST + DAST + dependency scanning + container scanning em pipeline.
+      8. Vulnerability scanning como gate bloqueante para criticas/altas.
+      9. Pentest automatizado em ambiente staging a cada release major.
+
+      **Prevencao de vazamento (IV):**
+      10. Secret detection em pre-commit e no pipeline.
+      11. Prevent secrets push via server-side hooks.
+      12. Code review focado em exfiltracao de dados.
+
+      **Trilhas de auditoria (VI):**
+      13. Audit events de todas as acoes no GitLab exportados para SIEM.
+      14. Rastreabilidade commit-to-deployment completa.
+
+      **Metricas (VII):**
+      15. Dashboard de vulnerabilidades por severidade, tipo e equipe.
+      16. MTTR por severidade como KPI de efetividade.
+      17. Tendencias de vulnerabilidades ao longo do tempo.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - checkov
+      - trivy
+      - sonarqube
+  secops:
+    prose: |
+      **Operacao dos sete componentes:**
+
+      **Autenticacao (I):**
+      1. Monitoramento de tentativas de autenticacao anomalas (brute force,
+         credential stuffing, password spraying).
+      2. Revisao trimestral de contas ativas e privilegios.
+
+      **Criptografia (II):**
+      3. Auditoria periodica de configuracao criptografica (cipher suites,
+         protocolos, certificados expirados).
+      4. Monitoramento de certificados com alertas de expiracao.
+
+      **Intrusao (III):**
+      5. SOC com correlacao de alertas de IDS/IPS, EDR e SIEM.
+      6. Threat hunting semanal focado em TTPs relevantes ao setor financeiro.
+      7. Analise de trafego de rede para deteccao de C2, lateral movement.
+
+      **Vazamento (IV):**
+      8. Monitoramento de DLP com triagem de alertas.
+      9. Monitoramento de dark web e paste sites para dados da entidade.
+      10. Investigacao de violacoes de politica de classificacao de dados.
+
+      **Testes (V):**
+      11. Pentest externo anual por empresa independente.
+      12. Vulnerability assessment trimestral.
+      13. Bug bounty program (para entidades de grande porte).
+
+      **Auditoria (VI):**
+      14. Revisao periodica de completude e integridade de logs.
+      15. Testes de capacidade de investigacao forense usando logs existentes.
+
+      **Metricas (VII):**
+      16. Painel executivo com MTTD, MTTR, incidentes por tipo, cobertura
+          de patching, postura de vulnerabilidades.
+      17. Relatorio mensal para CISO e trimestral para diretoria.
+    tools:
+      - siem
+      - soar
+      - edr-xdr
+      - dlp-solution
+      - threat-intelligence-platform
+      - vulnerability-scanner
+      - grc-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-4", "art-7"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-5", "SC-8", "SC-13", "SC-28", "SI-4", "SI-7", "AU-2", "AU-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.5", "A.8.24", "A.8.12", "A.8.16", "A.8.15", "A.5.28"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-48", "art-49"]
+    relationship: complements

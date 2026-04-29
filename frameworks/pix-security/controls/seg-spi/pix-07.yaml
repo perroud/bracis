@@ -1,0 +1,96 @@
+id: pix-07
+family: seg-spi
+title: "Seguranca do DICT"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O acesso ao DICT (Diretório de Identificadores de Contas Transacionais) deve ser
+    realizado exclusivamente por participantes autorizados, mediante autenticação por
+    certificado digital ICP-Brasil, com controle de taxa de requisições (rate limiting),
+    registro de auditoria de todas as consultas e proteção dos dados pessoais vinculados
+    às chaves Pix conforme a LGPD. O participante é responsável por garantir que as
+    consultas ao DICT sejam realizadas apenas quando necessário para a efetivação de
+    uma transação Pix ou operação relacionada.
+guidance:
+  prose: |
+    **O que e o DICT:**
+    O DICT armazena o mapeamento entre chaves Pix (CPF, CNPJ, e-mail, telefone, EVP)
+    e as contas transacionais dos usuarios. E operado pelo BCB e acessado pelos PSPs
+    para resolver chaves em transacoes Pix.
+
+    **Dados sensiveis no DICT:**
+    Cada registro contem: tipo da chave, valor da chave, ISPB do PSP, agencia, conta,
+    tipo de conta, nome do titular, CPF/CNPJ (mascarado nas consultas), data de criacao
+    e data de portabilidade. Esses dados sao protegidos pela LGPD.
+
+    **Controles de seguranca obrigatorios:**
+    1. **Autenticacao:** Certificado digital ICP-Brasil para cada requisicao.
+    2. **Autorizacao:** Apenas operacoes permitidas ao tipo de participante.
+    3. **Rate limiting:** Limites de consultas por periodo definidos pelo BCB para
+       prevenir data scraping e enumeracao de chaves.
+    4. **Auditoria:** Log de todas as consultas com identificacao do participante,
+       horario, chave consultada e motivo.
+    5. **Minimizacao:** Consultar apenas os dados necessarios para a transacao.
+
+    **Anti-scraping:**
+    O BCB monitora padroes de consulta ao DICT. Consultas excessivas, sem transacao
+    correspondente ou com padrao de enumeracao resultam em bloqueio e penalidades.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com DICT:**
+      1. API client dedicado para DICT com autenticacao mTLS (certificado ICP-Brasil).
+      2. Rate limiter local para garantir que as requisicoes ao DICT respeitem os limites
+         do BCB antes de serem enviadas.
+      3. Cache local de consultas recentes ao DICT com TTL curto para evitar consultas
+         duplicadas em um mesmo fluxo.
+      4. Circuit breaker para indisponibilidade do DICT com fallback documentado.
+
+      **Protecao de dados:**
+      5. Dados retornados pelo DICT criptografados em repouso no cache local.
+      6. TTL maximo para dados do DICT em cache conforme especificacao do BCB.
+      7. Mascaramento de CPF/CNPJ em logs e interfaces de atendimento.
+      8. Segregacao de acesso: apenas servicos autorizados consultam o DICT.
+    tools:
+      - api-gateway
+      - rate-limiter
+      - cache-layer
+      - data-masking
+      - mtls
+  devsecops:
+    prose: |
+      **Seguranca no acesso ao DICT:**
+      1. Testes de integracao com simulador DICT verificando autenticacao e autorizacao.
+      2. Testes de rate limiting para garantir que o codigo respeita os limites.
+      3. Validacao de que dados do DICT nao vazam para logs, traces ou mensagens de erro.
+      4. Code review obrigatorio para alteracoes em codigo que acessa o DICT.
+      5. SAST rules para detectar logging inadvertido de dados pessoais do DICT.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - api-simulator
+      - log-sanitizer
+  secops:
+    prose: |
+      **Monitoramento de acesso ao DICT:**
+      1. Monitoramento de volume de consultas ao DICT por periodo e por servico.
+      2. Alerta para padroes anomalos de consulta (potencial scraping).
+      3. Auditoria trimestral de logs de acesso ao DICT.
+      4. Relatorio de conformidade de acesso ao DICT para o BCB.
+      5. Revisao de acessos: verificar que apenas servicos autorizados acessam o DICT.
+    tools:
+      - siem
+      - anomaly-detection
+      - audit-log-analyzer
+      - access-review
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-13", "art-14", "art-15"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-6", "art-7", "art-46"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

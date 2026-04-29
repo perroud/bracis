@@ -1,0 +1,85 @@
+id: ac-2
+family: ac
+title: "Authentication and Multi-Factor Authentication"
+class: ISMAP
+baselines:
+  - ismap
+
+statement:
+  prose: |
+    The cloud service provider shall implement secure authentication mechanisms
+    for all users, including multi-factor authentication (MFA) for access to
+    cloud management consoles, administrative interfaces, and systems processing
+    government data. Authentication information shall be controlled through a
+    formal management process. Users shall be required to follow the
+    organization's practices in the use of authentication information. Access
+    to source code and privileged functions shall require strong authentication
+    that is resistant to phishing and replay attacks.
+
+guidance:
+  prose: |
+    ISMAP has stringent authentication requirements that exceed the baseline
+    ISO/IEC 27001 requirements, reflecting the sensitivity of Japanese government
+    data. Multi-factor authentication is mandatory for all administrative access
+    and strongly recommended for all user access to systems handling government
+    information. The standard aligns with NIST SP 800-63B authentication
+    assurance levels, with government cloud services typically requiring AAL2
+    or higher. Cloud service providers must also ensure that their authentication
+    mechanisms support integration with Japanese government identity systems
+    where applicable.
+
+references:
+  - citation: "ISMAP Management Criteria, AC-02"
+    url: "https://www.ismap.go.jp/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Deploy organization-wide multi-factor authentication enforced at the
+      identity provider level. Implement SSO with SAML or OIDC for all cloud
+      services. Configure hardware token or FIDO2 support for privileged
+      accounts. Enforce password complexity and rotation policies through
+      the centralized identity platform. Block legacy authentication
+      protocols that do not support MFA.
+    tools:
+      - keycloak
+      - okta
+      - duo
+      - yubikey
+
+  devsecops:
+    prose: |
+      Require MFA for all code repository access and CI/CD pipeline
+      operations. Enforce signed commits to verify developer identity.
+      Implement pipeline authentication that uses short-lived tokens
+      rather than static credentials. Scan for hardcoded credentials
+      and authentication bypasses in code.
+    tools:
+      - gitlab-ci
+      - gitleaks
+      - vault
+      - cosign
+
+  secops:
+    prose: |
+      Monitor authentication events for anomalies including failed MFA
+      attempts, impossible travel, and credential stuffing attacks.
+      Alert on authentication from unauthorized locations or devices.
+      Generate authentication compliance reports showing MFA adoption
+      rates and authentication method usage across the organization.
+    tools:
+      - splunk
+      - crowdstrike
+      - elastic-siem
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a-5.17", "annex-a-8.5"]
+    relationship: derived-from
+  - framework_id: nist-800-53
+    articles: ["IA-2", "IA-5", "IA-8"]
+    relationship: mapped
+  - framework_id: fedramp
+    articles: ["IA-2", "IA-2(1)", "IA-2(2)"]
+    relationship: mapped

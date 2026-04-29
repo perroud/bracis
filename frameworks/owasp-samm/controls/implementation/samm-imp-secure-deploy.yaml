@@ -1,0 +1,108 @@
+id: samm-imp-secure-deploy
+family: implementation
+title: "Secure Deploy"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Establish secure, consistent, and auditable deployment processes that enforce security
+    controls across all target environments. Implement secrets management to prevent
+    credential exposure in deployment pipelines and runtime configurations. Apply
+    environment hardening standards to eliminate unnecessary attack surface. Ensure
+    deployments are traceable, reversible, and validated against security baselines
+    before traffic is routed to new software versions.
+  parts:
+    - id: samm-imp-secure-deploy_smt.a
+      label: "Stream A — Deployment Process Security"
+      prose: >-
+        Standardize deployment procedures using infrastructure-as-code and configuration
+        management to ensure consistent, repeatable deployments across environments.
+        Implement pre-deployment security checks that verify artifact integrity (signature
+        verification), scan for runtime configuration vulnerabilities, and validate
+        compliance with environment security baselines. Require deployment approval for
+        production environments, with separation of duties between developers and release
+        approvers. Maintain deployment audit logs that record who deployed what, when,
+        and from which artifact version.
+    - id: samm-imp-secure-deploy_smt.b
+      label: "Stream B — Secret Management"
+      prose: >-
+        Implement a centralized secrets management solution to provide secure storage,
+        rotation, and access control for all secrets used in software deployment and
+        runtime operation. Prohibit hardcoded secrets in source code, configuration
+        files, and container images. Enforce secrets scanning in CI/CD pipelines to
+        detect credential exposure before artifacts are committed or deployed. Implement
+        dynamic secrets where feasible — generating short-lived credentials on demand
+        rather than distributing long-lived static secrets. Audit all secrets access
+        and rotate secrets on a defined schedule or immediately upon compromise.
+
+guidance:
+  prose: >-
+    Deployment is where secure builds meet insecure environments — and environments win.
+    Hardcoded secrets, misconfigured permissions, and unpatched runtime dependencies
+    routinely undermine secure code. At maturity level 1, the organization uses a
+    defined deployment procedure and stores secrets in a vault rather than source code.
+    At level 2, deployments are fully automated through IaC, artifact signatures are
+    verified before deployment, and secrets are dynamically injected at runtime. At
+    level 3, deployments implement progressive delivery (canary, blue/green) with
+    automated security validation gates, runtime security policies enforce least
+    privilege, and all secrets are dynamic with zero-standing-privilege access patterns.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Implementation: Secure Deploy"
+    url: "https://owaspsamm.org/model/implementation/secure-deploy/"
+  - citation: "OWASP Secrets Management Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+  - citation: "NIST SP 800-218 — PW.9"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps-based deployment through ArgoCD or Flux, ensuring all production
+      changes are driven from version-controlled manifests with mandatory code review.
+      Integrate HashiCorp Vault or AWS Secrets Manager as the platform-wide secrets
+      management solution, providing Vault agent sidecars or ESO (External Secrets
+      Operator) for transparent secret injection into workloads. Implement admission
+      controllers (Kyverno, OPA Gatekeeper) that block deployment of unsigned images,
+      containers running as root, or workloads requesting excessive privileges. Provide
+      deployment templates with pre-configured network policies, security contexts, and
+      resource limits as platform defaults.
+    tools:
+      - "ArgoCD / Flux (GitOps)"
+      - "HashiCorp Vault (secrets management)"
+      - "External Secrets Operator (ESO)"
+      - "Kyverno / OPA Gatekeeper (admission control)"
+      - "Cosign / Sigstore (image signing verification)"
+  devsecops:
+    prose: >-
+      Implement pre-deployment pipeline stages that verify image signatures, validate
+      SBOM provenance attestations, and run configuration security scans (Trivy, Checkov)
+      against Kubernetes manifests and Helm charts before deployment. Integrate GitLeaks
+      or TruffleHog as pipeline stages to detect secrets committed to source code.
+      Implement deployment gate policies that require security scan clearance before
+      production promotion. Use GitLab Environments with protected environments settings
+      to enforce approval workflows and deployment freezes. Automate rollback triggers
+      based on security alert thresholds in post-deployment monitoring.
+    tools:
+      - "GitLeaks / TruffleHog (secrets detection)"
+      - "Trivy (Kubernetes manifest scanning)"
+      - "Checkov (IaC security scanning)"
+      - "GitLab Environments (protected deployments)"
+      - "Cosign (image signature verification)"
+  secops:
+    prose: >-
+      Maintain deployment audit logs in a tamper-evident SIEM, enabling forensic
+      investigation of unauthorized deployments and deployment-time security events.
+      Implement runtime security monitoring to detect behavioral anomalies in newly
+      deployed workloads — unexpected network connections, privilege escalation attempts,
+      or container escape attempts. Monitor secrets vault access logs for anomalous
+      access patterns indicating credential theft. Conduct periodic deployment security
+      reviews to verify that production environments match approved baseline configurations
+      and that no unauthorized changes have occurred.
+    tools:
+      - "Falco (runtime security)"
+      - "Sysdig Secure"
+      - "HashiCorp Vault Audit Logs"
+      - "Splunk / Elastic SIEM"
+      - "AWS CloudTrail / GCP Cloud Audit Logs"

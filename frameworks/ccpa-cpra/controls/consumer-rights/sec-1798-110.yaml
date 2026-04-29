@@ -1,0 +1,119 @@
+id: sec-1798-110
+family: consumer-rights
+title: "Right to Know What Personal Information is Collected — Disclosure Details"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right to request that a business that collects personal
+    information about the consumer disclose to the consumer the following:
+    (1) The categories of personal information it has collected about that consumer.
+    (2) The categories of sources from which the personal information is collected.
+    (3) The business or commercial purpose for collecting, selling, or sharing personal
+    information.
+    (4) The categories of third parties to whom the business discloses personal information.
+    (5) The specific pieces of personal information it has collected about that consumer.
+
+    (b) A business that collects personal information about a consumer shall disclose to the
+    consumer, pursuant to subparagraph (B) of paragraph (3) of subdivision (a) of Section
+    1798.130, the information specified in subdivision (a) upon receipt of a verifiable consumer
+    request from the consumer, provided that a business shall be deemed to be in compliance with
+    paragraphs (1) through (4) of subdivision (a) of this section to the extent that the
+    categories of information and the business or commercial purpose for collecting, selling, or
+    sharing personal information it would be required to disclose to the consumer pursuant to
+    paragraphs (1) through (4) of subdivision (a) is the same as the information it has disclosed
+    in its privacy policy pursuant to subdivisions (a) and (b) of Section 1798.130.
+
+guidance:
+  prose: |
+    Section 1798.110 specifies the detailed disclosure requirements when a consumer exercises
+    the right to know. It complements Section 1798.100 by defining the specific categories of
+    information that must be disclosed. Key points:
+
+    1. **Five disclosure categories:** Businesses must provide (1) categories of PI collected,
+       (2) sources, (3) purposes, (4) third-party recipients, and (5) specific pieces of PI.
+
+    2. **Privacy policy safe harbor:** A business is deemed compliant with items (1)-(4) if the
+       same information is already disclosed in its privacy policy under Section 1798.130.
+
+    3. **12-month lookback:** The disclosure covers PI collected during the 12-month period
+       preceding the request. CPRA extended this to allow requests for PI collected beyond
+       12 months if the business retains it, unless doing so would be impossible or
+       disproportionately burdensome.
+
+    4. **Twice per year:** Consumers may make a verifiable request up to twice within a
+       12-month period.
+
+    5. **Portable format:** When delivered electronically, the information must be in a
+       portable and readily useable format.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a metadata-driven PI inventory that maps each data field to its category
+         (identifiers, commercial information, biometric, geolocation, etc.), source, purpose,
+         and downstream recipients.
+      2. Implement automated data discovery that scans databases, APIs, file stores, and
+         third-party integrations to maintain a current PI inventory.
+      3. Create structured data export templates that organize consumer PI by the five
+         disclosure categories required by this section.
+      4. Build a privacy policy generation system that automatically reflects current data
+         collection practices, ensuring consistency between policy and actual practice.
+      5. Implement request rate limiting and tracking to enforce the two-requests-per-12-months
+         limit per consumer.
+      6. Deploy data classification service that automatically tags PI by CCPA category
+         (identifiers, commercial info, internet activity, geolocation, etc.).
+    tools:
+      - datahub
+      - openmetadata
+      - apache-atlas
+      - privacy-portal
+      - data-classification
+      - dsar-automation
+
+  devsecops:
+    prose: |
+      1. Implement automated tests that verify data export responses include all five
+         disclosure categories.
+      2. Test that privacy policy content matches actual data collection practices — flag
+         discrepancies between code behavior and policy claims.
+      3. Validate data classification accuracy — test that PI fields are correctly categorized
+         according to CCPA definitions in Section 1798.140.
+      4. Test the 12-month lookback boundary — verify that responses include data from the
+         correct time window and exclude data outside it.
+      5. Implement contract tests for third-party data sharing integrations to ensure
+         accurate recipient tracking.
+    tools:
+      - gitlab-ci
+      - postman
+      - api-testing
+      - integration-testing
+      - semgrep
+
+  secops:
+    prose: |
+      1. Audit PI inventory completeness quarterly — cross-reference data stores against
+         the catalog to identify unregistered PI.
+      2. Monitor for new data collection points not reflected in the privacy policy or PI
+         inventory.
+      3. Verify that consumer disclosure responses are accurate and complete through
+         periodic sampling and review.
+      4. Track request fulfillment metrics (volume, response time, completeness) for
+         CPPA compliance reporting.
+      5. Alert on data collection practices that deviate from disclosed categories/purposes.
+    tools:
+      - data-discovery
+      - siem
+      - compliance-dashboard
+      - dsar-tracking
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 15"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-i", "art. 18-ii"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["A.7.3.2", "A.7.3.3"]
+    relationship: supports

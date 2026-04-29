@@ -1,0 +1,104 @@
+id: art-17
+family: cap-4
+title: "Transferencia Internacional de Dados"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 17. A transferência internacional de dados armazenados em soluções de
+    computação em nuvem por órgãos e entidades da administração pública federal
+    somente será permitida quando:
+    I - tratar-se de dados ostensivos ou públicos, devidamente autorizados pelo
+    gestor de segurança da informação;
+    II - o país de destino proporcionar grau de proteção de dados pessoais
+    adequado ao previsto na legislação brasileira, conforme avaliação da
+    Autoridade Nacional de Proteção de Dados (ANPD);
+    III - houver garantias de que o provedor de serviços de computação em nuvem
+    adotará medidas de segurança equivalentes às exigidas pela legislação brasileira;
+    IV - houver autorização expressa do gestor de segurança da informação,
+    com justificativa fundamentada.
+
+    Parágrafo único. É vedada a transferência internacional de informações
+    classificadas nos graus de sigilo ultrassecreto, secreto e reservado.
+guidance:
+  prose: |
+    O art. 17 regula a transferencia internacional de dados, alinhando-se com
+    a LGPD e impondo restricoes adicionais para dados governamentais.
+
+    **Quatro condicoes cumulativas para transferencia:**
+    1. Somente dados ostensivos/publicos
+    2. Pais com nivel adequado de protecao (lista ANPD)
+    3. Provedor com medidas de seguranca equivalentes
+    4. Autorizacao expressa do gestor de seguranca
+
+    **Proibicao absoluta:**
+    Dados classificados NUNCA podem ser transferidos internacionalmente.
+
+    **Alinhamento LGPD art. 33:**
+    A LGPD permite transferencia internacional quando:
+    - Pais com nivel adequado (lista ANPD)
+    - Clausulas contratuais padrao
+    - Consentimento especifico
+    - Cooperacao juridica internacional
+
+    **Mapeamento CSA CCM v4:**
+    - DSP-14: Data Jurisdiction
+    - DSP-18: Data Transfer Restriction
+
+    **Paises com nivel adequado (ANPD - referencia):**
+    Lista ainda em construcao pela ANPD. UE/EEA tende a ser considerado
+    adequado pela compatibilidade com GDPR.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de transferencia internacional:**
+      1. Data flow mapping que identifique todos os fluxos de dados transfronteiricos.
+      2. Bloqueio tecnico de replicacao para regioes internacionais (exceto
+         dados publicos autorizados).
+      3. DLP com regras que detectem e bloqueiem transferencia de dados
+         classificados para fora do Brasil.
+      4. Gateway de saida que monitore e controle trafego de dados para
+         destinos internacionais.
+    tools:
+      - data-flow-mapping
+      - dlp
+      - egress-gateway
+      - region-restriction
+  devsecops:
+    prose: |
+      **Transferencia no pipeline:**
+      1. Validacao de IaC que detecte configuracoes de replicacao internacional.
+      2. Testes que verifiquem que dados classificados nao possuem rotas para
+         fora do Brasil.
+      3. Checklist de autorizacao de transferencia internacional integrado
+         ao pipeline de provisionamento.
+      4. Scan de configuracao de CDNs e servicos globais para garantir que
+         dados sensiveis nao sejam cacheados fora do Brasil.
+    tools:
+      - gitlab-ci
+      - iac-scanner
+      - data-residency-tests
+      - cdn-scanner
+  secops:
+    prose: |
+      **Monitoramento de transferencias:**
+      1. Monitoramento em tempo real de fluxos de dados transfronteiricos.
+      2. Auditoria trimestral de todas as transferencias internacionais autorizadas.
+      3. Registro de autorizacoes de transferencia com justificativa e aprovacao.
+      4. Acompanhar lista de paises com nivel adequado publicada pela ANPD.
+      5. Alertas para transferencias nao autorizadas.
+    tools:
+      - data-flow-monitoring
+      - dlp
+      - grc-platform
+      - anpd-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35", "art-36"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-7", "art-8"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["DSP-14", "DSP-18"]
+    relationship: mapped

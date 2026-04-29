@@ -1,0 +1,191 @@
+id: art-3
+family: cap-2
+title: "Obrigacao de Notificacao de Incidentes ao BCB"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 3. As instituições referidas no art. 1 devem notificar ao Banco Central do
+    Brasil a ocorrência de incidentes de segurança relevantes.
+
+    § 1º São considerados incidentes de segurança relevantes aqueles que:
+    I - afetem componentes críticos dos sistemas de informação da instituição;
+    II - afetem infraestruturas críticas do sistema financeiro nacional;
+    III - comprometam informações críticas, incluindo dados pessoais de clientes e
+    de usuários de produtos e serviços financeiros;
+    IV - tenham impacto relevante na prestação de serviços da instituição;
+    V - sejam de interesse público.
+
+    § 2º A notificação de que trata o caput deve ser realizada no prazo máximo de
+    24 (vinte e quatro) horas após a detecção do incidente.
+
+    § 3º A obrigação de notificação de que trata este artigo aplica-se inclusive
+    a incidentes originados em prestadores de serviços contratados pela instituição.
+guidance:
+  prose: |
+    O art. 3 e o nucleo da resolucao: estabelece a obrigacao, os criterios de
+    relevancia e o prazo de notificacao.
+
+    **Criterios de relevancia (ss 1):**
+
+    **I - Componentes criticos de sistemas:**
+    Sistemas cuja indisponibilidade ou comprometimento afeta as operacoes core da
+    instituicao. Exemplos: core banking, sistema de pagamentos, gateway PIX,
+    plataforma de internet banking, infraestrutura de autenticacao.
+
+    **II - Infraestruturas criticas do SFN:**
+    Sistemas que fazem parte da infraestrutura do Sistema Financeiro Nacional:
+    SPB (Sistema de Pagamentos Brasileiro), STR, SILOC, CIP, sistemas de
+    compensacao e liquidacao. Qualquer incidente que afete a estabilidade do SFN
+    deve ser notificado imediatamente.
+
+    **III - Informacoes criticas e dados pessoais:**
+    Incidentes que comprometam:
+    - Dados pessoais de clientes (nome, CPF, conta, saldo)
+    - Dados de transacoes financeiras
+    - Credenciais de acesso
+    - Dados biometricos
+    A definicao de "comprometimento" inclui acesso nao autorizado, vazamento,
+    alteracao e destruicao.
+
+    **IV - Impacto na prestacao de servicos:**
+    Interrupcoes ou degradacoes que afetem a capacidade da instituicao de prestar
+    servicos. Exemplos: indisponibilidade do internet banking por mais de X horas,
+    impossibilidade de processar pagamentos, lentidao severa em canais digitais.
+
+    **V - Interesse publico:**
+    Incidentes que ganhem repercussao publica ou que possam afetar a confianca no
+    SFN. Criterio subjetivo que exige avaliacao caso a caso.
+
+    **Prazo de 24 horas (ss 2):**
+    O prazo de 24 horas e contado a partir da deteccao do incidente, nao da
+    confirmacao. Isso exige capacidade de deteccao rapida e processo de notificacao
+    agil. A Resolucao Conjunta 6/2023 atualizou e reafirmou este prazo.
+
+    **Terceiros (ss 3):**
+    A responsabilidade de notificacao e da instituicao, mesmo que o incidente tenha
+    origem em prestadores de servicos (ex: provedores de nuvem, processadoras de
+    pagamento, fintechs parceiras). A instituicao deve ter mecanismos para tomar
+    conhecimento de incidentes em terceiros dentro do prazo de notificacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificacao automatizada de relevancia:**
+      1. Motor de regras automatizado que classifica incidentes nos cinco criterios
+         de relevancia do ss 1:
+         - Regra I: mapeamento de componentes criticos no CMDB com flag "regulatorio".
+         - Regra II: identificacao de sistemas que integram infraestruturas do SFN
+           (SPB, STR, PIX).
+         - Regra III: deteccao de comprometimento de dados pessoais via DLP integrado.
+         - Regra IV: monitoramento de SLOs com threshold de "impacto na prestacao de
+           servicos" definido.
+         - Regra V: criterio manual, mas com sugestao automatizada baseada em volume
+           de clientes afetados.
+
+      **Garantia do prazo de 24 horas:**
+      2. Tempo medio de deteccao (MTTD) monitorado e mantido abaixo de 4 horas para
+         garantir margem no prazo de 24h.
+      3. Pipeline de notificacao automatizado:
+         Deteccao -> Classificacao -> Enriquecimento -> Draft de notificacao -> Aprovacao
+         -> Envio ao BCB. Todo o fluxo em < 8 horas apos deteccao.
+      4. Alerting de SLA interno: se 12 horas se passaram da deteccao sem envio da
+         notificacao, escalacao automatica para CISO e diretoria.
+
+      **Cobertura de terceiros (ss 3):**
+      5. Integracao com plataformas de monitoramento de terceiros (Third-Party Risk
+         Management).
+      6. Webhook ou API de notificacao de incidentes com cada prestador critico.
+      7. SLA contratual exigindo que terceiros comuniquem incidentes em < 4 horas.
+      8. Monitoramento de status pages de provedores de nuvem e servicos criticos.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - cmdb
+      - dlp
+      - third-party-risk
+      - monitoring-alerting
+  devsecops:
+    prose: |
+      **Mapeamento de componentes criticos no codigo:**
+      1. Label ou tag em cada repositorio indicando se o sistema e "componente critico"
+         conforme criterio I do ss 1.
+      2. Repositorios de sistemas SFN marcados com label "infraestrutura-sfn" para
+         triggerar notificacao automatica ao SOC.
+      3. Pipelines de sistemas criticos com gates de seguranca mais rigorosos.
+
+      **Deteccao rapida para cumprir 24 horas:**
+      4. Monitoramento de seguranca em real-time em todas as aplicacoes Tier 1:
+         SAST incrementado a cada commit, DAST em staging, runtime protection em producao.
+      5. Alertas de runtime (RASP/WAF) que alimentam diretamente o fluxo de incidentes.
+      6. Canary deployments em sistemas criticos para detectar comportamentos anomalos
+         antes de rollout completo.
+
+      **Rastreabilidade para notificacao:**
+      7. Audit trail completo de deploys para correlacionar incidentes com mudancas.
+      8. Bill of Materials (SBOM) atualizado para cada release de sistema critico.
+      9. Signed artifacts para garantir integridade e autenticidade das releases.
+
+      **Terceiros no pipeline:**
+      10. Dependency scanning com alertas imediatos para vulnerabilidades criticas
+          em bibliotecas de terceiros.
+      11. Monitoramento de advisories de seguranca de fornecedores de software.
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - container-scanning
+      - sbom-generator
+      - rasp-waf
+  secops:
+    prose: |
+      **Processo de classificacao e notificacao:**
+      1. Playbook especifico de classificacao de relevancia com decision tree:
+         Para cada incidente, avaliar sequencialmente os cinco criterios do ss 1.
+         Se qualquer criterio for atendido, o incidente e relevante e deve ser notificado.
+      2. Checklist de classificacao documentado e auditavel.
+      3. Responsavel designado pela decisao de notificacao (CISO ou delegado formal).
+
+      **Cumprimento do prazo de 24 horas:**
+      4. Cronometro automatico ativado na deteccao do incidente.
+      5. Marcos internos:
+         - T+0h: Deteccao e abertura de incidente
+         - T+2h: Classificacao de relevancia concluida
+         - T+4h: Draft de notificacao ao BCB preparado
+         - T+6h: Aprovacao interna (CISO, juridico, compliance)
+         - T+8h: Notificacao enviada ao BCB
+         - T+12h: Deadline de seguranca (se nao enviou, escalacao critica)
+         - T+24h: Deadline regulatorio absoluto
+      6. Escalacao automatica em T+8h se notificacao nao foi enviada.
+
+      **Gestao de terceiros (ss 3):**
+      7. Clausula contratual obrigatoria: terceiros devem comunicar incidentes em
+         ate 4 horas da deteccao.
+      8. Ponto focal de seguranca definido em cada prestador critico.
+      9. Teste periodico do canal de comunicacao com terceiros (exercicio simulado).
+      10. Registro de todos os incidentes originados em terceiros com rastreabilidade
+          ate a notificacao ao BCB.
+    tools:
+      - soar
+      - siem
+      - incident-management
+      - grc-platform
+      - third-party-risk
+      - communication-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6", "IR-7", "SI-5"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.26", "A.6.8"]
+    relationship: supports
+  - framework_id: bcb-85
+    articles: ["art-10"]
+    relationship: complements

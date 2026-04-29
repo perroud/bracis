@@ -1,0 +1,101 @@
+id: iot-4
+family: auth
+title: "Prohibition of Hardcoded Credentials in Source Code"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento não deve possuir credenciais de acesso ou senhas
+    registradas de forma irremovível (hard-coded) no código-fonte do
+    software ou firmware. Todas as credenciais devem ser armazenadas
+    de forma que possam ser alteradas pelo usuário ou pelo sistema de
+    gerenciamento remoto autorizado.
+
+    As senhas e credenciais armazenadas no equipamento devem ser
+    protegidas por métodos adequados de criptografia ou hashing,
+    baseados em padronização internacionalmente reconhecida.
+
+    (Ato 77/2021 §5.1.4, incisos VII e VIII)
+guidance:
+  prose: |
+    This control targets a critical firmware security flaw: embedding
+    credentials directly in source code or compiled binaries. Hardcoded
+    credentials are trivially extractable via firmware reverse engineering
+    and enable permanent, irrevocable unauthorized access.
+
+    **Key requirements:**
+    - No credential, password, API key, or authentication token may be
+      compiled into the firmware binary or stored in plaintext
+      configuration files.
+    - All stored credentials must use cryptographic hashing (bcrypt,
+      argon2, scrypt) or encryption with keys stored in hardware-backed
+      secure storage (TPM, secure element, eFuse).
+    - The user or authorized management system (e.g., TR-069 ACS) must
+      be able to change any credential on the device.
+
+    **ANATEL's definition of "adequate cryptography":**
+    Protocols and algorithms based on internationally recognized
+    standardization bodies (e.g., NIST, IETF, ISO). This excludes
+    proprietary, home-grown, or deprecated algorithms (MD5, SHA-1 for
+    password hashing, DES, RC4).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a credential storage module that uses argon2id or
+         bcrypt for password hashing with per-credential random salt.
+      2. Store encryption keys in a hardware secure element (if
+         available) or in a dedicated, access-controlled partition
+         with tamper detection.
+      3. Design the credential management API so that all credentials
+         (admin, service accounts, API keys) are mutable via the
+         management interface and TR-069/USP.
+      4. Implement secure boot chain to prevent firmware tampering that
+         could inject hardcoded credentials.
+      5. Use environment-specific configuration injection at provisioning
+         time rather than build-time credential embedding.
+    tools:
+      - hardware-security-module
+      - secure-element
+      - argon2-library
+      - firmware-build-pipeline
+  devsecops:
+    prose: |
+      1. Deploy secret detection scanning (GitLab Secret Detection,
+         TruffleHog, or Gitleaks) on all firmware repositories — fail
+         the pipeline on any detected credential.
+      2. Add SAST rules that flag: hardcoded string assignments to
+         variables named *password*, *secret*, *key*, *credential*,
+         *token*; use of strcmp/memcmp with string literals in
+         authentication code paths.
+      3. Perform binary analysis of release firmware images using
+         tools like binwalk + strings to verify no plaintext
+         credentials are present in the compiled output.
+      4. Enforce code review approval from a security engineer for
+         any changes to authentication or credential storage modules.
+    tools:
+      - gitlab-ci
+      - gitleaks
+      - trufflehog
+      - semgrep
+      - binwalk
+  secops:
+    prose: |
+      1. Include firmware binary credential extraction in the
+         penetration testing scope — use binwalk, Ghidra, or IDA to
+         reverse-engineer release images and search for embedded
+         credentials.
+      2. Maintain a registry of all credential types used per device
+         model and verify each is mutable and properly hashed.
+      3. Monitor CVE databases and security advisories for reports of
+         hardcoded credentials in your device firmware.
+      4. Retain binary analysis reports as ANATEL homologation evidence.
+    tools:
+      - ghidra
+      - binwalk
+      - penetration-testing-tools
+      - cve-monitoring
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-12"]
+    relationship: complements

@@ -1,0 +1,71 @@
+id: oi-dg-02
+family: dg
+title: "Definicoes e Conceitos Fundamentais"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Para fins do Open Insurance, consideram-se as seguintes definições fundamentais:
+
+    I - API (Application Programming Interface): conjunto de rotinas e padrões de
+    programação para acesso a aplicativo de software baseado na web;
+    II - Dados abertos: dados de produtos e serviços de seguros, previdência e
+    capitalização, acessíveis publicamente sem necessidade de autenticação;
+    III - Dados cadastrais e transacionais: dados pessoais e de operações dos clientes,
+    compartilhados apenas mediante consentimento;
+    IV - Participante obrigatório: sociedade seguradora, EAPC, sociedade de capitalização
+    ou ressegurador local com obrigação de participar do Open Insurance;
+    V - Participante voluntário: entidade que opta por participar do ecossistema;
+    VI - Receptora de dados: instituição que recebe dados compartilhados;
+    VII - Transmissora de dados: instituição que transmite dados compartilhados;
+    VIII - Iniciadora de serviços: instituição que inicia transação a pedido do cliente.
+guidance:
+  prose: |
+    As definicoes sao essenciais para a correta interpretacao dos direitos e obrigacoes
+    de cada participante. A distincao entre participante obrigatorio e voluntario
+    determina o nivel de exigencia regulatoria.
+
+    A separacao entre dados abertos (publicos) e dados cadastrais/transacionais
+    (que requerem consentimento) e fundamental para o desenho das APIs e dos fluxos
+    de autenticacao. Dados abertos incluem informacoes de produtos, canais de
+    atendimento e redes referenciadas. Dados que exigem consentimento incluem
+    informacoes de apolices, sinistros, movimentacoes de previdencia e capitalizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Classificar todas as APIs em duas categorias: dados abertos (publicos) e
+         dados que requerem consentimento.
+      2. Implementar endpoints separados para dados abertos (sem autenticacao) e
+         dados protegidos (com OAuth 2.0 + FAPI).
+      3. Configurar data catalog com metadados que reflitam a taxonomia do Open Insurance.
+      4. Manter registro de papeis (transmissora, receptora, iniciadora) para cada
+         integracao ativa.
+    tools:
+      - api-gateway
+      - data-catalog
+      - identity-provider
+  devsecops:
+    prose: |
+      1. Validar nos pipelines que endpoints de dados abertos nao exponham dados
+         que requerem consentimento.
+      2. Implementar testes automatizados que verificam a separacao entre APIs
+         publicas e protegidas.
+      3. Secret scanning para garantir que credenciais de API nao estejam em codigo.
+    tools:
+      - api-testing
+      - secret-detection
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Auditar periodicamente a classificacao de dados expostos por cada API.
+      2. Monitorar acessos a APIs protegidas para detectar tentativas de acesso
+         sem consentimento valido.
+      3. Manter inventario atualizado de participantes e seus papeis no ecossistema.
+    tools:
+      - api-monitoring
+      - siem
+      - grc-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: complements

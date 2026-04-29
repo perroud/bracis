@@ -1,0 +1,95 @@
+id: rec-2
+family: rec
+title: "System Reconstitution"
+class: NIST-800-34
+
+statement:
+  prose: >-
+    Reconstitution is the process of returning the information system to
+    full operational status at the original or new primary facility after
+    the disruption has been resolved. Reconstitution activities include
+    validating that the original or new facility is ready to resume normal
+    operations, transferring operations from the alternate processing site,
+    deactivating the contingency plan, and conducting a post-event review
+    to identify lessons learned. The reconstitution phase should be planned
+    and documented as part of the contingency plan to ensure a smooth
+    transition back to normal operations.
+
+guidance:
+  prose: >-
+    Reconstitution is often overlooked in contingency planning but is critical
+    for returning to normal operations. The process should include facility
+    validation (environmental controls, physical security, utilities),
+    system restoration (hardware, software, data), connectivity verification
+    (network, telecommunications), security validation (access controls,
+    monitoring), and functional testing. Organizations should plan for a
+    concurrent operations period where both the alternate and primary sites
+    are running to ensure stability before deactivating the alternate site.
+    A formal deactivation procedure should include data synchronization,
+    DNS changes, and notification to stakeholders. Post-event reviews
+    should capture lessons learned and feed into plan updates.
+
+references:
+  - citation: "NIST SP 800-34 Rev 1, Section 3.4.5"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-34/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated reconstitution procedures using infrastructure-as-code
+      to rebuild primary site infrastructure. Use DNS-based traffic management
+      to gradually shift traffic from alternate to primary site. Implement
+      data synchronization pipelines that ensure consistency between alternate
+      and primary sites during the transition period. Automate validation
+      checks that confirm primary site readiness including infrastructure
+      health, connectivity, and security controls. Implement monitoring
+      dashboards that track reconstitution progress and highlight issues.
+    tools:
+      - "Terraform / Pulumi (primary site reconstruction)"
+      - "Route 53 / Cloudflare (DNS traffic shifting)"
+      - "Database replication (data sync back)"
+      - "Prometheus / Grafana (reconstitution monitoring)"
+      - "Automated validation suites"
+  devsecops:
+    prose: >-
+      Implement deployment pipelines that support reconstitution to the
+      primary environment. Use database migration tools to synchronize
+      data accumulated at the alternate site back to the primary site.
+      Implement feature flags to manage the transition period. Run
+      comprehensive test suites against the reconstituted primary
+      environment before redirecting production traffic. Document
+      application-specific reconstitution procedures including cache
+      invalidation, session management, and external service reconnection.
+    tools:
+      - "GitLab CI/CD (reconstitution pipelines)"
+      - "Database sync tools (pg_dump, mysqldump)"
+      - "Feature flags (LaunchDarkly, Unleash)"
+      - "Automated test suites"
+      - "Load testing tools (k6, Locust)"
+  secops:
+    prose: >-
+      Develop and document reconstitution procedures including facility
+      readiness validation, system restoration, security verification, and
+      formal deactivation steps. Plan for a concurrent operations period
+      where both sites run simultaneously. Coordinate with facility
+      management to verify environmental and physical security readiness.
+      Conduct formal deactivation procedures including data verification,
+      media sanitization at the alternate site, and stakeholder notification.
+      Perform a post-event review within two weeks of reconstitution to
+      capture lessons learned and update the contingency plan.
+    tools:
+      - "Facility assessment checklists"
+      - "Security validation tools"
+      - "After-action review templates"
+      - "GRC platforms (lessons learned)"
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-10"]
+    relationship: mapped
+  - framework_id: iso-22301
+    articles: ["cl-8-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29"]
+    relationship: supports

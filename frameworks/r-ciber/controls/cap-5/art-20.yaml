@@ -1,0 +1,113 @@
+id: art-20
+family: cap-5
+title: "Rastreabilidade e Autenticidade de Equipamentos de Rede"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 20. As prestadoras devem implementar controles para garantir
+    a rastreabilidade e autenticidade dos equipamentos instalados em
+    suas redes de telecomunicações, incluindo:
+
+    I - verificação da autenticidade e integridade de equipamentos e
+    componentes de rede adquiridos, por meio de certificados de
+    autenticidade, verificação de número de série e assinaturas
+    digitais do fabricante quando disponíveis;
+
+    II - manutenção de cadeia de custódia documentada desde a aquisição
+    até a instalação de equipamentos em elementos de rede classificados
+    como ICT;
+
+    III - verificação de integridade de firmware antes da instalação
+    em equipamentos de rede, utilizando hashes e assinaturas digitais
+    fornecidos pelo fabricante;
+
+    IV - detecção de equipamentos não autorizados ou não homologados
+    conectados a redes de gestão e de usuários;
+
+    V - processo formal de descomissionamento seguro de equipamentos
+    de rede, com sanitização de dados e configurações antes do descarte.
+guidance:
+  prose: |
+    O art. 20 aborda a seguranca da cadeia de fornecimento de hardware,
+    area de crescente preocupacao dada a sofisticacao de ataques de
+    supply chain (ex: SolarWinds, XZ Utils).
+
+    **Verificacao de autenticidade (inciso I):**
+    Para equipamentos de rede de telecomunicacoes:
+    - Verificar numero de serie no portal do fabricante
+    - Validar certificado de autenticidade (Certificate of Origin)
+    - Verificar assinatura digital de firmware quando disponivel
+    - Inspecionar fisicamente a embalagem e lacres de seguranca
+
+    **Firmware counterfeit:**
+    Ha casos documentados de firmware modificado em equipamentos
+    de rede para introducao de backdoors. A verificacao de hash
+    de firmware antes da instalacao e medida preventiva essencial.
+
+    **Equipamentos nao autorizados (inciso IV):**
+    Deteccao de "rogue devices" conectados a rede de gestao pode ser
+    feita via Network Access Control (NAC) com 802.1X e certificate-
+    based authentication para equipamentos de rede.
+
+    **Descomissionamento seguro (inciso V):**
+    Equipamentos de rede armazenam configuracoes com credenciais,
+    chaves de criptografia, topologia de rede e outros dados sensiveis.
+    Antes do descarte, um factory reset verificado e obrigatorio.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Seguranca de cadeia de fornecimento de hardware:**
+      1. Implementar processo automatizado de verificacao de firmware
+         de equipamentos de rede: download do firmware do site oficial
+         do fabricante, verificacao de hash SHA-256 e assinatura digital.
+      2. Configurar NAC (Network Access Control) com 802.1X para
+         autenticacao de equipamentos conectados a redes de gestao,
+         bloqueando dispositivos nao autorizados.
+      3. Manter inventario de firmware verificado para cada modelo de
+         equipamento, com historico de versoes instaladas.
+      4. Automatizar deteccao de mudancas de firmware em equipamentos
+         via periodic hash checking.
+    tools:
+      - nac
+      - firmware-verification
+      - network-discovery
+      - hash-checking
+  devsecops:
+    prose: |
+      **Rastreabilidade em automacao de configuracao:**
+      1. Usar gerenciamento de configuracao de rede (NCM) com versionamento
+         Git de todas as configuracoes de equipamentos, especialmente ICT.
+      2. Implementar verificacao de integridade de configuracao de
+         equipamentos via baseline e deteccao de drift.
+      3. Automatizar verificacao de integridade de firmware em
+         equipamentos gerenciados antes de qualquer operacao de configuracao.
+    tools:
+      - network-config-management
+      - git-versioning
+      - drift-detection
+      - integrity-check
+  secops:
+    prose: |
+      **Programa de rastreabilidade de hardware:**
+      1. Implementar processo formal de recepcao de equipamentos com
+         lista de verificacao de autenticidade antes de aceitar entrega.
+      2. Manter registro de cadeia de custodia para equipamentos ICT,
+         documentando cada manuseio desde aquisicao ate instalacao.
+      3. Realizar auditoria periodica de equipamentos instalados contra
+         inventario para detectar discrepancias e dispositivos nao
+         autorizados.
+      4. Implementar processo de descomissionamento com lista de
+         verificacao de sanitizacao de dados e evidencia de conclusao.
+    tools:
+      - asset-tracking
+      - chain-of-custody
+      - decommission-process
+      - audit-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-5-19", "A-5-21", "A-7-8", "A-7-14"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-4", "art-5", "art-6", "art-7"]
+    relationship: mapped

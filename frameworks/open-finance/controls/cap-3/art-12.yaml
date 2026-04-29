@@ -1,0 +1,95 @@
+id: art-12
+family: cap-3
+title: "Confirmacao e Liquidacao da Transacao"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 12. Após a autenticação e confirmação pelo cliente, a instituição
+    detentora da conta deve:
+
+    I - executar a transação de pagamento conforme os parâmetros informados
+    pelo iniciador e confirmados pelo cliente;
+
+    II - informar ao iniciador o status da transação por meio da interface
+    dedicada, incluindo:
+    a) confirmação de aceite da transação;
+    b) rejeição da transação com código e motivo;
+    c) status de liquidação (quando aplicável);
+
+    III - manter registro completo da transação, incluindo dados do
+    iniciador, do cliente e dos parâmetros da operação;
+
+    IV - liquidar a transação conforme regras do arranjo de pagamento
+    utilizado (PIX, TED, boleto).
+guidance:
+  prose: |
+    O art. 12 define o ciclo de vida da transacao apos autenticacao:
+
+    **Status possiveis da transacao:**
+    - ACCEPTED: transacao aceita pela detentora
+    - PENDING: aguardando liquidacao
+    - COMPLETED: liquidada com sucesso
+    - REJECTED: rejeitada (com codigo de motivo)
+    - CANCELLED: cancelada pelo cliente ou sistema
+
+    **Codigos de rejeicao padronizados:**
+    - INSUFFICIENT_FUNDS: saldo insuficiente
+    - INVALID_ACCOUNT: conta invalida ou inativa
+    - LIMIT_EXCEEDED: limite de transacao excedido
+    - FRAUD_SUSPECTED: suspeita de fraude
+    - TECHNICAL_ERROR: erro tecnico temporario
+
+    **Registro obrigatorio:**
+    - Timestamp de cada mudanca de status
+    - Identificacao do iniciador (CNPJ, software statement)
+    - Identificacao do cliente (CPF/CNPJ)
+    - Parametros da transacao (valor, beneficiario, tipo)
+    - Consentimento vinculado
+
+    **Liquidacao:**
+    Segue regras do arranjo (PIX: instantaneo, TED: D+0, boleto: D+1).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de execucao de transacoes:**
+      1. Implementar maquina de estados para ciclo de vida da transacao
+         (accepted -> pending -> completed/rejected).
+      2. Integrar com sistemas de liquidacao (SPI para PIX, STR para TED).
+      3. Implementar endpoint de consulta de status (polling) e/ou
+         webhook de notificacao para o iniciador.
+      4. Registrar eventos de transacao em log imutavel (event sourcing).
+      5. Implementar idempotencia para retentativas de execucao.
+    tools:
+      - state-machine
+      - event-sourcing
+      - payment-gateway
+      - message-queue
+  devsecops:
+    prose: |
+      **Testes de integridade de transacoes:**
+      1. Testar todos os fluxos de status (happy path e edge cases).
+      2. Validar idempotencia de execucao (mesma requisicao = mesmo resultado).
+      3. Testar cenarios de falha de liquidacao e rollback.
+      4. Verificar consistencia entre logs de transacao e estado real.
+    tools:
+      - integration-tests
+      - chaos-testing
+      - idempotency-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Auditoria e monitoramento de transacoes:**
+      1. Monitorar volume, valor medio e taxa de sucesso de transacoes ITP.
+      2. Alertar sobre picos anomalos de rejeicoes ou erros.
+      3. Auditar registro de transacoes para completude e imutabilidade.
+      4. Investigar transacoes rejeitadas por suspeita de fraude.
+    tools:
+      - transaction-monitoring
+      - audit-trail
+      - siem
+      - fraud-investigation
+legal_references:
+  - framework_id: pix-security
+    articles: ["art-2"]
+    relationship: implements

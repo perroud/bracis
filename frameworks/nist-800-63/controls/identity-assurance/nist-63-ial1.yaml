@@ -1,0 +1,101 @@
+id: nist-63-ial1
+family: identity-assurance
+title: "IAL1 — Self-Asserted Identity"
+class: SP800-63A
+
+baselines: [ial1, ial2, ial3, aal1, aal2, aal3, fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    At IAL1, there is no requirement to link the applicant to a specific real-life
+    identity. Any attributes provided in conjunction with the subject's activities
+    at IAL1 are self-asserted or should be treated as self-asserted and therefore
+    not trusted. Self-asserted attributes are not verified. The subscriber is
+    allowed to use a pseudonym, for example when self-asserted attributes are
+    not necessary to complete a transaction. Identity proofing is not required
+    at IAL1. Binding a specific identity to the authentication event is the
+    responsibility of the relying party. An IAL1 credential is the only
+    requirement to obtain an AAL1 authenticator.
+
+guidance:
+  prose: >-
+    IAL1 is appropriate for applications where the identity of the user does not
+    need to be verified against real-world records. Examples include anonymous
+    comment platforms, low-value e-commerce accounts, and applications where
+    actions have negligible real-world consequences. Organizations must assess
+    their risk profile before defaulting to IAL1: if transactions involve
+    PII, health data, financial data, or government benefits, a higher IAL
+    is almost certainly required. When combining assurance levels (xAL model),
+    IAL1 may still be paired with AAL2 or AAL3 when strong authentication is
+    needed even without identity proofing (e.g., pseudonymous accounts on a
+    secure platform). CSPs must document their IAL decision and the risk
+    assessment supporting it.
+
+references:
+  - citation: "NIST SP 800-63-3 Section 6.1 — Selecting Assurance Levels"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"
+  - citation: "NIST SP 800-63A Section 4.1 — Identity Assurance Level 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63-3 Section 5 — Digital Identity Risk Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"
+
+related_controls:
+  - id: nist-63-enrollment
+    relationship: complements
+    description: "IAL1 has no enrollment proofing requirements, but downstream enrollment processes still apply."
+  - id: nist-63-privacy-proofing
+    relationship: complements
+    description: "Even at IAL1, privacy considerations apply to any attributes that are self-asserted."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      For IAL1 services, implement flexible registration flows that do not require
+      identity document submission or verification. Allow pseudonymous account
+      creation with only an email address or federated identity (OIDC/SAML) as
+      the binding credential. Enforce attribute minimization by default — collect
+      only what the application needs. Clearly communicate to users that their
+      identity is not verified. Implement email verification at minimum to establish
+      a communication channel, even though this does not constitute identity proofing.
+      Design the platform's IAL selection logic as a configurable policy so that
+      specific application contexts can enforce higher IALs without modifying the
+      platform core. Document the IAL selection in the system's security plan.
+    tools:
+      - keycloak
+      - auth0
+      - okta
+      - backstage
+      - dex
+
+  devsecops:
+    prose: >-
+      Tag application environments and services with their declared IAL level in
+      CI/CD metadata and service manifests. Implement automated policy checks in
+      CI pipelines that validate IAL decisions match the data classification of
+      information handled by the service. If a service handles PII or sensitive
+      data but is tagged as IAL1, trigger a mandatory security review gate in the
+      pipeline. Include IAL level in threat model documentation generated during
+      the build process. Ensure services operating at IAL1 do not inadvertently
+      upgrade to IAL2+ behaviors (e.g., by adding identity verification steps)
+      without re-running the IAL selection risk assessment.
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - checkov
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor IAL1 systems for scope creep — events where a nominally IAL1 service
+      begins processing attributes that require higher assurance (e.g., SSN, passport
+      data, health records). Alert on unexpected PII data flows from IAL1 systems
+      to data stores or downstream services. Correlate IAL1 account activity with
+      fraud signals such as account takeover patterns, credential stuffing, and
+      synthetic identity indicators. Implement anomaly detection on registration
+      velocity to detect bot-driven account creation, which is more prevalent at
+      IAL1 due to the absence of proofing friction.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog

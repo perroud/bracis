@@ -1,0 +1,144 @@
+id: art-5
+family: chap-2
+title: "Principles relating to processing of personal data"
+class: GDPR
+statement:
+  prose: >-
+    1. Personal data shall be:
+    (a) processed lawfully, fairly and in a transparent manner in relation to the data subject ('lawfulness, fairness and transparency');
+    (b) collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes ('purpose limitation');
+    (c) adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed ('data minimisation');
+    (d) accurate and, where necessary, kept up to date ('accuracy');
+    (e) kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed ('storage limitation');
+    (f) processed in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against
+    accidental loss, destruction or damage, using appropriate technical or organisational measures ('integrity and confidentiality').
+
+    2. The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1 ('accountability').
+  parts:
+    - id: art-5.1.a
+      label: "(1)(a)"
+      prose: >-
+        Processed lawfully, fairly and in a transparent manner in relation to the data subject
+        ('lawfulness, fairness and transparency').
+    - id: art-5.1.b
+      label: "(1)(b)"
+      prose: >-
+        Collected for specified, explicit and legitimate purposes and not further processed in a manner
+        that is incompatible with those purposes; further processing for archiving purposes in the public interest,
+        scientific or historical research purposes or statistical purposes shall, in accordance with Article 89(1),
+        not be considered to be incompatible with the initial purposes ('purpose limitation').
+    - id: art-5.1.c
+      label: "(1)(c)"
+      prose: >-
+        Adequate, relevant and limited to what is necessary in relation to the purposes for which they
+        are processed ('data minimisation').
+    - id: art-5.1.d
+      label: "(1)(d)"
+      prose: >-
+        Accurate and, where necessary, kept up to date; every reasonable step must be taken to ensure that
+        personal data that are inaccurate, having regard to the purposes for which they are processed, are
+        erased or rectified without delay ('accuracy').
+    - id: art-5.1.e
+      label: "(1)(e)"
+      prose: >-
+        Kept in a form which permits identification of data subjects for no longer than is necessary for
+        the purposes for which the personal data are processed; personal data may be stored for longer periods
+        insofar as the personal data will be processed solely for archiving purposes in the public interest,
+        scientific or historical research purposes or statistical purposes in accordance with Article 89(1)
+        subject to implementation of the appropriate technical and organisational measures required by this
+        Regulation in order to safeguard the rights and freedoms of the data subject ('storage limitation').
+    - id: art-5.1.f
+      label: "(1)(f)"
+      prose: >-
+        Processed in a manner that ensures appropriate security of the personal data, including protection
+        against unauthorised or unlawful processing and against accidental loss, destruction or damage,
+        using appropriate technical or organisational measures ('integrity and confidentiality').
+    - id: art-5.2
+      label: "(2)"
+      prose: >-
+        The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1
+        ('accountability').
+guidance:
+  prose: >-
+    Article 5 is the backbone of the GDPR. Every processing activity must be evaluated against these six
+    principles plus the overarching accountability principle. In practice, this means: (1) every data collection
+    point needs a documented legal basis (Art. 6), (2) you cannot repurpose data without compatibility assessment,
+    (3) you must collect only what you need (no 'just in case' data hoarding), (4) you must have processes
+    to keep data current, (5) you must implement retention schedules and enforce them technically, (6) you must
+    protect data with appropriate security measures, and (7) you must be able to prove all of the above.
+    The accountability principle (5.2) shifts the burden of proof to the controller: it is not enough to
+    comply, you must demonstrate compliance through documentation, audits, and technical evidence.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      LAWFULNESS: Implement consent management APIs as a platform service. Provide a centralized consent
+      store that all microservices query before processing personal data. PURPOSE LIMITATION: Tag every data
+      pipeline with a declared purpose using metadata labels. Enforce purpose-bound access through policy engines.
+      DATA MINIMISATION: Design APIs to accept and return only necessary fields. Implement field-level access
+      control on data stores. Provide data projection capabilities that strip unnecessary PII.
+      ACCURACY: Build self-service data correction endpoints. Implement event-driven propagation of data
+      corrections across all dependent systems. STORAGE LIMITATION: Implement automated TTL (time-to-live)
+      policies on all personal data stores. Build a retention policy engine that enforces deletion schedules.
+      Use database-level row expiration or scheduled purge jobs. INTEGRITY AND CONFIDENTIALITY: Encrypt
+      personal data at rest (AES-256) and in transit (TLS 1.3). Implement column-level encryption for
+      sensitive PII. Use field-level encryption in document stores. ACCOUNTABILITY: Build comprehensive
+      audit logging for all personal data operations. Every read, write, update, and delete of personal
+      data must be logged with actor, timestamp, purpose, and legal basis.
+    tools:
+      - "Kubernetes labels and annotations for data classification and purpose tagging"
+      - "Open Policy Agent (OPA) / Kyverno for purpose-bound access enforcement"
+      - "HashiCorp Vault for encryption key management and dynamic secrets"
+      - "PostgreSQL row-level security (RLS) for field-level access control"
+      - "Apache Kafka with schema registry for purpose-tagged data streams"
+      - "CronJob-based retention enforcement with audit trails"
+  devsecops:
+    prose: >-
+      LAWFULNESS: CI pipeline checks must verify that every new API endpoint processing personal data
+      has a documented legal basis in the data processing registry. PURPOSE LIMITATION: Code review
+      automation must flag when personal data is accessed outside its declared processing purpose.
+      DATA MINIMISATION: Linting rules must detect over-fetching of personal data fields (e.g., SELECT *
+      on tables containing PII). Enforce schema validation that rejects unnecessary personal data fields.
+      ACCURACY: Automated tests must verify data correction propagation across services.
+      STORAGE LIMITATION: Pipeline checks must verify that new data stores have TTL/retention policies
+      configured. INTEGRITY AND CONFIDENTIALITY: SAST must detect unencrypted personal data storage.
+      Dependency scanning must flag cryptographic libraries with known vulnerabilities.
+      ACCOUNTABILITY: Every deployment must include audit log configuration. Pipeline gates must
+      verify audit logging is active for personal data endpoints.
+    tools:
+      - "GitLab CI/CD with custom compliance pipeline templates"
+      - "Semgrep rules for PII detection and over-fetching"
+      - "SAST scanners with GDPR-specific rules (SonarQube, Checkmarx)"
+      - "Infrastructure-as-Code scanning (Checkov, tfsec) for encryption verification"
+      - "Schema validation tools (Spectral for OpenAPI, ajv for JSON Schema)"
+      - "Database migration linters to verify TTL/retention on new tables"
+  secops:
+    prose: >-
+      LAWFULNESS: Monitor for processing activities without registered legal basis. Alert when new data
+      flows appear that are not in the processing registry. PURPOSE LIMITATION: Detect and alert on data
+      access patterns that deviate from declared purposes. SIEM correlation rules should flag when services
+      access data stores outside their purpose scope. DATA MINIMISATION: Monitor API responses for
+      over-exposure of personal data. Alert on bulk data exports that may indicate unnecessary data
+      collection. ACCURACY: Monitor data correction request SLAs. Alert when correction propagation
+      exceeds defined timeframes. STORAGE LIMITATION: Monitor for personal data that exceeds retention
+      periods. Alert on storage growth anomalies in personal data stores. INTEGRITY AND CONFIDENTIALITY:
+      Continuous vulnerability scanning of systems processing personal data. Monitor for encryption
+      configuration drift. Alert on unencrypted personal data in transit or at rest.
+      ACCOUNTABILITY: Verify audit log integrity. Monitor for gaps in audit trails. Alert on
+      audit log tampering attempts.
+    tools:
+      - "SIEM (Splunk/Elastic Security) with GDPR principle violation rules"
+      - "Data Loss Prevention (DLP) with purpose-aware policies"
+      - "SOAR playbooks for principle violation response"
+      - "Compliance dashboards showing principle adherence metrics"
+      - "Automated retention compliance scanning"
+      - "Audit log integrity verification (WORM storage, blockchain-anchored hashes)"
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: equivalent-to
+  - framework_id: uk-gdpr
+    articles: ["art-5"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-3", "AU-2", "AU-3", "MP-6", "SC-8", "SC-28", "SI-12"]
+    relationship: supports

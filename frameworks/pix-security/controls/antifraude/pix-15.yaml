@@ -1,0 +1,88 @@
+id: pix-15
+family: antifraude
+title: "Limites Transacionais e Controle de Valor"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve implementar limites transacionais para operações Pix, incluindo limite
+    por transação, limite diário, limite noturno (entre 20h e 6h) e limite por período.
+    Os limites devem ser configuráveis pelo usuário dentro dos tetos definidos pelo PSP,
+    sendo que a redução de limite deve ser efetivada imediatamente e o aumento de limite
+    deve observar prazo mínimo de 24 horas para efetivação, conforme determinação do BCB.
+guidance:
+  prose: |
+    **Tipos de limites obrigatorios:**
+    1. **Limite por transacao:** Valor maximo por operacao Pix individual.
+    2. **Limite diario:** Valor acumulado maximo por dia.
+    3. **Limite noturno:** Limite especifico para periodo noturno (20h-6h), que deve ser
+       inferior ao limite diurno por padrao.
+    4. **Limite por periodo:** Semanal ou mensal, conforme politica do PSP.
+
+    **Regras de alteracao de limites:**
+    - **Reducao:** Efetivacao imediata (real-time).
+    - **Aumento:** Efetivacao em no minimo 24 horas (periodo de seguranca).
+    - O prazo de 24h para aumento visa proteger o usuario contra coacao (sequestro-
+      relampago, extorsao) onde o criminoso forca o aumento de limite.
+
+    **Limite noturno:**
+    O BCB determinou a reducao do limite noturno como medida antifraude e anti-sequestro.
+    O usuario pode solicitar aumento do limite noturno, sujeito ao prazo de 24h.
+
+    **Limites diferenciados:**
+    O PSP pode definir limites diferentes por:
+    - Tipo de chave Pix (CPF vs EVP)
+    - Destinatario (conhecido vs desconhecido)
+    - Canal (app, internet banking, API)
+    - Perfil de risco do usuario
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Servico de limites:**
+      1. Microservico de gestao de limites com configuracao por usuario, produto e canal.
+      2. Cache em memoria para consulta de limites com latencia < 10ms.
+      3. Controle atomico de saldo de limite (prevenir race conditions).
+      4. Scheduler para efetivacao de aumentos de limite apos 24h.
+
+      **Regras de limite:**
+      5. Motor de regras para calculo de limite efetivo considerando todas as dimensoes.
+      6. Limites diferenciados por horario (diurno/noturno) com transicao automatica.
+      7. Acumulador de valores transacionados por periodo (diario, semanal, mensal).
+      8. API para consulta e alteracao de limites pelo usuario no app.
+    tools:
+      - rules-engine
+      - redis
+      - scheduler
+      - api-gateway
+      - database
+  devsecops:
+    prose: |
+      **Testes de limites:**
+      1. Testes de borda: transacao exatamente no limite, acima do limite.
+      2. Testes de concorrencia: multiplas transacoes simultaneas consumindo o limite.
+      3. Testes de alteracao: reducao imediata, aumento com delay de 24h.
+      4. Testes de transicao noturna: limite muda as 20h e retorna as 6h.
+      5. Testes de acumulacao: limite diario reseta a meia-noite.
+    tools:
+      - gitlab-ci
+      - load-testing
+      - integration-testing
+  secops:
+    prose: |
+      **Monitoramento de limites:**
+      1. Alerta para usuarios que consomem 100% do limite em curto periodo.
+      2. Monitoramento de solicitacoes de aumento de limite em horario noturno.
+      3. Deteccao de padrao de sequestro: aumento de limite + transacao de alto valor
+         para chave desconhecida.
+      4. Relatorio de utilizacao de limites por segmento de usuario.
+    tools:
+      - siem
+      - fraud-detection
+      - analytics-dashboard
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: complements

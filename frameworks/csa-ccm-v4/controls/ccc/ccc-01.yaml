@@ -1,0 +1,96 @@
+id: ccc-01
+family: ccc
+title: "Change Management Policy"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Establish, document, approve, communicate, apply, evaluate, and maintain
+    policies and procedures for managing the risks associated with applying
+    changes to organization assets, including application, systems,
+    infrastructure, configuration, or the processes and procedures for
+    managing changes. Changes shall be formally requested, documented in
+    a change request, tested, reviewed, approved, and managed to reduce
+    risks of unintended impacts.
+
+guidance:
+  prose: >-
+    A change management policy should define classifications for changes
+    (standard, normal, emergency), required approval workflows for each
+    classification, testing requirements before deployment, rollback
+    procedures, and post-implementation reviews. Changes to cloud
+    infrastructure, application configurations, security controls, and
+    network configurations should all be covered. Emergency change
+    procedures must exist for urgent security patches while still
+    maintaining audit trails. The policy should address change windows,
+    communication requirements, and criteria for change success
+    verification. All changes must be traceable and auditable.
+
+references:
+  - citation: "CSA CCM v4.0 CCC-01"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps workflows where all infrastructure and configuration
+      changes are made through version-controlled pull requests. Use
+      policy-as-code to enforce change management requirements including
+      mandatory reviews, automated testing, and approval gates. Deploy
+      admission controllers that prevent direct modifications to production
+      resources, requiring all changes to flow through the GitOps pipeline.
+      Implement drift detection to identify and remediate unauthorized
+      changes. Maintain immutable infrastructure patterns where changes
+      result in new resource deployments rather than in-place modifications.
+    tools:
+      - argo-cd
+      - flux
+      - terraform
+      - crossplane
+      - kyverno
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Enforce mandatory CI/CD pipeline stages for all changes: code
+      review, automated testing, security scanning, staging validation,
+      and production approval. Implement branch protection rules requiring
+      minimum reviewer approvals and passing status checks. Use feature
+      flags to decouple deployment from release, enabling safer change
+      management. Maintain comprehensive test suites including unit,
+      integration, and end-to-end tests that must pass before changes
+      can be promoted. Automatically generate change logs and release notes.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - launchdarkly
+      - argo-rollouts
+      - semantic-release
+
+  secops:
+    prose: >-
+      Monitor for unauthorized changes to production systems using file
+      integrity monitoring and configuration drift detection. Correlate
+      change management records with actual system modifications to
+      identify unmanaged changes. Alert on changes made outside approved
+      change windows or without proper authorization. Maintain an audit
+      trail of all change approvals, implementations, and outcomes.
+      Integrate change management data with SIEM for security event
+      correlation.
+    tools:
+      - wazuh
+      - osquery
+      - tripwire
+      - servicenow
+      - splunk
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8-32"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-1", "CM-2", "CM-3", "CM-5"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC6.1", "CC8.1"]
+    relationship: mapped

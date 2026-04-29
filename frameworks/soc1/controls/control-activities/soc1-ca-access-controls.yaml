@@ -1,0 +1,90 @@
+id: soc1-ca-access-controls
+family: control-activities
+title: "Logical Access Controls to Financial Systems"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization implements logical access controls to restrict access to financial
+    processing systems, applications, databases, and data to authorized individuals commensurate
+    with their job responsibilities. Access provisioning requires formal authorization, is based
+    on the principle of least privilege, and follows a documented request and approval process.
+    Access is reviewed periodically and promptly removed or modified when employment terminates
+    or roles change. Multi-factor authentication is required for access to financial processing
+    systems, and shared or generic accounts are prohibited. Privileged access to financial
+    systems is separately controlled, requires additional authorization, and is subject to
+    enhanced monitoring. Access control configurations are reviewed at least annually to
+    confirm continued appropriateness.
+guidance:
+  prose: >-
+    Logical access controls are among the most frequently tested IT General Controls (ITGCs)
+    in SOC 1 examinations. Auditors test access controls by reviewing user access lists for
+    financial systems, confirming provisioning and de-provisioning procedures operated as
+    designed, sampling terminated employee accounts to confirm timely removal, testing
+    MFA enforcement, and reviewing privileged access logs. Access control findings are
+    serious because failure to restrict access to financial systems creates risk across
+    all ICFR assertions — unauthorized parties could modify transactions, extract data,
+    or suppress errors. Service organizations must demonstrate end-to-end access control
+    from initial request through provisioning, periodic review, modification, and termination.
+    User access reviews should be documented with clear evidence of who performed the review,
+    what was reviewed, and what actions were taken.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity and access management (IAM) for all financial processing
+      systems using a federated identity provider. Enforce MFA for all user access to financial
+      systems without exception. Apply the principle of least privilege through fine-grained
+      RBAC and attribute-based access control (ABAC). Use a PAM solution to control, record,
+      and monitor privileged access sessions in financial environments. Implement automated
+      access certification workflows that notify managers to review access quarterly.
+      Integrate HR system events (termination, role change) with IAM to trigger automatic
+      access de-provisioning. Store secrets in a centralized vault with dynamic, short-lived
+      credentials to eliminate standing privileged access.
+    tools:
+      - vault
+      - keycloak
+      - cyberark
+      - aws-iam
+      - gcp-iam
+  devsecops:
+    prose: >-
+      Enforce access controls in the CI/CD pipeline for financial processing repositories.
+      Require two-factor authentication for all GitLab accounts with access to financial code
+      repositories. Apply the principle of least privilege through GitLab's role-based access
+      levels: use Guest or Reporter roles where possible and restrict Developer/Maintainer
+      access to those with legitimate need. Protect production environments with environment-
+      specific access controls, ensuring only designated individuals can trigger production
+      deployments. Use OIDC token federation to eliminate long-lived secrets in pipelines.
+      Audit GitLab group membership quarterly and remove access that is no longer required.
+    tools:
+      - gitlab-2fa
+      - gitlab-protected-branches
+      - gitlab-protected-environments
+      - vault
+      - oidc-federation
+  secops:
+    prose: >-
+      Implement and maintain a formal access control policy for financial systems. Conduct
+      quarterly user access reviews for all financial processing systems, documenting findings
+      and actions taken. Monitor access logs for unauthorized access attempts and unusual
+      access patterns using a SIEM. Implement real-time alerts for privileged account usage
+      outside normal business hours. Maintain an access control log showing provisioning,
+      modification, review, and de-provisioning events for each user of financial systems.
+      Test access controls as part of the annual SOC 1 examination cycle to confirm operating
+      effectiveness. Retain access control evidence for the full audit examination period.
+    tools:
+      - splunk
+      - crowdstrike
+      - servicenow-iam
+      - saviynt
+      - cyberark
+related_controls:
+  - control_id: soc1-ca-segregation
+    relationship: supports
+    description: "Access controls enforce the technical implementation of segregation of duties."
+  - control_id: soc1-ca-itgc-program
+    relationship: implements
+    description: "Logical access control is a core ITGC category in the SOC 1 ITGC program."
+  - control_id: soc1-mon-continuous
+    relationship: supports
+    description: "Access control logs feed into continuous monitoring activities."

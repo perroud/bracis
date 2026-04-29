@@ -1,0 +1,121 @@
+id: owasp-a06
+family: a06
+title: "A06:2021 — Vulnerable and Outdated Components"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    An application is vulnerable if it does not know the versions of all components it uses
+    (both client-side and server-side), the software is vulnerable, unsupported, or out of date
+    (including the OS, web/application server, database management system, APIs and all components,
+    runtime environments, and libraries), it does not scan for vulnerabilities regularly and
+    subscribe to security bulletins related to the components it uses, it does not fix or upgrade
+    the underlying platform, frameworks, and dependencies in a risk-based, timely fashion —
+    this commonly happens in environments where patching is a monthly or quarterly task under
+    change control, leaving organizations vulnerable for unnecessarily long periods, or software
+    developers do not test the compatibility of updated, upgraded, or patched libraries. Additionally,
+    components running with the same privileges as the application inherit any vulnerability in
+    those components, and a single unpatched transitive dependency can expose the entire application.
+
+guidance:
+  prose: >-
+    This category moved up from ninth in 2017 to sixth in 2021, reflecting the increasing
+    frequency and severity of software supply chain attacks. The Log4Shell vulnerability (CVE-2021-44228)
+    exemplifies the risk: a single transitive dependency with a critical remote code execution
+    vulnerability, present in thousands of applications that were unaware of its inclusion or
+    unable to rapidly identify and patch affected systems. The SolarWinds and XZ Utils incidents
+    demonstrate that the threat extends to malicious code intentionally inserted into trusted
+    components. Prevention requires comprehensive software composition analysis (SCA) integrated
+    into the development pipeline, a real-time inventory of all components and their versions
+    (Software Bill of Materials — SBOM), continuous monitoring of components against known
+    vulnerability databases (NVD, OSV), and a rapid patching process with defined SLAs based
+    on vulnerability severity.
+
+references:
+  - citation: "OWASP Top 10:2021 A06 Vulnerable and Outdated Components"
+    url: "https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/"
+  - citation: "OWASP Software Component Verification Standard"
+    url: "https://owasp.org/www-project-software-component-verification-standard/"
+  - citation: "CISA Known Exploited Vulnerabilities Catalog"
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized artifact management system (JFrog Artifactory, Nexus Repository)
+      that proxies all package registries and enforces vulnerability policies: block download of
+      packages with critical CVEs, require security approval for medium/high vulnerabilities before
+      use, and maintain an approved package list. Generate and maintain a Software Bill of Materials
+      (SBOM) in SPDX or CycloneDX format for all deployed applications and update it on every
+      build. Integrate SBOM with a vulnerability intelligence platform to continuously monitor
+      deployed components against newly disclosed CVEs (not just at build time). Implement
+      Renovate Bot or Dependabot to automatically create merge requests for dependency updates,
+      reducing the friction of keeping dependencies current. Define patch SLAs by severity:
+      critical (CVSS 9+) patches within 24 hours, high (CVSS 7-8.9) within 7 days, medium within
+      30 days. Build golden container base images that are patched on a weekly schedule.
+    tools:
+      - dependabot
+      - renovate
+      - jfrog-artifactory
+      - nexus
+      - grype
+      - trivy
+      - gitlab-dependency-scanning
+
+  devsecops:
+    prose: >-
+      Run software composition analysis (SCA) in every pipeline build, scanning all direct and
+      transitive dependencies in all package manifests (package.json, requirements.txt, go.mod,
+      pom.xml, Gemfile, Cargo.toml). Configure SCA to fail the pipeline for critical and high
+      vulnerabilities without an approved exception. Generate an SBOM artifact as part of every
+      build and attach it to the container image or release artifact. Implement container image
+      scanning (Trivy, Grype) for both OS-level packages and application dependencies. Keep base
+      images updated: pin to specific digest (SHA) rather than floating tags, and use Renovate
+      or Dependabot to automate base image updates. Establish a dependency review process for
+      adding new dependencies: evaluate maintainer reputation, download count, vulnerability
+      history, and license before approval.
+    tools:
+      - gitlab-dependency-scanning
+      - trivy
+      - grype
+      - syft
+      - dependabot
+      - renovate
+      - semgrep
+      - owasp-dependency-check
+
+  secops:
+    prose: >-
+      Subscribe to vulnerability feeds for all components in use: NVD (National Vulnerability
+      Database), OSV (Open Source Vulnerabilities), vendor security advisories, and CISA KEV
+      (Known Exploited Vulnerabilities) catalog. Configure alerts for new CVEs affecting components
+      in the SBOM inventory — prioritize by CISA KEV status (actively exploited) over CVSS score
+      alone. Maintain a vulnerability management program with defined SLAs and escalation paths
+      for overdue patches. Conduct quarterly SCA audits to identify components that have been
+      added outside the standard dependency management process. Implement a rapid response
+      process for zero-day vulnerabilities in critical components — this requires maintaining
+      an up-to-date SBOM and the ability to identify all affected applications within hours.
+    tools:
+      - trivy
+      - grype
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - wiz
+      - tenable
+
+legal_references:
+  - framework_id: nist-ssdf
+    articles: ["PW.4.1", "PW.4.4", "RV.1.1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SI-16", "CM-3", "CM-8"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.3.3", "6.4.1"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["7.1", "7.2", "7.3", "7.4"]
+    relationship: mapped

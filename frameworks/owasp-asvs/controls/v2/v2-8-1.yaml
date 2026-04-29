@@ -1,0 +1,96 @@
+id: v2.8.1
+family: v2
+title: "Time-Based OTP Single-Factor Verification"
+class: OWASP-ASVS
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that time-based OTPs have a defined lifetime before expiring. TOTP tokens
+    must be valid for only a single use within the validity period. Verify that
+    multi-factor authentication is required for all high-value transactions and account
+    management functions. The application must support TOTP-based multi-factor
+    authentication using authenticator applications as a second factor.
+
+guidance:
+  prose: >-
+    Multi-factor authentication significantly reduces account compromise risk by requiring
+    something the user knows (password) and something the user has (authenticator device).
+    Time-based One-Time Passwords (TOTP) per RFC 6238 are the preferred software-based MFA
+    mechanism due to wide authenticator app support and no dependency on SMS delivery. TOTP
+    tokens must be single-use to prevent replay attacks. The default 30-second validity
+    window with one-step clock skew tolerance provides reasonable usability. SMS-based OTP
+    should be discouraged due to SIM-swapping attacks, SS7 vulnerabilities, and delivery
+    reliability issues. WebAuthn/FIDO2 hardware tokens provide the strongest MFA but TOTP
+    remains the minimum acceptable second factor for Level 2 applications.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V2.8.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "RFC 6238 - TOTP"
+    url: "https://datatracker.ietf.org/doc/html/rfc6238"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure MFA enforcement at the identity provider level. Enable TOTP as the baseline
+      second factor with support for WebAuthn/FIDO2 as the preferred option. Implement MFA
+      step-up authentication for high-value operations (password changes, payment
+      authorization, role assignment) even within an already-authenticated session. Store
+      TOTP shared secrets encrypted at rest using envelope encryption with HSM-backed keys.
+      Implement recovery code generation (single-use, high-entropy) for account recovery
+      when the authenticator device is lost. Enforce MFA enrollment during first login for
+      all accounts with elevated privileges.
+    tools:
+      - keycloak
+      - auth0
+      - okta
+      - aws-cognito
+      - vault
+      - yubikey
+      - webauthn
+
+  devsecops:
+    prose: >-
+      Write automated tests verifying that TOTP tokens cannot be replayed after first use.
+      Test that expired tokens (outside the 30-second window plus tolerance) are rejected.
+      Validate that high-value transaction endpoints require MFA step-up even with a valid
+      session. Include MFA bypass testing in DAST scans. Scan for hardcoded TOTP secrets
+      or insecure secret storage patterns in application code. Verify through IaC checks
+      that the identity provider MFA policy is enforced and cannot be disabled without
+      approval.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - gitlab-ci
+      - selenium
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Monitor for MFA bypass attempts: successful logins without MFA from accounts that
+      have MFA enrolled, sudden MFA un-enrollment events, or high volumes of failed MFA
+      attempts. Alert on TOTP brute-force patterns (rapid sequential OTP submissions).
+      Track MFA enrollment rates across the organization and report on accounts that have
+      not yet enrolled. Monitor for SIM-swap indicators if SMS fallback is permitted.
+      Include MFA effectiveness metrics in security posture dashboards.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog-security
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2(1)", "IA-2(2)", "IA-2(6)"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["8.4.2", "8.4.3"]
+    relationship: implements

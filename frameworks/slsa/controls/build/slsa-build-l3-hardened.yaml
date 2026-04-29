@@ -1,0 +1,105 @@
+id: slsa-build-l3-hardened
+family: build
+title: "Build L3: Hardened Build Platform"
+class: SLSA
+
+baselines: [build-l3]
+
+statement:
+  prose: >-
+    The build platform must provide strong isolation between build tenants and between
+    individual build executions. Builds must run in ephemeral, sandboxed environments
+    that prevent one build from influencing another and prevent the build tenant from
+    tampering with the provenance generation process. The platform must implement
+    protections against insider threats from build platform administrators, including
+    defense-in-depth measures that make it difficult for any single person to
+    compromise build integrity without detection.
+
+guidance:
+  prose: >-
+    Build L3 addresses sophisticated threats where an attacker has gained access to the
+    build platform itself. Hardened builds require that each build execution is isolated
+    in its own ephemeral environment (e.g., a fresh VM or container) that is destroyed
+    after the build completes. No state persists between builds. The build environment
+    must be tamper-resistant — the tenant should not be able to modify the provenance
+    generator, exfiltrate signing keys, or inject code into other tenants' builds. This
+    level requires build platforms with strong multi-tenancy isolation, such as hardware-
+    backed enclaves, VM-level isolation, or equivalent mechanisms. Organizations should
+    evaluate their build platforms against these requirements and consider platforms like
+    Google Cloud Build, GitHub Actions hosted runners, or Tekton Chains with hardened
+    configurations.
+
+references:
+  - citation: "SLSA v1.0 Specification — Build L3"
+    url: "https://slsa.dev/spec/v1.0/levels#build-l3"
+  - citation: "SLSA v1.0 — Threats and Mitigations"
+    url: "https://slsa.dev/spec/v1.0/threats"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy build infrastructure using ephemeral, VM-isolated runners that are provisioned
+      for each build and destroyed immediately after completion. Use hardware-backed security
+      (TPM, Confidential Computing, SEV-SNP) where available to ensure build environment
+      integrity. Implement hermetic builds that cannot access the network during execution
+      (after dependency resolution) to prevent exfiltration and injection. Use Tekton Chains
+      or equivalent to generate provenance within the platform control plane, outside the
+      tenant's execution environment. Enforce build platform configuration through
+      infrastructure-as-code with mandatory peer review for changes. Implement continuous
+      integrity monitoring of runner images and build infrastructure components.
+    tools:
+      - tekton-chains
+      - google-cloud-build
+      - github-actions
+      - gvisor
+      - kata-containers
+      - firecracker
+      - terraform
+      - falco
+
+  devsecops:
+    prose: >-
+      Enforce pipeline policies that require builds to run on hardened, isolated
+      infrastructure meeting L3 requirements. Implement hermetic build configurations that
+      pre-resolve dependencies and block network access during compilation. Use reproducible
+      build techniques to enable independent verification of build outputs. Configure build
+      pipelines to verify the integrity of the runner environment before executing build
+      steps (e.g., check runner image digest). Add pipeline checks that validate the build
+      platform attestation includes isolation evidence. Implement canary builds that verify
+      build environment integrity on a continuous basis.
+    tools:
+      - tekton-chains
+      - bazel
+      - nix
+      - cosign
+      - slsa-verifier
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Monitor build platform infrastructure for configuration drift that could weaken
+      isolation guarantees. Alert on runner image changes, network policy modifications,
+      or privilege escalations within build environments. Audit build platform administrator
+      actions and require multi-party approval for infrastructure changes. Implement runtime
+      security monitoring (Falco, Sysdig) on build nodes to detect anomalous behavior during
+      builds. Conduct periodic red-team exercises targeting build platform isolation boundaries.
+      Verify that builds cannot communicate with each other or persist state between executions.
+    tools:
+      - falco
+      - sysdig
+      - splunk
+      - elastic-siem
+      - trivy
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-4", "SR-4(1)", "SR-4(2)", "SA-15", "SC-39"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PO.3.1", "PO.3.2", "PS.1.1", "PS.3.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.2", "16.6", "16.12"]
+    relationship: supports

@@ -1,0 +1,92 @@
+id: ssf-data-3
+family: ssf-data
+title: "Sensitive Data Protection in Transit"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall protect sensitive data during transmission using strong
+    cryptographic protocols and configurations. All communication channels carrying
+    sensitive data shall use TLS 1.2 or higher with secure cipher suites. The
+    software shall validate server certificates and reject connections with expired,
+    self-signed, or mismatched certificates unless explicitly configured otherwise
+    by the administrator. Sensitive data shall not be transmitted via insecure
+    channels such as unencrypted HTTP, FTP, or email, even within internal networks.
+
+guidance:
+  prose: >-
+    Data in transit is vulnerable to interception by network-level attackers. PCI SSF
+    requires that all sensitive data transmissions use TLS 1.2 or higher with cipher
+    suites that provide forward secrecy. Older protocols such as SSL, TLS 1.0, and
+    TLS 1.1 are explicitly prohibited. Certificate validation is mandatory to prevent
+    man-in-the-middle attacks. The standard recognizes that internal networks are not
+    inherently trusted and requires encryption for sensitive data regardless of
+    whether the communication is internal or external.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 9 — Data in Transit Protection"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 7.5-7.6"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ at the ingress controller and load balancer level with
+      HSTS headers enabled. Deploy a service mesh with mutual TLS (mTLS) for all
+      internal service-to-service communication. Configure certificate management
+      with automatic rotation using cert-manager and a trusted CA. Implement
+      network policies that block unencrypted communication between services
+      handling sensitive data. Use infrastructure-as-code scanning to detect
+      TLS misconfigurations before deployment.
+    tools:
+      - cert-manager
+      - istio
+      - linkerd
+      - nginx-ingress
+      - envoy
+      - checkov
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect insecure TLS configurations, disabled certificate
+      validation, and use of deprecated protocols in application code. Implement
+      DAST scanning that tests for TLS configuration weaknesses including weak
+      cipher suites, missing HSTS, and certificate validation bypasses. Write
+      integration tests that validate TLS enforcement on all endpoints handling
+      sensitive data. Use dependency scanning to detect libraries with known TLS
+      implementation vulnerabilities.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - owasp-zap
+      - sslyze
+      - testssl
+
+  secops:
+    prose: >-
+      Monitor for unencrypted transmissions of sensitive data using network
+      inspection tools. Conduct periodic TLS configuration assessments across
+      all endpoints. Alert on certificate expiration approaching defined thresholds.
+      Track and report on TLS compliance across all services handling payment data.
+      Investigate alerts for TLS downgrade attempts or invalid certificate
+      presentations.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+      - nessus
+      - datadog
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-4.1", "req-4.2"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v9.1", "v9.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

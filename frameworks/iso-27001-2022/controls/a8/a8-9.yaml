@@ -1,0 +1,100 @@
+id: a8.9
+family: a8
+title: "Configuration management"
+class: ISO27001
+
+statement:
+  prose: >-
+    Configurations, including security configurations, of hardware,
+    software, services and networks shall be established, documented,
+    implemented, monitored and reviewed.
+
+guidance:
+  prose: >-
+    The organization should define and implement processes and tools
+    to enforce defined configurations, including security configurations,
+    for hardware, software, services, and networks, for newly installed
+    systems as well as for operational systems over their lifetime.
+    Roles, responsibilities and procedures should be defined to ensure
+    satisfactory control of all configuration changes. Standard templates
+    should be defined for the secure configuration of hardware, software,
+    services and networks. Standard configurations for hardware, software,
+    services and networks should be established using publicly available
+    guidance (e.g., predefined templates provided by vendors and from
+    security organizations such as CIS benchmarks). The actual
+    configurations should be reviewed regularly against the defined
+    standard template. If deviations are found, they should be addressed,
+    either by automatically enforcing the defined configuration, or by
+    manually analyzing the deviation and taking action.
+
+references:
+  - citation: "ISO/IEC 27002:2022, 8.9"
+    url: "https://www.iso.org/standard/75652.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement all infrastructure and platform configuration through
+      infrastructure-as-code (IaC) with Git as the single source of truth.
+      Use GitOps controllers (ArgoCD, Flux) to continuously reconcile
+      desired configuration state with actual state and auto-remediate
+      drift. Deploy CIS benchmark scanning (kube-bench, cloud provider
+      benchmarks) on a continuous schedule. Define golden configuration
+      templates for all standard workload types and enforce them through
+      admission controllers and policy engines. Implement configuration
+      drift detection with automated alerts when manual changes are
+      detected outside the IaC workflow.
+    tools:
+      - terraform
+      - argocd
+      - flux
+      - kyverno
+      - kube-bench
+      - open-policy-agent
+      - ansible
+
+  devsecops:
+    prose: >-
+      Scan IaC templates (Terraform, Kubernetes manifests, Helm charts,
+      Dockerfiles) in CI pipelines for configuration security issues
+      before they reach any environment. Enforce that all configuration
+      changes go through merge requests with mandatory review. Implement
+      automated drift detection that compares deployed configurations
+      against the repository and creates alerts or auto-remediation
+      merge requests. Store all environment-specific configurations
+      (excluding secrets) in version control with clear separation
+      between environments.
+    tools:
+      - checkov
+      - tfsec
+      - kics
+      - trivy
+      - gitlab-ci
+      - renovate
+
+  secops:
+    prose: >-
+      Monitor configuration change events across all systems and
+      correlate them with change management records to detect
+      unauthorized changes. Deploy configuration compliance scanning
+      tools that continuously validate systems against hardening
+      baselines (CIS, DISA STIGs). Alert on configuration drift
+      that weakens security posture: disabled firewalls, relaxed
+      authentication requirements, or new network exposure. Maintain
+      a configuration management database (CMDB) integrated with
+      the SIEM for asset context enrichment.
+    tools:
+      - wazuh
+      - nessus
+      - qualys
+      - splunk
+      - elastic-siem
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53
+    articles: ["CM-1", "CM-2", "CM-3", "CM-6", "CM-7"]
+    relationship: equivalent-to
+  - framework_id: soc-2
+    articles: ["CC8.1"]
+    relationship: supports

@@ -1,0 +1,130 @@
+id: art-12
+family: cap-3
+title: "Identificacao de Clientes Pessoas Fisicas"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 12. As supervisionadas devem coletar, verificar e registrar as seguintes
+    informações de seus clientes pessoas físicas, previamente ao início do
+    relacionamento:
+    I - nome completo;
+    II - número de inscrição no Cadastro de Pessoas Físicas (CPF);
+    III - número do documento de identidade, órgão expedidor e data de expedição;
+    IV - data de nascimento;
+    V - endereço residencial completo;
+    VI - número de telefone e endereço eletrônico (e-mail);
+    VII - profissão ou atividade principal;
+    VIII - renda mensal ou faturamento médio mensal, quando pessoa física equiparada
+    a jurídica;
+    IX - declaração sobre o propósito e a natureza pretendida da relação de negócios.
+guidance:
+  prose: |
+    O art. 12 define os dados minimos obrigatorios para identificacao de clientes
+    pessoas fisicas, aplicavel a todos os papeis no mercado securitario.
+
+    **Dados obrigatorios (incisos I a IX):**
+    Conjunto minimo que deve ser coletado antes de qualquer operacao. No mercado
+    securitario, a coleta se aplica a:
+    - Segurado: titular da apolice
+    - Proponente: quem solicita a contratacao (pode diferir do segurado)
+    - Beneficiario: quem recebera a indenizacao ou resgate
+    - Participante: membro de plano de previdencia
+    - Titular de capitalizacao: detentor do titulo
+
+    **Particularidades do mercado securitario:**
+
+    1. Profissao e renda (VII-VIII):
+       Fundamentais para avaliar compatibilidade entre perfil e produto.
+       Exemplos de incompatibilidade:
+       - Renda de R$ 3.000/mes com aporte mensal de R$ 10.000 em VGBL
+       - Estudante com seguro de vida de capital segurado de R$ 5.000.000
+       - MEI com seguro empresarial de premio anual de R$ 500.000
+
+    2. Proposito da relacao (IX):
+       No mercado securitario, o proposito deve ser coerente:
+       - Seguro de vida: protecao familiar, planejamento sucessorio
+       - VGBL/PGBL: previdencia complementar, planejamento tributario
+       - Capitalizacao: poupanca programada, sorteio
+       Propositos vagos ou incompativeis com o produto exigem aprofundamento.
+
+    3. Beneficiarios de apolices:
+       Embora o art. 12 trate do cliente, a identificacao de beneficiarios de
+       seguros de vida e previdencia e igualmente critica. Beneficiarios sem
+       vinculo familiar ou economico evidente com o segurado representam risco
+       elevado de lavagem.
+
+    **Momento da coleta:**
+    "Previamente ao inicio do relacionamento" significa antes da emissao da
+    apolice, adesao ao plano ou aquisicao do titulo. Nao e permitido emitir
+    e coletar depois.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Cadastro digital de clientes:**
+      1. Formulario de onboarding digital com todos os 9 campos obrigatorios do
+         art. 12 como campos required, com validacao em tempo real.
+      2. Validacao automatica de CPF na Receita Federal (situacao cadastral).
+      3. OCR de documentos de identidade com extracaao automatica de dados.
+      4. Validacao de endereco via CEP e geocodificacao para classificacao de
+         risco geografico.
+      5. Integracao com bureau de credito para validacao de renda declarada
+         (quando autorizado pelo cliente).
+
+      **Integracao com sistemas core:**
+      6. Bloqueio de emissao de apolice quando cadastro esta incompleto.
+      7. Integracao com sistema de emissao para validar que coleta foi feita
+         antes da operacao (pre-issuance check).
+      8. API de onboarding unificada para todos os canais (web, app, corretor,
+         bancassurance) com mesmo nivel de validacao.
+      9. Master Data Management para evitar duplicidades e consolidar visao
+         unica do cliente.
+    tools:
+      - kyc-platform
+      - ocr-service
+      - address-validation
+      - credit-bureau-integration
+      - master-data-management
+  devsecops:
+    prose: |
+      **Testes de onboarding:**
+      1. Testes end-to-end do fluxo de onboarding para cada tipo de cliente e
+         produto, validando que todos os campos obrigatorios sao coletados.
+      2. Testes de bloqueio: tentar emitir apolice com cadastro incompleto
+         deve retornar erro.
+      3. Testes de integracao com Receita Federal e servicos de validacao.
+
+      **Protecao de dados:**
+      4. Criptografia de dados pessoais em repouso e transito conforme LGPD.
+      5. Mascaramento de CPF e dados sensiveis em logs e ambientes nao-produtivos.
+      6. Testes de conformidade LGPD para todo o fluxo de coleta de dados.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - encryption-tests
+      - data-masking
+  secops:
+    prose: |
+      **Monitoramento de completude:**
+      1. Dashboard de completude cadastral por carteira, produto e canal.
+      2. Alertas para clientes com cadastro incompleto ha mais de 30 dias.
+      3. Processo de remediation para carteira legada com dados faltantes.
+
+      **Qualidade de dados:**
+      4. Verificacao periodica de validade de documentos (RG expirado, CPF
+         com situacao irregular).
+      5. Atualizacao cadastral periodica para clientes de maior risco.
+      6. Reconciliacao entre dados cadastrais e dados operacionais.
+      7. Retencao de dados cadastrais por minimo de 10 anos apos encerramento
+         do relacionamento.
+    tools:
+      - data-quality-dashboard
+      - kyc-platform
+      - compliance-monitoring
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-12"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-18"]
+    relationship: complements

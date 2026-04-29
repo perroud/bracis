@@ -1,0 +1,101 @@
+id: ctrl-17
+family: fam-5
+title: "Monitoramento Continuo de Seguranca Cibernetica do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar monitoramento contínuo de segurança
+    cibernética para o ARCiber, capaz de detectar atividades anômalas e
+    potenciais incidentes cibernéticos nos sistemas OT/ICS/SCADA. O monitoramento
+    deve abranger tráfego de rede do ARCiber (detecção de anomalias de protocolo
+    industrial, comunicações não autorizadas), acessos lógicos (autenticação,
+    autorização), e integridade de sistemas críticos. Alertas de segurança
+    devem ser tratados por equipe ou processo com capacidade de resposta
+    em tempo adequado para minimizar impacto potencial no SIN.
+
+guidance:
+  prose: >-
+    O monitoramento de seguranca em ambientes OT/ICS exige capacidades especificas:
+    (i) deteccao baseada em anomalias de protocolo industrial — reconhecer
+    comandos maliciosos em Modbus, DNP3, IEC 61850, IEC 60870-5-104, OPC UA,
+    ICCP que podem causar operacoes nao autorizadas em equipamentos de campo;
+    (ii) baseline de comunicacao — mapear o comportamento normal de comunicacao
+    entre componentes do ARCiber e alertar para desvios significativos;
+    (iii) deteccao de varredura de rede e reconhecimento — atividade de scan
+    em redes OT e frequentemente precursora de ataque;
+    (iv) correlacao de eventos IT/OT — integrar eventos de seguranca do ARCiber
+    com eventos da rede corporativa para identificar ataques que atravessam
+    o perimetro; (v) disponibilidade 24/7 — o SIN opera continuamente, e o
+    monitoramento de seguranca deve acompanhar essa disponibilidade. Implementar
+    SIEM com conteudo especifico para OT/ICS.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de monitoramento especifica para OT (Nozomi Networks
+      Guardian, Claroty CTD, ou Tenable.OT) com capacidade de inspecao profunda
+      de pacotes para protocolos industriais (DPI para DNP3, Modbus, IEC 61850,
+      IEC 60870-5-104, ICCP, OPC UA, PROFINET, EtherNet/IP). Integrar alertas
+      da plataforma OT ao SIEM corporativo (Splunk, IBM QRadar) para correlacao
+      centralizada de eventos IT/OT. Configurar baselines de comunicacao do
+      ARCiber e alertas para desvios. Implementar coleta passiva de trafego
+      (SPAN/TAP) nas interfaces de rede criticas do ARCiber sem impacto na
+      disponibilidade dos sistemas de controle.
+    tools:
+      - nozomi-networks-guardian
+      - claroty-ctd
+      - tenable-ot
+      - splunk
+      - ibm-qradar
+  devsecops:
+    prose: >-
+      Desenvolver e manter playbooks de deteccao especificos para ameacas ao
+      setor eletrico em formato YAML/JSON versionado no GitLab (regras Sigma,
+      regras YARA, alertas Splunk). Implementar processo de gerenciamento de
+      conteudo de deteccao como codigo (detection-as-code) com revisao de
+      pares e teste antes de deploy em producao. Automatizar a coleta de metricas
+      de cobertura de monitoramento do ARCiber e reportar em dashboard. Integrar
+      fontes de inteligencia de ameacas OT (STIX/TAXII) ao SIEM para enriquecimento
+      automatico de alertas.
+    tools:
+      - gitlab
+      - splunk
+      - sigma
+      - misp
+      - opencti
+  secops:
+    prose: >-
+      Estabelecer processo de triagem e investigacao de alertas de seguranca
+      do ARCiber com SLAs definidos por criticidade (critico: 15 min, alto:
+      1h, medio: 4h). Manter catalogo de casos de uso de deteccao (use cases)
+      especificos para ameacas ao ARCiber, incluindo tecnicas do MITRE ATT&CK
+      for ICS. Realizar revisao mensal da eficacia do monitoramento — falsos
+      positivos, falsos negativos e cobertura de ameacas. Compartilhar indicadores
+      de comprometimento (IOCs) relevantes com o ONS e com ISACs do setor eletrico
+      conforme acordos de compartilhamento de informacoes.
+    tools:
+      - splunk
+      - nozomi-vantage
+      - cortex-xsoar
+      - mitre-attck-ics
+      - misp
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 10", "art. 11"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR6.1", "62443-3-3 SR6.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.16"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-4", "AU-6", "IR-5"]
+    relationship: mapped

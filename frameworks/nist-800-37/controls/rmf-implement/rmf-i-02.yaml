@@ -1,0 +1,83 @@
+id: rmf-i-02
+family: rmf-implement
+title: "Update System Security Plan with Implementation Details"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Update the system security plan to reflect the actual implementation of controls.
+    The system security plan is updated to capture how each security and privacy control is
+    implemented, including the specific technologies, processes, and configurations used.
+    The updated plan provides the baseline description of the control implementations against
+    which future assessments and continuous monitoring activities are conducted.
+
+guidance:
+  prose: >-
+    After control implementation, the system security plan must be updated to reflect the
+    actual state of controls rather than planned implementations. Each control's
+    implementation description should specify the technology or process used, the
+    configuration settings applied, and any relevant parameters. For technical controls,
+    include references to configuration files, code repositories, or infrastructure
+    definitions where the implementation is codified. For operational controls, reference
+    the procedures, training materials, and schedules that constitute the implementation.
+    The updated SSP serves as the baseline for assessment — assessors compare actual system
+    behavior against the documented implementations.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Implement Step — Task I-2"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Automate SSP updates by integrating the documentation pipeline with infrastructure
+      deployment workflows. When infrastructure-as-code changes are applied, automatically
+      extract control-relevant configuration data and update the corresponding SSP entries.
+      Use OSCAL component definitions to describe each platform component's control
+      contribution and assemble them into the system-level SSP. Implement a reconciliation
+      process that compares deployed infrastructure state against SSP documentation and
+      flags discrepancies for review. Maintain the SSP in a machine-readable format that
+      can be validated, diffed, and versioned alongside the infrastructure code.
+    tools:
+      - oscal-tools
+      - compliance-trestle
+      - terraform
+      - backstage
+
+  devsecops:
+    prose: >-
+      Integrate SSP update triggers into the CI/CD pipeline. When code changes affect
+      security-relevant functionality (authentication, authorization, cryptography,
+      logging), automatically update the corresponding control implementation descriptions
+      in the SSP artifact. Use commit hooks or pipeline stages that detect changes to
+      security-critical files and prompt developers to update the SSP. Generate
+      implementation evidence artifacts (scan reports, test results, configuration
+      snapshots) and link them to SSP control entries. Ensure the SSP is reviewed
+      and approved through the same merge request process as code changes.
+    tools:
+      - gitlab-ci
+      - compliance-trestle
+      - oscal-tools
+
+  secops:
+    prose: >-
+      Enforce SSP update workflows in the GRC platform that require implementation
+      descriptions to be updated after control deployment. Track the delta between
+      planned and actual implementations and ensure the SSP accurately reflects the
+      current state. Conduct periodic SSP accuracy reviews by comparing documented
+      implementations against technical scan results, interview findings, and
+      operational evidence. Maintain an SSP change log that records when implementations
+      were updated, who made the change, and the reason for the update. Flag systems
+      where the SSP has not been updated within the defined review cycle.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-2", "CA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.37"]
+    relationship: mapped

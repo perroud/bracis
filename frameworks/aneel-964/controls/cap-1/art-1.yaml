@@ -1,0 +1,94 @@
+id: art-1
+family: cap-1
+title: "Objeto e Ambito de Aplicacao"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 1. Esta Resolução Normativa dispõe sobre as disposições relativas à segurança
+    cibernética aplicáveis aos agentes do setor elétrico brasileiro, incluindo
+    concessionários, permissionários e autorizados de geração, transmissão e distribuição
+    de energia elétrica, bem como demais agentes que operam sistemas eletrônicos
+    integrados ao Sistema Interligado Nacional (SIN).
+guidance:
+  prose: |
+    O art. 1 estabelece o objeto e o ambito subjetivo da Resolucao Normativa ANEEL 964/2021.
+
+    **Agentes regulados:**
+    - Concessionarios de geracao: usinas hidreletricas, termeletricas, eolicas e solares
+    - Concessionarios e permissionarios de transmissao: operadores de linhas de transmissao
+    - Concessionarios de distribuicao: distribuidoras de energia eletrica
+    - Demais agentes do setor eletrico com sistemas conectados ao SIN
+
+    **Importancia do SIN:**
+    O Sistema Interligado Nacional e a espinha dorsal do sistema eletrico brasileiro,
+    interligando as regioes Sul, Sudeste, Centro-Oeste, Norte e Nordeste. Um incidente
+    cibernetico que comprometa componentes criticos do SIN pode resultar em apagoes
+    de escala nacional com impacto severo na economia e na populacao.
+
+    **Relevancia regulatoria:**
+    A ANEEL reconhece que a crescente digitalizacao e automacao do setor eletrico
+    (smart grids, SCADA, ICS, medidores inteligentes) expoe a infraestrutura a ameacas
+    ciberneticas que nao existiam em ambientes analogicos. Esta resolucao e a resposta
+    regulatoria a esse risco sistemico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Catalogar todos os sistemas eletronicos da organizacao que se enquadram no
+      escopo da ANEEL 964, distinguindo entre:
+      1. Sistemas OT (Operational Technology): SCADA, DCS, RTU, PLC, IEDs
+      2. Sistemas IT (Information Technology): ERP, sistemas corporativos, redes administrativas
+      3. Sistemas de fronteira IT/OT: historians, DMZ industrial, gateways de protocolo
+
+      Registrar no CMDB a classificacao de cada sistema em relacao ao SIN:
+      - Criticos: impacto direto na operacao do SIN
+      - Importantes: suporte a operacao do SIN
+      - Corporativos: sem conexao direta com o SIN
+
+      Manter diagrama de arquitetura atualizado mostrando a topologia de rede e
+      os pontos de interconexao IT/OT.
+    tools:
+      - servicenow-cmdb
+      - backstage
+      - netbox
+      - lucidchart
+      - draw-io
+  devsecops:
+    prose: |
+      Implementar repositorio Git centralizado para catalogacao de ativos no escopo
+      da ANEEL 964, com:
+      1. Manifesto de ativos em formato YAML/JSON versionado
+      2. Pipeline de validacao que verifica completude dos metadados de escopo
+      3. Processo de onboarding de novos sistemas com checklist de classificacao
+      4. Notificacoes automaticas quando novos sistemas IT/OT sao adicionados
+
+      Integrar a classificacao de escopo ao processo de aprovacao de mudancas:
+      sistemas classificados como criticos para o SIN exigem aprovacao adicional
+      do time de seguranca OT antes do deploy.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - conftest
+      - opa
+  secops:
+    prose: |
+      Conduzir assessment inicial de escopo para identificar todos os sistemas
+      abrangidos pela ANEEL 964. Estabelecer processo formal de manutencao do
+      escopo com revisao semestral minima. Documentar criterios de inclusao e
+      exclusao de sistemas no escopo regulatorio. Manter lista de agentes do
+      setor eletrico com quem a organizacao possui interfaces criticas para
+      fins de compartilhamento de informacoes sobre incidentes.
+    tools:
+      - grc-platform
+      - cmdb
+      - asset-inventory
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-002"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.1"]
+    relationship: supports

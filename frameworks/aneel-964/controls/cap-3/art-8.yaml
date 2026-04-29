@@ -1,0 +1,129 @@
+id: art-8
+family: cap-3
+title: "Gestao de Riscos Ciberneticos"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 8. Os agentes do setor elétrico devem implementar processo formal e contínuo
+    de gestão de riscos cibernéticos, abrangendo:
+
+    I - identificação e classificação dos ativos cibernéticos críticos, com especial
+    atenção aos sistemas de controle industrial e aos componentes essenciais para
+    a operação do Sistema Interligado Nacional;
+
+    II - avaliação periódica das ameaças e vulnerabilidades relevantes para o setor
+    elétrico, incluindo ameaças específicas a sistemas SCADA, protocolos industriais
+    e equipamentos de campo;
+
+    III - análise e priorização dos riscos identificados com base no impacto potencial
+    sobre a continuidade da operação elétrica e a integridade do SIN;
+
+    IV - tratamento dos riscos mediante implementação de controles preventivos,
+    detectivos e corretivos proporcionais ao nível de risco identificado;
+
+    V - monitoramento contínuo da eficácia dos controles implementados e revisão
+    do processo de gestão de riscos ao menos anualmente.
+guidance:
+  prose: |
+    O art. 8 estabelece o framework de gestao de riscos ciberneticos especifico
+    para o setor eletrico. A gestao de riscos em ambientes OT/ICS difere
+    significativamente da gestao de riscos em ambientes IT tradicionais.
+
+    **Particularidades da gestao de riscos OT:**
+    1. Disponibilidade > Confidencialidade: no setor eletrico, o impacto de uma
+       interrupcao geralmente excede o de uma violacao de dados
+    2. Sistemas legados: muitos dispositivos OT nao podem ser facilmente atualizados
+       ou substituidos, criando vulnerabilidades persistentes
+    3. Protocolos industriais inseguros: DNP3, Modbus, IEC 60870-5 foram projetados
+       para confiabilidade, nao para seguranca — sem autenticacao nativa
+    4. Ciclos de vida longos: equipamentos industriais tipicamente operam por 15-30 anos,
+       tempo muito maior do que o ciclo de vida de software IT
+    5. Impacto fisico: um ataque bem-sucedido a sistemas SCADA pode causar danos
+       fisicos a equipamentos e risco a vidas humanas
+
+    **Ameacas especificas ao setor eletrico:**
+    - APTs patrocinadas por estados (Sandworm, Volt Typhoon, Dragonfly) com foco
+      em infraestrutura critica de energia
+    - Ransomware com capacidade de disruptao OT (EKANS/SNAKE, Industroyer2)
+    - Comprometimento de sistemas de medicao para fraude de energia
+    - Ataques fisico-ciberneticos em subestacoes e pontos de controle
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Construir plataforma de gestao de riscos integrada IT/OT:
+
+      1. Risk Registry centralizado: plataforma GRC que suporte ativos OT/SCADA
+         com campos especificos (protocolo, nivel de criticidade SIN, vendor,
+         versao de firmware, data de fim de suporte)
+      2. Integracao com feeds de threat intelligence especificos para ICS:
+         ICS-CERT (CISA), Dragos WorldView, Claroty Research, OTORIO
+      3. Vulnerability tracking para sistemas OT: diferenciar CVEs que afetam
+         sistemas em operacao vs. sistemas em manutencao
+      4. Impacto no SIN: mapa visual de como cada ativo OT se relaciona com a
+         topologia do SIN — quais subestacoes, linhas, geradores dependem do ativo
+      5. Risk scoring especifico para OT: adaptar CVSS para contexto industrial
+         (considerar impacto fisico, dificuldade de patching, disponibilidade critica)
+    tools:
+      - dragos-platform
+      - claroty
+      - nozomi-networks
+      - tenable-ot
+      - servicenow-grc
+  devsecops:
+    prose: |
+      Integrar gestao de riscos no ciclo de desenvolvimento e mudancas:
+
+      1. Security Assessment obrigatorio para qualquer mudanca em sistemas criticos
+         do SIN antes de ir para producao
+      2. Threat modeling especifico para ICS/SCADA para novos projetos e integrações
+         IT/OT (STRIDE adaptado para ambiente industrial, MITRE ATT&CK for ICS)
+      3. Pipeline de vulnerability scanning com bases de dados ICS:
+         - NVD com filtro para produtos OT (Siemens, Schneider, Rockwell, ABB)
+         - ICS-CERT advisories automaticamente importados
+      4. Risk acceptance workflow: para vulnerabilidades em sistemas OT que nao
+         podem ser patchadas imediatamente, exigir aprovacao formal com prazo
+         de remediaciao e controles compensatorios documentados
+      5. Change Risk Assessment automatico no pipeline para mudancas em sistemas
+         com classificacao critica-SIN
+    tools:
+      - gitlab-ci
+      - tenable-ot
+      - grype
+      - dependency-track
+      - threatmodeler
+  secops:
+    prose: |
+      Executar o processo de gestao de riscos ciberneticos OT/IT:
+
+      1. Inventario de ativos OT com avaliacao de risco inicial (criticidade para
+         SIN x exposicao a vulnerabilidades conhecidas)
+      2. Vulnerability scanning passivo em redes OT: usar Claroty, Nozomi ou Dragos
+         para nao impactar disponibilidade dos sistemas industriais
+      3. Threat Intelligence OT: assinar e processar ICS-CERT (CISA),
+         compartilhamentos do setor (ISACs de energia), inteligencia de fornecedores
+      4. Analise de impacto no SIN: para cada vulnerabilidade critica identificada,
+         avaliar o impacto potencial na operacao do SIN
+      5. Revisao anual do risk registry: atualizar probabilidades e impactos,
+         verificar eficacia de controles existentes
+      6. Relatorio de riscos para a alta administracao: sumario executivo trimestral
+         com top-10 riscos ciberneticos e status de tratamento
+    tools:
+      - dragos-platform
+      - claroty
+      - nozomi-networks
+      - tenable-ot
+      - grc-platform
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-002-R1", "CIP-010-R1"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.3", "3-2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.7", "A.8.8", "A.6.1"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "RA-3", "RA-5"]
+    relationship: supports

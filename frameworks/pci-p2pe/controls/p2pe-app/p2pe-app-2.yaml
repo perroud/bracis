@@ -1,0 +1,110 @@
+id: p2pe-app-2
+family: p2pe-app
+title: "P2PE Application Segmentation and Data Isolation"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    P2PE payment applications shall enforce logical segmentation between
+    components that handle encrypted account data and components that
+    perform other functions. The application shall not expose encrypted
+    account data to non-essential processes, log files, debugging
+    interfaces, or diagnostic outputs. Memory handling shall ensure that
+    encrypted data is securely overwritten after processing. The
+    application architecture shall prevent any component from accessing
+    encrypted data unless explicitly required for forwarding to the
+    decryption environment.
+  parts:
+    - id: p2pe-app-2.a
+      label: "Domain 2, 2C"
+      prose: >-
+        Encrypted account data is isolated within application components
+        that have a documented need to handle it, and is not exposed to
+        logging, debugging, or diagnostic functions.
+    - id: p2pe-app-2.b
+      label: "Domain 2, 2D"
+      prose: >-
+        Application memory containing encrypted account data is securely
+        overwritten after the data has been forwarded to the decryption
+        environment.
+
+guidance:
+  prose: >-
+    Even though encrypted account data is not cleartext PAN, its exposure
+    increases the attack surface — an attacker who captures encrypted
+    payloads alongside other transaction metadata may gain advantage in
+    cryptanalytic attacks or correlation analysis. Applications must treat
+    encrypted account data with a need-to-know principle. Logging of
+    encrypted data should be avoided entirely; if transaction identifiers
+    are needed for troubleshooting, use separate non-sensitive reference
+    numbers. Memory management must account for garbage-collected languages
+    where explicit secure overwrite may require special techniques (e.g.,
+    byte arrays instead of strings in Java/C#). Debug modes that expose
+    encrypted payloads must be disabled in production builds.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 2 — Application Security"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "OWASP Secure Coding Practices Quick Reference Guide"
+    url: "https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Architect P2PE applications with a dedicated encrypted-data-handler
+      microservice or module that receives encrypted payloads from the POI
+      device and forwards them to the acquirer/processor. This module
+      should have no persistent storage, no logging of payload content,
+      and minimal attack surface. Deploy it in a restricted network
+      segment with only ingress from the POS and egress to the
+      acquirer endpoint. Use ephemeral containers or serverless functions
+      to minimize the time encrypted data resides in memory.
+    tools:
+      - kubernetes
+      - aws-lambda
+      - azure-functions
+      - istio
+      - calico-network-policies
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect logging statements within encrypted
+      data handler modules. Enforce that debug/trace logging levels are
+      disabled in production build configurations. Scan for patterns where
+      encrypted payloads are converted to string types (which prevent
+      secure overwrite in managed languages). Include automated tests that
+      verify no encrypted data appears in application logs after processing
+      test transactions.
+    tools:
+      - semgrep
+      - sonarqube
+      - gitlab-ci
+      - custom-log-analysis-scripts
+      - checkmarx
+
+  secops:
+    prose: >-
+      Monitor application logs for any content matching encrypted payload
+      patterns (Base64-encoded blocks of expected length). Alert on any
+      debug-level logging enabled in production. Conduct periodic memory
+      forensics on running application instances to verify encrypted data
+      is not persisted beyond its processing window. Review application
+      configurations quarterly for any changes that could expose encrypted
+      data.
+    tools:
+      - splunk
+      - elastic-siem
+      - volatility-framework
+      - aqua-security
+      - falco
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1", "req-3.3", "req-6.2"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-4", "SC-28", "SI-11"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.10", "A8.11"]
+    relationship: supports

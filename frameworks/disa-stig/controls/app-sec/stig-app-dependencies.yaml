@@ -1,0 +1,126 @@
+id: stig-app-dependencies
+family: app-sec
+title: "Third-Party Library and Dependency Security"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Applications must maintain an inventory of all third-party libraries,
+    frameworks, and components used in the system, including transitive
+    (indirect) dependencies. All third-party components must be obtained from
+    trusted, verified sources and must be integrity-verified before use (via
+    hash verification, digital signature validation, or authenticated access
+    to approved package repositories). Third-party components must be evaluated
+    for known vulnerabilities before inclusion and kept current with vendor
+    security patches. The system must maintain a software bill of materials
+    (SBOM) in a standard format (CycloneDX or SPDX) covering all components.
+    License compliance must be evaluated for all third-party components —
+    copyleft licenses that would affect the licensing of DoD-developed code
+    must be identified and evaluated by legal counsel. Open-source components
+    with abandoned maintenance (no security releases in 24+ months) must be
+    evaluated for replacement.
+
+guidance:
+  prose: >-
+    Supply chain attacks targeting third-party dependencies (Log4Shell, XZ Utils
+    backdoor, SolarWinds SUNBURST) have demonstrated that the dependency supply
+    chain is a high-value attack vector. DoD systems are attractive targets,
+    and adversaries invest effort in compromising widely-used open-source
+    components to gain access to organizations that use them.
+
+    The SBOM requirement enables rapid response when new vulnerabilities are
+    discovered: an organization with an accurate SBOM can immediately determine
+    whether they are affected by querying their component inventory against the
+    CVE database, rather than manually searching codebases. CISA has mandated
+    SBOM as part of software security requirements for critical infrastructure.
+
+    STIG reviewers verify SBOM completeness, the process for evaluating new
+    dependencies, the currency of dependency versions, and the integrity
+    verification process for downloaded packages. A common finding is that
+    applications include transitive dependencies with critical CVEs that were
+    not detected because the development team only monitored direct dependencies.
+
+references:
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222396"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, SA-12, SA-22, SR-2, SR-4"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CISA — Securing the Software Supply Chain"
+    url: "https://www.cisa.gov/resources-tools/resources/securing-software-supply-chain-recommended-practices-guide-developers"
+  - citation: "EO 14028 — Improving the Nation's Cybersecurity (SBOM Mandate)"
+    url: "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Operate an internal artifact repository (Nexus, Artifactory, GitLab Package
+      Registry) that proxies approved public package registries and enforces
+      package integrity verification. Configure the repository to reject packages
+      with known critical CVEs or unverified checksums. Implement automated SBOM
+      generation for all container images using Syft or Grype, stored alongside
+      images in the registry. Deploy a software composition analysis (SCA)
+      platform (Dependency-Track) that ingests SBOMs, correlates against CVE
+      feeds, and provides a centralized vulnerability dashboard. Enforce package
+      registry configuration in build tooling (npm .npmrc, pip pip.conf, Maven
+      settings.xml) to use only the internal approved registry — direct internet
+      package downloads must be proxied through the controlled registry.
+    tools:
+      - nexus-repository
+      - artifactory
+      - gitlab-package-registry
+      - syft
+      - grype
+      - dependency-track
+
+  devsecops:
+    prose: >-
+      Run dependency scanning (GitLab Dependency Scanning, Dependabot, Renovate)
+      in every CI pipeline and block merges for critical/high CVEs above the
+      risk threshold. Generate SBOMs as pipeline artifacts for every build using
+      Syft (CycloneDX format). Implement license compliance scanning (FOSSA,
+      GitLab License Compliance) to identify copyleft license risks. Configure
+      Renovate Bot to automatically create merge requests for dependency updates,
+      reducing the window of exposure for newly disclosed CVEs. Implement package
+      integrity verification in pipelines using hash validation against authoritative
+      checksums. Maintain a dependency exception register for known accepted
+      vulnerabilities with documented risk acceptance and remediation timelines.
+    tools:
+      - gitlab-dependency-scanning
+      - gitlab-license-compliance
+      - syft
+      - renovate
+      - dependabot
+      - fossa
+      - dependency-track
+
+  secops:
+    prose: >-
+      Subscribe to NVD, GitHub Advisory Database, and ecosystem-specific advisory
+      feeds (npm security advisories, PyPI, Maven Central). Correlate new CVEs
+      against the SBOM inventory immediately upon publication to identify affected
+      systems. Track dependency vulnerabilities in the POA&M with SLA-aligned
+      remediation timelines. Conduct quarterly SBOM reviews to verify accuracy
+      and completeness against deployed artifacts. Include software supply chain
+      risk assessment in the system security plan and ATO package.
+    tools:
+      - dependency-track
+      - black-duck
+      - snyk
+      - splunk
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-12", "SA-22", "SR-2", "SR-4", "SR-11"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SR.L2-3.17.1", "SR.L2-3.17.2"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["sa-12", "sr-2", "sr-4"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["ID.SC-02", "ID.SC-04", "PR.DS-02"]
+    relationship: supports

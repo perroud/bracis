@@ -1,0 +1,97 @@
+id: art-6
+family: cap-2
+title: "Restricoes por Tipo de Dado"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 6. Os órgãos e entidades devem observar as seguintes restrições quanto ao
+    tipo de dado e o modelo de nuvem:
+    I - informações ostensivas e públicas podem ser tratadas em qualquer modelo de
+    nuvem;
+    II - informações pessoais, conforme a Lei n. 13.709, de 14 de agosto de 2018
+    (LGPD), devem ser tratadas preferencialmente em nuvem privada ou comunitária,
+    sendo admitido o uso de nuvem pública desde que adotadas medidas adicionais de
+    proteção;
+    III - informações classificadas nos graus de sigilo ultrassecreto, secreto e
+    reservado somente poderão ser tratadas em nuvem privada, sob controle direto
+    do órgão ou entidade;
+    IV - informações de infraestrutura crítica somente poderão ser tratadas em nuvem
+    privada ou comunitária governamental.
+guidance:
+  prose: |
+    O art. 6 cria uma matriz de permissoes cruzando tipo de dado com modelo de nuvem.
+
+    **Matriz de permissao:**
+    | Tipo de dado | Publica | Comunitaria | Privada |
+    |---|---|---|---|
+    | Ostensivo/Publico | SIM | SIM | SIM |
+    | Pessoal (LGPD) | COM RESTRICOES | SIM | SIM |
+    | Classificado | NAO | NAO | SIM (controle direto) |
+    | Infraestrutura critica | NAO | GOV ONLY | SIM |
+
+    **Medidas adicionais para dados pessoais em nuvem publica:**
+    - Criptografia com chave gerenciada pelo orgao (BYOK/HYOK)
+    - Pseudonimizacao ou anonimizacao quando possivel
+    - Contrato com clausulas LGPD especificas
+    - Avaliacao de impacto a protecao de dados (DPIA)
+
+    **Mapeamento CSA CCM v4:**
+    - DSP-04: Data Classification
+    - DSP-05: Data Flow Documentation
+    - DSP-17: Data Protection by Design and Default
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Enforcement automatico de restricoes:**
+      1. Politicas de OPA/Rego que bloqueiem provisionamento de recursos em nuvem
+         publica que tenham tag de classificacao incompativel.
+      2. CASB configurado para interceptar e bloquear upload de dados classificados
+         para servicos de nuvem publica.
+      3. Segregacao de ambientes: VPCs separadas para dados publicos, pessoais e
+         de infraestrutura critica.
+      4. Para dados pessoais em nuvem publica: implementar BYOK (Bring Your Own Key)
+         com chaves gerenciadas em HSM do orgao.
+    tools:
+      - opa-gatekeeper
+      - casb
+      - vpc-segmentation
+      - hsm
+      - byok
+  devsecops:
+    prose: |
+      **Validacao de conformidade de dados:**
+      1. Pipeline que valide classificacao de dados vs. destino de deployment.
+      2. Testes automatizados que verifiquem se dados pessoais em nuvem publica
+         possuem criptografia BYOK ativa.
+      3. Scan de configuracao que detecte dados de infraestrutura critica em
+         nuvem publica ou comunitaria nao-governamental.
+      4. Matriz de permissoes codificada como policy-as-code e validada em CI/CD.
+    tools:
+      - gitlab-ci
+      - opa-gatekeeper
+      - data-scanner
+      - policy-as-code
+  secops:
+    prose: |
+      **Monitoramento de restricoes:**
+      1. Monitoramento continuo via CSPM que alerte violacoes da matriz de permissoes.
+      2. Relatorio mensal de dados armazenados por tipo e modelo de nuvem.
+      3. Auditoria de fluxos de dados que identifique movimentacao de dados
+         classificados para modelos de nuvem nao autorizados.
+      4. Resposta automatizada: quarentena de dados que violem restricoes.
+    tools:
+      - cspm
+      - dlp
+      - data-flow-monitoring
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5", "art-11", "art-46"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-5", "art-6"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["DSP-04", "DSP-05", "DSP-17"]
+    relationship: mapped

@@ -1,0 +1,118 @@
+id: art-14
+family: cap-3
+title: "Rastreabilidade e Registro de Decisoes de IA"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 14. Toda decisão clínica assistida por sistema de inteligência
+    artificial deve ser registrada com rastreabilidade completa:
+
+    I - registro no prontuário do paciente da utilização de sistema de IA,
+    incluindo identificação do sistema, versão utilizada e resultado
+    produzido;
+
+    II - registro da decisão do médico, indicando se concordou, discordou
+    ou modificou a recomendação do sistema de IA, com justificativa;
+
+    III - preservação dos dados de entrada utilizados pelo sistema de IA
+    para a inferência específica, por prazo mínimo de 20 anos ou conforme
+    legislação aplicável ao prontuário médico;
+
+    IV - preservação da explicação gerada pelo sistema de IA para cada
+    inferência, vinculada ao registro do prontuário;
+
+    V - manutenção de log de auditoria imutável com todas as interações
+    entre o médico e o sistema de IA, incluindo timestamps, dados
+    consultados e ações tomadas.
+guidance:
+  prose: |
+    O art. 14 cria regime de rastreabilidade rigoroso para IA medica,
+    alinhado com exigencias do prontuario medico (Resolucao CFM 1.638/2002)
+    e estendido para contemplar especificidades de IA.
+
+    **Elementos de rastreabilidade:**
+
+    - Identificacao do sistema (inciso I): nao basta registrar "IA foi
+      usada". Deve constar: nome do sistema, versao especifica do modelo,
+      e resultado numerico ou categorico produzido.
+
+    - Decisao medica (inciso II): registrar concordancia/discordancia e
+      obrigatoriamente que o medico seja capaz de fazer a critica do
+      que a IA gerou. Isso cria evidencia de supervisao humana significativa.
+
+    - Dados de entrada (inciso III): os dados exatos que alimentaram
+      a inferencia devem ser preservados. Se a imagem foi pre-processada,
+      tanto a imagem original quanto a processada devem ser mantidas.
+      Prazo de 20 anos segue norma do prontuario medico.
+
+    - Explicacao persistida (inciso IV): a explicacao gerada (SHAP values,
+      attention maps, feature importance) deve ser armazenada junto
+      ao prontuario, nao apenas exibida em tela e descartada.
+
+    - Audit trail (inciso V): log imutavel estilo WORM (Write Once
+      Read Many) de todas as interacoes medico-IA. Deve suportar
+      investigacao retrospectica em caso de incidente adverso.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de rastreabilidade:**
+      1. Implementar servico de audit log imutavel (append-only) para
+         todas as interacoes medico-IA, com armazenamento WORM e
+         retencao minima de 20 anos.
+      2. Configurar integracao com PEP/EMR para registro automatico
+         de inferencia de IA, versao do modelo e resultado no prontuario.
+      3. Implementar armazenamento de longo prazo para dados de entrada
+         e explicacoes de cada inferencia, com vinculacao ao prontuario
+         (object storage com lifecycle policies).
+      4. Criar API padronizada de rastreabilidade que todos os sistemas
+         de IA devem utilizar, garantindo uniformidade de registros.
+    tools:
+      - audit-log
+      - worm-storage
+      - emr-integration
+      - object-storage
+      - data-retention
+  devsecops:
+    prose: |
+      **Validacao de rastreabilidade no pipeline:**
+      1. Implementar testes de integracao que verifiquem que toda
+         inferencia de modelo gera registro de rastreabilidade completo
+         (sistema, versao, entrada, saida, explicacao, timestamp).
+      2. Validar que registros de rastreabilidade sao imutaveis:
+         testes de seguranca que verifiquem impossibilidade de
+         alteracao ou exclusao.
+      3. Automatizar teste de retencao: verificar que politicas de
+         lifecycle garantem preservacao minima de 20 anos.
+      4. Implementar teste de vinculacao prontuario-IA: verificar
+         que registro de IA e acessivel a partir do prontuario e
+         vice-versa.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - security-tests
+      - retention-validation
+  secops:
+    prose: |
+      **Governanca de rastreabilidade:**
+      1. Auditar integridade dos logs de auditoria periodicamente,
+         verificando que nao houve alteracao, exclusao ou gap temporal.
+      2. Testar capacidade de reconstrucao: dado um incidente adverso,
+         verificar que e possivel recuperar toda a cadeia de evidencias
+         (dados de entrada, inferencia, explicacao, decisao medica).
+      3. Verificar que medicos estao registrando concordancia/discordancia
+         com IA conforme inciso II (amostragem de prontuarios).
+      4. Monitorar volume de armazenamento e custos de retencao de
+         longo prazo, planejando capacidade.
+    tools:
+      - audit-tools
+      - integrity-verification
+      - data-management
+      - compliance-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-38"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-12", "art-20"]
+    relationship: mapped

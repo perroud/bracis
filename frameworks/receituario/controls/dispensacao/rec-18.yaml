@@ -1,0 +1,126 @@
+id: rec-18
+family: dispensacao
+title: "Controlled Substance Inventory and Balance Reconciliation"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 35. Os estabelecimentos que dispensam medicamentos sujeitos a
+    controle especial devem manter controle de estoque eletrônico
+    integrado ao SNCR, observando:
+
+    I — registro de todas as entradas de medicamentos controlados,
+    vinculando cada entrada à respectiva nota fiscal eletrônica e ao
+    lote do fabricante;
+
+    II — registro de todas as saídas por dispensação, vinculando cada
+    saída à respectiva prescrição eletrônica e ao registro de
+    dispensação;
+
+    III — registro de perdas, avarias, desvios, furtos e extravios,
+    com documentação do fato, comunicação à autoridade sanitária e
+    registro de boletim de ocorrência quando aplicável;
+
+    IV — reconciliação automática entre estoque físico e estoque lógico,
+    com alertas imediatos para divergências superiores a 1 (uma) unidade;
+
+    V — inventário físico obrigatório com frequência mínima trimestral,
+    documentado e assinado pelo farmacêutico responsável.
+
+    Parágrafo único. Divergências de estoque não justificadas devem ser
+    comunicadas à vigilância sanitária local no prazo máximo de 48
+    (quarenta e oito) horas.
+guidance:
+  prose: |
+    Article 35 establishes strict electronic inventory control for
+    controlled substances, with real-time tracking and mandatory
+    reconciliation.
+
+    **Inventory tracking requirements:**
+    - All entries linked to electronic invoices and manufacturer batch
+    - All dispensation exits linked to electronic prescriptions
+    - All losses, damages, thefts, and diversions documented
+    - Automatic reconciliation with alerts for discrepancies > 1 unit
+
+    **Physical inventory:**
+    - Minimum quarterly physical inventory counts
+    - Must be documented and signed by the responsible pharmacist
+    - Discrepancies between physical and logical inventory trigger
+      investigation
+
+    **Loss and diversion handling:**
+    - All losses must be documented with cause analysis
+    - Communication to health surveillance authority required
+    - Police report (boletim de ocorrencia) for thefts
+    - 48-hour maximum reporting deadline for unexplained discrepancies
+
+    **Reconciliation sensitivity:**
+    The 1-unit discrepancy threshold is strict. Even a single missing
+    tablet of a controlled substance triggers an alert, reflecting the
+    regulatory concern about diversion.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controlled substance inventory platform:**
+      1. Implement a perpetual inventory system for controlled
+         substances with real-time balance tracking per SKU, batch,
+         and expiry date.
+      2. Deploy automated reconciliation between logical inventory
+         (system balance) and physical inventory (count entry),
+         alerting immediately when discrepancy exceeds 1 unit.
+      3. Implement electronic invoice (NF-e) integration for
+         automatic entry registration linked to manufacturer batch.
+      4. Deploy a loss/diversion reporting workflow with mandatory
+         fields (type, quantity, cause, documentation) and automatic
+         notification to health surveillance when triggered.
+      5. Implement a physical inventory module with mobile barcode
+         scanning, pharmacist digital signature, and automatic
+         discrepancy calculation against logical inventory.
+    tools:
+      - inventory-management
+      - barcode-scanner
+      - nf-e-integration
+      - alerting-engine
+      - mobile-counting
+      - postgresql
+  devsecops:
+    prose: |
+      **Inventory control testing:**
+      1. Create comprehensive tests for inventory balance accuracy
+         across all movement types (entry, dispensation, loss, return).
+      2. Implement reconciliation tests with known discrepancies to
+         verify correct alert generation at the 1-unit threshold.
+      3. Add concurrent dispensation tests to verify that race
+         conditions cannot create negative balances or phantom stock.
+      4. Deploy invoice integration tests verifying correct entry
+         registration linked to NF-e and batch data.
+    tools:
+      - gitlab-ci
+      - inventory-tests
+      - concurrency-tests
+      - integration-tests
+      - data-integrity-tests
+  secops:
+    prose: |
+      **Inventory compliance operations:**
+      1. Monitor controlled substance inventory alerts daily and
+         ensure investigation of all discrepancies within 24 hours.
+      2. Track quarterly physical inventory completion and sign-off
+         for all pharmacies, flagging overdue inventories.
+      3. Audit loss and diversion reports monthly for completeness
+         and timeliness of regulatory notifications.
+      4. Generate quarterly inventory accuracy metrics (discrepancy
+         rates, investigation resolution times, regulatory
+         notification compliance).
+    tools:
+      - inventory-dashboard
+      - compliance-tracking
+      - regulatory-notification
+      - audit-platform
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-25", "art-26"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

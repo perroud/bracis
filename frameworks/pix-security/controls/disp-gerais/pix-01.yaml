@@ -1,0 +1,106 @@
+id: pix-01
+family: disp-gerais
+title: "Objeto e Ambito do Arranjo Pix"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O arranjo de pagamentos instantâneos Pix, instituído pela Resolução BCB n. 1/2020,
+    estabelece o ecossistema de pagamentos eletrônicos instantâneos operado pelo Banco Central
+    do Brasil. O arranjo define as regras, os procedimentos e a infraestrutura necessários
+    para a realização de transferências eletrônicas de fundos entre usuários finais, com
+    liquidação em tempo real, disponibilidade 24 horas por dia, 7 dias por semana, 365 dias
+    por ano, incluindo feriados.
+guidance:
+  prose: |
+    O Pix constitui um arranjo de pagamento de proposito geral, instituido e gerido pelo
+    Banco Central do Brasil na qualidade de instituidor do arranjo.
+
+    **Escopo do arranjo:**
+    - Transferencias entre pessoas fisicas (P2P)
+    - Pagamentos a pessoas juridicas (P2M -- person-to-merchant)
+    - Pagamentos de tributos e cobrancas ao governo (P2G)
+    - Transferencias entre pessoas juridicas (B2B)
+    - Transacoes de saque e troco (Pix Saque e Pix Troco)
+
+    **Disponibilidade:**
+    O SPI (Sistema de Pagamentos Instantaneos) opera ininterruptamente. Toda a cadeia
+    tecnologica -- desde o aplicativo do usuario ate a liquidacao no BCB -- deve suportar
+    operacao 24x7x365 sem interrupcao.
+
+    **Participantes:**
+    - Participantes diretos: conectados diretamente ao SPI via RSFN
+    - Participantes indiretos: acessam o SPI por intermedio de um participante direto
+    - Liquidantes especiais: instituicoes com funcao especifica de liquidacao
+
+    **Papel do BCB:**
+    O BCB acumula os papeis de instituidor, gestor do arranjo e operador da infraestrutura
+    (SPI e DICT), o que confere poder regulatorio e operacional unificado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura para Pix:**
+      1. Servicos de pagamento projetados para disponibilidade 24x7x365 com zero
+         downtime planejado.
+      2. Arquitetura multi-AZ ou multi-regiao para eliminar single points of failure.
+      3. Conectividade com o SPI via RSFN com redundancia de enlaces.
+      4. Segregacao de ambientes: producao Pix isolado de outros servicos de pagamento.
+
+      **Capacidade e escalabilidade:**
+      5. Auto-scaling baseado em metricas de TPS (transacoes por segundo) do Pix.
+      6. Capacity planning para picos sazonais (Black Friday, pagamentos de salarios,
+         datas comemorativas).
+      7. Load testing periodico simulando volumes de pico do SPI.
+
+      **Monitoramento:**
+      8. Health checks em todas as camadas (aplicacao, banco, rede, SPI).
+      9. Alertas imediatos para degradacao de latencia ou indisponibilidade.
+      10. Dashboard operacional do Pix com metricas em tempo real.
+    tools:
+      - kubernetes
+      - service-mesh
+      - prometheus
+      - grafana
+      - load-balancer
+  devsecops:
+    prose: |
+      **Pipeline para servicos Pix:**
+      1. Pipeline de CI/CD com zero-downtime deployment (blue-green ou canary).
+      2. Testes de integracao com simulador do SPI em ambiente de homologacao.
+      3. Testes de carga automatizados no pipeline para validar SLAs do Pix.
+      4. Feature flags para ativacao gradual de novas funcionalidades Pix.
+
+      **Qualidade e conformidade:**
+      5. Contract testing para APIs Pix conforme especificacao do BCB.
+      6. Validacao automatica de mensagens ISO 20022 no pipeline.
+      7. Smoke tests pos-deploy que validam fluxos criticos do Pix.
+    tools:
+      - gitlab-ci
+      - k6
+      - gatling
+      - feature-flags
+      - contract-testing
+  secops:
+    prose: |
+      **Gestao operacional do Pix:**
+      1. Runbooks documentados para incidentes em servicos Pix.
+      2. Escalonamento automatico para indisponibilidade do canal Pix.
+      3. Comunicacao ao BCB em caso de interrupcao superior aos SLAs definidos.
+      4. Relatorio mensal de disponibilidade e incidentes do Pix.
+
+      **Monitoramento de participantes:**
+      5. Verificacao periodica do status de participante direto/indireto junto ao BCB.
+      6. Acompanhamento de atualizacoes regulatorias do arranjo Pix.
+      7. Inventario de servicos Pix ofertados com classificacao de risco.
+    tools:
+      - pagerduty
+      - siem
+      - runbook-automation
+      - grc-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-1", "art-2"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-1"]
+    relationship: complements

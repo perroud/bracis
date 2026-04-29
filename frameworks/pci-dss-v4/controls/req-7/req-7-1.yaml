@@ -1,0 +1,102 @@
+id: req-7.1
+family: req-7
+title: "Restrict Access to System Components and Cardholder Data by Business Need to Know"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for restricting access to system components and cardholder
+    data by business need to know are defined and understood. Access to system components
+    and data is appropriately defined and assigned based on an entity's business needs
+    and job responsibilities. Access to system components and data is managed via an
+    access control model that restricts access based on a user's need to know and is
+    set to "deny all" unless specifically allowed.
+  parts:
+    - id: req-7.1.a
+      label: "7.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 7
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-7.1.b
+      label: "7.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 7 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    The more people who have access to cardholder data, the more risk there is that the
+    data will be misused. Limiting access to the fewest number of individuals necessary
+    reduces the risk of unauthorized access. An access control model must be defined that
+    restricts access based on job classification and function, implements the principle
+    of least privilege, and defaults to "deny all." Access rights must be granted through
+    a formal authorization process with documented approval. Access control lists and
+    role assignments must be reviewed periodically (at least every six months) to verify
+    that access remains appropriate and aligned with current job responsibilities.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 7"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) across all platform components with
+      clearly defined roles mapped to job functions. Use Kubernetes RBAC with namespace-
+      level isolation for CDE workloads. Implement Just-in-Time (JIT) access for
+      administrative privileges using tools like Teleport or HashiCorp Boundary. Define
+      default deny network policies and security groups that only permit explicitly
+      authorized traffic. Use attribute-based access control (ABAC) where RBAC alone
+      is insufficient (e.g., data classification-based access). Integrate identity
+      provider group memberships with platform RBAC to automate access provisioning
+      and deprovisioning based on HR role changes.
+    tools:
+      - kubernetes-rbac
+      - hashicorp-boundary
+      - teleport
+      - keycloak
+      - okta
+      - vault
+      - opa
+
+  devsecops:
+    prose: >-
+      Enforce least privilege in CI/CD pipelines by restricting pipeline tokens
+      to only the permissions required for each stage. Implement separate deployment
+      credentials for production CDE environments with additional approval gates.
+      Use protected branches and environments in GitLab with restricted access to
+      CDE-related repositories. Implement CODEOWNERS files requiring security team
+      approval for changes to access control configurations. Audit pipeline
+      permissions quarterly and remove unused or excessive privileges.
+    tools:
+      - gitlab-ci
+      - gitlab-protected-environments
+      - vault
+      - aws-iam
+      - azure-ad
+      - gcp-iam
+
+  secops:
+    prose: >-
+      Monitor access control events in real time, alerting on privilege escalation
+      attempts, unauthorized access to cardholder data, and access from unusual
+      locations or times. Conduct semi-annual access reviews generating reports
+      of all user access to CDE systems with management sign-off. Detect and
+      alert on dormant accounts with CDE access. Monitor for shared or generic
+      account usage. Track access request, approval, and provisioning workflows
+      end-to-end to ensure compliance with the defined access control model.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - cyberark
+      - beyondtrust
+      - saviynt
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-5", "AC-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A5.18", "A8.2", "A8.3"]
+    relationship: supports

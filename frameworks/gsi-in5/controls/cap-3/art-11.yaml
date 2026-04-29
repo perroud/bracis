@@ -1,0 +1,105 @@
+id: art-11
+family: cap-3
+title: "Registros de Auditoria (Logs)"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 11. Os órgãos e entidades devem exigir que os provedores de serviços de
+    computação em nuvem mantenham registros de auditoria (logs) que permitam:
+    I - rastrear acessos e operações realizadas nos ambientes de nuvem;
+    II - identificar o responsável por cada ação realizada;
+    III - detectar tentativas de acesso não autorizado;
+    IV - subsidiar investigações de incidentes de segurança da informação;
+    V - atender aos requisitos de retenção de registros conforme legislação vigente.
+
+    Parágrafo 1. Os registros de auditoria devem ser armazenados de forma segura,
+    com proteção contra alteração e exclusão não autorizada, pelo prazo mínimo
+    definido na política de retenção do órgão ou entidade.
+
+    Parágrafo 2. O órgão ou entidade deve ter acesso irrestrito aos registros de
+    auditoria de seus ambientes de nuvem.
+guidance:
+  prose: |
+    O art. 11 estabelece requisitos de logging e auditoria para ambientes de nuvem,
+    garantindo rastreabilidade e suporte a investigacoes.
+
+    **Cinco requisitos de logging:**
+    1. Rastreabilidade: registro de todos os acessos e operacoes
+    2. Identificacao: quem fez o que (accountability)
+    3. Deteccao: tentativas de acesso nao autorizado
+    4. Investigacao: subsidio para analise forense
+    5. Retencao: conformidade com prazos legais
+
+    **Protecao de logs:**
+    - Imutabilidade: logs nao podem ser alterados ou deletados
+    - Acesso irrestrito pelo orgao: clausula contratual obrigatoria
+    - Armazenamento seguro: WORM (Write Once Read Many)
+
+    **Mapeamento CSA CCM v4:**
+    - LOG-01: Logging and Monitoring Policy
+    - LOG-02: Logging Scope
+    - LOG-03: Security Monitoring and Alerting
+    - LOG-05: Audit Log Protection
+
+    **Mapeamento NIST SP 800-53:**
+    - AU-2: Audit Events
+    - AU-3: Content of Audit Records
+    - AU-9: Protection of Audit Information
+    - AU-11: Audit Record Retention
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de logging:**
+      1. Habilitar logs nativos de todos os provedores: AWS CloudTrail, Azure
+         Activity Log, GCP Cloud Audit Logs.
+      2. Centralizar logs em SIEM com retencao imutavel (AWS S3 Object Lock,
+         Azure Immutable Blob Storage).
+      3. Garantir que logs incluam: timestamp, usuario, IP de origem, acao
+         realizada, recurso afetado, resultado (sucesso/falha).
+      4. Implementar log forwarding em tempo real para o SIEM do orgao.
+      5. Retencao minima: 1 ano online, 5 anos em arquivo (conforme politica).
+    tools:
+      - siem
+      - cloudtrail
+      - log-aggregation
+      - immutable-storage
+      - log-forwarding
+  devsecops:
+    prose: |
+      **Logging no pipeline:**
+      1. Validacao de que logging esta habilitado em todos os recursos provisionados.
+      2. Testes de conformidade de formato e conteudo dos logs.
+      3. Verificacao de que logs sao enviados para o SIEM centralizado.
+      4. Testes de imutabilidade: verificar que logs nao podem ser alterados
+         ou deletados por usuarios nao-root.
+      5. Pipeline de auditoria que gere relatorio de cobertura de logging.
+    tools:
+      - gitlab-ci
+      - log-validator
+      - iac-scanner
+      - compliance-tests
+  secops:
+    prose: |
+      **Operacao de logging:**
+      1. Monitoramento continuo de integridade dos logs (hash verification).
+      2. Alertas para gaps de logging (periodos sem registros).
+      3. Correlacao de logs de multiplos provedores no SIEM.
+      4. Investigacao de incidentes com timeline de eventos reconstruida a
+         partir dos logs.
+      5. Auditoria trimestral de cobertura e qualidade dos logs.
+    tools:
+      - siem
+      - log-integrity-monitor
+      - incident-investigation
+      - audit-trail
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-11"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-37", "art-49"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["LOG-01", "LOG-02", "LOG-03", "LOG-05"]
+    relationship: mapped

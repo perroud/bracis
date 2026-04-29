@@ -1,0 +1,98 @@
+id: pix-11
+family: authn-authz
+title: "Gestao de Chaves Pix"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve implementar processos seguros para registro, exclusão, portabilidade e
+    reivindicação de chaves Pix, garantindo que cada operação seja autenticada pelo
+    titular da chave, validada junto ao DICT e registrada em trilha de auditoria. O PSP
+    deve verificar a titularidade da chave antes do registro, prevenir vínculos fraudulentos
+    e garantir que o usuário possa gerenciar suas chaves de forma autônoma e segura.
+guidance:
+  prose: |
+    **Tipos de chave Pix:**
+    - CPF/CNPJ: vinculado ao documento do titular da conta
+    - E-mail: endereco eletronico do titular
+    - Telefone celular: numero com DDD do titular
+    - Chave aleatoria (EVP): UUID gerado pelo sistema, sem vinculo pessoal
+
+    **Operacoes de chave:**
+    1. **Registro:** Vincula uma chave a uma conta transacional no DICT.
+       - CPF/CNPJ: validacao contra base da Receita Federal
+       - E-mail e telefone: validacao por token enviado ao canal (OTP)
+       - EVP: geracao automatica sem validacao adicional
+    2. **Exclusao:** Remove o vinculo da chave no DICT.
+    3. **Portabilidade:** Transferencia de chave de um PSP para outro, iniciada pelo
+       usuario no PSP de destino. Prazo de 7 dias para o PSP de origem contestar.
+    4. **Reivindicacao:** Quando o titular de uma chave (CPF/CNPJ) deseja registra-la
+       em outro PSP mas a chave esta vinculada a outra pessoa/conta.
+
+    **Limites de chaves por conta:**
+    - Pessoa fisica: ate 5 chaves por conta
+    - Pessoa juridica: ate 20 chaves por conta
+
+    **Riscos de seguranca:**
+    - Registro fraudulento: alguem registra chave com dados de terceiro
+    - SIM swap: atacante porta telefone e registra chave no PSP
+    - Phishing: usuario e induzido a portabilizar chave para PSP fraudulento
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Servico de gestao de chaves:**
+      1. Microservico dedicado para operacoes de chave Pix (CRUD + portabilidade +
+         reivindicacao).
+      2. Integracao sincrona com DICT para registro e consulta.
+      3. Fila assincrona para processos de portabilidade e reivindicacao com controle
+         de prazo.
+      4. Validacao de OTP (One-Time Password) para registro de e-mail e telefone.
+
+      **Protecao contra fraude de chave:**
+      5. Verificacao de titularidade contra base cadastral (CPF/CNPJ).
+      6. Rate limiting para operacoes de registro de chave por conta e por usuario.
+      7. Cooldown period apos exclusao de chave (prevencao de registro imediato por
+         terceiro).
+      8. Notificacao ao usuario para cada operacao de chave (registro, exclusao,
+         portabilidade).
+    tools:
+      - microservices
+      - message-queue
+      - otp-service
+      - notification-service
+      - dict-client
+  devsecops:
+    prose: |
+      **Testes de chave Pix:**
+      1. Testes de integracao para todos os fluxos de chave (registro, exclusao,
+         portabilidade, reivindicacao).
+      2. Testes de cenarios de fraude: registro com CPF de terceiro, portabilidade
+         nao autorizada.
+      3. Testes de limites: tentativa de registrar mais chaves que o permitido.
+      4. Testes de concorrencia: duas operacoes simultaneas na mesma chave.
+      5. Validacao de OTP: testes de expiracao, reuso e brute force.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - load-testing
+      - security-testing
+  secops:
+    prose: |
+      **Monitoramento de operacoes de chave:**
+      1. Alerta para volume anomalo de registros de chave por conta.
+      2. Monitoramento de portabilidades e reivindicacoes nao concluidas.
+      3. Deteccao de SIM swap: mudanca de telefone + registro de chave em curto periodo.
+      4. Auditoria mensal de operacoes de chave para detectar padroes fraudulentos.
+      5. Relatorio de chaves ativas, portadas e reivindicadas por periodo.
+    tools:
+      - siem
+      - fraud-detection
+      - anomaly-detection
+      - audit-log-analyzer
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-13", "art-14"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-7", "art-18"]
+    relationship: complements

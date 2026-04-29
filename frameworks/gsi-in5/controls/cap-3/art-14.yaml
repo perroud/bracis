@@ -1,0 +1,101 @@
+id: art-14
+family: cap-3
+title: "Seguranca de Rede e Segmentacao"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 14. Os órgãos e entidades devem implementar controles de segurança de rede
+    nos ambientes de computação em nuvem, incluindo:
+    I - segmentação de rede para isolamento de ambientes e cargas de trabalho
+    conforme a classificação das informações;
+    II - firewalls e grupos de segurança configurados com o princípio de menor
+    privilégio de rede (deny all, allow by exception);
+    III - proteção contra ataques de negação de serviço distribuído (DDoS);
+    IV - monitoramento do tráfego de rede para detecção de anomalias e ameaças;
+    V - conexão segura entre a rede do órgão ou entidade e o ambiente de nuvem,
+    preferencialmente via link dedicado ou VPN criptografada.
+
+    Parágrafo único. Os ambientes de desenvolvimento, homologação e produção
+    devem ser segregados em redes distintas, com controles de acesso diferenciados.
+guidance:
+  prose: |
+    O art. 14 estabelece requisitos de seguranca de rede para ambientes de nuvem,
+    focando em segmentacao e protecao de trafego.
+
+    **Cinco requisitos de rede:**
+    1. Segmentacao: VPCs separadas por classificacao de dados
+    2. Firewall: deny-all por padrao, liberacao explicita
+    3. Anti-DDoS: protecao contra ataques volumetricos
+    4. Monitoramento: IDS/IPS e network flow analysis
+    5. Conectividade segura: Direct Connect, ExpressRoute ou VPN site-to-site
+
+    **Segregacao de ambientes:**
+    Dev, staging e producao DEVEM estar em redes separadas, impedindo
+    que vulnerabilidades em dev contaminem producao.
+
+    **Mapeamento CSA CCM v4:**
+    - IVS-01: Infrastructure and Virtualization Security Policy
+    - IVS-03: Network Security
+    - IVS-06: Segmentation and Segregation
+    - IVS-09: Network Defence
+
+    **Mapeamento NIST SP 800-53:**
+    - SC-7: Boundary Protection
+    - SC-8: Transmission Confidentiality and Integrity
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de rede segura:**
+      1. VPCs segregadas: producao, staging, dev, management, cada uma com
+         CIDR blocks nao-sobrepostos e NACLs restritivas.
+      2. Security groups com deny-all padrao e regras explicitas por servico.
+      3. AWS Shield / Azure DDoS Protection / GCP Cloud Armor para anti-DDoS.
+      4. VPC Flow Logs habilitados para todo trafego de rede.
+      5. Direct Connect / ExpressRoute / Cloud Interconnect para conectividade
+         privada com o datacenter do orgao.
+      6. Transit Gateway / Hub-spoke para roteamento centralizado entre VPCs.
+      7. Private endpoints para servicos de nuvem (S3, RDS, etc.) evitando
+         trafego pela internet publica.
+    tools:
+      - vpc-management
+      - network-firewall
+      - ddos-protection
+      - flow-logs
+      - direct-connect
+      - transit-gateway
+  devsecops:
+    prose: |
+      **Seguranca de rede no pipeline:**
+      1. IaC scanning que valide security groups e NACLs antes do provisionamento.
+      2. Testes automatizados de segmentacao: verificar que producao nao e
+         acessivel a partir de dev.
+      3. Validacao de que todos os endpoints publicos possuem protecao DDoS.
+      4. Testes de conectividade que verifiquem que servicos internos nao estao
+         expostos na internet.
+      5. Compliance checks para VPC Flow Logs habilitados em todas as VPCs.
+    tools:
+      - gitlab-ci
+      - iac-scanner
+      - network-tests
+      - exposure-scanner
+  secops:
+    prose: |
+      **Operacao de seguranca de rede:**
+      1. Monitoramento continuo de VPC Flow Logs para deteccao de anomalias.
+      2. IDS/IPS baseado em rede com atualizacao de assinaturas.
+      3. Alertas para alteracoes em security groups e NACLs.
+      4. Revisao mensal de regras de firewall para remocao de regras obsoletas.
+      5. Teste trimestral de segmentacao de rede e validacao de isolamento.
+    tools:
+      - siem
+      - ids-ips
+      - network-monitoring
+      - firewall-audit
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-10"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["IVS-01", "IVS-03", "IVS-06", "IVS-09"]
+    relationship: mapped

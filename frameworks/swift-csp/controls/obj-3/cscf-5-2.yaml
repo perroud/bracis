@@ -1,0 +1,104 @@
+id: cscf-5.2
+family: obj-3
+title: "Token Management"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure proper management and protection of authentication tokens,
+    certificates, and cryptographic keys used within the SWIFT secure zone.
+    Tokens must be securely generated, distributed, stored, and revoked
+    throughout their lifecycle. Compromise of tokens must be detectable
+    and recoverable.
+  parts:
+    - id: cscf-5.2.a
+      label: "5.2.a"
+      prose: >-
+        SWIFT-specific authentication tokens (operator certificates,
+        PKI certificates, hardware security module keys) are managed
+        through a documented lifecycle process covering generation,
+        distribution, storage, rotation, and revocation.
+    - id: cscf-5.2.b
+      label: "5.2.b"
+      prose: >-
+        Private keys are stored in hardware security modules (HSMs) or
+        equivalent tamper-resistant hardware. Software-based key storage
+        is used only with compensating controls.
+    - id: cscf-5.2.c
+      label: "5.2.c"
+      prose: >-
+        Token and certificate inventory is maintained, with expiration
+        tracking and automated alerting for upcoming renewals.
+
+guidance:
+  prose: >-
+    SWIFT operations rely heavily on cryptographic tokens for message signing,
+    encryption, and operator authentication. Compromise of these tokens
+    could allow an attacker to impersonate legitimate operators or forge
+    messages. HSMs provide the highest level of protection for private keys,
+    making extraction computationally infeasible. Organizations must maintain
+    a complete inventory of all cryptographic assets within the secure zone,
+    track their expiration dates, and automate rotation where possible.
+    Emergency token revocation procedures must be documented and tested.
+    SWIFT's own PKI infrastructure provides certificates that must be
+    managed according to SWIFT's published key management guidelines.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 5.2"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-57 Part 1 Rev. 5 — Recommendation for Key Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-57pt1r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy HSMs (Thales Luna, AWS CloudHSM, Azure Dedicated HSM) for
+      all SWIFT private key operations. Implement cert-manager or Venafi
+      for automated certificate lifecycle management. Use HashiCorp Vault
+      as a centralized secrets engine for non-HSM token management.
+      Configure automated certificate rotation with zero-downtime deployment
+      strategies. Maintain a cryptographic asset inventory in a CMDB with
+      automated discovery.
+    tools:
+      - thales-luna-hsm
+      - aws-cloudhsm
+      - azure-dedicated-hsm
+      - hashicorp-vault
+      - cert-manager
+      - venafi
+
+  devsecops:
+    prose: >-
+      Automate certificate deployment through CI/CD pipelines. Validate
+      certificate configurations (key length, algorithm, validity period)
+      in IaC templates. Alert on certificates approaching expiration in
+      pipeline dashboards. Test token revocation procedures in staging
+      environments.
+    tools:
+      - cert-manager
+      - gitlab-ci
+      - github-actions
+      - inspec
+
+  secops:
+    prose: >-
+      Monitor certificate transparency logs for unauthorized certificate
+      issuance. Alert on HSM access outside approved maintenance windows.
+      Track certificate expiration dashboards with 90/60/30-day warnings.
+      Investigate any certificate revocation events. Review HSM audit
+      logs monthly.
+    tools:
+      - splunk
+      - venafi
+      - keyfactor
+      - certificate-transparency-monitoring
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-12(1)", "IA-5(2)"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports

@@ -1,0 +1,110 @@
+id: art-15
+family: cap-4
+title: "Registro e Retencao de Informacoes de Operacoes"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 15. As instituições de pagamento devem manter registros de todas as
+    operações realizadas por seus clientes, contendo, no mínimo:
+
+    I - a identificação do cliente e da contraparte da operação, quando disponível;
+
+    II - o valor, a moeda, o tipo e a data da operação;
+
+    III - o canal utilizado para realização da operação;
+
+    IV - a origem e o destino dos recursos, incluindo os dados das contas ou
+    instrumentos de pagamento envolvidos.
+
+    § 1. Os registros devem ser mantidos por, no mínimo, dez anos contados
+    da data de encerramento da relação de negócio com o cliente ou da data
+    da operação, o que ocorrer por último.
+
+    § 2. Os registros devem estar disponíveis para acesso pelo Banco Central
+    do Brasil e pelo COAF no prazo fixado por essas autoridades.
+guidance:
+  prose: |
+    O art. 15 define o repositorio de evidencias do programa de PLD/FT.
+    Sem registros completos, qualquer investigacao ou auditoria e ineficaz.
+
+    **O que registrar (nao apenas o minimo legal):**
+    Alem dos 4 incisos, boas praticas incluem:
+    - IP de origem da transacao
+    - Dispositivo utilizado (fingerprint)
+    - Localizacao geografica (quando disponivel)
+    - Motivo declarado pelo cliente para operacoes de maior valor
+    - Agente/correspondente que intermediou a operacao
+
+    **Prazo de 10 anos (ss 1):**
+    Contagem do MAIS TARDIO entre:
+    - Encerramento da relacao de negocio
+    - Data da operacao especifica
+    Isso significa que operacoes de clientes ainda ativos devem ser mantidas
+    indefinidamente enquanto a relacao persiste, mais 10 anos apos o encerramento.
+
+    **Disponibilidade para o BCB e COAF (ss 2):**
+    Em investigacoes, as autoridades podem solicitar dados com prazo muito curto
+    (tipicamente 48-72 horas). A IP deve ser capaz de extrair e entregar dados
+    de forma estruturada nesse prazo.
+
+    **Implicacoes tecnologicas:**
+    - Data lakehouse com retencao de dados transacionais de longo prazo
+    - Indexacao e buscabilidade por todos os campos do art. 15
+    - Processo de export para autoridades (com controle de acesso e auditoria)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de registro transacional:**
+      1. Armazenar todos os eventos de pagamento em banco de dados imutavel
+         (append-only) com todos os campos do art. 15 obrigatorios.
+      2. Implementar politica de retencao: dados transacionais mantidos por
+         10 anos apos encerramento do cliente (data de vencimento calculada
+         por cliente, nao por operacao).
+      3. Pipeline de export para autoridades: endpoint seguro que permite
+         extrair transacoes de um cliente por periodo em formato padronizado
+         (CSV, JSON) com autenticacao e log de acesso.
+      4. Backup geograficamente distribuido dos registros: prevencao de
+         perda de dados por desastre.
+      5. Indices em todos os campos de busca: cliente, data, valor, tipo,
+         conta destino, para garantir SLA de recuperacao.
+    tools:
+      - data-warehouse
+      - event-store
+      - backup-system
+      - audit-logging
+  devsecops:
+    prose: |
+      **Integridade dos registros:**
+      1. Implementar assinatura criptografica dos eventos de pagamento: garantir
+         que registros nao foram alterados apos a criacao (audit trail imutavel).
+      2. Testes de completude: verificar que todos os campos obrigatorios do
+         art. 15 estao presentes em 100% dos registros.
+      3. Testes de retencao: verificar que dados antigos nao sao deletados
+         antes do prazo de 10 anos.
+      4. Testes de export: simular solicitacao de autoridade e verificar que
+         dados extraidos sao completos e corretos.
+    tools:
+      - gitlab-ci
+      - data-quality
+      - cryptographic-hashing
+  secops:
+    prose: |
+      **Gestao do acervo de dados:**
+      1. Inventario de tabelas e sistemas que contem registros de operacoes,
+         com mapeamento de data de retencao de cada conjunto.
+      2. Monitoramento de capacidade de armazenamento de dados de longo prazo.
+      3. Teste de recuperacao de dados antigos (garantir que dados de 5+ anos
+         sao efetivamente recuperaveis dentro do SLA).
+      4. Procedimento documentado de resposta a solicitacoes do BCB/COAF.
+    tools:
+      - data-governance
+      - storage-monitoring
+      - incident-response
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-19"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-16"]
+    relationship: complements

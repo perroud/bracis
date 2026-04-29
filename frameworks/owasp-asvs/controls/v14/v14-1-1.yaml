@@ -1,0 +1,106 @@
+id: v14.1.1
+family: v14
+title: "Build and Deploy Configuration"
+class: OWASP-ASVS
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that the application build and deployment processes are performed in a secure
+    manner, including CI/CD automation, with access controls and integrity verification
+    at each step. Build environments must be hardened and isolated. The application must
+    not contain debug features, developer backdoors, sample accounts, or unnecessary
+    functionality in production deployments. Server configuration must be hardened per
+    industry recommendations, with all unnecessary services, ports, protocols, and
+    features disabled.
+
+guidance:
+  prose: >-
+    Build and deployment configuration is a critical attack surface. Compromised build
+    pipelines can inject malicious code into trusted applications. Debug features left
+    enabled in production expose sensitive application internals (stack traces, database
+    queries, environment variables). Default accounts and sample data provide trivial
+    entry points for attackers. Server hardening reduces the attack surface by eliminating
+    unnecessary services and features that could be exploited. The principle of least
+    functionality applies: every enabled feature, service, or port that is not required
+    for the application's operation is unnecessary attack surface. Configuration must be
+    managed as code with the same review and approval processes as application code.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V14.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Secure Deployment"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Product_Design_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement immutable infrastructure: build container images or VM images once and
+      promote the identical artifact through staging to production. Use multi-stage Docker
+      builds that exclude build tools, source code, and debug symbols from production images.
+      Configure CI/CD pipelines with least-privilege access to deployment targets. Implement
+      environment-specific configuration injection using secrets managers (Vault, AWS Secrets
+      Manager) rather than baking configuration into artifacts. Deploy distroless or minimal
+      base images. Disable debug endpoints, verbose error messages, and development features
+      through environment-aware configuration. Implement network policies that restrict
+      service-to-service communication to explicitly required paths.
+    tools:
+      - docker
+      - buildpacks
+      - vault
+      - aws-secrets-manager
+      - kubernetes
+      - terraform
+      - ansible
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Scan container images for unnecessary packages, debug tools, and known vulnerabilities.
+      Implement pipeline gates that verify: no debug flags in production configuration,
+      no default credentials in configuration files, no development dependencies in
+      production builds. Use Dockerfile linting (hadolint) to enforce best practices.
+      Scan IaC templates for security misconfigurations (open ports, missing encryption,
+      excessive permissions). Verify that production builds are reproducible and
+      artifact-signed. Implement configuration drift detection between declared IaC
+      state and actual infrastructure.
+    tools:
+      - trivy
+      - grype
+      - hadolint
+      - checkov
+      - tfsec
+      - semgrep
+      - gitlab-ci
+      - cosign
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor for configuration drift from approved baselines. Alert on unexpected port
+      openings, new services starting, or configuration file changes in production. Scan
+      production environments for debug endpoints, directory listings, and default
+      credentials. Track server hardening compliance against CIS benchmarks. Monitor
+      CI/CD pipeline access logs for unauthorized access or unusual deployment patterns.
+      Implement runtime security monitoring to detect unexpected process execution or
+      file system modifications in immutable infrastructure.
+    tools:
+      - falco
+      - splunk
+      - elastic-siem
+      - qualys
+      - tenable-nessus
+      - crowdstrike
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-6", "CM-7", "SA-15"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.25"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["2.2.1", "6.3.2", "6.5.4"]
+    relationship: implements

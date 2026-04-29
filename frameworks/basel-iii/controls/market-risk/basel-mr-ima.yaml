@@ -1,0 +1,110 @@
+id: basel-mr-ima
+family: market-risk
+title: "Market Risk — Internal Models Approach (FRTB-IMA)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks may apply to their supervisor for approval to use the Internal Models Approach
+    (IMA) under the FRTB for eligible trading desks. IMA approval is granted at the desk
+    level and requires: (1) passing a quantitative back-testing requirement — the number
+    of daily P&L back-testing exceptions at desk level over the preceding 250 business
+    days must not exceed 12 (green zone ≤4, amber 5-9, red ≥10 for automatic reversion
+    to SA); (2) passing the Profit and Loss Attribution (PLA) test — the ratio of the
+    risk-theoretical P&L to the hypothetical P&L, measured by the Spearman correlation
+    and the Kolmogorov-Smirnov (KS) test statistics, must remain within green zone bounds
+    over 12 months; (3) risk factor modellability — each risk factor used in the ES model
+    must pass the Real Price Observation (RPO) test with at least 24 real price observations
+    per year and no gap exceeding 90 days. IMA capital is calculated as the maximum of the
+    previous day's ES-based capital charge and the average of the preceding 60 days'
+    ES-based charges multiplied by a supervisory multiplier mc ≥ 1.5 (increased to 2.0 for
+    banks in the amber or red back-testing zone), plus a stressed Expected Shortfall charge
+    and a NMRF stress scenario capital add-on.
+
+guidance:
+  prose: >-
+    The IMA under FRTB is materially more demanding than the VaR-based IMA under Basel II.5.
+    Banks must maintain a Real Price Observation database for every risk factor in the model,
+    populate it from market data feeds, and run the NMRF test daily. Risk factors that fail
+    the NMRF test must be capitalised under the stressed scenario approach with a stress
+    scenario calibrated to the worst 12-month loss period. Desks that fail either back-testing
+    or PLA revert to SA for capital purposes, which significantly increases capital charges for
+    complex trading books. Banks should develop a proactive monitoring framework that detects
+    emerging back-testing exceptions and PLA deterioration before they trigger desk-level
+    model revocation. The interaction between NMRF charges and SA fallback charges means that
+    the total IMA benefit relative to SA may be modest for banks with many illiquid risk
+    factors, and some banks have chosen to remain on SA for certain desks or risk classes.
+
+references:
+  - citation: "BCBS, Minimum capital requirements for market risk (FRTB), January 2019 (revised February 2019), Chapter 5"
+    url: "https://www.bis.org/bcbs/publ/d457.htm"
+  - citation: "BCBS, Calculation of RWA for market risk — IMA (MAR30-MAR33), Basel Framework"
+    url: "https://www.bis.org/basel_framework/chapter/MAR/30.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build an IMA infrastructure comprising: (a) a market data platform that captures and
+      archives real price observations from execution venues, interdealer brokers, and pricing
+      vendors, indexing each observation by risk factor, timestamp, and source; (b) an ES
+      calculation engine using historical simulation over a 10-year window with stressed period
+      calibration; (c) a daily PLA calculation service that computes risk-theoretical P&L by
+      repricing the desk's end-of-day portfolio through the IMA engine and comparing it with
+      actual hypothetical P&L; (d) a back-testing engine that tracks daily back-testing
+      exceptions per desk and generates the traffic-light classification automatically; and
+      (e) an NMRF screening service that identifies risk factors failing the RPO test and routes
+      them to the stressed scenario capital calculation.
+    tools:
+      - apache-spark
+      - apache-kafka
+      - postgresql
+      - redis
+      - quantlib
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement a model governance pipeline for IMA: model code changes must pass automated
+      back-testing benchmarks (using historical data) and PLA tests on a representative
+      portfolio before promotion to production. Version all ES model calibrations — stressed
+      period selection, liquidity horizon parameters, risk factor classification — as auditable
+      configuration artifacts in Git. Implement automated NMRF screening reports that run
+      daily and alert the Quant team if any risk factor transitions from modellable to
+      non-modellable. Maintain rollback capability for the ES model to allow rapid reversion
+      to a prior approved version if errors are detected post-deployment.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - dvc
+      - pytest
+      - sonarqube
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Real price observation databases are commercially sensitive and must be protected
+      against tampering. Implement cryptographic integrity checks on the RPO database so
+      that any retroactive modification of observations is detectable. Restrict write access
+      to the RPO database to automated market data feed processes; human modifications must
+      go through a controlled exception workflow with approval by the Head of Market Risk.
+      Retain all ES model outputs and back-testing records for at least 10 years to support
+      supervisory examination and internal model validation reviews.
+    tools:
+      - hashicorp-vault
+      - cyberark
+      - splunk
+      - aws-s3-object-lock
+      - sentinel
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: cobit-2019
+    articles: ["EDM03", "BAI08", "APO12"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-9", "AC-5", "AC-6"]
+    relationship: mapped

@@ -1,0 +1,110 @@
+id: art-18
+family: cap-4
+title: "XML Schemas e Validacao de Mensagens"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 18. Todas as mensagens TISS devem ser estruturadas em XML
+    conforme os schemas XSD publicados pela ANS, sendo vedada a
+    transmissão de mensagens que não passem na validação de schema.
+
+    Parágrafo 1. Os schemas XSD definem:
+    I - Estrutura hierárquica de cada tipo de mensagem TISS;
+    II - Tipos de dados permitidos para cada campo (string, integer,
+    decimal, date, boolean);
+    III - Campos obrigatórios e opcionais;
+    IV - Restrições de tamanho, formato e domínio para cada campo;
+    V - Namespaces XML oficiais do Padrão TISS.
+
+    Parágrafo 2. O receptor de uma transação TISS deve validar a
+    mensagem contra o schema XSD antes de processamento, rejeitando
+    mensagens inválidas com código de erro específico.
+
+    Parágrafo 3. A ANS publica os schemas XSD em seu portal oficial,
+    com versionamento e histórico de alterações.
+guidance:
+  prose: |
+    O art. 18 torna os schemas XSD a especificacao tecnica autoritativa
+    do TISS, com validacao obrigatoria em ambos os lados (emissor e
+    receptor).
+
+    **Schemas XSD principais:**
+    - tissV4_01_00.xsd: schema raiz com imports
+    - tissGuiasV4_01_00.xsd: definicao das guias
+    - tissTiposV4_01_00.xsd: tipos de dados complexos
+    - tissTabelas_V4_01_00.xsd: enumeracoes e tabelas de dominio
+
+    **Validacao obrigatoria:**
+    - Emissor: validar XML antes de enviar (fail fast)
+    - Receptor: validar XML antes de processar (defense in depth)
+    - Rejeitar com codigo de erro especifico (ex: MSG_INVALIDA_001)
+
+    **Seguranca de XML parsing:**
+    - Desabilitar DTD processing (prevenir XXE attacks)
+    - Limitar tamanho maximo de mensagem (prevenir DoS)
+    - Desabilitar external entity resolution
+    - Limitar profundidade de aninhamento XML
+
+    **Versionamento:**
+    - Schemas versionados semanticamente (major.minor.patch)
+    - Backward compatibility dentro da mesma major version
+    - Breaking changes apenas em major version, com periodo de transicao
+    - Historico completo disponivel no portal ANS
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de validacao XML TISS:**
+      1. Implementar middleware de validacao XML como servico
+         compartilhado, que valide toda mensagem TISS contra schema
+         XSD antes do processamento por servicos downstream.
+      2. Manter repositorio versionado de schemas XSD TISS com
+         automacao para download de novas versoes do portal ANS.
+      3. Configurar XML parser seguro: DTD disabled, external entities
+         disabled, tamanho maximo de mensagem, profundidade maxima.
+      4. Implementar cache de schemas compilados para performance
+         (XML schema compilation e caro em CPU).
+    tools:
+      - xml-validation-service
+      - schema-repository
+      - secure-xml-parser
+      - schema-cache
+  devsecops:
+    prose: |
+      **Validacao de XML no pipeline:**
+      1. Implementar validacao automatica de mensagens XML de teste
+         contra schemas XSD TISS em cada build.
+      2. Incluir testes de seguranca XML: XXE injection, billion
+         laughs, DTD bombing, XPath injection.
+      3. Automatizar diff entre versoes de schema XSD para identificar
+         breaking changes e campos novos/removidos.
+      4. Criar fuzzing de XML para testar robustez do parser contra
+         inputs malformados e maliciosos.
+    tools:
+      - xsd-validation
+      - xml-security-testing
+      - schema-diff
+      - xml-fuzzing
+  secops:
+    prose: |
+      **Gestao operacional de schemas XML:**
+      1. Monitorar publicacoes de novos schemas XSD pela ANS com
+         avaliacao de impacto em ate 5 dias uteis.
+      2. Auditar periodicamente se os sistemas utilizam a versao
+         mais recente dos schemas XSD vigentes.
+      3. Manter registro de taxa de rejeicao de mensagens por falha
+         de validacao, por operadora/prestador.
+      4. Investigar e resolver causas raiz de mensagens invalidas
+         recorrentes (treinamento, bug em sistema contraparte).
+    tools:
+      - schema-monitoring
+      - compliance-audit
+      - rejection-analytics
+      - root-cause-analysis
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1002"]
+    relationship: mapped

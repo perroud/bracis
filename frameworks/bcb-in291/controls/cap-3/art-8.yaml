@@ -1,0 +1,124 @@
+id: art-8
+family: cap-3
+title: "Canal Oficial de Comunicacao com o BCB"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 8. A notificação de incidentes de segurança cibernética ao BCB deve
+    ser realizada exclusivamente pelo canal oficial de comunicação designado pelo
+    BCB para este fim.
+
+    § 1. O BCB manterá e divulgará o canal oficial de notificação de incidentes
+    cibernéticos, que poderá ser atualizado mediante publicação em ato normativo
+    ou comunicado específico.
+
+    § 2. A instituição deve verificar periodicamente o canal oficial vigente e
+    manter os dados de acesso e procedimentos atualizados.
+
+    § 3. Em caso de impossibilidade técnica de utilização do canal oficial, a
+    instituição deve comunicar o incidente ao BCB pelos meios alternativos
+    disponibilizados pelo BCB, registrando a indisponibilidade do canal oficial e
+    formalizando a comunicação pelo canal oficial assim que restabelecida.
+
+    § 4. A utilização de canais não oficiais, inclusive contatos pessoais com
+    servidores do BCB, não supre a obrigação de notificação pelo canal oficial.
+guidance:
+  prose: |
+    O art. 8 aborda um aspecto aparentemente simples mas critico na pratica:
+    como fisicamente enviar a notificacao.
+
+    **Canal oficial atual:**
+    O BCB disponibiliza o Sistema de Envio de Documentos (SISBACEN/SEI BCB) como
+    canal oficial para a maioria das comunicacoes regulatorias. Para incidentes
+    ciberneticos, o BCB pode designar canal especifico. A instituicao deve consultar
+    a pagina oficial do BCB (www.bcb.gov.br) e verificar comunicados recentes sobre
+    o canal designado para a IN 291.
+
+    **Obrigacao de atualizacao (ss 2):**
+    O canal pode mudar. A instituicao precisa de processo de monitoramento de
+    publicacoes do BCB para identificar mudancas de canal. O "periodicamente" sugere
+    verificacao ao menos trimestral.
+
+    **Canal de contingencia (ss 3):**
+    A impossibilidade do canal oficial nao exime a obrigacao de notificacao nem
+    permite atraso. A instituicao deve:
+    1. Usar canal alternativo imediatamente
+    2. Registrar a impossibilidade com evidencias
+    3. Formalizar pelo canal oficial quando disponivel
+    Nao existir canal alternativo configurado de antecipacao e um risco operacional
+    regulatorio grave.
+
+    **Canais pessoais (ss 4):**
+    Comum em instituicoes com relacionamento proximo ao BCB: ligar para o superintendente
+    de supervisao e informar o incidente. O ss 4 e explicito: isso NAO vale como
+    notificacao oficial. Pode ser feito adicionalmente para agilizar comunicacao,
+    mas nunca como substituto do canal oficial.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com o canal oficial BCB:**
+      1. Modulo de envio no sistema de notificacao integrado ao canal oficial
+         do BCB (SISBACEN/SEI ou equivalente), com:
+         - Autenticacao via certificado digital ICPBrasil
+         - Envio automatico com acuse de recebimento
+         - Armazenamento do numero de protocolo
+         - Retry automatico em caso de falha temporaria
+      2. Monitoramento de disponibilidade do canal BCB:
+         health check a cada 30 minutos durante incidentes ativos.
+      3. Canal de contingencia configurado e testado:
+         - Email oficial de contingencia do BCB (manter atualizado)
+         - Numero de telefone da Central do BCB para emergencias
+         - Procedimento documentado para cada alternativa
+      4. Alertas de indisponibilidade do canal BCB:
+         se o canal principal falhar durante um incidente ativo, escalacao
+         imediata para CISO com instrucoes de uso do canal alternativo.
+    tools:
+      - notification-system
+      - certificate-management
+      - monitoring-alerting
+      - incident-management
+  devsecops:
+    prose: |
+      **Certificados digitais para o canal oficial:**
+      1. Certificado ICPBrasil para autenticacao no sistema BCB:
+         monitoramento de expiracao com alertas 90/60/30 dias antes.
+      2. Rotacao automatica de certificados integrada ao pipeline de deploy:
+         evitar expiracao do certificado justamente durante um incidente.
+      3. Ambiente de homologacao do canal BCB para testes de integracao:
+         simular envio de notificacoes sem impacto em producao.
+      4. Versionamento de templates de notificacao no repositorio git
+         para garantir que o formato correto para o canal atual seja utilizado.
+    tools:
+      - certificate-management
+      - gitlab-ci
+      - secrets-manager
+      - testing-environment
+  secops:
+    prose: |
+      **Gestao operacional do canal:**
+      1. Documento de procedimento de notificacao com:
+         - URL e credenciais de acesso ao canal oficial (em cofre de senhas)
+         - Passo a passo para envio via canal oficial
+         - Passo a passo para canal de contingencia
+         - Contatos de suporte do BCB para problemas tecnicos
+      2. Verificacao trimestral do canal:
+         - Confirmar que URL e credenciais estao funcionais
+         - Verificar publicacoes do BCB sobre mudancas de canal
+         - Testar envio de documento de teste (se o canal permitir)
+      3. Exercicio anual de notificacao pelo canal alternativo:
+         simulacao de indisponibilidade do canal principal.
+      4. Registro de toda comunicacao com o BCB sobre o incidente,
+         independente do canal utilizado (oficial, alternativo, telefone).
+    tools:
+      - grc-platform
+      - password-manager
+      - incident-management
+      - document-management
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-5"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6", "IR-7"]
+    relationship: supports

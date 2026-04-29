@@ -1,0 +1,111 @@
+id: art-22
+family: cap-4
+title: "Entrada Manual de Dados e Verificacao"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 22. Quando dados críticos forem inseridos manualmente em sistemas
+    computadorizados, devem existir controles adicionais para verificação
+    da precisão e integridade dos dados inseridos.
+
+    Parágrafo 1. Os controles de verificação devem incluir, conforme
+    aplicável:
+    I - dupla conferência independente de dados críticos;
+    II - validação automática de formato, faixa e consistência;
+    III - verificação de dados inseridos contra documentos-fonte;
+    IV - alerta automático para valores fora de especificação;
+    V - registro de quem inseriu e quem verificou os dados.
+
+    Parágrafo 2. O fabricante deve definir quais dados são considerados
+    críticos e requerem verificação adicional, com base na avaliação
+    de risco e no impacto na qualidade do produto.
+guidance:
+  prose: |
+    O art. 22 mitiga riscos de erro humano na entrada de dados em
+    sistemas GMP, que e uma das principais fontes de nao-conformidade.
+
+    **Dados tipicamente criticos em ambiente GMP:**
+    - Parametros de processo (temperatura, pressao, tempo)
+    - Resultados analiticos (potencia, pureza, dissolucao)
+    - Pesos e medidas de materias-primas
+    - Numeros de lote e datas de validade
+    - Resultados de testes ambientais
+    - Dados de calibracao de equipamentos
+
+    **Controles de verificacao:**
+    1. Dupla conferencia (double-check): segundo operador verifica
+       independentemente os dados inseridos pelo primeiro
+    2. Validacao de campo: sistema rejeita dados fora de formato ou
+       faixa pre-definida (ex: pH entre 0 e 14)
+    3. Verificacao contra fonte: conferencia de dados digitados contra
+       registro manual ou documento-fonte
+    4. Alertas OOS: notificacao automatica quando valores estao fora
+       de especificacao (Out of Specification)
+    5. Checksums: verificacao de digitos de controle para numeros
+       criticos (lote, serie, codigo de barras)
+
+    **Rastreabilidade:**
+    Para dados criticos, o sistema deve registrar quem inseriu os dados,
+    quem verificou e quando cada acao ocorreu, vinculando ao audit trail.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles de validacao de entrada de dados:**
+      1. Implementar framework de validacao de dados com regras
+         configuraveis por tipo de campo: formato, faixa de valores,
+         consistencia com outros campos, listas de valores permitidos.
+      2. Configurar alertas automaticos para valores fora de especificacao
+         com notificacao a supervisores e registro em audit trail.
+      3. Implementar mecanismo de dupla conferencia eletromica para dados
+         criticos: segundo usuario deve confirmar dados antes de gravacao.
+      4. Configurar integracao com dispositivos de captura automatica
+         (balancos, sensores, leitores de codigo de barras) para minimizar
+         entrada manual de dados quando possivel.
+    tools:
+      - data-validation-framework
+      - alerting
+      - barcode-integration
+      - sensor-integration
+  devsecops:
+    prose: |
+      **Testes de validacao de entrada no pipeline:**
+      1. Implementar testes automatizados que verifiquem regras de
+         validacao de campos criticos: rejeicao de dados invalidos,
+         alertas para valores OOS, dupla conferencia funcional.
+      2. Testar cenarios de erro de entrada de dados como parte da
+         qualificacao operacional (OQ) de cada sistema GMP.
+      3. Verificar automaticamente que todos os campos criticos definidos
+         na avaliacao de risco possuem validacao implementada.
+      4. Testar integracao de dispositivos de captura automatica como
+         parte do pipeline de validacao.
+    tools:
+      - gitlab-ci
+      - input-validation-testing
+      - integration-testing
+      - oq-automation
+  secops:
+    prose: |
+      **Governanca de entrada de dados:**
+      1. Definir e manter lista de dados criticos que requerem verificacao
+         adicional, baseada na avaliacao de risco de cada sistema.
+      2. Estabelecer procedimento formal de dupla conferencia com
+         responsabilidades e criterios claros.
+      3. Monitorar taxa de erros de entrada de dados e investigar
+         tendencias adversas.
+      4. Treinar operadores em procedimentos de entrada de dados e
+         importancia da verificacao para integridade de dados GMP.
+      5. Auditar periodicamente eficacia dos controles de verificacao
+         de entrada de dados.
+    tools:
+      - quality-management-system
+      - training-management
+      - data-quality-monitoring
+      - audit-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-11"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-c-1", "164.312-e-1"]
+    relationship: mapped

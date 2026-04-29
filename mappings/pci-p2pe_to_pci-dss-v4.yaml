@@ -1,0 +1,450 @@
+id: pci-p2pe_to_pci-dss-v4
+title: "PCI P2PE v3.1 to PCI DSS v4.0 Control Mapping"
+source_framework: pci-p2pe
+target_framework: pci-dss-v4
+version: "1.0.0"
+last_updated: "2026-04-05"
+methodology: semantic
+
+mappings:
+  # p2pe-encrypt — Encryption Device and Application Management
+  - source_control: p2pe-enc-1
+    target_controls:
+      - id: req-3.1
+        relationship: derived-from
+        confidence: 0.85
+        rationale: >
+          P2PE-ENC-1 requires PCI-approved POI devices with SRED to encrypt
+          account data at the point of interaction using strong cryptography
+          (AES-128+). PCI DSS Req 3 addresses protection of stored account
+          data including rendering PAN unreadable via strong cryptography.
+          P2PE-ENC-1 is derived from the same cryptographic protection
+          principle but applies it specifically at the POI device boundary
+          rather than at rest.
+      - id: req-4.1
+        relationship: implements
+        confidence: 0.82
+        rationale: >
+          P2PE-ENC-1 mandates encryption of account data immediately upon
+          card read before it traverses any network. PCI DSS Req 4 requires
+          strong cryptography during transmission over open networks. Both
+          address data-in-transit protection, but P2PE-ENC-1 specifies
+          hardware-enforced encryption at the POI device level, which is a
+          more specific implementation than general TLS-based transit
+          encryption.
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          P2PE-ENC-1 requires PCI-approved POI devices listed on the PCI
+          SSC website. PCI DSS Req 9.5 addresses POI device tamper
+          protection. Both controls concern POI devices, but from different
+          angles — ENC-1 focuses on cryptographic capability while Req 9
+          focuses on physical protection and tamper inspection.
+
+  - source_control: p2pe-enc-2
+    target_controls:
+      - id: req-3.1
+        relationship: derived-from
+        confidence: 0.87
+        rationale: >
+          P2PE-ENC-2 requires unique-per-transaction encryption keys (DUKPT)
+          and documented cryptographic parameters. PCI DSS Req 3.5-3.6
+          address cryptographic key management for protecting stored account
+          data. Both enforce strong cryptographic practices, but P2PE-ENC-2
+          is specifically concerned with transaction-level key derivation at
+          the POI device, which is a specialization of the broader PCI DSS
+          key management requirements.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          P2PE-ENC-2 specifies cipher suite requirements (algorithm, key
+          length, mode of operation, padding) for the encryption between POI
+          and decryption environment. PCI DSS Req 4.1 requires strong
+          cryptography for transmission but focuses on TLS/network-level
+          encryption. P2PE-ENC-2 complements this by addressing the
+          application-layer payload encryption that operates independently
+          of the transport-layer encryption.
+
+  - source_control: p2pe-enc-3
+    target_controls:
+      - id: req-3.1
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          P2PE-ENC-3 mandates that encrypted account data must not be
+          decrypted, re-encrypted, or transformed within the merchant
+          environment. PCI DSS Req 3 requires protection of stored account
+          data and minimization of storage. P2PE-ENC-3 achieves Req 3's
+          objective by eliminating cleartext account data from the merchant
+          environment entirely, which is a stronger control than the
+          encryption-at-rest approach in Req 3.
+      - id: req-4.1
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          P2PE-ENC-3 requires encrypted data to be transmitted unmodified to
+          the decryption environment. PCI DSS Req 4 requires protection
+          during transmission. Both ensure data integrity during transit,
+          though P2PE-ENC-3 adds the constraint that no intermediate system
+          may perform cryptographic operations on the payload.
+      - id: req-7.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          P2PE-ENC-3 ensures the merchant environment has no access to
+          cleartext account data or decryption keys. PCI DSS Req 7 restricts
+          access to cardholder data by business need to know. P2PE-ENC-3
+          complements Req 7 by architecturally eliminating access rather than
+          managing access through authorization controls.
+
+  # p2pe-app — Application Security
+  - source_control: p2pe-app-1
+    target_controls:
+      - id: req-6.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-APP-1 requires secure SDLC including threat modeling, secure
+          coding, SAST, and DAST for P2PE payment applications. PCI DSS
+          Req 6.1 covers vulnerability management and secure development of
+          systems and software. Both require secure development processes,
+          but P2PE-APP-1 is specifically scoped to P2PE payment applications
+          and references PCI Secure Software Standard compliance.
+      - id: req-6.2
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          P2PE-APP-1 mandates secure SDLC with threat modeling, code review,
+          SAST, DAST, and security training for developers. PCI DSS Req 6.2
+          requires bespoke and custom software to be developed securely with
+          trained developers and security testing before release. These
+          controls are functionally equivalent — both require a documented
+          SDLC with security integrated at every phase, mandatory code
+          review, and pre-release security testing.
+
+  - source_control: p2pe-app-2
+    target_controls:
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          P2PE-APP-2 requires data isolation within applications, preventing
+          encrypted account data exposure to logs, debug interfaces, or
+          non-essential processes. PCI DSS Req 3 addresses protection of
+          stored account data. P2PE-APP-2 extends this to runtime memory
+          handling and application-level segmentation, requiring secure
+          overwrite of encrypted data after processing.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          P2PE-APP-2 enforces application-level segmentation and secure
+          memory handling for encrypted account data. PCI DSS Req 6.2
+          requires secure coding techniques that prevent data leakage. The
+          P2PE control complements Req 6.2 by specifying concrete isolation
+          requirements specific to encrypted payment data handling.
+
+  - source_control: p2pe-app-3
+    target_controls:
+      - id: req-6.1
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          P2PE-APP-3 requires digitally signed application updates,
+          secure distribution channels, and tested rollback procedures.
+          PCI DSS Req 6.1 covers change management for system components
+          including security patching. Both address secure update processes,
+          but P2PE-APP-3 adds specific requirements for digital signature
+          verification, code-signing infrastructure, and ensuring no
+          cleartext data exposure during the update lifecycle.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          P2PE-APP-3 mandates signature verification and integrity checks
+          for application updates. PCI DSS Req 11 covers file integrity
+          monitoring and change detection. P2PE-APP-3 complements Req 11
+          by requiring cryptographic integrity verification of application
+          artifacts prior to deployment, adding a preventive control to
+          Req 11's detective controls.
+
+  # p2pe-decrypt — Decryption Environment
+  - source_control: p2pe-dec-1
+    target_controls:
+      - id: req-9.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-DEC-1 requires the decryption environment to be physically
+          secured with access controls, surveillance, and visitor management
+          meeting PCI DSS Requirement 9 standards. PCI DSS Req 9 restricts
+          physical access to cardholder data. The P2PE control directly
+          references Req 9 physical security standards and applies them to
+          the decryption environment.
+      - id: req-1.1
+        relationship: implements
+        confidence: 0.83
+        rationale: >
+          P2PE-DEC-1 requires strict network segmentation for the
+          decryption environment with minimum required connectivity and
+          deny-all default firewall rules. PCI DSS Req 1 covers network
+          security controls that protect the CDE. P2PE-DEC-1 applies these
+          network segmentation principles specifically to the decryption
+          environment, which is the most sensitive component of a P2PE
+          solution.
+      - id: req-8.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          P2PE-DEC-1 requires multi-factor authentication for logical
+          access to the decryption environment with all access logged and
+          monitored. PCI DSS Req 8 requires MFA for access into the CDE.
+          Both mandate MFA, but P2PE-DEC-1 applies this specifically to the
+          decryption environment as a distinct high-security zone within the
+          broader CDE.
+
+  - source_control: p2pe-dec-2
+    target_controls:
+      - id: req-3.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-DEC-2 requires decryption exclusively within PCI PTS-approved
+          HSMs or FIPS 140-2 Level 3+ devices, with dual control and split
+          knowledge for administrative functions. PCI DSS Req 3.5-3.7 cover
+          cryptographic key protection and management. P2PE-DEC-2 implements
+          Req 3's key protection requirements by specifying the hardware
+          security boundary (HSM) as the mandatory implementation for the
+          decryption side of a P2PE solution.
+      - id: req-7.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          P2PE-DEC-2 enforces HSM access controls preventing extraction of
+          decryption keys and restricting cryptographic operations to
+          authorized service accounts. PCI DSS Req 7 restricts access based
+          on need to know. P2PE-DEC-2 complements this by implementing
+          hardware-enforced access controls within the HSM boundary that
+          cannot be bypassed through software-level access management.
+
+  - source_control: p2pe-dec-3
+    target_controls:
+      - id: req-10.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-DEC-3 requires continuous monitoring, anomaly detection for
+          decryption patterns, and audit log retention (1 year with 3 months
+          immediately available). PCI DSS Req 10 covers logging and
+          monitoring with the same retention requirements (10.7). Both
+          controls mandate comprehensive audit logging and monitoring, with
+          P2PE-DEC-3 applying these requirements specifically to the
+          decryption environment and adding behavioral analytics for
+          decryption pattern anomalies.
+      - id: req-12.1
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          P2PE-DEC-3 requires PCI DSS compliance validation (ROC or SAQ)
+          for the decryption environment with annual QSA reassessment.
+          PCI DSS Req 12.4 mandates PCI DSS compliance management. Both
+          address compliance governance, with P2PE-DEC-3 explicitly
+          requiring the decryption environment to maintain its own PCI DSS
+          compliance evidence separate from the broader organizational
+          compliance program.
+
+  # p2pe-key — Key Management
+  - source_control: p2pe-key-1
+    target_controls:
+      - id: req-3.1
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          P2PE-KEY-1 requires key generation within PCI PTS-approved HSMs or
+          FIPS 140-2 Level 3+ devices using approved random number generators
+          under dual control and split knowledge. PCI DSS Req 3.6 covers
+          cryptographic key generation using strong cryptographic methods.
+          Both require hardware-based key generation with proper controls,
+          but P2PE-KEY-1 adds P2PE-specific requirements for BDK generation
+          and HSM-to-HSM distribution using TR-34/TR-31 protocols.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          P2PE-KEY-1 requires secure key distribution preventing cleartext
+          key exposure outside secure cryptographic devices throughout the
+          distribution chain. PCI DSS Req 4 protects data during
+          transmission. P2PE-KEY-1 complements this by specifically
+          addressing cryptographic key distribution security using
+          specialized protocols (TR-34, TR-31) rather than general-purpose
+          TLS transport.
+
+  - source_control: p2pe-key-2
+    target_controls:
+      - id: req-3.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-KEY-2 requires key injection in PCI-approved Key Injection
+          Facilities or via PCI-approved remote key loading (TR-34), with
+          dual control, split knowledge, and complete audit trails. PCI DSS
+          Req 3.7 covers key management procedures including key
+          distribution. P2PE-KEY-2 implements Req 3's key distribution
+          requirements with POI device-specific injection procedures
+          including KIF requirements and device serial number tracking.
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          P2PE-KEY-2 requires physically secured Key Injection Facilities
+          with dual control for all key loading operations. PCI DSS Req 9
+          covers physical access restrictions. P2PE-KEY-2 complements Req 9
+          by defining physical security requirements specific to the key
+          injection process, including personnel identification, device
+          serial number scanning, and chain-of-custody documentation.
+
+  - source_control: p2pe-key-3
+    target_controls:
+      - id: req-3.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-KEY-3 covers key rotation, retirement, and secure destruction
+          including HSM zeroization and physical destruction of key component
+          records. PCI DSS Req 3.6-3.7 address cryptoperiod management, key
+          replacement, and key destruction. Both controls address the full
+          key lifecycle, but P2PE-KEY-3 adds P2PE-specific concerns including
+          DUKPT BDK rotation logistics across large device fleets, canary
+          re-keying strategies, and dual-control witnessed destruction
+          ceremonies.
+
+  # p2pe-device — Device Management
+  - source_control: p2pe-dev-1
+    target_controls:
+      - id: req-9.1
+        relationship: superset-of
+        confidence: 0.88
+        rationale: >
+          P2PE-DEV-1 requires secure lifecycle management of POI devices
+          from procurement through decommissioning, including supply chain
+          security, unique device identification, and tamper inspection upon
+          receipt. PCI DSS Req 9.5 addresses POI device protection from
+          tampering and substitution. Both controls protect POI devices, with
+          P2PE-DEV-1 extending coverage upstream to the supply chain
+          including manufacturing, shipping, and storage chain-of-custody.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          P2PE-DEV-1 requires documented supply chain security procedures
+          and complete device inventory with chain-of-custody records.
+          PCI DSS Req 12.5 addresses PCI DSS scope documentation and asset
+          management. P2PE-DEV-1 complements Req 12 by extending asset
+          management to cover pre-deployment supply chain integrity for POI
+          devices, which is not addressed by standard PCI DSS scope
+          documentation.
+      - id: req-2.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          P2PE-DEV-1 requires device inspection including firmware hash
+          verification against known-good baselines before deployment.
+          PCI DSS Req 2 requires secure configurations and removal of vendor
+          defaults. P2PE-DEV-1 complements this by applying configuration
+          verification specifically to POI devices at the pre-deployment
+          stage, ensuring devices have not been tampered with before key
+          injection.
+
+  - source_control: p2pe-dev-2
+    target_controls:
+      - id: req-9.1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          P2PE-DEV-2 requires periodic tamper inspections of deployed POI
+          devices, merchant instructions for tamper detection, and reporting
+          procedures. PCI DSS Req 9.5 requires protection of POI devices
+          from tampering and unauthorized substitution, including periodic
+          inspections and training for personnel. These controls are
+          functionally equivalent — both mandate periodic tamper inspection,
+          personnel training on detection of skimming overlays and tampering
+          indicators, and established reporting procedures for suspected
+          compromise.
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          P2PE-DEV-2 requires secure key zeroization and physical
+          destruction of cryptographic components during device
+          decommissioning. PCI DSS Req 3.1 addresses secure disposal of
+          account data and media when no longer needed. P2PE-DEV-2
+          complements Req 3 by specifying the decommissioning process for
+          POI devices, including HSM-verified zeroization and coordinated
+          key retirement through the key management system.
+
+  # p2pe-ops — Solution Provider Management
+  - source_control: p2pe-ops-1
+    target_controls:
+      - id: req-12.1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          P2PE-OPS-1 requires documented operational procedures, role-
+          specific training, and annual QSA assessment for the P2PE solution.
+          PCI DSS Req 12 covers information security policy, personnel
+          training, compliance management, and third-party oversight. Both
+          controls address organizational governance and compliance
+          validation, with P2PE-OPS-1 specifying P2PE-specific elements
+          including the P2PE Instruction Manual for merchants and P2PE QSA
+          assessment requirements.
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          P2PE-OPS-1 requires formal change management that evaluates every
+          change for P2PE security impact and triggers reassessment when
+          material changes affect encryption, decryption, or key management.
+          PCI DSS Req 6.5 covers change management processes. P2PE-OPS-1
+          complements this by adding P2PE-specific change impact analysis
+          that determines whether changes trigger a reassessment of the
+          validated P2PE solution listing.
+
+  - source_control: p2pe-ops-2
+    target_controls:
+      - id: req-12.1
+        relationship: derived-from
+        confidence: 0.90
+        rationale: >
+          P2PE-OPS-2 requires a documented incident response plan covering
+          P2PE-specific compromise scenarios (key compromise, device
+          tampering, decryption environment breach), notification procedures
+          for affected stakeholders, and annual IR testing. PCI DSS Req 12.10
+          requires an incident response plan that is tested annually. Both
+          mandate comprehensive IR planning and testing, with P2PE-OPS-2
+          adding P2PE-specific scenarios such as emergency BDK re-keying of
+          thousands of POI devices and payment brand notification procedures.
+      - id: req-10.1
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          P2PE-OPS-2 requires detection and identification of security
+          incidents affecting the P2PE solution, including monitoring for
+          compromise indicators across HSMs, POI devices, and the decryption
+          environment. PCI DSS Req 10 covers logging and monitoring to detect
+          anomalies and suspicious activity. P2PE-OPS-2 complements Req 10
+          by defining the response actions that follow detection, including
+          containment (device isolation, key revocation), eradication, and
+          stakeholder notification workflows.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          P2PE-OPS-2 requires annual incident response testing through
+          tabletop exercises simulating P2PE compromise scenarios. PCI DSS
+          Req 11 covers regular security testing including penetration
+          testing. P2PE-OPS-2 complements Req 11 by adding incident response
+          simulation exercises that test the organization's ability to
+          respond to P2PE-specific breach scenarios, which is distinct from
+          the technical vulnerability testing covered by Req 11.

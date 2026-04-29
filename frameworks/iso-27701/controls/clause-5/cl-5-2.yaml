@@ -1,0 +1,111 @@
+id: cl-5.2
+family: clause-5
+title: "Context of the organization and determination of PII processing scope"
+class: ISO27701
+baselines: [pii-controller, pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization shall determine its role as a PII controller and/or PII processor
+    with respect to the processing of PII. The organization shall understand the context
+    of the organization by identifying external and internal issues relevant to its
+    purpose and that affect its ability to achieve the intended outcome(s) of its PIMS.
+    The organization shall determine the scope of the PIMS, including the boundaries
+    and applicability of the PIMS, considering the PII processing activities it performs,
+    the types of PII processed, the categories of PII principals, and applicable
+    legislation and regulatory requirements. The organization shall identify all relevant
+    interested parties, their requirements, and the contractual obligations related to
+    PII processing.
+
+guidance:
+  prose: >-
+    This clause extends ISO 27001 Clauses 4.1 through 4.4 with privacy-specific
+    requirements. The organization must go beyond generic information security context
+    analysis and explicitly map all PII processing activities. This includes maintaining
+    a PII processing inventory that identifies what PII is collected, the legal basis for
+    processing, data flows between systems and third parties, retention periods, and the
+    jurisdictions involved. The determination of controller versus processor roles is
+    critical because it dictates which Annex controls apply (Annex A for controllers,
+    Annex B for processors). An organization may act as both controller and processor
+    for different processing activities. The scope determination must account for
+    cross-border data transfers and applicable privacy regulations in each jurisdiction
+    where PII principals reside or where processing takes place.
+
+references:
+  - citation: "ISO/IEC 27701:2019, Clause 5.2"
+    url: "https://www.iso.org/standard/71670.html"
+  - citation: "ISO/IEC 27001:2022, Clauses 4.1-4.4"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a centralized PII processing registry as a platform service that all
+      microservices must register with before processing any personal data. Implement
+      a metadata schema that captures: PII categories processed, legal basis, data
+      flow direction (ingress/egress), third-party recipients, retention periods,
+      and applicable jurisdictions. Use Kubernetes namespace labels and annotations
+      to tag workloads with their PII processing role (controller/processor/none).
+      Implement admission controllers that block deployment of services processing
+      PII unless they are registered in the PII processing registry. Build a data
+      flow discovery tool that automatically maps PII movement across services by
+      analyzing network policies, service mesh telemetry, and database access patterns.
+      Maintain an infrastructure-as-code module that provisions privacy-compliant
+      data stores with jurisdiction-aware deployment (e.g., EU data stays in EU
+      regions). Expose a self-service API for development teams to declare their
+      PII processing scope during onboarding.
+    tools:
+      - backstage-catalog
+      - kubernetes-labels-and-annotations
+      - open-policy-agent
+      - kyverno
+      - service-mesh-telemetry
+      - terraform-modules
+
+  devsecops:
+    prose: >-
+      Integrate PII scope validation into CI/CD pipelines. Every service that
+      introduces new PII processing must include a PII processing declaration file
+      (e.g., pii-manifest.yaml) in its repository. Pipeline gates must verify that
+      the declared PII scope matches the PII processing registry. Implement static
+      analysis rules that detect new database schemas or API endpoints handling
+      personal data and flag them for privacy review. Code review automation should
+      verify that services do not access PII outside their declared scope. Build
+      pipeline stages that generate data flow diagrams from infrastructure code and
+      service dependencies, enabling continuous validation of the documented PII
+      processing scope against actual system behavior.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - semgrep
+      - checkov
+      - custom-pii-manifest-validator
+      - data-flow-diagram-generator
+
+  secops:
+    prose: >-
+      Monitor for undeclared PII processing activities using network traffic
+      analysis and database query auditing. Implement SIEM correlation rules that
+      detect when services access PII data stores outside their registered scope.
+      Build dashboards that visualize the complete PII processing map, including
+      controller/processor relationships, data flows, and jurisdictional boundaries.
+      Alert on new data flows involving PII that are not registered in the processing
+      inventory. Conduct periodic automated audits comparing the declared PII scope
+      against actual system behavior observed through logs and telemetry.
+    tools:
+      - splunk
+      - elastic-siem
+      - data-flow-monitoring
+      - database-activity-monitoring
+      - compliance-dashboards
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-4", "art-24", "art-28", "art-30"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-5", "art-37", "art-38"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.1", "a5.2"]
+    relationship: extends

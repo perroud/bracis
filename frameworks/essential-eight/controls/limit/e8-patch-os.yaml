@@ -1,0 +1,135 @@
+id: e8-patch-os
+family: limit
+title: "Patch Operating Systems"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Patches, updates, or vendor mitigations for security vulnerabilities in operating
+    systems of internet-facing services, workstations, and servers are applied in a timely
+    manner. Operating systems that are no longer supported by vendors are replaced. This
+    reduces the ability of adversaries to exploit known operating system vulnerabilities
+    to escalate privileges, move laterally, or maintain persistence.
+
+guidance:
+  prose: >-
+    Operating system patching complements application patching and is critical for
+    maintaining a secure baseline. Unpatched operating systems provide adversaries with
+    reliable exploitation paths for privilege escalation and lateral movement. The
+    Essential Eight requires tiered patching timelines based on maturity level, with
+    ML3 demanding 48-hour remediation for all critical vulnerabilities. Organisations
+    must also ensure end-of-life operating systems are replaced before vendor support
+    ceases.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities. A
+        vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities. Patches, updates, or vendor mitigations for
+        security vulnerabilities in operating systems of internet-facing services are
+        applied within two weeks of release. Patches, updates, or vendor mitigations for
+        security vulnerabilities in operating systems of workstations, servers, and
+        network devices are applied within one month of release. Operating systems that
+        are no longer supported by vendors are replaced.
+    ml2:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities. A
+        vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities at least fortnightly. Patches, updates, or
+        vendor mitigations for security vulnerabilities in operating systems of
+        internet-facing services are applied within two weeks of release, or within
+        48 hours if an exploit exists. Patches, updates, or vendor mitigations for
+        security vulnerabilities in operating systems of workstations, servers, and
+        network devices are applied within two weeks of release. Operating systems
+        that are no longer supported by vendors are replaced.
+    ml3:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities. A
+        vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities at least daily. Patches, updates, or vendor
+        mitigations for security vulnerabilities in operating systems of internet-facing
+        services are applied within 48 hours of release, or within 48 hours of an exploit
+        being identified. Patches, updates, or vendor mitigations for security
+        vulnerabilities in operating systems of workstations, servers, and network devices
+        are applied within 48 hours of release. The latest release, or the previous
+        release, of operating systems are used. Operating systems that are no longer
+        supported by vendors are replaced.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Patch Operating Systems"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 SI-2 - Flaw Remediation"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy automated OS patch management using WSUS/SCCM/Intune for Windows, Landscape
+      for Ubuntu, Satellite for RHEL, or cloud-native patching services (AWS Systems
+      Manager Patch Manager, Azure Update Management, GCP OS Patch Management). Implement
+      immutable infrastructure patterns where servers are rebuilt from patched golden
+      images rather than patched in-place. Automate container base image updates and
+      node pool upgrades in Kubernetes environments. Use Infrastructure-as-Code to
+      enforce minimum OS versions and trigger automated rebuilds when patches are released.
+      Maintain OS lifecycle tracking to identify systems approaching end-of-support
+      status with sufficient lead time for migration.
+    tools:
+      - wsus
+      - sccm
+      - intune
+      - aws-ssm-patch-manager
+      - azure-update-management
+      - gcp-os-patch-management
+      - ansible
+      - terraform
+      - packer
+
+  devsecops:
+    prose: >-
+      Integrate OS-level vulnerability scanning into CI/CD pipelines for container images
+      and virtual machine images. Block promotion of images containing OS packages with
+      known critical CVEs beyond SLA thresholds. Automate golden image rebuilds triggered
+      by upstream patch releases. Implement canary deployment patterns for OS patches to
+      detect regressions before fleet-wide rollout. Track OS version compliance as a
+      pipeline metric and fail deployments that target end-of-life operating systems.
+    tools:
+      - trivy
+      - grype
+      - gitlab-ci
+      - packer
+      - ansible
+      - checkov
+
+  secops:
+    prose: >-
+      Run automated OS vulnerability scans at the cadence required by target maturity
+      level (fortnightly for ML1/ML2, daily for ML3). Maintain an OS lifecycle dashboard
+      showing current versions, patch status, and end-of-support dates for all systems.
+      Configure SIEM alerts for systems exceeding patching SLA windows. Generate executive
+      compliance reports showing OS patching posture by business unit, environment, and
+      criticality. Maintain a risk register for systems that cannot meet patching SLAs,
+      with documented compensating controls and remediation timelines.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - splunk
+      - elastic-siem
+      - servicenow-vuln-response
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5", "CM-6"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 7.1", "CIS 7.3", "CIS 7.4"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.19"]
+    relationship: supports

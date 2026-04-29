@@ -1,0 +1,125 @@
+id: stig-cat2-patch
+family: cat-ii
+title: "Patch Management and Vulnerability Remediation"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must have a documented and implemented patch management process
+    that identifies, evaluates, tests, and installs security patches within
+    required timeframes. Critical patches rated CVSS 9.0 or higher must be
+    applied within 21 days of availability. High-severity patches (CVSS 7.0–8.9)
+    must be applied within 30 days. Medium-severity patches must be applied
+    within 90 days. The system must subscribe to vendor security advisories and
+    relevant vulnerability feeds (including CISA Known Exploited Vulnerabilities
+    catalog) and conduct vulnerability scanning at least monthly using
+    DISA-approved scanning tools. Vulnerability scan results must be provided
+    to the Authorizing Official (AO) as part of continuous monitoring deliverables.
+    Systems that cannot be patched within required timelines must implement
+    compensating controls and document the risk in the POA&M.
+
+guidance:
+  prose: >-
+    Unpatched vulnerabilities are among the most commonly exploited initial
+    access vectors in DoD incidents. The tiered remediation timeframes reflect
+    the relative urgency based on exploitability and potential impact. CISA's
+    Known Exploited Vulnerabilities (KEV) catalog represents vulnerabilities
+    actively being exploited in the wild and warrants the most urgent attention —
+    DoD Instruction 8531.01 requires remediation of KEV entries within 14 days
+    for internet-accessible systems.
+
+    In containerized environments, patch management complexity increases because
+    vulnerabilities may exist in the base OS image, language runtime, application
+    framework, or specific library within the container. Effective patch management
+    requires a clear process for updating base images, rebuilding dependent images,
+    testing the rebuilt images, and redeploying affected services — a pipeline
+    that must run frequently and be automated where possible.
+
+    Compensating controls for systems that cannot be immediately patched might
+    include network segmentation that prevents exploitation, web application
+    firewall rules that block the attack vector, or enhanced monitoring that
+    detects exploitation attempts.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SI-2, RA-5"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DoD Instruction 8531.01 — DoD Vulnerability Management"
+    url: "https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/853101p.pdf"
+  - citation: "CISA Known Exploited Vulnerabilities Catalog"
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement an automated patch pipeline using Renovate Bot or Dependabot
+      to generate patch merge requests for all platform dependencies. Use
+      container image build pipelines that automatically rebuild images from
+      updated base images and notify platform teams when patches are available.
+      Deploy vulnerability scanners (Trivy, Grype) as admission controllers
+      in Kubernetes to prevent deployment of images with critical unpatched
+      CVEs. Maintain a software bill of materials (SBOM) for all platform
+      components and correlate against CVE feeds to identify affected components
+      immediately when new vulnerabilities are published. Implement automated
+      compliance dashboards showing patch status per component against required
+      remediation timelines.
+    tools:
+      - renovate
+      - dependabot
+      - trivy
+      - grype
+      - syft
+      - tenable
+      - backstage
+
+  devsecops:
+    prose: >-
+      Integrate dependency scanning and container scanning into every CI/CD
+      pipeline with blocking policies for critical CVEs. Configure pipeline
+      policies that require developer acknowledgment and POA&M entry for any
+      accepted vulnerabilities above the risk threshold. Implement automated
+      SBOM generation as a pipeline artifact for every release. Use GitLab's
+      vulnerability management features to track, assign, and report on open
+      findings. Create scheduled pipelines that run vulnerability scans against
+      production images and feed results into the continuous monitoring reporting
+      process. Ensure container images used in pipelines are rebuilt weekly
+      from current base images, regardless of whether there are code changes.
+    tools:
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - trivy
+      - grype
+      - syft
+      - renovate
+
+  secops:
+    prose: >-
+      Subscribe to and monitor NVD, CISA KEV, and vendor-specific advisory
+      feeds. Run authenticated vulnerability scans monthly (or more frequently
+      for high-risk systems) using Tenable or Qualys configured with DoD-approved
+      scan policy templates. Track all open vulnerabilities in the POA&M with
+      assigned owners, remediation timelines, and milestone dates. Generate
+      monthly vulnerability status reports for the AO that show new findings,
+      remediated findings, and exceptions with risk acceptance documentation.
+      Escalate KEV findings immediately to system owners for emergency patching.
+    tools:
+      - tenable
+      - qualys
+      - splunk
+      - servicenow-grc
+      - archer-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5", "RA-7"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SI.L1-3.14.1", "RA.L2-3.11.2", "RA.L2-3.11.3"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["si-2", "ra-5"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["ID.RA-01", "ID.RA-02", "PR.IP-12"]
+    relationship: supports

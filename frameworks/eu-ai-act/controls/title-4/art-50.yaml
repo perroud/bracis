@@ -1,0 +1,151 @@
+id: art-50
+family: title-4
+title: "Transparency Obligations for Providers and Deployers of Certain AI Systems"
+class: EU-AI-Act
+
+statement:
+  prose: >-
+    Providers and deployers of certain AI systems shall ensure that natural persons
+    are informed that they are interacting with an AI system, that content has been
+    artificially generated or manipulated, or that emotion recognition or biometric
+    categorisation systems are being used, unless this is obvious from the
+    circumstances and context of use.
+  parts:
+    - id: art-50.1
+      label: "1."
+      prose: >-
+        Providers shall ensure that AI systems intended to interact directly with
+        natural persons are designed and developed in such a way that the natural
+        persons concerned are informed that they are interacting with an AI system,
+        unless this is obvious from the point of view of a natural person who is
+        reasonably well-informed, observant and circumspect, taking into account the
+        circumstances and the context of use.
+    - id: art-50.2
+      label: "2."
+      prose: >-
+        Providers of AI systems, including general-purpose AI systems, generating
+        synthetic audio, image, video or text content, shall ensure that the outputs
+        of the AI system are marked in a machine-readable format and detectable as
+        artificially generated or manipulated. Providers shall ensure that their
+        technical solutions are effective, interoperable, robust and reliable as far
+        as this is technically feasible, taking into account the specificities and
+        limitations of various types of content, the costs of implementation and the
+        generally acknowledged state of the art.
+    - id: art-50.3
+      label: "3."
+      prose: >-
+        Deployers of an emotion recognition system or a biometric categorisation system
+        shall inform the natural persons exposed thereto of the operation of the system,
+        and shall process the personal data in accordance with Regulation (EU) 2016/679,
+        Directive (EU) 2016/680 and Regulation (EU) 2018/1725, as applicable.
+    - id: art-50.4
+      label: "4."
+      prose: >-
+        Deployers of an AI system that generates or manipulates image, audio or video
+        content constituting a deep fake, shall disclose that the content has been
+        artificially generated or manipulated. Deployers of an AI system that generates
+        or manipulates text which is published with the purpose of informing the public
+        on matters of public interest shall disclose that the text has been artificially
+        generated or manipulated. This shall not apply where the AI-generated content
+        has undergone a process of human review or editorial control and where a natural
+        or legal person holds editorial responsibility for the content published.
+
+guidance:
+  prose: >-
+    Article 50 applies to AI systems regardless of their risk classification, creating
+    a universal transparency floor. The chatbot disclosure requirement ensures people
+    know when they are interacting with AI rather than humans. The synthetic content
+    marking requirement (paragraph 2) demands machine-readable watermarking or metadata
+    embedding in AI-generated audio, images, video, and text — this targets deepfakes
+    and AI-generated misinformation. The deepfake disclosure requirement (paragraph 4)
+    places responsibility on deployers to label content, with an exception for
+    editorially reviewed content. The emotion recognition and biometric categorisation
+    notification requirement (paragraph 3) ensures individuals are aware when these
+    systems are applied to them. These obligations are particularly relevant for
+    organisations deploying chatbots, content generation tools, customer service AI,
+    and any public-facing AI system.
+
+references:
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 50"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "C2PA (Coalition for Content Provenance and Authenticity) Specification"
+    url: "https://c2pa.org/specifications/specifications/2.1/specs/C2PA_Specification.html"
+  - citation: "GDPR Regulation (EU) 2016/679, Articles 13-14 (Information obligations)"
+    url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement AI interaction disclosure mechanisms as platform-level capabilities
+      applicable to all AI-powered interfaces: chatbot frameworks must include
+      mandatory disclosure banners, API responses from AI systems must include
+      machine-readable headers indicating AI generation, and content management
+      systems must support AI-generated content labelling. Deploy content provenance
+      infrastructure based on C2PA or equivalent standards that automatically embeds
+      machine-readable provenance metadata into AI-generated images, audio, video,
+      and text at the point of generation. Build centralised AI content watermarking
+      services that inference endpoints call to mark outputs before delivery to
+      consumers. Implement metadata schemas for AI-generated content that travel
+      with the content across platform boundaries, enabling downstream systems to
+      detect and display AI generation disclosures. Provision content moderation
+      infrastructure that can detect unmarked AI-generated content in publishing
+      pipelines.
+    tools:
+      - c2pa-libraries
+      - backstage
+      - kubernetes
+      - api-gateway
+      - content-management-system
+      - terraform
+
+  devsecops:
+    prose: >-
+      Enforce AI disclosure requirements through pipeline gates that verify chatbot
+      interfaces include AI interaction notifications, AI-generated content includes
+      machine-readable provenance markers, and API responses include appropriate
+      AI-generation headers. Implement automated tests that validate disclosure
+      mechanisms are functional and visible to end users across all deployment
+      targets. Require C2PA or equivalent content provenance integration as a
+      mandatory component for any service generating synthetic media, validated
+      through integration tests in the CI/CD pipeline. Include deepfake detection
+      scanning in content publishing pipelines to catch AI-generated content that
+      lacks required disclosure labels. Enforce code review requirements for
+      changes to AI disclosure mechanisms with mandatory approval from compliance
+      reviewers.
+    tools:
+      - gitlab-ci
+      - c2pa-libraries
+      - cypress
+      - pytest
+      - conftest
+      - gitlab-approval-rules
+
+  secops:
+    prose: >-
+      Monitor public-facing AI interfaces to verify that AI interaction disclosures
+      are consistently displayed and not circumvented through UI changes or
+      configuration errors. Scan published content for AI-generated material lacking
+      required machine-readable provenance markers or disclosure labels. Configure
+      alerting for scenarios where AI content watermarking services fail or are
+      bypassed, which would result in non-compliant content being distributed.
+      Audit emotion recognition and biometric categorisation deployments to verify
+      that affected individuals are properly notified per Article 50(3). Generate
+      periodic compliance reports on transparency obligation adherence across all
+      AI systems subject to Article 50, identifying gaps and remediation priorities.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - content-moderation-tools
+      - grafana
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-13", "art-14"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["a5.37", "a7.4"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["GV.OC-03", "GV.PO-01"]
+    relationship: supports

@@ -1,0 +1,120 @@
+id: art-28
+family: cap-6
+title: "Atualizacoes do Padrao TISS"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 28. As atualizações do Padrão TISS serão publicadas pela ANS
+    mediante Instrução Normativa ou Resolução Normativa, conforme a
+    natureza e abrangência da alteração.
+
+    Parágrafo 1. As atualizações podem incluir:
+    I - Novos schemas XSD ou alterações em schemas existentes;
+    II - Novas guias ou alterações em guias existentes;
+    III - Atualizações de terminologias e tabelas de domínio;
+    IV - Alterações em regras de negócio do componente organizacional;
+    V - Novos requisitos de segurança ou comunicação.
+
+    Parágrafo 2. Para atualizações que exijam alteração em sistemas,
+    a ANS garantirá prazo mínimo de 6 meses entre a publicação e a
+    obrigatoriedade de adoção.
+
+    Parágrafo 3. Durante o período de transição entre versões, as
+    operadoras devem aceitar transações em ambas as versões (anterior
+    e nova), garantindo continuidade operacional.
+
+    Parágrafo 4. A ANS manterá histórico completo de todas as versões
+    do Padrão TISS, incluindo schemas, tabelas e documentação.
+guidance:
+  prose: |
+    O art. 28 regula o ciclo de vida das atualizacoes do TISS,
+    garantindo previsibilidade para o mercado.
+
+    **Tipos de atualizacao:**
+    1. Major: nova versao de schema (ex: TISS 3.x para 4.x),
+       pode conter breaking changes, prazo longo de transicao
+    2. Minor: novos campos, guias ou regras sem breaking changes,
+       prazo padrao de 6 meses
+    3. Patch: correcao de erros em schemas ou tabelas, pode ser
+       urgente com prazo reduzido
+    4. Tabelas: atualizacao de TUSS, CID-10, CBHPM, pode ocorrer
+       independentemente de alteracao de schema
+
+    **Processo de atualizacao:**
+    1. ANS publica nova versao (Diario Oficial ou portal)
+    2. Schemas XSD publicados no portal ANS
+    3. Inicia periodo de transicao (minimo 6 meses)
+    4. Operadoras e prestadores implementam nova versao
+    5. Testes de conformidade entre contrapartes
+    6. Data de obrigatoriedade: somente nova versao aceita
+
+    **Coexistencia de versoes:**
+    Durante a transicao, o sistema deve:
+    - Detectar automaticamente a versao da mensagem recebida
+    - Processar mensagens em ambas as versoes
+    - Enviar mensagens na versao suportada pelo receptor
+    - Registrar metricas de adocao por versao
+
+    **Riscos de transicao:**
+    - Incompatibilidade entre versoes nao detectada
+    - Prestadores atrasados na adocao
+    - Mapeamento incorreto entre versoes
+    - Perda de dados em campos novos/removidos
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de versoes TISS na infraestrutura:**
+      1. Implementar schema registry versionado que armazene todas as
+         versoes de schemas TISS (vigentes e anteriores) e sirva a
+         versao correta conforme negociacao com a contraparte.
+      2. Configurar message router que detecte automaticamente a versao
+         da mensagem TISS recebida e direcione para o parser correto.
+      3. Implementar feature toggles para habilitar/desabilitar suporte
+         a versoes especificas sem necessidade de deploy.
+      4. Manter ambiente de testes multi-versao para validar
+         interoperabilidade entre versoes durante transicao.
+    tools:
+      - schema-registry
+      - message-router
+      - feature-toggles
+      - multi-version-testing
+  devsecops:
+    prose: |
+      **Pipeline de transicao de versao:**
+      1. Automatizar download e integracao de novos schemas XSD
+         publicados pela ANS no pipeline de build.
+      2. Implementar testes de compatibilidade entre versoes: mensagem
+         da versao N processada corretamente pela versao N+1 e vice-versa.
+      3. Criar alertas automaticos quando nova versao e publicada pela
+         ANS, com avaliacao de impacto automatica (schema diff).
+      4. Manter cobertura de testes para todas as versoes ativamente
+         suportadas (nao apenas a mais recente).
+    tools:
+      - schema-automation
+      - compatibility-testing
+      - version-alerting
+      - multi-version-coverage
+  secops:
+    prose: |
+      **Gestao operacional de atualizacoes:**
+      1. Manter calendario de atualizacoes TISS com marcos: publicacao,
+         inicio de testes, go-live, fim da transicao.
+      2. Comunicar prestadores/operadoras sobre suporte a novas
+         versoes com antecedencia de 90 dias.
+      3. Monitorar taxa de adocao da nova versao entre contrapartes,
+         com acoes proativas para atrasados.
+      4. Documentar impacto de cada atualizacao TISS nos processos
+         e sistemas internos da organizacao.
+    tools:
+      - update-calendar
+      - partner-communication
+      - adoption-tracking
+      - impact-documentation
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-925"]
+    relationship: mapped

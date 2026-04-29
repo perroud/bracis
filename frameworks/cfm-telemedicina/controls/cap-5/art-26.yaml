@@ -1,0 +1,111 @@
+id: art-26
+family: cap-5
+title: "Portabilidade e Acesso do Paciente aos Dados"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 26. O paciente tem direito de acessar seus dados clínicos
+    armazenados em plataformas de telemedicina e de solicitar a
+    portabilidade desses dados para outra instituição ou
+    profissional de saúde.
+
+    Parágrafo 1. A portabilidade de dados deve ser viabilizada em
+    formato interoperável e legível, preferencialmente utilizando
+    padrões abertos como HL7 FHIR ou HL7 CDA.
+
+    Parágrafo 2. O prazo para atendimento de solicitação de acesso
+    ou portabilidade de dados deve observar os prazos estabelecidos
+    pela LGPD.
+
+    Parágrafo 3. A instituição não pode condicionar o atendimento
+    por telemedicina à renúncia do paciente ao direito de
+    portabilidade de seus dados.
+guidance:
+  prose: |
+    O art. 26 garante o direito do paciente sobre seus dados
+    clinicos, alinhando a resolucao com os principios da LGPD
+    e do Codigo de Etica Medica.
+
+    **Portabilidade em formato interoperavel (paragrafo 1):**
+    A portabilidade nao e atendida com envio de PDF generico.
+    Dados devem ser exportados em formato estruturado que
+    permita importacao por outro sistema de saude:
+    - HL7 FHIR Bundle: formato preferencial para dados clinicos
+    - HL7 CDA: formato alternativo para documentos clinicos
+    - DICOM: obrigatorio para imagens diagnosticas
+    - IPS (International Patient Summary): formato resumido
+      padronizado para continuidade do cuidado
+
+    **Prazos LGPD (paragrafo 2):**
+    A LGPD estabelece que solicitacoes de titulares devem ser
+    atendidas em formato simplificado imediatamente ou em
+    declaracao completa em 15 dias. Na pratica, para dados
+    de saude, o prazo de 15 dias e o mais realista.
+
+    **Vedacao de renuncia (paragrafo 3):**
+    A instituicao nao pode incluir clausula de renuncia a
+    portabilidade nos termos de uso da plataforma. Tal clausula
+    seria nula de pleno direito (LGPD + CDC).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de portabilidade:**
+      1. Implementar funcionalidade de exportacao de dados do
+         paciente em formato HL7 FHIR Bundle, incluindo todos
+         os recursos clinicos (Patient, Encounter, Observation,
+         Condition, MedicationRequest, DiagnosticReport).
+      2. Criar API de portabilidade que permita transferencia
+         segura de dados para outra instituicao, com autenticacao
+         e autorizacao adequadas.
+      3. Implementar exportacao de imagens diagnosticas em
+         formato DICOM com todos os metadados preservados.
+      4. Criar portal do paciente com funcionalidade de download
+         de seus dados clinicos em formato legivel e estruturado.
+      5. Implementar workflow de solicitacao de portabilidade
+         com rastreamento de prazo (15 dias maximo).
+    tools:
+      - hl7-fhir
+      - patient-portal
+      - data-export
+      - dicom-export
+      - workflow-management
+  devsecops:
+    prose: |
+      **Pipeline de portabilidade:**
+      1. Testar exportacao de dados em formato FHIR Bundle,
+         validando completude e conformidade com especificacao.
+      2. Verificar que API de portabilidade exige autenticacao
+         e autorizacao adequadas (o paciente deve autorizar).
+      3. Testar que imagens DICOM exportadas preservam todos
+         os metadados e qualidade original.
+      4. Validar que workflow de solicitacao rastreia prazos
+         e alerta quando proximo do limite de 15 dias.
+    tools:
+      - gitlab-ci
+      - fhir-validation
+      - api-testing
+      - workflow-testing
+  secops:
+    prose: |
+      **Operacao de portabilidade:**
+      1. Monitorar solicitacoes de portabilidade e acesso,
+         garantindo atendimento dentro do prazo de 15 dias.
+      2. Auditar que dados exportados estao completos e em
+         formato interoperavel conforme exigido.
+      3. Verificar que nenhum termo de uso ou contrato inclui
+         clausula de renuncia a portabilidade.
+      4. Manter metricas de tempo medio de atendimento de
+         solicitacoes de portabilidade.
+    tools:
+      - request-tracking
+      - compliance-audit
+      - contract-review
+      - sla-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-18", "art-19", "art-20"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.524"]
+    relationship: mapped

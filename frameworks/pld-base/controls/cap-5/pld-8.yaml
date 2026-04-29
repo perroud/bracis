@@ -1,0 +1,105 @@
+id: pld-8
+family: cap-5
+title: "Client Identification and KYC Obligations"
+class: PLD-BASE
+baselines: [pessoas-obrigadas]
+statement:
+  prose: |
+    Art. 10. As pessoas referidas no art. 9º:
+
+    I - identificarão seus clientes e manterão cadastro atualizado, nos termos de
+    instruções emanadas das autoridades competentes;
+
+    § 1º Na hipótese de o cliente constituir-se em pessoa jurídica, a identificação
+    referida no inciso I deste artigo deverá abranger as pessoas físicas autorizadas
+    a representá-la, bem como seus proprietários.
+guidance:
+  prose: |
+    Article 10, inciso I and § 1 establish the fundamental Know Your Customer (KYC)
+    obligation for all persons listed in Art. 9.
+
+    **Core requirements:**
+    - Identify all clients and maintain up-to-date records
+    - For legal entities: identification must extend to authorized representatives
+      AND owners (beneficial ownership)
+    - Records must follow instructions from the competent authority (BCB for
+      financial institutions, CVM for securities, SUSEP for insurance, COAF for
+      entities without a specific regulator)
+
+    **Beneficial ownership (§ 1):**
+    This is critical — the law requires identifying the ultimate beneficial owners
+    (UBOs) of legal entity clients, not just the corporate facade. This aligns with
+    FATF Recommendation 10 (Customer Due Diligence) and Recommendation 24
+    (Transparency of Legal Persons).
+
+    **Practical implications:**
+    Organizations must implement robust onboarding processes that collect, verify,
+    and maintain client identification data, including corporate structure
+    documentation for legal entities. Ongoing monitoring must detect changes in
+    beneficial ownership or authorized representatives.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a comprehensive KYC onboarding platform that collects identification
+         data for natural persons (CPF, RG, address, occupation, income) and legal
+         entities (CNPJ, articles of incorporation, shareholder structure, UBOs).
+      2. Implement automated beneficial ownership identification through corporate
+         chain traversal, flagging when ownership cannot be traced to natural persons.
+      3. Integrate with authoritative data sources for identity verification:
+         - Receita Federal (CPF/CNPJ validation)
+         - SERPRO/DataValid (biometric verification)
+         - Commercial registries (JUCESP, JUCERJA, etc.)
+         - PEP databases (CNPEP, COAF lists)
+      4. Build automated KYC refresh workflows that trigger periodic recertification
+         based on client risk classification (annual for high-risk, biennial for
+         medium, triennial for low).
+      5. Implement change detection monitoring for client data: address changes,
+         ownership changes, representative changes, activity changes.
+    tools:
+      - kyc-platform
+      - identity-verification
+      - beneficial-ownership-engine
+      - data-enrichment
+      - kyc-refresh-automation
+  devsecops:
+    prose: |
+      1. Implement data validation rules as code for all KYC fields, with
+         automated tests covering edge cases (foreign persons, complex corporate
+         structures, trusts, foundations).
+      2. CI/CD pipeline must validate KYC form completeness rules against
+         regulatory requirements before deployment.
+      3. SAST scanning for KYC data handling code to detect potential data
+         leakage, SQL injection, or insecure storage of sensitive identity data.
+      4. Implement DAST scanning for KYC web interfaces to detect vulnerabilities
+         that could expose client identification data.
+      5. Maintain test datasets with anonymized KYC scenarios for regression testing.
+    tools:
+      - sast
+      - dast
+      - data-validation
+      - gitlab-ci
+      - test-data-management
+  secops:
+    prose: |
+      1. Monitor KYC completion rates and identify accounts with incomplete or
+         expired identification data.
+      2. Implement escalation procedures for clients who refuse to provide
+         required identification or beneficial ownership information.
+      3. Conduct periodic quality reviews of KYC files, sampling across risk
+         categories and entity types.
+      4. Track regulatory examination findings related to KYC deficiencies and
+         ensure timely remediation.
+      5. Report KYC metrics to the compliance committee: completion rates,
+         refresh rates, deficiency rates, remediation status.
+    tools:
+      - kyc-quality-dashboard
+      - grc-platform
+      - regulatory-tracking
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-10", "art-11", "art-12", "art-13", "art-14"]
+    relationship: derived-from
+  - framework_id: cvm-50
+    articles: ["art-7", "art-8"]
+    relationship: derived-from

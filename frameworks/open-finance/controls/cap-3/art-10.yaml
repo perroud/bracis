@@ -1,0 +1,96 @@
+id: art-10
+family: cap-3
+title: "Servico de Iniciacao de Transacao de Pagamento"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 10. O serviço de iniciação de transação de pagamento (ITP) consiste
+    na prestação de serviço de iniciação de uma ordem de pagamento por
+    instituição participante (iniciador), a pedido do cliente, sem que o
+    iniciador detenha em momento algum os recursos objeto da transação.
+
+    Parágrafo 1. O iniciador de transação de pagamento deve:
+    I - obter consentimento prévio e específico do cliente para cada
+    transação ou conjunto de transações;
+    II - autenticar o cliente junto à instituição detentora da conta
+    por meio de redirecionamento seguro;
+    III - transmitir a ordem de pagamento à instituição detentora da conta
+    para execução;
+    IV - confirmar ao cliente o status da transação iniciada.
+
+    Parágrafo 2. O iniciador não pode armazenar credenciais de acesso
+    do cliente à instituição detentora da conta.
+guidance:
+  prose: |
+    O art. 10 define o servico de ITP e suas regras:
+
+    **Fluxo de iniciacao de pagamento:**
+    1. Cliente solicita pagamento no ambiente do iniciador
+    2. Iniciador obtem consentimento especifico para a transacao
+    3. Cliente e redirecionado a detentora de conta para autenticacao
+    4. Detentora autentica cliente e confirma consentimento
+    5. Iniciador transmite ordem de pagamento
+    6. Detentora executa o pagamento
+    7. Iniciador informa status ao cliente
+
+    **Restricoes do iniciador:**
+    - NAO detem recursos do cliente em momento algum
+    - NAO armazena credenciais de acesso do cliente
+    - NAO tem acesso direto a conta do cliente
+    - Atua exclusivamente como intermediario da ordem
+
+    **Tipos de pagamento iniciaveis:**
+    - PIX (transferencia instantanea)
+    - TED (transferencia entre bancos)
+    - Boleto (pagamento de boletos)
+    - Pagamento recorrente (mediante consentimento especifico)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de ITP:**
+      1. Implementar fluxo de redirecionamento (redirect) conforme FAPI
+         com authorization code flow + PKCE.
+      2. Garantir que nenhuma credencial do cliente seja armazenada
+         ou transitada pelo sistema do iniciador.
+      3. Implementar callback endpoint para receber confirmacao da
+         detentora apos autenticacao.
+      4. Implementar polling ou webhook para status da transacao.
+      5. Assinar requests com certificado de assinatura ICP-Brasil.
+    tools:
+      - oauth-server
+      - api-gateway
+      - webhook-handler
+      - digital-signature
+  devsecops:
+    prose: |
+      **Seguranca do fluxo de ITP:**
+      1. Validar que nenhum dado de credencial e persistido em logs,
+         banco ou cache.
+      2. Testar fluxo de redirecionamento contra ataques de redirect.
+      3. Verificar assinatura digital de requests e responses.
+      4. Implementar testes de nao-repudio para ordens de pagamento.
+    tools:
+      - secret-detection
+      - security-testing
+      - digital-signature-verification
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de transacoes iniciadas:**
+      1. Monitorar volume e valor de transacoes iniciadas em tempo real.
+      2. Detectar padroes anomalos de iniciacao (fraude).
+      3. Registrar trilha de auditoria completa de cada iniciacao.
+      4. Monitorar taxa de sucesso/falha de transacoes.
+    tools:
+      - transaction-monitoring
+      - fraud-detection
+      - siem
+      - audit-trail
+legal_references:
+  - framework_id: pix-security
+    articles: ["art-1"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

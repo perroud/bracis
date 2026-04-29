@@ -1,0 +1,86 @@
+id: pin-13
+family: pin-device
+title: "PIN Entry Device Logical Security"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    PEDs must incorporate logical security mechanisms that protect the PIN entry, encryption,
+    and communication functions from software-based attacks. The PED firmware must be
+    digitally signed and verified at boot time using a secure boot process. The PED must
+    not execute unauthorized code or allow firmware modifications that have not been
+    authenticated by the manufacturer's signing authority. PEDs must enforce separation
+    between PIN entry functions and non-payment applications running on the same device
+    (in the case of multi-application terminals). The PED must ensure that no application
+    or process can intercept, log, or replay PIN keystrokes. Communication between the PED
+    and the host system must be authenticated and encrypted to prevent man-in-the-middle
+    attacks.
+
+guidance:
+  prose: >-
+    Logical security of PEDs has become increasingly critical as modern payment terminals
+    evolve from single-purpose devices into multi-application platforms running Android or
+    Linux-based operating systems. These open platforms introduce software attack surfaces
+    (malware, privilege escalation, side-channel attacks on shared memory) that did not
+    exist in proprietary firmware-only devices. The secure boot chain ensures that only
+    manufacturer-authorized firmware runs on the device. Application isolation (using
+    hardware-enforced TEE — Trusted Execution Environment — or similar mechanisms) ensures
+    that non-payment applications cannot access the secure PIN entry module. Organizations
+    must validate that multi-application terminals have undergone PCI PTS POI evaluation
+    that specifically covers multi-application security.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 4, Logical Security"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy PEDs that support secure boot with hardware root of trust (TPM or equivalent).
+      Implement firmware update infrastructure that validates digital signatures before
+      applying updates to production devices. For multi-application terminals, deploy only
+      devices certified under PCI PTS POI with multi-application approval. Configure
+      terminal management systems to push firmware updates using encrypted and signed
+      packages. Enforce TLS mutual authentication between PEDs and host systems.
+      Implement application whitelisting on PED platforms to prevent execution of
+      unauthorized code.
+    tools:
+      - terminal-management-system
+      - firmware-signing-infrastructure
+      - device-management-platform
+      - tpm-provisioning
+  devsecops:
+    prose: >-
+      Integrate PED firmware builds into CI/CD pipelines with automated code signing.
+      Implement static analysis of PED application code to detect potential PIN data
+      leakage through logging, error messages, or shared memory. Test application
+      isolation by attempting cross-application data access in staging environments.
+      Validate secure boot chain integrity as part of firmware release testing.
+    tools:
+      - gitlab-sast
+      - firmware-signing-tools
+      - static-analysis-embedded
+      - integration-test-framework
+  secops:
+    prose: >-
+      Monitor PED firmware integrity status through the terminal management system.
+      Alert on any PED reporting a secure boot failure or unauthorized firmware
+      modification. Conduct periodic security assessments of multi-application PED
+      configurations to verify application isolation. Review terminal management system
+      logs for unauthorized firmware push attempts or configuration changes.
+    tools:
+      - splunk
+      - terminal-management-system
+      - crowdstrike
+      - endpoint-detection-response
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.1", "req-9.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "CM-14"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.9", "A.7.8"]
+    relationship: mapped

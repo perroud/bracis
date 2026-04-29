@@ -1,0 +1,102 @@
+id: v13.1.1
+family: v13
+title: "Generic Web Service Security"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that all application components use the same encodings and parsers to avoid
+    parsing attacks that exploit differing URI or file parsing behavior between components.
+    API endpoints must enforce authentication and authorization consistently, validate all
+    input according to a strict schema, apply rate limiting, and return appropriate HTTP
+    status codes and security headers. RESTful APIs must not expose sensitive data in URL
+    parameters.
+
+guidance:
+  prose: >-
+    API and web service security requires consistent application of all security controls
+    across every endpoint. Parser differential attacks exploit differences in how components
+    (load balancer, WAF, application server, backend service) parse the same request. If a
+    WAF and application server disagree on URL normalization, an attacker can craft requests
+    that bypass WAF rules. All components in the request processing chain must use identical
+    parsing and encoding rules. APIs must enforce the same authentication, authorization,
+    input validation, and rate limiting controls as traditional web applications. GraphQL,
+    gRPC, and WebSocket endpoints require the same security attention as REST endpoints.
+    API documentation and error messages must not reveal internal implementation details.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V13.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP REST Security Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Standardize URL parsing, encoding, and normalization across all layers of the
+      request processing stack (CDN, WAF, load balancer, API gateway, application). Use
+      a single API gateway as the enforcement point for authentication, rate limiting,
+      and schema validation. Deploy OpenAPI specification enforcement at the gateway layer
+      to reject requests not conforming to the published API contract. Implement consistent
+      error response formatting that does not leak stack traces, SQL errors, or internal
+      paths. Apply CORS policies at the gateway level with strict origin allow-lists. Use
+      content-type validation to reject requests with unexpected content types. Implement
+      request ID tracing across all components for correlated debugging.
+    tools:
+      - kong
+      - envoy
+      - aws-api-gateway
+      - nginx
+      - openapi-validator
+      - cloudflare
+      - istio
+
+  devsecops:
+    prose: >-
+      Implement API contract testing using OpenAPI validators to detect schema violations.
+      Write DAST tests targeting all API endpoints with authentication bypass, injection
+      payloads, and malformed requests. Test parser differential attacks by sending requests
+      with ambiguous encoding through the full stack. Validate that error responses do not
+      contain stack traces, database errors, or internal file paths. Include API-specific
+      tests: mass assignment, BOLA (Broken Object Level Authorization), excessive data
+      exposure, and rate limit bypass. Lint OpenAPI specifications for security
+      anti-patterns (missing authentication, overly permissive schemas).
+    tools:
+      - owasp-zap
+      - burp-suite
+      - schemathesis
+      - dredd
+      - semgrep
+      - gitlab-ci
+      - nuclei
+      - postman
+
+  secops:
+    prose: >-
+      Monitor API traffic for abuse patterns: excessive request rates, unusual endpoint
+      access sequences, high error rates from specific clients, or data volumes inconsistent
+      with normal usage. Implement API-specific threat detection rules in the SIEM. Track
+      API usage per consumer and alert on deviations from established baselines. Monitor
+      for API enumeration (sequential access to listing endpoints) and scraping patterns.
+      Review API access logs for deprecated endpoint usage that may indicate attacker
+      reconnaissance using outdated documentation.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog-security
+      - cloudflare-security-analytics
+      - kong-analytics
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SI-10", "AC-3"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4", "6.5.5"]
+    relationship: implements

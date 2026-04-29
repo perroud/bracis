@@ -1,0 +1,91 @@
+id: art-2
+family: cap-1
+title: "Definicoes e Conceitos"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 2. Para os fins desta Instrução Normativa, consideram-se os seguintes conceitos:
+    I - computação em nuvem: modelo que possibilita o acesso, por meio de rede, a um
+    conjunto compartilhado de recursos computacionais configuráveis, que podem ser
+    provisionados e liberados com mínimo esforço de gestão ou interação com o provedor;
+    II - nuvem pública: infraestrutura de nuvem disponibilizada para uso aberto ao
+    público em geral, podendo ser de propriedade e operação de organização empresarial,
+    acadêmica ou governamental;
+    III - nuvem privada: infraestrutura de nuvem provisionada para uso exclusivo de
+    uma única organização;
+    IV - nuvem híbrida: composição de duas ou mais infraestruturas de nuvem distintas
+    que permanecem como entidades únicas, porém vinculadas por tecnologia que permite
+    portabilidade de dados e aplicações;
+    V - nuvem comunitária: infraestrutura de nuvem provisionada para uso exclusivo
+    de uma comunidade específica de organizações que compartilham preocupações comuns.
+guidance:
+  prose: |
+    O art. 2 estabelece as definicoes tecnicas de modelos de implantacao de nuvem,
+    alinhadas com as definicoes do NIST SP 800-145.
+
+    **Modelos de implantacao:**
+    - Nuvem publica: AWS, Azure, GCP (maior risco, menor controle)
+    - Nuvem privada: datacenter proprio ou dedicado (maior controle, maior custo)
+    - Nuvem hibrida: combinacao de publica e privada (equilibrio risco/custo)
+    - Nuvem comunitaria: compartilhada entre orgaos federais (ex: nuvem do SERPRO)
+
+    **Mapeamento CSA CCM v4:**
+    - STA-01: Shared Security Responsibility Model (modelo de responsabilidade
+      compartilhada varia conforme tipo de nuvem)
+
+    **Mapeamento NIST SP 800-145:**
+    - Definicao de modelos de nuvem (secao 2)
+
+    **Implicacao pratica:**
+    A classificacao do modelo de nuvem determina o nivel de controle que o orgao
+    mantem sobre os dados e a infraestrutura, impactando diretamente os requisitos
+    de seguranca aplicaveis.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificacao e registro de modelos:**
+      1. Classificar cada servico de nuvem contratado segundo os modelos definidos
+         no art. 2 (publica, privada, hibrida, comunitaria).
+      2. Documentar o modelo de responsabilidade compartilhada (shared responsibility)
+         para cada servico, delimitando o que e responsabilidade do provedor vs. do orgao.
+      3. Manter matriz de riscos por modelo de nuvem, considerando que nuvem publica
+         tem maior superficie de ataque e menor controle operacional.
+      4. Implementar tags e labels em recursos de nuvem que identifiquem o modelo
+         de implantacao e a classificacao de dados.
+    tools:
+      - cloud-inventory
+      - tagging-policy
+      - risk-matrix
+  devsecops:
+    prose: |
+      **Controles diferenciados por modelo:**
+      1. Politicas de IaC que apliquem controles diferenciados conforme modelo de nuvem
+         (ex: criptografia obrigatoria em nuvem publica, opcional em nuvem privada).
+      2. Validacao automatica de que recursos provisionados estejam no modelo de nuvem
+         aprovado para o tipo de dado que armazenarao.
+      3. Testes de seguranca diferenciados por modelo: nuvem publica exige testes
+         mais rigorosos que nuvem privada.
+    tools:
+      - terraform
+      - opa-gatekeeper
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento por modelo:**
+      1. Monitoramento diferenciado por modelo de nuvem, com SLAs de resposta
+         mais agressivos para nuvem publica.
+      2. Auditoria periodica de classificacao de modelos vs. dados armazenados.
+      3. Alertas automaticos caso dados com classificacao restrita sejam detectados
+         em modelo de nuvem nao autorizado.
+    tools:
+      - casb
+      - siem
+      - dlp
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-3"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["STA-01"]
+    relationship: mapped

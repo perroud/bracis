@@ -1,0 +1,154 @@
+id: itgc-access
+family: itgc
+title: "IT General Control: Access Management"
+class: SOX
+
+statement:
+  prose: >-
+    The organization shall establish and maintain logical access controls over IT
+    systems and data that support financial reporting. Access to programs, data,
+    and computing resources shall be restricted to authorized individuals based on
+    business need and job responsibilities. Access provisioning, modification, and
+    revocation shall be formally authorized, documented, and periodically reviewed.
+    Privileged access shall be restricted to the minimum number of individuals
+    necessary and subject to enhanced monitoring. Authentication mechanisms shall
+    provide reasonable assurance that users are who they claim to be.
+  parts:
+    - id: itgc-access.1
+      label: "(1)"
+      prose: >-
+        Access to applications, databases, operating systems, and network devices
+        that support financial reporting shall be restricted to authorized users
+        through unique user identification and authentication.
+    - id: itgc-access.2
+      label: "(2)"
+      prose: >-
+        Access provisioning and modification shall be formally authorized by
+        appropriate management, documented, and processed in a timely manner.
+    - id: itgc-access.3
+      label: "(3)"
+      prose: >-
+        Access shall be revoked or modified in a timely manner upon personnel
+        termination, transfer, or change in job responsibilities.
+    - id: itgc-access.4
+      label: "(4)"
+      prose: >-
+        Periodic access reviews shall be performed to validate that access
+        rights remain appropriate and that unauthorized access has not been granted.
+    - id: itgc-access.5
+      label: "(5)"
+      prose: >-
+        Privileged and administrative access shall be restricted, formally
+        authorized, and subject to enhanced monitoring and periodic review.
+    - id: itgc-access.6
+      label: "(6)"
+      prose: >-
+        Segregation of duties shall be enforced through access controls to
+        prevent any single individual from performing incompatible functions
+        (e.g., developing and deploying code, initiating and approving transactions).
+
+guidance:
+  prose: >-
+    Access management is the most frequently tested ITGC domain in SOX audits.
+    Auditors focus on whether the organization can demonstrate that only authorized
+    individuals have access to financial systems and data, that access is granted
+    based on documented business need, and that access is promptly removed when no
+    longer required. Common audit findings include: stale accounts (terminated employees
+    with active access), excessive privileged access, lack of periodic access reviews,
+    missing access request documentation, and inadequate segregation of duties. The
+    scope includes all layers of the technology stack: applications (ERP, financial
+    reporting tools), databases, operating systems, network devices, cloud consoles,
+    and middleware. For SOX purposes, the control population is limited to systems
+    that are material to financial reporting, but the same access control principles
+    should be applied consistently.
+
+references:
+  - citation: "COSO Internal Control — Integrated Framework, Principle 12: Deploy Control Activities Through Policies"
+    url: "https://www.coso.org/guidance-on-ic"
+  - citation: "COBIT 2019 — DSS05: Manage Security Services"
+    url: "https://www.isaca.org/resources/cobit"
+  - citation: "PCAOB AS 2201, Paragraphs 34-38 — IT General Controls"
+    url: "https://pcaobus.org/oversight/standards/auditing-standards/details/AS2201"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management through a single identity provider
+      (IdP) with SAML/OIDC federation to all in-scope applications. Enforce unique
+      user identification — eliminate shared accounts and service accounts where
+      possible, and where service accounts are required, implement credential rotation
+      and usage monitoring. Deploy role-based access control (RBAC) with predefined
+      role templates that map to job functions, reducing the risk of ad-hoc access
+      grants. Implement automated provisioning/deprovisioning through SCIM integration
+      between HR systems and the IdP to ensure timely access changes on hire, transfer,
+      and termination. Deploy just-in-time (JIT) privileged access that grants
+      elevated permissions only for a defined time window with documented justification.
+      Implement automated access certification campaigns on a quarterly cadence that
+      require managers to review and confirm or revoke their direct reports' access.
+      Enforce multi-factor authentication (MFA) for all access to in-scope systems.
+      Implement segregation of duties matrices as code, enforced through policy engines
+      that prevent conflicting role assignments.
+    tools:
+      - okta
+      - azure-ad
+      - vault
+      - kubernetes-rbac
+      - open-policy-agent
+      - terraform
+      - backstage
+  devsecops:
+    prose: >-
+      Enforce access controls within the CI/CD system by implementing protected
+      branches, merge request approval rules, and environment-level access restrictions.
+      Configure the CI/CD system to prevent developers from deploying their own code
+      to production (segregation of duties). Implement automated access reviews for
+      repository permissions and deployment credentials on a quarterly basis. Use
+      infrastructure-as-code to manage access control configurations, ensuring all
+      access changes are version-controlled, peer-reviewed, and auditable. Deploy
+      automated scanning of infrastructure code to detect overly permissive access
+      configurations (wildcard permissions, disabled authentication, public exposure).
+      Implement automated detection of hardcoded credentials in code and configuration.
+      Configure pipeline secrets management through a dedicated vault with access
+      logging and automatic rotation.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - vault
+      - checkov
+      - tfsec
+      - gitleaks
+      - open-policy-agent
+  secops:
+    prose: >-
+      Operate quarterly user access reviews across all in-scope systems, generating
+      review packages that list each user, their roles, their last access date, and
+      the authorizing manager. Investigate and remediate exceptions within defined SLAs.
+      Monitor authentication and authorization logs in SIEM to detect anomalous access
+      patterns (access from unusual locations, access outside business hours, privilege
+      escalation attempts, brute force attacks). Implement automated alerts for
+      high-risk access events (new privileged accounts, access to financial databases
+      by non-financial users, service account usage anomalies). Maintain segregation
+      of duties monitoring that flags conflicting access combinations. Track access
+      request and revocation timeliness metrics (time from HR termination notification
+      to access revocation, time from access request to provisioning). Generate monthly
+      access management reports showing review completion rates, exceptions identified,
+      remediation timelines, and trend analysis.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - saviynt
+      - grc-platform
+      - servicenow
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-5", "AC-6", "IA-2", "IA-4", "IA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.16", "a5.17", "a5.18", "a8.2", "a8.3", "a8.5"]
+    relationship: supports
+  - framework_id: soc2
+    articles: ["cc6.1", "cc6.2", "cc6.3"]
+    relationship: supports

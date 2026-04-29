@@ -1,0 +1,99 @@
+id: pii-d.3
+family: pii-d
+title: "Disclosure limitation and sub-processor management"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall disclose PII to third parties only as
+    authorized by the cloud service customer or as required by law. The public
+    cloud PII processor shall inform the cloud service customer of any legally
+    binding request for disclosure of PII by a law enforcement authority, unless
+    such disclosure is otherwise prohibited. Before engaging a sub-processor, the
+    public cloud PII processor shall inform the cloud service customer and obtain
+    authorization. The public cloud PII processor shall impose on any sub-processor
+    the same data protection obligations as those imposed on the processor in the
+    agreement with the cloud service customer.
+
+guidance:
+  prose: >-
+    Disclosure limitation addresses two critical scenarios: third-party sharing
+    (including sub-processors) and government access requests. For sub-processors,
+    the control establishes a chain-of-accountability: the original processor
+    remains responsible for its sub-processors' compliance. The customer must know
+    who the sub-processors are, where they operate, and what PII they can access.
+    For government access, the processor must be transparent about requests
+    received, subject only to legal prohibitions (e.g., gag orders). The processor
+    should resist overbroad government requests and disclose only the minimum PII
+    legally required. The processor should maintain a transparency report
+    documenting the volume and nature of government access requests.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.4.2"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement sub-processor registry as a platform service. All third-party
+      integrations that access customer PII must be registered, authorized, and
+      monitored. Build data flow controls that prevent PII from being transmitted
+      to destinations not authorized in the sub-processor registry. Implement
+      network-level controls that whitelist approved sub-processor endpoints and
+      block all other outbound PII transfers. Build government access request
+      tracking into the legal response workflow with automatic customer
+      notification (unless legally prohibited). Deploy data residency controls
+      that enforce geographic restrictions on PII storage and processing
+      consistent with the sub-processor authorization.
+    tools:
+      - sub-processor-registry
+      - data-flow-controls
+      - network-egress-policies
+      - government-request-tracker
+      - data-residency-controls
+      - customer-notification-service
+
+  devsecops:
+    prose: >-
+      Enforce sub-processor controls in the development pipeline. Any code that
+      transmits PII to external endpoints must reference an authorized sub-
+      processor in its configuration. CI gates should validate that outbound PII
+      destinations are registered in the sub-processor registry. Static analysis
+      rules should flag hardcoded external API calls that could transmit PII.
+      Build integration tests that verify PII cannot be transmitted to
+      unauthorized destinations. Include sub-processor review in the security
+      review checklist for all third-party integration code.
+    tools:
+      - gitlab-ci
+      - sub-processor-validator
+      - semgrep
+      - egress-control-tests
+      - third-party-integration-review
+      - destination-whitelist-linter
+
+  secops:
+    prose: >-
+      Monitor for unauthorized PII disclosure. Build detection rules for PII
+      transmission to destinations not in the sub-processor registry. Track
+      government access requests and verify customer notification compliance.
+      Audit sub-processor compliance through regular assessment of their security
+      posture and data handling practices. Monitor sub-processor data flows for
+      anomalies that could indicate unauthorized re-sharing. Maintain
+      transparency reports documenting government access request volumes and
+      outcomes. Alert on new outbound data flows containing PII.
+    tools:
+      - splunk
+      - elastic-siem
+      - egress-monitoring
+      - government-request-dashboard
+      - sub-processor-audit
+      - transparency-reporting
+      - data-flow-anomaly-detection
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28.2", "art-28.4", "art-48"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.5.1", "b-8.5.1"]
+    relationship: complements

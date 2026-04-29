@@ -1,0 +1,123 @@
+id: art-21
+family: cap-5
+title: "Monitoramento de Operacoes e Situacoes Suspeitas"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 21. As instituições mencionadas no art. 1 devem implementar procedimentos de
+    monitoramento, seleção e análise de operações e situações suspeitas que possam indicar
+    a prática de lavagem de dinheiro ou de financiamento do terrorismo.
+
+    § 1. Os procedimentos de monitoramento devem ser compatíveis com a política, os
+    procedimentos e os controles internos da instituição.
+
+    § 2. O monitoramento deve abranger todas as operações realizadas, produtos e
+    serviços contratados, inclusive depósitos, saques, aportes, pagamentos, recebimentos
+    e transferências de recursos.
+guidance:
+  prose: |
+    O art. 21 estabelece a obrigacao de monitoramento continuo de transacoes,
+    que e o coracao operacional do programa de PLD/FT.
+
+    **Ciclo de monitoramento em tres etapas:**
+    1. Monitoramento: observacao sistematica de operacoes e situacoes
+    2. Selecao: identificacao de operacoes que desviam do padrao esperado
+    3. Analise: investigacao das operacoes selecionadas para determinar
+       se sao suspeitas
+
+    **Compatibilidade com a politica (ss 1):**
+    Os procedimentos de monitoramento devem estar alinhados com:
+    - A politica de PLD/FT (art. 3)
+    - A avaliacao de risco (art. 6)
+    - As categorias de risco (art. 7)
+    - Os perfis de clientes (arts. 10-17)
+
+    **Abrangencia total (ss 2):**
+    O monitoramento deve cobrir TODAS as operacoes sem excecao. Nao pode
+    haver produto, servico ou canal sem monitoramento. Isso inclui:
+    - Operacoes tradicionais (depositos, saques, transferencias)
+    - Operacoes digitais (PIX, TED, DOC)
+    - Contratacoes de produtos (credito, investimentos, seguros)
+    - Operacoes internacionais (cambio, remessas)
+
+    **Implicacao tecnica:**
+    O monitoramento de 100% das operacoes exige automacao. E impossivel
+    realizar manualmente para qualquer instituicao de porte minimo.
+    Requer engine de regras, processamento de eventos e machine learning.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Engine de monitoramento transacional:**
+      1. Processamento de eventos em tempo real (Kafka Streams, Flink, Spark
+         Streaming) para ingestao de todas as operacoes.
+      2. Motor de regras com dois modos de execucao:
+         - Real-time: regras de deteccao imediata (alto risco, sancoes)
+         - Batch: analise de padroes comportamentais (diario, semanal)
+      3. Biblioteca de cenarios de deteccao (regras):
+         - Operacoes incompativeis com perfil (valor, frequencia, tipo)
+         - Estruturacao (smurfing): divisao de operacoes para evitar threshold
+         - Operacoes com jurisdicoes de alto risco
+         - Transacoes rapidas (passagem de recursos sem permanencia)
+         - Operacoes de PEPs acima de threshold
+         - Concentracao de operacoes em especie
+      4. Score de suspeita por operacao que combina multiplas regras.
+
+      **Pipeline de alertas:**
+      5. Fila de alertas priorizada por score de suspeita e categoria de risco.
+      6. Deduplicacao de alertas (consolidacao de operacoes do mesmo cliente).
+      7. Enriquecimento automatico de alertas com dados contextuais.
+      8. Dashboard de monitoramento com metricas em tempo real.
+    tools:
+      - transaction-monitoring
+      - event-streaming
+      - rules-engine
+      - aml-platform
+  devsecops:
+    prose: |
+      **Qualidade das regras de monitoramento:**
+      1. Testes unitarios para cada regra de deteccao (true positive, true
+         negative, boundary).
+      2. Backtesting de regras contra dados historicos com metricas de
+         precision e recall.
+      3. A/B testing para novas regras antes de producao.
+      4. Pipeline de deploy de regras com gate de aprovacao do compliance.
+
+      **Performance e escalabilidade:**
+      5. Testes de carga com volumes de producao (milhoes de transacoes/dia).
+      6. Monitoramento de latencia de processamento (meta: < 5 segundos).
+      7. Testes de failover e recuperacao do engine de monitoramento.
+      8. Alertas de degradacao de performance.
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - event-streaming
+      - monitoring
+  secops:
+    prose: |
+      **Operacao do monitoramento:**
+      1. Equipe dedicada de analistas de PLD/FT para analise de alertas.
+      2. SLA de analise: alto risco em 24h, medio risco em 72h, baixo em 5 dias.
+      3. Processo de escalacao quando backlog excede threshold.
+      4. Documentacao padronizada de analise e conclusao.
+
+      **Efetividade do monitoramento:**
+      5. Metricas de efetividade: taxa de conversao (alerta -> comunicacao COAF),
+         taxa de falso positivo, taxa de descarte.
+      6. Ajuste periodico de regras com base em metricas de efetividade.
+      7. Revisao de regras quando novas tipologias sao identificadas.
+      8. Relatorio mensal ao diretor responsavel sobre efetividade do monitoramento.
+    tools:
+      - aml-platform
+      - case-management
+      - reporting-dashboard
+      - siem
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "SI-4", "CA-7"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-46"]
+    relationship: complements

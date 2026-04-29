@@ -1,0 +1,128 @@
+id: art-14
+family: cap-3
+title: "Manutencao e Gestao de Mudancas de Software"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 14. O fabricante deve implementar processo de manutenção de
+    software conforme IEC 62304 que inclua:
+
+    I - processo de resolução de problemas para receber, documentar,
+    avaliar e resolver problemas reportados por usuários, equipe
+    interna, vigilância pós-mercado e auditorias;
+    II - análise de impacto de cada alteração de software na segurança
+    e eficácia do SaMD, incluindo impacto em funcionalidades existentes,
+    integrações e desempenho clínico;
+    III - classificação de alterações em categorias regulatórias:
+    a) alteração maior: exige alteração de registro junto à ANVISA;
+    b) alteração menor: exige notificação à ANVISA;
+    c) correção: registro interno com documentação de impacto;
+    IV - revalidação proporcional ao impacto da alteração, incluindo
+    execução de testes de regressão e, quando aplicável, revalidação
+    clínica;
+    V - rastreabilidade de cada alteração ao problema que a motivou,
+    aos requisitos afetados e aos testes de verificação realizados.
+
+    Parágrafo único. O fabricante deve comunicar ao usuário final as
+    alterações relevantes para segurança e eficácia do SaMD, incluindo
+    notas de versão com descrição de mudanças e instruções de atualização.
+guidance:
+  prose: |
+    O art. 14 regula o processo de manutencao de SaMD, que e particularmente
+    critico porque atualizacoes de software podem alterar o perfil de
+    risco do dispositivo.
+
+    **Classificacao regulatoria de alteracoes:**
+    A ANVISA distingue entre alteracoes que exigem acao regulatoria e
+    aquelas que sao geridas internamente:
+    - Alteracao maior: mudanca de indicacao de uso, novo algoritmo
+      clinico, alteracao de classe de risco -> alteracao de registro
+    - Alteracao menor: melhoria de usabilidade sem impacto clinico,
+      correcao de defeito sem impacto em seguranca -> notificacao
+    - Correcao: bug fix sem impacto clinico, patch de seguranca ->
+      registro interno
+
+    **Ciclo de manutencao:**
+    1. Problema reportado (usuario, vigilancia, auditoria, scanner)
+    2. Triagem e classificacao (severidade + impacto clinico)
+    3. Analise de impacto (seguranca, eficacia, regulatorio)
+    4. Implementacao da correcao
+    5. Revalidacao proporcional
+    6. Liberacao com notas de versao
+    7. Acao regulatoria se aplicavel
+
+    **Notas de versao para SaMD:**
+    Devem ser escritas em linguagem acessivel ao usuario pretendido e
+    incluir: problemas corrigidos, melhorias implementadas, impacto
+    em seguranca/eficacia e instrucoes de atualizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de manutencao e gestao de mudancas:**
+      1. Implementar sistema de issue tracking com workflow regulatorio:
+         triagem -> classificacao (maior/menor/correcao) -> analise de
+         impacto -> desenvolvimento -> revalidacao -> release -> acao
+         regulatoria.
+      2. Configurar pipeline de release automatizado com geracao de
+         release notes a partir de conventional commits, classificadas
+         por impacto regulatorio.
+      3. Implementar mecanismo de distribuicao de atualizacoes com
+         rollback automatico, canary deployment para SaMD Classe I/II
+         e blue-green deployment para SaMD Classe III/IV.
+      4. Configurar sistema de notificacao de atualizacoes para
+         usuarios finais, com confirmacao de recebimento e instrucoes
+         de atualizacao customizadas por perfil de usuario.
+    tools:
+      - issue-tracking
+      - release-management
+      - deployment-strategies
+      - notification-system
+  devsecops:
+    prose: |
+      **Pipeline de manutencao controlada:**
+      1. Implementar analise de impacto automatizada no pipeline:
+         analisar diff de codigo para identificar componentes clinicos
+         afetados e sugerir classificacao regulatoria da alteracao.
+      2. Configurar pipeline de revalidacao automatica proporcional:
+         correcao -> testes de regressao; alteracao menor -> testes
+         de regressao + integracao; alteracao maior -> suite completa
+         + revalidacao clinica.
+      3. Automatizar geracao de Change Impact Assessment (CIA) como
+         artefato de merge request, incluindo: componentes afetados,
+         requisitos impactados, testes a executar, acao regulatoria.
+      4. Implementar rastreabilidade bidirecional: issue -> merge
+         request -> commit -> test result -> release -> regulatory
+         action, verificavel automaticamente no pipeline.
+    tools:
+      - gitlab-ci
+      - impact-analysis
+      - change-management
+      - traceability-tools
+  secops:
+    prose: |
+      **Governanca de manutencao e mudancas:**
+      1. Manter Change Control Board (CCB) com representantes de
+         engenharia, clinico, regulatorio e qualidade para avaliar
+         alteracoes maiores e decidir acao regulatoria.
+      2. Implementar processo de comunicacao com ANVISA para alteracoes
+         maiores (alteracao de registro) e menores (notificacao),
+         com templates e prazos documentados.
+      3. Monitorar metricas de manutencao: tempo de resolucao por
+         severidade, taxa de reincidencia de defeitos, volume de
+         alteracoes por categoria regulatoria.
+      4. Auditar anualmente processo de gestao de mudancas, verificando
+         completude de analises de impacto, adequacao de classificacoes
+         regulatorias e rastreabilidade.
+    tools:
+      - change-control-board
+      - regulatory-communication
+      - metrics-dashboard
+      - audit-management
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7-4", "SR-7-5"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164-308-a-5-ii"]
+    relationship: mapped

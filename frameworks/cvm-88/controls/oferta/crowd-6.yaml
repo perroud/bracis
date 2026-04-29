@@ -1,0 +1,123 @@
+id: crowd-6
+family: oferta
+title: "Public Offering Fundraising Limits"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 13. A oferta pública de distribuição de valores mobiliários de
+    emissão de sociedade empresária de pequeno porte, realizada por meio
+    de plataforma eletrônica de investimento participativo, está dispensada
+    de registro na CVM desde que observados os seguintes limites:
+    I — o valor total das captações realizadas pela sociedade empresária
+    emissora, por meio de plataformas eletrônicas de investimento
+    participativo, não exceda R$ 15.000.000,00 (quinze milhões de reais)
+    no período de 12 (doze) meses; II — cada oferta não exceda o prazo
+    máximo de captação de 180 (cento e oitenta) dias.
+
+    § 1º O valor mencionado no inciso I inclui todas as captações realizadas
+    pela sociedade empresária emissora e por sociedades a ela vinculadas
+    por meio de plataformas eletrônicas de investimento participativo no
+    período de 12 meses.
+
+    § 2º A sociedade empresária emissora é considerada de pequeno porte
+    quando sua receita bruta anual, apurada no exercício social encerrado
+    no ano anterior à oferta, não exceda R$ 40.000.000,00 (quarenta milhões
+    de reais).
+guidance:
+  prose: |
+    Article 13 defines the core exemption framework for crowdfunding
+    offerings. Securities offered through CVM-registered platforms are
+    exempt from the standard CVM offering registration (which is
+    significantly more expensive and complex) provided two limits are
+    respected.
+
+    **R$15M rolling 12-month cap:**
+    The issuer (and all related entities) cannot raise more than R$15M
+    through crowdfunding platforms in any 12-month rolling window. This
+    is an aggregate limit across ALL platforms, not per platform.
+
+    **180-day offering window:**
+    Each individual offering has a maximum duration of 180 days. If the
+    target is not reached within this period, the offering must close.
+
+    **Small enterprise definition:**
+    Only companies with annual gross revenue up to R$40M in the previous
+    fiscal year qualify as "small enterprises" for CVM 88 purposes.
+
+    **Technology implications:**
+    Platforms must implement real-time tracking of cumulative fundraising
+    across the ecosystem to prevent issuers from exceeding the R$15M
+    limit. This requires either a centralized registry or inter-platform
+    data sharing mechanism.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fundraising limit enforcement system:**
+      1. Implement a cumulative fundraising tracker per issuer that
+         monitors the rolling 12-month total across all platform
+         offerings, including related entities.
+      2. Build automated offering deadline enforcement: system must
+         automatically close offerings at the 180-day mark.
+      3. Deploy real-time limit calculation API that factors in all
+         related-entity fundraising when validating new offering
+         eligibility.
+
+      **Issuer qualification:**
+      4. Build issuer onboarding workflow that validates small enterprise
+         status (annual gross revenue <= R$40M) with document
+         verification.
+      5. Implement CVM reporting integration for issuer registration
+         and offering status updates.
+    tools:
+      - postgresql
+      - redis
+      - kubernetes
+      - api-gateway
+  devsecops:
+    prose: |
+      **Financial calculation integrity:**
+      1. Extensive unit testing for fundraising limit calculations
+         including edge cases: related entities, multiple concurrent
+         offerings, timezone boundaries for 12-month window.
+      2. SAST focused on financial arithmetic modules to detect
+         integer overflow, rounding errors, or bypass vulnerabilities.
+      3. Integration tests simulating multi-platform fundraising
+         scenarios to verify cross-platform limit enforcement.
+
+      **Deployment controls:**
+      4. Feature flags for limit-related changes with gradual rollout
+         and monitoring.
+      5. Database migration testing for any changes to offering or
+         issuer data models.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - jest
+      - cypress
+  secops:
+    prose: |
+      **Limit monitoring and oversight:**
+      1. Daily automated report of issuers approaching the R$15M
+         ceiling (alert at 80%, 90%, 95% thresholds).
+      2. Monitor for attempts to circumvent limits through related
+         entities, corporate restructuring, or identity manipulation.
+      3. Alert on offerings approaching the 180-day deadline with
+         insufficient funding.
+
+      **Regulatory reporting:**
+      4. Quarterly report to CVM on all offerings, amounts raised,
+         and issuer compliance with small enterprise criteria.
+      5. Maintain audit trail of all limit calculations and override
+         decisions (if any emergency exceptions are needed).
+    tools:
+      - grc-platform
+      - siem
+      - business-intelligence
+legal_references:
+  - framework_id: cvm-135
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: cvm-175
+    articles: ["art-1"]
+    relationship: complements

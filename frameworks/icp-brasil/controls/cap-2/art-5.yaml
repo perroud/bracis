@@ -1,0 +1,114 @@
+id: art-5
+family: cap-2
+title: "Advanced Electronic Signature Requirements"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 5. da Lei 14.063/2020. A assinatura eletrônica avançada, de que trata
+    o inciso III do caput do art. 2º desta Lei:
+
+    I - está associada ao signatário de maneira unívoca;
+
+    II - utiliza dados para a criação de assinatura eletrônica cujo signatário
+    pode, com elevado nível de confiança, operar sob o seu controle exclusivo;
+
+    III - está relacionada aos dados a ela associados de tal modo que qualquer
+    modificação posterior é detectável.
+
+    § 1º É admitida a assinatura eletrônica avançada nas interações com ente
+    público que envolvam informações protegidas por grau de sigilo, nas
+    interações entre entes públicos e em registros de saúde.
+
+    § 2º A assinatura eletrônica avançada pode ser admitida nas interações
+    com ente público que requeiram assinatura eletrônica qualificada, desde
+    que autorizada por ato do titular do Poder ou do órgão.
+guidance:
+  prose: |
+    Article 5 defines the advanced electronic signature, the intermediate
+    assurance level, with three mandatory properties:
+
+    **Mandatory properties:**
+    1. **Unique association:** The signature must be uniquely linked to the
+       signer (not shared credentials).
+    2. **Sole control:** The signer must have exclusive control over the
+       signing key/mechanism with high confidence.
+    3. **Tamper detection:** Any modification to the signed data after
+       signing must be detectable.
+
+    **Permitted use cases:**
+    - Interactions with government involving classified information
+    - Inter-governmental communications
+    - Health records and medical documentation
+    - Can substitute qualified signatures when authorized by regulation
+
+    **Implementation approaches:**
+    - Cloud-based signing with strong authentication (e.g., gov.br gold level)
+    - Institutional PKI certificates (not ICP-Brasil but meeting the three
+      properties above)
+    - Hardware security modules (HSM) with individual user keys
+    - Blockchain-anchored signatures with identity verification
+
+    **Key distinction from qualified:**
+    Advanced signatures do NOT require ICP-Brasil certificates. They can
+    use any technology that satisfies the three properties. However, they
+    lack the automatic legal presumption of qualified signatures unless
+    accepted by the parties or authorized by specific regulation.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implement advanced signature infrastructure:**
+      1. Deploy cloud-based signing service with HSM-backed keys for
+         individual signers (e.g., AWS CloudHSM, Azure Dedicated HSM).
+      2. Implement strong authentication (MFA) for signature key access,
+         ensuring sole control by the signer.
+      3. Use cryptographic algorithms that provide tamper detection:
+         RSA-2048+ or ECDSA P-256+ with SHA-256+ hash.
+      4. Integrate with gov.br at gold level (biometric or certificate
+         validation) for identity assurance.
+      5. Implement signature evidence package including certificate,
+         signed hash, timestamp, and validation data.
+    tools:
+      - hsm-service
+      - cloud-signing
+      - gov-br-integration
+      - mfa-service
+  devsecops:
+    prose: |
+      **Advanced signature quality assurance:**
+      1. Implement automated tests validating all three mandatory properties:
+         unique association, sole control, and tamper detection.
+      2. Include cryptographic algorithm compliance checks in pipeline
+         (minimum key sizes, approved algorithms per ICP-Brasil standards).
+      3. Test signature verification across different platforms and
+         libraries to ensure interoperability.
+      4. Add regression tests for tamper detection: modify signed content
+         and verify that validation fails.
+    tools:
+      - gitlab-ci
+      - crypto-testing
+      - interoperability-testing
+      - security-scanning
+  secops:
+    prose: |
+      **Operational management of advanced signatures:**
+      1. Monitor key usage patterns to detect potential compromise of
+         sole control (e.g., concurrent signing from multiple locations).
+      2. Maintain inventory of advanced signature implementations across
+         the organization with technology and algorithm details.
+      3. Conduct periodic assessment of cryptographic algorithm strength
+         against current threat landscape and ICP-Brasil recommendations.
+      4. Implement incident response procedures for suspected key
+         compromise, including revocation and re-issuance workflows.
+    tools:
+      - key-management
+      - siem
+      - crypto-inventory
+      - incident-response
+legal_references:
+  - framework_id: pep
+    articles: ["art-3", "art-4"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

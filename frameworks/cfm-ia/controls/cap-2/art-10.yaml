@@ -1,0 +1,115 @@
+id: art-10
+family: cap-2
+title: "Reclassificacao de Risco e Revisao Periodica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 10. A classificação de risco de sistemas de IA médica deve ser
+    revista:
+
+    I - sempre que houver alteração significativa no modelo de IA, incluindo
+    retreinamento com novos dados, mudança de arquitetura ou expansão do
+    escopo de uso clínico;
+
+    II - sempre que houver mudança na população-alvo, no contexto clínico
+    de utilização ou no nível de autonomia do sistema;
+
+    III - periodicamente, no mínimo a cada 12 meses, independentemente de
+    alterações no sistema;
+
+    IV - quando incidentes adversos relacionados ao sistema de IA indicarem
+    que o nível de risco vigente pode estar subestimado.
+
+    Parágrafo único. A reclassificação de risco deve seguir o mesmo
+    procedimento de classificação inicial previsto nos art. 6 e 7, com
+    documentação formal da justificativa e aprovação pelo responsável
+    técnico médico.
+guidance:
+  prose: |
+    O art. 10 reconhece que o risco de sistemas de IA nao e estatico.
+    Modelos mudam, contextos mudam e a classificacao deve acompanhar.
+
+    **Gatilhos de reclassificacao:**
+
+    - Alteracao no modelo (inciso I): retreinamento com dados novos pode
+      introduzir novos biases ou alterar performance em subgrupos. Mudanca
+      de arquitetura (ex: de random forest para deep learning) pode alterar
+      explicabilidade. Expansao de escopo (ex: de dermatologia para
+      oncologia) muda o perfil de risco.
+
+    - Mudanca de contexto (inciso II): mesmo modelo usado em ambulatorio
+      eletivo vs pronto-socorro tem riscos diferentes. Mudanca de
+      populacao (ex: de adultos para pediatria) eleva risco.
+
+    - Revisao periodica (inciso III): mesmo sem mudancas, o contexto
+      externo muda — novas evidencias clinicas, novos dados populacionais,
+      drift de dados. Revisao anual e o minimo.
+
+    - Incidentes adversos (inciso IV): se um sistema classificado como
+      risco medio causa dano inesperado, a classificacao deve ser revisada
+      imediatamente, nao apenas no ciclo anual.
+
+    **Documentacao de reclassificacao:** a mudanca de nivel de risco
+    (tanto para cima quanto para baixo) deve ser formalmente documentada
+    com justificativa tecnica e clinica, aprovada por medico responsavel.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de reclassificacao:**
+      1. Implementar triggers automaticos de reclassificacao no model
+         registry: qualquer alteracao em modelo, dataset ou configuracao
+         deve acionar workflow de revisao de classificacao.
+      2. Configurar alertas automaticos quando metricas de monitoramento
+         indicarem degradacao que possa justificar reclassificacao.
+      3. Implementar calendario automatico de revisao anual, com
+         notificacoes antecipadas aos responsaveis.
+      4. Manter historico completo de classificacoes e reclassificacoes
+         com timestamps, justificativas e aprovadores.
+    tools:
+      - ml-registry
+      - model-monitoring
+      - workflow-engine
+      - audit-trail
+  devsecops:
+    prose: |
+      **Triggers de reclassificacao no pipeline:**
+      1. Implementar deteccao automatica de mudancas significativas no
+         pipeline: alteracao de arquitetura, retreinamento, mudanca de
+         features de entrada — acionando workflow de reclassificacao.
+      2. Bloquear deploy de versao atualizada de modelo ate que
+         reclassificacao seja concluida e aprovada.
+      3. Automatizar comparacao de metricas entre versao atual e nova
+         versao para subsidiar decisao de reclassificacao.
+      4. Gerar diff de model card entre versoes, destacando mudancas
+         relevantes para classificacao de risco.
+    tools:
+      - gitlab-ci
+      - model-versioning
+      - model-comparison
+      - risk-assessment
+  secops:
+    prose: |
+      **Governanca de reclassificacao:**
+      1. Definir processo formal de reclassificacao com SLA: 72 horas
+         para reclassificacao por incidente adverso, 30 dias para
+         reclassificacao por mudanca planejada.
+      2. Implementar processo de notificacao imediata ao CRM quando
+         sistema for reclassificado para nivel superior.
+      3. Auditar que todas as reclassificacoes seguiram procedimento
+         formal com documentacao e aprovacao adequadas.
+      4. Manter dashboard de reclassificacoes para identificar padroes
+         (ex: sistemas que frequentemente sao reclassificados para cima
+         podem indicar problemas sistematicos).
+    tools:
+      - grc-platform
+      - incident-management
+      - regulatory-reporting
+      - risk-dashboard
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-7", "art-43"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["measure-1", "manage-2"]
+    relationship: mapped

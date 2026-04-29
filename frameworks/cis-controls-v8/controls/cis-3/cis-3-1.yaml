@@ -1,0 +1,99 @@
+id: cis-3.1
+family: cis-3
+title: "Establish and Maintain a Data Management Process"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain a data management process. In the process, address data
+    sensitivity, data owner, handling of data, data retention limits, and disposal
+    requirements, based on sensitivity and retention standards for the enterprise.
+    Review and update documentation annually, or when significant enterprise changes
+    occur that could impact this Safeguard.
+
+guidance:
+  prose: >-
+    Data management is the foundation of data protection. Without understanding what
+    data exists, where it lives, how sensitive it is, and who owns it, organizations
+    cannot apply appropriate controls. The data management process should classify data
+    into tiers (e.g., public, internal, confidential, restricted) with clear handling
+    rules for each tier. Data owners must be designated and held accountable for the
+    data under their stewardship. Retention policies must comply with applicable
+    regulations (GDPR, LGPD, HIPAA, etc.) and ensure data is securely destroyed when
+    no longer needed. The process should cover data at rest, in transit, and in use
+    across all environments including cloud, on-premises, and edge.
+
+references:
+  - citation: "CIS Controls v8.1, Control 3, Safeguard 3.1"
+    url: "https://www.cisecurity.org/controls/v8"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a data classification framework enforced through infrastructure policies.
+      Use OPA or Kyverno policies to require data classification labels on all databases,
+      storage buckets, and data pipelines. Deploy automated data discovery and classification
+      tools that scan storage systems, databases, and object stores for sensitive data
+      patterns (PII, PHI, PCI). Enforce encryption-at-rest policies based on classification
+      level: restricted data requires customer-managed keys, confidential data requires
+      platform-managed keys. Implement data lifecycle management through cloud provider
+      lifecycle policies (S3 lifecycle rules, GCS lifecycle management) tied to retention
+      classifications. Use data catalogs (DataHub, OpenMetadata) to track data lineage
+      and ownership.
+    tools:
+      - open-policy-agent
+      - kyverno
+      - datahub
+      - openmetadata
+      - aws-macie
+      - gcp-dlp
+      - azure-purview
+
+  devsecops:
+    prose: >-
+      Integrate data classification checks into CI/CD pipelines. Reject infrastructure
+      code that creates storage resources without classification tags. Scan application
+      code and configuration files for hardcoded sensitive data using secret detection
+      tools. Enforce that database migration scripts include data retention metadata.
+      Implement pre-commit hooks that prevent committing files matching sensitive data
+      patterns. Use pipeline policies to ensure test environments do not contain
+      production data unless properly anonymized.
+    tools:
+      - gitleaks
+      - trufflehog
+      - checkov
+      - tfsec
+      - gitlab-secret-detection
+      - detect-secrets
+
+  secops:
+    prose: >-
+      Deploy DLP (Data Loss Prevention) solutions to monitor data movement across
+      network boundaries. Configure SIEM rules to alert on bulk data exports,
+      unauthorized data access patterns, and data exfiltration indicators. Maintain
+      a data flow diagram showing how sensitive data moves through the organization.
+      Conduct quarterly reviews of data retention compliance, generating reports on
+      data past its retention deadline. Monitor cloud storage access logs for anomalous
+      access patterns to classified data stores.
+    tools:
+      - google-dlp
+      - microsoft-purview
+      - netskope
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-1", "MP-4", "MP-6", "SI-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.10", "A5.12", "A5.13", "A5.33"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-6", "art-16", "art-46"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-01", "PR.DS-02"]
+    relationship: implements

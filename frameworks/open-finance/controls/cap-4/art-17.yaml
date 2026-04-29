@@ -1,0 +1,97 @@
+id: art-17
+family: cap-4
+title: "Protecao contra Ataques e Rate Limiting"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 17. As instituições participantes devem implementar mecanismos de
+    proteção contra ataques e abuso das interfaces dedicadas, incluindo:
+
+    I - limitação de taxa de requisições (rate limiting) por participante,
+    por endpoint e por consentimento, conforme limites definidos nas
+    especificações técnicas;
+
+    II - proteção contra ataques de negação de serviço (DoS/DDoS);
+
+    III - validação de entrada de dados (input validation) para prevenção
+    de ataques de injeção;
+
+    IV - proteção contra ataques de replay, utilizando mecanismos de
+    nonce, timestamp e idempotência;
+
+    V - monitoramento e bloqueio automático de participantes que apresentem
+    comportamento anômalo ou malicioso.
+guidance:
+  prose: |
+    O art. 17 exige defesas em profundidade para as APIs:
+
+    **Rate limiting (especificacoes tecnicas):**
+    - Global: limite por minuto por participante
+    - Por endpoint: limites diferenciados (dados abertos vs. transacionais)
+    - Por consentimento: limite por cliente/consentimento ativo
+    - HTTP 429 (Too Many Requests) com Retry-After header
+
+    **Protecao contra ataques:**
+    - DDoS: WAF, CDN com mitigacao DDoS, geo-blocking
+    - Injecao: validacao de input, parameterized queries, sanitizacao
+    - Replay: nonce no request object, jti no JWT, timestamp validation
+    - CSRF: state parameter obrigatorio no OAuth flow
+
+    **Idempotencia:**
+    - Header x-idempotency-key para operacoes de escrita (pagamentos)
+    - Servidor retorna mesmo resultado para mesma chave
+    - Previne execucao duplicada por retentativa
+
+    **Comportamento anomalo:**
+    - Rafagas de requisicoes acima do normal
+    - Tentativas massivas de consentimentos
+    - Scanning de endpoints inexistentes
+    - Requisicoes com payloads maliciosos
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de defesas em profundidade:**
+      1. Configurar rate limiting em camadas: API gateway (global),
+         middleware (por endpoint), aplicacao (por consentimento).
+      2. Integrar WAF com regras especificas para APIs Open Finance.
+      3. Implementar mecanismo de idempotencia com TTL configuravel.
+      4. Configurar validacao de input baseada nos schemas OpenAPI.
+      5. Implementar nonce validation e timestamp checking em payloads.
+    tools:
+      - waf
+      - api-gateway
+      - rate-limiter
+      - input-validator
+  devsecops:
+    prose: |
+      **Testes de seguranca ofensivos:**
+      1. Executar DAST (Dynamic Application Security Testing) contra APIs.
+      2. Testar rate limiting com ferramentas de carga (k6, Locust).
+      3. Executar fuzzing de endpoints com payloads maliciosos.
+      4. Validar idempotencia em cenarios de retentativa concorrente.
+    tools:
+      - owasp-zap
+      - dast-scanner
+      - k6
+      - fuzzing-tools
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento e resposta a ataques:**
+      1. Monitorar taxa de requisicoes por participante em tempo real.
+      2. Implementar bloqueio automatico com threshold configuravel.
+      3. Alertar sobre padroes de ataque (DDoS, scanning, injection).
+      4. Manter runbook de resposta a incidentes especifico para APIs.
+    tools:
+      - siem
+      - ddos-mitigation
+      - waf-monitoring
+      - incident-response
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-9"]
+    relationship: complements
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements

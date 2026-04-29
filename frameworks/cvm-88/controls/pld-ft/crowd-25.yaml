@@ -1,0 +1,138 @@
+id: crowd-25
+family: pld-ft
+title: "AML/CFT Record-Keeping and Regulatory Cooperation"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 57. A plataforma deve manter, pelo prazo mínimo de 5 (cinco)
+    anos, registros de todas as operações realizadas, incluindo:
+    I — identificação completa das partes envolvidas em cada operação;
+    II — valores, datas e características das operações; III — registros
+    de análises de operações suspeitas realizadas; IV — comunicações
+    efetuadas ao COAF e respectivas respostas; V — documentação relativa
+    aos procedimentos de identificação e qualificação de clientes.
+
+    § 1º Os registros devem ser mantidos de forma organizada e
+    acessível, permitindo a reconstrução de todas as operações realizadas
+    na plataforma.
+
+    § 2º A plataforma deve atender prontamente às solicitações de
+    informações da CVM, do COAF e de outras autoridades competentes,
+    nos prazos por estas estabelecidos.
+
+    § 3º A plataforma deve cooperar com as autoridades competentes na
+    prevenção e combate à lavagem de dinheiro e ao financiamento do
+    terrorismo, fornecendo informações e documentos sempre que
+    solicitado.
+
+    § 4º O descumprimento das obrigações previstas neste capítulo
+    sujeita a plataforma às penalidades previstas na legislação e
+    regulamentação aplicáveis.
+guidance:
+  prose: |
+    Article 57 establishes comprehensive record-keeping and regulatory
+    cooperation obligations for AML/CFT purposes.
+
+    **5-year retention requirement:**
+    All operational records must be maintained for minimum 5 years,
+    including:
+    - Complete party identification for every transaction
+    - Transaction values, dates, and characteristics
+    - Suspicious activity analysis records
+    - COAF communications and responses
+    - KYC documentation
+
+    **Accessibility:**
+    Records must be organized and accessible, enabling full
+    reconstruction of all platform operations. This means searchable,
+    indexed storage with query capabilities — not just raw data dumps.
+
+    **Regulatory cooperation:**
+    Platforms must promptly respond to information requests from CVM,
+    COAF, and other competent authorities within their specified
+    deadlines. Cooperation includes proactive information sharing when
+    relevant.
+
+    **Penalties:**
+    Non-compliance with AML/CFT obligations subjects the platform to
+    penalties under applicable legislation, which can include fines,
+    suspension, and registration cancellation.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **AML/CFT data architecture:**
+      1. Deploy immutable data store for all AML/CFT records with
+         write-once-read-many (WORM) storage ensuring records cannot
+         be altered or deleted before the 5-year retention period.
+      2. Implement comprehensive transaction logging capturing all
+         required fields: parties, amounts, dates, characteristics,
+         and metadata.
+      3. Build regulatory data export system supporting CVM, COAF,
+         and law enforcement data request formats with automated
+         report generation.
+
+      **Search and reconstruction:**
+      4. Deploy full-text search and analytics engine over AML/CFT
+         records enabling transaction reconstruction by party, date
+         range, amount, and transaction type.
+      5. Implement data archival lifecycle: active (0-2 years), warm
+         archive (2-5 years), compliant deletion (5+ years).
+      6. Build regulatory portal for authorized authority access with
+         audit logging of all regulatory queries.
+    tools:
+      - elasticsearch
+      - postgresql
+      - minio
+      - worm-storage
+      - kubernetes
+  devsecops:
+    prose: |
+      **Record integrity and security:**
+      1. Implement cryptographic hashing (SHA-256) for all stored
+         records to ensure tamper detection.
+      2. SAST scanning for data storage and export code with focus
+         on data integrity and access control.
+      3. Secret detection to prevent AML/CFT data from appearing
+         in non-secure locations.
+
+      **Testing:**
+      4. Automated tests for retention policy enforcement: verify
+         records cannot be deleted before 5-year period and are
+         properly purged afterward.
+      5. Integration tests for regulatory data export in all required
+         formats.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - jest
+  secops:
+    prose: |
+      **AML/CFT record management:**
+      1. Monitor record storage integrity with periodic hash
+         verification to detect unauthorized modifications.
+      2. Track regulatory information requests: receipt, processing
+         status, response deadline, and delivery confirmation.
+      3. Maintain SLA dashboard for regulatory response times.
+
+      **Compliance readiness:**
+      4. Conduct quarterly mock regulatory data requests to test
+         response capability and data accessibility.
+      5. Annual review of record-keeping completeness: verify all
+         required data fields are being captured for every transaction.
+      6. Generate AML/CFT compliance report for management and CVM
+         covering program effectiveness, SAR statistics, and
+         regulatory cooperation metrics.
+    tools:
+      - grc-platform
+      - siem
+      - case-management
+      - data-governance
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-15", "art-17"]
+    relationship: implements
+  - framework_id: bcb-3978
+    articles: ["art-25"]
+    relationship: complements

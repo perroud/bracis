@@ -1,0 +1,103 @@
+id: art-26
+family: cap-5
+title: "Monitoramento de Operacoes e Situacoes Suspeitas"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 26. Os participantes devem implementar procedimentos sistemáticos
+    de monitoramento das operações dos clientes, visando identificar operações
+    e situações que possam estar relacionadas aos crimes previstos nesta Resolução.
+
+    § 1. Os procedimentos de monitoramento devem ser proporcionais ao porte
+    e ao perfil de risco do participante e dos clientes, e devem considerar:
+    I - padrões e frequências das operações dos clientes;
+    II - consistência das operações com o perfil de risco do cliente;
+    III - operações que envolvam valores mobiliários pouco negociados ou
+    de emissores desconhecidos;
+    IV - operações com contrapartes localizadas em jurisdições de alto risco.
+
+    § 2. Os participantes devem manter sistemas automatizados ou manuais
+    adequados ao volume de operações para o monitoramento previsto no caput.
+guidance:
+  prose: |
+    O monitoramento e onde o programa de PLD/FT "encontra a realidade" —
+    e atraves do monitoramento que situacoes suspeitas sao identificadas
+    na pratica, nao apenas em teoria.
+
+    **Monitoramento automatizado vs. manual:**
+    Para participantes de grande porte com alto volume de operacoes, o
+    monitoramento manual e impossivel — e necessario ter sistemas automatizados
+    de transaction monitoring (TMS). Para pequenos participantes com poucos
+    clientes, o monitoramento pode ser mais manual, mas ainda deve ser sistematico.
+
+    **Os quatro criterios do ss 1:**
+    1. Padroes e frequencias: mudanca abrupta no padrao do cliente (ex: cliente
+       que nunca operou mais que R$ 10.000/mes de repente faz R$ 500.000)
+    2. Consistencia com perfil: operacoes incompativeis com renda/patrimonio
+       declarados (ex: pessoa fisica investindo muito acima da renda declarada)
+    3. Valores mobiliarios atipicos: emissores obscuros, ativos de baixa liquidez
+       que subitamente ganham volume (pump-and-dump)
+    4. Jurisdicoes de risco: contrapartes em paises da lista GAFI
+
+    **Sensibilidade do monitoramento:**
+    O monitoramento deve ser calibrado para minimizar tanto falsos positivos
+    (geram trabalho sem resultado) quanto falsos negativos (transacoes suspeitas
+    que nao foram detectadas). O equilíbrio e dinamico e deve ser revisado
+    periodicamente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de Transaction Monitoring (TMS):**
+      1. TMS integrado ao clearing e custódia para captura em tempo real
+         de todas as operacoes.
+      2. Regras de monitoramento para os quatro criterios do ss 1:
+         - Regras de volume e frequencia: alertas para operacoes que superam
+           thresholds por periodo (dia, semana, mes)
+         - Regras de consistencia de perfil: desvio do comportamento historico
+           acima de N desvios-padrao
+         - Regras de valores mobiliarios atipicos: volume incomum em ativo de
+           baixa liquidez
+         - Regras geograficas: operacoes com contrapartes em jurisdicoes de risco
+      3. Regras parametrizaveis: thresholds configurados pelo compliance sem
+         necessidade de desenvolvimento.
+      4. Motor de analytics: visao historica do comportamento do cliente para
+         calcular baseline e detectar desvios.
+    tools:
+      - transaction-monitoring
+      - rules-engine
+      - analytics-platform
+      - data-lake
+  devsecops:
+    prose: |
+      **Qualidade das regras de monitoramento:**
+      1. Testes de regras de monitoramento com casos de uso conhecidos
+         (padroes classicos de lavagem de dinheiro).
+      2. Backtesting: aplicar regras em dados historicos para validar
+         capacidade de deteccao.
+      3. Testes de performance: TMS deve processar operacoes sem degradar
+         o tempo de execucao das operacoes de mercado.
+      4. Testes de configuracao de thresholds: garantir que parametros
+         por nivel de risco sao corretamente aplicados.
+    tools:
+      - test-automation
+      - backtesting-framework
+      - performance-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Efetividade do monitoramento:**
+      1. Metricas mensais: alertas gerados, taxa de falso positivo, alertas
+         investigados, alertas que geraram comunicacao ao COAF.
+      2. Taxa de deteccao: percentual de casos confirmados de PLD/FT que
+         foram detectados pelo sistema de monitoramento.
+      3. Revisao periodica de thresholds: ajustar quando taxa de falso positivo
+         e muito alta ou taxa de deteccao e muito baixa.
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-22"]
+    relationship: equivalent-to

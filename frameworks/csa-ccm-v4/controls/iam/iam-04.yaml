@@ -1,0 +1,98 @@
+id: iam-04
+family: iam
+title: "Separation of Duties"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Employ the separation of duties principle when implementing information
+    system access. Separation of duties shall be implemented to reduce
+    the risk of unauthorized or unintentional modification of information
+    or assets. Where segregation is impractical, compensating controls
+    such as activity monitoring, audit trails, and management supervision
+    shall be applied.
+
+guidance:
+  prose: >-
+    Separation of duties should ensure that no single individual has
+    end-to-end control over critical processes without independent
+    oversight. Key segregation points include: development versus
+    production deployment, access provisioning versus access approval,
+    security monitoring versus security administration, and financial
+    transaction initiation versus approval. In cloud environments,
+    separation must be enforced between cloud account administration,
+    security configuration, and billing management. Where small team
+    sizes make strict separation impractical, implement compensating
+    controls such as dual-authorization workflows, comprehensive
+    audit logging, and automated anomaly detection.
+
+references:
+  - citation: "CSA CCM v4.0 IAM-04"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce separation of duties through technical controls in the
+      platform. Implement distinct roles for platform administration,
+      security operations, and application deployment. Configure
+      Kubernetes namespaces with RBAC policies that prevent developers
+      from accessing production workloads directly. Deploy break-glass
+      access patterns that require dual approval for sensitive
+      operations. Enforce that infrastructure provisioners cannot
+      approve their own changes through GitOps workflow policies.
+      Implement separate cloud accounts for development, staging,
+      and production with cross-account role assumption requiring
+      appropriate authorization.
+    tools:
+      - kubernetes-rbac
+      - vault
+      - teleport
+      - open-policy-agent
+      - aws-organizations
+      - azure-management-groups
+
+  devsecops:
+    prose: >-
+      Configure branch protection rules requiring that code authors
+      cannot approve their own merge requests. Enforce that deployment
+      pipelines require approval from a separate team or role than
+      the development team. Implement CODEOWNERS files that mandate
+      security team review for security-sensitive code paths. Use
+      separate service accounts for build, test, and deploy stages
+      with scoped permissions. Ensure that pipeline configuration
+      changes require approval from platform or security teams.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - codeowners
+      - vault
+      - argo-cd
+
+  secops:
+    prose: >-
+      Monitor for violations of separation of duties including same-user
+      creation and approval of access requests, self-approved changes,
+      and unauthorized cross-role activity. Implement detective controls
+      that alert when segregation boundaries are crossed. Generate
+      separation of duties compliance reports showing role assignments,
+      potential conflicts, and compensating controls. Conduct periodic
+      SoD conflict analysis across all systems and report findings
+      to governance.
+    tools:
+      - sailpoint
+      - splunk
+      - servicenow
+      - cyberark
+      - saviynt
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5-3"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-5"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC5.1", "CC6.1"]
+    relationship: mapped

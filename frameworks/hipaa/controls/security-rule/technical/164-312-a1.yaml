@@ -1,0 +1,118 @@
+id: 164.312-a1
+family: security-rule-technical
+title: "Access Control"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement technical policies and procedures for electronic information systems that
+    maintain electronic protected health information to allow access only to those persons
+    or software programs that have been granted access rights as specified in the
+    Information Access Management standard.
+  parts:
+    - id: 164.312-a2-i
+      label: "164.312(a)(2)(i)"
+      prose: >-
+        Unique User Identification (Required). Assign a unique name and/or number for
+        identifying and tracking user identity.
+    - id: 164.312-a2-ii
+      label: "164.312(a)(2)(ii)"
+      prose: >-
+        Emergency Access Procedure (Required). Establish (and implement as needed)
+        procedures for obtaining necessary electronic protected health information
+        during an emergency.
+    - id: 164.312-a2-iii
+      label: "164.312(a)(2)(iii)"
+      prose: >-
+        Automatic Logoff (Addressable). Implement electronic procedures that terminate
+        an electronic session after a predetermined time of inactivity.
+    - id: 164.312-a2-iv
+      label: "164.312(a)(2)(iv)"
+      prose: >-
+        Encryption and Decryption (Addressable). Implement a mechanism to encrypt and
+        decrypt electronic protected health information.
+
+guidance:
+  prose: >-
+    Technical access control ensures that only authorized users and processes can access
+    ePHI. Every user must have a unique identifier; shared accounts make it impossible to
+    maintain accountability. Emergency access procedures must balance the need for ePHI
+    availability during emergencies with security requirements -- these procedures should
+    define break-glass mechanisms with enhanced logging and post-event review. Automatic
+    logoff prevents unauthorized access when workstations are left unattended. Encryption
+    of ePHI at rest provides protection even if physical access controls are circumvented.
+    While encryption and automatic logoff are addressable (not required), they are
+    considered best practices and must be implemented unless an equivalent alternative
+    measure is documented and justified.
+
+references:
+  - citation: "45 CFR 164.312(a)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.312"
+  - citation: "HHS Guidance on Encryption"
+    url: "https://www.hhs.gov/hipaa/for-professionals/breach-notification/guidance/index.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized authentication through an IdP (Keycloak, Okta, Azure AD)
+      ensuring every user has a unique identifier tied to their organizational identity.
+      Deploy encryption at rest for all storage containing ePHI using platform-native
+      encryption (AWS EBS encryption, Azure Disk Encryption, GCP CMEK, Kubernetes
+      encrypted secrets). Implement session timeout policies at the application gateway
+      and IdP levels. Build break-glass emergency access procedures using privileged
+      access management tools with enhanced audit logging. Implement disk encryption
+      for all nodes in the ePHI environment. Use Vault for dynamic secrets that
+      automatically expire.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - gcp-cloud-kms
+      - sealed-secrets
+      - teleport
+
+  devsecops:
+    prose: >-
+      Enforce unique user identification in CI/CD by prohibiting shared service
+      accounts for human-triggered pipelines. Implement session management testing
+      in DAST scans that verify automatic logoff functionality. Scan IaC templates
+      to ensure all storage resources have encryption enabled. Test emergency access
+      procedures in staging environments through DR drills. Enforce that applications
+      handling ePHI implement proper session management with configurable timeouts.
+      Use secret scanning to prevent encryption keys from being committed to
+      repositories.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - checkov
+      - tfsec
+      - gitlab-secret-detection
+      - owasp-zap
+
+  secops:
+    prose: >-
+      Monitor access control events across all ePHI systems. Detect shared account
+      usage and enforce unique identification. Alert on emergency access procedure
+      activation and conduct post-event reviews. Monitor session management to detect
+      sessions exceeding timeout thresholds. Audit encryption status across all ePHI
+      storage locations and alert on unencrypted storage. Track access control
+      configuration changes and verify authorization. Monitor for privilege escalation
+      and unauthorized access patterns.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark
+      - beyondtrust
+      - qualys
+      - tenable
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-7", "AC-11", "AC-12", "SC-28"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A8.2", "A8.3", "A8.5", "A8.11"]
+    relationship: supports

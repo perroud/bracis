@@ -1,0 +1,111 @@
+id: req-10.1
+family: req-10
+title: "Log and Monitor All Access to System Components and Cardholder Data"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for logging and monitoring all access to system components
+    and cardholder data are defined and understood. Audit logs are enabled and active for
+    all system components and cardholder data. Audit logs record sufficient detail for all
+    system components to establish accountability for all actions. Audit logs are protected
+    from destruction and unauthorized modifications. Audit logs are reviewed to identify
+    anomalies or suspicious activity. Time-synchronization technology synchronizes clocks
+    and time across all systems. Failures of critical security control systems are detected,
+    reported, and responded to promptly.
+  parts:
+    - id: req-10.1.a
+      label: "10.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 10
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-10.1.b
+      label: "10.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 10 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Logging mechanisms and the ability to track user activities are critical for detecting,
+    preventing, and minimizing the impact of a data compromise. The presence of logs
+    across all environments allows thorough tracking, alerting, and analysis when something
+    goes wrong. Audit logs must capture user identification, type of event, date and time,
+    success or failure indication, origination of event, and identity or name of affected
+    data, system component, or resource. Logs must be retained for at least 12 months
+    with at least the most recent 3 months immediately available for analysis. Automated
+    log review mechanisms (SIEM) should correlate events across systems to detect
+    multi-stage attacks. Time synchronization using NTP ensures log correlation accuracy.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 10"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized logging infrastructure using the ELK stack (Elasticsearch,
+      Logstash, Kibana), Loki/Grafana, or a managed SIEM service. Enforce structured
+      logging formats (JSON) across all applications to enable consistent parsing
+      and correlation. Implement log shipping agents on all CDE system components
+      that forward logs to the central store in real time. Use immutable log storage
+      (WORM, object lock) to prevent tampering. Configure NTP synchronization on
+      all hosts using chrony or systemd-timesyncd pointing to authoritative time
+      sources. Implement audit logging for all Kubernetes API server operations,
+      including admission controller decisions. Use Falco for runtime audit events
+      in containerized environments.
+    tools:
+      - elasticsearch
+      - logstash
+      - kibana
+      - fluentd
+      - fluentbit
+      - loki
+      - grafana
+      - falco
+      - chrony
+      - vector
+
+  devsecops:
+    prose: >-
+      Enforce mandatory logging standards in application code through shared
+      libraries and linting rules. Include audit log validation in CI/CD pipeline
+      test stages that verify applications emit required log fields (user ID, event
+      type, timestamp, source IP, resource accessed, success/failure). Scan code
+      for logging anti-patterns such as logging sensitive data (PAN, CVV) or
+      suppressing error logs. Implement pipeline stages that verify log shipping
+      is functional in staging before promoting to production. Test log retention
+      policies in CI/CD to ensure 12-month retention is configured.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - eslint
+      - log-validation-tests
+      - trivy
+
+  secops:
+    prose: >-
+      Implement continuous log monitoring with automated alerting for security-relevant
+      events: failed authentication attempts, privilege escalation, access to cardholder
+      data, administrative actions, audit log access or modification attempts, and
+      security control failures. Configure daily automated log review dashboards
+      highlighting anomalies. Maintain a 12-month log retention policy with the most
+      recent 3 months in hot storage for immediate analysis. Monitor time synchronization
+      drift across all systems and alert when drift exceeds acceptable thresholds.
+      Implement log integrity verification using cryptographic checksums.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - sumo-logic
+      - datadog
+      - pagerduty
+      - opsgenie
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-1", "AU-2", "AU-3", "AU-6", "AU-8", "AU-9", "AU-11"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.17"]
+    relationship: supports

@@ -1,0 +1,88 @@
+id: pin-14
+family: pin-device
+title: "PIN Entry Device Lifecycle Management"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    The complete lifecycle of PIN entry devices must be tracked and managed from initial
+    procurement through deployment, maintenance, and decommissioning. A complete inventory
+    of all PEDs must be maintained, including device model, serial number, firmware version,
+    deployment location, PCI PTS approval status, and key injection status. PEDs must be
+    procured only from trusted sources and their integrity must be verified upon receipt
+    before deployment. Initial key injection must occur in a PCI-approved Key Injection
+    Facility (KIF) or using PCI-approved remote key loading methods. PEDs removed from
+    service must have all key material and sensitive data securely erased before disposal.
+    Regular physical inspections of deployed PEDs must be conducted to detect tampering,
+    unauthorized replacement, or attachment of skimming devices.
+
+guidance:
+  prose: >-
+    PED lifecycle management addresses supply chain attacks, which have become a significant
+    threat vector. Attackers have targeted PEDs during manufacturing, shipping, maintenance,
+    and deployment to install skimming hardware or modified firmware. A robust lifecycle
+    management program ensures that every device is accounted for, its integrity is verified
+    at each stage, and any deviation from the expected state triggers investigation. The
+    physical inspection program is particularly important for devices deployed in unattended
+    or semi-attended environments where they are more vulnerable to physical tampering.
+    Organizations should implement serialized chain-of-custody tracking so that any gap in
+    a device's history is immediately flagged.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 4, Device Management"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized PED lifecycle management system that tracks device status
+      from procurement through decommissioning. Integrate with procurement systems to
+      verify that PEDs are sourced only from PCI-approved manufacturers. Deploy barcode
+      or RFID-based tracking for physical device movement between facilities. Implement
+      automated firmware verification upon device connection to the network (comparing
+      firmware hash against known-good values). Deploy remote key loading infrastructure
+      (TR-34) to reduce reliance on physical key injection facilities. Implement secure
+      decommissioning workflows that verify key material zeroization before device
+      disposal.
+    tools:
+      - asset-inventory-system
+      - device-management-platform
+      - remote-key-loading-server
+      - chain-of-custody-tracking
+  devsecops:
+    prose: >-
+      Automate PED firmware hash verification in deployment pipelines. Implement
+      integration tests that verify device provisioning workflows correctly inject
+      keys and configure security parameters. Scan device management API endpoints
+      for authentication and authorization vulnerabilities. Test decommissioning
+      workflows to verify complete key zeroization.
+    tools:
+      - gitlab-sast
+      - integration-test-framework
+      - gitlab-dast
+  secops:
+    prose: >-
+      Conduct physical inspections of PEDs on a risk-based schedule (monthly for
+      high-risk unattended locations, quarterly for attended locations). Train
+      merchant staff on visual PED inspection techniques for tamper detection.
+      Monitor device management system for PEDs reporting unexpected firmware
+      versions, serial number mismatches, or connectivity from unexpected
+      locations. Investigate any PED that cannot be accounted for in the inventory
+      as a potential compromise.
+    tools:
+      - physical-inspection-checklists
+      - device-management-platform
+      - splunk
+      - service-now
+      - risk-assessment-tools
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.1", "req-12.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PE-3", "SA-12"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.7.8", "A.7.9", "A.7.14"]
+    relationship: mapped

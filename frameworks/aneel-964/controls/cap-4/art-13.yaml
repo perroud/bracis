@@ -1,0 +1,137 @@
+id: art-13
+family: cap-4
+title: "Notificacao de Incidentes Ciberneticos a ANEEL"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 13. Os agentes do setor elétrico devem notificar a ANEEL sobre incidentes
+    cibernéticos que:
+
+    I - causem interrupção, degradação ou comprometimento da operação de sistemas
+    elétricos, incluindo redução de capacidade de geração, transmissão ou distribuição;
+
+    II - comprometam a confidencialidade, integridade ou disponibilidade de sistemas
+    de controle industrial conectados ao SIN;
+
+    III - envolvam acesso não autorizado a sistemas críticos do agente, mesmo que não
+    tenham resultado em dano operacional confirmado;
+
+    IV - sejam considerados relevantes pelo agente pela sua natureza, origem,
+    abrangência ou potencial de impacto no setor elétrico.
+
+    Parágrafo 1. A notificação inicial deve ser realizada em até 72 (setenta e
+    duas) horas após o agente tomar ciência do incidente, por meio de canal
+    específico disponibilizado pela ANEEL.
+
+    Parágrafo 2. A notificação completa, com análise preliminar, impacto identificado
+    e ações de contenção adotadas, deve ser enviada em até 15 (quinze) dias úteis
+    após a notificação inicial.
+
+    Parágrafo 3. O agente deve informar a ANEEL o encerramento do incidente e as
+    ações de remediação e melhoria implementadas.
+guidance:
+  prose: |
+    O art. 13 estabelece a obrigacao de notificacao de incidentes — um dos pilares
+    da regulacao de seguranca cibernetica em infraestrutura critica.
+
+    **Por que notificar em 72 horas:**
+    O prazo de 72 horas (alinhado com o GDPR europeu e a LGPD) foi definido para:
+    - Permitir que a ANEEL avalie o risco sistemico para o setor eletrico
+    - Possibilitar alertas preventivos para outros agentes do setor
+    - Coordenar resposta nacional se o incidente for de origem APT
+
+    **O que incluir na notificacao inicial (Paragrafo 1):**
+    - Identificacao do agente notificante
+    - Data/hora de deteccao do incidente
+    - Descricao inicial do incidente (o que foi afetado, como foi detectado)
+    - Classificacao de severidade preliminar
+    - Impacto operacional inicial (houve interrupcao? qual a escala?)
+    - Acoes iniciais de contencao adotadas
+    - Status atual (em andamento / contido / encerrado)
+
+    **O que incluir na notificacao completa (Paragrafo 2):**
+    - Analise tecnica detalhada (causa raiz, vetor de ataque, sistemas afetados)
+    - Cronologia completa do incidente (timeline)
+    - Impacto final confirmado (operacional, financeiro, de dados)
+    - Acoes de contencao e erradicacao implementadas
+    - Plano de remediaciao com prazos e responsaveis
+    - Licoes aprendidas e melhorias planejadas
+
+    **Risco de nao notificacao:**
+    A omissao de notificacao configura infraction grave e pode resultar em
+    sancoes administrativas pela ANEEL, incluindo multas e restricoes operacionais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Automatizar o processo de notificacao para garantir conformidade com os prazos:
+
+      1. Sistema de gestao de incidentes com campos obrigatorios de notificacao ANEEL:
+         - Quando incidente e classificado como notificavel (Alto/Critico), gerar
+           automaticamente o rascunho de notificacao com campos pre-preenchidos
+         - Contador regressivo de 72h visivel no ticket do incidente
+         - Escalacao automatica se notificacao nao for enviada em 48h
+      2. Template padronizado de notificacao ANEEL em ferramenta de GRC,
+         com validacao de completude antes do envio
+      3. Canal de comunicacao seguro e dedicado para notificacoes regulatorias:
+         email seguro, portal ANEEL ou WebService (conforme disponibilizado)
+      4. Arquivo imutavel de todas as notificacoes enviadas (evidencia para auditoria)
+    tools:
+      - servicenow-itsm
+      - servicenow-grc
+      - pagerduty
+      - archer-grc
+  devsecops:
+    prose: |
+      Implementar automacao do processo de notificacao no pipeline de resposta:
+
+      1. Integrar SOAR com sistema de notificacao regulatoria:
+         - Quando playbook classifica incidente como notificavel, disparar
+           workflow de notificacao automaticamente
+         - Gerar documento de notificacao inicial preenchido com dados do SIEM
+         - Notificar responsaveis designados via PagerDuty/Teams/Slack
+      2. Dashboard de SLA de notificacao: visualizar em tempo real o tempo
+         decorrido desde a ciencia do incidente vs. prazo de 72h
+      3. Gestao de comunicacoes pos-incidente: rastrear envio de notificacao
+         inicial, notificacao completa e encerramento como tarefas no sistema
+         de gestao de incidentes
+      4. Relatorio automatico de conformidade de notificacoes: quantos incidentes
+         notificaveis ocorreram, quantos foram notificados no prazo
+    tools:
+      - palo-alto-xsoar
+      - servicenow-itsm
+      - pagerduty
+      - gitlab-ci
+  secops:
+    prose: |
+      Gerenciar o processo de notificacao regulatoria de incidentes:
+
+      1. Designar responsavel pela comunicacao com a ANEEL (CISO ou Diretor
+         de Operacoes) com substituto designado para continuidade
+      2. Manter canal de comunicacao com a ANEEL atualizado:
+         contatos, portal de notificacao, procedimentos vigentes
+      3. Treinamento da equipe de resposta sobre criterios de notificacao:
+         todos os analistas de SOC devem saber identificar incidentes notificaveis
+      4. Simulacoes com notificacao real: em exercicios de DR, simular o processo
+         de notificacao completo (nao apenas interno — incluir rascunho de
+         notificacao para a ANEEL)
+      5. Registro cronologico preciso: a partir da ciencia do incidente, registrar
+         todos os timestamps para demonstrar conformidade com os prazos do art. 13
+    tools:
+      - servicenow-itsm
+      - grc-platform
+      - pagerduty
+      - splunk
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-008-R4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26", "A.5.28"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-9", "art-10"]
+    relationship: complements

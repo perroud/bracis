@@ -1,0 +1,125 @@
+id: art-13
+family: cap-3
+title: "Verificacao e Validacao de Software"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 13. O fabricante deve implementar processo de verificação e
+    validação (V&V) do SaMD que inclua:
+
+    I - verificação de software: confirmação por meio de exame e provisão
+    de evidência objetiva de que os resultados de cada fase de
+    desenvolvimento atendem aos requisitos e especificações dessa fase;
+    II - validação de software: confirmação de que o SaMD atende aos
+    requisitos do usuário e às necessidades clínicas pretendidas,
+    realizada em condições que simulem ou reproduzam o ambiente de
+    uso pretendido;
+    III - testes unitários com cobertura adequada à classe de segurança
+    do software conforme IEC 62304;
+    IV - testes de integração que validem interfaces entre componentes
+    de software e entre o SaMD e sistemas externos;
+    V - testes de sistema que validem o comportamento do SaMD completo
+    contra requisitos de sistema;
+    VI - testes de regressão automatizados para garantir que correções
+    e novas funcionalidades não introduzam defeitos em funcionalidades
+    existentes.
+
+    Parágrafo único. Os resultados de verificação e validação devem ser
+    documentados e rastreáveis aos requisitos verificados/validados.
+guidance:
+  prose: |
+    O art. 13 detalha o processo de V&V conforme IEC 62304 e ISO 13485,
+    com enfase em automacao e rastreabilidade.
+
+    **Diferenca entre verificacao e validacao:**
+    - Verificacao: "Construimos o produto corretamente?"
+      (outputs atendem inputs da mesma fase)
+    - Validacao: "Construimos o produto correto?"
+      (SaMD atende necessidades reais do usuario)
+
+    **Cobertura de testes por classe IEC 62304:**
+    - Classe A: testes de sistema (cobertura funcional)
+    - Classe B: testes unitarios + integracao + sistema (cobertura >= 80%)
+    - Classe C: testes unitarios + integracao + sistema + formal
+      verification (cobertura >= 90%, branch coverage >= 80%)
+
+    **Ambiente de validacao:**
+    A validacao deve ser realizada em ambiente que reproduza condicoes
+    reais de uso. Para SaMD isso inclui:
+    - Hardware e SO representativos do usuario final
+    - Conectividade de rede em condicoes realistas
+    - Dados de teste representativos (nao apenas happy path)
+    - Cenarios de falha (rede indisponivel, dados corrompidos)
+
+    **Testes de regressao:**
+    Essenciais para SaMD pois alteracoes podem ter impacto clinico.
+    Toda correcao de defeito deve adicionar teste de regressao que
+    previne recorrencia do defeito.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de V&V:**
+      1. Provisionar ambientes de validacao que replicam condicoes
+         reais de uso: hardware representativo, conectividade realista,
+         integracoes com sistemas mock de saude (HL7 FHIR, DICOM).
+      2. Implementar framework de testes end-to-end que simula jornadas
+         clinicas completas (do login ao resultado clinico), com
+         capacidade de replay em ambientes diferentes.
+      3. Configurar pipeline de testes de performance e stress que
+         valida comportamento do SaMD sob carga realista e condicoes
+         adversas (latencia, perda de pacotes, volume de dados).
+      4. Manter infraestrutura de test data management com datasets
+         anonimizados e representativos, versionados e reproduziveis.
+    tools:
+      - test-environments
+      - e2e-testing
+      - performance-testing
+      - test-data-management
+  devsecops:
+    prose: |
+      **Pipeline de V&V automatizado:**
+      1. Implementar pipeline multi-stage com: unit-tests -> integration-
+         tests -> system-tests -> regression-tests -> clinical-validation,
+         com metricas de cobertura reportadas em cada merge request.
+      2. Configurar cobertura de testes minima como gate de pipeline:
+         - Classe A: funcional coverage 100% de requisitos
+         - Classe B: line coverage >= 80%, branch >= 70%
+         - Classe C: line coverage >= 90%, branch >= 80%
+      3. Automatizar geracao de traceability matrix (requisito -> teste
+         -> resultado) como artefato de release, com identificacao de
+         requisitos sem cobertura de teste.
+      4. Implementar mutation testing para SaMD Classe C, validando
+         efetividade dos testes unitarios em detectar defeitos.
+    tools:
+      - gitlab-ci
+      - coverage-tools
+      - mutation-testing
+      - traceability-tools
+  secops:
+    prose: |
+      **Governanca de V&V:**
+      1. Manter plano de verificacao e validacao documentado conforme
+         IEC 62304, com definicao de atividades, criterios de aceitacao,
+         responsaveis e cronograma para cada fase.
+      2. Implementar processo de revisao de resultados de V&V por
+         equipe independente (nao envolvida no desenvolvimento) antes
+         de liberacao de versao.
+      3. Manter registro de todos os defeitos encontrados durante V&V,
+         com classificacao de severidade, analise de causa raiz e
+         rastreabilidade para correcao.
+      4. Auditar semestralmente a efetividade do processo de V&V,
+         analisando metricas como: defeitos em producao, cobertura
+         de requisitos, tempo de ciclo de V&V.
+    tools:
+      - test-management
+      - defect-tracking
+      - audit-management
+      - qms-platform
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7-2"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164-308-a-8"]
+    relationship: mapped

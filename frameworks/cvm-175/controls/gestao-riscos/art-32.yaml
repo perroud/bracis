@@ -1,0 +1,106 @@
+id: art-32
+family: gestao-riscos
+title: "Gestao de Liquidez"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 32. O administrador e o gestor devem implementar programa de gestão de
+    liquidez do fundo de investimento, compatível com a política de investimento
+    e os prazos de resgate previstos no regulamento.
+
+    Parágrafo 1. O programa de gestão de liquidez deve prever, no mínimo:
+    I - análise da liquidez dos ativos da carteira; II - simulação de cenários
+    de resgate em condições normais e de estresse; III - instrumentos e mecanismos
+    disponíveis para administrar situações de iliquidez; IV - critérios para
+    fechamento do fundo para resgates.
+
+    Parágrafo 2. O administrador pode, em situações excepcionais de iliquidez,
+    suspender os resgates do fundo, comunicando imediatamente à CVM e aos
+    cotistas e convocando assembleia geral extraordinária no prazo máximo de
+    um dia útil.
+
+    Parágrafo 3. O fechamento do fundo para resgates não pode exceder cinco
+    dias úteis consecutivos, salvo deliberação em assembleia geral.
+guidance:
+  prose: |
+    O art. 32 regulamenta a gestao de liquidez, um dos riscos mais criticos em
+    fundos de investimento. Corridas de resgate podem forcar vendas de ativos
+    a precos deprimidos, prejudicando cotistas remanescentes.
+
+    **Programa de gestao de liquidez:**
+    Nao basta monitorar liquidez reativamente. A CVM exige um programa formal
+    com analise proativa, simulacoes e instrumentos definidos antecipadamente.
+
+    **Instrumentos de gestao de liquidez:**
+    A CVM 175 introduziu novos mecanismos: (i) gates de resgate (limite de
+    resgate por periodo); (ii) side pockets (segregacao de ativos iliquidos);
+    (iii) swing pricing (ajuste de NAV para penalizar resgates em estresse);
+    (iv) fechamento temporario para resgates.
+
+    **Fechamento para resgates:**
+    E a ultima opcao. Limitado a 5 dias uteis sem assembleia. Exige comunicacao
+    imediata a CVM e cotistas e convocacao de AGE em D+1.
+
+    **Simulacao de cenarios:**
+    O programa deve incluir simulacoes de resgate em cenarios normais e de
+    estresse. Quantos dias seriam necessarios para liquidar X% da carteira?
+    A carteira consegue honrar resgates de 30% em um dia?
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de gestao de liquidez:**
+      1. Motor de analise de liquidez: calcular perfil de liquidez da carteira
+         (dias para liquidar cada ativo sem impacto de mercado).
+      2. Simulacao de resgates: modelar cenarios de resgate (10%, 30%, 50%
+         do patrimonio) e tempo necessario para liquidacao.
+      3. Monitoramento de concentracao de cotistas: alertas quando poucos
+         cotistas concentram grande percentual do patrimonio.
+
+      **Mecanismos automatizados:**
+      4. Gates de resgate automatizados: quando resgates excedem limite,
+         ativar gate e comunicar cotistas.
+      5. Pipeline de comunicacao a CVM e cotistas em caso de fechamento.
+    tools:
+      - terraform
+      - vault
+      - git
+      - gitlab-ci
+  devsecops:
+    prose: |
+      **Validacao de mecanismos de liquidez:**
+      1. Testes automatizados para cada mecanismo: gates, side pockets,
+         swing pricing, fechamento.
+      2. Testes de cenarios extremos: resgate de 100% do patrimonio, falha
+         de contraparte, mercado congelado.
+      3. Pipeline de validacao de regras de liquidez antes de deploy.
+
+      **Seguranca de comunicacoes:**
+      4. Canais seguros de comunicacao com CVM e cotistas para situacoes
+         de emergencia.
+      5. Templates de comunicacao pre-aprovados e versionados.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de liquidez:**
+      1. Dashboard de liquidez em tempo real: perfil de liquidez da carteira,
+         concentracao de cotistas, fluxo de resgates.
+      2. Alertas para: deterioracao de liquidez, concentracao de cotistas,
+         resgates acima de thresholds.
+      3. Simulacao diaria de cenarios de resgate.
+
+      **Gestao de crises de liquidez:**
+      4. Playbook de crise de liquidez: procedimentos pre-definidos, responsaveis,
+         comunicacoes, prazos.
+      5. Drill periodico de crise de liquidez (simulacao de fechamento do fundo).
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: bcb-304
+    articles: ["art-3", "art-5"]
+    relationship: complements

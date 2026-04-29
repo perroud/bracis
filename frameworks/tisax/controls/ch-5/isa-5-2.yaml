@@ -1,0 +1,133 @@
+id: isa-5.2
+family: ch-5
+title: "System Acquisition, Development, and Maintenance"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall include information security requirements
+    in the requirements for new information systems or enhancements
+    to existing systems. Secure development policies and procedures
+    shall be established and applied. Changes to systems within the
+    development lifecycle shall be controlled by the use of formal
+    change management procedures. Applications shall be reviewed
+    and tested after platform changes. Restrictions on changes to
+    software packages shall be defined and enforced. Secure system
+    engineering principles shall be established, documented,
+    maintained, and applied.
+
+guidance:
+  prose: >-
+    VDA ISA requires a secure software development lifecycle (SSDLC)
+    that integrates security from requirements through deployment
+    and maintenance. Security requirements must be defined at the
+    project inception phase and validated throughout development.
+    The organization must implement secure coding standards, code
+    review processes, and automated security testing (SAST, DAST,
+    SCA). Secure development training must be provided to all
+    developers. Third-party software and open-source components
+    must be inventoried, assessed for vulnerabilities, and managed
+    through a software bill of materials (SBOM). For automotive
+    software, additional considerations apply: safety-critical
+    code separation, automotive SPICE compliance, and ECU firmware
+    integrity verification. At AL3, auditors verify that secure
+    development practices are consistently followed, code review
+    records exist, vulnerability scan results are addressed, and
+    SBOM management is implemented.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of secure development practices."
+  al2:
+    applicability: required
+    notes: "Auditor reviews SSDLC documentation, code review records, and vulnerability management."
+  al3:
+    applicability: required
+    notes: "On-site verification of SSDLC effectiveness, SBOM management, and security testing coverage."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 5.2"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.8.25, A.8.26, A.8.27, A.8.28, A.8.31, A.8.32"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide golden paths and secure-by-default templates through
+      the internal developer portal that embed security controls
+      from project inception. Implement a centralized SBOM
+      management platform that automatically generates and stores
+      SBOMs for all platform components. Enforce secure system
+      engineering principles through platform-level guardrails:
+      approved base images, pre-configured security headers,
+      mandatory encryption, and secure defaults. Provide shared
+      libraries for common security functions (authentication,
+      authorization, input validation, cryptography) to prevent
+      developers from implementing their own insecure versions.
+      Implement automated dependency update management with
+      vulnerability-aware upgrade recommendations.
+    tools:
+      - backstage
+      - syft
+      - grype
+      - dependabot
+      - renovate
+      - argocd
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Implement security testing at every stage of the CI/CD
+      pipeline: pre-commit (secrets scanning, linting), build
+      (SAST, SCA, SBOM generation), test (DAST, IAST), and
+      deploy (container scanning, IaC scanning). Enforce code
+      review requirements with mandatory security reviewer
+      approval for security-critical changes. Automate SBOM
+      generation and vulnerability tracking for every build
+      artifact. Implement dependency-check pipelines that block
+      builds when critical or high vulnerabilities are found in
+      dependencies. Use signed artifacts and provenance attestation
+      (SLSA) to ensure supply chain integrity. Maintain a
+      vulnerability management workflow that tracks findings from
+      discovery through remediation with defined SLAs.
+    tools:
+      - semgrep
+      - sonarqube
+      - snyk
+      - owasp-zap
+      - syft
+      - grype
+      - cosign
+      - slsa
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor production applications for runtime vulnerabilities
+      and exploits using runtime application self-protection (RASP)
+      or web application firewalls (WAF). Integrate vulnerability
+      management platforms with the SIEM to correlate vulnerability
+      data with threat intelligence and attack telemetry. Track
+      vulnerability remediation SLA compliance and escalate overdue
+      findings. Monitor software supply chain indicators (dependency
+      confusion attacks, typosquatting, compromised packages) through
+      threat intelligence feeds. Generate development security
+      metrics reports covering code review coverage, security testing
+      results, vulnerability remediation rates, and SBOM completeness.
+    tools:
+      - defectdojo
+      - splunk
+      - elastic-siem
+      - snyk
+      - waf
+      - cloudflare
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.8.25", "A.8.26", "A.8.27", "A.8.28", "A.8.31", "A.8.32"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-3", "SA-8", "SA-10", "SA-11", "SA-15", "SA-17"]
+    relationship: mapped

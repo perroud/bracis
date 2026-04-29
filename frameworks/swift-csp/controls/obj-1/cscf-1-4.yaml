@@ -1,0 +1,107 @@
+id: cscf-1.4
+family: obj-1
+title: "Restriction of Internet Access"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Protect SWIFT-related operator PCs from internet-originated threats by
+    controlling and limiting their internet access. Operator PCs used to
+    access SWIFT applications and services must not have unrestricted internet
+    browsing capabilities. Where internet access is operationally required,
+    it must be mediated through security controls that filter malicious content.
+  parts:
+    - id: cscf-1.4.a
+      label: "1.4.a"
+      prose: >-
+        Operator PCs within the secure zone have no direct internet access.
+        Any required internet connectivity is provided through a secured,
+        monitored proxy or remote browser isolation solution.
+    - id: cscf-1.4.b
+      label: "1.4.b"
+      prose: >-
+        Web filtering and content inspection controls are applied to any
+        allowed internet traffic from operator PCs to block malicious
+        domains, drive-by downloads, and phishing sites.
+    - id: cscf-1.4.c
+      label: "1.4.c"
+      prose: >-
+        Email access from operator PCs within the secure zone is restricted
+        or isolated to prevent phishing-based compromise vectors.
+
+guidance:
+  prose: >-
+    Operator PCs represent a high-value target because they are used to
+    initiate and authorize financial transactions. Phishing attacks,
+    watering-hole attacks, and drive-by downloads targeting operator PCs
+    have been a primary vector in SWIFT-related breaches (e.g., Bangladesh
+    Bank incident). The most effective mitigation is complete internet
+    isolation for operator PCs. Where this is not feasible, remote browser
+    isolation (RBI) provides a strong alternative by executing all web
+    content in a disposable environment outside the secure zone. URL
+    filtering, DNS security, and email gateway controls add defense in
+    depth.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 1.4"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-177 Rev. 1 — Trustworthy Email"
+    url: "https://doi.org/10.6028/NIST.SP.800-177r1"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy remote browser isolation (Zscaler, Menlo Security, Cloudflare
+      Browser Isolation) for any operator PC requiring web access. Configure
+      DNS-layer security (Cisco Umbrella, Cloudflare Gateway) to block known
+      malicious domains and categories. Implement egress filtering at the
+      network level allowing only proxy traffic from operator PCs. Use
+      dedicated VDI instances for SWIFT operators with no internet breakout
+      configured. Apply application whitelisting to operator PCs to prevent
+      execution of downloaded executables.
+    tools:
+      - zscaler
+      - cloudflare-gateway
+      - cisco-umbrella
+      - menlo-security
+      - citrix-vdi
+      - vmware-horizon
+
+  devsecops:
+    prose: >-
+      Validate operator PC configuration baselines in CI/CD pipelines
+      using policy-as-code. Enforce that VDI templates for SWIFT operators
+      have no internet gateway routes. Automate compliance checks against
+      browser isolation and web filtering configurations. Test that blocked
+      categories return expected deny responses through automated integration
+      tests.
+    tools:
+      - ansible
+      - inspec
+      - opa
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor web proxy and DNS logs for operator PCs. Alert on any
+      operator PC attempting direct internet connections bypassing the
+      proxy. Review blocked URL categories weekly for emerging threats.
+      Conduct quarterly phishing simulations targeting SWIFT operators to
+      validate training effectiveness and technical controls.
+    tools:
+      - splunk
+      - elastic-siem
+      - zscaler-logs
+      - cisco-umbrella-investigate
+      - knowbe4
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-7(8)", "SI-3", "SI-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.23"]
+    relationship: supports

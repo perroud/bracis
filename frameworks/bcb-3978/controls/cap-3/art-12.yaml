@@ -1,0 +1,128 @@
+id: art-12
+family: cap-3
+title: "Informacoes de Identificacao de Pessoa Juridica"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 12. A coleta de informações de que trata o art. 10, § 1, no caso de clientes
+    pessoa jurídica, deve contemplar, no mínimo:
+    I - a razão social;
+    II - o nome fantasia, se houver;
+    III - o número de inscrição no Cadastro Nacional da Pessoa Jurídica (CNPJ);
+    IV - o endereço da sede;
+    V - o número de telefone e o endereço eletrônico (e-mail);
+    VI - a atividade principal;
+    VII - a forma e a data de constituição;
+    VIII - a identificação dos beneficiários finais; e
+    IX - a capacidade econômico-financeira, incluindo o faturamento.
+guidance:
+  prose: |
+    O art. 12 define os dados minimos para KYC de pessoa juridica. A principal
+    diferenca em relacao a pessoa natural (art. 11) e a exigencia de identificacao
+    de beneficiarios finais (inciso VIII).
+
+    **Dados corporativos (I-V):**
+    Razao social, nome fantasia, CNPJ, endereco e contatos formam a base de
+    identificacao da pessoa juridica. Devem ser validados contra registros
+    oficiais (Receita Federal, junta comercial).
+
+    **Atividade principal (VI):**
+    O CNAE principal e indicador importante de risco. Atividades de alto risco
+    incluem: comercio de joias/pedras preciosas, imobiliarias, casas de cambio,
+    loterias, criptoativos, comercio de arte.
+
+    **Constituicao (VII):**
+    Forma juridica (LTDA, S.A., EIRELI, MEI) e data de constituicao. Empresas
+    recem-constituidas ou com historico de alteracoes frequentes requerem mais
+    atencao.
+
+    **Beneficiario final (VIII):**
+    Obrigacao mais complexa e critica. A instituicao deve identificar a pessoa
+    natural que, direta ou indiretamente:
+    - Possui participacao >= 25% do capital
+    - Controla a empresa (acordo de acionistas, procuracoes)
+    - Influencia significativamente a gestao
+
+    **Capacidade financeira (IX):**
+    Faturamento declarado e fundamental para avaliar compatibilidade das
+    movimentacoes com o perfil do cliente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelo de dados de pessoa juridica:**
+      1. Campos obrigatorios:
+         - razao_social, nome_fantasia: strings
+         - cnpj: validacao de digito verificador
+         - endereco_sede: struct completo
+         - telefone, email: com validacao
+         - cnae_principal: codigo e descricao
+         - forma_juridica: enum (LTDA, SA, EIRELI, MEI, etc.)
+         - data_constituicao: date
+         - faturamento_anual: decimal
+      2. Estrutura de dados para quadro societario com rastreamento recursivo
+         de cadeia de participacao ate identificacao da pessoa natural
+         (beneficiario final).
+      3. Consulta automatica a Receita Federal (CNPJ) para validacao de razao
+         social, situacao cadastral, CNAE, quadro societario.
+      4. Consulta a juntas comerciais para obter contrato social/estatuto.
+
+      **Identificacao de beneficiario final:**
+      5. Algoritmo de resolucao de cadeia societaria que calcula participacao
+         indireta ate encontrar a pessoa natural.
+      6. Suporte a estruturas complexas: holdings, trustes, fundacoes, SPEs.
+      7. Alerta automatico quando cadeia societaria excede 3 niveis.
+      8. Flag de risco quando beneficiario final nao pode ser identificado.
+    tools:
+      - kyc-system
+      - ubo-resolution-engine
+      - data-enrichment-api
+      - sanctions-screening
+  devsecops:
+    prose: |
+      **Testes de KYC de pessoa juridica:**
+      1. Testes de validacao de CNPJ (formatos validos, invalidos, cancelados).
+      2. Testes de resolucao de cadeia societaria (1 nivel, 2 niveis, circular,
+         offshore, trust).
+      3. Testes de integracao com Receita Federal e juntas comerciais.
+      4. Testes de cenarios complexos: PJ com PEP no quadro societario,
+         PJ com beneficiario final em jurisdicao de alto risco.
+
+      **Seguranca:**
+      5. Criptografia de dados societarios sensiveis.
+      6. Controle de acesso a dados de beneficiario final.
+      7. Audit trail de consultas ao quadro societario.
+      8. Mascaramento de dados em ambientes nao produtivos.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - data-masking
+  secops:
+    prose: |
+      **Qualidade da identificacao de PJ:**
+      1. Auditoria periodica de completude cadastral de PJ.
+      2. Verificacao de que beneficiario final esta identificado para todas
+         as PJ da base.
+      3. Monitoramento de PJ com quadro societario desatualizado.
+      4. Revisao de PJ classificadas como baixo risco com estruturas complexas.
+
+      **Monitoramento de mudancas:**
+      5. Alerta quando alteracao no quadro societario e detectada.
+      6. Reclassificacao de risco automatica quando CNAE muda.
+      7. Verificacao periodica de situacao cadastral na Receita Federal.
+      8. Relatorio de PJ com beneficiario final em jurisdicoes de alto risco.
+    tools:
+      - aml-platform
+      - grc-platform
+      - data-quality
+      - sanctions-screening
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-4", "IA-5", "IA-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

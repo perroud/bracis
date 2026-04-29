@@ -1,0 +1,95 @@
+id: rs.ma-01
+family: rs
+title: "Incident Management - The incident response plan is executed in coordination with relevant third parties once an incident is declared"
+class: CSF2
+
+statement:
+  prose: >-
+    The incident response plan is executed in coordination with relevant third parties
+    once an incident is declared.
+
+guidance:
+  prose: >-
+    Incident response plan execution requires clear roles and responsibilities, defined
+    escalation paths, communication procedures, and coordination with external parties
+    (law enforcement, regulators, customers, insurers, CERT/CSIRT teams, forensic
+    firms). The plan should define incident severity levels with corresponding response
+    procedures, timelines, and decision authorities. Communication during incidents
+    must be coordinated through a designated spokesperson to ensure consistent messaging.
+    The plan should address evidence preservation requirements for potential legal
+    proceedings. Post-incident activities must include root cause analysis, lessons
+    learned, and plan updates. Regular testing through tabletop exercises, functional
+    exercises, and full-scale simulations ensures readiness.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, RS.MA-01"
+    url: "https://www.nist.gov/cyberframework"
+  - citation: "NIST SP 800-61 Rev. 2"
+    url: "https://doi.org/10.6028/NIST.SP.800-61r2"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated incident response capabilities embedded in the platform.
+      Deploy automated containment actions that can be triggered via runbooks:
+      isolating compromised containers (network policy enforcement), rotating
+      credentials (Vault credential rotation), scaling down affected services,
+      and creating forensic snapshots. Maintain infrastructure-as-code templates
+      for rapid deployment of clean replacement infrastructure. Implement
+      break-glass procedures that grant emergency elevated access with full audit
+      logging. Deploy chaos engineering tools (Chaos Monkey, Litmus) to test
+      incident response procedures against infrastructure failures.
+    tools:
+      - hashicorp-vault
+      - kubernetes-network-policies
+      - pagerduty
+      - opsgenie
+      - runbook-automation
+      - litmus-chaos
+
+  devsecops:
+    prose: >-
+      Maintain incident response runbooks as code in version-controlled repositories,
+      ensuring they are reviewed, tested, and updated through the standard merge request
+      process. Implement automated rollback capabilities in CI/CD pipelines that can
+      rapidly revert to the last known-good deployment. Define pipeline procedures for
+      emergency patches that bypass normal review cycles while maintaining audit trails.
+      Implement feature flags that enable rapid disabling of compromised features
+      without full redeployment. Test incident response procedures by simulating
+      supply chain compromises (malicious dependency injection) in staging environments.
+    tools:
+      - gitlab-ci
+      - argocd
+      - feature-flags
+      - gitlab-environments
+      - gitlab-rollback
+
+  secops:
+    prose: >-
+      Maintain and regularly test a comprehensive incident response plan that defines
+      severity levels, response procedures, roles, escalation paths, and communication
+      templates. Implement SOAR playbooks for automated triage and initial response
+      actions. Establish relationships with external incident response resources
+      (forensic firms, legal counsel, PR firms, CERT teams) before incidents occur.
+      Conduct quarterly tabletop exercises and annual functional exercises. Maintain
+      an incident log that tracks all actions taken during an incident for post-incident
+      review and compliance reporting. Comply with regulatory notification requirements
+      (GDPR 72-hour, NIS2, LGPD) through automated notification workflows.
+    tools:
+      - pagerduty
+      - opsgenie
+      - splunk-soar
+      - thehive
+      - jira-incident
+      - statuspage
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-4", "IR-6", "IR-8"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.24", "A5.25", "A5.26"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-17.1"]
+    relationship: equivalent-to

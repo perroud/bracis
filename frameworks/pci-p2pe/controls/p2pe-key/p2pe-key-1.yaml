@@ -1,0 +1,120 @@
+id: p2pe-key-1
+family: p2pe-key
+title: "Cryptographic Key Generation and Distribution"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    Cryptographic keys used in the P2PE solution shall be generated within
+    a PCI PTS-approved HSM or FIPS 140-2 Level 3+ secure cryptographic
+    device using approved random number generation methods. Key generation
+    shall occur under dual control and split knowledge procedures. Key
+    distribution from the generation point to the POI device or decryption
+    HSM shall use secure methods that prevent cleartext key exposure outside
+    of a secure cryptographic device at any point in the distribution chain.
+    Base Derivation Keys (BDKs) for DUKPT shall be generated with
+    sufficient entropy and distributed using key-encrypting keys (KEKs)
+    or direct HSM-to-HSM transfer.
+  parts:
+    - id: p2pe-key-1.a
+      label: "Domain 4, 4A"
+      prose: >-
+        All cryptographic keys are generated within PCI PTS-approved HSMs
+        or FIPS 140-2 Level 3+ devices using approved random number
+        generators, under dual control and split knowledge.
+    - id: p2pe-key-1.b
+      label: "Domain 4, 4B"
+      prose: >-
+        Key distribution ensures keys are never exposed in cleartext
+        outside of a secure cryptographic device throughout the entire
+        distribution chain.
+
+guidance:
+  prose: >-
+    Key generation quality is foundational to the security of the entire
+    P2PE solution. Weak keys or predictable random number generation can
+    undermine even the strongest encryption algorithms. PCI PTS-approved
+    HSMs include validated random number generators that meet NIST SP
+    800-90A/B requirements. Dual control requires two or more authorized
+    individuals to independently authenticate before the HSM performs key
+    generation. Split knowledge means key components are generated
+    separately so that no single person knows the complete key. For DUKPT,
+    the BDK is the most sensitive key — its compromise would allow
+    decryption of all transactions from devices loaded with derived keys
+    from that BDK. Key distribution methods include TR-34 (asymmetric key
+    distribution), TR-31 (key block format for symmetric key wrapping),
+    and direct HSM-to-HSM secure channels.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 4 — Key Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "ANSI X9.24-1 — Retail Financial Services Symmetric Key Management Part 1"
+    url: "https://webstore.ansi.org/"
+  - citation: "ANSI TR-34 — Interoperable Method for Distribution of Symmetric Keys Using Asymmetric Techniques"
+    url: "https://webstore.ansi.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provision dedicated key generation HSMs in a physically secured key
+      ceremony room with CCTV recording and access logging. Implement
+      automated key generation workflows that enforce dual control through
+      multi-party authentication (smart cards, PINs, or biometrics).
+      Deploy TR-34 remote key loading infrastructure for distributing keys
+      to POI devices without physical key injection. Store BDKs in
+      redundant HSM clusters with automated backup to offline HSMs in a
+      separate physical location. Implement key generation audit trails
+      that record the key identifier, generation timestamp, authorized
+      personnel, and HSM serial number.
+    tools:
+      - thales-payshield
+      - futurex-vectera
+      - utimaco-cryptoserver
+      - aws-cloudhsm
+      - hashicorp-vault-hsm-backend
+
+  devsecops:
+    prose: >-
+      Enforce that key management application code only interacts with
+      HSMs through validated PKCS#11 or vendor API libraries. Scan code
+      for any software-based key generation (use of Math.random, /dev/
+      urandom directly for cryptographic keys). Include integration tests
+      that validate key generation produces expected key lengths, formats,
+      and check values (KCVs). Automate verification that newly generated
+      keys are correctly replicated to backup HSMs.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - pkcs11-tool
+      - custom-hsm-integration-tests
+
+  secops:
+    prose: >-
+      Monitor HSM audit logs for all key generation events. Alert on key
+      generation outside of scheduled key ceremony windows. Track all BDKs
+      by identifier, generation date, associated devices, and expected
+      retirement date. Conduct annual key ceremony audits verifying dual
+      control and split knowledge procedures were followed. Maintain
+      chain-of-custody documentation for all key components during
+      distribution.
+    tools:
+      - splunk
+      - elastic-siem
+      - hsm-audit-logs
+      - key-management-system
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-crypto-1", "pin-crypto-2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-12(1)", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports

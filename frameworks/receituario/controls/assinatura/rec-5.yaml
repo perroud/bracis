@@ -1,0 +1,127 @@
+id: rec-5
+family: assinatura
+title: "Mandatory ICP-Brasil Digital Signature for Prescriptions"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 9.º Toda prescrição eletrônica deve ser assinada digitalmente pelo
+    prescritor utilizando certificado digital emitido por Autoridade
+    Certificadora credenciada na Infraestrutura de Chaves Públicas
+    Brasileira (ICP-Brasil), nos termos da Medida Provisória n.º 2.200-2,
+    de 24 de agosto de 2001.
+
+    § 1.º O certificado digital do prescritor deve conter, no mínimo, o
+    nome completo, o número do CPF e o número de registro no respectivo
+    conselho profissional.
+
+    § 2.º São aceitos certificados digitais do tipo A1 (armazenado em
+    software), A3 (armazenado em token ou smartcard) ou certificado em
+    nuvem, desde que emitidos por Autoridade Certificadora credenciada
+    na ICP-Brasil.
+
+    § 3.º A assinatura digital deve abranger a integralidade do conteúdo
+    da prescrição, de modo que qualquer alteração posterior ao ato de
+    assinar invalide a assinatura.
+guidance:
+  prose: |
+    Article 9 establishes the mandatory use of ICP-Brasil digital signatures
+    for all electronic prescriptions, aligning with Brazil's public key
+    infrastructure framework (MP 2.200-2/2001).
+
+    **Certificate types accepted:**
+    - A1: software-stored certificate (file-based, typically .pfx/.p12)
+    - A3: hardware-stored certificate (USB token or smartcard)
+    - Cloud certificate: cloud-based ICP-Brasil certificate (e.g., via
+      BirdID, VIDaaS, SafeSign)
+
+    **Mandatory certificate attributes:**
+    - Full name of the prescriber
+    - CPF (Brazilian individual taxpayer ID)
+    - Professional council registry number (CRM, CRO, CRMV)
+
+    **Signature scope:**
+    The digital signature must cover the entire prescription content.
+    Any modification after signing must invalidate the signature,
+    ensuring tamper evidence.
+
+    **Legal basis:**
+    MP 2.200-2/2001 gives ICP-Brasil digital signatures the same legal
+    validity as handwritten signatures. This is the legal foundation
+    that enables paperless prescriptions.
+
+    **Signature standards:**
+    CAdES (CMS Advanced Electronic Signatures) or XAdES (XML Advanced
+    Electronic Signatures) formats are recommended for long-term
+    signature validation.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **ICP-Brasil digital signature infrastructure:**
+      1. Integrate an ICP-Brasil-compatible digital signature SDK
+         (e.g., Lacuna PKI, BRy Signer, Certisign SDK) into the
+         prescription service for CAdES or XAdES signing.
+      2. Deploy a certificate validation service that verifies the
+         full ICP-Brasil certificate chain, CRL (Certificate Revocation
+         List), and OCSP (Online Certificate Status Protocol) in
+         real time during signing.
+      3. Implement support for A1, A3, and cloud certificate types,
+         with browser-based token/smartcard interaction for A3 and
+         OAuth-based cloud signing flows.
+      4. Store signed prescriptions with the detached or enveloped
+         signature, preserving the original document for independent
+         verification.
+      5. Deploy a signature verification service that validates
+         prescription integrity on every access and dispensation.
+    tools:
+      - lacuna-pki
+      - bry-signer
+      - icp-brasil-sdk
+      - ocsp-client
+      - crl-cache
+      - hsm
+  devsecops:
+    prose: |
+      **Digital signature validation pipeline:**
+      1. Create automated tests verifying signature generation and
+         validation with test ICP-Brasil certificates across all
+         supported types (A1, A3, cloud).
+      2. Implement tests confirming that document tampering after
+         signing correctly invalidates the signature.
+      3. Add certificate chain validation tests covering expired
+         certificates, revoked certificates, and invalid chains.
+      4. Deploy SAST rules to detect insecure cryptographic
+         practices (weak algorithms, hardcoded keys, disabled
+         certificate validation).
+    tools:
+      - gitlab-ci
+      - sast
+      - crypto-linting
+      - certificate-testing
+      - integration-tests
+  secops:
+    prose: |
+      **Digital signature operations:**
+      1. Monitor certificate expiration dates for all registered
+         prescribers and notify them 30, 15, and 7 days before
+         expiration.
+      2. Track signature validation failure rates and investigate
+         root causes (expired CRL, OCSP unavailability, tampered
+         documents).
+      3. Audit the certificate authority chain quarterly to ensure
+         all trusted CAs remain ICP-Brasil accredited.
+      4. Maintain an incident response procedure for compromised
+         prescriber certificates, including immediate revocation
+         and prescription review.
+    tools:
+      - certificate-monitoring
+      - siem
+      - alerting
+      - incident-management
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-1", "art-2", "art-6"]
+    relationship: implements
+  - framework_id: pep
+    articles: ["art-8", "art-9"]
+    relationship: complements

@@ -1,0 +1,112 @@
+id: iot-13
+family: data
+title: "Data Collection Transparency and Documentation"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O fabricante deve documentar de forma clara e acessível ao consumidor
+    quais dados pessoais e sensíveis são coletados, utilizados e
+    armazenados pelo equipamento, incluindo a finalidade de cada coleta,
+    o período de retenção e se os dados são transmitidos a terceiros.
+
+    A documentação técnica do produto deve especificar todos os tipos
+    de dados coletados pelo equipamento durante sua operação normal e
+    quaisquer dados transmitidos a serviços externos.
+
+    (Ato 77/2021 §5.1.6, inciso IV)
+guidance:
+  prose: |
+    This control requires manufacturers to provide full transparency
+    about the data handling practices of their devices. It aligns with
+    LGPD's transparency principle (Art. 6, VI) and the data subject's
+    right to information (Art. 18, I-II).
+
+    **What must be documented:**
+    - Categories of personal data collected (e.g., network traffic
+      metadata, device usage statistics, location data, user
+      credentials, connected device inventory).
+    - Purpose of each data collection (e.g., service provisioning,
+      performance monitoring, advertising, analytics).
+    - Whether data is stored locally, transmitted to manufacturer
+      servers, or shared with third parties.
+    - Data retention period for each category.
+    - Legal basis for processing under LGPD.
+
+    **Where to document:**
+    - Product manual (physical and digital).
+    - Product webpage/datasheet.
+    - Device setup wizard (summary of data practices during first
+      configuration).
+    - Privacy policy specific to the device/product line.
+
+    **Practical note:**
+    Many CPE/IoT devices collect more data than users realize:
+    DNS query logs, connected device MAC addresses, network topology,
+    usage patterns, firmware telemetry. All must be disclosed.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Create and maintain a data inventory for each device model:
+         enumerate every data element collected, stored, or transmitted,
+         with purpose, retention period, and destination.
+      2. Implement a privacy dashboard in the device web UI that
+         displays: what data the device is collecting, where it is
+         being sent, and how to opt out of optional data collection.
+      3. For devices with a setup wizard, include a data practices
+         summary screen that the user reviews during initial
+         configuration.
+      4. Implement data collection toggles: allow users to disable
+         non-essential data collection (analytics, telemetry) while
+         maintaining core functionality.
+      5. Tag all outbound data transmissions with purpose metadata in
+         the communication manifest.
+    tools:
+      - privacy-dashboard
+      - data-inventory-system
+      - firmware-build-pipeline
+      - consent-management
+  devsecops:
+    prose: |
+      1. Maintain the data inventory as a versioned artifact in the
+         repository — update it as part of the code review process
+         whenever new data collection is added.
+      2. Add automated tests that compare actual device data
+         transmissions (captured via network traffic analysis) against
+         the documented data inventory — flag undocumented data flows.
+      3. Implement CI checks that require a data inventory update when
+         code changes introduce new data collection, storage, or
+         transmission.
+      4. Review user-facing documentation (manual, privacy policy) as
+         part of the release process to ensure alignment with actual
+         device behavior.
+    tools:
+      - gitlab-ci
+      - wireshark
+      - data-flow-analysis
+      - documentation-review
+  secops:
+    prose: |
+      1. Conduct periodic data flow audits: capture device traffic,
+         compare against the published data inventory, and flag any
+         discrepancies (undocumented data collection is a compliance
+         violation).
+      2. Review consumer-facing privacy documentation for accuracy and
+         completeness — cross-reference with the technical data
+         inventory.
+      3. Monitor consumer complaints and regulatory inquiries related
+         to data practices for early detection of documentation gaps.
+      4. Maintain evidence of data transparency documentation for
+         ANATEL homologation and LGPD compliance audits.
+    tools:
+      - data-flow-audit-tools
+      - privacy-review-process
+      - grc-platform
+      - complaint-tracking
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-18", "art-9"]
+    relationship: complements
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

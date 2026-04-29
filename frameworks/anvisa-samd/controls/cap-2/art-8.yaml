@@ -1,0 +1,121 @@
+id: art-8
+family: cap-2
+title: "Seguranca Cibernetica by Design para SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 8. O fabricante deve incorporar requisitos de segurança
+    cibernética no projeto e desenvolvimento do SaMD desde a fase
+    de concepção, incluindo:
+
+    I - autenticação e controle de acesso adequados ao perfil de
+    risco do SaMD e ao ambiente de uso pretendido;
+    II - criptografia de dados em trânsito e em repouso para dados
+    clínicos e dados pessoais de saúde processados pelo SaMD;
+    III - mecanismos de detecção e resposta a incidentes de segurança
+    que possam comprometer a segurança ou eficácia do SaMD;
+    IV - processo de gestão de vulnerabilidades que inclua monitoramento
+    contínuo, avaliação de impacto clínico e correção tempestiva;
+    V - segregação de funcionalidades críticas do SaMD de funcionalidades
+    não essenciais, minimizando superfície de ataque;
+    VI - capacidade de atualização segura que permita aplicação de
+    patches de segurança sem comprometer a funcionalidade clínica.
+
+    Parágrafo único. O fabricante deve manter documentação de segurança
+    cibernética que descreva a arquitetura de segurança, superfície de
+    ataque, ameaças identificadas e controles implementados.
+guidance:
+  prose: |
+    O art. 8 estabelece seguranca cibernetica como requisito de design
+    (security by design) para SaMD, refletindo o crescente risco de
+    ciberataques a dispositivos medicos conectados.
+
+    **Contexto de ameacas:**
+    SaMD opera frequentemente em ambientes clinicos com conectividade
+    de rede, integracao com sistemas hospitalares (HIS, RIS, PACS) e
+    troca de dados via padroes como HL7 FHIR e DICOM. Cada ponto de
+    integracao e uma superficie de ataque potencial.
+
+    **Modelo de ameacas recomendado:**
+    Utilizar STRIDE (Spoofing, Tampering, Repudiation, Information
+    Disclosure, Denial of Service, Elevation of Privilege) adaptado
+    ao contexto de dispositivos medicos para identificar ameacas.
+
+    **Impacto clinico de vulnerabilidades:**
+    Diferente de software convencional, vulnerabilidades em SaMD podem
+    ter impacto direto na saude do paciente. O processo de gestao de
+    vulnerabilidades deve incluir avaliacao de impacto clinico alem
+    do impacto tecnico (CVSS complementado por analise clinica).
+
+    **Atualizacao segura:**
+    O mecanismo de atualizacao deve garantir integridade (assinatura
+    digital), disponibilidade (rollback automatico) e continuidade
+    clinica (nao interromper funcao critica durante atualizacao).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de seguranca para SaMD:**
+      1. Implementar arquitetura de seguranca em camadas (defense in depth)
+         com isolamento de funcionalidades clinicas criticas em microsservicos
+         dedicados com superficie de ataque minimizada.
+      2. Configurar criptografia TLS 1.3 para dados em transito e
+         AES-256 para dados em repouso, com gestao de chaves via HSM
+         ou servico gerenciado (AWS KMS, Azure Key Vault).
+      3. Implementar autenticacao multifator para acesso administrativo
+         e RBAC (Role-Based Access Control) granular com papeis clinicos
+         (medico, enfermeiro, tecnico, administrador).
+      4. Provisionar WAF (Web Application Firewall) e IDS/IPS dedicados
+         para ambientes de SaMD, com regras especificas para protocolos
+         clinicos (HL7, DICOM, FHIR).
+    tools:
+      - waf
+      - hsm
+      - rbac
+      - network-segmentation
+  devsecops:
+    prose: |
+      **Pipeline de seguranca cibernetica:**
+      1. Implementar SAST, DAST, SCA e container scanning como gates
+         obrigatorios no pipeline de SaMD, com bloqueio para
+         vulnerabilidades criticas e altas.
+      2. Executar threat modeling (STRIDE) como parte do design review
+         de novas funcionalidades, documentando ameacas e controles.
+      3. Integrar secret scanning para prevenir exposicao de credenciais,
+         chaves de API e certificados em repositorios de SaMD.
+      4. Automatizar geracao de documentacao de seguranca cibernetica
+         (architecture diagram, attack surface, threat model, controls)
+         a partir de artefatos do pipeline e configuracoes de infra.
+    tools:
+      - sast
+      - dast
+      - dependency-scanning
+      - container-scanning
+      - secret-detection
+      - threat-modeling
+  secops:
+    prose: |
+      **Governanca de seguranca cibernetica:**
+      1. Manter programa de gestao de vulnerabilidades com SLA
+         diferenciado para SaMD: critica = 24h, alta = 72h, media =
+         30 dias, baixa = 90 dias, com avaliacao de impacto clinico.
+      2. Implementar monitoramento continuo (SIEM) com correlacao de
+         eventos de seguranca em SaMD, incluindo alertas para tentativas
+         de acesso nao autorizado e anomalias de uso.
+      3. Realizar penetration testing anual em SaMD Classe III e IV,
+         com escopo que inclua vetores especificos de dispositivos
+         medicos (HL7 injection, DICOM abuse, API abuse).
+      4. Manter plano de resposta a incidentes especifico para SaMD
+         que inclua avaliacao de impacto clinico e notificacao ANVISA.
+    tools:
+      - siem
+      - vulnerability-management
+      - penetration-testing
+      - incident-response
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-1-1", "SR-3-1", "SR-3-4"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,81 @@
+id: oi-it-02
+family: it
+title: "SLA de Disponibilidade e Performance"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Os participantes do Open Insurance devem cumprir níveis mínimos de serviço (SLA)
+    para suas APIs, conforme definido pela governança do ecossistema:
+
+    I - Disponibilidade mínima: 99,5% mensal para APIs de dados protegidos e 95%
+    para APIs de dados abertos;
+    II - Tempo de resposta: P95 de latência não superior a 1000ms para endpoints
+    de consulta e 2000ms para endpoints de iniciação;
+    III - Taxa de erros: máximo de 0,5% de erros 5xx por período de medição;
+    IV - Janelas de manutenção: notificação prévia de 48 horas para manutenções
+    programadas, limitadas a 4 horas por mês fora do horário comercial;
+    V - Tempo de recuperação: RTO (Recovery Time Objective) máximo de 2 horas
+    para incidentes não planejados.
+
+    Os participantes devem reportar métricas de SLA à governança do ecossistema
+    conforme periodicidade definida. O descumprimento reiterado de SLA pode gerar
+    sanções.
+guidance:
+  prose: |
+    Os SLAs sao fundamentais para garantir que o ecossistema funcione de forma
+    confiavel. Um participante com APIs instave prejudica todos que dependem dele.
+
+    A disponibilidade de 99,5% equivale a aproximadamente 3,65 horas de indisponibilidade
+    por mes. Parece pouco, mas para APIs financeiras e um nivel aceitavel que
+    equilibra confiabilidade com viabilidade operacional.
+
+    Os tempos de resposta sao medidos no P95 (percentil 95), ou seja, 95% das
+    requisicoes devem responder dentro do limite. Isso permite picos ocasionais
+    sem violar o SLA.
+
+    O monitoramento de SLA deve ser feito tanto pelo participante (interno) quanto
+    pela governanca (externo, via probes sinteticos). Divergencias entre medicoes
+    internas e externas devem ser investigadas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar monitoramento sintetico de disponibilidade para todas as APIs
+         do Open Insurance (uptime checks a cada 1 minuto).
+      2. Configurar alertas para degradacao de performance (latencia acima de threshold).
+      3. Implementar auto-scaling para absorver picos de demanda sem violar SLA.
+      4. Configurar circuit breaker para dependencias externas (evitar cascading failures).
+      5. Implementar mecanismo de health check padronizado conforme ecossistema.
+      6. Planejar janelas de manutencao com notificacao previa e rollback rapido.
+    tools:
+      - monitoring
+      - auto-scaling
+      - circuit-breaker
+      - health-check
+      - alerting
+  devsecops:
+    prose: |
+      1. Testes de carga automatizados para validar que APIs suportam volume
+         esperado dentro do SLA de performance.
+      2. Testes de resiliencia (chaos engineering) para validar RTO.
+      3. Monitorar metricas de performance no pipeline (load testing em staging).
+      4. Alertar no pipeline quando degradacao de performance e detectada.
+    tools:
+      - load-testing
+      - chaos-engineering
+      - performance-monitoring
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Gerar relatorios periodicos de SLA para reporte a governanca.
+      2. Investigar e documentar root cause de violacoes de SLA.
+      3. Monitorar SLA de participantes com os quais a instituicao se integra
+         (dependencias).
+    tools:
+      - sla-reporting
+      - incident-management
+      - monitoring
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-9"]
+    relationship: complements

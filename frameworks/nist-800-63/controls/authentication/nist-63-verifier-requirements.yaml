@@ -1,0 +1,130 @@
+id: nist-63-verifier-requirements
+family: authentication
+title: "Verifier Impersonation Resistance"
+class: SP800-63B
+
+baselines: [aal2, aal3]
+
+statement:
+  prose: >-
+    Verifier impersonation resistance refers to the ability of an authenticator
+    to detect and prevent disclosure of the authentication secret to a
+    counterfeit verifier. An authentication protocol is considered verifier
+    impersonation resistant when it cryptographically binds the authentication
+    output to the intended verifier's identity, making it impossible for a
+    phishing site to capture and replay valid authentication outputs. Verifiers
+    SHALL verify the authentication output from a claimant only after confirming
+    that the output is cryptographically bound to the verifier's identity.
+    At AAL3, authentication SHALL use an authenticator that provides verifier
+    impersonation resistance. At AAL2, verifier impersonation resistance is
+    strongly recommended but not required for all authenticator types. Verifiers
+    SHALL use approved cryptographic algorithms. Verifiers SHALL be implemented
+    in a trusted execution environment or use hardware security modules for key
+    operations. The verifier SHALL authenticate to the claimant using an approved
+    channel (e.g., TLS) before requesting the claimant's authentication output.
+
+guidance:
+  prose: >-
+    Verifier impersonation resistance is the technical property that distinguishes
+    phishing-resistant authenticators from phishing-susceptible ones. TOTP and
+    SMS OTP do not provide verifier impersonation resistance: an attacker who
+    proxies the authentication session can capture the OTP code in real time and
+    relay it to the legitimate verifier. FIDO2/WebAuthn and PIV/CAC provide
+    verifier impersonation resistance because they cryptographically bind the
+    authentication to the specific origin (domain), making codes obtained from a
+    phishing site invalid for use on the legitimate site. Executive Order 14028
+    and OMB M-22-09 both mandate phishing-resistant MFA for federal agencies,
+    which operationally means implementing verifier impersonation-resistant
+    authenticators. The WebAuthn specification achieves this through the Client
+    Data JSON (which includes the rpId and challenge) being signed by the private
+    key stored in the hardware authenticator — a replay to a different origin
+    would have an invalid rpId and fail verification. Verifiers must validate
+    the entire credential response, not just the signature.
+
+references:
+  - citation: "NIST SP 800-63B Section 5.2.5 — Verifier Impersonation Resistance"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "W3C WebAuthn — Verifier Impersonation Resistance"
+    url: "https://www.w3.org/TR/webauthn-2/#sctn-verifier-impersonation-resistance"
+  - citation: "OMB M-22-09 — Phishing-Resistant MFA Requirements"
+    url: "https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf"
+  - citation: "CISA Phishing-Resistant MFA Factsheet"
+    url: "https://www.cisa.gov/sites/default/files/publications/fact-sheet-implementing-phishing-resistant-mfa-508c.pdf"
+
+related_controls:
+  - id: nist-63-aal2
+    relationship: supports
+    description: "AAL2 strongly recommends verifier impersonation-resistant authenticators."
+  - id: nist-63-aal3
+    relationship: implements
+    description: "AAL3 mandates verifier impersonation resistance as a non-negotiable requirement."
+  - id: nist-63-authenticator-types
+    relationship: implements
+    description: "Only cryptographic hardware and software authenticators provide verifier impersonation resistance."
+  - id: nist-63-oidc-saml
+    relationship: complements
+    description: "Federation protocols must propagate the verifier impersonation resistance property through assertions."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy WebAuthn relying party (RP) implementation using a validated
+      library (e.g., SimpleWebAuthn, webauthn4j, py_webauthn). Configure the
+      RP to: (1) set the rpId to the exact domain (no wildcards), (2) require
+      user verification (UV=required) for AAL3, (3) validate the clientDataJSON
+      origin matches the expected origin, (4) verify the authenticator data
+      rpIdHash against the expected rpId, (5) validate the attestation
+      statement format and trust chain for hardware-bound keys. Implement
+      challenge-response protocol where each authentication session uses a
+      cryptographically random challenge (at least 16 bytes of entropy) that
+      is bound to the session and single-use. For PKI/PIV implementations,
+      validate the certificate chain against the Federal PKI trust anchor
+      and check the certificate revocation status via OCSP. Use TLS 1.2+
+      for all verifier communications, with certificate pinning where applicable.
+    tools:
+      - keycloak
+      - okta
+      - yubico-java-webauthn
+      - simplewebauthn
+      - vault
+
+  devsecops:
+    prose: >-
+      Include security tests that specifically validate verifier impersonation
+      resistance: attempt to replay a captured WebAuthn credential against
+      a different origin and confirm rejection. Test that the rpId validation
+      is not bypassed by subdomain variations or IP address substitution.
+      Validate that challenges are properly randomized and single-use: replay
+      a previously used challenge and confirm it is rejected. Include supply
+      chain verification for the WebAuthn library (signed releases, SBOM).
+      Implement a compliance gate in the pipeline that verifies the
+      authentication service is configured with origin binding before
+      deployment to production. Scan for anti-patterns in WebAuthn
+      implementations such as disabled attestation verification or wildcard
+      rpId.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - open-policy-agent
+      - playwright
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor authentication events for indicators of phishing attacks against
+      the authentication service: authentication attempts from IP addresses
+      not associated with the rpId origin, unusually high challenge failure
+      rates, and authentication events where the authenticator data rpIdHash
+      does not match the expected value (which would be caught by the verifier
+      but may still appear in logs as a failed attempt). Alert on any
+      modification to the WebAuthn RP configuration, particularly changes
+      to the rpId or allowed origins list. Conduct quarterly phishing
+      simulations to verify that FIDO2 authenticators correctly resist
+      phishing attacks by employees — measure the click rate and credential
+      entry rate to verify that hardware keys cannot be phished even when
+      the user clicks a phishing link.
+    tools:
+      - splunk
+      - crowdstrike
+      - proofpoint
+      - knowbe4

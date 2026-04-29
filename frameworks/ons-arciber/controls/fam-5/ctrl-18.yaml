@@ -1,0 +1,101 @@
+id: ctrl-18
+family: fam-5
+title: "Gestao de Logs e Registros de Auditoria do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar coleta, armazenamento, proteção e retenção
+    de logs e registros de auditoria de segurança para todos os sistemas do ARCiber
+    que possuam capacidade de geração de logs. Os logs devem incluir eventos de
+    autenticação (logins, logouts, falhas), ações administrativas, alertas de
+    segurança, mudanças de configuração e eventos de rede no ARCiber. Os logs
+    devem ser armazenados em repositório protegido e imutável, separado dos
+    sistemas de origem, e retidos por no mínimo 12 meses. A sincronização de
+    tempo (NTP) deve ser implementada em todos os ativos do ARCiber para garantir
+    a integridade temporal dos registros.
+
+guidance:
+  prose: >-
+    Logs de auditoria sao essenciais para investigacao de incidentes, conformidade
+    regulatoria e deteccao de ameacas persistentes (APT) que podem permanecer
+    latentes por semanas ou meses em sistemas OT. Os controles devem abranger:
+    (i) inventario de fontes de log do ARCiber — sistemas que geram logs,
+    sistemas que nao suportam geracao de logs (limitacao de sistemas legados);
+    (ii) coleta centralizada de logs em plataforma SIEM com suporte a protocolos
+    industriais (Syslog, OPC UA, SNMP); (iii) sincronizacao de tempo via NTP
+    para todos os sistemas do ARCiber — logs com timestamp incorreto sao
+    ineficazes para investigacao; (iv) protecao de integridade dos logs —
+    armazenamento em sistema separado com controle de acesso restrito,
+    preferencialmente imutavel (write-once); (v) retencao minima de 12 meses
+    para logs de seguranca do ARCiber conforme requisitos regulatorios; (vi)
+    definicao de quais eventos sao obrigatorios de logar em cada tipo de sistema.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar servidor NTP interno dedicado para sincronizacao de tempo de
+      todos os ativos do ARCiber, com fontes de tempo confiavel (GPS ou stratum-1
+      da RNP/INPE). Configurar encaminhamento de logs (Syslog, SNMP traps,
+      WMI events) de todos os sistemas do ARCiber para o SIEM central. Para
+      sistemas sem capacidade nativa de geracao de logs, implementar monitoramento
+      de rede passivo para captura de eventos (Nozomi, Claroty) como fonte
+      complementar. Implementar armazenamento imutavel de logs (WORM storage,
+      S3 Object Lock) para garantia de integridade. Configurar retencao de logs:
+      30 dias em armazenamento quente (SIEM), 12 meses em armazenamento frio.
+    tools:
+      - splunk
+      - ibm-qradar
+      - ntp-server
+      - nozomi-networks
+      - aws-s3-worm
+  devsecops:
+    prose: >-
+      Implementar pipeline de validacao de cobertura de logs do ARCiber,
+      verificando periodicamente quais sistemas estao enviando logs e alertando
+      para lacunas. Automatizar verificacao de sincronizacao NTP em todos os
+      ativos do ARCiber como parte do monitoramento de saude da plataforma.
+      Implementar alertas para interrupcao de fluxo de logs de sistemas criticos
+      do ARCiber (log gap detection) — ausencia de logs pode indicar problema
+      operacional ou atividade maliciosa. Documentar no repositorio GitLab o
+      inventario de fontes de log e eventos monitorados por sistema.
+    tools:
+      - splunk
+      - gitlab-ci
+      - ansible
+      - nagios
+  secops:
+    prose: >-
+      Revisar diariamente alertas de seguranca gerados a partir de logs do
+      ARCiber. Realizar analise retrospectiva de logs (threat hunting) ao menos
+      mensalmente para identificar atividades maliciosas que nao geraram alertas
+      automaticos. Manter logs de auditoria de acesso aos proprios logs do ARCiber
+      (quis acesso, quando, o que consultou) para detectar atividade suspeita
+      de cobertura de trilhas. Disponibilizar logs do ARCiber para investigacao
+      de incidentes pelo ONS ou ANEEL quando solicitado, em formato padronizado.
+      Testar anualmente a integridade e completude dos logs por meio de exercicio
+      de simulacao de incidente.
+    tools:
+      - splunk
+      - ibm-qradar
+      - servicenow
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 10"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR6.1", "62443-3-3 SR6.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.17"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-9", "AU-11"]
+    relationship: mapped

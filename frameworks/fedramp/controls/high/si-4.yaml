@@ -1,0 +1,165 @@
+id: si-4
+family: si
+title: "System Monitoring"
+class: FedRAMP
+
+baselines: [moderate, high]
+
+parameters:
+  - id: si-04_odp.01
+    label: "monitoring objectives"
+    guidance: "FedRAMP requirement: Monitor for attacks, indicators of potential attacks, unauthorized local/network/remote connections, and anomalous system behavior."
+  - id: si-04_odp.02
+    label: "techniques and methods for monitoring"
+    guidance: "FedRAMP High parameter: Real-time alerting, automated correlation, and behavioral analytics across all system components."
+  - id: si-04_odp.03
+    label: "frequency of monitoring"
+    guidance: "FedRAMP High parameter: Continuous real-time monitoring with automated analysis. Moderate: Near real-time with at least daily log review."
+  - id: si-04_odp.04
+    label: "personnel or roles to receive alerts"
+    guidance: "FedRAMP requirement: SOC analysts, ISSO, system owner, and incident response team."
+
+statement:
+  prose: >-
+    a. Monitor the system to detect attacks and indicators of potential
+       attacks in accordance with the FedRAMP continuous monitoring
+       strategy, and unauthorized local, network, and remote connections;
+    b. Identify unauthorized use of the system through real-time
+       monitoring and automated analysis techniques;
+    c. Deploy monitoring devices strategically within the system to
+       collect organization-determined essential information, and at
+       ad hoc locations within the system to track specific types of
+       transactions of interest to the organization;
+    d. Protect information obtained from intrusion-monitoring tools
+       from unauthorized access, modification, and deletion;
+    e. Adjust the level of system monitoring activity when there is a
+       change in risk to organizational operations and assets, individuals,
+       other organizations, or the Nation;
+    f. Obtain legal opinion regarding system monitoring activities; and
+    g. Provide system monitoring information to designated personnel or
+       roles as needed.
+  parts:
+    - id: si-4_smt.high
+      label: "FedRAMP High Additional"
+      prose: >-
+        FedRAMP High Additional Requirement: Implement real-time alerting
+        with automated response capabilities. Deploy UEBA (User and Entity
+        Behavior Analytics) for advanced threat detection. Implement
+        automated correlation across all system monitoring data sources.
+        Maintain minimum 12 months of monitoring data for forensic analysis.
+
+guidance:
+  prose: >-
+    FedRAMP system monitoring for the High baseline requires
+    comprehensive, continuous, real-time monitoring capabilities that
+    go significantly beyond Moderate requirements. The High baseline
+    demands automated analysis, correlation across multiple data sources,
+    and real-time alerting with automated response capabilities. CSPs
+    must demonstrate that monitoring covers all system components:
+    network devices, servers, containers, applications, databases, and
+    security devices. Monitoring data must be protected with the same
+    rigor as the data it protects. The FedRAMP High baseline effectively
+    requires a full-scale SOC with SIEM, SOAR, and threat intelligence
+    integration. Monitoring must be adaptive, increasing in intensity
+    during elevated threat periods. At least 12 months of monitoring
+    data must be retained for forensic analysis.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SI-4"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-137, Information Security Continuous Monitoring (ISCM)"
+    url: "https://doi.org/10.6028/NIST.SP.800-137"
+  - citation: "FedRAMP High Baseline Requirements"
+    url: "https://www.fedramp.gov/baselines/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a comprehensive observability and security monitoring stack:
+      Prometheus/Grafana for infrastructure metrics, Elasticsearch/Loki
+      for centralized logging, Jaeger/Tempo for distributed tracing,
+      and Falco for runtime security monitoring. Implement automated
+      anomaly detection on golden signals (latency, traffic, errors,
+      saturation) with ML-based baseline learning. Deploy runtime
+      security monitoring (Falco, Sysdig) on all compute nodes to
+      detect system call anomalies, container escapes, and unauthorized
+      process execution. Implement network traffic analysis (Zeek,
+      Suricata) at all network boundaries and key internal segments.
+      Ensure monitoring data is stored in immutable, access-controlled
+      storage with 12+ months retention. Deploy monitoring health
+      checks that alert when monitoring coverage gaps are detected.
+      Implement adaptive monitoring that increases collection granularity
+      during elevated threat conditions.
+    tools:
+      - prometheus
+      - grafana
+      - elasticsearch
+      - loki
+      - falco
+      - sysdig
+      - jaeger
+      - alertmanager
+      - pagerduty
+
+  devsecops:
+    prose: >-
+      Ensure all applications are instrumented with security-relevant
+      logging and monitoring hooks as a deployment prerequisite.
+      Implement pipeline policy checks that validate monitoring
+      instrumentation completeness before deployment to production.
+      Deploy canary analysis in deployment pipelines that leverages
+      monitoring data to automatically roll back deployments exhibiting
+      anomalous behavior. Integrate security monitoring validation
+      into DAST testing to verify that attack patterns trigger expected
+      alerts. Generate monitoring coverage reports as pipeline artifacts
+      for ConMon evidence. Implement detection-as-code where SIEM
+      correlation rules are version-controlled and tested in CI/CD.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - falco
+      - fluentd
+      - vector
+      - argocd
+      - flagger
+
+  secops:
+    prose: >-
+      Operate a 24/7 SOC with SIEM (Splunk/Elastic), SOAR (Splunk SOAR/
+      Cortex XSOAR), and threat intelligence integration for real-time
+      monitoring. Implement MITRE ATT&CK-aligned detection rules covering
+      all relevant threat actor TTPs. Deploy UEBA for behavioral anomaly
+      detection including insider threat indicators. Maintain automated
+      alerting with severity-based routing and defined escalation
+      procedures. Implement automated response playbooks for high-
+      confidence detections (account lockout, network isolation, process
+      termination). Conduct regular purple team exercises to validate
+      detection coverage. Tune monitoring continuously to reduce false
+      positive rates while maintaining detection effectiveness. Generate
+      monitoring effectiveness reports for ConMon: alert volumes, true
+      positive rates, mean time to detect, and coverage metrics.
+      Maintain 12+ months of monitoring data with chain-of-custody
+      controls for forensic readiness.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - splunk-soar
+      - cortex-xsoar
+      - crowdstrike
+      - darktrace
+      - mitre-attack
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-4"]
+    relationship: derived-from
+  - framework_id: dora
+    articles: ["art-10"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.16"]
+    relationship: supports
+  - framework_id: cmmc-v2
+    articles: ["si-l2-006"]
+    relationship: equivalent-to

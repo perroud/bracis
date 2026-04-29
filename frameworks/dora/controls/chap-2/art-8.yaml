@@ -1,0 +1,125 @@
+id: art-8
+family: chap-2
+title: "Identification"
+class: DORA
+
+statement:
+  prose: >-
+    As part of the ICT risk management framework referred to in Article 6(1),
+    financial entities shall identify, classify and adequately document all
+    ICT-supported business functions, roles and responsibilities, the
+    information assets and ICT assets supporting those functions, and their
+    roles and dependencies in relation to ICT risk.
+  parts:
+    - id: art-8.1
+      label: "1."
+      prose: >-
+        Financial entities shall, on a continuous basis, identify all sources
+        of ICT risk, in particular the risk exposure to and from other
+        financial entities, and assess cyber threats and ICT vulnerabilities
+        relevant to their ICT-supported business functions, information assets
+        and ICT assets.
+    - id: art-8.2
+      label: "2."
+      prose: >-
+        Financial entities shall identify all information assets and ICT assets,
+        including those on remote sites, network resources and hardware equipment,
+        and shall map those considered critical. They shall map the configuration
+        of the information assets and ICT assets and the links and
+        interdependencies between the different information assets and ICT assets.
+    - id: art-8.3
+      label: "3."
+      prose: >-
+        Financial entities shall identify and document all processes that are
+        dependent on ICT third-party service providers, and shall identify
+        interconnections with ICT third-party service providers.
+    - id: art-8.4
+      label: "4."
+      prose: >-
+        Financial entities shall, at least yearly, conduct a specific ICT
+        risk assessment on all legacy ICT systems, and in any case before
+        and after connecting technologies, applications or systems.
+
+guidance:
+  prose: >-
+    Identification is the foundational function of ICT risk management. Without
+    a complete and accurate asset inventory, no downstream risk management
+    activities can be effective. This article requires both a comprehensive
+    inventory and a dynamic dependency map showing how assets interconnect,
+    including third-party dependencies. The inventory must be maintained
+    continuously, not just as a point-in-time exercise. Special attention
+    must be given to legacy systems, which often carry elevated risk due
+    to outdated security controls and lack of vendor support.
+
+references:
+  - citation: "DORA Regulation (EU) 2022/2554, Article 8"
+    url: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy an automated asset discovery and inventory system that
+      continuously scans the environment for ICT assets. Use Backstage
+      service catalog as the authoritative registry of all services,
+      APIs, databases, and infrastructure components with ownership and
+      criticality metadata. Implement network topology mapping tools to
+      automatically discover and visualize interdependencies. Tag all
+      infrastructure-as-code resources with business function, data
+      classification, and criticality labels. Automate legacy system
+      identification by tracking component versions against vendor
+      end-of-life databases. Use dependency graph tools (Backstage
+      System Model, ArgoCD application sets) to map service-to-service
+      and service-to-infrastructure dependencies. Integrate third-party
+      service provider inventory with the CMDB.
+    tools:
+      - backstage
+      - terraform
+      - kubernetes-labels
+      - dependency-track
+      - cartography
+      - grafana-service-map
+
+  devsecops:
+    prose: >-
+      Generate Software Bill of Materials (SBOM) for every build artifact
+      and store them in a central registry. Implement pipeline jobs that
+      automatically register new services and components in the service
+      catalog upon first deployment. Enforce mandatory metadata labels
+      (owner, criticality, data-classification) on all deployable
+      artifacts via pipeline policy checks. Scan for shadow IT and
+      undocumented dependencies by comparing runtime service discovery
+      with the declared inventory. Flag legacy dependencies (libraries,
+      frameworks, OS versions) in pipeline scan results with severity
+      based on end-of-support status.
+    tools:
+      - gitlab-ci
+      - syft
+      - grype
+      - trivy
+      - gitlab-dependency-list
+      - conftest
+
+  secops:
+    prose: >-
+      Continuously reconcile the asset inventory against runtime
+      discovery tools (network scanners, cloud APIs, Kubernetes API)
+      to detect unregistered or rogue assets. Alert on assets that
+      appear in runtime but not in the inventory. Conduct annual legacy
+      system risk assessments and document findings in the risk register.
+      Maintain a third-party dependency map linked to vendor risk
+      assessments. Generate reports showing asset coverage, inventory
+      completeness, and legacy system exposure for regulatory reporting.
+    tools:
+      - nessus
+      - qualys
+      - splunk
+      - elastic-siem
+      - servicenow-cmdb
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.9", "a5.12", "a8.9"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PM-5", "RA-2", "RA-3", "SA-9"]
+    relationship: supports

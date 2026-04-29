@@ -1,0 +1,96 @@
+id: pr.ps-01
+family: pr
+title: "Platform Security - The hardware, software, and services of physical and virtual platforms are managed consistent with the organization's risk strategy"
+class: CSF2
+
+statement:
+  prose: >-
+    The hardware, software (e.g., firmware, operating systems, applications), and
+    services of physical and virtual platforms are managed consistent with the
+    organization's risk strategy to protect their confidentiality, integrity,
+    and availability.
+
+guidance:
+  prose: >-
+    Platform security encompasses the secure configuration and maintenance of all
+    infrastructure components: physical servers, virtual machines, containers,
+    orchestrators, operating systems, firmware, and platform services. Management
+    consistent with risk strategy means applying security controls proportional to
+    the criticality of the platform component and the data it processes. This includes
+    hardened baselines derived from industry benchmarks, timely patching, removal of
+    unnecessary services, secure boot processes, and continuous configuration monitoring.
+    Platform security also addresses supply chain risk for hardware and firmware
+    components.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, PR.PS-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement immutable infrastructure patterns where platform components are
+      replaced rather than patched in place. Build hardened base images using Packer
+      with CIS Benchmark configurations applied. Use Kubernetes pod security standards
+      (restricted profile) enforced via admission controllers. Implement automatic
+      node patching with rolling updates that maintain availability. Use GitOps
+      (ArgoCD, Flux) to ensure all platform configurations match their version-controlled
+      desired state. Monitor for configuration drift and auto-remediate deviations.
+      Implement network segmentation using Kubernetes network policies and cloud VPC
+      configurations. Harden container runtime configurations (read-only root filesystem,
+      no privilege escalation, drop all capabilities).
+    tools:
+      - packer
+      - ansible
+      - kyverno
+      - opa-gatekeeper
+      - argocd
+      - flux
+      - kubernetes-network-policies
+      - falco
+
+  devsecops:
+    prose: >-
+      Scan all infrastructure code and container definitions against CIS Benchmarks
+      and organizational security policies before deployment. Use kube-linter for
+      Kubernetes manifests, Hadolint for Dockerfiles, and Checkov/tfsec for Terraform.
+      Implement container image signing (Cosign/Sigstore) and verify signatures before
+      deployment. Enforce that only images from trusted registries are deployable.
+      Scan Helm charts and Kustomize overlays for security misconfigurations. Implement
+      pipeline policies that block deployment of configurations with critical findings.
+    tools:
+      - checkov
+      - tfsec
+      - kube-linter
+      - hadolint
+      - cosign
+      - trivy
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Run continuous configuration compliance assessments against CIS Benchmarks for
+      all platform components (OS, Kubernetes, cloud services). Monitor runtime behavior
+      with tools like Falco to detect anomalous system calls, unauthorized process
+      execution, and container escapes. Implement cloud security posture management
+      (CSPM) for multi-cloud environments. Alert on platform configuration changes
+      that deviate from approved baselines. Conduct quarterly platform security reviews
+      covering patch status, configuration compliance, and vulnerability posture.
+    tools:
+      - falco
+      - prisma-cloud
+      - aqua-security
+      - wazuh
+      - cis-cat-pro
+      - osquery
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-6", "CM-7", "SI-2"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.19", "A8.20"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-4.1"]
+    relationship: equivalent-to

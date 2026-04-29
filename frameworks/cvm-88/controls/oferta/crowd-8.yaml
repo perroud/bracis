@@ -1,0 +1,123 @@
+id: crowd-8
+family: oferta
+title: "Target Amount and Partial Offering Closure"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 17. A oferta deve estabelecer valor alvo de captação e pode
+    prever a possibilidade de encerramento parcial, desde que:
+    I — o valor mínimo de captação seja claramente definido e divulgado
+    aos investidores antes do início da oferta; II — o valor mínimo de
+    captação não seja inferior a 2/3 (dois terços) do valor alvo;
+    III — a possibilidade de captação parcial esteja claramente descrita
+    no material da oferta; IV — os recursos captados sejam suficientes
+    para a execução do plano de negócios apresentado.
+
+    § 1º Caso a oferta não atinja o valor mínimo de captação ao final do
+    prazo de captação, os recursos devem ser integralmente devolvidos aos
+    investidores no prazo de 5 (cinco) dias úteis, sem qualquer desconto.
+
+    § 2º Os recursos captados devem ser depositados em conta vinculada em
+    instituição financeira, e somente podem ser liberados para a sociedade
+    empresária emissora após o encerramento bem-sucedido da oferta.
+
+    § 3º A plataforma deve informar aos investidores, de forma contínua
+    e atualizada, o valor total já captado na oferta.
+guidance:
+  prose: |
+    Article 17 establishes the target amount and escrow mechanism for
+    crowdfunding offerings, providing critical investor protection through
+    the "all-or-nothing" (or partial) funding model.
+
+    **Target and minimum amounts:**
+    - Each offering must define a clear target amount
+    - Partial closure is allowed but minimum must be at least 2/3 of target
+    - Minimum amount must be disclosed before offering starts
+    - The minimum must be sufficient to execute the business plan
+
+    **Escrow mechanism:**
+    Funds are held in an escrow account at a financial institution and can
+    only be released to the issuer upon successful offering closure. This
+    is a critical investor protection mechanism.
+
+    **Refund obligation:**
+    If the minimum is not reached, ALL funds must be returned to investors
+    within 5 business days, with no deductions.
+
+    **Real-time transparency:**
+    The platform must provide continuous, real-time updates on the total
+    amount raised during the offering period.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Escrow and funding infrastructure:**
+      1. Integrate with a licensed financial institution for escrow
+         account management via API (PIX, TED, or payment gateway).
+      2. Build real-time funding progress tracker with WebSocket or
+         SSE updates for investors showing current amount vs target
+         and minimum.
+      3. Implement automated offering lifecycle management: open,
+         tracking, partial-closure eligible, closed-success,
+         closed-refund.
+
+      **Refund automation:**
+      4. Build automated refund engine triggered when offering fails
+         to reach minimum, processing returns within the 5-business-day
+         SLA.
+      5. Implement escrow release workflow requiring dual authorization
+         (platform + compliance) before funds transfer to issuer.
+      6. Deploy reconciliation system that continuously validates
+         escrow balance against investor commitments.
+    tools:
+      - postgresql
+      - redis
+      - payment-gateway
+      - kubernetes
+      - websocket
+  devsecops:
+    prose: |
+      **Financial transaction security:**
+      1. Extensive testing for escrow logic: partial closure threshold
+         (2/3 rule), refund timing (5 business days), escrow release
+         conditions.
+      2. SAST focused on payment processing and escrow management code
+         to detect financial calculation vulnerabilities.
+      3. Integration tests simulating full offering lifecycle: funding,
+         partial closure, full closure, and failed-offering refund.
+
+      **Deployment safety:**
+      4. Blue-green deployment for escrow and payment services with
+         zero-downtime requirements.
+      5. Database transaction integrity tests ensuring atomicity of
+         investment commitments and refund operations.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - jest
+      - k6
+  secops:
+    prose: |
+      **Escrow monitoring:**
+      1. Real-time monitoring of escrow account balances with
+         reconciliation against platform records every 15 minutes.
+      2. Alert on any escrow fund movement outside normal offering
+         lifecycle events.
+      3. Monitor refund SLA compliance — alert if any refund exceeds
+         3 business days (early warning before 5-day deadline).
+
+      **Financial oversight:**
+      4. Daily reconciliation report of all active escrow accounts.
+      5. Quarterly audit of escrow processes and refund history for
+         CVM compliance evidence.
+    tools:
+      - siem
+      - grc-platform
+      - financial-monitoring
+legal_references:
+  - framework_id: cvm-135
+    articles: ["art-15"]
+    relationship: complements
+  - framework_id: cvm-175
+    articles: ["art-36"]
+    relationship: complements

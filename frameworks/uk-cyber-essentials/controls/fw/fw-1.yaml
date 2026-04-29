@@ -1,0 +1,101 @@
+id: fw-1
+family: fw
+title: "Boundary Firewalls and Internet Gateways"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Every device in scope that connects to the internet (or other untrusted networks)
+    must be protected by a correctly configured firewall (or equivalent network device).
+    The firewall must control inbound and outbound network traffic, permitting only
+    traffic that has been explicitly authorised and denying all other traffic by default.
+    Where a software (host-based) firewall is used, it must be configured to prevent the
+    end user from disabling or changing its configuration. The boundary firewall or
+    internet gateway must prevent unauthenticated inbound connections from the internet
+    to internal network services.
+
+guidance:
+  prose: >-
+    The intent of this control is to ensure that every internet-facing boundary has a
+    clearly defined and enforced security perimeter. Firewalls can be hardware appliances,
+    virtual appliances, cloud-native security groups, or host-based software firewalls.
+    In cloud environments, Virtual Private Clouds (VPCs) with network access control lists
+    (NACLs) and security groups serve as the boundary firewall equivalent. Organisations
+    must document which firewall rules are in place, who approved them, and when they were
+    last reviewed. Default-deny posture is mandatory — only explicitly permitted traffic
+    should traverse the boundary.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Firewalls"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Firewalls"
+    url: "https://www.ncsc.gov.uk/collection/device-security-guidance/infrastructure/firewalls"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define all network boundaries as Infrastructure-as-Code (Terraform, Pulumi, CloudFormation)
+      with explicit ingress and egress rules. Enforce default-deny security groups and NACLs
+      across all VPCs and subnets. Deploy cloud-native firewall services (AWS Network Firewall,
+      Azure Firewall, GCP Cloud Firewall) for centralised traffic inspection. Use network
+      segmentation to isolate workloads by trust level. Implement automated drift detection
+      to alert on unauthorised firewall rule changes. Store firewall rule definitions in
+      version-controlled repositories with mandatory code review for any modifications.
+    tools:
+      - terraform
+      - pulumi
+      - aws-network-firewall
+      - azure-firewall
+      - gcp-cloud-armor
+      - palo-alto-ngfw
+      - checkov
+      - tfsec
+
+  devsecops:
+    prose: >-
+      Integrate infrastructure scanning tools into CI/CD pipelines to validate firewall
+      configurations before deployment. Use policy-as-code frameworks (Open Policy Agent,
+      Kyverno) to enforce that no security group allows unrestricted inbound access (0.0.0.0/0)
+      on sensitive ports. Implement automated tests that verify firewall rules match the
+      documented allow-list. Run network policy linting in merge request pipelines to catch
+      overly permissive rules before they reach production. Track firewall rule changes as
+      auditable events in the deployment pipeline.
+    tools:
+      - checkov
+      - tfsec
+      - open-policy-agent
+      - kyverno
+      - gitlab-ci
+      - trivy
+
+  secops:
+    prose: >-
+      Conduct periodic reviews of all firewall rules (at minimum quarterly) to remove
+      stale or overly broad entries. Monitor firewall logs for denied connection attempts
+      and anomalous traffic patterns using a SIEM platform. Configure alerts for any
+      unauthorised changes to firewall rules or security group configurations. Perform
+      external vulnerability scanning to verify that no unintended services are exposed
+      to the internet. Maintain a documented register of all approved firewall rules with
+      business justification and expiry dates.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - palo-alto-panorama
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.21"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "AC-4"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-app-control"]
+    relationship: complements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 4.4", "CIS 9.2", "CIS 9.3"]
+    relationship: mapped

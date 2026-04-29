@@ -1,0 +1,82 @@
+id: cry-1
+family: cry
+title: "Cryptographic Policy and Key Management"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    The organization shall establish a cryptographic policy that defines
+    the use of cryptographic controls for protection of information. The
+    policy shall specify approved cryptographic algorithms, minimum key
+    lengths, and protocols for protecting personal information and sensitive
+    data in transit and at rest. A key management process shall be
+    implemented covering the entire lifecycle of cryptographic keys
+    including generation, distribution, storage, rotation, revocation,
+    and destruction.
+
+guidance:
+  prose: |
+    K-ISMS-P requires the use of cryptographic controls compliant with
+    Korean Cryptographic Module Validation Program (KCMVP) standards for
+    government and critical infrastructure systems. For personal information
+    processing, encryption is mandatory for data at rest and in transit.
+    KISA auditors verify that the cryptographic policy is not merely
+    documented but actively enforced through technical controls. Key
+    management is a common audit finding; organizations must demonstrate
+    that keys are stored separately from encrypted data and that key
+    rotation schedules are followed.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 2.6 — Cryptography"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Deploy centralized key management services (KMS) for all cryptographic
+      operations. Enforce TLS 1.2 or higher for all network communications.
+      Implement transparent data encryption (TDE) for databases containing
+      personal information. Use hardware security modules (HSMs) for
+      managing root keys and signing operations. Automate certificate
+      lifecycle management including renewal and revocation.
+    tools:
+      - hashicorp-vault
+      - aws-kms
+      - cert-manager
+      - istio
+
+  devsecops:
+    prose: |
+      Scan code for use of deprecated or weak cryptographic algorithms.
+      Enforce minimum TLS versions and cipher suites through CI/CD policy
+      checks. Detect hardcoded secrets and cryptographic keys in source
+      code. Validate that encryption is enabled for all data stores
+      before deployment.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - gitleaks
+      - checkov
+
+  secops:
+    prose: |
+      Monitor for use of weak or deprecated cryptographic protocols across
+      the network. Track certificate expiration dates and alert before
+      expiry. Audit key access logs to detect unauthorized key usage.
+      Conduct periodic reviews of cryptographic implementations to ensure
+      compliance with the approved algorithm list.
+    tools:
+      - qualys-ssl
+      - splunk
+      - elastic-siem
+      - venafi
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a.8.24"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped

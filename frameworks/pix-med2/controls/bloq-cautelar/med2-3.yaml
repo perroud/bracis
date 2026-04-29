@@ -1,0 +1,88 @@
+id: med2-3
+family: bloq-cautelar
+title: "Cascade Blocking Time Limits and Proportionality"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O bloqueio cautelar em cascata deve observar os prazos regulamentares estabelecidos pelo BCB.
+    O PSP que receber solicitação de bloqueio em cascata via DICT deve efetuar o bloqueio dos
+    recursos na conta indicada no prazo máximo de 30 minutos contados do recebimento da
+    solicitação. O valor bloqueado em cada conta da cadeia deve ser proporcional ao valor
+    efetivamente recebido naquela conta, respeitando o limite do saldo disponível. A soma dos
+    valores bloqueados em toda a cadeia não pode exceder o valor da transação original objeto da
+    notificação de infração. O bloqueio cautelar permanece vigente pelo prazo de até 72 horas,
+    período no qual o PSP deve concluir a análise de procedência da notificação e decidir pela
+    devolução ou desbloqueio dos recursos.
+guidance:
+  prose: |
+    **Time Limits:**
+    - **30 minutes:** Maximum time for a PSP to execute a cascade blocking request after
+      receiving it via DICT. This is per-hop — each PSP in the chain has its own 30-minute
+      window from the moment it receives the request.
+    - **72 hours:** Maximum duration of the precautionary block. Within this window, the
+      PSP must complete its analysis and either initiate a return or release the funds.
+
+    **Proportionality Rules:**
+    1. Block only the amount that was actually credited to the specific account in the chain.
+    2. If the account balance is less than the credited amount, block the available balance.
+    3. The sum of all blocks across the entire cascade must not exceed the original
+       transaction value — the cascade orchestrator must track cumulative blocked amounts.
+
+    **Example:** Original fraud: R$10,000. Account A received R$10,000 and forwarded
+    R$6,000 to Account B and R$4,000 to Account C. Block R$10,000 (or available balance)
+    at A, R$6,000 at B, R$4,000 at C — but total effective recovery capped at R$10,000.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a cascade ledger service that tracks the original transaction value,
+         amounts credited at each hop, and cumulative blocked amounts across the chain.
+      2. Build proportional blocking logic: for each account in the cascade, calculate
+         block_amount = min(credited_amount, available_balance, remaining_unblocked_amount).
+      3. Implement a countdown timer per blocking request — trigger escalation alerts at
+         20 minutes if the block has not been confirmed.
+      4. Build automatic deblock scheduling: if no return decision is made within 72 hours,
+         automatically release the block and generate an audit event.
+      5. Implement concurrency controls for the cascade ledger to handle simultaneous
+         blocking confirmations without exceeding the original value cap.
+    tools:
+      - distributed-ledger
+      - scheduler
+      - event-streaming
+      - dict-api-client
+      - concurrency-control
+  devsecops:
+    prose: |
+      1. Test proportional blocking with various chain topologies: linear (A→B→C),
+         fan-out (A→B, A→C, A→D), and mixed (A→B→C, A→D).
+      2. Verify the cumulative cap: simulate chains where the sum of available balances
+         exceeds the original value and confirm blocking stops at the cap.
+      3. Test the 30-minute SLA: inject delays at various points and verify alerts trigger.
+      4. Test the 72-hour auto-deblock: verify funds are released exactly at expiry.
+      5. Test race conditions: two cascade branches completing simultaneously.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - load-testing
+      - time-simulation
+  secops:
+    prose: |
+      1. Monitor SLA compliance: percentage of cascade blocks executed within 30 minutes.
+      2. Track 72-hour expiry: alert on blocks approaching expiry without a decision.
+      3. Dashboard showing active cascades, total blocked amounts, and remaining analysis
+         time per case.
+      4. Weekly SLA report for BCB: average blocking time, compliance rate, exceptions.
+      5. Escalation procedures for blocks that cannot be executed (account closed, PSP
+         unresponsive, insufficient balance).
+    tools:
+      - monitoring-platform
+      - alerting-system
+      - sla-tracking
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21", "art-22"]
+    relationship: implements

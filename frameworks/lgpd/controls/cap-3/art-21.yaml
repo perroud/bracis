@@ -1,0 +1,120 @@
+id: art-21
+family: cap-3
+title: "Dados Anonimizados"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 12. Os dados anonimizados não serão considerados dados pessoais para os fins
+    desta Lei, salvo quando o processo de anonimização ao qual foram submetidos for
+    revertido, utilizando exclusivamente meios próprios, ou quando, com esforços razoáveis,
+    puder ser revertido.
+
+    § 1º A determinação do que seja razoável deve levar em consideração fatores objetivos,
+    tais como custo e tempo necessários para reverter o processo de anonimização, de acordo
+    com as tecnologias disponíveis, e a utilização exclusiva de meios próprios.
+
+    § 2º Poderão ser igualmente considerados como dados pessoais, para os fins desta Lei,
+    aqueles utilizados para formação do perfil comportamental de determinada pessoa natural,
+    se identificada.
+
+    § 3º A autoridade nacional poderá dispor sobre padrões e técnicas utilizados em
+    processos de anonimização e realizar verificações acerca de sua segurança, ouvido o
+    Conselho Nacional de Proteção de Dados Pessoais e da Privacidade.
+
+    Art. 13. § 4º Para os efeitos deste artigo, a pseudonimização é o tratamento por
+    meio do qual um dado perde a possibilidade de associação, direta ou indireta, a um
+    indivíduo, senão pelo uso de informação adicional mantida separadamente pelo
+    controlador em ambiente controlado e seguro.
+guidance:
+  prose: |
+    O art. 12 (aqui referenciado como art-21 para organização temática junto aos direitos
+    do titular no cap-3) trata da fronteira entre dado pessoal e dado anonimizado. A
+    distinção é crítica porque dados anonimizados estão fora do escopo da LGPD.
+
+    **Anonimização vs. Pseudonimização:**
+    - **Anonimização:** Processo irreversível. Dado deixa de ser pessoal. Fora do escopo
+      da LGPD.
+    - **Pseudonimização:** Processo reversível com informação adicional. Dado CONTINUA
+      sendo pessoal. Dentro do escopo da LGPD.
+
+    **Teste de razoabilidade (§ 1º):**
+    A anonimização não precisa ser absolutamente irreversível — basta que a reversão
+    exija "esforços não razoáveis". Fatores considerados: custo, tempo, tecnologias
+    disponíveis. O padrão evolui com a tecnologia: o que é irreversível hoje pode
+    não ser amanhã.
+
+    **Perfil comportamental (§ 2º):**
+    Mesmo dados que individualmente são anônimos podem ser considerados pessoais se
+    usados para formar perfil comportamental de pessoa identificada. Ex.: dados de
+    navegação "anonimizados" que, combinados, permitem identificar o indivíduo.
+
+    **Técnicas de anonimização reconhecidas:**
+    - k-anonimato
+    - l-diversidade
+    - t-proximidade
+    - Differential privacy
+    - Generalização e supressão
+    - Data masking (quando irreversível)
+
+    **Técnicas que NÃO são anonimização:**
+    - Hashing sem salt (reversível com rainbow tables)
+    - Tokenização reversível
+    - Criptografia (reversível com chave)
+    - Pseudonimização (reversível com tabela de lookup)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar pipeline de anonimização com técnicas comprovadas (k-anonimato,
+         differential privacy) para dados que precisam ser retidos após término do
+         tratamento.
+      2. Criar processo de avaliação de risco de re-identificação antes de classificar
+         dados como anonimizados.
+      3. Separar claramente pseudonimização de anonimização nos sistemas — dados
+         pseudonimizados continuam sujeitos à LGPD.
+      4. Implementar controles de acesso separados para tabelas de lookup de
+         pseudonimização (ambiente controlado e seguro, conforme art. 13 § 4º).
+      5. Criar data warehouse analítico com dados genuinamente anonimizados para
+         business intelligence e analytics.
+      6. Implementar monitoramento de risco de re-identificação que considere
+         evolução tecnológica.
+    tools:
+      - anonymization-engine
+      - differential-privacy-library
+      - data-masking
+      - data-warehouse
+      - risk-assessment
+      - key-management
+  devsecops:
+    prose: |
+      1. Implementar testes de re-identificação no pipeline para validar que dados
+         classificados como anonimizados são efetivamente irreversíveis.
+      2. Validar que pseudonimização mantém controles de acesso adequados à tabela
+         de lookup.
+      3. Testar que técnicas de anonimização não degradam utilidade dos dados
+         abaixo do necessário para a finalidade.
+      4. Implementar revisão periódica de técnicas de anonimização considerando
+         avanços tecnológicos (novos ataques de re-identificação).
+    tools:
+      - re-identification-testing
+      - anonymization-validation
+      - security-testing
+      - compliance-as-code
+  secops:
+    prose: |
+      1. Monitorar acessos a tabelas de lookup de pseudonimização com alertas
+         reforçados.
+      2. Auditar periodicamente datasets anonimizados para verificar risco de
+         re-identificação com técnicas atualizadas.
+      3. Alertar sobre combinação de datasets anonimizados que possam resultar
+         em re-identificação (linkage attacks).
+      4. Monitorar publicação de novas técnicas de ataque a anonimização.
+    tools:
+      - data-access-monitoring
+      - privacy-risk-assessment
+      - threat-intelligence
+      - siem
+legal_references:
+  - framework_id: gdpr
+    articles: ["considerando 26", "art. 4(5)"]
+    relationship: equivalent-to

@@ -1,0 +1,128 @@
+id: crowd-17
+family: divulgacao
+title: "Material Fact Disclosure"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 40. A sociedade empresária emissora deve comunicar imediatamente
+    à plataforma qualquer fato relevante que possa influenciar a decisão
+    de investimento, incluindo: I — alteração substâncial no plano de
+    negócios ou nas projeções financeiras; II — mudança no quadro de
+    administradores ou no controle societário; III — proposição de
+    recuperação judicial ou extrajudicial; IV — ajuizamento de ações
+    judiciais relevantes; V — celebração ou rescisão de contratos
+    relevantes; VI — qualquer outro fato que possa afetar material e
+    adversamente a situação financeira ou operacional da sociedade
+    empresária emissora.
+
+    § 1º A plataforma deve divulgar o fato relevante aos investidores
+    de forma imediata após o recebimento da comunicação da sociedade
+    empresária emissora.
+
+    § 2º Caso o fato relevante ocorra durante o período de captação da
+    oferta, os investidores que já tenham confirmado investimento devem
+    ser notificados individualmente e ter o prazo de desistência
+    reaberto pelo período de 5 (cinco) dias.
+
+    § 3º A plataforma deve manter registro de todos os fatos relevantes
+    comunicados e das notificações enviadas aos investidores.
+guidance:
+  prose: |
+    Article 40 establishes the material fact disclosure regime for
+    crowdfunding issuers. This is a continuous disclosure obligation that
+    applies both during and after the offering period.
+
+    **Material events requiring immediate disclosure:**
+    - Substantial changes to business plan or projections
+    - Management or ownership changes
+    - Judicial or extrajudicial recovery proceedings
+    - Material litigation
+    - Significant contract execution or termination
+    - Any other materially adverse event
+
+    **Immediate disclosure chain:**
+    Issuer -> Platform -> Investors. The platform must relay material
+    facts to investors immediately upon receipt from the issuer.
+
+    **During active offerings:**
+    If a material fact occurs while an offering is active, existing
+    investors must be individually notified and granted a new 5-day
+    withdrawal period. This is a critical investor protection mechanism.
+
+    **Record-keeping:**
+    Complete records of all material facts and investor notifications
+    must be maintained.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Material fact management system:**
+      1. Build a material fact submission portal for issuers with
+         structured categorization (business plan change, management
+         change, litigation, etc.) and urgency classification.
+      2. Implement real-time notification pipeline that immediately
+         distributes material facts to all relevant investors via
+         email, SMS, and in-app notification.
+      3. Deploy automated withdrawal period reopening when material
+         facts occur during active offerings: system must reopen the
+         5-day withdrawal window and notify affected investors.
+
+      **Investor notification:**
+      4. Build individual notification tracking system confirming
+         delivery to each investor (sent, delivered, read).
+      5. Implement notification archive with full audit trail of
+         all material fact communications.
+    tools:
+      - notification-service
+      - postgresql
+      - redis
+      - message-queue
+      - kubernetes
+  devsecops:
+    prose: |
+      **Material fact system reliability:**
+      1. End-to-end tests for the complete material fact lifecycle:
+         issuer submission -> platform review -> investor notification
+         -> withdrawal period reopening.
+      2. Performance testing for notification delivery under load
+         (scenario: material fact affecting an offering with thousands
+         of investors).
+      3. SAST scanning for notification and communication code.
+
+      **Reliability engineering:**
+      4. Implement retry mechanisms and dead letter queues for failed
+         notification deliveries.
+      5. Circuit breaker patterns for external notification channels
+         (email, SMS) with fallback delivery methods.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - k6
+      - jest
+  secops:
+    prose: |
+      **Material fact monitoring:**
+      1. Monitor notification delivery rates — alert on failed
+         deliveries requiring manual intervention.
+      2. Track time from material fact receipt to investor
+         notification — regulatory expectation is "immediate."
+      3. Monitor withdrawal patterns following material facts to
+         assess investor impact.
+
+      **Compliance evidence:**
+      4. Maintain immutable log of all material facts with timestamps
+         for: issuer submission, platform receipt, investor
+         notification sent, delivery confirmed.
+      5. Generate material fact compliance report for CVM showing
+         all events, notification timing, and withdrawal activity.
+    tools:
+      - siem
+      - grc-platform
+      - notification-monitoring
+legal_references:
+  - framework_id: cvm-175
+    articles: ["art-45"]
+    relationship: complements
+  - framework_id: cvm-135
+    articles: ["art-33"]
+    relationship: complements

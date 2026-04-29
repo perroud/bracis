@@ -1,0 +1,133 @@
+id: rec-16
+family: seguranca
+title: "Audit Trail and Regulatory Inspection Support"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 30. Os sistemas de prescrição eletrônica e dispensação devem
+    manter trilha de auditoria inalterável que registre:
+
+    I — todas as operações de criação, consulta, alteração e cancelamento
+    de prescrições, com identificação do usuário, data, hora e endereço
+    IP de origem;
+
+    II — todas as operações de dispensação, incluindo dispensações parciais,
+    recusas de dispensação e devoluções;
+
+    III — todas as tentativas de acesso, sejam bem-sucedidas ou não,
+    incluindo tentativas de autenticação com credenciais inválidas;
+
+    IV — todas as alterações de configuração do sistema, incluindo
+    alterações em perfis de acesso, parâmetros de segurança e regras de
+    negócio;
+
+    V — eventos de integração com o SNCR, incluindo registros de
+    prescrição, consultas de status e recebimento de alertas.
+
+    § 1.º A trilha de auditoria deve ser armazenada em repositório
+    segregado do banco de dados operacional, com controle de acesso
+    restrito ao perfil de auditor.
+
+    § 2.º Os registros de auditoria devem ser mantidos por prazo mínimo
+    de 10 (dez) anos, íntegros e disponíveis para consulta pela ANVISA
+    em até 48 (quarenta e oito) horas após solicitação.
+guidance:
+  prose: |
+    Article 30 defines comprehensive audit trail requirements for
+    prescription systems, covering all operations, access attempts,
+    configuration changes, and system integrations.
+
+    **Audit scope (what to log):**
+    - All CRUD operations on prescriptions
+    - All dispensation operations (dispense, partial, refuse, return)
+    - All authentication attempts (success and failure)
+    - All configuration and security parameter changes
+    - All SNCR integration events
+
+    **Audit entry fields:**
+    - User identifier
+    - Timestamp
+    - Source IP address
+    - Operation type
+    - Affected resource(s)
+    - Before/after state (for modifications)
+
+    **Storage requirements:**
+    - Segregated from operational database
+    - Access restricted to auditor role only
+    - Immutable (append-only, no modification or deletion)
+    - 10-year minimum retention
+    - Available to ANVISA within 48 hours of request
+
+    **Regulatory inspection support:**
+    The 48-hour availability requirement means audit data must be
+    readily queryable, not buried in cold storage. Systems need
+    efficient search and export capabilities for regulatory requests.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Audit trail infrastructure:**
+      1. Implement a dedicated, append-only audit log store segregated
+         from the operational database (e.g., dedicated Elasticsearch
+         cluster, immutable S3 buckets, or blockchain-based ledger).
+      2. Deploy audit event capture at the API gateway and application
+         layers, ensuring no operation bypasses logging.
+      3. Implement cryptographic chaining (hash chain) for audit
+         entries to provide tamper evidence.
+      4. Deploy a regulatory inspection portal with search, filter,
+         and export capabilities for audit data, accessible only to
+         the auditor role.
+      5. Implement tiered audit storage: hot storage (0-1 year) for
+         real-time queries, warm storage (1-5 years) for regulatory
+         requests, cold storage (5-10 years) for archival compliance.
+    tools:
+      - elasticsearch
+      - fluentd
+      - s3-immutable
+      - audit-portal
+      - hash-chain
+      - worm-storage
+  devsecops:
+    prose: |
+      **Audit trail testing:**
+      1. Create tests verifying that every API endpoint generates
+         the correct audit log entries with all required fields.
+      2. Implement immutability tests confirming that audit entries
+         cannot be modified or deleted through any system interface.
+      3. Add access control tests verifying that only the auditor
+         role can access audit data.
+      4. Deploy performance tests ensuring audit logging does not
+         degrade operational system response times by more than 5%.
+    tools:
+      - gitlab-ci
+      - audit-testing
+      - access-control-tests
+      - performance-tests
+      - immutability-verification
+  secops:
+    prose: |
+      **Audit operations and regulatory readiness:**
+      1. Monitor audit log volume and storage consumption with
+         capacity planning alerts.
+      2. Conduct quarterly audit log integrity checks using the
+         cryptographic hash chain verification.
+      3. Maintain a regulatory inspection runbook with procedures
+         for responding to ANVISA data requests within 48 hours.
+      4. Review audit log retention compliance annually, ensuring
+         the 10-year minimum is met across all storage tiers.
+    tools:
+      - siem
+      - integrity-verification
+      - regulatory-response-runbook
+      - retention-compliance
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-19", "art-34"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-37", "art-38"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["clausula-A-8-15"]
+    relationship: mapped

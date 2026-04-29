@@ -1,0 +1,121 @@
+id: art-30
+family: cap-6
+title: "Plano de Contingencia e Continuidade"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 30. O fabricante deve elaborar e manter plano de contingência
+    para cada sistema computadorizado crítico, definindo procedimentos
+    alternativos que garantam a continuidade das operações GMP em caso
+    de falha ou indisponibilidade do sistema.
+
+    Parágrafo 1. O plano de contingência deve incluir:
+    I - identificação de sistemas críticos e seus processos dependentes;
+    II - procedimentos alternativos (manuais ou sistemas backup) para
+    continuidade de operações GMP;
+    III - critérios de ativação do plano de contingência;
+    IV - funções e responsabilidades durante contingência;
+    V - procedimentos de retorno à operação normal;
+    VI - requisitos de integridade de dados durante contingência;
+    VII - tempo máximo tolerável de indisponibilidade (RTO).
+
+    Parágrafo 2. O plano de contingência deve ser testado periodicamente,
+    no mínimo anualmente para sistemas críticos, e os resultados dos testes
+    devem ser documentados com ações corretivas para falhas identificadas.
+guidance:
+  prose: |
+    O art. 30 garante que falhas de sistema nao comprometam a qualidade
+    do medicamento ou a seguranca do paciente.
+
+    **Cenarios de contingencia tipicos:**
+    - Falha de sistema SCADA/DCS durante producao
+    - Indisponibilidade de LIMS durante liberacao de lote
+    - Falha de ERP durante recebimento/expedicao
+    - Perda de conectividade de rede
+    - Falha de energia em datacenter
+    - Ataque cibernetico (ransomware, DDoS)
+    - Desastre natural (enchente, incendio)
+
+    **Procedimentos alternativos:**
+    - Procedimentos manuais documentados e treinados
+    - Sistema backup/hot standby
+    - Registro manual com posterior digitacao (data entry)
+    - Operacao em modo degradado com restricoes documentadas
+
+    **Tempos de recuperacao (RTO) sugeridos:**
+    - SCADA/DCS (processo em andamento): < 15 minutos
+    - LIMS (liberacao de lote): < 4 horas
+    - MES (registro de producao): < 2 horas
+    - ERP (logistica): < 8 horas
+    - QMS (desvios, CAPAs): < 24 horas
+
+    **Integridade de dados durante contingencia:**
+    Procedimentos alternativos devem garantir que dados gerados durante
+    contingencia sejam precisos, atribuiveis e rastreavies, mesmo quando
+    registrados manualmente. Dados devem ser digitados no sistema apos
+    retorno a normalidade com rastreabilidade ao registro manual.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de alta disponibilidade e contingencia:**
+      1. Implementar arquitetura de alta disponibilidade para sistemas
+         GMP criticos: clusters ativos-ativos ou ativos-passivos com
+         failover automatico dentro do RTO definido.
+      2. Configurar disaster recovery site em localidade geograficamente
+         separada com replicacao de dados e capacidade de assumir
+         operacao em caso de desastre no site primario.
+      3. Implementar monitoramento de saude dos sistemas de contingencia
+         com testes automaticos de failover periodicos.
+      4. Configurar runbooks automatizados para cenarios de contingencia
+         que padronizem e acelerem a resposta a falhas.
+      5. Manter documentacao de arquitetura de contingencia como codigo
+         versionado, atualizada a cada mudanca de infraestrutura.
+    tools:
+      - kubernetes-ha
+      - disaster-recovery
+      - failover-automation
+      - runbooks
+      - monitoring
+  devsecops:
+    prose: |
+      **Testes de contingencia automatizados:**
+      1. Implementar testes de chaos engineering periodicos que simulem
+         falhas de componentes e verifiquem ativacao correta de
+         mecanismos de contingencia.
+      2. Configurar pipeline de DR drill que execute failover para site
+         de contingencia e verifique funcionalidades criticas.
+      3. Testar procedimentos de retorno a normalidade apos ativacao
+         de contingencia, incluindo reconciliacao de dados.
+      4. Gerar relatorio automatizado de teste de contingencia como
+         artefato auditavel com resultados e tempos de recuperacao.
+    tools:
+      - chaos-engineering
+      - dr-testing
+      - failover-testing
+      - reporting
+  secops:
+    prose: |
+      **Programa de gestao de contingencia:**
+      1. Elaborar e manter plano de contingencia para cada sistema
+         computadorizado GMP critico com aprovacao da diretoria.
+      2. Executar testes de contingencia anuais com cenarios realistas
+         e participacao de equipes operacionais.
+      3. Documentar resultados de testes com gap analysis e plano de
+         remediacao para deficiencias identificadas.
+      4. Treinar equipes em procedimentos de contingencia e retorno
+         a normalidade, incluindo registro manual de dados.
+      5. Revisar plano de contingencia apos cada teste, incidente real
+         ou mudanca significativa de infraestrutura.
+    tools:
+      - business-continuity-management
+      - quality-management-system
+      - training-management
+      - incident-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-29", "controle-A-5-30"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.308-a-7"]
+    relationship: mapped

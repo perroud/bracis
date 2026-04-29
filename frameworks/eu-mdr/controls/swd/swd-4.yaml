@@ -1,0 +1,121 @@
+id: swd-4
+family: swd
+title: "Software Update and Change Management"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    For devices that incorporate software or for software that are devices
+    in themselves, the manufacturer shall put in place and keep up to date
+    a plan for the management of changes to the software, including
+    cybersecurity updates.
+
+    Any significant change in the design or intended purpose of a device
+    which has already been placed on the market or put into service shall
+    be considered a modification of the device. Such modifications shall
+    require a new conformity assessment or a supplement to the existing
+    conformity assessment depending on the nature of the change.
+
+    Manufacturers shall have in place adequate systems to address software
+    updates in the field, ensuring that updates can be validated and
+    deployed in a controlled manner while maintaining device safety and
+    performance throughout the deployed lifetime of the device.
+guidance:
+  prose: |
+    EU MDR requires manufacturers to manage software changes throughout
+    the entire lifecycle of the device. MDCG 2020-3 provides guidance on
+    significant changes and when a new conformity assessment is required.
+
+    Key change management considerations:
+    - Classification of changes: each software change must be evaluated
+      to determine whether it is significant (requiring notified body
+      involvement) or non-significant.
+    - Regression analysis: the impact of each change on existing
+      functionality, safety, and performance must be assessed.
+    - Cybersecurity patches: security updates must be deployable in a
+      timely manner without requiring a full re-certification, provided
+      they do not change the intended purpose or safety characteristics.
+    - Update delivery mechanism: the manufacturer must have a reliable
+      mechanism for deploying updates to devices in the field, including
+      rollback capability.
+    - User notification: users must be informed of available updates
+      and their necessity for continued safe use of the device.
+    - Version management: every deployed version must be identifiable
+      and traceable to its build artifacts, test results, and risk
+      assessment.
+references:
+  - citation: "EU MDR 2017/745, Article 10(10), Article 120"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+  - citation: "MDCG 2020-3 — Significant changes regarding MDD/AIMDD"
+    url: "https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2020_3_guidance_significant_changes_en_0.pdf"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement blue-green or canary deployment strategies that
+         enable controlled rollout of software updates with automated
+         rollback capability if health checks fail.
+      2. Configure a centralized update distribution system that can
+         deliver software updates to deployed device instances with
+         integrity verification (code signing) and delivery confirmation.
+      3. Maintain deployment manifests linking each deployed version
+         to its build pipeline, test results, risk assessment, and
+         change classification (significant/non-significant).
+      4. Implement feature flags for progressive rollout of new
+         functionality, enabling quick deactivation without full
+         redeployment in case of field issues.
+    tools:
+      - argocd
+      - flagger
+      - feature-flags
+      - cosign
+      - artifact-registry
+  devsecops:
+    prose: |
+      1. Implement an automated change classification pipeline that
+         evaluates each merge request against predefined criteria to
+         flag potentially significant changes requiring additional
+         regulatory review.
+      2. Configure automated regression test execution for every
+         change, with expanded test suites for safety-critical modules
+         and full system validation for release candidates.
+      3. Enforce change documentation requirements: each merge request
+         must include a change impact assessment, updated risk analysis
+         (if applicable), and verification/validation evidence.
+      4. Implement automated SBOM comparison between versions to
+         identify added, removed, and updated dependencies, triggering
+         security review for dependency changes.
+    tools:
+      - gitlab-ci
+      - gitlab-merge-requests
+      - sbom-diff
+      - regression-testing
+      - change-impact-analysis
+  secops:
+    prose: |
+      1. Establish a change control board (CCB) that reviews and
+         approves all software changes, classifying them as significant
+         or non-significant per MDCG 2020-3 guidance.
+      2. Maintain a change log documenting all software modifications,
+         their classification, impact assessment, verification/
+         validation results, and approval records.
+      3. Implement a field safety corrective action (FSCA) process
+         for urgent safety-related software updates, including
+         expedited review and deployment procedures.
+      4. Track deployed software versions across all customer sites,
+         monitoring update adoption rates and following up with
+         customers on outstanding critical updates.
+    tools:
+      - change-control
+      - quality-management-system
+      - field-action-management
+      - deployment-tracking
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-21"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.32"]
+    relationship: complements
+  - framework_id: fda-21-cfr-11
+    articles: ["11.10"]
+    relationship: mapped

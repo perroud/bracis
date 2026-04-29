@@ -1,0 +1,135 @@
+id: trm-6-1
+family: sec-6
+title: "Software Application Development and Management"
+class: MAS-TRM
+
+statement:
+  prose: >-
+    The financial institution shall implement robust software application
+    development and management practices to ensure that applications are
+    developed securely, tested thoroughly, and maintained throughout their
+    lifecycle.
+  parts:
+    - id: trm-6-1.1
+      label: "6.1.1"
+      prose: >-
+        The institution shall establish a secure software development
+        lifecycle (SSDLC) that integrates security practices into all
+        phases of development, including requirements analysis, design,
+        coding, testing, deployment, and maintenance.
+    - id: trm-6-1.2
+      label: "6.1.2"
+      prose: >-
+        Developers shall follow secure coding standards and guidelines
+        to prevent common vulnerabilities such as injection flaws,
+        cross-site scripting, broken authentication, and insecure
+        deserialization. Training on secure coding practices shall be
+        provided to development personnel.
+    - id: trm-6-1.3
+      label: "6.1.3"
+      prose: >-
+        The institution shall maintain separate environments for
+        development, testing, staging, and production. Access controls
+        shall prevent unauthorized promotion of code between environments.
+        Production data shall not be used in development or testing
+        environments without proper anonymization.
+    - id: trm-6-1.4
+      label: "6.1.4"
+      prose: >-
+        Application security testing, including static analysis, dynamic
+        analysis, and software composition analysis, shall be conducted
+        before deployment. Critical and high-severity vulnerabilities
+        shall be remediated before production release.
+    - id: trm-6-1.5
+      label: "6.1.5"
+      prose: >-
+        The institution shall maintain an inventory of all applications,
+        including their dependencies, and establish processes for
+        end-of-life management, patch management, and timely retirement
+        of unsupported software.
+
+guidance:
+  prose: >-
+    The SSDLC must be a mandatory process, not an optional guideline.
+    Environment segregation is critical to prevent test data contamination
+    and unauthorized changes reaching production. Secure coding standards
+    should be aligned with OWASP Top 10, CWE/SANS Top 25, and
+    language-specific best practices. Application inventory must include
+    third-party and open-source components with known vulnerability
+    tracking. End-of-life planning must begin well before vendor support
+    ends to avoid running unsupported software in production.
+
+references:
+  - citation: "MAS Technology Risk Management Guidelines 2021, Section 6"
+    url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+  - citation: "OWASP Application Security Verification Standard (ASVS)"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce environment segregation through infrastructure-as-code with
+      separate namespaces, clusters, or accounts for development, staging,
+      and production. Implement automated environment provisioning that
+      applies security baselines by default. Use a service catalog to
+      maintain the application inventory with dependency tracking via
+      SBOM generation. Configure platform-level policies that prevent
+      production data from being replicated to lower environments without
+      data masking. Implement GitOps promotion workflows that require
+      security scan completion and approval before environment promotion.
+    tools:
+      - backstage
+      - terraform
+      - kubernetes
+      - argocd
+      - syft
+      - dependency-track
+
+  devsecops:
+    prose: >-
+      Implement the SSDLC as automated pipeline stages: SAST on every
+      commit, SCA on every build, DAST on staging deployments, and
+      container scanning on every image build. Enforce secure coding
+      standards through linters and SAST rules aligned with OWASP Top 10.
+      Configure pipeline gates that block deployment when critical or
+      high-severity vulnerabilities are detected. Generate SBOMs
+      automatically and feed them into dependency tracking systems.
+      Implement branch protection rules that require security scan
+      passage and peer review before merge.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - semgrep
+      - sonarqube
+      - trivy
+      - syft
+
+  secops:
+    prose: >-
+      Monitor the vulnerability management pipeline for applications,
+      ensuring critical findings are tracked to closure within defined
+      SLAs. Maintain a centralized vulnerability management platform that
+      aggregates findings from SAST, DAST, SCA, and penetration testing.
+      Track application end-of-life dates and generate alerts when
+      applications approach unsupported status. Conduct periodic reviews
+      of the application inventory to identify shadow IT and unmanaged
+      applications.
+    tools:
+      - defectdojo
+      - dependency-track
+      - grc-platform
+      - wazuh
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-3", "SA-8", "SA-11", "SA-15", "CM-2"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a8.25", "a8.26", "a8.27", "a8.31"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-7", "art-8"]
+    relationship: supports

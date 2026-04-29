@@ -1,0 +1,110 @@
+id: cps234-27
+family: assets
+title: "Information Asset Classification"
+class: CPS234
+
+statement:
+  prose: >-
+    The classification of an information asset must reflect the degree
+    to which an information security incident affecting that asset has
+    the potential to affect the entity or the interests of depositors,
+    policyholders, beneficiaries, or other customers, whether
+    financially or non-financially.
+  parts:
+    - id: cps234-27.a
+      label: "a."
+      prose: >-
+        The classification scheme must consider confidentiality,
+        integrity, and availability requirements of each information
+        asset.
+    - id: cps234-27.b
+      label: "b."
+      prose: >-
+        The classification must be reviewed and updated when there
+        is a material change to the information asset or its
+        business context.
+
+guidance:
+  prose: >-
+    Classification is the foundation for proportionate control
+    implementation. APRA expects a classification scheme that goes
+    beyond simple confidentiality labels to consider the full
+    CIA triad (confidentiality, integrity, availability) and the
+    potential impact on the entity and its customers. A system with
+    low confidentiality requirements may still be critical if its
+    unavailability would prevent the entity from meeting its
+    obligations to customers. Classification must be dynamic —
+    reviewed when assets change, when business context changes,
+    or when new threats emerge that alter the risk profile.
+
+references:
+  - citation: "APRA Prudential Standard CPS 234, Paragraph 27"
+    url: "https://www.legislation.gov.au/F2018L01745/latest/text"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a tiered classification scheme (e.g., Public,
+      Internal, Confidential, Restricted) enforced via metadata
+      labels on all platform resources. Use Kubernetes labels and
+      annotations to tag workloads with classification levels.
+      Deploy admission controllers (OPA/Gatekeeper) that enforce
+      classification-appropriate controls: restricted workloads must
+      run in hardened namespaces with encryption, network isolation,
+      and enhanced logging. Automate classification inheritance
+      where child resources inherit the parent's classification.
+      Implement data loss prevention controls at platform boundaries
+      based on classification tags.
+    tools:
+      - open-policy-agent
+      - gatekeeper
+      - kubernetes
+      - vault
+      - calico
+      - backstage
+
+  devsecops:
+    prose: >-
+      Require classification metadata in every repository's service
+      manifest. Implement pipeline rules that adjust scanning rigor
+      based on asset classification — restricted assets trigger full
+      SAST, DAST, SCA, and manual security review while internal
+      assets require automated scanning only. Use classification to
+      drive deployment approval requirements: higher classifications
+      require additional approvals. Enforce code review requirements
+      proportional to classification. Generate classification
+      coverage reports showing the percentage of deployed services
+      with current, valid classification.
+    tools:
+      - gitlab-ci
+      - gitlab-approvals
+      - sonarqube
+      - trivy
+      - semgrep
+
+  secops:
+    prose: >-
+      Maintain the authoritative classification register in the GRC
+      platform with automated feeds from the service catalog.
+      Implement monitoring rules calibrated to asset classification:
+      restricted assets receive full audit logging and real-time
+      alerting while lower classifications receive standard
+      monitoring. Track classification review cadence and flag
+      assets overdue for reclassification. Implement data flow
+      monitoring that alerts on data moving between classification
+      zones without proper controls. Generate periodic classification
+      reports for governing body review.
+    tools:
+      - grc-platform
+      - splunk
+      - elastic-siem
+      - servicenow
+      - wazuh
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.10", "a5.12", "a5.13"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "SC-16", "MP-4"]
+    relationship: supports

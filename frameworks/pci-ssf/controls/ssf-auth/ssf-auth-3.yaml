@@ -1,0 +1,91 @@
+id: ssf-auth-3
+family: ssf-auth
+title: "Session Management and Credential Lifecycle"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall implement secure session management that protects session
+    tokens from interception, replay, and fixation attacks. Sessions shall have
+    defined timeouts and shall be invalidated upon logout, password change, or
+    detected compromise. Session tokens shall be generated using cryptographically
+    secure random number generators with sufficient entropy. The software shall
+    support credential lifecycle management including secure password reset,
+    credential rotation, and revocation of compromised credentials.
+
+guidance:
+  prose: >-
+    Session management is a critical aspect of authentication security. PCI SSF
+    requires that session tokens are unpredictable, transmitted securely, and
+    properly invalidated when no longer needed. Session fixation attacks, where an
+    attacker sets a known session identifier before authentication, must be prevented
+    by generating a new session token after successful authentication. Credential
+    lifecycle management ensures that passwords can be securely reset, that compromised
+    credentials can be rapidly revoked, and that service credentials are rotated on a
+    defined schedule.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 6 — Session Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 4.4-4.5"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure session management at the API gateway layer with enforced timeouts,
+      secure cookie attributes (HttpOnly, Secure, SameSite), and token rotation
+      policies. Deploy centralized session stores (Redis, Memcached) with encryption
+      at rest and in transit. Implement automatic credential rotation for service
+      accounts using Vault or equivalent secrets management. Configure platform-level
+      session timeout policies that align with PCI SSF requirements. Use short-lived
+      JWT tokens with refresh token rotation for API authentication.
+    tools:
+      - vault
+      - redis
+      - kong
+      - envoy
+      - cert-manager
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect insecure session management patterns including
+      predictable session tokens, missing session invalidation on logout, and
+      insecure cookie attributes. Implement DAST scanning that tests for session
+      fixation, session hijacking, and improper session timeout behavior. Write
+      integration tests that validate session lifecycle including creation,
+      timeout, and invalidation. Scan for hardcoded session secrets in source code.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - owasp-zap
+      - semgrep
+      - burp-suite
+
+  secops:
+    prose: >-
+      Monitor for session anomalies including concurrent sessions from different
+      geographic locations, session reuse after invalidation, and unusual session
+      durations. Alert on credential rotation failures for service accounts.
+      Track and report on password reset volumes and patterns that may indicate
+      account takeover campaigns. Investigate and respond to reports of session
+      hijacking or credential compromise.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - crowdstrike
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-8.2", "req-8.6"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v3.1", "v3.2", "v3.3", "v3.4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.5"]
+    relationship: mapped

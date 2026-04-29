@@ -1,0 +1,126 @@
+id: art-24
+family: cap-5
+title: "Backup e Recuperacao de Dados"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 24. O fabricante deve implementar procedimento documentado de
+    backup e recuperação de dados para todos os sistemas computadorizados
+    GMP, assegurando a disponibilidade e integridade dos dados em caso
+    de falha do sistema.
+
+    Parágrafo 1. O procedimento de backup deve definir:
+    I - frequência de backups conforme criticidade dos dados;
+    II - tipo de backup (completo, incremental, diferencial);
+    III - local de armazenamento dos backups (incluindo cópia offsite);
+    IV - período de retenção dos backups;
+    V - procedimento de verificação de integridade dos backups;
+    VI - responsáveis pela execução e monitoramento.
+
+    Parágrafo 2. Testes de restauração devem ser executados periodicamente
+    para confirmar que os dados podem ser recuperados integralmente e que
+    o sistema pode ser restaurado a um estado funcional e validado.
+
+    Parágrafo 3. A frequência de testes de restauração deve ser definida
+    com base na criticidade do sistema, não devendo ser inferior a uma
+    vez ao ano para sistemas de alto risco.
+guidance:
+  prose: |
+    O art. 24 garante continuidade operacional e preservacao de dados GMP
+    criticos frente a falhas de sistema, desastres ou corruptacao de dados.
+
+    **Requisitos de backup por criticidade:**
+
+    Alto risco (SCADA, LIMS de liberacao):
+    - Backup incremental: a cada 4 horas
+    - Backup completo: diario
+    - Retencao: minimo 1 ano online, 5+ anos arquivo
+    - Copia offsite: obrigatoria
+    - Teste de restore: semestral
+
+    Medio risco (ERP GMP, QMS):
+    - Backup incremental: diario
+    - Backup completo: semanal
+    - Retencao: minimo 6 meses online, 5+ anos arquivo
+    - Copia offsite: obrigatoria
+    - Teste de restore: anual
+
+    Baixo risco (treinamento, documentacao):
+    - Backup completo: semanal
+    - Retencao: minimo 3 meses online, 3+ anos arquivo
+    - Copia offsite: recomendada
+    - Teste de restore: anual
+
+    **Verificacao de integridade:**
+    - Checksums de backups devem ser verificados apos cada execucao
+    - Restauracao parcial de amostra deve ser verificada periodicamente
+    - Resultados de verificacao devem ser registrados e auditaveis
+
+    **Armazenamento offsite:**
+    Pelo menos uma copia de backup deve estar em localidade geograficamente
+    separada para protecao contra desastres locais. Distancia minima
+    recomendada: 50 km.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de backup e recuperacao:**
+      1. Implementar solucao de backup automatizada com politicas
+         diferenciadas por nivel de criticidade do sistema GMP:
+         frequencia, retencao, tipo de backup, local de armazenamento.
+      2. Configurar replicacao geografica para backups criticos com
+         armazenamento em localidade separada (offsite ou cloud region).
+      3. Implementar verificacao automatica de integridade de backups
+         via checksums com alertas para falhas.
+      4. Configurar testes automatizados de restauracao periodicos
+         que verifiquem integridade de dados e funcionalidade do
+         sistema apos restore.
+      5. Monitorar SLOs de backup (tempo de backup, tamanho, sucesso)
+         com dashboards e alertas automaticos.
+    tools:
+      - backup-solution
+      - geo-replication
+      - checksum-verification
+      - restore-testing
+      - monitoring
+  devsecops:
+    prose: |
+      **Validacao de backup no pipeline:**
+      1. Implementar testes de backup e restore como parte da qualificacao
+         operacional (OQ) de cada sistema GMP.
+      2. Configurar pipeline scheduled que execute restauracao periodica
+         de backup em ambiente de teste e verifique integridade dos dados.
+      3. Verificar automaticamente que politicas de backup estao
+         configuradas conforme requisitos de criticidade do sistema.
+      4. Gerar relatorio de status de backup como artefato auditavel
+         incluindo sucesso, integridade e tempo de restauracao.
+    tools:
+      - gitlab-ci
+      - backup-testing
+      - scheduled-pipelines
+      - compliance-reporting
+  secops:
+    prose: |
+      **Programa de gestao de backup e recuperacao:**
+      1. Manter procedimento operacional padrao (POP) de backup e
+         recuperacao para cada sistema GMP com responsabilidades claras.
+      2. Executar e documentar testes de restauracao conforme cronograma
+         definido (semestral para alto risco, anual para demais).
+      3. Monitorar e reportar indicadores de backup: taxa de sucesso,
+         conformidade com cronograma, tempo de restauracao (RTO).
+      4. Investigar falhas de backup como desvios de qualidade com
+         acoes corretivas documentadas.
+      5. Revisar procedimento de backup anualmente e sempre que houver
+         mudancas significativas na infraestrutura ou requisitos.
+    tools:
+      - quality-management-system
+      - backup-monitoring
+      - incident-management
+      - document-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-13", "controle-A-8-14"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.308-a-7", "164.310-d-1"]
+    relationship: mapped

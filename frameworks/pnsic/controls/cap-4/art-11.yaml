@@ -1,0 +1,117 @@
+id: art-11
+family: cap-4
+title: "Planos Setoriais de Seguranca e Continuidade Operacional"
+class: PNSIC
+baselines: [critical-infrastructure]
+statement:
+  prose: |
+    Art. 11. Cada setor de infraestrutura crítica deverá elaborar Plano
+    Setorial de Segurança de Infraestrutura Crítica (PSSIC) contendo:
+    I - mapeamento dos ativos de IC do setor e suas dependências críticas;
+    II - identificação das principais ameaças e vulnerabilidades do setor;
+    III - objetivos e metas de segurança com indicadores de desempenho
+    mensuráveis;
+    IV - ações prioritárias de segurança com responsáveis, prazos e
+    recursos necessários;
+    V - plano de continuidade operacional para manutenção dos serviços
+    essenciais durante e após incidentes;
+    VI - mecanismos de monitoramento e revisão periódica do plano.
+
+    Parágrafo único. Os PSSICs deverão ser aprovados pelo órgão regulador
+    setorial e comunicados ao GSI/PR, que manterá registro nacional dos
+    planos e coordenará a articulação entre setores.
+guidance:
+  prose: |
+    O art. 11 cria os Planos Setoriais de Seguranca de Infraestrutura
+    Critica (PSSICs) como instrumento formal de planejamento de cada setor.
+
+    **PSSIC como instrumento de governanca setorial:**
+    O PSSIC e equivalente ao Plano de Seguranca da Informacao (PSI) exigido
+    pela GSI/PR IN 1, mas especificamente voltado para infraestruturas criticas
+    e com escopo setorial (todos os operadores do setor participam do plano).
+
+    **Continuidade operacional vs. recuperacao de desastres:**
+    O inciso V distingue entre duas situacoes:
+    - Durante o incidente: manutencao de servicos essenciais em modo degradado
+    - Apos o incidente: recuperacao completa das funcionalidades normais
+    Esta distinção determina que o plano de continuidade deve ser diferente
+    do plano de recuperacao de desastres.
+
+    **Coordenacao nacional pelo GSI/PR:**
+    O registro nacional dos PSSICs pelo GSI/PR e crucial para identificar:
+    - Lacunas de cobertura (ativos sem plano)
+    - Dependencias cross-setoriais nao planejadas
+    - Melhor praticas setoriais que podem ser disseminadas
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para suporte ao PSSIC:**
+      1. BCP (Business Continuity Platform) com capacidade de ativacao
+         imediata para sistemas de IC: failover automatico em menos de
+         30 segundos para sistemas de maxima criticidade.
+      2. Capacidade de operacao off-grid para sistemas de IC fisicos
+         (geradores, no-breaks) com autonomia minima de 72 horas.
+      3. Replicacao geografica de dados criticos com RPO de segundos para
+         sistemas de maxima criticidade (STR, ONS, sistemas de controle de
+         agua em grandes centros urbanos).
+      4. Infraestrutura de comunicacao de emergencia independente da internet
+         comercial: canais dedicados ou satelite para comunicacao entre operadores
+         de IC em situacao de crise.
+      5. Plataforma de gestao de crises: painel de situacao em tempo real para
+         o GSI/PR e reguladores setoriais em caso de incidente de IC.
+    tools:
+      - bcp-platform
+      - off-grid-power-management
+      - geo-replication-system
+      - emergency-comm-network
+      - crisis-management-platform
+  devsecops:
+    prose: |
+      **Desenvolvimento para suporte a continuidade:**
+      1. Arquitetura de microservicos com degradacao gracosa: cada servico deve
+         ter modo de operacao reduzida que mantenha as funcoes essenciais mesmo
+         sem dependencias externas.
+      2. Testes de continuidade automatizados no pipeline: simulacao semanal de
+         perda de datacenter principal e validacao do failover automatico.
+      3. Versionamento imutavel e rollback instantaneo: qualquer versao nos
+         ultimos 30 dias deve ser restauravel em menos de 5 minutos.
+      4. Documentacao de runbooks de continuidade no repositorio: procedimentos
+         de recuperacao para cada componente critico, testados e atualizados a
+         cada release.
+      5. Chaos engineering programado: injecao deliberada de falhas em ambiente
+         de staging para validar que os planos de continuidade funcionam na
+         pratica antes de incidentes reais.
+    tools:
+      - graceful-degradation-framework
+      - continuity-test-automation
+      - rollback-orchestrator
+      - runbook-documentation-platform
+      - chaos-engineering-tools
+  secops:
+    prose: |
+      **Gestao e ativacao do PSSIC:**
+      1. Processo formal de elaboracao do PSSIC: metodologia padronizada pelo
+         GSI/PR com templates, workshops de levantamento e validacao por pares.
+      2. Exercicios anuais de ativacao do PSSIC: simulacao completa do plano
+         de continuidade com todos os operadores do setor, cronometrada e auditada.
+      3. Indicadores de desempenho do PSSIC: RTO e RPO reais vs. planejados,
+         taxa de incidentes cobertos pelo plano, tempo de ativacao do plano.
+      4. Revisao bienal obrigatoria do PSSIC para incorporar novas ameacas,
+         mudancas tecnologicas e licoes aprendidas de exercicios e incidentes reais.
+      5. Registro nacional dos PSSICs no portal do GSI/PR: versao vigente de
+         cada plano, data de aprovacao, proxima revisao e status de implementacao.
+    tools:
+      - pssic-documentation-platform
+      - continuity-exercise-management
+      - pssic-kpi-dashboard
+      - national-pssic-registry
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["PR.IR-01", "RC.RP-01", "RC.RP-02", "RC.RP-03"]
+    relationship: mapped
+  - framework_id: pnsi
+    articles: ["art-9"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-6", "art-7"]
+    relationship: complements

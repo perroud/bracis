@@ -1,0 +1,116 @@
+id: ferpa-directory
+family: disclosure
+title: "Directory Information Exception"
+class: FERPA
+
+statement:
+  prose: >-
+    An educational agency or institution may disclose directory information without
+    prior written consent if it has given public notice to parents and eligible
+    students of the types of personally identifiable information that the institution
+    has designated as directory information, and has allowed a reasonable period of
+    time for parents or eligible students to opt out of such disclosures.
+  parts:
+    - id: ferpa-directory-1
+      label: "34 CFR § 99.3 (Directory Information)"
+      prose: >-
+        Directory information means information contained in an education record of
+        a student that would not generally be considered harmful or an invasion of
+        privacy if disclosed. It includes, but is not limited to: name, address,
+        telephone listing, email address, date and place of birth, major field of
+        study, dates of attendance, grade level, enrollment status, degrees and
+        awards received, participation in officially recognized activities and sports,
+        weight and height of members of athletic teams, and the most recent
+        educational agency or institution attended.
+    - id: ferpa-directory-2
+      label: "34 CFR § 99.37(a)"
+      prose: >-
+        An educational agency or institution may disclose directory information if it
+        has given public notice to parents of students in attendance and eligible
+        students in attendance of the types of PII that the agency or institution
+        has designated as directory information.
+    - id: ferpa-directory-3
+      label: "34 CFR § 99.37(b)"
+      prose: >-
+        The public notice must include an explanation of the right of a parent or
+        eligible student to refuse to let the agency or institution designate any
+        or all of those types of information about the student as directory
+        information.
+
+guidance:
+  prose: >-
+    Directory information is the most commonly used FERPA exception and also one
+    of the most misunderstood. Institutions must carefully define which data elements
+    they designate as directory information — the designation should be conservative.
+    Social Security numbers and student ID numbers that could be used to gain access
+    to education records must never be designated as directory information. The opt-out
+    process must be meaningful — students/parents must have adequate notice and a
+    reasonable period to opt out before any disclosure. Once a student opts out, the
+    institution must honor the opt-out for all directory information disclosures, not
+    selectively. Institutions should maintain clear records of which students have
+    opted out and implement technical controls to prevent accidental disclosure of
+    opted-out students' directory information.
+
+references:
+  - citation: "34 CFR § 99.3 - Definition of directory information"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-A/section-99.3"
+  - citation: "34 CFR § 99.37 - Directory information conditions"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-D/section-99.37"
+  - citation: "FPCO Guidance on Directory Information"
+    url: "https://studentprivacy.ed.gov/faq/what-directory-information"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a directory information management system with clear field-level
+      classification of which data elements are designated as directory information.
+      Build opt-out workflows that allow parents/eligible students to opt out of
+      directory information disclosures during enrollment and at any time thereafter.
+      Implement technical controls that enforce opt-out flags — directory information
+      APIs must check opt-out status before returning data. Build a centralized
+      opt-out registry that is consulted by all systems that may disclose directory
+      information. Tag data fields with directory/non-directory classification in the
+      data catalog. Implement automated suppression of opted-out students from
+      directory information queries and reports.
+    tools:
+      - postgresql
+      - redis
+      - keycloak
+      - elasticsearch
+
+  devsecops:
+    prose: >-
+      Test that opt-out flags are enforced across all directory information
+      disclosure points. Verify that no non-directory data is inadvertently
+      included in directory information responses. Scan for hardcoded directory
+      information field lists that could become stale as policy changes.
+      Implement integration tests that verify opted-out students are excluded
+      from directory information queries. Test that Student ID numbers and
+      SSNs cannot be classified as directory information in the system
+      configuration.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - checkov
+
+  secops:
+    prose: >-
+      Monitor directory information disclosure events and verify opt-out
+      compliance. Alert on disclosures that include opted-out students. Audit
+      directory information field designations periodically for appropriateness.
+      Track opt-out rates and patterns for compliance reporting. Monitor for
+      bulk directory information requests that could indicate data harvesting.
+      Generate reports showing directory information disclosure activity by
+      recipient and purpose.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-6", "MP-3", "SI-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.12", "A5.13", "A5.34"]
+    relationship: supports

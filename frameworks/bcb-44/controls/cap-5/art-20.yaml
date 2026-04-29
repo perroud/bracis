@@ -1,0 +1,108 @@
+id: art-20
+family: cap-5
+title: "Parametros e Limiares de Monitoramento"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 20. Os parâmetros e os critérios de seleção de operações para monitoramento
+    devem considerar, no mínimo:
+
+    I - operações em espécie de qualquer valor que, considerando o volume ou
+    a frequência, sejam incompatíveis com o perfil do cliente;
+
+    II - operações com contrapartes localizadas em países ou territórios com
+    deficiências estratégicas identificadas pelo GAFI;
+
+    III - operações realizadas por clientes classificados como de alto risco;
+
+    IV - operações que, individualmente ou em conjunto, indiquem possível
+    tentativa de fragmentação para evitar os limiares de identificação e registro;
+
+    V - operações incompatíveis com a atividade econômica declarada ou o
+    perfil cadastral do cliente;
+
+    VI - operações realizadas em horários ou por canais incompatíveis com
+    o perfil habitual do cliente.
+guidance:
+  prose: |
+    O art. 20 define os "gatilhos" minimos de monitoramento. Cada inciso
+    corresponde a um conjunto de regras que o sistema de AML deve implementar.
+
+    **Analise de comportamento (incisos I, V, VI):**
+    Esses incisos exigem que o sistema conheça o "perfil normal" do cliente
+    e detecte desvios. Isso requer:
+    - Baseline transacional calculado com dados historicos (90-180 dias)
+    - Deteccao de anomalias estatisticas (Z-score, percentis, ML)
+    - Regras de horario: transacoes entre 2h e 5h por cliente que normalmente
+      opera em horario comercial.
+
+    **Fragmentacao (inciso IV):**
+    Tambem chamada de "smurfing". Padroes tipicos:
+    - Varios depositos no mesmo dia abaixo do limiar de registro
+    - Transferencias em rajada para a mesma contraparte
+    - Uso de multiplas contas da mesma familia/grupo societario
+
+    **Paises de risco FATF (inciso II):**
+    O sistema deve ter tabela atualizada de paises em blacklist e greylist do FATF,
+    com atualizacao automatica quando o FATF publicar nova lista.
+
+    **Regra pratica:**
+    Cada inciso do art. 20 deve se traduzir em pelo menos uma regra concreta
+    documentada no sistema de monitoramento, com limiar, janela de tempo e
+    acao esperada.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos parametros do art. 20:**
+      1. Regra I (especie incompativel): calcular media de operacoes em especie
+         por cliente e alertar quando volume/frequencia exceder N desvios-padrao.
+      2. Regra II (paises FATF): integrar lista de paises de risco como
+         parametro configuravel, gerar alerta automatico em qualquer transacao
+         com contraparte em pais de risco.
+      3. Regra III (alto risco): criar regras com limiares 50% menores para
+         clientes classificados como alto risco.
+      4. Regra IV (fragmentacao): sliding window de 24h e 7d para somatoria
+         de transacoes por par (pagador, recebedor); alertar se somatoria
+         ultrapassar limiar com multiplas transacoes individuais abaixo do limiar.
+      5. Regra V (atividade incompativel): mapear CNAE para perfil de transacoes
+         esperado; alertar se tipo de operacao nao e compativel com a atividade.
+      6. Regra VI (horario/canal atipico): registrar horario habitual de cada
+         cliente por canal; alertar se transacao ocorre em horario/canal incomum.
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - rule-engine
+      - anomaly-detection
+  devsecops:
+    prose: |
+      **Validacao e manutencao das regras:**
+      1. Documentar cada regra com: descricao, limiar, janela de tempo,
+         inciso legal correspondente, data de ultima revisao.
+      2. Backtesting de regras com dados historicos: verificar se a regra
+         teria capturado casos conhecidos de lavagem.
+      3. Pipeline de deploy de novas regras com aprovacao do compliance officer.
+      4. Monitoramento de degradacao de regras: se a taxa de alertas cair a zero,
+         pode indicar que a regra parou de funcionar.
+    tools:
+      - gitlab-ci
+      - rule-testing
+      - backtesting
+  secops:
+    prose: |
+      **Efetividade dos parametros:**
+      1. Relatorio mensal de alertas gerados por cada regra do art. 20.
+      2. Revisao trimestral dos limiares de cada regra: ajustar se taxa de
+         falsos positivos for muito alta ou se regra nao estiver gerando alertas.
+      3. Comparar padroes detectados com tipologias publicadas pelo COAF e
+         FATF para verificar cobertura.
+      4. Documentar justificativa de cada limiar definido (base regulatoria
+         e base estatistica).
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-22", "art-23"]
+    relationship: equivalent-to

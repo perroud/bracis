@@ -1,0 +1,104 @@
+id: basel-mr-sa
+family: market-risk
+title: "Market Risk — FRTB Standardised Approach (FRTB-SA)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    The FRTB Standardised Approach (FRTB-SA) is the mandatory fallback market risk capital
+    calculation method for all banks and the compulsory approach for trading desks that
+    fail the Internal Models Approach (IMA) eligibility tests (back-testing or PLA). Under
+    FRTB-SA, market risk capital is calculated using sensitivity-based methods (SBM),
+    residual risk add-ons (RRAO), and default risk charges (DRC). The SBM captures delta,
+    vega, and curvature risk across five risk classes: General Interest Rate Risk (GIRR),
+    Credit Spread Risk (CSR) for non-securitisations, CSR for securitisations, Equity risk,
+    Commodity risk, and Foreign Exchange (FX) risk. Within each risk class, risk factors
+    are mapped to prescribed buckets, weighted by supervisory risk weights, and aggregated
+    using prescribed intra-bucket and inter-bucket correlations. The RRAO captures residual
+    risks not captured by the SBM (e.g., exotic exposures). The DRC captures jump-to-default
+    risk and credit migration risk in the trading book and replaces the incremental risk
+    charge (IRC). Banks with only non-linear instruments in a given risk class must also
+    calculate the curvature risk component.
+
+guidance:
+  prose: >-
+    The FRTB-SA is substantially more complex than the Basel II.5 standardised approach
+    it replaces. It requires banks to compute sensitivity-based risk measures (sensitivities)
+    for all instruments, including non-linear instruments such as options and swaptions, for
+    which delta, vega, and curvature sensitivities must be computed. For institutions without
+    the resources to build full FRTB-SA infrastructure, regulators (particularly for small
+    non-complex institutions) may permit use of a simplified standardised approach (SSA) or
+    the Basic Indicator Approach for operational risk. Banks should validate sensitivity
+    calculations by comparing them against sensitivity computations from their internal
+    pricing library for a representative portfolio. The RRAO applies a 1% charge for
+    instruments with exotic underlying and a 0.1% charge for instruments with gap risk,
+    correlation risk, or behavioural risk. The DRC is calculated as a weighted sum of net
+    jump-to-default positions by issuer and credit quality bucket.
+
+references:
+  - citation: "BCBS, Minimum capital requirements for market risk (FRTB), January 2019 (revised February 2019), Chapters 2-4"
+    url: "https://www.bis.org/bcbs/publ/d457.htm"
+  - citation: "BCBS, Calculation of RWA for market risk — sensitivities based method (MAR20-MAR23), Basel Framework"
+    url: "https://www.bis.org/basel_framework/chapter/MAR/20.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a sensitivities calculation service that computes bump-and-reprice delta and
+      vega sensitivities for all trading book instruments using the bank's front office
+      pricing library, with curvature computed using the prescribed upward and downward
+      scenario bumps. The service must be performant enough to compute sensitivities for
+      the full trading book within the overnight batch window. Implement the SBM aggregation
+      engine with all prescribed risk weights, bucket assignments, and correlation matrices
+      as configurable parameters. Expose FRTB-SA capital by risk class, bucket, and desk in
+      the risk reporting dashboard. Generate COREP market risk template automatically from
+      the FRTB-SA engine output.
+    tools:
+      - apache-spark
+      - quantlib
+      - redis
+      - postgresql
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain all FRTB-SA risk weights, bucket structures, correlation parameters, and
+      RRAO/DRC rules as versioned configuration files tied to the Basel Framework MAR
+      chapter version. Implement automated tests that run the full FRTB-SA calculation on
+      a standardised benchmark portfolio and compare outputs against BCBS-provided worked
+      examples. Build regression tests that flag any unexpected change in FRTB-SA capital
+      output after code or configuration changes. Enforce four-eyes review for changes to
+      supervisory risk weights or correlation matrices.
+    tools:
+      - gitlab-ci
+      - pytest
+      - sonarqube
+      - opa-conftest
+      - signed-commits
+
+  secops:
+    prose: >-
+      Apply role-based access controls distinguishing between those who build the FRTB-SA
+      engine (Risk Technology), those who configure risk weights and correlations (Quant
+      Risk), and those who review and approve capital outputs (Market Risk Management).
+      Log all configuration changes to risk weight tables and immediately alert on any
+      modification outside a sanctioned change control window. Include FRTB-SA systems in
+      the annual IT risk assessment and penetration testing programme.
+    tools:
+      - cyberark
+      - splunk
+      - hashicorp-vault
+      - qualys
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AC-5"]
+    relationship: mapped
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12"]
+    relationship: supports

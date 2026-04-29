@@ -1,0 +1,104 @@
+id: art-1
+family: disposicoes-gerais
+title: "Objeto e Ambito de Aplicacao"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 1. Esta Resolução dispõe sobre a constituição, o funcionamento, a
+    administração, a gestão, a prestação de serviços, a divulgação de informações
+    e a distribuição de cotas de fundos de investimento, bem como sobre a liquidação
+    e o encerramento desses fundos.
+
+    Parágrafo único. Sujeitam-se a esta Resolução os fundos de investimento
+    constituídos sob a forma de condomínio de natureza especial, destinados à
+    aplicação em ativos financeiros, bens e direitos de qualquer natureza.
+guidance:
+  prose: |
+    O art. 1 define o escopo material da Resolucao CVM 175 -- o Marco Regulatorio
+    dos Fundos de Investimento. A norma consolida toda a regulamentacao de fundos
+    em um unico instrumento normativo, substituindo as instrucoes anteriores
+    (CVM 555, 356, 472, 578, entre outras).
+
+    **Escopo universal:**
+    A CVM 175 aplica-se a TODOS os fundos de investimento constituidos no Brasil:
+    FI, FIC, FII, FIP, FIDC, FIAGRO, ETF e demais categorias. Nenhum fundo
+    regulado pela CVM escapa desta resolucao.
+
+    **Condominio de natureza especial:**
+    O fundo de investimento nao possui personalidade juridica propria, mas
+    constitui um patrimonio segregado, com CNPJ proprio, representado pelo
+    administrador. A natureza juridica de condominio especial protege os cotistas
+    em caso de insolvencia do administrador.
+
+    **Parte geral + Anexos normativos:**
+    A CVM 175 tem estrutura modular: uma parte geral aplicavel a todos os fundos
+    e anexos normativos especificos por categoria (I a V). Cada fundo deve
+    observar a parte geral e o anexo normativo correspondente a sua categoria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Cadastro e classificacao de fundos:**
+      1. Manter repositorio centralizado (Git) com metadados de cada fundo:
+         CNPJ, categoria, anexo normativo aplicavel, administrador, gestor.
+      2. Implementar taxonomia de classificacao que reflita as categorias da
+         CVM 175 (renda fixa, acoes, multimercado, cambial, FII, FIP, FIDC,
+         FIAGRO, ETF, criptoativos).
+      3. Pipeline de validacao automatica para verificar se cada fundo possui
+         todos os documentos e registros obrigatorios.
+
+      **Segregacao patrimonial:**
+      4. Infraestrutura segregada por fundo: cada fundo deve ter seus dados,
+         chaves e credenciais isolados de outros fundos e do patrimonio do
+         administrador.
+      5. Politicas de rede e acesso que impedem acesso cruzado entre fundos.
+    tools:
+      - git
+      - vault
+      - terraform
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Rastreabilidade de constituicao:**
+      1. Cada evento de constituicao, alteracao de regulamento ou encerramento
+         de fundo deve gerar registro imutavel em audit log.
+      2. Pipeline de CI/CD para validar conformidade de documentos de fundos
+         antes de publicacao (regulamento, lamina, politicas).
+      3. Versionamento de todos os documentos regulatorios com historico completo.
+
+      **Validacao automatica:**
+      4. Checks automatizados para verificar se cada fundo possui: regulamento
+         vigente, administrador e gestor registrados, custodiante contratado.
+      5. Alertas para fundos que se aproximam de prazos regulatorios (adequacao,
+         envio de relatorios).
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - gitlab-audit-events
+  secops:
+    prose: |
+      **Monitoramento regulatorio:**
+      1. Dashboard de conformidade por fundo: status de documentacao, registros
+         obrigatorios, prazos de reporte.
+      2. Monitoramento de alteracoes regulatorias da CVM que impactam fundos.
+      3. Inventario atualizado de todos os fundos administrados e gestidos,
+         com classificacao por categoria e anexo normativo.
+
+      **Auditoria de conformidade:**
+      4. Auditoria periodica de completude documental de cada fundo.
+      5. Verificacao de segregacao patrimonial entre fundos.
+      6. Evidencias de conformidade organizadas por artigo da CVM 175.
+    tools:
+      - grc-platform
+      - siem
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-1", "art-5"]
+    relationship: complements

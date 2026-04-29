@@ -1,0 +1,100 @@
+id: art-15
+family: cap-4
+title: "Territorialidade dos Dados"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 15. Os dados e informações dos órgãos e entidades da administração pública
+    federal armazenados em soluções de computação em nuvem devem estar localizados
+    em território nacional.
+
+    Parágrafo 1. Excepcionalmente, mediante justificativa fundamentada e aprovação
+    do gestor de segurança da informação, dados ostensivos e públicos poderão ser
+    armazenados em datacenters localizados fora do território nacional.
+
+    Parágrafo 2. Em nenhuma hipótese, informações classificadas nos graus de sigilo
+    ultrassecreto, secreto e reservado poderão ser armazenados fora do território
+    nacional.
+guidance:
+  prose: |
+    O art. 15 estabelece a regra geral de data residency: dados da APF DEVEM
+    residir no Brasil, com excecao limitada para dados publicos.
+
+    **Regra geral:**
+    Todos os dados da APF devem estar em datacenters no Brasil.
+
+    **Excecao (paragrafo 1):**
+    Dados ostensivos/publicos podem ir para fora do Brasil se:
+    - Houver justificativa fundamentada
+    - Gestor de seguranca aprovar formalmente
+
+    **Proibicao absoluta (paragrafo 2):**
+    Dados classificados NUNCA podem sair do territorio nacional.
+
+    **Implicacao pratica:**
+    - AWS: usar sa-east-1 (Sao Paulo)
+    - Azure: usar brazilsouth
+    - GCP: usar southamerica-east1 (Sao Paulo)
+    - Servicos globais (CDN, DNS) podem processar metadata fora do Brasil
+
+    **Mapeamento CSA CCM v4:**
+    - DSP-14: Data Jurisdiction
+    - DSP-19: Data Location
+
+    **Mapeamento LGPD:**
+    - Art. 33: Transferencia internacional de dados pessoais
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Enforcement de data residency:**
+      1. Politicas de organizacao que restrinjam criacao de recursos a regioes
+         brasileiras: AWS Organization SCP, Azure Policy, GCP Organization Policy.
+      2. Bloqueio automatico de provisionamento de recursos em regioes fora do
+         Brasil via OPA/Gatekeeper.
+      3. Tags obrigatorias de data residency em todos os recursos de armazenamento.
+      4. Monitoramento de replicacao: garantir que cross-region replication nao
+         envie dados para fora do Brasil.
+      5. Avaliacao de servicos gerenciados: verificar se servicos SaaS armazenam
+         dados em regioes brasileiras (ex: muitos SaaS nao tem datacenter no BR).
+    tools:
+      - organization-policies
+      - opa-gatekeeper
+      - data-residency-monitor
+      - region-restriction
+  devsecops:
+    prose: |
+      **Data residency no pipeline:**
+      1. Validacao de IaC que rejeite recursos fora de regioes brasileiras.
+      2. Testes de conformidade que verifiquem localizacao de todos os dados.
+      3. Scan de configuracao de servicos gerenciados para validar data residency.
+      4. Pipeline de aprovacao especial para excecoes de dados publicos em
+         regioes internacionais.
+    tools:
+      - gitlab-ci
+      - terraform
+      - iac-scanner
+      - data-residency-validator
+  secops:
+    prose: |
+      **Monitoramento de data residency:**
+      1. Auditoria trimestral de localizacao de todos os dados em nuvem.
+      2. Alertas em tempo real para tentativas de criacao de recursos fora do Brasil.
+      3. Monitoramento de fluxos de dados transfronteiricos.
+      4. Inventario de excecoes aprovadas com justificativa e aprovacao documentadas.
+      5. Verificacao de que provedores SaaS mantem dados no Brasil.
+    tools:
+      - cspm
+      - data-flow-monitoring
+      - grc-platform
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-7"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["DSP-14", "DSP-19"]
+    relationship: mapped

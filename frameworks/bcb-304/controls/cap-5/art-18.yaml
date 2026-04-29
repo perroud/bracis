@@ -1,0 +1,94 @@
+id: art-18
+family: cap-5
+title: "Comunicacao ao COAF e Registro de Operacoes"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 18. A prestadora de serviços de ativos virtuais deve comunicar ao Conselho
+    de Controle de Atividades Financeiras (COAF):
+    I - as operações suspeitas de lavagem de dinheiro ou de financiamento do
+    terrorismo, no prazo de até 24 horas após a decisão de comunicação;
+    II - as operações em espécie de valor igual ou superior a R$ 50.000,00 (cinquenta
+    mil reais), ou equivalente em ativos virtuais;
+    III - qualquer operação que, após análise, indique fundados indícios de crimes
+    de lavagem de dinheiro ou financiamento do terrorismo.
+
+    Parágrafo 1. A prestadora deve manter registros de todas as operações realizadas,
+    incluindo informações on-chain (hash de transação, endereços de carteira,
+    valores, timestamps), pelo prazo mínimo de 5 anos.
+
+    Parágrafo 2. As comunicações ao COAF e os respectivos registros de análise são
+    sigilosos e não podem ser informados aos clientes investigados.
+guidance:
+  prose: |
+    O art. 18 adapta as obrigacoes de comunicacao ao COAF (Circular 3.978) ao
+    contexto de ativos virtuais.
+
+    **Tres tipos de comunicacao obrigatoria:**
+    1. SAR (Suspicious Activity Report): operacoes suspeitas, no prazo de 24h
+       apos a decisao de comunicar
+    2. CTR (Currency Transaction Report): operacoes >= R$ 50.000 (ou equivalente
+       em cripto, convertido pela cotacao do momento)
+    3. STR complementar: qualquer outra operacao com indicios de LD/FT
+
+    **Registro on-chain obrigatorio:**
+    Alem dos dados tradicionais, a VASP deve registrar dados especificos de
+    blockchain: tx hash, enderecos, valores, timestamps. Retencao minima de 5 anos.
+
+    **Sigilo da comunicacao:**
+    O cliente NAO pode ser informado de que foi objeto de comunicacao ao COAF
+    (tipping-off prohibition). Isso e crime.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de reporte ao COAF:**
+      1. Integracao com SISCOAF (Sistema de Controle de Atividades Financeiras)
+         via API para submissao automatizada de comunicacoes.
+      2. Workflow de comunicacao: alerta -> analise -> decisao -> submissao COAF,
+         com controle de SLA de 24h para SAR.
+      3. Data warehouse de operacoes com retencao minima de 5 anos, incluindo
+         dados on-chain (tx hash, enderecos, blocos, gas).
+      4. Calculo automatico de equivalencia cripto->BRL pela cotacao do momento
+         da operacao para threshold de R$ 50.000.
+      5. Controle de acesso restrito a dados de comunicacoes ao COAF (need-to-know).
+    tools:
+      - siscoaf-integration
+      - case-management
+      - data-warehouse
+      - price-oracle
+      - access-control
+  devsecops:
+    prose: |
+      **Validacao de reporte:**
+      1. Testes automatizados do workflow de comunicacao ao COAF.
+      2. Testes de integracao com SISCOAF (formato, campos, validacoes).
+      3. Testes de calculo de equivalencia cripto->BRL.
+      4. Validacao de retencao de dados (5 anos minimo).
+      5. Testes de controle de acesso a dados sigilosos de COAF.
+    tools:
+      - gitlab-ci
+      - coaf-integration-tests
+      - data-retention-tests
+      - access-control-tests
+  secops:
+    prose: |
+      **Operacao de comunicacao ao COAF:**
+      1. Processo formal de decisao de comunicacao com comite de analise.
+      2. Controle de prazo de 24h para comunicacao apos decisao.
+      3. Auditoria periodica de aderencia ao processo de comunicacao.
+      4. Treinamento sobre sigilo da comunicacao (tipping-off prohibition).
+      5. Relatorio mensal de comunicacoes ao diretor de PLD/FT.
+      6. Retencao e backup seguro de toda documentacao de suporte.
+    tools:
+      - coaf-reporting
+      - case-management
+      - audit-trail
+      - training-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-25", "art-26", "art-27", "art-28", "art-29", "art-30"]
+    relationship: implements
+  - framework_id: bcb-44
+    articles: ["art-25", "art-26", "art-27"]
+    relationship: complements

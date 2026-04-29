@@ -1,0 +1,115 @@
+id: owasp-a05-hardening
+family: a05
+title: "A05:2021 — Security Hardening and Baseline Configuration"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Security hardening requires establishing and maintaining a minimum security baseline for all
+    components of the application stack — operating systems, container runtimes, web servers,
+    application frameworks, databases, message brokers, and cloud services. Inadequate hardening
+    includes leaving default configurations unchanged (default admin passwords, sample applications,
+    unnecessary services), disabling security features for convenience (debug mode in production,
+    disabled authentication on internal APIs, permissive CORS configurations), failing to remove
+    unnecessary software and features from production environments (development tools, documentation
+    endpoints, admin UIs accessible without additional controls), and not applying security headers
+    and HTTP security directives that modern browsers enforce.
+
+guidance:
+  prose: >-
+    Hardening is not a one-time activity but a continuous process that must adapt as new
+    vulnerabilities are discovered in default configurations, as the attack surface changes
+    with new deployments, and as configuration drift occurs over time. The industry standard
+    approach is to define a hardened baseline using established benchmarks (CIS Benchmarks,
+    DISA STIGs) and enforce that baseline through automated compliance checks. Key hardening
+    areas for web applications include: removing default accounts and changing all default
+    credentials, disabling directory listing, removing server version headers (X-Powered-By,
+    Server), enabling security response headers (HSTS, CSP, X-Frame-Options, X-Content-Type-Options),
+    configuring error pages that do not reveal internal information, disabling HTTP TRACE/TRACK
+    methods, removing sample files and documentation from production, and configuring appropriate
+    file permissions and ownership.
+
+references:
+  - citation: "CIS Benchmark for Docker"
+    url: "https://www.cisecurity.org/benchmark/docker"
+  - citation: "CIS Benchmark for Kubernetes"
+    url: "https://www.cisecurity.org/benchmark/kubernetes"
+  - citation: "OWASP Web Security Testing Guide — Configuration Testing"
+    url: "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement golden image pipelines that build hardened base images for containers and VMs
+      using infrastructure-as-code, incorporating CIS Benchmark configurations automatically.
+      Use Packer with CIS-hardened AMIs/images as the starting point for all machine images.
+      Enforce container image hardening standards: run as non-root user, read-only filesystem
+      where possible, drop all Linux capabilities and add back only required ones (no CAP_SYS_ADMIN,
+      no CAP_NET_RAW unless explicitly required), disable privilege escalation (allowPrivilegeEscalation: false).
+      Configure web servers with minimal security headers in the platform-level ingress controller
+      so all applications inherit them without individual configuration. Implement Pod Security
+      Standards (restricted profile) in Kubernetes to enforce container hardening policy. Run
+      kube-bench and docker-bench-security in the CI/CD pipeline for infrastructure changes.
+    tools:
+      - packer
+      - kyverno
+      - opa
+      - kube-bench
+      - docker-bench-security
+      - checkov
+      - trivy
+      - nginx
+      - traefik
+
+  devsecops:
+    prose: >-
+      Include hardening verification in deployment pipelines: scan Dockerfiles for hardening
+      anti-patterns (running as root, adding unnecessary capabilities, installing unnecessary
+      packages), scan Kubernetes manifests for security context violations, and test deployed
+      applications for missing security headers using automated security header scanners.
+      Implement a "no SSH in production" policy enforced through infrastructure configuration —
+      production instances should have no SSH access; any operational tasks must go through the
+      deployment pipeline or dedicated bastion with recorded sessions. Add automated tests that
+      verify production configuration: check that debug endpoints are absent, admin interfaces
+      have additional authentication, and error pages return generic messages without stack traces.
+      Maintain a hardening checklist in the definition of done for new services.
+    tools:
+      - checkov
+      - trivy
+      - hadolint
+      - kube-score
+      - gitlab-ci
+      - securityheaders
+      - nuclei
+
+  secops:
+    prose: >-
+      Run regular automated compliance scans against CIS Benchmark profiles for all infrastructure
+      components. Configure alerts for configuration changes that deviate from hardened baselines —
+      enable cloud provider configuration change tracking (AWS Config, Azure Monitor, GCP Cloud Asset
+      Inventory) and integrate with SIEM. Conduct periodic attack surface assessments to identify
+      exposed admin interfaces, debug endpoints, and development artifacts inadvertently deployed
+      to production. Implement file integrity monitoring (FIM) on critical system files and
+      application configurations to detect unauthorized changes. Review server response headers
+      on all public-facing applications monthly.
+    tools:
+      - aws-config
+      - azure-policy
+      - gcp-scc
+      - wazuh
+      - osquery
+      - splunk
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "CM-7", "SI-2"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["4.1", "4.2", "4.3", "4.5"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["2.2.1", "2.2.4", "2.2.7"]
+    relationship: implements

@@ -1,0 +1,95 @@
+id: v3.1.1
+family: v3
+title: "Session Management Fundamentals"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify the application never reveals session tokens in URL parameters or error messages.
+    Session tokens must be generated using a cryptographically secure pseudo-random number
+    generator with at least 128 bits of entropy. Sessions must be invalidated on the server
+    side after logout, and session identifiers must not be reused after invalidation.
+
+guidance:
+  prose: >-
+    Session management is the mechanism by which an application maintains state for an
+    authenticated user across multiple HTTP requests. Weak session management directly
+    enables session hijacking, fixation, and replay attacks. Session tokens exposed in URLs
+    leak through browser history, referrer headers, proxy logs, and shared links. Tokens
+    must have sufficient entropy (128 bits minimum) to resist brute-force guessing within
+    the token space. Server-side session invalidation is critical because client-side token
+    deletion alone does not prevent use of a captured token. Modern applications should use
+    framework-provided session management rather than custom implementations, as custom
+    session handling is a frequent source of vulnerabilities.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V3.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Session Management Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Use the framework's built-in session management. For stateless architectures, use
+      short-lived JWTs (15-minute expiry) paired with opaque refresh tokens stored
+      server-side. Configure session cookies with Secure, HttpOnly, SameSite=Strict (or Lax
+      where cross-origin is required), and appropriate Domain/Path attributes. Implement
+      server-side session stores (Redis, Memcached) with automatic expiration. Generate
+      session identifiers using the platform's cryptographic random generator (e.g.,
+      crypto.randomBytes in Node.js, secrets.token_urlsafe in Python). Implement session
+      binding to client fingerprint (user agent, IP range) for sensitive applications.
+      Rotate session identifiers after privilege level changes (login, role escalation).
+    tools:
+      - redis
+      - memcached
+      - keycloak
+      - auth0
+      - express-session
+      - spring-session
+
+  devsecops:
+    prose: >-
+      Scan for session tokens in URL parameters using SAST rules. Write DAST tests that
+      verify session tokens are not exposed in responses, redirects, or error messages.
+      Validate that logout endpoints actually invalidate the server-side session by
+      attempting to reuse the token after logout. Test session fixation by verifying the
+      session ID changes after authentication. Include session entropy validation in
+      automated security test suites. Scan for custom session management implementations
+      that bypass framework-provided mechanisms.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - sonarqube
+      - gitlab-ci
+      - nuclei
+
+  secops:
+    prose: >-
+      Monitor for session anomalies: concurrent sessions from geographically distant
+      locations, session use after logout, or sessions with abnormally long lifetimes.
+      Configure SIEM rules to detect session fixation patterns (same session ID used
+      before and after authentication from different sources). Alert on mass session
+      creation from single IPs (potential session brute-force). Review session store
+      metrics for memory exhaustion or abnormal growth patterns that could indicate
+      session flooding attacks.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog-security
+      - redis-monitoring
+      - cloudflare-security-analytics
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-23", "AC-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.5"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: supports

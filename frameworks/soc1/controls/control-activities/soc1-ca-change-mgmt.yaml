@@ -1,0 +1,88 @@
+id: soc1-ca-change-mgmt
+family: control-activities
+title: "Change Management for Financial Applications"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization authorizes, designs, tests, approves, and implements changes
+    to financial processing systems, applications, databases, and supporting infrastructure
+    through a formal change management process. Changes are categorized by risk and urgency,
+    and the level of authorization and testing required is commensurate with the risk category.
+    Emergency changes follow an expedited process that includes retroactive review and
+    documentation. Changes are tested in a separate environment before implementation in
+    production. Segregation of duties is maintained between individuals who develop changes
+    and those who approve and migrate changes to production. Changes are tracked in a change
+    management system, and post-implementation reviews are conducted for significant changes.
+guidance:
+  prose: >-
+    Change management is one of the three core ITGC domains (alongside access controls and
+    computer operations) tested in virtually every SOC 1 examination. Auditors test change
+    management by sampling changes implemented during the examination period and confirming
+    that each had appropriate authorization, testing documentation, and approval before
+    production implementation. They verify that developers cannot directly promote their
+    own code to production (segregation of duties), that test environments are separate
+    from production, and that emergency changes received retroactive review. Change management
+    failures are significant because unauthorized or untested changes to financial processing
+    systems can introduce errors that affect the completeness, accuracy, or validity of
+    transactions processed on behalf of user entities.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a GitOps-based change management workflow where all changes to financial
+      processing infrastructure are managed through pull/merge requests in version-controlled
+      repositories. Enforce environment separation by using separate infrastructure stacks
+      for development, staging, and production, with access controls that prevent direct
+      production access by developers. Implement automated pipeline gates that require
+      all tests to pass before changes can be promoted to production. Use Terraform workspaces
+      or separate state files per environment, controlled by the CI/CD system rather than
+      individuals. Deploy a service mesh with policy enforcement to prevent unauthorized
+      runtime changes to financial processing services.
+    tools:
+      - terraform
+      - gitlab-ci
+      - argocd
+      - flux
+      - vault
+  devsecops:
+    prose: >-
+      Enforce change management through GitLab's protected branches and merge request
+      approval rules. Protect the main/production branch so that only authorized pipeline
+      jobs can push to it, preventing direct developer commits. Require a minimum of two
+      approvals for merge requests affecting financial processing code, with at least one
+      approver being different from the author (enforce this with GitLab's merge request
+      author approval prevention setting). Configure CODEOWNERS to ensure that designated
+      financial controls owners must approve changes to critical code paths. Use GitLab
+      environments to enforce deployment pipelines — production deployments must go through
+      all stages. Implement mandatory pre-deployment security scanning with quality gates.
+    tools:
+      - gitlab-protected-branches
+      - gitlab-approval-rules
+      - gitlab-codeowners
+      - gitlab-environments
+      - checkov
+  secops:
+    prose: >-
+      Implement a formal change management policy and procedure that defines change categories
+      (standard, normal, emergency), approval requirements, testing requirements, and
+      communication requirements for each category. Maintain a change management log in a
+      ticketing system that captures the change description, risk assessment, approvals,
+      test results, implementation evidence, and post-implementation review. Conduct a
+      weekly change advisory board (CAB) review for normal and significant changes.
+      Sample and review implemented changes as part of the ICFR self-assessment cycle
+      to confirm that the change management control operated as designed.
+    tools:
+      - servicenow-change-management
+      - jira
+      - pagerduty
+      - confluence
+related_controls:
+  - control_id: soc1-ra-change-risk
+    relationship: implements
+    description: "Change management controls are designed based on the change risk assessment."
+  - control_id: soc1-ca-segregation
+    relationship: supports
+    description: "Change management enforces developer/promoter segregation of duties."
+  - control_id: soc1-ca-itgc-program
+    relationship: implements
+    description: "Change management is a core ITGC domain in the overall ITGC program."

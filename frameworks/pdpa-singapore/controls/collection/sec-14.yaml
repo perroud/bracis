@@ -1,0 +1,106 @@
+id: sec-14
+family: collection
+title: "Notification Obligation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) An organisation shall not, on or after the appointed day, collect, use or
+    disclose personal data about an individual for any purpose unless it has informed
+    the individual of the purpose for the collection, use or disclosure of the
+    personal data, as the case may be, on or before such collection, use or disclosure.
+
+    (2) An organisation must inform the individual of —
+    (a) the purposes for the collection, use or disclosure of the personal data on
+    or before collecting, using or disclosing the personal data, as the case may be;
+    (b) any other purpose, upon the request of the individual.
+
+    (3) The purposes referred to in subsection (2) must be those that a reasonable
+    person would consider appropriate in the circumstances.
+
+guidance:
+  prose: |
+    Section 14 imposes a proactive notification obligation — organizations must inform
+    individuals of the purpose of collection BEFORE collecting the data, not after.
+
+    Key requirements:
+
+    1. **Timing:** Notification must occur "on or before" collection. Retroactive
+       notification is non-compliant.
+
+    2. **Specificity:** Purposes must be specific enough that a "reasonable person"
+       would consider them appropriate. Vague or overly broad purposes (e.g., "to
+       improve our services") are insufficient.
+
+    3. **Transparency:** Upon request, organizations must disclose any additional
+       purposes beyond those initially stated.
+
+    This is analogous to GDPR Articles 13-14 (information to be provided) but is
+    less prescriptive — the PDPA does not mandate a specific format or enumerate
+    all information elements that must be disclosed.
+
+references:
+  - citation: "PDPA 2012, Section 14"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement purpose notification banners, modals, or inline text at every
+         data collection point (forms, APIs, mobile app screens, chatbots).
+      2. Build a centralized purpose registry that maps each collection point to
+         its stated purposes, ensuring consistency across channels.
+      3. Create version-controlled privacy notices linked to specific data collection
+         flows, enabling audit of what was displayed to users at the time of collection.
+      4. Implement just-in-time notifications for secondary data use — when data
+         collected for Purpose A is to be used for Purpose B, trigger a new notification.
+      5. Build API documentation that includes purpose statements for all endpoints
+         that collect personal data.
+    tools:
+      - consent-management-platform
+      - backstage
+      - content-management-system
+      - privacy-notice-engine
+
+  devsecops:
+    prose: |
+      1. Create CI/CD checks that flag new data collection endpoints lacking
+         associated purpose notifications.
+      2. Implement visual regression tests to verify privacy notices render correctly
+         across browsers and devices.
+      3. Validate that purpose statements in code match those in the centralized
+         purpose registry.
+      4. Scan API definitions (OpenAPI specs) for personal data collection endpoints
+         without documented purpose statements.
+    tools:
+      - gitlab-ci
+      - playwright
+      - semgrep
+      - spectral
+      - openapi-linter
+
+  secops:
+    prose: |
+      1. Audit data collection points quarterly to verify purpose notifications
+         are present and accurate.
+      2. Monitor for new data collection flows that bypass the notification framework.
+      3. Review user complaints related to unexpected data use for notification gaps.
+      4. Track notification coverage — percentage of collection points with valid,
+         current purpose statements.
+    tools:
+      - compliance-dashboard
+      - user-complaint-tracker
+      - siem
+      - web-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-13", "art-14"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-9"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: mapped

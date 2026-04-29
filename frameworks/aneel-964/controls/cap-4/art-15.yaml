@@ -1,0 +1,125 @@
+id: art-15
+family: cap-4
+title: "Gestao de Logs e Evidencias de Incidentes"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 15. Os agentes do setor elétrico devem manter logs e registros de eventos
+    de segurança em seus sistemas críticos, assegurando:
+
+    I - registro de eventos de autenticação, autorização, acesso e modificações de
+    configuração em sistemas de controle industrial e em componentes de rede críticos;
+
+    II - retenção dos logs de segurança por período mínimo de 2 (dois) anos para
+    fins de investigação de incidentes e auditoria regulatória;
+
+    III - proteção da integridade dos logs contra alteração ou destruição, incluindo
+    o armazenamento em local separado e seguro;
+
+    IV - capacidade de correlacionar eventos de segurança entre sistemas IT e OT
+    para investigação de incidentes de convergência.
+guidance:
+  prose: |
+    O art. 15 estabelece os requisitos de log management para o setor eletrico,
+    com enfase especial na retencao e integridade dos logs — elementos criticos
+    para investigacao forense apos incidentes.
+
+    **Desafios de logging em sistemas OT:**
+    1. Muitos sistemas SCADA e ICS legados tem capacidade limitada de logging
+    2. Os protocolos industriais (Modbus, DNP3) nao geram logs nativos estruturados
+    3. O volume de eventos em sistemas OT pode ser diferente do IT — menos eventos,
+       mas cada um com potencial impacto fisico significativo
+    4. Correlacao IT/OT e complexa: os timestamps podem diferir, os formatos sao
+       incompativeis e os sistemas podem estar em redes isoladas
+
+    **Eventos criticos para logging em OT:**
+    - Autenticacao e falhas de autenticacao em servidores SCADA e HMIs
+    - Comandos enviados para RTUs e PLCs (especialmente comandos de controle)
+    - Alteracoes de configuracao em equipamentos de campo
+    - Acessos remotos (especialmente de fornecedores)
+    - Mudancas de estado em disjuntores e equipamentos criticos via SCADA
+    - Anomalias detectadas por sistemas de monitoramento passivo OT
+
+    **Retencao de 2 anos:**
+    O prazo de 2 anos e necessario porque:
+    - Incidentes APT sofisticados podem permanecer latentes por meses antes de serem detectados
+    - Investigacoes pos-incidente frequentemente precisam de contexto historico extenso
+    - Auditorias da ANEEL podem ocorrer a qualquer momento
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar arquitetura de log management especifica para o setor eletrico:
+
+      1. SIEM unificado IT/OT: plataforma que ingere logs de:
+         - Sistemas IT (Windows Event Logs, Syslog, firewall logs)
+         - Sistemas OT (logs de servidores SCADA, HMIs, gateways industriais)
+         - Monitores passivos OT (Claroty, Nozomi — exportar alertas para o SIEM)
+      2. Log forwarder na DMZ industrial: coletar logs de redes OT isoladas
+         e encaminhar de forma unidirecional para o SIEM corporativo
+      3. Armazenamento imutavel: usar WORM storage (Write Once Read Many)
+         para logs criticos, garantindo integridade contra alteracao
+      4. Retencao configurada: hot storage (90 dias para consulta rapida) +
+         warm storage (2 anos para conformidade e investigacao)
+      5. Sincronizacao de tempo (NTP): garantir que todos os dispositivos OT
+         e IT usam a mesma fonte de tempo para correlacao de eventos
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - aws-s3-worm
+      - ntp-server
+  devsecops:
+    prose: |
+      Gerenciar log management como codigo e automatizar conformidade:
+
+      1. Configuracao de logging como IaC: definir em Ansible/Terraform quais
+         eventos devem ser logados em cada tipo de sistema (padronizar por tipo
+         de ativo: SCADA server, HMI, firewall industrial, RTU gateway)
+      2. Pipeline de validacao de logs: verificar continuamente que todos os
+         sistemas criticos estao enviando logs para o SIEM (alertar quando
+         um sistema para de enviar logs — pode indicar comprometimento)
+      3. Relatorio de retencao: dashboard mostrando o status de retencao de
+         logs por sistema, alertando quando logs estao proximos do vencimento
+         antes do periodo de 2 anos
+      4. Testes de integridade: verificacoes periodicas de que logs armazenados
+         nao foram alterados (hash verification)
+    tools:
+      - splunk
+      - elastic-siem
+      - ansible
+      - terraform
+      - gitlab-ci
+  secops:
+    prose: |
+      Operar o programa de log management para conformidade e investigacao:
+
+      1. Inventario de fontes de log: mapear todos os sistemas criticos e
+         verificar se cada um esta enviando logs para o SIEM
+      2. Revisao de alertas de ausencia de logs: quando um sistema para de
+         enviar logs, investigar imediatamente (pode ser comprometimento)
+      3. Processo de preservacao de evidencias: quando um incidente e declarado,
+         exportar imediatamente os logs relevantes para storage imutavel dedicado
+      4. Exercicios de investigacao forense: usar logs historicos para simular
+         investigacoes de incidentes e verificar a qualidade e completude dos registros
+      5. Relatorio semestral de conformidade de logging: verificar que todos os
+         sistemas criticos estao em conformidade com os requisitos do art. 15
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - volatility
+      - autopsy
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R4", "CIP-007-R5"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["3-3-SR-2.8", "3-3-SR-6.1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16", "A.8.17"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-9", "AU-11"]
+    relationship: supports

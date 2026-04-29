@@ -1,0 +1,119 @@
+id: art-3
+family: cap-1
+title: "Classificacao de Risco de SaMD -- Categorias I a IV"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 3. A classificação de risco de SaMD deve ser realizada pelo
+    fabricante considerando dois fatores combinados:
+
+    I - a significância da informação fornecida pela saída do SaMD
+    para a decisão clínica, categorizada em:
+    a) informar decisão de gerenciamento clínico: Categoria I;
+    b) direcionar decisão de gerenciamento clínico: Categoria II;
+    c) diagnosticar ou tratar: Categoria III;
+    d) diagnosticar ou tratar condição crítica ou situação de emergência:
+    Categoria IV.
+
+    II - a condição de saúde ou situação do paciente, categorizada em:
+    a) condição não séria (ex: monitoramento de bem-estar);
+    b) condição séria (ex: doenças crônicas em tratamento);
+    c) condição crítica ou situação com risco de vida.
+
+    Parágrafo único. A classificação final deve ser obtida pela combinação
+    dos fatores I e II conforme matriz de classificação de risco definida
+    pela ANVISA, baseada no framework IMDRF N12:2014.
+guidance:
+  prose: |
+    O art. 3 implementa no Brasil a matriz de classificacao de risco
+    do IMDRF (N12:2014), que combina significancia da saida clinica
+    com gravidade da condicao de saude.
+
+    **Matriz de classificacao IMDRF adaptada:**
+
+    | Significancia da saida | Nao seria | Seria | Critica |
+    |------------------------|-----------|-------|---------|
+    | Informar               | I         | I     | II      |
+    | Direcionar             | I         | II    | III     |
+    | Diagnosticar/Tratar    | II        | III   | IV      |
+    | Diagnosticar Critico   | III       | IV    | IV      |
+
+    **Impacto regulatorio por classe:**
+    - Classe I: cadastro simplificado, autodeclaracao de conformidade
+    - Classe II: registro com dosie tecnico reduzido
+    - Classe III: registro com dosie tecnico completo e avaliacao clinica
+    - Classe IV: registro com dosie tecnico completo, avaliacao clinica
+      e inspecao de Boas Praticas de Fabricacao
+
+    **Exemplos praticos:**
+    - Classe I: app de lembretes de medicacao sem algoritmo clinico
+    - Classe II: software de triagem com questionario validado
+    - Classe III: sistema de analise de ECG com deteccao de arritmias
+    - Classe IV: software de diagnostico de AVC por imagem em emergencia
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de classificacao de risco:**
+      1. Implementar formulario estruturado no processo de criacao de
+         repositorio que coleta: significancia da saida clinica e
+         gravidade da condicao de saude alvo.
+      2. Automatizar calculo de classe de risco (I-IV) baseado na
+         matriz IMDRF, armazenando resultado como metadado do projeto.
+      3. Configurar politicas diferenciadas por classe de risco:
+         - Classe I/II: pipeline padrao + documentacao basica
+         - Classe III: pipeline reforchado + revisao clinica obrigatoria
+         - Classe IV: pipeline maximo + aprovacao multidisciplinar
+      4. Criar dashboard de portfolio SaMD por classe de risco,
+         mostrando distribuicao, status regulatorio e proximas acoes.
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - service-catalog
+      - compliance-dashboard
+  devsecops:
+    prose: |
+      **Controles diferenciados por classe de risco no CI/CD:**
+      1. Definir niveis de rigor de pipeline proporcional a classe:
+         - Classe I: SAST + unit tests (cobertura >= 80%)
+         - Classe II: SAST + DAST + integration tests (cobertura >= 85%)
+         - Classe III: SAST + DAST + SCA + fuzzing + clinical validation
+         - Classe IV: todos acima + penetration test + formal verification
+      2. Implementar gate de classificacao no pipeline que verifica se
+         o nivel de testes e revisoes e compativel com a classe declarada.
+      3. Bloquear merge request de SaMD Classe III/IV sem aprovacao
+         de Responsavel Tecnico e revisor clinico.
+      4. Gerar automaticamente dosie tecnico parcial a partir de
+         artefatos do pipeline (test reports, coverage, SBOM, scan results).
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - fuzzing
+  secops:
+    prose: |
+      **Governanca de classificacao de risco:**
+      1. Estabelecer comite de classificacao multidisciplinar (engenharia,
+         clinico, regulatorio, qualidade) para validar classificacoes
+         de risco de novos SaMD e reclassificacoes.
+      2. Documentar justificativa de classificacao em dosie tecnico,
+         incluindo analise de significancia da saida e gravidade da
+         condicao de saude.
+      3. Revisar classificacao de risco quando houver alteracao de
+         funcionalidade, expansao de indicacao de uso ou mudanca no
+         perfil de risco do SaMD.
+      4. Manter registro historico de classificacoes e reclassificacoes
+         com rastreabilidade para decisoes regulatorias.
+    tools:
+      - grc-platform
+      - risk-register
+      - regulatory-tracking
+      - audit-trail
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["annex-III"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164-308"]
+    relationship: mapped

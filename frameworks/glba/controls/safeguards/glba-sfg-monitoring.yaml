@@ -1,0 +1,140 @@
+id: glba-sfg-monitoring
+family: safeguards
+title: "Continuous Monitoring and Logging"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall implement continuous monitoring of information systems
+    containing customer information to detect actual and attempted attacks or intrusions.
+    The institution shall maintain activity logs sufficient to detect unauthorized access
+    to or tampering with customer information and shall regularly review the activity
+    of authorized users to detect unauthorized activity.
+  parts:
+    - id: glba-sfg-monitoring.1
+      label: "(1)"
+      prose: >-
+        The institution shall implement logging on all information systems that store,
+        process, or transmit customer information. Logs shall capture authentication
+        events, authorization decisions, data access events, administrative actions,
+        and system changes at a minimum.
+    - id: glba-sfg-monitoring.2
+      label: "(2)"
+      prose: >-
+        The institution shall implement continuous monitoring capabilities that detect
+        actual and attempted attacks, intrusions, and unauthorized access to customer
+        information in real time or near real time.
+    - id: glba-sfg-monitoring.3
+      label: "(3)"
+      prose: >-
+        Activity logs shall be protected from unauthorized modification or deletion
+        and shall be retained for a period sufficient to support incident investigation,
+        regulatory examination, and legal proceedings.
+    - id: glba-sfg-monitoring.4
+      label: "(4)"
+      prose: >-
+        The institution shall regularly review the activity of authorized users
+        to detect unauthorized use of or access to customer information, including
+        analysis of access patterns, data download volumes, and off-hours activity.
+    - id: glba-sfg-monitoring.5
+      label: "(5)"
+      prose: >-
+        Monitoring alerts shall be investigated and resolved in a timely manner,
+        with documented investigation findings and remediation actions.
+
+guidance:
+  prose: >-
+    The 2023 Safeguards Rule amendment explicitly requires continuous monitoring,
+    making it a prescriptive requirement rather than a general best practice. Examiners
+    evaluate whether monitoring is comprehensive (covering all NPI systems), effective
+    (detecting actual threats), and actionable (alerts are investigated and resolved).
+    Common findings include: logging not enabled on all NPI systems, logs that do not
+    capture sufficient detail for investigation, logs stored on the same system they
+    monitor (subject to tampering by an attacker who compromises the system), monitoring
+    that generates excessive false positives leading to alert fatigue and missed real
+    threats, authorized user activity not monitored (insider threat blind spot), and
+    alert investigation backlogs indicating insufficient staffing. Log retention periods
+    should align with regulatory examination cycles and statute of limitations for
+    relevant legal proceedings. Institutions should implement a tiered alerting strategy
+    that prioritizes high-risk events (NPI exfiltration, privilege escalation, access
+    from sanctioned countries) for immediate investigation.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(2), (7)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "FFIEC IT Examination Handbook — Audit and Monitoring"
+    url: "https://ithandbook.ffiec.gov/it-booklets/audit.aspx"
+  - citation: "NIST SP 800-92 — Guide to Computer Security Log Management"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-92/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized log aggregation that collects logs from all systems handling
+      customer information into an immutable log store with write-once-read-many (WORM)
+      protection. Implement structured logging standards across all applications that
+      ensure consistent event format and sufficient detail for investigation. Deploy
+      SIEM with correlation rules tuned to detect NPI-specific threats (bulk data
+      access, unusual query patterns, privilege escalation, exfiltration indicators).
+      Implement network detection and response (NDR) for traffic analysis on segments
+      carrying customer information. Deploy user and entity behavior analytics (UEBA)
+      that baselines normal user activity and alerts on deviations. Implement database
+      activity monitoring (DAM) on all databases containing customer information to
+      capture query-level access details. Configure log retention policies that meet
+      regulatory requirements (minimum 6 years for financial institutions). Implement
+      automated log integrity verification using cryptographic hashing.
+    tools:
+      - splunk
+      - elastic-siem
+      - kafka
+      - kubernetes
+      - prometheus
+      - grafana
+      - istio
+  devsecops:
+    prose: >-
+      Implement logging as a cross-cutting concern in application templates — all new
+      services handling NPI automatically include standardized logging. Deploy CI/CD
+      pipeline checks that verify logging is configured on all deployed services.
+      Implement automated tests that verify critical events (authentication, NPI
+      access, administrative actions) generate log entries. Add pipeline stages that
+      validate log format compliance and required field inclusion. Deploy
+      infrastructure-as-code scanning that detects logging misconfigurations
+      (disabled audit logging, insufficient log retention, missing log encryption).
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - open-policy-agent
+      - terraform
+  secops:
+    prose: >-
+      Operate 24/7 monitoring of NPI systems with tiered alerting: critical alerts
+      (potential data breach, active intrusion) require immediate response; high alerts
+      (privilege escalation, policy violation) require same-day investigation; medium
+      alerts (anomalous access pattern, failed authentication spike) require next-business-day
+      review. Maintain and tune SIEM correlation rules to minimize false positives
+      while maintaining detection coverage. Conduct periodic threat hunting exercises
+      using log data to identify threats that evade automated detection. Generate
+      monthly monitoring reports showing: alert volumes by severity, investigation
+      completion rates, mean time to detect and respond, false positive rates, and
+      coverage gaps. Conduct annual reviews of monitoring coverage to ensure all NPI
+      systems are included.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - grc-platform
+      - servicenow
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-12", "SI-4", "CA-7"]
+    relationship: supports
+  - framework_id: sox
+    articles: ["itgc-operations"]
+    relationship: complements
+  - framework_id: pci-dss-v4
+    articles: ["10.1", "10.2", "10.3", "10.4", "10.5", "10.6", "10.7"]
+    relationship: complements

@@ -1,0 +1,93 @@
+id: pin-20
+family: pin-incident
+title: "PIN Security Incident Response"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Organizations must establish and maintain an incident response plan that specifically
+    addresses the compromise or suspected compromise of PIN data, cryptographic keys, or
+    PIN processing systems. The incident response plan must define: criteria for declaring
+    a PIN security incident; roles and responsibilities of the incident response team;
+    escalation procedures including notification of payment brands, acquirers, and law
+    enforcement; containment procedures including emergency key replacement and device
+    quarantine; forensic investigation procedures that preserve evidence; recovery procedures
+    that restore secure PIN processing; and post-incident review procedures that identify
+    root causes and implement corrective actions. When a cryptographic key is known or
+    suspected to be compromised, all affected keys must be immediately revoked and replaced,
+    and all transactions processed under the compromised key must be identified for fraud
+    monitoring.
+
+guidance:
+  prose: >-
+    PIN security incidents have unique characteristics that distinguish them from general
+    cybersecurity incidents. A compromised PIN encryption key can retroactively expose PINs
+    for all transactions encrypted under that key, creating a mass exposure scenario. The
+    incident response plan must therefore include rapid key replacement procedures that can
+    be executed within hours, not days. The plan must also address the coordination
+    complexity inherent in payment networks — an incident at one entity often impacts
+    multiple interconnected parties. Organizations must establish pre-existing communication
+    channels with payment brands, card issuers, and law enforcement to avoid delays during
+    an actual incident. Tabletop exercises specifically simulating PIN compromise scenarios
+    must be conducted at least annually to validate the plan's effectiveness.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 7"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated key revocation and replacement workflows that can be triggered
+      within minutes of a compromise detection. Deploy canary transactions that test
+      PIN processing integrity continuously and alert on anomalous encryption results.
+      Implement emergency HSM failover procedures that activate backup HSMs with
+      replacement keys. Deploy automated forensic data collection tools that can capture
+      HSM state, network traffic, and system images without disrupting evidence integrity.
+      Maintain pre-provisioned emergency communication channels (encrypted email, secure
+      voice) for incident coordination.
+    tools:
+      - incident-response-platform
+      - thales-payshield
+      - hsm-failover-automation
+      - forensic-imaging-tools
+      - pagerduty
+  devsecops:
+    prose: >-
+      Implement automated incident detection rules in CI/CD monitoring that flag
+      cryptographic anomalies (unexpected key usage, failed PIN verifications above
+      threshold, HSM health degradation). Deploy chaos engineering tests that simulate
+      key compromise scenarios and verify automated response workflows. Maintain
+      runbooks in version control for each incident response procedure. Test backup
+      and recovery procedures regularly.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - runbook-automation
+      - incident-response-testing
+  secops:
+    prose: >-
+      Conduct tabletop exercises simulating PIN security incidents at least annually,
+      involving all relevant stakeholders (security, operations, legal, communications,
+      executive management). Maintain current contact lists for payment brand incident
+      response teams, law enforcement, and forensic investigation firms. Monitor threat
+      intelligence feeds for indicators of compromise targeting PIN processing
+      infrastructure. Conduct post-incident reviews within 72 hours of incident
+      closure and track corrective action implementation to completion.
+    tools:
+      - incident-response-platform
+      - pagerduty
+      - service-now
+      - threat-intelligence-platform
+      - splunk-soar
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-12.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-4", "IR-5", "IR-6", "IR-8"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26", "A.5.27"]
+    relationship: mapped

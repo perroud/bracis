@@ -1,0 +1,131 @@
+id: art-15
+family: cap-5
+title: "Timestamp Requirements and Interoperability"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 11 da MP 2.200-2/2001. A utilização de documento eletrônico para
+    fins tributários atenderá, ainda, ao disposto no art. 100 da Lei nº 5.172,
+    de 25 de outubro de 1966 — Código Tributário Nacional.
+
+    Art. 15 da Lei 14.063/2020. Ato do Poder Executivo federal disporá sobre:
+
+    I - o formato dos documentos eletrônicos assinados eletronicamente que
+    possam ser utilizados em interações com entes públicos;
+
+    II - o padrão mínimo de tecnologia admitido para cada nível de assinatura
+    eletrônica;
+
+    III - os critérios de interoperabilidade entre os diferentes sistemas de
+    assinatura eletrônica utilizados pelos entes públicos;
+
+    IV - o mecanismo de validação das assinaturas eletrônicas apostas nos
+    documentos eletrônicos;
+
+    V - o carimbo de tempo a ser utilizado em assinaturas eletrônicas.
+guidance:
+  prose: |
+    Article 15 of Lei 14.063/2020 and Article 11 of MP 2.200-2/2001 address
+    interoperability, technical standards, and timestamp requirements.
+
+    **Regulatory mandate for interoperability:**
+    The federal executive must define:
+    1. **Document formats:** Standard formats for signed electronic documents
+       in government interactions (PDF/A with PAdES, XML with XAdES, etc.)
+    2. **Minimum technology standards:** Per signature level, defining
+       acceptable algorithms, key sizes, and signature formats.
+    3. **Interoperability criteria:** Ensuring different government systems
+       can validate signatures created in other systems.
+    4. **Validation mechanisms:** Standard way to verify electronic signatures
+       (ITI Verificador de Conformidade is the reference implementation).
+    5. **Timestamps:** Standards for timestamp tokens used in electronic
+       signatures (based on DOC-ICP-04).
+
+    **Timestamp (carimbo de tempo) requirements:**
+    - Must come from an ICP-Brasil accredited Timestamp Authority (ACT)
+    - Provides proof of existence of a document at a specific point in time
+    - Essential for long-term validity: allows verification even after
+      certificate expiration
+    - Required for CAdES-T, XAdES-T, PAdES-T and higher signature profiles
+
+    **Interoperability standards:**
+    - ITI Verificador de Conformidade: reference validation tool
+    - PBAD (Padrao Brasileiro de Assinatura Digital): Brazilian standard
+      for digital signature profiles
+    - Interoperability with SEFAZ (tax), DENATRAN (vehicle), JUCESPA
+      (commercial registry), and other government systems
+
+    **Tax document specifics (art. 11 MP 2.200-2):**
+    Electronic documents for tax purposes must additionally comply with
+    the National Tax Code (CTN), including NF-e, CT-e, and other fiscal
+    electronic documents.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Interoperability and timestamp infrastructure:**
+      1. Implement support for PBAD (Padrao Brasileiro de Assinatura Digital)
+         signature profiles: CAdES (AD-RB, AD-RT, AD-RV, AD-RC, AD-RA),
+         XAdES, and PAdES equivalents.
+      2. Integrate with ICP-Brasil accredited Timestamp Authority (ACT)
+         for mandatory timestamp tokens in AD-RT and higher profiles.
+      3. Implement ITI Verificador de Conformidade compatible validation
+         endpoint that can be used by other government systems.
+      4. Support PDF/A-1b and PDF/A-2b document formats with PAdES
+         signatures for long-term archival interoperability.
+      5. Build cross-system signature validation API that accepts documents
+         from any PBAD-compliant system and returns standardized results.
+      6. For tax documents: integrate with SEFAZ web services using e-CNPJ
+         ICP-Brasil certificates for NF-e/CT-e issuance and validation.
+    tools:
+      - pbad-signature-library
+      - tsa-integration
+      - iti-verificador
+      - pdfa-generator
+      - sefaz-integration
+      - interop-api
+  devsecops:
+    prose: |
+      **Interoperability and timestamp testing:**
+      1. Implement PBAD conformity tests for all supported signature
+         profiles (AD-RB through AD-RA).
+      2. Test interoperability by generating signatures and validating
+         them against ITI Verificador de Conformidade.
+      3. Include timestamp token validation tests: verify TSA certificate
+         chain, token format (RFC 3161), and accuracy.
+      4. Test cross-format scenarios: sign in CAdES, verify in PAdES
+         viewer, and vice versa.
+      5. Automate tax document (NF-e) schema validation and signature
+         compliance in the CI/CD pipeline.
+    tools:
+      - gitlab-ci
+      - pbad-testing
+      - iti-verificador-testing
+      - tsa-testing
+      - nfe-validation
+  secops:
+    prose: |
+      **Interoperability and timestamp operations:**
+      1. Monitor TSA availability and response times, maintaining backup
+         TSA integration for high availability.
+      2. Track PBAD standard updates and ITI Verificador de Conformidade
+         version changes for compatibility assurance.
+      3. Conduct periodic interoperability testing with partner government
+         systems to detect and resolve validation discrepancies.
+      4. Maintain timestamp token archive for long-term validation:
+         preserve TSA certificates and CRL snapshots.
+      5. Report interoperability issues to ITI via official channels for
+         resolution and standard clarification.
+    tools:
+      - tsa-monitoring
+      - interop-testing
+      - standard-tracking
+      - archive-management
+      - iti-communication
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-15", "art-16"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

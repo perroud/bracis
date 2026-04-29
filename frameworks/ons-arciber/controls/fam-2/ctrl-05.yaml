@@ -1,0 +1,99 @@
+id: ctrl-05
+family: fam-2
+title: "Inventario de Ativos do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve manter um inventário completo, atualizado e classificado
+    de todos os ativos cibernéticos que integram o ARCiber, incluindo: sistemas
+    SCADA, EMS e DMS; controladores lógicos programáveis (PLCs), unidades
+    terminais remotas (RTUs) e dispositivos eletrônicos inteligentes (IEDs);
+    servidores de historiadores, workstations de engenharia e HMIs; ativos de
+    rede (switches, roteadores, firewalls) do ARCiber; e sistemas de
+    telecomunicação críticos para a operação do SIN. O inventário deve conter
+    informações mínimas de identificação, versão de firmware/software, criticidade
+    e responsável pelo ativo.
+
+guidance:
+  prose: >-
+    Nao e possivel proteger o que nao e conhecido. O inventario de ativos e a
+    base de todos os controles subsequentes do ARCiber. Deve contemplar:
+    (i) identificacao unica de cada ativo (tag de ativo, numero de serie, hostname);
+    (ii) classificacao por nivel ISA-95 (0 a 4); (iii) criticidade para o SIN
+    (critico, importante, suporte); (iv) versoes de firmware, sistema operacional
+    e software aplicativo; (v) fabricante e data prevista de fim de suporte (EoL/EoS);
+    (vi) localizacao fisica (subestacao, usina, centro de controle); (vii)
+    conectividade — protocolos utilizados (Modbus, DNP3, IEC 61850, IEC 60870-5-101/104,
+    OPC UA, ICCP). O inventario deve ser reconciliado com a topologia de rede
+    real por meio de ferramentas de descoberta passiva de ativos OT ao menos
+    semestralmente.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de descoberta passiva de ativos OT (Nozomi Networks,
+      Claroty ou Tenable.OT) para descoberta automatica e inventario continuo
+      de dispositivos no ARCiber sem impacto nos sistemas de controle. Integrar
+      o inventario OT ao CMDB corporativo (ServiceNow) para visibilidade unificada
+      IT/OT. Implementar sincronizacao automatica entre a ferramenta de descoberta
+      OT e o CMDB com alertas para novos ativos detectados nao catalogados.
+      Manter o inventario como codigo (inventory-as-code) em repositorio GitLab
+      com historico de mudancas auditavel. Implementar alertas para ativos em
+      estado EoL/EoS sem plano de mitigacao documentado.
+    tools:
+      - nozomi-networks
+      - claroty
+      - tenable-ot
+      - servicenow
+      - gitlab
+  devsecops:
+    prose: >-
+      Implementar pipeline de validacao do inventario que verifique periodicamente
+      a consistencia entre o inventario declarado e os ativos detectados pelas
+      ferramentas de descoberta OT. Criar alertas no CI/CD para mudancas no
+      inventario de ativos criticos do ARCiber que nao passaram pelo processo
+      formal de gestao de mudancas. Automatizar a geracao de relatorios de
+      inventario de ativos para submissao ao ONS quando solicitado. Implementar
+      tags de classificacao de ativos consistentes entre CMDB e repositorios de
+      configuracao (IaC).
+    tools:
+      - gitlab-ci
+      - servicenow
+      - ansible
+      - terraform
+  secops:
+    prose: >-
+      Realizar reconciliacao completa do inventario de ativos do ARCiber ao menos
+      semestralmente, comparando o inventario declarado com os resultados de
+      discovery passivo das ferramentas OT. Investigar e documentar qualquer
+      ativo detectado nao presente no inventario. Manter processo de atualizacao
+      do inventario integrado ao processo de gestao de mudancas: qualquer adicao,
+      remocao ou modificacao de ativo no ARCiber deve atualizar o inventario.
+      Classificar ativos por criticidade para o SIN e priorizar controles de
+      protecao conforme a classificacao. Reportar ao ONS o inventario de ativos
+      criticos do ARCiber conforme periodicidade definida nos Procedimentos de Rede.
+    tools:
+      - nozomi-vantage
+      - claroty-ctd
+      - servicenow
+      - tenable-ot
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 8"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-1 cl.4.2.3"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-002-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.1", "a8.2"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PM-5"]
+    relationship: mapped

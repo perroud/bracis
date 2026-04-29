@@ -1,0 +1,107 @@
+id: art-18
+family: cap-4
+title: "Restricoes de Armazenamento e Processamento"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 18. Os órgãos e entidades devem garantir que os provedores de serviços de
+    computação em nuvem não utilizem os dados armazenados ou processados para
+    finalidades distintas daquelas contratadas, incluindo:
+    I - vedação ao uso dos dados para treinamento de modelos de inteligência
+    artificial, mineração de dados ou análise de comportamento pelo provedor;
+    II - vedação ao compartilhamento dos dados com terceiros sem autorização
+    expressa do órgão ou entidade;
+    III - garantia de que os dados serão eliminados de forma segura e irrecuperável
+    ao término do contrato ou quando solicitado pelo órgão ou entidade;
+    IV - garantia de que os metadados gerados pelo uso dos serviços de nuvem
+    não serão utilizados pelo provedor para finalidades próprias.
+
+    Parágrafo único. As vedações previstas neste artigo devem constar
+    expressamente do contrato firmado com o provedor de serviços de
+    computação em nuvem.
+guidance:
+  prose: |
+    O art. 18 protege contra uso indevido dos dados pelo provedor, um risco
+    crescente com o avanco de IA e analytics.
+
+    **Quatro vedacoes:**
+    1. Treinamento de IA/ML: provedor NAO pode usar dados para treinar modelos
+    2. Compartilhamento com terceiros: sem autorizacao expressa
+    3. Eliminacao segura: destruicao irrecuperavel ao fim do contrato
+    4. Metadados: provedor nao pode usar metadata para fins proprios
+
+    **Risco real:**
+    Provedores de SaaS frequentemente usam dados agregados de clientes para
+    melhorar produtos ou treinar modelos de IA. Este artigo proibe essa pratica
+    para dados da APF.
+
+    **Eliminacao segura:**
+    NIST SP 800-88 (Guidelines for Media Sanitization) define metodos:
+    - Clear: overwrite logico
+    - Purge: degaussing ou crypto-erase
+    - Destroy: destruicao fisica
+
+    **Mapeamento CSA CCM v4:**
+    - DSP-07: Data Retention and Deletion
+    - DSP-09: Data Privacy by Design and Default
+    - DSP-16: Data Processing, Data Transfer, and Data Sharing
+
+    **Mapeamento LGPD:**
+    - Art. 6: Principio da finalidade (dados usados apenas para fins contratados)
+    - Art. 16: Eliminacao de dados
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle tecnico de uso de dados:**
+      1. Criptografia BYOK/HYOK que impossibilite uso dos dados pelo provedor
+         sem as chaves do orgao.
+      2. Monitoramento de API calls do provedor aos dados do orgao para
+         detectar acessos nao justificados por operacao contratada.
+      3. Data masking e tokenizacao para minimizar exposicao de dados ao
+         provedor em ambientes compartilhados.
+      4. Procedimento automatizado de crypto-shredding para eliminacao segura:
+         destruir chaves BYOK torna dados irrecuperaveis.
+    tools:
+      - byok-management
+      - api-monitoring
+      - data-masking
+      - crypto-shredding
+      - tokenization
+  devsecops:
+    prose: |
+      **Validacao de restricoes:**
+      1. Testes de que provedor nao tem acesso a chaves de descriptografia.
+      2. Validacao de clausulas contratuais via checklist automatizado.
+      3. Pipeline de offboarding que execute crypto-shredding e valide
+         eliminacao de dados ao fim de contrato.
+      4. Testes de que metadados do orgao nao sao acessiveis ao provedor.
+    tools:
+      - gitlab-ci
+      - contract-validator
+      - offboarding-pipeline
+      - data-access-tests
+  secops:
+    prose: |
+      **Monitoramento de uso de dados:**
+      1. Auditoria de acessos do provedor aos dados do orgao (logs de acesso
+         da infraestrutura do provedor).
+      2. Verificacao periodica de que termos de servico do provedor nao
+         incluem clausulas de uso de dados para fins proprios.
+      3. Processo de eliminacao segura documentado com certificado do provedor.
+      4. Monitoramento pos-contrato para garantir que dados foram eliminados.
+    tools:
+      - access-audit
+      - tos-monitoring
+      - data-destruction-certificate
+      - grc-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-15", "art-16"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["DSP-07", "DSP-09", "DSP-16"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-5"]
+    relationship: derived-from

@@ -1,0 +1,82 @@
+id: oi-cc-01
+family: cc
+title: "Jornada de Consentimento e Requisitos de Validade"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O consentimento para compartilhamento de dados no Open Insurance deve ser obtido
+    de forma prévia, expressa, informada e inequívoca, por meio de jornada digital
+    padronizada que garanta ao cliente plena compreensão do que está autorizando.
+
+    A jornada de consentimento deve incluir:
+    I - Identificação clara da instituição receptora dos dados;
+    II - Finalidade específica do compartilhamento;
+    III - Categorias de dados que serão compartilhados;
+    IV - Prazo de validade do consentimento;
+    V - Informação sobre o direito de revogação a qualquer momento;
+    VI - Redirecionamento seguro do cliente entre a receptora e a transmissora
+    para autenticação e autorização.
+
+    O consentimento deve ser registrado e armazenado pela transmissora e pela
+    receptora, com rastreabilidade completa.
+guidance:
+  prose: |
+    A jornada de consentimento e o ponto mais critico do Open Insurance do ponto de
+    vista do cliente. Deve ser simples, transparente e segura.
+
+    O fluxo padrao segue o modelo de redirecionamento (redirect):
+    1. Cliente inicia na instituicao receptora (ex: app de seguradora concorrente)
+    2. Receptora redireciona para a transmissora (ex: seguradora atual)
+    3. Cliente se autentica na transmissora
+    4. Cliente autoriza o compartilhamento com granularidade
+    5. Transmissora redireciona de volta para a receptora com authorization code
+    6. Receptora troca authorization code por access token
+
+    Esse fluxo segue o padrao OAuth 2.0 Authorization Code com PKCE, conforme
+    perfil FAPI (Financial-grade API) adotado pelo Open Insurance.
+
+    O consentimento nao pode ser obtido por meios genericos (ex: checkbox em termos
+    de uso extensos). Deve ser ato especifico e destacado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar Authorization Server conforme perfil FAPI 1.0 Advanced.
+      2. Desenvolver telas de consentimento com UX padronizada conforme guia do
+         Open Insurance.
+      3. Implementar storage de consentimentos com campos: id, titular, receptora,
+         finalidade, escopo, prazo, status, timestamps.
+      4. Configurar fluxo de redirecionamento com PKCE obrigatorio.
+      5. Implementar mecanismo de consulta de consentimentos vigentes pelo cliente.
+    tools:
+      - oauth2-server
+      - identity-provider
+      - consent-management
+      - api-gateway
+  devsecops:
+    prose: |
+      1. Testes automatizados end-to-end da jornada de consentimento (happy path
+         e cenarios de erro).
+      2. Testes de seguranca no fluxo de redirecionamento (CSRF, open redirect,
+         token hijacking).
+      3. Validar que consentimento e registrado com todos os campos obrigatorios.
+      4. DAST focado em autorizacao e autenticacao.
+    tools:
+      - dast
+      - e2e-testing
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar jornadas de consentimento para detectar padroes anomalos
+         (tentativas de phishing, redirecionamentos suspeitos).
+      2. Auditar que consentimentos registrados sao validos e nao foram adulterados.
+      3. Monitorar volume de consentimentos por receptora para detectar abusos.
+    tools:
+      - siem
+      - fraud-detection
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-9"]
+    relationship: complements

@@ -1,0 +1,123 @@
+id: coppa-parent-revoke
+family: rights
+title: "Parent's Right to Revoke Consent and Delete"
+class: COPPA
+
+statement:
+  prose: |
+    A parent may, at any time, revoke their consent, refuse to allow an operator to further
+    use or collect their child's personal information, and direct the operator to delete the
+    child's personal information that has been collected (16 CFR § 312.6(a)(2)).
+
+    Upon receiving such a request, the operator must:
+    (1) Cease collecting personal information from the child.
+    (2) Delete the child's personal information that has been collected and maintained by
+        the operator.
+    (3) Direct any third party to whom the child's personal information has been disclosed
+        to delete the information.
+
+    The operator may terminate the child's access to the service if the service requires
+    the personal information for participation. The operator must inform the parent of this
+    consequence before effectuating the revocation.
+
+guidance:
+  prose: |
+    The right to revoke consent and delete is the enforcement mechanism for parental control
+    under COPPA. Key implementation considerations:
+
+    1. **Unconditional right:** Parents can revoke consent at any time, for any reason.
+       There are no exceptions or balancing tests — the operator must comply.
+
+    2. **Scope of deletion:** Deletion must cover ALL personal information collected from
+       the child, across ALL systems — databases, backups, caches, logs, analytics,
+       and third-party systems.
+
+    3. **Third-party deletion:** The operator must direct third parties to delete the
+       child's PI. This requires contractual provisions with third parties and a mechanism
+       to communicate deletion requests downstream.
+
+    4. **Service termination:** The operator may terminate the child's account if PI is
+       necessary for the service, but must warn the parent first. This cannot be used
+       as a punitive measure to discourage revocation.
+
+    5. **Timeliness:** Deletion should be prompt. The FTC expects operators to have
+       efficient deletion mechanisms, not manual processes that take weeks.
+
+    6. **Verification before deletion:** Operators should verify the requestor is the
+       parent before deleting data, to prevent malicious deletion requests. But
+       verification must not be so burdensome as to discourage exercise of the right.
+
+    7. **Confirmation:** After deletion, the operator should confirm completion to the
+       parent.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a consent revocation endpoint in the parent portal that triggers an
+         automated deletion cascade across all systems.
+      2. Build a data deletion orchestrator that coordinates deletion across microservices,
+         databases, caches, message queues, analytics systems, and backup systems.
+      3. Implement third-party deletion API integrations — when a parent revokes consent,
+         automatically send deletion requests to all third parties who received the child's PI.
+      4. Create a deletion verification service that confirms all systems have completed
+         deletion and generates a deletion certificate for the parent.
+      5. Build a pre-revocation notice flow that warns the parent if service termination
+         will result and requires explicit confirmation before proceeding.
+      6. Implement a deletion audit trail that records every system from which data was
+         deleted, timestamps, and confirmation status.
+      7. Handle backup deletion — implement scheduled purge of child PI from backup systems
+         where immediate deletion is not technically feasible, with documented timelines.
+    tools:
+      - data-deletion-service
+      - privacy-portal
+      - api-gateway
+      - audit-log
+      - workflow-engine
+      - backup-management
+
+  devsecops:
+    prose: |
+      1. Test deletion completeness — verify that after revocation, no child PI remains
+         in ANY system, including caches, search indices, analytics, and logs.
+      2. Test third-party deletion propagation — verify deletion requests are sent to all
+         third parties and responses are tracked.
+      3. Test the pre-revocation warning flow — verify parents are informed of service
+         termination consequences before deletion proceeds.
+      4. Implement data remnant scanning — after deletion, scan all data stores to verify
+         no orphaned PI remains.
+      5. Test deletion under load — verify the deletion cascade handles concurrent requests
+         and does not leave partial deletions.
+    tools:
+      - integration-testing
+      - data-remnant-scanner
+      - gitlab-ci
+      - api-testing
+      - load-testing
+
+  secops:
+    prose: |
+      1. Monitor deletion request volume and fulfillment times — alert on overdue requests.
+      2. Audit deletion completeness quarterly — sample completed deletions and verify
+         data is actually gone from all systems.
+      3. Track third-party deletion confirmations — flag third parties that fail to confirm
+         deletion within SLA.
+      4. Monitor for re-collection of data from children whose parents revoked consent —
+         the child may re-register, requiring new consent.
+      5. Report on deletion metrics: volume, average time to complete, third-party
+         compliance rates, and any failures.
+    tools:
+      - compliance-dashboard
+      - data-discovery
+      - third-party-risk-management
+      - audit-log
+
+legal_references:
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-105"]
+    relationship: complements
+  - framework_id: gdpr
+    articles: ["art. 17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18(VI)"]
+    relationship: equivalent-to

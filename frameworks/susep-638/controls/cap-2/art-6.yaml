@@ -1,0 +1,172 @@
+id: art-6
+family: cap-2
+title: "Procedimentos e Controles Tecnologicos"
+class: SUSEP-638
+statement:
+  prose: |
+    Art. 6. Os procedimentos e os controles de que trata o art. 4, inciso II, devem
+    abranger, no mínimo:
+    I - a autenticação, a criptografia, a prevenção e a detecção de intrusão, a
+    prevenção de vazamento de informações, a realização periódica de testes e varreduras
+    para detecção de vulnerabilidades, a proteção contra softwares maliciosos, o
+    estabelecimento de mecanismos de rastreabilidade, os controles de acesso e de
+    segmentação da rede de computadores e a manutenção de cópias de segurança dos
+    dados e das informações;
+    II - os controles específicos, incluindo os voltados para a rastreabilidade da
+    informação, que busquem garantir a segurança das informações sensíveis; e
+    III - a adoção de procedimentos e controles voltados à prevenção e ao tratamento
+    de incidentes a serem adotados por empresas prestadoras de serviços a
+    supervisionadas que manuseiem dados ou informações sensíveis ou que sejam
+    relevantes para a condução das atividades operacionais da supervisionada.
+guidance:
+  prose: |
+    O art. 6 detalha os controles tecnicos minimos obrigatorios. Cada item do
+    inciso I representa um controle especifico que deve estar implementado.
+
+    **Controles obrigatorios do inciso I:**
+
+    1. Autenticacao: controle de identidade e acesso a sistemas de seguros. MFA
+       obrigatorio para acesso a dados de segurados e sistemas core.
+    2. Criptografia: protecao de dados em transito e em repouso. Critico para
+       dados de saude de segurados e informacoes financeiras.
+    3. Prevencao e deteccao de intrusao: IDS/IPS monitorando acessos a sistemas
+       de cotacao, emissao e sinistros.
+    4. Prevencao de vazamento de informacoes (DLP): protecao contra exfiltracao
+       de dados de segurados, bases atuariais e informacoes proprietarias.
+    5. Testes e varreduras de vulnerabilidades: scans periodicos em todos os
+       sistemas da supervisionada, com priorizacao de sistemas expostos a internet.
+    6. Protecao contra malware: antivirus/EDR em todos os endpoints e servidores
+       que processam dados de seguros.
+    7. Rastreabilidade: logs de auditoria para todo acesso a dados de segurados,
+       alteracoes em apolices e processamento de sinistros.
+    8. Controles de acesso: RBAC com principio de menor privilegio para sistemas
+       de seguros. Segregacao de funcoes entre subscricao, sinistros e financeiro.
+    9. Segmentacao de rede: isolamento de redes entre sistemas core de seguros,
+       redes de corretores e redes administrativas.
+    10. Copias de seguranca: backup de dados de apolices, sinistros, provisoes
+        tecnicas e dados atuariais com teste de restauracao periodico.
+
+    **Inciso II - Informacoes sensiveis:**
+    Controles adicionais para dados classificados como sensiveis no mercado
+    segurador: dados de saude, laudos medicos, pericias, dados financeiros
+    detalhados de segurados.
+
+    **Inciso III - Prestadores de servicos:**
+    Extensao dos controles para toda a cadeia de valor: corretores com acesso
+    a sistemas, empresas de assistencia, peritos, oficinas credenciadas,
+    hospitais da rede referenciada, resseguradores.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Autenticacao:**
+      1. Identity Provider centralizado (IdP) com MFA para todos os acessos a
+         sistemas de seguros.
+      2. SSO (Single Sign-On) entre sistemas core: cotacao, emissao, sinistros, atuarial.
+      3. MFA obrigatorio para acesso a dados de segurados e operacoes financeiras.
+      4. Autenticacao forte para segurados no portal de autoatendimento.
+
+      **Criptografia:**
+      5. TLS 1.3 em todas as comunicacoes: segurado-seguradora, corretora-seguradora,
+         seguradora-resseguradora.
+      6. AES-256 para dados em repouso: bases de apolices, sinistros, dados atuariais.
+      7. Criptografia de campo para dados especialmente sensiveis (dados de saude, CPF).
+      8. KMS com rotacao automatica de chaves e separacao de chaves por dominio.
+
+      **IDS/IPS e segmentacao:**
+      9. Network IDS/IPS em pontos de fronteira da rede.
+      10. Host-based IDS em servidores de sistemas core de seguros.
+      11. Microsegmentacao: sistemas atuariais isolados, sistemas de sinistros isolados,
+          DMZ para portais de corretores.
+      12. Network policies em Kubernetes para isolamento de workloads de seguros.
+
+      **Backup e recuperacao:**
+      13. Backup automatizado de todas as bases de dados de seguros.
+      14. Backup imutavel (WORM) para protecao contra ransomware.
+      15. Teste de restauracao mensal de bases criticas (apolices, sinistros, provisoes).
+      16. Replicacao geografica de backups para disaster recovery.
+    tools:
+      - identity-provider
+      - kms-hsm
+      - vault
+      - network-ids-ips
+      - network-policies
+      - backup-solution
+      - waf
+  devsecops:
+    prose: |
+      **Deteccao de vulnerabilidades no pipeline:**
+      1. SAST (Static Application Security Testing) em todo merge request.
+      2. DAST (Dynamic Application Security Testing) em staging antes de deploy.
+      3. SCA (Software Composition Analysis) para vulnerabilidades em dependencias.
+      4. Container scanning para imagens de servicos de seguros.
+      5. Secret detection para prevenir vazamento de credenciais e chaves.
+
+      **Prevencao de vazamento (DLP no pipeline):**
+      6. Deteccao de dados de segurados (CPF, dados de saude) em codigo-fonte e logs.
+      7. Bloqueio de commit contendo dados sensiveis de segurados.
+      8. Sanitizacao automatica de dados em ambientes de teste.
+
+      **Rastreabilidade no desenvolvimento:**
+      9. Commit signing obrigatorio (GPG ou SSH keys).
+      10. Merge request audit trail com aprovacoes e revisoes.
+      11. Pipeline execution log com retencao por 5 anos.
+
+      **Controles de acesso ao repositorio:**
+      12. RBAC em repositorios: separacao entre sistemas core e suporte.
+      13. Branch protection rules para branches de producao.
+      14. Code owners obrigatorios para sistemas com dados de segurados.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - trivy
+      - semgrep
+      - gitleaks
+  secops:
+    prose: |
+      **Monitoramento integrado:**
+      1. SIEM com correlacao de eventos de todos os controles do art. 6.
+      2. SOC com monitoramento 24x7 para sistemas core de seguros.
+      3. Alertas priorizados por impacto ao segurado e risco regulatorio.
+
+      **Gestao de vulnerabilidades:**
+      4. Scans de vulnerabilidade semanais em sistemas expostos a internet.
+      5. Scans mensais em sistemas internos.
+      6. SLA de remediacao: critica 24h, alta 72h, media 30 dias, baixa 90 dias.
+      7. Pen test anual em sistemas core de seguros por empresa independente.
+
+      **DLP e rastreabilidade:**
+      8. DLP monitorando canais de saida: email, cloud storage, USB, impressao.
+      9. Monitoramento de acesso a dados de segurados com alertas de anomalia.
+      10. Revisao trimestral de logs de acesso a dados sensiveis.
+
+      **Gestao de prestadores (inciso III):**
+      11. Avaliacao de seguranca de corretores com acesso a sistemas.
+      12. Monitoramento de acessos de prestadores de servicos (peritos, assistencia).
+      13. Revisao semestral de acessos de terceiros.
+      14. Clausulas de seguranca cibernetica em contratos com prestadores.
+    tools:
+      - siem
+      - vulnerability-scanner
+      - dlp
+      - edr-xdr
+      - pen-test-tools
+      - third-party-risk-management
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-5"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "SC-8", "SC-12", "SC-13", "SC-28", "SI-3", "SI-4", "SI-7", "AC-2", "AC-3", "AC-4", "CP-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.15", "A.8.1", "A.8.5", "A.8.7", "A.8.9", "A.8.12", "A.8.13", "A.8.20", "A.8.24"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

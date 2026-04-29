@@ -1,0 +1,114 @@
+id: art-23
+family: cap-5
+title: "Analise de Operacoes Selecionadas"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 23. As operações e situações selecionadas pelo procedimento de monitoramento
+    devem ser analisadas com a finalidade de:
+    I - caracterizar ou descartar a suspeita de lavagem de dinheiro ou de financiamento
+    do terrorismo; e
+    II - fundamentar a decisão sobre a comunicação ao COAF.
+
+    Parágrafo único. A análise de que trata o caput deve ser registrada e
+    fundamentada, e ficar à disposição do Banco Central do Brasil e do COAF
+    por período mínimo de dez anos.
+guidance:
+  prose: |
+    O art. 23 trata da etapa final do ciclo de monitoramento: a analise das
+    operacoes selecionadas (alertas) para decisao sobre comunicacao ao COAF.
+
+    **Finalidade dupla da analise:**
+    1. Caracterizar ou descartar suspeita: a analise deve chegar a uma
+       conclusao definitiva (suspeito ou nao suspeito)
+    2. Fundamentar comunicacao: a conclusao deve ser suficientemente
+       documentada para justificar a decisao
+
+    **Registro e fundamentacao (paragrafo unico):**
+    Cada analise deve ser:
+    - Registrada: documentacao formal com dados do alerta, informacoes
+      coletadas, analise realizada e conclusao
+    - Fundamentada: justificativa tecnica para a decisao (por que e
+      suspeito ou por que foi descartado)
+    - Retida por 10 anos: mesma regra de retencao dos registros de operacoes
+
+    **Implicacao pratica:**
+    - Todo alerta deve ser analisado (nao pode ser simplesmente descartado)
+    - A analise deve seguir processo padronizado e auditavel
+    - A decisao deve ser tomada por pessoa qualificada
+    - Nao comunicar uma operacao suspeita e tao grave quanto nao detecta-la
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Case management de PLD/FT:**
+      1. Plataforma de case management com workflow de analise:
+         - Atribuicao automatica ao analista (round-robin ou por especialidade)
+         - Coleta de informacoes complementares (historico do cliente, operacoes
+           relacionadas, dados de fontes externas)
+         - Registro de analise com campos obrigatorios
+         - Decisao: comunicar COAF / descartar / escalar
+         - Aprovacao pelo supervisor
+      2. Tela de analise com visao 360 do cliente: dados cadastrais,
+         historico transacional, alertas anteriores, comunicacoes ao COAF.
+      3. Timeline de eventos por cliente para contextualizacao.
+      4. Vinculacao de alertas relacionados (mesmo cliente, mesma operacao).
+
+      **Registro e retencao:**
+      5. Registro imutavel de cada analise com timestamp, analista, conclusao.
+      6. Anexacao de evidencias (prints, documentos, fontes consultadas).
+      7. Retencao de 10 anos com politica de lifecycle automatizada.
+      8. Exportacao de analises para entrega ao BCB/COAF quando solicitado.
+    tools:
+      - case-management
+      - aml-platform
+      - data-lake
+      - document-management
+  devsecops:
+    prose: |
+      **Qualidade do processo de analise:**
+      1. Testes de workflow de analise (fluxo completo: alerta -> analise -> decisao).
+      2. Testes de campos obrigatorios (analise nao pode ser concluida sem
+         fundamentacao).
+      3. Testes de segregacao de funcoes (analista != aprovador).
+      4. Testes de retencao (verificar que analises nao sao excluidas antes
+         do prazo).
+
+      **Automacao de apoio a analise:**
+      5. Sugestao automatica de conclusao baseada em padroes historicos.
+      6. Pre-preenchimento de informacoes complementares.
+      7. Templates de analise por tipo de cenario/alerta.
+      8. Metricas de produtividade do analista.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - ml-platform
+      - case-management
+  secops:
+    prose: |
+      **Gestao operacional:**
+      1. SLA de analise por prioridade: critico (24h), alto (48h), medio (5 dias),
+         baixo (10 dias).
+      2. Monitoramento de backlog com alertas de envelhecimento.
+      3. Redistribuicao automatica quando analista esta sobrecarregado.
+      4. Revisao de qualidade de analises por amostragem (QA).
+
+      **Governanca:**
+      5. Relatorio mensal de volume de alertas, analises e decisoes.
+      6. Metricas de produtividade e qualidade por analista.
+      7. Treinamento continuo de analistas com casos reais (anonimizados).
+      8. Auditoria anual do processo de analise pela auditoria interna.
+    tools:
+      - aml-platform
+      - case-management
+      - reporting-dashboard
+      - training-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "IR-4", "IR-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.25", "A.8.15"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-46"]
+    relationship: complements

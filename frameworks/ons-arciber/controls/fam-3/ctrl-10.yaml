@@ -1,0 +1,95 @@
+id: ctrl-10
+family: fam-3
+title: "Autenticacao e Identificacao de Usuarios no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar mecanismos de autenticação para controle
+    de acesso lógico a todos os sistemas do ARCiber, exigindo identificação
+    individual de cada usuário. Para sistemas críticos do ARCiber (SCADA, EMS,
+    DMS, sistemas de proteção), deve ser implementada autenticação multifator
+    (MFA) onde tecnicamente viável. O uso de autenticação baseada em senhas
+    deve seguir política de complexidade e renovação definida. Credenciais
+    padrão de fabricante devem ser obrigatoriamente alteradas antes da
+    instalação de qualquer ativo no ARCiber.
+
+guidance:
+  prose: >-
+    A autenticacao em ambientes OT/ICS e mais complexa que em IT por restricoes
+    de latencia, disponibilidade e suporte de sistemas legados. A implementacao
+    deve considerar: (i) MFA para acesso a SCADA, EMS e sistemas de supervisao
+    de nivel 2-3 da ISA-95 — solucoes como tokens TOTP, smart cards ou biometria
+    que nao introduzam latencia inaceitavel nas operacoes; (ii) para sistemas
+    de nivel 0-1 (PLCs, RTUs) onde MFA nao e tecnicamente viavel, implementar
+    controles compensatorios (acesso fisico restrito, monitoramento reforçado,
+    PAM com cofre de senhas); (iii) politica de senhas: minimo 12 caracteres,
+    complexidade obrigatoria, renovacao a cada 90 dias para contas privilegiadas;
+    (iv) bloqueio de conta apos 5 tentativas de autenticacao invalidas;
+    (v) nenhum sistema do ARCiber deve usar credenciais padrao de fabricante.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar MFA para todos os usuarios com acesso a sistemas SCADA/EMS
+      do ARCiber usando solucao compativel com ambientes OT (RSA SecurID, Duo
+      Security ou similar) sem impacto inaceitavel na disponibilidade operacional.
+      Integrar sistemas do ARCiber que suportam LDAP/RADIUS ao diretorio
+      corporativo para autenticacao centralizada. Implementar CyberArk ou
+      BeyondTrust para rotacao automatica de senhas de contas privilegiadas
+      em sistemas OT, eliminando o uso de senhas estaticas de longo prazo.
+      Auditar e alterar todas as credenciais padrao de fabricante antes do
+      comissionamento de novos ativos no ARCiber — automatizar via Ansible.
+    tools:
+      - cyberark
+      - beyondtrust
+      - duo-security
+      - rsa-securid
+      - ansible
+  devsecops:
+    prose: >-
+      Implementar verificacao automatizada no pipeline de comissionamento de
+      novos ativos OT para detectar credenciais padrao conhecidas (usando bases
+      como DefaultCreds-Cheatsheet). Criar alertas de seguranca para tentativas
+      de autenticacao com credenciais padrao nos sistemas do ARCiber. Implementar
+      testes automatizados de politica de senhas como parte da validacao de
+      configuracao de novos sistemas. Documentar excecoes de MFA com analise
+      de risco e controles compensatorios aprovados pelo RSCA.
+    tools:
+      - gitlab-ci
+      - ansible
+      - nessus
+      - cyberark
+  secops:
+    prose: >-
+      Monitorar e alertar para: autenticacoes falhas repetidas (potencial brute
+      force), logins bem-sucedidos fora de horario esperado, logins de contas
+      inativas, e tentativas de uso de credenciais padrao. Realizar scan semestral
+      de credenciais padrao em todos os ativos do ARCiber. Revisar anualmente a
+      politica de senhas e MFA do ARCiber para garantir alinhamento com as
+      melhores praticas e requisitos regulatorios. Manter registro de todas as
+      alteracoes de credenciais privilegiadas nos sistemas do ARCiber.
+    tools:
+      - splunk
+      - cyberark
+      - nozomi-networks
+      - tenable-ot
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR1.1", "62443-3-3 SR1.5"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.5", "a8.6"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-5", "IA-6"]
+    relationship: mapped

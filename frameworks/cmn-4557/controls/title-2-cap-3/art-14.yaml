@@ -1,0 +1,133 @@
+id: art-14
+family: title-2-cap-3
+title: "Backtesting e Validacao de Modelos de Mercado"
+class: CMN-4557
+statement:
+  prose: |
+    Art. 14. A estrutura de gerenciamento do risco de mercado deve contemplar:
+    I - programas de backtesting para avaliação da adequação dos modelos de risco de mercado;
+    II - validação independente periódica dos modelos utilizados;
+    III - procedimentos de ajuste quando os modelos apresentarem deficiências;
+    IV - documentação completa das metodologias e premissas dos modelos.
+guidance:
+  prose: |
+    O art. 14 e especificamente sobre validacao e backtesting de modelos de risco de
+    mercado. Complementa o art. 11 (modelos de credito) para o dominio de mercado.
+
+    **Backtesting de VaR (inciso I):**
+
+    **Metodologia:**
+    Comparar VaR previsto (ex-ante) com P&L realizado (ex-post) diariamente.
+    Se VaR 99% 1 dia, espera-se no maximo 2-3 excecoes em 250 dias uteis.
+
+    **Traffic light approach (Basileia):**
+    - Zona verde: 0-4 excecoes em 250 dias -> modelo OK
+    - Zona amarela: 5-9 excecoes -> monitoramento intensificado
+    - Zona vermelha: 10+ excecoes -> modelo inadequado, acao corretiva
+
+    **Tipos de backtesting:**
+    - Clean backtesting: P&L hipotetico (posicoes fixas) vs. VaR
+    - Dirty backtesting: P&L real (incluindo novas operacoes) vs. VaR
+    - Por fator de risco: backtesting para cada componente de VaR
+
+    **Validacao independente (inciso II):**
+    - Equipe de validacao independente do desenvolvimento
+    - Validacao conceitual: modelo teoricamente correto?
+    - Validacao de implementacao: codigo implementa modelo corretamente?
+    - Validacao outcomes-based: modelo performa bem empiricamente?
+
+    **Procedimentos de ajuste (inciso III):**
+    Quando modelo falha:
+    - Investigar causa: dados? parametros? metodologia? evento atipico?
+    - Ajustar parametros se necessario (ex: janela de observacao)
+    - Trocar metodologia se necessario (ex: parametrico -> simulacao historica)
+    - Aplicar multiplicador de seguranca enquanto modelo esta em revisao
+    - Documentar decisao e comunicar regulador se aplicavel
+
+    **Documentacao (inciso IV):**
+    - Model book com metodologia detalhada para cada modelo
+    - Premissas explicitas (ex: normalidade dos retornos, horizonte temporal)
+    - Limitacoes reconhecidas (ex: VaR nao captura tail risk)
+    - Resultados de backtesting e validacao historicos
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Backtesting automatizado:**
+      1. Pipeline diario de backtesting: VaR T-1 vs. P&L T comparacao automatica.
+      2. Rolling window backtesting com 250 dias uteis.
+      3. Traffic light dashboard com contagem de excecoes em tempo real.
+      4. P&L decomposition engine para atribuicao de excecoes a fatores de risco.
+
+      **Infraestrutura de validacao:**
+      5. Challenger model framework: manter modelos alternativos para comparacao.
+      6. Benchmark comparison: VaR interno vs. VaR de modelo padrao regulatorio.
+      7. Model documentation repository com versionamento.
+      8. Automated report generation para resultados de backtesting e validacao.
+
+      **Procedimentos de ajuste (III):**
+      9. Model adjustment workflow com aprovacao e rastreabilidade.
+      10. Multiplicador de seguranca automatico quando zona amarela/vermelha.
+      11. A/B testing para comparar modelo atual com modelo ajustado.
+      12. Rollback capability para reverter ajustes que pioram performance.
+    tools:
+      - risk-engine
+      - model-registry
+      - bi-platform
+      - workflow-engine
+  devsecops:
+    prose: |
+      **MLOps para modelos de mercado:**
+      1. CI/CD para modelos de VaR com backtesting como gate obrigatorio.
+      2. Testes automatizados: excecoes, Kupiec test, Christoffersen test.
+      3. Performance benchmarks: tempo de calculo dentro do SLA.
+      4. Regression tests: mudanca em modelo nao pode piorar backtesting sem justificativa.
+
+      **Reproducibilidade:**
+      5. Data snapshot diario para reproducibilidade de VaR historico.
+      6. Model versioning com parametros e dados rastreados.
+      7. Containerizacao de modelos para consistencia entre ambientes.
+      8. Audit trail de todas as mudancas em modelos e parametros.
+
+      **Documentacao como codigo:**
+      9. Model documentation gerada automaticamente a partir de codigo e metadados.
+      10. Changelog automatico para mudancas em modelos de mercado.
+      11. LaTeX/Markdown templates para documentacao padronizada de modelos.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - docker
+      - model-registry
+  secops:
+    prose: |
+      **Governanca de modelos de mercado:**
+      1. Comite de modelos com revisao trimestral de resultados de backtesting.
+      2. Plano anual de validacao de modelos de mercado.
+      3. Processo de escalacao quando modelo entra em zona amarela/vermelha.
+      4. Comunicacao ao BCB quando modelo apresenta deficiencias significativas.
+
+      **Backtesting operacional:**
+      5. Backtesting diario com relatorio matinal para risk management.
+      6. Analise de excecoes com root cause documentation.
+      7. Tracking de excecoes acumuladas e tendencias ao longo do tempo.
+      8. Comparacao de backtesting entre periodos para detectar degradacao.
+
+      **Validacao independente:**
+      9. Equipe de validacao com mandato e recursos independentes.
+      10. Relatorio de validacao com findings e recomendacoes.
+      11. Follow-up de findings ate resolucao completa.
+      12. Reporte de resultados de validacao ao comite de riscos e BCB.
+    tools:
+      - model-validation-platform
+      - risk-management-platform
+      - grc-platform
+      - reporting-platform
+legal_references:
+  - framework_id: basel-iii
+    articles: ["pillar-1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-15", "CA-2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.8", "A.8.25"]
+    relationship: supports

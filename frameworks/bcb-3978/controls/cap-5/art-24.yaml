@@ -1,0 +1,120 @@
+id: art-24
+family: cap-5
+title: "Periodicidade do Monitoramento"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 24. O monitoramento de que trata o art. 21 deve ser realizado de forma contínua
+    e abranger, no mínimo:
+    I - a verificação da compatibilidade das operações com as informações cadastrais e
+    com o perfil de risco do cliente;
+    II - a verificação da compatibilidade das operações com a capacidade econômico-
+    financeira do cliente; e
+    III - a identificação de operações que possam configurar indícios de lavagem de
+    dinheiro ou de financiamento do terrorismo.
+
+    Parágrafo único. A instituição deve estabelecer a periodicidade de execução dos
+    procedimentos de monitoramento proporcionalmente ao risco identificado.
+guidance:
+  prose: |
+    O art. 24 reforca a continuidade do monitoramento e define as verificacoes
+    minimas obrigatorias.
+
+    **Monitoramento continuo:**
+    "De forma continua" nao significa necessariamente em tempo real para todas
+    as operacoes, mas sim que o monitoramento e permanente e sem interrupcoes.
+    A periodicidade pode variar conforme o risco (paragrafo unico).
+
+    **Verificacoes obrigatorias:**
+    1. Compatibilidade operacoes vs. cadastro: verificar se as operacoes
+       realizadas sao coerentes com a atividade declarada, localizacao,
+       tipo de conta e demais dados cadastrais.
+    2. Compatibilidade operacoes vs. capacidade financeira: o indicador
+       mais importante de lavagem de dinheiro. Operacoes que excedem
+       significativamente a renda/faturamento declarado sao red flags.
+    3. Indicios de PLD/FT: alem da compatibilidade com perfil, buscar
+       padroes tipicos de lavagem e financiamento.
+
+    **Proporcionalidade (paragrafo unico):**
+    Periodicidade diferenciada por risco:
+    - Alto risco: monitoramento em tempo real ou near-real-time
+    - Medio risco: monitoramento diario (batch)
+    - Baixo risco: monitoramento semanal ou mensal (batch)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Monitoramento por camadas:**
+      1. Real-time layer: processamento de stream para regras imediatas
+         (sancoes, alto risco, PEP, valor elevado). Latencia < 5 segundos.
+      2. Near-real-time layer: processamento batch de curta duracao
+         (a cada hora) para regras de perfil comportamental.
+      3. Batch layer: processamento diario para analise de padroes
+         (acumulados, frequencia, tendencias).
+      4. Long-term layer: analise semanal/mensal para deteccao de
+         padroes complexos (redes, ciclos).
+
+      **Verificacao de compatibilidade (incisos I-II):**
+      5. Modelo de perfil transacional esperado por cliente baseado em
+         dados cadastrais (atividade, renda, localizacao, tipo de conta).
+      6. Calculo de desvio entre operacoes reais e perfil esperado.
+      7. Alerta quando desvio excede threshold por categoria de risco.
+      8. Atualizacao dinamica do perfil esperado conforme comportamento
+         legitimo evolui (evitar falsos positivos).
+
+      **Periodicidade configuravel:**
+      9. Parametrizacao da periodicidade de monitoramento por categoria
+         de risco sem necessidade de deploy.
+      10. Scheduler inteligente que prioriza clientes de alto risco.
+    tools:
+      - transaction-monitoring
+      - event-streaming
+      - batch-processing
+      - scoring-engine
+  devsecops:
+    prose: |
+      **Testes de monitoramento continuo:**
+      1. Testes de continuidade: verificar que monitoramento nao tem gaps.
+      2. Testes de latencia por layer (real-time < 5s, batch < 24h).
+      3. Testes de compatibilidade: cenarios de operacao compativel e
+         incompativel com perfil cadastral e financeiro.
+      4. Testes de periodicidade por categoria de risco.
+
+      **Observabilidade:**
+      5. Metricas de volume processado por layer e por periodo.
+      6. Alertas de atraso no processamento batch.
+      7. Monitoramento de health do pipeline de monitoramento.
+      8. Dashboards de SLA de monitoramento.
+    tools:
+      - gitlab-ci
+      - monitoring
+      - performance-testing
+      - observability
+  secops:
+    prose: |
+      **Operacao do monitoramento:**
+      1. Verificacao diaria de que monitoramento batch foi executado.
+      2. Escalacao imediata quando monitoramento real-time esta indisponivel.
+      3. Relatorio de incidentes de indisponibilidade do monitoramento.
+      4. Plano de contingencia para monitoramento manual quando sistema
+         esta indisponivel.
+
+      **Efetividade:**
+      5. Metricas de deteccao por tipo de verificacao (I, II, III).
+      6. Analise de comunicacoes ao COAF por tipo de cenario.
+      7. Identificacao de gaps de cobertura (tipos de operacao nao monitorados).
+      8. Relatorio trimestral de efetividade ao comite de PLD/FT.
+    tools:
+      - aml-platform
+      - monitoring
+      - reporting-dashboard
+      - incident-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "SI-4", "CA-7"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-46"]
+    relationship: complements

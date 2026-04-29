@@ -1,0 +1,80 @@
+id: pw-6
+family: pw
+title: "Configure the Compilation, Interpreter, and Build Processes"
+class: SP800-218
+statement:
+  prose: >-
+    Decrease the number of security vulnerabilities in the software and strengthen the
+    protection of the software against exploitation by configuring the compilation, interpreter,
+    and build processes to improve executable security characteristics.
+  parts:
+    - id: pw-6_smt.a
+      label: "a."
+      prose: >-
+        Enable compiler security features such as stack canaries, address space layout
+        randomization (ASLR), position-independent executables (PIE), control flow integrity
+        (CFI), and other hardening flags appropriate to the target language and platform.
+    - id: pw-6_smt.b
+      label: "b."
+      prose: >-
+        Configure build processes to enable all applicable warnings and treat security-relevant
+        warnings as errors to prevent vulnerable code from being compiled.
+    - id: pw-6_smt.c
+      label: "c."
+      prose: >-
+        Ensure that build processes are reproducible and documented, producing identical outputs
+        from identical inputs to enable independent verification of build integrity.
+guidance:
+  prose: >-
+    Compiler and build configuration settings can significantly enhance the security of
+    produced executables. Modern compilers offer hardening features that make exploitation of
+    vulnerabilities more difficult: stack protectors detect buffer overflows, ASLR randomizes
+    memory layout, PIE enables full ASLR, and CFI prevents control flow hijacking. These
+    features should be enabled by default in all build configurations. Additionally, reproducible
+    builds enable independent verification that a given binary was produced from the claimed
+    source code, strengthening supply chain integrity. Build configurations should be managed
+    as code and subject to the same review and change control as source code.
+references:
+  - citation: "NIST SP 800-218 Section 2.3"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "Reproducible Builds"
+    url: "https://reproducible-builds.org/"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide hardened build configurations as part of platform-maintained software templates.
+      Enforce compiler hardening flags through centralized build system configurations that
+      projects inherit by default. Implement build reproducibility verification in the platform's
+      CI/CD infrastructure. Maintain a standard set of approved build toolchain versions and
+      configurations. Provide pre-configured build containers with hardening flags enabled.
+    tools:
+      - "Bazel / Buck2 (hermetic builds)"
+      - "Nix / Guix (reproducible builds)"
+      - "Distroless / Chainguard Images"
+      - "GCC/Clang hardening flags"
+      - "Backstage Software Templates"
+  devsecops:
+    prose: >-
+      Enforce compiler hardening flags in CI/CD pipelines through build configuration validation.
+      Implement pipeline checks that verify hardening flags are enabled and fail builds that
+      omit required security configurations. Use containerized build environments with
+      pre-configured hardening. Validate build reproducibility by periodically rebuilding
+      artifacts and comparing outputs. Document build configurations as code alongside source
+      code in version control.
+    tools:
+      - "GitLab CI/CD"
+      - "Docker Multi-stage Builds"
+      - "Checksec (binary hardening verification)"
+      - "Diffoscope (reproducibility verification)"
+      - "Hadolint (Dockerfile linting)"
+  secops:
+    prose: >-
+      Audit build configurations to verify that security hardening flags are enabled across
+      all projects. Monitor for build configuration changes that disable security features.
+      Verify binary hardening of production artifacts using tools like checksec. Report on
+      build hardening compliance across the software portfolio.
+    tools:
+      - "Checksec"
+      - "SIEM (Splunk, Elastic Security)"
+      - "GitLab Audit Events"
+      - "Binary analysis tools"

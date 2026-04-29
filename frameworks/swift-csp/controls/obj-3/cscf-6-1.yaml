@@ -1,0 +1,108 @@
+id: cscf-6.1
+family: obj-3
+title: "Malware Protection"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Protect all systems within the SWIFT secure zone against malware through
+    deployment of anti-malware solutions, application whitelisting, and
+    behavioral detection capabilities. Malware defenses must be kept current
+    and configured to provide real-time protection and alerting.
+  parts:
+    - id: cscf-6.1.a
+      label: "6.1.a"
+      prose: >-
+        Anti-malware software with real-time scanning is deployed on all
+        servers and operator workstations within the SWIFT secure zone.
+        Signature databases are updated at least daily.
+    - id: cscf-6.1.b
+      label: "6.1.b"
+      prose: >-
+        Application whitelisting or equivalent endpoint detection and
+        response (EDR) capabilities are deployed on critical systems to
+        detect and prevent execution of unauthorized code.
+    - id: cscf-6.1.c
+      label: "6.1.c"
+      prose: >-
+        Removable media scanning is enforced before any external media
+        is connected to systems within the secure zone.
+
+guidance:
+  prose: >-
+    Malware has been a primary attack vector in SWIFT-related breaches.
+    Attackers deploy custom malware to manipulate SWIFT messaging applications,
+    alter transaction records, and cover their tracks. Traditional signature-based
+    antivirus alone is insufficient against targeted attacks; organizations
+    must layer behavioral detection (EDR/XDR), application whitelisting,
+    and memory protection. SWIFT-specific malware families (e.g., Hermes,
+    KillDisk variants) have been documented; detection signatures for these
+    should be prioritized. Regular full-system scans should complement
+    real-time protection.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 6.1"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-83 Rev. 1 — Guide to Malware Incident Prevention and Handling"
+    url: "https://doi.org/10.6028/NIST.SP.800-83r1"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy EDR/XDR solutions (CrowdStrike Falcon, Microsoft Defender for
+      Endpoint, SentinelOne) on all secure zone endpoints. Implement
+      application whitelisting (AppLocker, Carbon Black App Control) on
+      operator PCs and critical servers. Configure anti-malware to scan
+      all file operations in real time with cloud-based lookup for zero-day
+      detection. Deploy USB device control policies blocking unauthorized
+      removable media. Use network-level malware detection (sandboxing)
+      at the secure zone boundary.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-endpoint
+      - sentinelone
+      - carbon-black
+      - applocker
+      - palo-alto-wildfire
+
+  devsecops:
+    prose: >-
+      Scan deployment artifacts (container images, VM templates) for
+      malware before promotion to the secure zone. Validate that anti-malware
+      agents are included in all golden image builds. Automate EDR
+      deployment verification through infrastructure compliance checks
+      in CI/CD.
+    tools:
+      - trivy
+      - clamav
+      - inspec
+      - ansible
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor EDR alerts in real time with 24/7 coverage for the secure
+      zone. Investigate all malware detections as potential incidents.
+      Correlate malware indicators with threat intelligence feeds specific
+      to financial sector threats. Conduct quarterly reviews of anti-malware
+      effectiveness and false positive rates. Run malware simulation
+      exercises to validate detection capabilities.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-xdr
+      - splunk
+      - elastic-siem
+      - virustotal
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-3(2)", "SI-4"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.7"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-5.1", "req-5.2", "req-5.3"]
+    relationship: complements

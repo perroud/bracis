@@ -1,0 +1,87 @@
+id: de.ae-01
+family: de
+title: "Adverse Event Analysis - Estimated impact and scope of adverse events are understood"
+class: CSF2
+
+statement:
+  prose: >-
+    Estimated impact and scope of adverse events are understood.
+
+guidance:
+  prose: >-
+    When potential security events are detected, the organization must quickly assess
+    their scope and potential impact to determine the appropriate response. Analysis
+    should determine: which assets are affected, what data may be compromised, the
+    attack vector and technique used (mapped to MITRE ATT&CK), whether the event is
+    ongoing or contained, and the potential business impact. Effective adverse event
+    analysis requires correlation across multiple data sources (logs, network traffic,
+    endpoint telemetry, threat intelligence), trained analysts, and documented
+    analysis procedures. The analysis should support timely escalation decisions
+    by providing clear impact assessments tied to business context.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, DE.AE-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement comprehensive observability infrastructure that supports security
+      event analysis. Deploy distributed tracing (OpenTelemetry, Jaeger) that enables
+      analysts to trace request flows through microservices to identify the blast
+      radius of an event. Maintain infrastructure topology maps that show service
+      dependencies, enabling rapid impact assessment when a component is compromised.
+      Implement automated impact scoring that correlates affected assets with their
+      criticality tier and data classification to estimate business impact. Deploy
+      forensic collection capabilities (memory dumps, disk snapshots, log archives)
+      that can be triggered automatically when high-severity events are detected.
+    tools:
+      - opentelemetry
+      - jaeger
+      - grafana
+      - backstage-topology
+      - aws-detective
+      - gcp-chronicle
+
+  devsecops:
+    prose: >-
+      Ensure application logs contain sufficient context for security event analysis:
+      correlation IDs, user identifiers, source IPs, action performed, and resources
+      accessed. Implement audit trails for all CI/CD pipeline actions, enabling
+      forensic analysis of supply chain attacks. Maintain immutable build artifacts
+      and provenance records (SLSA) that support post-incident analysis of whether
+      deployed artifacts were tampered with. Tag all deployments with commit SHA,
+      pipeline ID, and approver for rapid identification of which code version is
+      running when incidents occur.
+    tools:
+      - opentelemetry
+      - gitlab-audit-events
+      - slsa-provenance
+      - cosign
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Implement structured incident analysis procedures following frameworks like
+      MITRE ATT&CK. Use SIEM correlation rules to automatically enrich events with
+      context from multiple sources. Maintain analyst playbooks for common event types
+      that guide investigation steps and data collection. Deploy SOAR (Security
+      Orchestration, Automation, and Response) to automate routine enrichment tasks
+      (IP reputation lookup, user context retrieval, asset ownership lookup). Conduct
+      tabletop exercises quarterly to practice adverse event analysis procedures.
+      Track mean-time-to-triage (MTTT) and mean-time-to-understand (MTTU) as key
+      detection metrics.
+    tools:
+      - splunk-soar
+      - palo-alto-xsoar
+      - thehive
+      - mitre-attack-navigator
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-5", "SI-4"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.25", "A8.16"]
+    relationship: supports

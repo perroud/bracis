@@ -1,0 +1,96 @@
+id: art-5
+family: cap-2
+title: "Classificacao da Informacao para Nuvem"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 5. Os órgãos e entidades devem classificar as informações conforme os níveis
+    de sigilo previstos na legislação vigente, previamente à sua disponibilização em
+    soluções de computação em nuvem.
+
+    Parágrafo 1. A classificação deve considerar a sensibilidade, o valor, a
+    criticidade e os requisitos legais e regulamentares aplicáveis à informação.
+
+    Parágrafo 2. As informações classificadas nos graus de sigilo ultrassecreto,
+    secreto e reservado, nos termos da Lei n. 12.527, de 18 de novembro de 2011,
+    não poderão ser tratadas em soluções de computação em nuvem pública.
+guidance:
+  prose: |
+    O art. 5 estabelece a obrigatoriedade de classificacao previa da informacao
+    antes de qualquer migacao para nuvem, e proibe dados classificados em nuvem
+    publica.
+
+    **Niveis de classificacao (Lei 12.527/2011 - LAI):**
+    - Ultrassecreto: 25 anos de sigilo - PROIBIDO em nuvem publica
+    - Secreto: 15 anos de sigilo - PROIBIDO em nuvem publica
+    - Reservado: 5 anos de sigilo - PROIBIDO em nuvem publica
+    - Ostensivo/Publico: sem restricao - PERMITIDO em nuvem publica
+
+    **Dados pessoais (LGPD):**
+    Dados pessoais sensiveis exigem avaliacao adicional de risco antes de
+    armazenamento em nuvem, mesmo que nao sejam classificados.
+
+    **Mapeamento CSA CCM v4:**
+    - DSP-01: Data Security & Privacy Lifecycle Management
+    - DSP-04: Data Classification
+
+    **Mapeamento ISO 27017:**
+    - A.8.2: Information Classification (cloud specific)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de classificacao de dados:**
+      1. Implementar ferramenta de Data Loss Prevention (DLP) que classifique
+         automaticamente dados antes de upload para nuvem.
+      2. Criar politicas de tagging obrigatorio: todo dado armazenado em nuvem
+         deve ter tag de classificacao (publico, interno, restrito, classificado).
+      3. Bloquear automaticamente upload de dados classificados (ultrassecreto,
+         secreto, reservado) para nuvem publica.
+      4. Scanner de conteudo que detecte informacoes classificadas em repositorios
+         de nuvem e alerte o gestor de seguranca.
+    tools:
+      - dlp
+      - data-classification-engine
+      - tagging-policy
+      - content-scanner
+  devsecops:
+    prose: |
+      **Classificacao no pipeline:**
+      1. Scan de dados em repositorios de codigo que identifique informacoes
+         classificadas antes do deploy para ambientes em nuvem.
+      2. Validacao automatica de que dados classificados nao sejam referenciados
+         em configuracoes de nuvem publica.
+      3. Testes de conformidade que verifiquem tags de classificacao em todos
+         os recursos de nuvem provisionados.
+      4. Bloqueio de pipeline caso dados classificados sejam detectados em
+         destino de nuvem publica.
+    tools:
+      - gitlab-ci
+      - secret-detection
+      - data-scanner
+      - compliance-pipeline
+  secops:
+    prose: |
+      **Auditoria de classificacao:**
+      1. Inventario periodico de dados armazenados em nuvem com sua classificacao.
+      2. Auditoria trimestral que valide que nenhum dado classificado reside em
+         nuvem publica.
+      3. Monitoramento continuo de DLP para deteccao de vazamento de dados
+         classificados para ambientes de nuvem nao autorizados.
+      4. Processo de reclassificacao quando dados mudam de nivel de sigilo.
+    tools:
+      - dlp
+      - data-inventory
+      - grc-platform
+      - audit-trail
+legal_references:
+  - framework_id: gsi-in3
+    articles: ["art-2", "art-3", "art-4"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-5", "art-11", "art-12"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["DSP-01", "DSP-04"]
+    relationship: mapped

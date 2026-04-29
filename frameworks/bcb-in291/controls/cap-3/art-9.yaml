@@ -1,0 +1,136 @@
+id: art-9
+family: cap-3
+title: "Responsavel pela Notificacao e Governanca do Processo"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 9. A instituição deve designar formalmente o responsável pela
+    notificação de incidentes de segurança cibernética ao BCB, observando:
+
+    I - o responsável deve ter nível hierárquico compatível com a relevância
+    regulatória da função, preferencialmente vinculado à diretoria de segurança
+    cibernética, compliance ou equivalente;
+    II - deve haver designação formal de substituto para garantir cobertura
+    24 (vinte e quatro) horas por dia, 7 (sete) dias por semana;
+    III - o responsável e seu substituto devem ter acesso garantido ao canal
+    oficial de notificação e às informações necessárias para o exercício da função;
+    IV - a designação do responsável deve ser comunicada ao BCB e atualizada
+    sempre que houver alteração.
+
+    § 1. O responsável pela notificação não precisa ser o mesmo que gestiona
+    tecnicamente o incidente, mas deve ter autoridade para tomar a decisão de
+    notificação sem necessidade de aprovação adicional.
+
+    § 2. A decisão de não notificar um incidente que atinja os limiares do art. 4
+    deve ser documentada com justificativa técnica e aprovada pelo nível hierárquico
+    superior ao responsável designado.
+guidance:
+  prose: |
+    O art. 9 resolve um problema de governanca frequente: quem tem a autoridade
+    e responsabilidade de notificar o BCB?
+
+    **Nivel hierarquico (inciso I):**
+    A designacao de um analista operacional como responsavel sem poderes de decisao
+    viola o espirito do artigo. O responsavel precisa de autonomia para decidir
+    notificar sem aprovacoes em cadeia que consumam o prazo de 24h.
+    Perfis adequados: CISO, Chief Risk Officer (CRO), Diretor de Compliance,
+    Diretor de Operacoes com foco em seguranca.
+
+    **Cobertura 24/7 (inciso II):**
+    Incidentes nao respeitam horario comercial. O substituto deve ter as mesmas
+    capacidades do titular: acesso ao canal BCB, ao sistema de incidentes, e
+    autoridade para assinar a notificacao. A cadeia de substituicao deve ter
+    ao menos dois niveis (titular -> substituto 1 -> substituto 2).
+
+    **Comunicacao ao BCB (inciso IV):**
+    O BCB mantem cadastro dos responsaveis de notificacao de incidentes de cada
+    instituicao. Este cadastro deve ser atualizado em ate 5 dias uteis de qualquer
+    alteracao (demissao, mudanca de cargo, licenca prolongada).
+
+    **Separacao de papeis (ss 1):**
+    O gestor tecnico do incidente (geralmente um lider de SOC ou incident commander)
+    pode ser diferente do responsavel pela notificacao ao BCB. Esta separacao evita
+    que a pessoa gerenciando o caos tecnico do incidente tenha que lidar
+    simultaneamente com a comunicacao regulatoria.
+
+    **Decisao de nao notificar (ss 2):**
+    A ausencia de notificacao quando os limiares do art. 4 sao atingidos e uma
+    violacao grave. Por isso, a decisao de nao notificar exige nivel hierarquico
+    superior ao do responsavel e documentacao robusta.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de gestao de responsaveis:**
+      1. Cadastro digital do responsavel e substitutos:
+         - Dados pessoais, cargo, contatos 24/7 (celular, email)
+         - Nivel de acesso ao canal BCB (login, certificado)
+         - Acesso ao sistema de incidentes (perfil, permissoes)
+         - Vigencia da designacao formal
+      2. Alertas automaticos de escalacao baseados no responsavel designado:
+         - Incidente de nivel Alto/Critico -> notificacao automatica ao responsavel
+         - Se nao houver confirmacao de leitura em 30 min -> escalacao ao substituto
+         - Se substituto tambem nao confirmar em 30 min -> escalacao ao nivel superior
+      3. Rotacao de plantao automatizada:
+         sistema que atualiza automaticamente quem e o "oncall" de notificacao
+         regulatoria a cada turno.
+      4. Integracao com calendario para identificar automaticamente o responsavel
+         de plantao em qualquer data e hora.
+    tools:
+      - incident-management
+      - on-call-management
+      - notification-system
+      - grc-platform
+  devsecops:
+    prose: |
+      **Acesso seguro do responsavel ao canal BCB:**
+      1. Conta no canal BCB com autenticacao multifator para cada responsavel
+         e substituto, com acesso verificado mensalmente.
+      2. Certificado digital ICPBrasil de cada responsavel armazenado em
+         cofre de credenciais com acesso controlado e auditado.
+      3. Script de teste de acesso ao canal BCB executado mensalmente em
+         ambiente de teste, confirmando que as credenciais estao validas.
+      4. Automacao de renovacao de acessos ao canal BCB antes da expiracao.
+    tools:
+      - secrets-manager
+      - certificate-management
+      - gitlab-ci
+      - identity-management
+  secops:
+    prose: |
+      **Governanca do responsavel de notificacao:**
+      1. Ato formal de designacao (portaria interna ou deliberacao da diretoria)
+         com:
+         - Identificacao do titular e dos substitutos (nivel 1 e nivel 2)
+         - Escopo da responsabilidade (todas as entidades do grupo ou por entidade)
+         - Poderes delegados para notificacao ao BCB
+         - Vigencia e condicoes de substituicao
+      2. Comunicacao ao BCB da designacao com:
+         - Dados completos do titular e substitutos
+         - Contatos de emergencia 24/7
+         - Prazo de vigencia
+      3. Revisao anual da designacao:
+         confirmar que o responsavel ainda e adequado para o cargo.
+      4. Procedimento de substituicao de emergencia:
+         o que fazer se o responsavel titular e o substituto nivel 1 estao
+         indisponiveis simultaneamente (ex: acidente, forca maior).
+      5. Registro de todas as decisoes de nao-notificacao do ss 2 com:
+         - Justificativa tecnica detalhada
+         - Evidencias de que os limiares nao foram atingidos
+         - Aprovacao do nivel superior ao responsavel
+         - Data e assinatura digital
+    tools:
+      - grc-platform
+      - document-management
+      - identity-management
+      - incident-management
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-3", "art-6"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-4", "art-5"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-2", "IR-7", "PS-2"]
+    relationship: supports

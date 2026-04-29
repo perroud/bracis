@@ -1,0 +1,101 @@
+id: art-18
+family: administracao-gestao
+title: "Vedacoes ao Administrador e ao Gestor"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 18. É vedado ao administrador e ao gestor, no exercício de suas funções:
+    I - receber depósito em conta corrente própria de recursos provenientes de
+    aplicação no fundo; II - emitir cotas do fundo em montante que exceda o
+    patrimônio do fundo; III - utilizar recursos do fundo para pagamento de
+    seguro contra perdas financeiras de cotistas; IV - praticar qualquer ato
+    de liberalidade às custas do fundo; V - obter vantagem ou benefício direto
+    ou indireto, de qualquer natureza, em prejuízo do fundo; VI - emprestar
+    recursos ou valores mobiliários do fundo em benefício próprio ou de terceiros
+    que não o próprio fundo.
+
+    Parágrafo único. As vedações previstas neste artigo aplicam-se também
+    às pessoas ligadas ao administrador e ao gestor.
+guidance:
+  prose: |
+    O art. 18 lista as vedacoes absolutas. Sao proibicoes que nao admitem
+    excecao, independentemente de autorizacao do cotista ou previsao no regulamento.
+
+    **Protecao patrimonial:**
+    As vedacoes protegem o patrimonio do fundo contra desvio, apropriacao
+    indevida ou uso em beneficio do administrador/gestor. O fundo e um patrimonio
+    separado que nao pode ser confundido com o do administrador.
+
+    **Extensao a pessoas ligadas:**
+    As vedacoes se estendem a pessoas ligadas (coligadas, controladas,
+    controladores, diretores, funcionarios). Isso impede que se contornem as
+    vedacoes via interpostas pessoas.
+
+    **Impacto em tecnologia:**
+    Sistemas de gestao de carteira devem implementar travas (hard blocks) para
+    impedir operacoes vedadas. Nao basta alerta: a operacao deve ser bloqueada
+    antes da execucao. Logs de tentativas bloqueadas devem ser mantidos como
+    evidencia de conformidade.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Travas automaticas para vedacoes:**
+      1. Implementar hard blocks no OMS para operacoes vedadas: emprestimo de
+         recursos do fundo, deposito em conta do administrador, operacoes
+         com partes relacionadas sem autorizacao.
+      2. Cadastro de partes relacionadas (pessoas ligadas) em sistema centralizado,
+         atualizado periodicamente.
+      3. Validacao pre-trade que cruza contraparte da operacao com cadastro
+         de partes relacionadas.
+
+      **Segregacao de contas:**
+      4. Contas bancarias do fundo segregadas das contas do administrador.
+      5. Monitoramento automatico de movimentacoes entre contas do fundo e
+         contas do administrador/gestor/partes relacionadas.
+    tools:
+      - opa-gatekeeper
+      - vault
+      - terraform
+      - git
+  devsecops:
+    prose: |
+      **Validacao de vedacoes no pipeline:**
+      1. Testes automatizados para cada vedacao: simular tentativa de operacao
+         vedada e confirmar que o sistema bloqueia.
+      2. SAST para identificar fluxos de codigo que poderiam contornar as
+         travas de vedacao.
+      3. Revisao obrigatoria para qualquer alteracao em regras de vedacao.
+
+      **Auditoria de codigo:**
+      4. Code review com foco em validacao de que nenhum fluxo contorna as
+         vedacoes implementadas.
+      5. Dependency scanning para garantir integridade de bibliotecas que
+         implementam regras de compliance.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-dependency-scanning
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de violacoes:**
+      1. Alertas em tempo real para tentativas de operacoes vedadas.
+      2. Dashboard de partes relacionadas: cadastro atualizado, operacoes
+         monitoradas, tentativas bloqueadas.
+      3. Investigacao automatica de operacoes suspeitas com partes relacionadas.
+
+      **Auditoria de vedacoes:**
+      4. Relatorio periodico de tentativas de operacoes vedadas e bloqueios.
+      5. Teste de efetividade das travas: cenarios de teste para cada vedacao.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-10", "art-11"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

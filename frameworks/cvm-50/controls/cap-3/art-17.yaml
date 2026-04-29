@@ -1,0 +1,101 @@
+id: art-17
+family: cap-3
+title: "Proibicao de Relacoes com Entidades Fictícias e Shell Companies"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 17. É vedado aos participantes manter relações de negócios ou realizar
+    operações com:
+
+    I - pessoas jurídicas cujos beneficiários finais não sejam identificáveis;
+    II - pessoas jurídicas com estrutura societária atípica ou complexidade
+    não justificada por razões econômicas legítimas;
+    III - pessoas jurídicas registradas em jurisdições que não permitem a
+    identificação do beneficiário final; e
+    IV - qualquer pessoa que não seja possível identificar na forma desta Resolução.
+
+    Parágrafo único. Na impossibilidade de identificação nos termos do caput,
+    o participante deve:
+    I - recusar o início da relação de negócios; ou
+    II - encerrar a relação existente com comunicação ao COAF, se houver
+    fundada suspeita de lavagem de dinheiro.
+guidance:
+  prose: |
+    O art. 17 estabelece proibicoes absolutas — situacoes nas quais o participante
+    simplesmente nao pode operar, independentemente de qualquer beneficio comercial.
+
+    **Entidades fictícias e shell companies:**
+    Shell companies sao empresas sem atividade economica real, criadas apenas
+    para mover recursos e obscurecer a propriedade. O uso de shells no mercado
+    de capitais e um padrao classico de lavagem de dinheiro (ex: offshore com
+    acao ao portador compra acoes na bolsa e vende com lucro aparentemente legitimo).
+
+    **Jurisdicoes nao cooperativas:**
+    Paises que proibem a divulgacao de beneficiarios finais (ex: historicamente,
+    algumas ilhas do Caribe) nao permitem que o participante cumpra a obrigacao
+    de identificacao. Nesse caso, a relacao e vedada.
+
+    **Quando encerrar vs. quando recusar:**
+    - Recusar (inciso I): para novos clientes — simplesmente nao abre a conta
+    - Encerrar (inciso II): para clientes existentes onde a impossibilidade
+      de identificacao e descoberta depois, especialmente se houver suspeita.
+      O encerramento DEVE ser acompanhado de comunicacao ao COAF se ha suspeita.
+
+    **Comunicacao ao COAF no encerramento:**
+    Encerrar a relacao sem comunicar ao COAF quando ha suspeita e tipping-off
+    "inverso" — o participante pode estar protegendo o lavador ao simplesmente
+    encerrar sem alertar as autoridades.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles de bloqueio:**
+      1. Regra de negocio no sistema de onboarding: cliente nao pode ser ativado
+         se beneficiario final e desconhecido.
+      2. Verificacao automatica de jurisdicao: empresas de paises que nao permitem
+         identificacao de beneficiario final sao bloqueadas automaticamente.
+      3. Flag de "estrutura atipica" com workflow de investigacao obrigatorio
+         antes de aprovacao.
+      4. Processo automatizado de encerramento de relacao com: notificacao ao
+         cliente, bloqueio de operacoes, e trigger de comunicacao ao COAF.
+
+      **Monitoramento de shells:**
+      5. Indicadores de shell company: empresa recente (< 1 ano), sem colaboradores,
+         sem ativos fisicos, multiplos enderecos iguais a de outras empresas,
+         conta bancaria em pais diferente do pais de incorporacao.
+    tools:
+      - kyc-platform
+      - entity-resolution
+      - workflow-engine
+      - aml-platform
+  devsecops:
+    prose: |
+      **Controles de bloqueio no pipeline:**
+      1. Testes de que o sistema bloqueia corretamente clientes sem beneficiario
+         final identificado.
+      2. Testes de que empresas de jurisdicoes na lista negra sao bloqueadas.
+      3. Audit trail imutavel de todas as recusas e encerramentos com motivo.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - audit-log
+  secops:
+    prose: |
+      **Governanca de recusas e encerramentos:**
+      1. Relatorio mensal de clientes recusados por impossibilidade de
+         identificacao, com analise de padroes.
+      2. Revisao de encerramentos de relacoes para garantir que comunicacao
+         ao COAF foi realizada quando necessario.
+      3. Auditoria de clientes ativos para identificar shells ou empresas
+         sem beneficiario final documentado.
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - audit-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-13"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: complements

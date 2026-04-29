@@ -1,0 +1,107 @@
+id: sec-4
+family: gen
+title: "Consent of Data Principal"
+class: DPDP-INDIA
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    (1) The Data Principal may give consent to the processing of her personal data for the
+    specified purpose. (2) Every request made to a Data Principal under sub-section (1) for
+    consent shall be accompanied by a notice given by the Data Fiduciary to the Data Principal
+    informing the Data Principal— (a) the personal data and the purpose of its processing;
+    (b) the manner in which the Data Principal may exercise her rights under section 11 and
+    make a complaint to the Board under section 13; and (c) the manner in which the Data
+    Principal may make a complaint to the Board under section 13. (3) The consent given by the
+    Data Principal shall be— (a) free, specific, informed, unconditional and unambiguous with
+    a clear affirmative action; (b) limited to such personal data as is necessary for such
+    specified purpose. (4) The Data Principal shall have the right to withdraw her consent at
+    any time, with the ease of such withdrawal being comparable to the ease with which such
+    consent was given. (5) The consequences of the withdrawal of consent shall be borne by the
+    Data Principal who has so withdrawn her consent.
+
+guidance:
+  prose: >-
+    Section 4 is the consent cornerstone of the DPDP Act. Consent must be free, specific,
+    informed, unconditional, and unambiguous — closely mirroring GDPR Article 7 standards. A
+    critical distinction is that consent must be accompanied by a notice detailing the data
+    collected, purpose, and how to exercise rights. The Act mandates that withdrawal of consent
+    must be as easy as giving it (the "symmetry principle"). Importantly, Section 4(5) places
+    the burden of withdrawal consequences on the Data Principal — meaning organizations can
+    discontinue services that require the withdrawn consent. Organizations must implement
+    granular consent mechanisms that allow Data Principals to consent to specific purposes
+    independently. Bundled or blanket consent will not satisfy the "specific" and "informed"
+    requirements.
+
+references:
+  - citation: "DPDP Act 2023, Section 4"
+    url: "https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Build a centralized consent management service that records, stores, and serves consent
+      status for each Data Principal per processing purpose.
+      2. Implement granular consent APIs that allow per-purpose consent collection with clear
+      affirmative action (no pre-ticked checkboxes, no implied consent).
+      3. Design consent notice templates that include: personal data categories, processing
+      purpose, rights exercise instructions, and complaint mechanism.
+      4. Build consent withdrawal APIs with symmetry parity — if consent was given via one click,
+      withdrawal must require no more than one click.
+      5. Implement consent propagation across all downstream services — when consent is withdrawn,
+      all processing dependent on that consent must cease immediately.
+      6. Integrate with registered Consent Managers as an alternative consent collection channel.
+      7. Build audit trails for all consent events (grant, modify, withdraw) with timestamps
+      and the exact notice presented at the time of consent.
+    tools:
+      - consent-management-platform
+      - api-gateway
+      - event-driven-architecture
+      - kafka
+      - redis
+      - postgresql
+
+  devsecops:
+    prose: >-
+      1. CI/CD pipeline gates must verify that any new personal data collection endpoint has
+      corresponding consent collection and notice delivery logic.
+      2. Automated tests must verify consent withdrawal propagation — withdrawing consent must
+      stop all downstream processing within the defined SLA.
+      3. UI tests must verify that consent withdrawal is as easy as consent granting (symmetry).
+      4. Schema validation must ensure consent records include all required fields: purpose,
+      timestamp, notice version, affirmative action type.
+      5. Linting rules must flag any processing of personal data without a consent check.
+    tools:
+      - gitlab-ci
+      - cypress
+      - playwright
+      - semgrep
+      - api-testing
+      - postman
+
+  secops:
+    prose: >-
+      1. Monitor consent grant/withdrawal ratios and alert on anomalies that may indicate
+      dark patterns or consent fatigue issues.
+      2. Audit consent records for completeness — verify all active processing has valid,
+      non-withdrawn consent.
+      3. Monitor for processing activities that continue after consent withdrawal.
+      4. Track consent notice versions and ensure Data Principals who consented under older
+      notices are re-notified when purposes change.
+      5. Implement dashboards showing consent coverage across all processing activities.
+    tools:
+      - siem
+      - compliance-dashboard
+      - consent-analytics
+      - data-governance-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-8"]
+    relationship: equivalent-to
+  - framework_id: pipl
+    articles: ["art-13", "art-14", "art-15"]
+    relationship: equivalent-to

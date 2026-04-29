@@ -1,0 +1,111 @@
+id: cps234-26
+family: assets
+title: "Information Asset Identification"
+class: CPS234
+
+statement:
+  prose: >-
+    An APRA-regulated entity must classify its information assets,
+    including those managed by related parties and third parties, by
+    criticality and sensitivity. This classification must reflect the
+    degree to which an information security incident affecting an
+    information asset has the potential to affect, financially or
+    non-financially, the entity or the interests of depositors,
+    policyholders, beneficiaries, or other customers.
+  parts:
+    - id: cps234-26.a
+      label: "a."
+      prose: >-
+        The entity must maintain an inventory of information assets
+        that is sufficiently comprehensive to enable identification of
+        information assets that require protection.
+    - id: cps234-26.b
+      label: "b."
+      prose: >-
+        The inventory must include information assets managed by
+        third parties and related parties on behalf of the entity.
+
+guidance:
+  prose: >-
+    You cannot protect what you do not know about. APRA expects
+    entities to maintain a comprehensive inventory of information
+    assets covering data, systems, applications, infrastructure, and
+    supporting technology. The inventory must extend beyond the entity's
+    direct control to include assets managed by third parties and
+    related parties. The inventory should be a living record that is
+    updated as assets are created, modified, decommissioned, or
+    migrated. Shadow IT — information assets not captured in the
+    inventory — represents a significant unmanaged risk.
+
+references:
+  - citation: "APRA Prudential Standard CPS 234, Paragraph 26"
+    url: "https://www.legislation.gov.au/F2018L01745/latest/text"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated asset discovery and registration using a
+      service catalog (Backstage) integrated with infrastructure
+      provisioning. Require all infrastructure-as-code deployments
+      to register assets in the catalog with mandatory metadata
+      fields (owner, classification, data types, third-party
+      dependencies). Deploy runtime discovery agents that detect
+      unregistered assets (containers, VMs, databases, APIs) and
+      flag them for registration. Integrate cloud provider asset
+      inventories (AWS Config, Azure Resource Graph, GCP Asset
+      Inventory) into the central catalog. Enforce admission
+      policies that reject deployments without proper asset
+      registration.
+    tools:
+      - backstage
+      - terraform
+      - crossplane
+      - aws-config
+      - grafana
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Automate asset registration as part of the CI/CD pipeline.
+      Require all repositories to include a service manifest
+      declaring the asset classification, data sensitivity, and
+      owner. Use pipeline stages to validate asset metadata
+      completeness and reject deployments with incomplete
+      classification. Generate Software Bills of Materials (SBOM)
+      for all deployed artifacts to maintain visibility into
+      component-level assets. Track dependency relationships
+      between assets in a centralized dependency graph. Automate
+      detection of new third-party dependencies introduced via
+      package managers.
+    tools:
+      - gitlab-ci
+      - syft
+      - backstage
+      - dependency-track
+      - trivy
+
+  secops:
+    prose: >-
+      Maintain a central asset register in the GRC platform or CMDB
+      synchronized with automated discovery data. Conduct periodic
+      reconciliation between the asset register and actual deployed
+      assets to identify shadow IT. Monitor for new assets appearing
+      on the network that are not in the inventory. Track asset
+      lifecycle from creation through decommissioning. Generate
+      reports on inventory completeness, classification coverage,
+      and ownership gaps. Alert on assets without assigned owners
+      or classification.
+    tools:
+      - grc-platform
+      - servicenow
+      - splunk
+      - elastic-siem
+      - nessus
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.9", "a5.10", "a5.12"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PM-5", "RA-2"]
+    relationship: supports

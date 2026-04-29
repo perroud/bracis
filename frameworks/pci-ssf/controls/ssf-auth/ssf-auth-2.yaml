@@ -1,0 +1,92 @@
+id: ssf-auth-2
+family: ssf-auth
+title: "Authorization and Least-Privilege Access"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall enforce authorization controls that restrict access to
+    functions, data, and resources based on the principle of least privilege.
+    Access control decisions shall be enforced server-side and shall not rely solely
+    on client-side controls. The software shall implement role-based or attribute-based
+    access control with clearly defined roles and permissions. Privilege escalation
+    paths shall be explicitly defined and protected. Administrative functions shall
+    require elevated authentication and shall be segregated from normal user
+    functionality.
+
+guidance:
+  prose: >-
+    Authorization controls ensure that authenticated entities can only access the
+    resources and perform the actions they are explicitly permitted to. PCI SSF
+    requires that all access control decisions are enforced on the server side,
+    as client-side controls can be trivially bypassed. The standard mandates a
+    structured access control model (RBAC or ABAC) where roles and permissions
+    are clearly documented and regularly reviewed. Administrative interfaces must
+    be segregated and subject to additional authentication requirements.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 5 — Authorization"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 5.1-5.2"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement authorization enforcement at the API gateway and service mesh layers
+      using policy engines like OPA. Deploy Kubernetes RBAC with fine-grained roles
+      that map to business functions. Enforce namespace isolation and network
+      policies that restrict cross-service access to only authorized communication
+      paths. Use admission controllers to prevent deployment of containers with
+      elevated privileges. Implement audit logging for all authorization decisions,
+      including denials.
+    tools:
+      - opa-gatekeeper
+      - kyverno
+      - istio
+      - kubernetes-rbac
+      - kong
+      - envoy
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect missing authorization checks, insecure direct object
+      references (IDOR), and broken access control patterns. Implement DAST scanning
+      that tests for horizontal and vertical privilege escalation. Write automated
+      tests that validate authorization enforcement for each role, including negative
+      tests that confirm unauthorized access is denied. Enforce code review for all
+      changes to authorization logic with a designated security reviewer.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - semgrep
+      - owasp-zap
+      - burp-suite
+      - postman
+
+  secops:
+    prose: >-
+      Monitor authorization failures and alert on patterns indicating privilege
+      escalation attempts or unauthorized access. Conduct periodic access reviews
+      to validate that role assignments follow least privilege. Track and report
+      on excessive permission grants and dormant privileged accounts. Investigate
+      anomalous access patterns that deviate from established baselines for each
+      role.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - servicenow
+      - sailpoint
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-7.1", "req-7.2"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v4.1", "v4.2", "v4.3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.3", "A8.4"]
+    relationship: mapped

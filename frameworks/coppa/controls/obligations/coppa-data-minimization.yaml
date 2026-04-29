@@ -1,0 +1,118 @@
+id: coppa-data-minimization
+family: obligations
+title: "Collection Limited to Reasonably Necessary"
+class: COPPA
+
+statement:
+  prose: |
+    An operator must collect only as much personal information from a child as is reasonably
+    necessary for the child to participate in the activity for which the information is
+    collected (16 CFR § 312.7, reinforced by § 312.3(c) and § 312.8).
+
+    The operator must not collect personal information in excess of what is reasonably
+    necessary for the purpose for which the information was collected. This applies to both
+    direct collection (information provided by the child) and passive collection (persistent
+    identifiers, device information, behavioral data).
+
+guidance:
+  prose: |
+    Data minimization under COPPA is stricter than under most privacy frameworks because
+    the data subjects are children who cannot meaningfully consent to data collection
+    themselves. Key requirements:
+
+    1. **Purpose specification:** Before collecting any PI, the operator must have a clear,
+       documented purpose. Collection "just in case" or "for future analytics" is not
+       permitted.
+
+    2. **Necessity test:** For each piece of PI collected, the operator must be able to
+       demonstrate that the activity would not function without it. This is a higher bar
+       than "useful" or "enhances the experience."
+
+    3. **Passive collection scope:** Persistent identifiers, device fingerprints, IP
+       addresses, and behavioral data are personal information under COPPA. Operators
+       must minimize passive collection to what is necessary for the permitted internal
+       operations exception or the consented purpose.
+
+    4. **Third-party SDKs:** Many COPPA violations stem from third-party SDKs that
+       collect excessive data. The operator is responsible for all data collection on
+       their service, including by third-party code.
+
+    5. **Profile minimization:** Child profiles should contain the minimum data needed.
+       Detailed demographics, interest profiles, behavioral histories, and social graphs
+       should not be built unless specifically necessary and consented.
+
+    The 2024 proposed rule updates would strengthen data minimization by explicitly
+    requiring operators to document their data necessity analysis.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a data purpose registry that maps every field of PI to a documented
+         purpose and business justification, reviewed by privacy engineering before
+         deployment.
+      2. Build child-specific data schemas that are a strict subset of adult schemas —
+         child accounts should have fewer fields, not the same schema with fields left blank.
+      3. Configure third-party SDKs in child-directed services with maximum restriction —
+         disable all optional data collection, advertising identifiers, and behavioral
+         tracking.
+      4. Implement automated PI detection in data pipelines — flag any new data fields
+         or collection points that are introduced without a corresponding entry in the
+         data purpose registry.
+      5. Build data collection dashboards that show, per child user, exactly what PI is
+         stored across all systems — use this for ongoing minimization audits.
+      6. Implement data flow mapping for child PI — from collection point through processing,
+         storage, and any third-party transmission.
+    tools:
+      - data-catalog
+      - data-flow-mapping
+      - privacy-engineering-toolkit
+      - sdk-configuration
+      - monitoring-dashboard
+
+  devsecops:
+    prose: |
+      1. Enforce data purpose registry checks in CI/CD — any code adding new PI collection
+         must include a data purpose registry entry or the build fails.
+      2. Scan third-party SDKs for data collection capabilities and verify they are
+         configured for COPPA-compliant minimal collection.
+      3. Implement data schema validation — verify child account schemas do not include
+         fields beyond what is documented as necessary.
+      4. Test that passive data collection (cookies, device info, analytics events) is
+         limited to the internal operations exception scope for child sessions.
+      5. Implement code review checklists that include data minimization verification
+         for any code touching child-directed features.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - sdk-audit
+      - schema-validation
+      - code-review
+
+  secops:
+    prose: |
+      1. Audit data purpose registry completeness — verify all PI collected has a
+         corresponding documented purpose and necessity justification.
+      2. Monitor data volume per child account — flag accounts with unusually large
+         data footprints that may indicate excessive collection.
+      3. Audit third-party SDK data transmission — monitor network traffic from
+         child-directed services to identify undisclosed data collection.
+      4. Conduct quarterly data minimization reviews — identify stored PI that is no
+         longer necessary and initiate deletion.
+      5. Track data collection changes over time — new fields, new SDKs, new purposes —
+         and verify each change includes a minimization analysis.
+    tools:
+      - data-discovery
+      - network-monitoring
+      - compliance-dashboard
+      - audit-log
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(c)"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 6(III)"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: complements

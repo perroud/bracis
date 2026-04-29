@@ -1,0 +1,107 @@
+id: ia-2
+family: ia
+title: "Identification and Authentication (Organizational Users)"
+class: SP800-53
+baselines: [low, moderate, high]
+statement:
+  prose: >-
+    Uniquely identify and authenticate organizational users, processes acting on behalf of
+    organizational users, and devices.
+guidance:
+  prose: >-
+    Organizations can satisfy the identification and authentication requirements by complying
+    with the requirements in HSPD 12. Organizational users include employees or individuals
+    who organizations consider to have an equivalent status to employees (e.g., contractors
+    and guest researchers). Unique identification of individuals in group accounts (e.g., shared
+    privilege accounts) may need to be considered on a case-by-case basis. Authentication of
+    user identities is accomplished through the use of passwords, physical authenticators,
+    biometrics, or in combination (i.e., multifactor authentication). NIST SP 800-63B provides
+    guidance on digital identity authentication. Access to organizational systems is defined as
+    either local access or network access. Local access is any access to organizational systems
+    by users (or processes acting on behalf of users) where access is obtained through direct
+    connections without the use of networks. Network access is access to organizational systems
+    by users (or processes acting on behalf of users) where access is obtained through network
+    connections (i.e., nonlocal accesses). Remote access is a type of network access that involves
+    communication through external networks. Internal networks include local area networks and
+    wide area networks. The use of encrypted virtual private networks for connections between
+    organization-controlled endpoints and non-organization controlled endpoints may be treated
+    as internal networks with regard to protecting the confidentiality and integrity of information
+    traversing the network.
+enhancements:
+  - id: ia-2.1
+    title: "Multi-Factor Authentication to Privileged Accounts"
+    baselines: [low, moderate, high]
+  - id: ia-2.2
+    title: "Multi-Factor Authentication to Non-Privileged Accounts"
+    baselines: [low, moderate, high]
+  - id: ia-2.5
+    title: "Individual Authentication with Group Authentication"
+    baselines: []
+  - id: ia-2.6
+    title: "Access to Accounts — Separate Device"
+    baselines: [high]
+  - id: ia-2.8
+    title: "Access to Accounts — Replay Resistant"
+    baselines: [moderate, high]
+  - id: ia-2.12
+    title: "Acceptance of PIV Credentials"
+    baselines: [low, moderate, high]
+  - id: ia-2.13
+    title: "Out-of-Band Authentication"
+    baselines: []
+references:
+  - citation: "NIST SP 800-63-3"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"
+  - citation: "NIST SP 800-63A"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63B"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "FIPS 201-3"
+    url: "https://doi.org/10.6028/NIST.FIPS.201-3"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized authentication through an Identity Provider (IdP) using SAML 2.0 or
+      OIDC protocols. Enforce multi-factor authentication (MFA) for all user accounts, with
+      hardware security keys (FIDO2/WebAuthn) required for privileged accounts. Use short-lived
+      tokens (JWT with expiration) rather than long-lived credentials. Implement machine identity
+      through X.509 certificates managed by a PKI or service mesh (mTLS). Use Kubernetes
+      ServiceAccount tokens with audience-bound, time-limited projections. Integrate with
+      enterprise directory services (LDAP/Active Directory) for centralized identity management.
+      Implement SSO across all platform services to reduce credential sprawl.
+    tools:
+      - "Okta / Azure AD / Keycloak / Google Workspace"
+      - "FIDO2/WebAuthn hardware keys"
+      - "cert-manager (Kubernetes PKI)"
+      - "Istio mTLS"
+      - "SPIFFE/SPIRE (workload identity)"
+      - "Vault (identity and secrets)"
+  devsecops:
+    prose: >-
+      Enforce SAML/OIDC SSO for GitLab access with mandatory MFA. Configure GitLab to require
+      two-factor authentication at the group level. Use deploy tokens and CI job tokens instead
+      of personal access tokens for automation. Implement signed commits (GPG or SSH signing) to
+      verify developer identity. Scan code for hardcoded credentials in CI pipelines. Enforce
+      SSH key rotation policies. Use protected environments with additional authentication
+      requirements for production deployments.
+    tools:
+      - "GitLab SAML SSO"
+      - "GitLab 2FA enforcement"
+      - "GitLab Deploy Tokens / CI Job Tokens"
+      - "Git commit signing (GPG/SSH)"
+      - "GitLeaks / TruffleHog (secret scanning)"
+      - "GitLab Secret Detection"
+  secops:
+    prose: >-
+      Monitor authentication events for anomalies including impossible travel, brute force
+      attempts, MFA bypass, and credential stuffing. Implement conditional access policies
+      that adjust authentication requirements based on risk signals (location, device posture,
+      time). Alert on use of service accounts from unexpected sources. Monitor for compromised
+      credentials through integration with breach databases and threat intelligence feeds.
+      Conduct periodic authentication mechanism reviews to ensure MFA adoption rates meet targets.
+    tools:
+      - "SIEM (authentication event correlation)"
+      - "Identity Threat Detection and Response (ITDR)"
+      - "Conditional Access (Azure AD, Okta)"
+      - "Have I Been Pwned API"
+      - "CrowdStrike / SentinelOne (endpoint identity)"

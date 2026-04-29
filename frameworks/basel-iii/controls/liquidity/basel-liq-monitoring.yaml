@@ -1,0 +1,110 @@
+id: basel-liq-monitoring
+family: liquidity
+title: "Intraday Liquidity Monitoring"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must actively manage their intraday liquidity positions and risks to meet payment
+    and settlement obligations on a timely basis under both normal and stressed conditions.
+    Banks must have the ability to measure expected daily gross liquidity inflows and
+    outflows, identify and prioritise time-specific and other critical obligations, and
+    settle these obligations at the appropriate time. Banks must maintain sufficient
+    intraday liquidity to cover net positions throughout the day, including during
+    stress events. Banks must monitor and report the following intraday liquidity metrics
+    to their supervisor: (1) daily maximum intraday liquidity usage, (2) available
+    intraday liquidity at the start of the business day, (3) total payments sent,
+    (4) time-specific obligations, (5) the value of customer payments made on behalf of
+    financial institution customers, (6) intraday credit lines extended to financial
+    institution customers, and (7) timing of intraday payments. Banks with significant
+    correspondent banking businesses must also report correspondent-specific metrics.
+
+guidance:
+  prose: >-
+    Intraday liquidity risk was identified as a critical gap in the 2007-2009 financial
+    crisis when the freezing of interbank payment systems amplified liquidity stress.
+    Banks must understand their payment flows with sufficient granularity to avoid gridlock
+    in payment systems. This requires real-time (or near real-time) visibility into payment
+    obligations across all payment systems in which the bank participates — including
+    SWIFT, CHAPS, TARGET2, Fedwire, CHIPS, and local RTGS systems. Banks should implement
+    intraday liquidity stress scenarios that model delays in incoming payments and sudden
+    increases in payment obligations, and maintain contingency intraday credit facilities
+    to manage these scenarios. The monitoring metrics should be reported monthly under
+    normal conditions; supervisors may require more frequent reporting during periods of
+    idiosyncratic or market-wide stress. Technology resilience of payment infrastructure
+    is integral to intraday liquidity management.
+
+references:
+  - citation: "BCBS, Monitoring tools for intraday liquidity management, April 2013"
+    url: "https://www.bis.org/publ/bcbs248.htm"
+  - citation: "BCBS, Basel III: The Liquidity Coverage Ratio and liquidity risk monitoring tools, January 2013, Section 5"
+    url: "https://www.bis.org/publ/bcbs238.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a real-time payment aggregation platform that connects to all payment system
+      APIs (SWIFT gpi, TARGET2/T2, Fedwire, CHIPS) and internal payment processing
+      systems via event streaming. Compute intraday liquidity metrics (daily maximum usage,
+      available liquidity, payment timing) continuously and publish them to a Treasury
+      dashboard with sub-minute latency. Implement automated nostro reconciliation that
+      flags discrepancies between expected and received settlement within payment system
+      settlement windows. Build a time-to-crisis indicator that forecasts intraday
+      liquidity position through the end of the business day based on confirmed outstanding
+      payment obligations and expected inflows.
+    tools:
+      - apache-kafka
+      - apache-flink
+      - redis
+      - grafana
+      - prometheus
+      - postgresql
+      - terraform
+
+  devsecops:
+    prose: >-
+      Build payment monitoring agents as microservices with dedicated CI/CD pipelines and
+      strict SLAs on recovery time after failure. Use chaos engineering practices to test
+      that the intraday liquidity monitoring system degrades gracefully when individual
+      payment system feeds are unavailable, falling back to last-known-good positions with
+      visible uncertainty indicators. Implement automated testing of payment prioritisation
+      logic — the system must correctly identify and flag time-specific obligations (e.g.,
+      CLS settlement, margin calls) even under high load. All payment data pipelines must
+      be end-to-end encrypted and authenticated.
+    tools:
+      - gitlab-ci
+      - chaos-mesh
+      - pytest
+      - istio
+      - linkerd
+      - vault
+
+  secops:
+    prose: >-
+      Payment infrastructure is a critical national financial market infrastructure (FMI)
+      component; apply the highest security controls. Implement network segmentation
+      isolating payment gateway systems from other bank systems. Monitor all payment
+      system access in real time using SIEM rules tuned for payment fraud patterns
+      (unusual timing, unusual counterparty, unusual amount). Implement multi-person
+      authorisation for payments above defined thresholds. Conduct annual red team
+      exercises targeting payment infrastructure. Establish a payment system incident
+      response procedure with defined escalation paths to the central bank if a payment
+      gridlock scenario occurs.
+    tools:
+      - splunk
+      - cyberark
+      - paloalto-networks
+      - sentinel
+      - pagerduty
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-9", "art-10", "art-11"]
+    relationship: complements
+  - framework_id: iso-22301
+    articles: ["cl-8.4", "cl-8.5", "cl-8.6"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-7", "SI-13", "SC-5"]
+    relationship: mapped

@@ -1,0 +1,98 @@
+id: art-13
+family: rules
+title: "Lawful bases for processing personal information"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 13: Personal information processors may process personal information only where one of
+    the following circumstances exists:
+    (1) The consent of the individual has been obtained;
+    (2) Where it is necessary for the conclusion or performance of a contract to which the individual
+    is a party, or where it is necessary for the implementation of human resource management in
+    accordance with lawfully formulated labor rules and regulations and lawfully concluded collective
+    contracts;
+    (3) Where it is necessary for the performance of statutory duties or statutory obligations;
+    (4) Where it is necessary for responding to public health emergencies, or for the protection of
+    the life, health, and property safety of natural persons in emergency situations;
+    (5) The processing of personal information within a reasonable scope for the implementation of
+    news reporting, public opinion supervision, and other activities in the public interest;
+    (6) The processing within a reasonable scope of personal information that has been disclosed by
+    the individual or otherwise lawfully disclosed, in accordance with the provisions of this Law;
+    (7) Other circumstances provided for by laws or administrative regulations.
+    Where personal information is processed based on the consent of the individual, such consent shall
+    be given by the individual on a voluntary and explicit basis with full knowledge of the relevant
+    facts. Where laws or administrative regulations provide that the processing of personal information
+    requires separate consent or written consent from the individual, such provisions shall prevail.
+    Where there is a change in the purpose of processing personal information, the method of processing,
+    or the categories of personal information being processed, the consent of the individual shall be
+    obtained anew.
+
+guidance:
+  prose: >-
+    Article 13 defines seven lawful bases for processing personal information, with consent as the
+    primary basis. Unlike the GDPR, which lists six lawful bases in Article 6, the PIPL includes
+    seven bases with notable differences: there is no explicit "legitimate interest" basis under PIPL.
+    The closest equivalents are the public interest (13.5) and publicly disclosed information (13.6)
+    bases, but these are narrower in scope. The absence of a legitimate interest basis significantly
+    affects commercial processing: most processing that would rely on legitimate interest under GDPR
+    requires consent under PIPL. The consent requirement is strict: it must be informed, voluntary,
+    and explicit. Changes to processing purpose, method, or data categories require fresh consent.
+    Certain processing scenarios (sensitive data, cross-border transfers, sharing with third parties)
+    require separate or written consent as specified in other PIPL articles.
+
+references:
+  - citation: "PIPL, Article 13"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a consent management platform (CMP) as a centralized service. The CMP must support:
+      granular purpose-specific consent collection, separate consent for sensitive data processing,
+      separate consent for cross-border transfers, consent versioning with change detection,
+      re-consent workflows triggered by changes to processing purpose or method, and withdrawal
+      propagation to all dependent services. Implement a lawful basis registry where every
+      microservice declares which of the seven PIPL bases it relies upon. Build middleware that
+      verifies the applicable lawful basis before any personal information processing operation.
+    tools:
+      - "Consent Management Platform (OneTrust, TrustArc, custom CMP)"
+      - "Lawful basis registry (custom service with API)"
+      - "Event-driven consent propagation (Kafka, RabbitMQ, NATS)"
+      - "API middleware with lawful basis verification"
+      - "Consent versioning and change detection service"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must verify that every service processing personal information has a
+      registered lawful basis. Automated tests must validate that consent collection flows meet
+      PIPL requirements: informed, voluntary, explicit, and purpose-specific. Pipeline gates should
+      detect changes to processing purpose or method and flag them for re-consent workflow
+      implementation. Code reviews must verify that consent withdrawal is propagated correctly.
+    tools:
+      - "CI/CD pipeline with lawful basis verification gates"
+      - "Consent flow testing (Playwright, Cypress)"
+      - "Processing change detection in deployment pipelines"
+      - "Consent propagation integration tests"
+  secops:
+    prose: >-
+      Monitor for processing activities without a registered lawful basis. Alert when consent is
+      withdrawn but processing continues. Detect processing changes that require re-consent but
+      have not triggered re-consent workflows. Track consent rates and withdrawal rates for
+      compliance reporting. Monitor for consent manipulation attempts.
+    tools:
+      - "SIEM rules for unauthorized processing detection"
+      - "Consent audit log monitoring"
+      - "Compliance dashboards with consent metrics"
+      - "Anomaly detection for consent manipulation"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: equivalent-to
+  - framework_id: pdpa-thailand
+    articles: ["sec-24"]
+    relationship: equivalent-to

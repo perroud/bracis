@@ -1,0 +1,111 @@
+id: stig-cat3-documentation
+family: cat-iii
+title: "Security Documentation and System Security Plan"
+class: DISA-STIG
+
+baselines: [cat-iii]
+
+statement:
+  prose: >-
+    The system must maintain complete, accurate, and current security
+    documentation as required by DoD RMF. Required documentation includes:
+    a System Security Plan (SSP) describing the system boundary, architecture,
+    data flows, and implementation status of all applicable security controls;
+    a Privacy Impact Assessment (PIA) if the system processes personally
+    identifiable information (PII); a Plan of Action and Milestones (POA&M)
+    tracking all open security findings with remediation timelines; a
+    Contingency Plan (CP) describing recovery procedures; an Incident Response
+    Plan (IRP); and a Configuration Management Plan (CMP). All documentation
+    must be reviewed and updated at least annually and whenever significant
+    system changes occur. Documentation must be stored in eMASS (Enterprise
+    Mission Assurance Support Service) or the authoritative DoD governance
+    repository.
+
+guidance:
+  prose: >-
+    Documentation requirements are CAT III findings because they represent
+    governance and process maturity rather than direct technical vulnerabilities.
+    However, inadequate documentation significantly impairs the organization's
+    ability to respond to incidents (without an IRP), recover from disasters
+    (without a CP), or demonstrate compliance to the AO (without an accurate SSP).
+
+    STIG reviewers verify documentation completeness, currency (last review date
+    within the past 12 months), and accuracy relative to the actual system
+    configuration. A common finding is an SSP that accurately described the system
+    at its initial authorization but has not been updated to reflect subsequent
+    architecture changes, new integrations, or changed data flows.
+
+    eMASS serves as the authoritative system of record for DoD RMF documentation;
+    all security control implementation statements must be maintained there, with
+    supporting artifacts (configuration screenshots, scan results, interview notes)
+    attached as evidence.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, PL-2, PL-4, PM-1"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DoDI 8510.01 — Risk Management Framework (RMF) for DoD Information Technology"
+    url: "https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/851001p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Automate the generation of documentation artifacts from the platform's
+      infrastructure-as-code and configuration management tooling. Use Backstage
+      or similar internal developer portals to maintain living architecture
+      documentation that updates when infrastructure definitions change. Generate
+      network topology diagrams automatically from Terraform state and Kubernetes
+      cluster introspection. Maintain system component inventories in the CMDB
+      with automated reconciliation against discovered infrastructure.
+      Integrate eMASS API (where available) to automatically update control
+      implementation status based on automated compliance scan results.
+    tools:
+      - backstage
+      - terraform-docs
+      - k8s-documenter
+      - servicenow-cmdb
+      - confluence
+
+  devsecops:
+    prose: >-
+      Generate system documentation artifacts as part of CI/CD pipeline runs:
+      SBOM, dependency graphs, architecture diagrams from infrastructure code,
+      and security scan summaries. Store these artifacts in version control
+      alongside the system code so documentation history is traceable. Implement
+      documentation completeness checks as merge request requirements for
+      significant changes — require that SSP-related sections are updated when
+      architecture-impacting changes are introduced. Use policy-as-code to
+      detect when new services or data flows are introduced without corresponding
+      documentation updates.
+    tools:
+      - gitlab-ci
+      - syft
+      - terraform-docs
+      - mermaid
+      - conftest
+
+  secops:
+    prose: >-
+      Conduct annual documentation reviews as a formal process with documented
+      outputs. Schedule SSP reviews following significant system changes,
+      personnel changes to key security roles, or audit findings. Maintain the
+      POA&M as a living document with weekly updates reflecting remediation
+      progress. Ensure all ATO-related documentation in eMASS is current and
+      that control implementation statements accurately reflect the current
+      system configuration. Track documentation review dates in the governance
+      platform and alert when reviews are overdue.
+    tools:
+      - emass
+      - servicenow-grc
+      - archer-grc
+      - confluence
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-2", "PM-1", "CA-7"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["CA.L2-3.12.4"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["pl-2", "pm-1"]
+    relationship: equivalent-to

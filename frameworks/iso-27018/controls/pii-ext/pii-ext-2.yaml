@@ -1,0 +1,106 @@
+id: pii-ext.2
+family: pii-ext
+title: "PII return, transfer and secure disposal upon contract termination"
+class: ISO27018
+
+statement:
+  prose: >-
+    Upon termination or expiry of the cloud service agreement, or upon request by
+    the cloud service customer, the public cloud PII processor shall return all PII
+    to the cloud service customer in a structured, commonly used, and machine-
+    readable format and subsequently securely delete all copies of PII from its
+    systems. The public cloud PII processor shall define and communicate a reasonable
+    period during which PII will be available for retrieval after termination. After
+    the retrieval period, the processor shall ensure secure and verifiable disposal
+    of all PII, including copies in backups, caches, logs, and disaster recovery
+    systems. The processor shall provide the cloud service customer with
+    certification of secure disposal.
+
+guidance:
+  prose: >-
+    Contract termination is a high-risk moment for PII. The customer needs
+    assurance that all PII will be returned and then permanently destroyed. The
+    processor must define a clear timeline: a retrieval period during which the
+    customer can export PII, followed by a disposal period during which all copies
+    are permanently deleted. The retrieval window must be sufficient for the
+    customer to complete data migration, including verification of export
+    completeness. Disposal must be comprehensive, covering not only primary storage
+    but all secondary copies: backups, replicas, caches, log files, analytics
+    derivatives, and disaster recovery sites. The processor must provide verifiable
+    evidence of disposal, either through cryptographic proof (e.g., destruction of
+    encryption keys with evidence that no unencrypted copies exist) or physical
+    verification. The disposal certification should be retained by both parties as
+    evidence of compliance.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.12.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build comprehensive contract termination workflows. Implement data export
+      services that produce complete PII exports in standard formats (JSON, CSV,
+      XML) with schema documentation and integrity checksums. Provide export
+      verification tools that allow the customer to validate completeness before
+      disposal begins. Implement cascading disposal that systematically deletes
+      PII from all storage locations: primary databases, replicas, object stores,
+      caches, message queues, CDN caches, backups, and disaster recovery sites.
+      Build disposal verification that confirms deletion across all locations.
+      Generate disposal certificates with cryptographic proof and detailed
+      inventory of destroyed data. Implement a disposal scheduler that enforces
+      the post-retrieval disposal deadline.
+    tools:
+      - contract-termination-workflow
+      - data-export-service
+      - export-verification-tools
+      - cascading-disposal-engine
+      - disposal-verification-service
+      - disposal-certificate-generator
+      - backup-purge-orchestrator
+
+  devsecops:
+    prose: >-
+      Build and maintain disposal capability as a core service. CI pipelines
+      must validate that any new PII storage location is registered in the
+      disposal inventory and reachable by the cascading disposal engine. Build
+      integration tests that exercise the full termination lifecycle: export,
+      verify, dispose, verify disposal. Static analysis should flag PII storage
+      locations not covered by the disposal system. Include disposal
+      compatibility in the architecture review checklist for all new features
+      that store PII.
+    tools:
+      - gitlab-ci
+      - disposal-inventory-validator
+      - termination-lifecycle-tests
+      - semgrep
+      - disposal-coverage-scanner
+      - architecture-review-checklist
+
+  secops:
+    prose: >-
+      Monitor contract termination workflows for completeness and timeliness.
+      Track each termination through the full lifecycle: notification, retrieval
+      period, export completion, disposal execution, and disposal verification.
+      Alert on terminations that exceed the disposal deadline. Audit disposal
+      completeness by scanning for residual PII after disposal is reported
+      complete. Monitor backup systems to verify PII is purged from backup
+      rotation within the documented timeframe. Verify disposal certificates
+      are generated and delivered to customers. Track metrics: average time
+      to disposal, disposal completeness rate, and customer export utilization.
+    tools:
+      - splunk
+      - elastic-siem
+      - termination-workflow-monitor
+      - residual-pii-scanner
+      - backup-purge-auditor
+      - disposal-metrics-dashboard
+      - certificate-delivery-tracker
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-17", "art-28.3.g"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["b-8.4.2"]
+    relationship: complements

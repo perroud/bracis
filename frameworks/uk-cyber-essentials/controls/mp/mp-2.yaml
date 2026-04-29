@@ -1,0 +1,100 @@
+id: mp-2
+family: mp
+title: "Application Allow-Listing and Sandboxing"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    As an alternative or supplement to anti-malware software, application allow-listing
+    may be used to prevent the execution of unauthorised software. Only approved
+    applications and executables should be permitted to run. Sandboxing technologies
+    may also be used to isolate the execution of untrusted applications, limiting the
+    damage that malicious code can cause. Where application allow-listing is used as
+    the primary malware protection mechanism, it must prevent users from running
+    unauthorised executables including those downloaded from the internet or received
+    via email.
+
+guidance:
+  prose: >-
+    Application allow-listing is considered a stronger control than traditional
+    anti-malware because it operates on a default-deny model — only explicitly
+    approved software can execute. However, it requires significant operational
+    investment in maintaining the allow-list. The Cyber Essentials scheme accepts
+    application allow-listing as a valid alternative to traditional anti-malware
+    software. Sandboxing (browser sandboxing, application isolation) adds another
+    layer of protection by containing the impact of any malicious code that does
+    execute. Both approaches are most effective when combined with traditional
+    anti-malware and used as part of a defence-in-depth strategy.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Malware Protection"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy Windows Defender Application Control (WDAC) or AppLocker on Windows
+      endpoints to enforce application allow-listing. Use managed app configurations
+      on macOS through Jamf or Intune. Implement SELinux or AppArmor profiles on
+      Linux systems to restrict application execution. Deploy browser isolation
+      solutions (Menlo Security, Zscaler Browser Isolation) for web browsing
+      activities. Use Kubernetes admission controllers (OPA Gatekeeper, Kyverno) to
+      enforce that only approved container images from trusted registries can run
+      in the cluster.
+    tools:
+      - wdac
+      - applocker
+      - jamf
+      - intune
+      - selinux
+      - apparmor
+      - opa-gatekeeper
+      - kyverno
+
+  devsecops:
+    prose: >-
+      Maintain approved software lists as code in version-controlled repositories.
+      Automate the generation and deployment of application allow-list policies
+      through CI/CD pipelines. Implement container image signing (cosign, Notary)
+      and enforce signature verification at deployment time. Use pipeline policies
+      to ensure that only images from approved base registries are used in builds.
+      Test application allow-list policies in audit mode before enforcing to prevent
+      business disruption.
+    tools:
+      - cosign
+      - notary
+      - trivy
+      - opa-gatekeeper
+      - kyverno
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor application allow-list policy violations — blocked execution attempts
+      may indicate attempted malware execution or shadow IT. Review and update the
+      approved software list regularly to accommodate legitimate new software
+      requirements. Track the ratio of approved to blocked applications as a metric
+      of allow-list effectiveness. Investigate repeated blocks on the same executable
+      across multiple endpoints as potential indicators of a malware campaign.
+      Maintain an exception process for temporary software approvals with automatic
+      expiry.
+    tools:
+      - microsoft-defender-for-endpoint
+      - crowdstrike-falcon
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.7", "A8.19"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7(5)", "SI-3", "SC-44"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-app-control"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.5", "CIS 2.6", "CIS 2.7"]
+    relationship: mapped

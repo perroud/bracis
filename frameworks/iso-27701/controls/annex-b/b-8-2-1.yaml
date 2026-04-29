@@ -1,0 +1,115 @@
+id: b-8.2.1
+family: annex-b
+title: "Customer agreement"
+class: ISO27701
+baselines: [pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization acting as a PII processor shall ensure that the contract between
+    the organization and the PII controller (customer) addresses the organization's
+    obligation to assist the PII controller with its obligations relating to PII
+    processing. The contract shall specify the subject matter and duration of the
+    processing, the nature and purpose of the processing, the type of PII and categories
+    of PII principals, and the obligations and rights of the PII controller. The contract
+    shall require the PII processor to process PII only on documented instructions from
+    the PII controller, ensure that persons authorized to process PII have committed
+    themselves to confidentiality, implement appropriate technical and organizational
+    security measures, assist the PII controller with PII principal rights requests,
+    assist with breach notification obligations, delete or return all PII at the end of
+    the service, and make available all information necessary to demonstrate compliance.
+
+guidance:
+  prose: >-
+    The data processing agreement (DPA) is the legal foundation of the controller-
+    processor relationship. Without a compliant DPA, the processor's processing of
+    PII may be unlawful under regulations like GDPR (Article 28) and LGPD (Article 39).
+    The DPA must be specific and actionable, not a generic confidentiality agreement.
+    It must detail: what PII is processed (data categories), why (processing purposes
+    bound to the controller's instructions), how (security measures), for how long
+    (duration and post-termination obligations), and what the processor must do when
+    things go wrong (breach notification, incident response). The DPA should also
+    address sub-processing: if the processor engages other processors (sub-processors),
+    the controller must authorize this and the sub-processor must be bound by equivalent
+    obligations. The organization should maintain a DPA template that is pre-approved
+    by legal counsel and covers all regulatory requirements, and should track DPA
+    status for all customer relationships involving PII processing.
+
+references:
+  - citation: "ISO/IEC 27701:2019, B.8.2.1"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a contract and obligation management system integrated with the
+      platform's tenant management. For multi-tenant SaaS platforms, implement
+      per-tenant processing configuration that enforces the specific processing
+      instructions from each customer's DPA: data residency requirements,
+      retention periods, sub-processor restrictions, and access control
+      requirements. Store DPA metadata as machine-readable configuration
+      alongside tenant profiles. Implement policy engine rules that enforce
+      DPA-specific processing constraints per tenant: data cannot be processed
+      in restricted regions, specific data categories have custom retention,
+      sub-processor access is limited to approved entities. Build automated
+      DPA compliance reporting that generates per-customer compliance evidence
+      packages showing how contractual obligations are being met.
+    tools:
+      - tenant-management-system
+      - policy-as-code
+      - open-policy-agent
+      - contract-configuration-store
+      - compliance-evidence-generator
+      - multi-tenant-isolation
+
+  devsecops:
+    prose: >-
+      Integrate DPA obligation compliance into the development workflow.
+      Implement pipeline validation that verifies tenant-specific processing
+      configurations are correctly applied: data residency constraints,
+      retention policies, access controls. Build automated tests that verify
+      multi-tenant isolation: one customer's PII cannot be accessed by
+      another customer's processing context. Implement DPA obligation
+      tracking in the development backlog, with automated alerts when
+      contractual obligations require feature changes. Build integration
+      tests that verify sub-processor data flows comply with customer
+      authorization. Track DPA compliance coverage as a metric per
+      customer relationship.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - tenant-isolation-tests
+      - data-residency-validators
+      - sub-processor-flow-tests
+      - dpa-compliance-tracking
+
+  secops:
+    prose: >-
+      Monitor compliance with DPA obligations across all customer
+      relationships. Build SIEM rules that detect DPA violations: processing
+      outside customer-authorized scope, data access from unauthorized
+      sub-processors, data residency violations, retention policy breaches.
+      Track per-customer compliance metrics: breach notification SLAs,
+      rights request fulfillment times, deletion obligations at contract
+      termination. Alert when customer DPAs are approaching expiry without
+      renewal. Generate per-customer compliance reports demonstrating
+      adherence to contractual obligations. Monitor sub-processor
+      compliance through audit log analysis and access pattern monitoring.
+    tools:
+      - splunk
+      - elastic-siem
+      - per-customer-compliance-dashboards
+      - dpa-lifecycle-tracking
+      - sub-processor-monitoring
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-39"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.140"]
+    relationship: supports

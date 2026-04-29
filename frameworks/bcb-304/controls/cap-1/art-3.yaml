@@ -1,0 +1,81 @@
+id: art-3
+family: cap-1
+title: "Atividades Reguladas e Vedacoes"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 3. É vedada a prestação de serviços de ativos virtuais no País por pessoa
+    jurídica sem autorização do Banco Central do Brasil.
+
+    Parágrafo 1. A vedação de que trata o caput aplica-se inclusive a prestadoras de
+    serviços de ativos virtuais com sede no exterior que ofereçam serviços de forma
+    habitual a clientes domiciliados ou residentes no Brasil.
+
+    Parágrafo 2. As prestadoras de serviços de ativos virtuais autorizadas devem
+    atuar exclusivamente nas atividades para as quais tenham sido autorizadas,
+    sendo vedado o exercício de atividades não autorizadas.
+guidance:
+  prose: |
+    O art. 3 estabelece o principio de reserva de atividade: ninguem pode prestar
+    servicos de ativos virtuais no Brasil sem autorizacao previa do BCB.
+
+    **Alcance extraterritorial (par. 1):**
+    VASPs estrangeiras que atendam habitualmente clientes brasileiros tambem
+    precisam de autorizacao. Isso alinha o Brasil com a tendencia global de
+    regulacao de VASPs cross-border (similar ao MiCA europeu).
+
+    **Criterio de habitualidade:**
+    A prestacao de servicos deve ser habitual, nao eventual. O BCB pode interpretar
+    como habitual: marketing direcionado ao publico brasileiro, website em portugues,
+    aceitar PIX/BRL, ter representante no Brasil.
+
+    **Principio de especificidade (par. 2):**
+    A autorizacao e especifica por tipo de servico. Uma VASP autorizada apenas para
+    exchange nao pode oferecer custodia sem nova autorizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de servicos autorizados:**
+      1. Configuracao centralizada de servicos autorizados pelo BCB com feature flags
+         que habilitam/desabilitam funcionalidades por tipo de servico.
+      2. Middleware de autorizacao que valida se operacao solicitada esta dentro do
+         escopo de servicos autorizados.
+      3. Geofencing para bloquear acesso de jurisdicoes nao autorizadas.
+      4. Sistema de deteccao de clientes brasileiros em plataformas offshore
+         (IP geolocation, documento, telefone, metodo de pagamento).
+    tools:
+      - feature-flags
+      - geofencing
+      - authorization-middleware
+      - ip-geolocation
+  devsecops:
+    prose: |
+      **Enforcement de escopo de servicos:**
+      1. Testes automatizados que validam que funcionalidades nao autorizadas estao
+         desabilitadas em producao.
+      2. Pipeline de validacao de feature flags antes de deploy.
+      3. Security scan que detecta endpoints de servicos nao autorizados expostos.
+      4. Monitoramento de drift entre servicos autorizados e servicos ativos.
+    tools:
+      - gitlab-ci
+      - feature-flag-validation
+      - endpoint-scanner
+  secops:
+    prose: |
+      **Monitoramento de conformidade de escopo:**
+      1. Auditoria periodica de servicos oferecidos vs. servicos autorizados pelo BCB.
+      2. Monitoramento de tentativas de acesso a servicos nao autorizados.
+      3. Procedimento de comunicacao ao BCB antes de lancar novo servico.
+      4. Revisao legal periodica de alcance extraterritorial da regulacao.
+    tools:
+      - grc-platform
+      - access-monitoring
+      - regulatory-calendar
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: implements

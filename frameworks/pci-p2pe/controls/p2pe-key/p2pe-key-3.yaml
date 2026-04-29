@@ -1,0 +1,120 @@
+id: p2pe-key-3
+family: p2pe-key
+title: "Key Rotation, Retirement, and Destruction"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The solution provider shall define and enforce cryptographic key
+    lifecycle policies including maximum key usage periods, rotation
+    triggers, and secure destruction procedures. Encryption keys shall be
+    rotated at defined intervals or when a compromise is suspected. Key
+    rotation shall not require cleartext key exposure and shall be
+    achievable without taking the P2PE solution offline. Retired keys
+    shall be securely destroyed using methods that prevent recovery,
+    including zeroization of HSM key slots and physical destruction of
+    key component records. The key lifecycle shall be documented and
+    auditable from creation through destruction.
+  parts:
+    - id: p2pe-key-3.a
+      label: "Domain 4, 4E"
+      prose: >-
+        Key rotation is performed at documented intervals or upon
+        suspected compromise, without exposing cleartext key material
+        and without requiring P2PE solution downtime.
+    - id: p2pe-key-3.b
+      label: "Domain 4, 4F"
+      prose: >-
+        Retired keys are securely destroyed through HSM zeroization and
+        physical destruction of key component records, with destruction
+        events documented and witnessed under dual control.
+
+guidance:
+  prose: >-
+    Key rotation limits the exposure window if a key is compromised. For
+    DUKPT solutions, BDK rotation requires re-keying all POI devices
+    associated with the BDK, which is operationally expensive — this
+    drives the importance of limiting the number of devices per BDK and
+    planning rotation logistics in advance. AES-DUKPT with large key
+    spaces supports longer BDK lifetimes than TDEA-DUKPT. Key-encrypting
+    keys (KEKs) used for distribution should be rotated more frequently
+    than BDKs because they are exposed during key transport operations.
+    Destruction must be verifiable — HSM zeroization should be confirmed
+    through HSM audit logs showing the key slot was cleared. Physical key
+    component records (printed shares, smart cards) must be destroyed
+    using cross-cut shredding or incineration with witness documentation.
+    The complete key lifecycle record should be retained even after key
+    destruction, for audit and forensic purposes.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 4 — Key Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "NIST SP 800-57 Part 1 Rev. 5 — Recommendation for Key Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-57pt1r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated key lifecycle tracking that records creation
+      date, activation date, usage count, and projected rotation date for
+      every key. Build automated rotation workflows that coordinate BDK
+      rotation across HSMs and trigger remote re-keying of POI devices in
+      managed batches. Deploy canary devices that are re-keyed first and
+      validated before fleet-wide rollout. Implement HSM key slot
+      zeroization as an automated step in the retirement workflow with
+      confirmation logging. Maintain immutable lifecycle records in a
+      separate audit system from the key management system.
+    tools:
+      - key-management-system
+      - thales-payshield
+      - futurex-vectera
+      - hashicorp-vault
+      - device-management-platform
+      - terraform
+
+  devsecops:
+    prose: >-
+      Automate testing of key rotation procedures in staging environments
+      with test HSMs and test devices. Validate that devices continue
+      to produce valid encrypted transactions after re-keying. Test
+      rollback scenarios where a device fails to accept a new key. Scan
+      key management code for proper error handling during rotation (e.g.,
+      partial rotation states). Include lifecycle policy compliance checks
+      in CI/CD that flag keys approaching their maximum usage period.
+    tools:
+      - gitlab-ci
+      - custom-rotation-test-suite
+      - test-hsm-emulator
+      - semgrep
+      - opa
+
+  secops:
+    prose: >-
+      Monitor key age and usage metrics against lifecycle policy
+      thresholds. Alert 90 days before scheduled key rotation dates.
+      Investigate and alert on keys that exceed their maximum usage period
+      without rotation. Witness and document all key destruction events
+      with photographs, HSM audit log extracts, and signed destruction
+      certificates. Conduct annual reviews of the key lifecycle inventory
+      to identify orphaned keys (keys without associated active devices)
+      for cleanup.
+    tools:
+      - splunk
+      - elastic-siem
+      - key-management-system
+      - hsm-audit-logs
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-crypto-4"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-12(1)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports

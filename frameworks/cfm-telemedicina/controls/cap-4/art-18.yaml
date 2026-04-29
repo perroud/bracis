@@ -1,0 +1,115 @@
+id: art-18
+family: cap-4
+title: "Disponibilidade e Latencia de Plataformas"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 18. As plataformas de telemedicina devem garantir
+    disponibilidade e desempenho adequados para a prestação
+    segura de serviços médicos.
+
+    Parágrafo 1. A plataforma deve manter disponibilidade mínima
+    de 99,5% do tempo, com plano de contingência para períodos
+    de indisponibilidade que inclua procedimento de atendimento
+    alternativo.
+
+    Parágrafo 2. A latência de comunicação deve ser adequada à
+    modalidade de telemedicina utilizada, sendo:
+    I - teleconsulta: latência máxima de 500 milissegundos;
+    II - telecirurgia: latência máxima de 150 milissegundos;
+    III - telemonitoramento: latência máxima de 5 segundos para
+    alertas críticos.
+
+    Parágrafo 3. A plataforma deve possuir mecanismos de detecção
+    e alerta automático de degradação de qualidade, informando
+    médico e paciente quando a qualidade de conexão é insuficiente
+    para o atendimento seguro.
+guidance:
+  prose: |
+    O art. 18 estabelece requisitos de disponibilidade e desempenho
+    especificos por modalidade de telemedicina. Esses requisitos
+    sao fundamentais porque degradacao de servico em telemedicina
+    pode comprometer seguranca do paciente.
+
+    **Disponibilidade 99,5% (paragrafo 1):**
+    - Equivale a maximo 43,8 horas de indisponibilidade por ano
+    - Exige arquitetura com redundancia, failover e monitoramento
+    - Plano de contingencia deve incluir: redirecionamento para
+      atendimento presencial, notificacao ao paciente, e
+      reagendamento automatico
+
+    **Latencia por modalidade (paragrafo 2):**
+    - Teleconsulta (500ms): viavel com infraestrutura padrao de
+      nuvem em territorio nacional
+    - Telecirurgia (150ms): exige infraestrutura dedicada, 5G
+      privado ou fibra ponto-a-ponto
+    - Telemonitoramento alertas (5s): mais permissivo, mas
+      alertas criticos nao podem ter atraso superior
+
+    **Deteccao de degradacao (paragrafo 3):**
+    O sistema deve monitorar continuamente a qualidade de conexao
+    e interromper ou alertar ANTES que degradacao comprometa
+    seguranca do paciente, nao depois.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de alta disponibilidade:**
+      1. Implementar arquitetura multi-AZ (Availability Zone) com
+         failover automatico para garantir disponibilidade de 99,5%.
+      2. Configurar load balancer com health checks e roteamento
+         automatico de trafego em caso de falha de instancia.
+      3. Implementar monitoramento de latencia fim-a-fim por
+         modalidade, com alertas quando se aproximar dos limiares
+         definidos (80% do maximo permitido).
+      4. Criar mecanismo de deteccao de qualidade de conexao que
+         alerte medico e paciente quando qualidade e insuficiente.
+      5. Implementar plano de contingencia automatizado: notificacao,
+         reagendamento e direcionamento para atendimento presencial.
+    tools:
+      - load-balancer
+      - multi-az-deployment
+      - latency-monitoring
+      - quality-detection
+      - contingency-automation
+  devsecops:
+    prose: |
+      **Testes de disponibilidade e desempenho:**
+      1. Implementar testes de carga que validem latencia sob
+         demanda de pico para cada modalidade de telemedicina.
+      2. Testar failover automatico com simulacao de falha de AZ,
+         medindo tempo de recuperacao e impacto na latencia.
+      3. Validar que alertas de degradacao de qualidade sao
+         disparados corretamente nos limiares definidos.
+      4. Implementar chaos engineering para testar resiliencia
+         da plataforma sob condicoes adversas.
+    tools:
+      - gitlab-ci
+      - load-testing
+      - chaos-engineering
+      - failover-testing
+      - latency-testing
+  secops:
+    prose: |
+      **Monitoramento de disponibilidade:**
+      1. Monitorar disponibilidade em tempo real com dashboard
+         que mostre status por modalidade de telemedicina.
+      2. Manter registro historico de disponibilidade e latencia
+         para demonstrar conformidade com SLA de 99,5%.
+      3. Realizar post-mortem de toda indisponibilidade que
+         impacte atendimento de telemedicina, com acoes
+         corretivas documentadas.
+      4. Testar plano de contingencia trimestralmente, validando
+         que procedimentos alternativos funcionam.
+    tools:
+      - uptime-monitoring
+      - sla-dashboard
+      - incident-management
+      - contingency-testing
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.308-a-7", "164.312-a-1"]
+    relationship: mapped

@@ -1,0 +1,158 @@
+id: art-12
+family: cap-3
+title: "Comunicacao de Incidentes Relevantes a CVM"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 12. A entidade deve comunicar à CVM a ocorrência de incidentes
+    cibernéticos relevantes que possam afetar o regular funcionamento de
+    suas atividades ou que acarretem risco a investidores.
+
+    Parágrafo 1. A comunicação de que trata o caput deve ser realizada
+    tempestivamente, contendo, no mínimo:
+    I - descrição do incidente;
+    II - riscos e impactos identificados;
+    III - medidas adotadas para contenção e mitigação;
+    IV - avaliação preliminar de impacto em investidores.
+
+    Parágrafo 2. A entidade deve manter a CVM informada sobre a evolução
+    do incidente e as medidas adotadas até a sua completa resolução.
+guidance:
+  prose: |
+    O art. 12 estabelece a obrigacao de notificacao de incidentes
+    ciberneticos relevantes a CVM, analogamente ao art. 10 da Bacen 4.893.
+
+    **Criterio de relevancia:**
+    Nem todo incidente precisa ser comunicado. O criterio e duplo:
+    - Incidentes que afetem o "regular funcionamento" das atividades
+      (indisponibilidade de sistemas de negociacao, falha de custodia).
+    - Incidentes que acarretem risco a investidores (vazamento de dados
+      pessoais/financeiros, fraude, manipulacao de ordens).
+
+    **Tempestividade:**
+    A resolucao usa "tempestivamente" sem definir prazo exato, diferente
+    da LGPD que define "prazo razoavel". Na pratica, a CVM espera
+    comunicacao em ate 24 horas da confirmacao do incidente. Para
+    incidentes criticos (indisponibilidade de mercado), a comunicacao
+    deve ser imediata.
+
+    **Conteudo obrigatorio (paragrafo 1):**
+    I - Descricao: o que aconteceu, quando, sistemas afetados.
+    II - Riscos: ameaca identificada, potencial de propagacao, dados
+         comprometidos.
+    III - Medidas: acoes de contencao ja realizadas, plano de erradicacao.
+    IV - Impacto em investidores: dados afetados, operacoes impactadas,
+         prejuizo potencial.
+
+    **Atualizacao continua (paragrafo 2):**
+    A obrigacao nao termina com a comunicacao inicial. A entidade deve
+    manter a CVM informada com atualizacoes periodicas ate a resolucao
+    completa do incidente.
+
+    **Consequencias de nao comunicar:**
+    A omissao de comunicacao de incidente relevante e infração grave,
+    agravada se a CVM tomar conhecimento por terceiros ou pela midia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Deteccao automatizada de incidentes reportaveis:**
+      1. Regras no SIEM para identificar automaticamente incidentes que
+         atendem aos criterios de relevancia (impacto em operacoes ou
+         investidores).
+      2. Alertas prioritarios com tag "CVM-reportavel" para triagem
+         imediata pelo CSIRT.
+      3. Workflow automatizado de notificacao interna quando incidente
+         atinge criterio de relevancia.
+
+      **Template de comunicacao:**
+      4. Template padronizado com os quatro itens obrigatorios do
+         paragrafo 1, pre-preenchido com dados do SIEM e ticketing.
+      5. Versionamento de comunicacoes (inicial, atualizacoes, final).
+      6. Repositorio seguro para armazenamento de todas as comunicacoes
+         enviadas a CVM.
+
+      **Infraestrutura de comunicacao:**
+      7. Canal de comunicacao seguro com a CVM (email seguro, portal
+         dedicado se disponivel).
+      8. Backup de canal de comunicacao (telefone, protocolo presencial)
+         caso infraestrutura digital esteja comprometida.
+    tools:
+      - siem
+      - soar
+      - ticketing-system
+      - secure-email
+  devsecops:
+    prose: |
+      **Deteccao de incidentes no pipeline:**
+      1. Alertas quando vulnerabilidades criticas exploraveis sao detectadas
+         em producao (potencial incidente em andamento).
+      2. Deteccao de alteracoes nao autorizadas em codigo de producao
+         (supply chain attack, insider threat).
+      3. Monitoramento de integridade de artefatos deployados vs. artefatos
+         assinados.
+
+      **Correlacao para relatorio de incidente:**
+      4. Timeline automatica: ultimo deploy, alteracoes recentes, vulnerabilidades
+         conhecidas, para compor descricao do incidente (I).
+      5. Analise de blast radius: quais servicos, dados e investidores podem
+         ter sido afetados (IV).
+      6. Evidencias de pipeline para demonstrar medidas preventivas existentes
+         (scanning, code review, aprovacoes).
+
+      **Remediacao rastreavel:**
+      7. Hotfix pipeline com rastreabilidade completa para demonstrar
+         medidas adotadas (III).
+      8. Rollback documentado com justificativa e timestamp.
+    tools:
+      - gitlab-ci
+      - gitlab-audit-events
+      - gitlab-incident-management
+      - siem
+  secops:
+    prose: |
+      **Processo de comunicacao a CVM:**
+      1. Procedimento formal de avaliacao de relevancia: checklist com
+         criterios objetivos (afeta operacoes? risco a investidores?).
+      2. Arvore de decisao documentada: incidente -> triagem -> classificacao
+         -> avaliacao de relevancia -> comunicacao CVM se aplicavel.
+      3. SLA interno: avaliacao de relevancia em ate 2 horas apos
+         confirmacao do incidente.
+
+      **Preparacao da comunicacao (paragrafo 1):**
+      4. I - Descricao: timeline, vetor de ataque, sistemas afetados.
+      5. II - Riscos: analise de impacto, dados comprometidos, potencial
+         de propagacao.
+      6. III - Medidas: acoes de contencao realizadas, plano de erradicacao,
+         timeline estimada.
+      7. IV - Impacto em investidores: dados afetados, operacoes impactadas,
+         comunicacao a investidores planejada.
+
+      **Atualizacao continua (paragrafo 2):**
+      8. Atualizacoes a cada 24 horas para incidentes em andamento.
+      9. Relatorio final detalhado apos resolucao completa.
+      10. Licoes aprendidas compartilhadas com CVM se solicitado.
+
+      **Registro e retencao:**
+      11. Todas as comunicacoes retidas por minimo 5 anos.
+      12. Dossiê completo do incidente para referencia futura.
+      13. Simulacao de comunicacao a CVM nos exercicios de resposta.
+    tools:
+      - soar
+      - ticketing-system
+      - grc-platform
+      - secure-communication
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-10", "art-11"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6", "IR-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.26", "A.6.8"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements

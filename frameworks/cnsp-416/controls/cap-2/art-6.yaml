@@ -1,0 +1,125 @@
+id: art-6
+family: cap-2
+title: "Sistemas de Informacao e Trilha de Auditoria"
+class: CNSP-416
+baselines: [todas-supervisionadas]
+statement:
+  prose: |
+    Art. 6. Os sistemas de informação utilizados pela supervisionada devem:
+    I - manter registros completos e tempestivos das transações e operações realizadas;
+    II - possuir trilha de auditoria que permita identificar o usuário que realizou
+    cada operação, o momento da realização e as alterações efetuadas;
+    III - garantir a integridade, disponibilidade e confidencialidade das informações;
+    IV - assegurar a rastreabilidade das informações utilizadas nos processos de gestão
+    de riscos e de tomada de decisão;
+    V - possuir controles de acesso adequados, com autenticação e autorização baseadas
+    no princípio do menor privilégio.
+guidance:
+  prose: |
+    O art. 6 estabelece requisitos tecnicos especificos para os sistemas de informacao
+    que suportam o SCI e a EGR.
+
+    **Registros completos e tempestivos (I):**
+    "Tempestivos" significa em tempo real ou proximos disso — nao registros batch
+    que chegam com atraso. Para decisoes de risco em tempo real (ex: subscrever um
+    risco grande), o registro deve ser imediato.
+
+    **Trilha de auditoria (II):**
+    Tres elementos obrigatorios:
+    - WHO: identificacao do usuario (nao anonimo, nao compartilhado)
+    - WHEN: timestamp com precisao adequada (para reconciliacoes, judicial)
+    - WHAT: o que foi alterado (before/after para campos criticos)
+
+    **CIA da informacao (III):**
+    Trias classica de seguranca da informacao aplicada a contexto regulatorio:
+    - Confidencialidade: dados de segurados protegidos (LGPD)
+    - Integridade: dados de provisoes tecnicas nao podem ser alterados indevidamente
+    - Disponibilidade: sistemas de sinistro disponivel para regulacao
+
+    **Rastreabilidade (IV):**
+    Dados que alimentam modelos de risco e decisoes devem ter linhagem completa:
+    de onde vieram, quando foram atualizados, quem autorizou alteracoes.
+
+    **Menor privilegio (V):**
+    Cada usuario acessa apenas o que precisa para sua funcao. Nenhum usuario deve
+    ter acesso universal a todos os sistemas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Trilha de auditoria imutavel:**
+      1. Implementar audit logging centralizado imutavel (append-only) para todos os
+         sistemas criticos de seguros (policy, sinistro, investimentos, contabilidade).
+      2. Log fields obrigatorios: user_id, timestamp_utc, action, object_type, object_id,
+         old_value, new_value, ip_address, session_id.
+      3. Centralizacao de logs em SIEM com retencao minima de 5 anos.
+      4. Protecao dos logs: controle de acesso, criptografia at-rest e in-transit.
+
+      **Integridade e disponibilidade:**
+      5. Banco de dados com checksums para detectar corrupcao de dados.
+      6. Backup e recuperacao testados periodicamente (RTO/RPO definidos).
+      7. Replicacao de dados criticos em multiplas zonas de disponibilidade.
+      8. Criptografia de dados sensiveis (dados de segurados, valores de apolices).
+
+      **Controles de acesso:**
+      9. IAM centralizado com RBAC granular em todos os sistemas de seguros.
+      10. MFA obrigatorio para todos os usuarios de sistemas criticos.
+      11. Revisao automatizada de permissoes excessivas (SoD violations).
+      12. Privileged Access Management para acesso administrativo.
+    tools:
+      - siem
+      - iam-platform
+      - pam-solution
+      - encryption-platform
+      - backup-recovery
+  devsecops:
+    prose: |
+      **Audit logging no desenvolvimento:**
+      1. Bibliotecas padrao de audit logging fornecidas como package interno.
+      2. Template de microservico ja inclui audit logging para operacoes criticas.
+      3. Testes automatizados que verificam que audit logs sao gerados corretamente.
+      4. Code review checklist: audit logging presente para todas as operacoes de escrita?
+
+      **Controles de acesso no codigo:**
+      5. Authorization middleware padronizado para todos os servicos (menor privilegio).
+      6. Testes de autorizacao: verificar que usuarios sem permissao sao bloqueados.
+      7. Secret scanning: credenciais nao podem aparecer em codigo ou logs.
+      8. Dependency scanning para bibliotecas de autenticacao/autorizacao.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - secret-detection
+      - opa-gatekeeper
+      - audit-logging
+  secops:
+    prose: |
+      **Gestao da trilha de auditoria:**
+      1. Monitoramento da integridade dos logs de auditoria (alert se logs forem deletados
+         ou modificados).
+      2. Revisao periodica de logs de acesso privilegiado.
+      3. Investigacoes de incidentes usando trilha de auditoria.
+      4. Retencao de logs conforme politica: minimo 5 anos, criticos 10 anos.
+
+      **Revisao de controles de acesso:**
+      5. Revisao semestral de todos os acessos: usuarios ativos com permissoes corretas?
+      6. Recertificacao de acessos privilegiados: trimestral.
+      7. Revogacao imediata de acessos de colaboradores desligados (processo formal).
+      8. Teste de acesso: verificar que controles de menor privilegio funcionam.
+    tools:
+      - siem
+      - iam-platform
+      - pam-solution
+      - compliance-scanner
+      - grc-platform
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-7"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-9", "AC-2", "AC-3", "AC-17"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16", "A.8.2", "A.8.3"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

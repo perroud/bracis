@@ -1,0 +1,140 @@
+id: e8-user-app-hardening
+family: prevent
+title: "User Application Hardening"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    User applications (including web browsers, email clients, office suites, and PDF
+    viewers) are hardened by disabling unneeded features that are commonly exploited by
+    adversaries. This includes blocking Flash content, advertisements, Java in web
+    browsers, and other unnecessary internet-facing features. Web browsers are configured
+    to block or disable support for unnecessary web technologies and plugins that increase
+    the attack surface.
+
+guidance:
+  prose: >-
+    User-facing applications are the primary interface between end users and the internet,
+    making them prime targets for exploitation. Hardening these applications by disabling
+    unnecessary features significantly reduces the attack surface. Flash Player, Java
+    applets in browsers, and web advertisements have historically been major vectors for
+    drive-by downloads and exploit kit delivery. Even after Flash's end-of-life, legacy
+    installations must be identified and removed. Advertisement blocking reduces exposure
+    to malvertising campaigns.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        Web browsers do not process Java from the internet. Web browsers do not process
+        web advertisements from the internet. Internet Explorer 11 is disabled or
+        removed. .NET Framework 3.5 (includes .NET 2.0 and 3.0) is disabled or removed.
+        Microsoft Office is blocked from creating child processes. Microsoft Office is
+        blocked from creating executable content. Microsoft Office is blocked from
+        injecting code into other processes. Microsoft Office is configured to prevent
+        activation of OLE packages. PDF software is blocked from creating child
+        processes. Security settings for user applications cannot be changed by users.
+    ml2:
+      prose: >-
+        Web browsers do not process Java from the internet. Web browsers do not process
+        web advertisements from the internet. Internet Explorer 11 is disabled or
+        removed. .NET Framework 3.5 (includes .NET 2.0 and 3.0) is disabled or removed.
+        Microsoft Office is blocked from creating child processes. Microsoft Office is
+        blocked from creating executable content. Microsoft Office is blocked from
+        injecting code into other processes. Microsoft Office is configured to prevent
+        activation of OLE packages. PDF software is blocked from creating child
+        processes. Web browsers are hardened using ASD/ACSC or vendor hardening guidance.
+        Microsoft Office, PDF software, and security products are hardened using
+        ASD/ACSC or vendor hardening guidance. Security settings for user applications
+        cannot be changed by users. Allowed and blocked user application hardening
+        events are logged. Event logs are protected from unauthorised modification
+        and deletion.
+    ml3:
+      prose: >-
+        Web browsers do not process Java from the internet. Web browsers do not process
+        web advertisements from the internet. Internet Explorer 11 is disabled or
+        removed. .NET Framework 3.5 (includes .NET 2.0 and 3.0) is disabled or removed.
+        PowerShell is configured to use Constrained Language Mode. Microsoft Office is
+        blocked from creating child processes. Microsoft Office is blocked from creating
+        executable content. Microsoft Office is blocked from injecting code into other
+        processes. Microsoft Office is configured to prevent activation of OLE packages.
+        PDF software is blocked from creating child processes. Web browsers, Microsoft
+        Office, PDF software, and security products are hardened using ASD/ACSC or
+        vendor hardening guidance, with the most restrictive settings applied.
+        Security settings for user applications cannot be changed by users. Allowed and
+        blocked user application hardening events are centrally logged and monitored for
+        signs of compromise. Event logs are protected from unauthorised modification
+        and deletion. Event logs are analysed in a timely manner.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - User Application Hardening"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 CM-7 - Least Functionality"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy browser hardening configurations via Group Policy, Intune, or Chrome ADMX
+      templates to disable Java plugins, block advertisements via enterprise ad-blocking
+      DNS (Pi-hole, NextDNS, Cloudflare Gateway), and enforce HTTPS-only mode. Remove
+      Internet Explorer 11 and .NET Framework 3.5 via Windows feature management in
+      SCCM/Intune or via image hardening in golden image pipelines. Configure Microsoft
+      Defender Attack Surface Reduction (ASR) rules to block Office and PDF child process
+      creation, executable content creation, and OLE activation. Enforce PowerShell
+      Constrained Language Mode via WDAC or AppLocker policies for ML3. Manage all
+      hardening configurations as code in version-controlled repositories.
+    tools:
+      - group-policy
+      - intune
+      - sccm
+      - microsoft-defender-asr
+      - chrome-admx
+      - nextdns
+      - cloudflare-gateway
+      - ansible
+
+  devsecops:
+    prose: >-
+      Include user application hardening validation in endpoint compliance scanning
+      pipelines. Use CIS Benchmark scanning tools (CIS-CAT, InSpec) to verify browser,
+      Office, and PDF reader hardening against published baselines. Integrate hardening
+      configuration drift detection into CI/CD pipelines that deploy endpoint
+      configuration. Version-control all ADMX templates, ASR rule configurations, and
+      Intune compliance policies. Automate golden image builds with hardening applied
+      and verified via automated tests before image promotion.
+    tools:
+      - cis-cat
+      - inspec
+      - gitlab-ci
+      - packer
+      - ansible
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor ASR rule events via Microsoft Defender for Endpoint and forward to SIEM
+      for centralized analysis. Alert on blocked child process creation by Office or PDF
+      applications as potential indicators of exploitation attempts. Track removal
+      compliance for Internet Explorer 11 and .NET Framework 3.5 across the fleet.
+      Conduct quarterly hardening compliance audits comparing endpoint configurations
+      against ASD/ACSC and vendor hardening baselines. Investigate user application
+      hardening bypass attempts or configuration drift.
+    tools:
+      - microsoft-defender-endpoint
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - qualys-policy-compliance
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7", "CM-7(1)", "CM-7(2)", "SC-18"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.3", "CIS 2.7", "CIS 9.1"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.19", "A8.9"]
+    relationship: supports

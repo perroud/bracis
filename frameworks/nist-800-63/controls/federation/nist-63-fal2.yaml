@@ -1,0 +1,119 @@
+id: nist-63-fal2
+family: federation
+title: "FAL2 — Signed and Encrypted Assertions"
+class: SP800-63C
+
+baselines: [fal2, fal3]
+
+statement:
+  prose: >-
+    At FAL2, in addition to the requirements at FAL1, the assertion SHALL be
+    encrypted to the RP using a key managed by the RP. The assertion SHALL be
+    signed by the IdP prior to encryption (sign-then-encrypt). The RP's key
+    used for assertion encryption SHALL be an asymmetric key. The assertion SHALL
+    be encrypted using an approved key transport or agreement scheme (e.g., RSA-OAEP
+    or ECDH-ES). The IdP SHALL encrypt assertions to the RP in such a way that
+    the assertion content is not available to network observers or intermediaries
+    that may be present in the channel between the IdP and the RP, including
+    any other party to the federation. Proxied federation protocols SHALL
+    maintain the assertion encryption at FAL2 by re-encrypting assertions for
+    the ultimate RP.
+
+guidance:
+  prose: >-
+    FAL2 adds assertion encryption as a protection against bearer token interception.
+    Even over TLS, intermediaries such as proxies, CDNs, and TLS inspection appliances
+    may have access to assertion content. FAL2 prevents these intermediaries from
+    reading the assertion payload, which may contain sensitive identity attributes
+    (email, name, IAL level, AAL level). The sign-then-encrypt requirement is important
+    because it preserves the integrity of the IdP's signature within the encrypted
+    envelope — an intermediary could not strip the signature and create a fraudulent
+    assertion. In OIDC, FAL2 is implemented using JSON Web Encryption (JWE) for the
+    ID token, requiring the RP to publish an encryption key in its metadata
+    (jwks_uri). In SAML, it is implemented using XML Encryption for the assertion.
+    Organizations using OIDC must configure their authorization server to encrypt
+    ID tokens and retrieve the RP's encryption key from the RP's JWKS endpoint.
+    FAL2 is the recommended minimum for applications handling PII or operating at
+    IAL2 and above.
+
+references:
+  - citation: "NIST SP 800-63C Section 4.2 — Federation Assurance Level 2"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "RFC 7516 — JSON Web Encryption (JWE)"
+    url: "https://datatracker.ietf.org/doc/html/rfc7516"
+  - citation: "OpenID Connect Core 1.0 — Passing Request Parameters as JWTs"
+    url: "https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests"
+
+related_controls:
+  - id: nist-63-fal1
+    relationship: extends
+    description: "FAL2 adds assertion encryption to all FAL1 requirements."
+  - id: nist-63-fal3
+    relationship: derived-from
+    description: "FAL3 adds holder-of-key binding to the FAL2 baseline."
+  - id: nist-63-assertions
+    relationship: implements
+    description: "Assertion encryption requirements are a key component of FAL2 assertion handling."
+  - id: nist-63-oidc-saml
+    relationship: implements
+    description: "OIDC JWE and SAML XML Encryption implement the FAL2 encryption requirement."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure the authorization server (Keycloak, Okta, Dex) to enable
+      assertion encryption for all FAL2 RPs. Register each RP with an
+      encryption public key (RSA-OAEP with RSA 2048+ or ECDH-ES with P-256)
+      published at the RP's jwks_uri endpoint. Configure the IdP to:
+      (1) retrieve the RP's encryption key at assertion issuance time or
+      cache with a short TTL, (2) sign the assertion using the IdP's signing
+      key, (3) encrypt the signed assertion using the RP's encryption public
+      key with RSA-OAEP-256 or ECDH-ES+A256KW key agreement, (4) embed the
+      kid claim identifying the RP's encryption key. The RP must decrypt
+      the assertion using its corresponding private key (stored in an HSM
+      or Vault-managed secret) before signature verification. Implement
+      automated key rotation for RP encryption keys with JWKS publication
+      of multiple keys (old and new) during the rotation period to allow
+      graceful transitions.
+    tools:
+      - keycloak
+      - okta
+      - vault
+      - dex
+      - aws-kms
+
+  devsecops:
+    prose: >-
+      Include FAL2 assertion encryption in integration tests: validate that
+      assertions are returned as JWE compact serialization (five dot-separated
+      components) when the RP is configured for encryption. Test that the RP
+      correctly decrypts the assertion and then validates the signature on
+      the inner JWS. Build negative tests that confirm the RP rejects
+      unencrypted assertions when FAL2 is configured. Validate the encryption
+      algorithm selection: confirm that weak algorithms (RSA-PKCS1v1.5, weak
+      key sizes) are rejected. Include the RP's encryption private key in the
+      secrets management pipeline, ensuring it is stored in Vault and injected
+      at runtime rather than baked into container images.
+    tools:
+      - gitlab-ci
+      - vault
+      - pytest
+      - playwright
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor for assertion encryption failures: if the RP's encryption key
+      is unavailable or misconfigured, assertions will fail to decrypt and
+      authentication will fail for all users. Alert on decryption failure
+      rates exceeding a threshold. Monitor for encrypted assertion replay
+      attempts (the jti check inside the decrypted payload must still be
+      validated). Conduct periodic checks that the RP encryption keys are
+      stored in HSMs and not in plaintext configuration files. Review the
+      RP's encryption key rotation schedule and alert if keys have not been
+      rotated within the defined policy period.
+    tools:
+      - splunk
+      - azure-sentinel
+      - vault
+      - pagerduty

@@ -1,0 +1,85 @@
+id: art-10
+family: cap-3
+title: "Autenticacao de Usuarios"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 10. Os órgãos e entidades devem implementar mecanismos de autenticação
+    robustos, observando:
+
+    I - uso de autenticação multifator (MFA) para acesso a sistemas críticos
+    e a redes a partir de ambientes externos;
+    II - política de senhas com requisitos mínimos de complexidade, comprimento
+    e periodicidade de troca;
+    III - bloqueio de contas após tentativas sucessivas de autenticação mal
+    sucedidas;
+    IV - vedação do armazenamento de senhas em texto claro.
+guidance:
+  prose: |
+    O art. 10 exige MFA para sistemas criticos e acessos externos. Define
+    requisitos minimos de politica de senhas.
+
+    **Requisitos de autenticacao:**
+    1. MFA obrigatorio: sistemas criticos + acesso remoto
+    2. Senha: complexidade + comprimento minimo + troca periodica
+    3. Bloqueio: lockout apos N tentativas falhas
+    4. Armazenamento: hash + salt (bcrypt, Argon2, PBKDF2)
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.5 (Secure authentication)
+    - NIST 800-53 rev5: IA-2 (Identification and Authentication)
+    - NIST 800-63B (Digital Identity Guidelines - Authentication)
+    - CIS Controls v8: 6.3 (MFA), 6.4 (Password Policies)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack de autenticacao:**
+      1. MFA obrigatorio em todos os IdPs (TOTP, FIDO2/WebAuthn preferencial).
+      2. Politica de senhas: minimo 14 caracteres, verificacao contra lista de
+         senhas comprometidas (HaveIBeenPwned API).
+      3. Account lockout: 5 tentativas falhas -> bloqueio 15min -> desbloqueio
+         automatico ou manual.
+      4. Hashing com Argon2id ou bcrypt (cost factor >= 12).
+      5. Passwordless authentication como evolucao (FIDO2 keys).
+    tools:
+      - mfa-provider
+      - fido2-webauthn
+      - password-policy-engine
+      - breach-password-check
+  devsecops:
+    prose: |
+      **Autenticacao em pipelines:**
+      1. MFA obrigatorio para acesso ao GitLab (TOTP ou WebAuthn).
+      2. Deploy keys e CI/CD variables com rotacao automatica.
+      3. Proibicao de hardcoded credentials em codigo (secret detection).
+      4. Pipeline secrets via vault com TTL curto.
+    tools:
+      - gitlab-mfa
+      - secret-detection
+      - vault
+      - deploy-key-rotation
+  secops:
+    prose: |
+      **Monitoramento de autenticacao:**
+      1. Alerta para tentativas de brute force (>N tentativas falhas em Y minutos).
+      2. Alerta para MFA bypass ou desativacao.
+      3. Monitoramento de credential stuffing via correlacao de IPs.
+      4. Relatorio de usuarios sem MFA ativo em sistemas criticos.
+    tools:
+      - siem
+      - brute-force-detection
+      - mfa-compliance-report
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.5"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-2(1)", "IA-2(2)", "IA-5"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

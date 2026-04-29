@@ -1,0 +1,117 @@
+id: art-5
+family: cap-2
+title: "Nivel de Garantia de Seguranca 1 -- NGS1"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 5. O Nível de Garantia de Segurança 1 (NGS1) compreende os
+    requisitos obrigatórios de segurança da informação que todo sistema
+    PEP deve atender, incluindo:
+
+    I - controle de acesso ao sistema, com autenticação individual de
+    usuários e gerenciamento de perfis de acesso;
+
+    II - registro de log de acesso com identificação do usuário, data,
+    hora e ação realizada;
+
+    III - mecanismos de backup e recuperação de dados;
+
+    IV - garantia de integridade dos dados armazenados, impedindo
+    alteração ou exclusão indevida de registros clínicos;
+
+    V - confidencialidade dos dados de saúde, com criptografia em
+    trânsito e em repouso;
+
+    VI - disponibilidade do sistema compatível com a criticidade
+    do serviço de saúde prestado.
+guidance:
+  prose: |
+    O art. 5 detalha os requisitos tecnicos minimos do NGS1. Todo
+    sistema PEP, mesmo sem certificacao formal, deveria atender estes
+    requisitos como baseline de seguranca.
+
+    **Controle de acesso (inciso I):**
+    Autenticacao individual significa que cada profissional de saude
+    deve ter credencial unica. Logins genericos ou compartilhados
+    (ex.: "enfermagem_uti") violam esta exigencia. Perfis de acesso
+    devem seguir principio do menor privilegio.
+
+    **Log de acesso (inciso II):**
+    Todo acesso a dados de paciente deve gerar registro imutavel com
+    identificacao do profissional, paciente acessado, data/hora e tipo
+    de acao (visualizacao, edicao, impressao). Esses logs sao evidencia
+    em caso de vazamento ou acesso indevido.
+
+    **Integridade (inciso IV):**
+    Registros clinicos nao podem ser deletados ou alterados sem
+    rastreabilidade. O padrao e append-only: correcoes geram novo
+    registro vinculado ao original, nunca sobrescrevem.
+
+    **Criptografia (inciso V):**
+    Dados de saude sao dados pessoais sensiveis (LGPD art. 5, II).
+    Criptografia em transito (TLS 1.2+) e em repouso (AES-256) sao
+    requisitos minimos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos requisitos NGS1:**
+      1. Implementar autenticacao com MFA obrigatorio para todos
+         os usuarios do PEP, com integracao a diretorio corporativo
+         (LDAP/AD/SAML) para gestao centralizada de identidades.
+      2. Provisionar banco de dados com criptografia em repouso
+         (TDE ou encryption-at-rest nativo) e garantir TLS 1.2+
+         em todas as conexoes.
+      3. Implementar modelo de dados append-only para registros
+         clinicos: INSERTs e soft-deletes, nunca UPDATEs destrutivos.
+      4. Configurar backup automatizado com RPO maximo de 1 hora
+         e RTO maximo de 4 horas, com testes de restauracao mensais.
+      5. Monitorar disponibilidade do PEP com SLA minimo de 99.5%
+         e alertas automaticos para degradacao.
+    tools:
+      - identity-provider
+      - mfa-service
+      - encrypted-database
+      - backup-automation
+      - monitoring-stack
+  devsecops:
+    prose: |
+      **Validacao de requisitos NGS1 no pipeline:**
+      1. Implementar SAST para identificar falhas de controle de
+         acesso (OWASP A01) e exposicao de dados sensiveis (A02).
+      2. Criar testes automatizados que validem que registros
+         clinicos nao podem ser alterados ou deletados via API.
+      3. Verificar automaticamente que todas as conexoes de banco
+         e APIs utilizam TLS 1.2+ (rejeitar conexoes inseguras).
+      4. Implementar testes de penetracao automatizados focados
+         em escalacao de privilegios e acesso horizontal.
+    tools:
+      - gitlab-ci
+      - sast-scanner
+      - api-security-tests
+      - tls-checker
+      - penetration-testing
+  secops:
+    prose: |
+      **Operacao e monitoramento NGS1:**
+      1. Implementar SIEM para centralizacao e analise de logs de
+         acesso ao PEP, com alertas para padroes anomalos (acesso
+         fora de horario, volume atipico, acesso a pacientes VIP).
+      2. Realizar revisao trimestral de perfis de acesso, removendo
+         acessos de profissionais desligados ou transferidos.
+      3. Executar testes de restauracao de backup mensalmente e
+         documentar resultados como evidencia de conformidade.
+      4. Monitorar tentativas de login falhas e implementar
+         bloqueio automatico apos tentativas excessivas.
+    tools:
+      - siem
+      - access-review
+      - backup-testing
+      - threat-monitoring
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a", "164.312-b", "164.312-c"]
+    relationship: mapped

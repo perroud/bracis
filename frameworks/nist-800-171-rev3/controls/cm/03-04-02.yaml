@@ -1,0 +1,83 @@
+id: 03.04.02
+family: cm
+title: "Configuration Settings"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [cm-6]
+  - cmmc-v2: [cm.l2-3.4.2]
+statement:
+  prose: >-
+    a. Establish and document configuration settings for components employed within the
+       system that reflect the most restrictive mode consistent with operational
+       requirements.
+    b. Implement the configuration settings.
+    c. Identify, document, and approve any deviations from established configuration
+       settings based on explicit operational requirements.
+    d. Monitor and control changes to the configuration settings in accordance with
+       organizational policies and procedures.
+guidance:
+  prose: >-
+    Configuration settings are the parameters that can be changed in the hardware,
+    software, or firmware components of the system that affect the security posture or
+    functionality of the system. IT products with configurable security features are
+    configured in the most restrictive mode consistent with system operational
+    requirements. Common secure configurations (hardening guides) are available from
+    organizations such as the Center for Internet Security (CIS), the Defense Information
+    Systems Agency (DISA STIGs), and vendors. Settings that can be used to meet security
+    requirements include: disabling unnecessary services, protocols, and ports; configuring
+    maximum failed login attempts and session timeouts; enabling logging and audit
+    functions; restricting administrative privileges; and enabling encryption.
+    Deviations from established settings are formally documented and approved.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement CIS Benchmarks and DISA STIGs as code using hardening automation (Ansible
+      hardening roles, Packer golden images). Deploy Kubernetes Pod Security Standards
+      with restricted profiles enforced via admission controllers. Configure all services
+      with security-hardened defaults: TLS 1.2+ only, strong cipher suites, disabled
+      unnecessary protocols, minimal open ports. Use OPA/Kyverno policies to enforce
+      configuration standards across all deployed workloads. Implement golden container
+      base images with pre-hardened configurations maintained by the platform team.
+      Document all configuration deviations in a risk register with compensating controls.
+    tools:
+      - "CIS Benchmarks (automated scanning)"
+      - "DISA STIGs (automated compliance)"
+      - "Ansible hardening roles"
+      - "Packer (golden images)"
+      - "Kyverno / OPA (configuration enforcement)"
+      - "Kubernetes Pod Security Standards"
+  devsecops:
+    prose: >-
+      Scan all IaC and container configurations against CIS Benchmarks and organizational
+      security baselines in CI pipelines. Implement pipeline gates that block deployments
+      with non-compliant configurations unless an approved deviation exists. Maintain a
+      configuration deviation register as a version-controlled document with required
+      approval workflows. Automate STIG compliance checking for OS-level configurations
+      using InSpec or OpenSCAP.
+    tools:
+      - "Checkov / tfsec (CIS compliance)"
+      - "InSpec / OpenSCAP (STIG validation)"
+      - "Trivy (container misconfiguration)"
+      - "Kube-bench (Kubernetes CIS)"
+      - "Hadolint (Dockerfile linting)"
+      - "CI/CD compliance gates"
+  secops:
+    prose: >-
+      Continuously monitor configuration compliance across all systems. Alert on
+      configuration changes that deviate from approved settings. Conduct periodic
+      configuration audits comparing actual settings against documented baselines and
+      approved deviations. Track remediation timelines for non-compliant configurations.
+      Report configuration compliance metrics to management and maintain evidence for
+      assessment purposes.
+    tools:
+      - "CSPM (Prisma Cloud, Wiz, AWS Config)"
+      - "STIG compliance scanners"
+      - "Configuration monitoring dashboards"
+      - "Vulnerability management (misconfiguration tracking)"
+      - "Compliance evidence collection"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — CM-6"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"

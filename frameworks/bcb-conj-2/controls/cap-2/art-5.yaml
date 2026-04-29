@@ -1,0 +1,165 @@
+id: art-5
+family: cap-2
+title: "Atualizacao e Complementacao da Notificacao"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 5. As instituições referidas no art. 1 devem manter o Banco Central do
+    Brasil informado sobre o andamento do tratamento do incidente notificado,
+    incluindo atualizações sobre:
+    I - a evolução do incidente e de seus efeitos;
+    II - as medidas adotadas e as em curso para o tratamento do incidente;
+    III - a conclusão do tratamento do incidente, incluindo a análise de causa raiz;
+    IV - as medidas adotadas ou planejadas para prevenir a recorrência do incidente.
+
+    Parágrafo único. As informações de que trata este artigo devem ser prestadas
+    até o encerramento do tratamento do incidente.
+guidance:
+  prose: |
+    O art. 5 estabelece a obrigacao de comunicacao continua apos a notificacao
+    inicial do art. 3. Nao basta notificar uma vez; a instituicao deve manter o
+    BCB informado ate o encerramento completo do incidente.
+
+    **I - Evolucao do incidente:**
+    Atualizacoes sobre como o incidente esta evoluindo:
+    - Escopo esta se expandindo ou foi contido?
+    - Novos sistemas ou dados foram afetados?
+    - Numero de afetados aumentou?
+    - Severidade foi reclassificada?
+    Estas atualizacoes devem ser factuais, sem especulacoes.
+
+    **II - Medidas em andamento:**
+    Status das acoes de resposta:
+    - O que ja foi feito (contencao, patches aplicados, contas bloqueadas)
+    - O que esta em execucao (investigacao forense, restauracao de backups)
+    - O que esta planejado (hardening, atualizacao de controles)
+    Deve incluir estimativa de prazo para conclusao de cada acao.
+
+    **III - Conclusao e causa raiz:**
+    Quando o incidente e encerrado, a comunicacao final deve incluir:
+    - Confirmacao do encerramento
+    - Analise de causa raiz (root cause analysis)
+    - Impacto final real (vs. estimativa inicial)
+    - Timeline completa do incidente (deteccao -> contencao -> erradicacao ->
+      recuperacao -> encerramento)
+
+    **IV - Prevencao de recorrencia:**
+    Plano de acoes corretivas e preventivas:
+    - Medidas ja implementadas para evitar recorrencia
+    - Medidas planejadas com cronograma de implementacao
+    - Investimentos em seguranca relacionados
+    - Indicadores que serao monitorados
+
+    **Frequencia de atualizacao (paragrafo unico):**
+    A resolucao nao define frequencia especifica, mas na pratica o BCB espera:
+    - Incidentes criticos: atualizacao a cada 4-8 horas
+    - Incidentes altos: atualizacao diaria
+    - Evolucao significativa: atualizacao imediata
+    - Relatorio de encerramento: ate 5 dias uteis apos encerramento
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de atualizacao continua:**
+      1. Incident management platform com fluxo de atualizacao regulatorio embutido:
+         - Trigger automatico para gerar update report quando status do incidente
+           muda (novo sistema afetado, reclassificacao, contencao concluida).
+         - Timer configuravel para forcar update periodico (ex: a cada 4h para
+           incidentes criticos).
+      2. Dashboard de status do incidente com dados em tempo real que alimentam
+         automaticamente os updates ao BCB.
+      3. Timeline imutavel do incidente com registro de todas as acoes, decisoes
+         e comunicacoes.
+
+      **Analise de causa raiz automatizada (inciso III):**
+      4. Correlacao automatica de eventos no SIEM para sugerir causa raiz.
+      5. Rastreamento de mudancas recentes (deploys, configs, patches) que possam
+         estar correlacionadas ao incidente.
+      6. Integracao com CMDB para mapear cadeia de causalidade entre componentes.
+
+      **Prevencao de recorrencia (inciso IV):**
+      7. Registro de acoes corretivas como tickets com SLA de implementacao.
+      8. Monitoramento automatico de regressao: alertas se indicadores que levaram
+         ao incidente voltarem a se manifestar.
+      9. Dashboard de progresso das acoes preventivas visivel para compliance.
+    tools:
+      - incident-management
+      - siem
+      - cmdb
+      - monitoring-alerting
+      - centralized-logging
+  devsecops:
+    prose: |
+      **Rastreabilidade para updates ao BCB:**
+      1. Git history como fonte de evidencia para evolucao do incidente:
+         - Commits de hotfix com referencia ao incidente
+         - Merge requests de contencao com timeline
+         - Rollbacks documentados
+      2. Pipeline de coleta continua de evidencias durante o incidente:
+         - Logs de aplicacao
+         - Metricas de performance
+         - Estado de configuracoes
+         - Resultados de scans de seguranca
+
+      **Analise de causa raiz no codigo (inciso III):**
+      3. Correlacao entre o incidente e vulnerabilidades detectadas em scans
+         anteriores (SAST, DAST, dependency).
+      4. Revisao de code changes no periodo anterior ao incidente.
+      5. SBOM analysis para identificar componentes vulneraveis.
+
+      **Acoes preventivas no pipeline (inciso IV):**
+      6. Novos rules/checks no pipeline derivados do incidente.
+      7. Atualizacao de dependencias vulneraveis identificadas na causa raiz.
+      8. Test cases adicionais cobrindo o cenario do incidente.
+      9. Documentacao de lessons learned no repositorio.
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - centralized-logging
+      - incident-management
+  secops:
+    prose: |
+      **Processo de atualizacao ao BCB:**
+      1. Responsavel designado por compilar atualizacoes (inciso I e II).
+      2. Frequencia de atualizacao definida por severidade:
+         - Critico: a cada 4 horas ou a cada mudanca significativa
+         - Alto: diariamente
+         - Medio: a cada 48 horas
+      3. Template de atualizacao com campos mapeados aos incisos I a IV.
+      4. Aprovacao do CISO antes de cada envio.
+
+      **Relatorio de encerramento (inciso III):**
+      5. Post-mortem formal com analise de causa raiz.
+      6. Metodologia de RCA documentada (5 Whys, Fishbone, Fault Tree).
+      7. Timeline completa e imutavel do incidente.
+      8. Impacto final quantificado (clientes, transacoes, dados, financeiro).
+      9. Licoes aprendidas documentadas.
+
+      **Plano de prevencao de recorrencia (inciso IV):**
+      10. Lista de acoes corretivas com responsavel e prazo.
+      11. Acompanhamento de implementacao com evidencias.
+      12. Teste de eficacia das medidas implementadas.
+      13. Atualizacao de controles, playbooks e politicas conforme necessario.
+      14. Comunicacao ao BCB sobre o status de implementacao das medidas
+          preventivas em intervalos acordados.
+    tools:
+      - incident-management
+      - soar
+      - grc-platform
+      - forensic-tools
+      - communication-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-5", "IR-6", "IR-8"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.27"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements

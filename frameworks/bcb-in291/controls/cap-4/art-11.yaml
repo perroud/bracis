@@ -1,0 +1,154 @@
+id: art-11
+family: cap-4
+title: "Relatorio Final de Incidente Cibernetico"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 11. No prazo de 30 (trinta) dias após o encerramento do incidente de
+    segurança cibernética, a instituição deve encaminhar ao BCB relatório final
+    contendo:
+
+    I - cronologia detalhada do incidente, desde a detecção até o encerramento;
+    II - descrição completa dos sistemas, dados e clientes afetados, com
+    quantificações definitivas;
+    III - análise da causa raiz do incidente, com identificação dos fatores
+    contribuintes técnicos e humanos;
+    IV - descrição das ações de contenção, erradicação e recuperação realizadas;
+    V - avaliação do impacto financeiro total do incidente, incluindo perdas
+    operacionais, custos de remediação e provisões para multas regulatórias;
+    VI - medidas corretivas e preventivas implementadas ou planejadas para evitar
+    recorrência;
+    VII - lições aprendidas e melhorias identificadas para o programa de segurança
+    cibernética da instituição;
+    VIII - status das notificações a outras autoridades reguladoras, incluindo
+    resultado de processos abertos.
+
+    § 1. O BCB pode, a seu critério, solicitar informações adicionais ou
+    esclarecimentos sobre o relatório final, e a instituição deve responder no
+    prazo estabelecido pelo regulador.
+
+    § 2. O relatório final substitui e consolida todas as comunicações
+    anteriores sobre o incidente, devendo ser elaborado com a profundidade e
+    precisão que o distancia das notificações iniciais, necessariamente realizadas
+    sob pressão de tempo e com informações parciais.
+guidance:
+  prose: |
+    O relatorio final e o documento mais importante e permanente do ciclo de
+    notificacao. Diferente das comunicacoes iniciais feitas sob pressao de tempo,
+    o relatorio final tem 30 dias para ser elaborado com rigor e completude.
+
+    **Inciso I - Cronologia:**
+    Timeline detalhada com timestamps precisos de cada evento relevante:
+    - Primeiro indicador de comprometimento (mesmo que retroativamente identificado)
+    - Primeira deteccao pela instituicao
+    - Cada acao de resposta com hora e responsavel
+    - Notificacoes ao BCB e outras autoridades
+    - Marcos de contencao, erradicacao, recuperacao
+    - Encerramento formal
+    A cronologia deve ser baseada em evidencias forenses, nao em memoria ou
+    relatos. Logs devem ser preservados e citados como fontes.
+
+    **Inciso II - Quantificacoes definitivas:**
+    O relatorio final deve ter numeros precisos (ou a melhor estimativa possivel
+    com metodologia declarada), em contraste com as estimativas iniciais.
+    Reconciliacao explicita entre as estimativas iniciais e os numeros finais
+    e boa pratica: "a notificacao inicial estimou 50.000 clientes afetados;
+    a investigacao forense confirmou 47.321 clientes."
+
+    **Inciso III - Causa raiz:**
+    A analise de causa raiz (RCA) e o elemento mais substancial do relatorio.
+    Metodologias recomendadas:
+    - 5 Whys para incidentes simples
+    - Fishbone (Ishikawa) para incidentes com multiplos fatores
+    - Attack chain analysis para incidentes de ameaca persistente
+    A RCA deve identificar causas tecnicas (vulnerabilidade explorada), causas de
+    processo (controle que falhou) e causas humanas (erro ou negligencia) sem
+    atribuir culpa individual.
+
+    **Inciso VI e VII - Medidas corretivas e licoes aprendidas:**
+    O BCB espera ver nao apenas o que aconteceu, mas o que a instituicao aprendeu
+    e como vai se fortalecer. Medidas vagas como "fortalecer a seguranca" sao
+    insuficientes; o BCB espera medidas especificas com prazos e responsaveis.
+
+    **Prazo de 30 dias:**
+    O prazo comeca no encerramento formal do incidente. O encerramento deve ser
+    uma declaracao formal documentada, nao apenas uma percepcao informal de que
+    "o incidente passou". Sem encerramento formal, o prazo de 30 dias nao inicia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de elaboracao do relatorio final:**
+      1. Template de relatorio final estruturado com oito secoes correspondentes
+         aos incisos do art. 11, com:
+         - Pre-preenchimento automatico com todos os dados coletados durante o incidente
+         - Importacao automatica da timeline do sistema de incidentes
+         - Reconciliacao automatica entre estimativas iniciais e dados finais
+         - Campo de "delta de aprendizados" comparando com incidentes anteriores
+      2. Timer de 30 dias ativado no momento do encerramento formal do incidente:
+         alertas em D+15, D+25, D+28, D+30.
+      3. Workflow de aprovacao do relatorio final:
+         Analyst -> CISO -> Compliance -> Juridico -> Diretoria -> Envio ao BCB
+      4. Integracao com sistema de gestao de RCA:
+         importar automaticamente a analise de causa raiz do ticket de incidente.
+      5. Rastreamento de medidas corretivas (inciso VI):
+         cada medida vira um ticket de acao corretiva com prazo e responsavel,
+         linkado ao relatorio final.
+    tools:
+      - incident-management
+      - grc-platform
+      - document-management
+      - task-management
+      - notification-system
+  devsecops:
+    prose: |
+      **Dados tecnicos para o relatorio final:**
+      1. Coleta automatica e preservacao de artefatos forenses durante o incidente:
+         logs, netflows, memory dumps, disk images armazenados com chain of custody.
+      2. Timeline automatica de deploys, configuracoes e mudancas de infraestrutura
+         para correlacao com a cronologia do incidente (inciso I).
+      3. SBOM e patch history para confirmar se a vulnerabilidade explorada
+         tinha correcao disponivel e quando foi (ou deveria ter sido) aplicada.
+      4. Metricas de cobertura de controles de seguranca antes do incidente
+         para identificar gaps no programa de seguranca (inciso VII).
+      5. Automacao da medicao de impacto definitivo:
+         relatorio de transacoes afetadas, usuarios impactados, downtime total.
+    tools:
+      - forensic-tools
+      - gitlab-ci
+      - sbom-generator
+      - log-aggregator
+      - metrics-platform
+  secops:
+    prose: |
+      **Processo de elaboracao do relatorio final:**
+      1. Designar autor principal do relatorio (diferente do incident commander):
+         perspectiva externa ao caos do incidente melhora a qualidade.
+      2. Entrevistas estruturadas com todos os envolvidos na resposta ao incidente
+         para capturar perspectivas diferentes e reconstruir a cronologia.
+      3. Revisao por par: outro CISO ou consultor externo revisa o relatorio
+         antes do envio ao BCB para garantir qualidade e completude.
+      4. Post-mortem blameless: cultura de licoes aprendidas sem culpabilizacao
+         individual para maximizar abertura e aprendizado genuino.
+      5. Mecanismo de rastreamento de acoes corretivas com status visivel para
+         a alta diretoria e para o BCB (se solicitado apos o relatorio).
+      6. Versao executiva do relatorio (1-2 paginas) para a diretoria, distinta
+         do relatorio tecnico completo para o BCB.
+    tools:
+      - incident-management
+      - grc-platform
+      - document-management
+      - task-management
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-4", "art-5"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-10", "art-11"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-5", "IR-8"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26", "A.5.27"]
+    relationship: supports

@@ -1,0 +1,135 @@
+id: art-13
+family: cap-3
+title: "Identificacao de Clientes Pessoas Juridicas"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 13. As supervisionadas devem coletar, verificar e registrar as seguintes
+    informações de seus clientes pessoas jurídicas, previamente ao início do
+    relacionamento:
+    I - razão social;
+    II - nome fantasia, quando houver;
+    III - número de inscrição no Cadastro Nacional da Pessoa Jurídica (CNPJ);
+    IV - endereço da sede;
+    V - número de telefone e endereço eletrônico (e-mail);
+    VI - atividade principal;
+    VII - faturamento médio mensal dos últimos doze meses;
+    VIII - identificação dos beneficiários finais;
+    IX - declaração sobre o propósito e a natureza pretendida da relação de negócios.
+guidance:
+  prose: |
+    O art. 13 define os dados minimos obrigatorios para identificacao de clientes
+    pessoas juridicas no mercado securitario.
+
+    **Dados obrigatorios (incisos I a IX):**
+
+    1. Dados de identificacao (I-V):
+       Informacoes basicas de identificacao corporativa. No mercado securitario,
+       pessoas juridicas aparecem como:
+       - Estipulantes de seguros coletivos (empresas que contratam para funcionarios)
+       - Segurados de seguros empresariais (patrimonial, responsabilidade civil)
+       - Participantes corporativos de planos de previdencia
+       - Cedentes de resseguro
+       - Beneficiarios de seguros (indenizacao paga a PJ)
+
+    2. Atividade e faturamento (VI-VII):
+       Criticos para avaliacao de compatibilidade:
+       - Empresa de faturamento de R$ 100.000/mes com seguro patrimonial de
+         R$ 50.000.000 e incompativel
+       - CNAE de alto risco (ex: comercio de joias, cambio, imoveis) exige EDD
+       - Faturamento declarado deve ser consistente com dados publicos (porte
+         SIMPLES/Lucro Presumido/Lucro Real)
+
+    3. Beneficiario final (VIII):
+       Obrigacao central do art. 13. A supervisionada deve identificar a pessoa
+       natural que, em ultima instancia, controla a pessoa juridica:
+       - Participacao direta ou indireta >= 25% do capital social
+       - Controle efetivo independente de participacao (acordo de acionistas,
+         procuracao irrevogavel)
+       - Cadeia societaria completa ate pessoa fisica final
+       Excecoes a identificacao: empresas listadas em bolsa (ja tem disclosure),
+       orgaos publicos, organismos internacionais
+
+    4. Proposito da relacao (IX):
+       Justificativa economica para contratacao:
+       - Seguro patrimonial: protecao de ativos da empresa
+       - Seguro de vida em grupo: beneficio a funcionarios
+       - PGBL/VGBL corporativo: remuneracao variavel
+       Propositos sem vinculo com atividade empresarial exigem investigacao.
+
+    **Estruturas societarias complexas:**
+    No mercado securitario, atencao especial para:
+    - Holdings familiares que contratam seguros de vida de alto valor
+    - Offshore companies como beneficiarias de seguros
+    - SPVs (Special Purpose Vehicles) em operacoes de resseguro
+    - Empresas recem-constituidas com seguros de alto valor
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Cadastro corporativo:**
+      1. Formulario de onboarding PJ com todos os 9 campos obrigatorios, incluindo
+         modulo especifico de beneficiario final com suporte a cadeia societaria.
+      2. Integracao com Receita Federal para consulta de CNPJ, situacao cadastral,
+         CNAE, QSA (Quadro de Socios e Administradores).
+      3. Motor de resolucao de cadeia societaria para identificar beneficiario
+         final ate pessoa fisica, com suporte a cadeia de participacoes.
+      4. Integracao com Junta Comercial para validacao de contrato social e
+         alteracoes.
+
+      **Validacoes automaticas:**
+      5. Verificacao de situacao cadastral CNPJ (ativa, suspensa, inapta).
+      6. Cruzamento de faturamento declarado com porte na Receita Federal.
+      7. Screening de todos os socios e beneficiarios finais contra listas de
+         PEP e sancoes.
+      8. Alerta automatico quando beneficiario final nao pode ser identificado
+         (cadeia societaria opaca) para trigger de EDD.
+    tools:
+      - kyc-platform
+      - corporate-registry-integration
+      - beneficial-ownership-engine
+      - sanctions-screening
+      - pep-screening
+  devsecops:
+    prose: |
+      **Testes de onboarding PJ:**
+      1. Testes para cenarios de cadeia societaria complexa: holding com
+         multiplos niveis, participacao cruzada, socios estrangeiros.
+      2. Testes de bloqueio quando beneficiario final nao identificado em PJ
+         de alto risco.
+      3. Testes de integracao com Receita Federal e servicos de consulta.
+
+      **Qualidade de dados:**
+      4. Validacao de CNPJ com digito verificador.
+      5. Testes de consistencia entre dados declarados e dados publicos.
+      6. Mascaramento de CNPJ e dados corporativos em ambientes nao-produtivos.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - data-validation
+      - integration-tests
+  secops:
+    prose: |
+      **Monitoramento de PJ:**
+      1. Monitoramento continuo de alteracoes societarias de clientes PJ
+         (alertas de mudanca em QSA via servicos de monitoramento).
+      2. Reavaliacao de beneficiario final quando detectada alteracao societaria.
+      3. Dashboard de PJ com beneficiario final nao identificado ou pendente.
+
+      **Due diligence corporativa:**
+      4. Processo de EDD para PJ com estrutura societaria opaca ou beneficiario
+         final em jurisdicao de alto risco.
+      5. Verificacao de consistencia entre CNAE declarado e produtos contratados.
+      6. Revisao periodica de PJ de alto risco (minimo semestral).
+      7. Retencao de documentacao corporativa por 10 anos apos encerramento.
+    tools:
+      - kyc-platform
+      - corporate-monitoring
+      - beneficial-ownership-engine
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-13"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-18"]
+    relationship: complements

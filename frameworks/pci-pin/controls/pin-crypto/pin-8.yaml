@@ -1,0 +1,87 @@
+id: pin-8
+family: pin-crypto
+title: "Cryptographic Key Lifecycle and Destruction"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    All cryptographic keys used for PIN protection must have a defined lifecycle that
+    includes generation, distribution, storage, usage, rotation, and destruction phases.
+    Keys must be replaced before they reach the end of their cryptoperiod, which must be
+    defined based on the key type, algorithm, and usage volume. Key rotation must be
+    performed without interrupting transaction processing and must ensure that no
+    transactions are processed under expired keys. When keys are retired, all copies of
+    the key material — including backup copies, archived copies, and key components — must
+    be securely destroyed. Destruction of key material within an SCD must use the device's
+    zeroization function. Destruction of key components on paper must use cross-cut
+    shredding or incineration with witnessed documentation.
+
+guidance:
+  prose: >-
+    Key lifecycle management prevents the cryptographic degradation that occurs when keys
+    are used beyond their intended lifespan. TDEA keys should be rotated at minimum
+    annually; AES keys may have longer cryptoperiods depending on usage volume. The
+    critical risk in key rotation is the transition period where both old and new keys must
+    be active — organizations must test rollover procedures thoroughly to prevent
+    transaction failures. Key destruction is equally critical: inadequate destruction
+    leaves residual key material that could be recovered. Organizations must maintain
+    destruction certificates signed by two key custodians, documenting the key identifier,
+    destruction method, date, and witnesses.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 2, Key Replacement and Destruction"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "NIST SP 800-57 Part 1 Rev 5 — Recommendation for Key Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-57pt1r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated key rotation schedules in the key management system with
+      configurable cryptoperiods per key type. Deploy key rotation mechanisms that
+      support zero-downtime rotation using overlapping key validity windows. Configure
+      HSMs to enforce maximum key usage counters and expiration dates, automatically
+      rejecting operations with expired keys. Implement automated key destruction
+      workflows that trigger zeroization across all HSMs holding copies of the retired
+      key. Maintain a key destruction audit trail with cryptographic proof of
+      destruction (e.g., key check value before and after zeroization).
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - venafi
+      - keyfactor
+      - key-lifecycle-management
+  devsecops:
+    prose: >-
+      Test key rotation procedures in CI/CD staging environments to verify zero-downtime
+      transition. Implement automated tests that verify transactions fail gracefully
+      when presented with expired keys. Scan deployment configurations for hardcoded
+      key identifiers that would prevent automated rotation. Test key destruction
+      confirmation workflows end-to-end.
+    tools:
+      - gitlab-sast
+      - integration-test-framework
+      - chaos-engineering
+  secops:
+    prose: >-
+      Monitor key expiration dates and alert 30, 14, and 7 days before scheduled
+      rotation. Audit key destruction certificates for completeness and dual-control
+      signatures. Review key usage volumes against cryptoperiod thresholds. Investigate
+      any transaction attempts using expired or destroyed keys as potential indicators
+      of compromise. Maintain a historical key inventory with full lifecycle records.
+    tools:
+      - splunk
+      - elastic-siem
+      - venafi
+      - thales-crypto-command-center
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped

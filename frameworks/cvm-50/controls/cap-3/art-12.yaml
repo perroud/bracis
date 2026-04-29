@@ -1,0 +1,112 @@
+id: art-12
+family: cap-3
+title: "Identificacao de Beneficiarios Finais"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 12. Os participantes devem identificar o beneficiário final de pessoas
+    jurídicas, fundos de investimento e demais estruturas sem personalidade
+    jurídica com quem mantenham relação de negócios.
+
+    § 1. Para fins desta Resolução, considera-se beneficiário final a pessoa
+    natural que, em última instância:
+    I - detenha, direta ou indiretamente, mais de 25% do capital votante
+    da pessoa jurídica; ou
+    II - exerça controle direto ou indireto, independentemente do percentual
+    de participação; ou
+    III - em nome de quem a relação de negócios é estabelecida ou a transação
+    é realizada.
+
+    § 2. Os participantes devem adotar procedimentos para identificar beneficiários
+    finais até o nível necessário para encontrar as pessoas naturais, percorrendo
+    os níveis societários quando necessário.
+
+    § 3. Quando não for possível identificar o beneficiário final, o participante
+    deve:
+    I - registrar as medidas adotadas para a identificação;
+    II - considerar a relação de negócios como de alto risco; e
+    III - comunicar ao COAF se houver suspeita de lavagem de dinheiro.
+guidance:
+  prose: |
+    A identificacao do beneficiario final e um dos requisitos mais operacionalmente
+    desafiadores da CVM 50, especialmente para participantes que atendem
+    pessoas juridicas e fundos de investimento.
+
+    **Por que o beneficiario final importa:**
+    Criminosos usam camadas de pessoas juridicas (empresas, holdings, offshores,
+    trusts) para obscurecer a origem de recursos. Identificar apenas a pessoa
+    juridica imediata e insuficiente — e necessario chegar ate a pessoa natural.
+
+    **Cadeia societaria:**
+    Se a empresa A e cliente, mas e controlada pela empresa B (em outro pais),
+    que e controlada pela empresa C (em outro pais ainda), o beneficiario final
+    e o acionista pessoa natural que controla a empresa C. O participante precisa
+    percorrer essa cadeia inteira.
+
+    **Threshold de 25%:**
+    O threshold de 25% e quantitativo, mas o inciso II do ss 1 captura controle
+    independente de percentual. Uma pessoa com 15% mas que detem acoes preferenciais
+    especiais ou poderes estatutarios de veto e beneficiaria final.
+
+    **Quando nao e possivel identificar:**
+    O ss 3 estabelece o protocolo para esse caso critico: registrar o esforco,
+    elevar para alto risco e comunicar ao COAF se houver suspeita. Nao identificar
+    o beneficiario final nao e opcao — a relacao deve ser tratada como alto risco.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arvore societaria:**
+      1. Estrutura de dados em grafo para representar cadeias societarias
+         multinivel com suporte a loops (cross-ownership) e jurisdicoes mistas.
+      2. Algoritmo de calculo de participacao indireta: dado arvore societaria,
+         calcular participacao economica efetiva de cada no.
+      3. Identificacao automatica de beneficiarios que superam threshold de 25%
+         em qualquer nivel da cadeia.
+      4. Integracao com fontes de dados internacionais: Orbis (Bureau van Dijk),
+         OpenCorporates, Dunn & Bradstreet para empresas estrangeiras.
+      5. Alerta automatico quando estrutura societaria e alterada (via fonte
+         externa) e novo beneficiario surge ou percentual muda.
+
+      **Fundos de investimento:**
+      6. Para fundos, identificacao de cotistas pessoas naturais acima do
+         threshold ou com controle da politica de investimento do fundo.
+    tools:
+      - entity-resolution
+      - graph-database
+      - beneficial-ownership-platform
+      - data-enrichment-api
+  devsecops:
+    prose: |
+      **Testes de beneficiario final:**
+      1. Testes unitarios para algoritmo de calculo de participacao indireta.
+      2. Casos de teste: empresa direta, holding nacional, holding estrangeira,
+         fundo de fundo, trust estrangeiro, acao preferenciais especiais.
+      3. Testes de performance do grafo societario para empresas com cadeias
+         longas (10+ niveis).
+      4. Testes de integracao com fontes externas de dados societarios.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - graph-testing
+  secops:
+    prose: |
+      **Governanca de beneficiario final:**
+      1. Revisao periodica de beneficiarios finais de clientes PJ de alto risco.
+      2. Processo estruturado para lidar com casos onde o beneficiario final
+         nao pode ser identificado (ss 3).
+      3. KPI: percentual de clientes PJ com beneficiario final identificado
+         e documentado.
+      4. Auditoria de qualidade da identificacao de beneficiario final por
+         amostragem.
+    tools:
+      - aml-platform
+      - audit-management
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-12", "art-13"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

@@ -1,0 +1,90 @@
+id: de.cm-01
+family: de
+title: "Continuous Monitoring - Networks and network services are monitored to find potentially adverse events"
+class: CSF2
+
+statement:
+  prose: >-
+    Networks and network services are monitored to find potentially adverse events.
+
+guidance:
+  prose: >-
+    Continuous monitoring of networks provides the ability to detect attacks, intrusions,
+    and anomalous behavior in near real-time. Monitoring must cover network traffic
+    flows, DNS queries, authentication events, API calls, and service communications.
+    The organization should employ a combination of signature-based detection (known
+    threats), anomaly-based detection (deviations from baselines), and behavioral
+    analysis (threat hunting). Monitoring should span all network segments including
+    east-west traffic within the data center, north-south traffic at the perimeter,
+    cloud VPC flow logs, and service mesh telemetry. Monitoring tools must be properly
+    tuned to minimize false positives while maintaining detection coverage. Alert
+    triage procedures must be documented to ensure timely investigation.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, DE.CM-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement multi-layer network monitoring. Enable cloud VPC flow logs (AWS VPC
+      Flow Logs, GCP VPC Flow Logs, Azure NSG Flow Logs) and forward to the SIEM.
+      Deploy network detection and response (NDR) sensors at key network boundaries.
+      Use service mesh telemetry (Istio, Linkerd) to capture east-west traffic metrics
+      and detect anomalous service-to-service communication. Implement Kubernetes
+      network policies to define expected traffic patterns; deviations from policy
+      generate alerts. Deploy eBPF-based monitoring (Cilium, Falco) for kernel-level
+      network visibility. Configure DNS logging and analytics to detect C2
+      communications, DGA domains, and DNS tunneling.
+    tools:
+      - cilium
+      - falco
+      - istio-telemetry
+      - aws-vpc-flow-logs
+      - gcp-vpc-flow-logs
+      - kubernetes-network-policies
+
+  devsecops:
+    prose: >-
+      Implement application-level monitoring instrumentation through distributed tracing
+      (OpenTelemetry) and structured logging. Define expected API traffic patterns and
+      implement rate limiting and anomaly detection at the API gateway level. Use GitLab
+      Audit Events streaming to forward CI/CD activity events to the SIEM for monitoring.
+      Implement pipeline security monitoring to detect compromised CI/CD pipelines
+      (unusual commands, unexpected network connections during builds, unauthorized
+      secret access).
+    tools:
+      - opentelemetry
+      - gitlab-audit-event-streaming
+      - gitlab-ci
+      - jaeger
+      - grafana
+
+  secops:
+    prose: >-
+      Deploy and tune SIEM correlation rules for network-based threat detection.
+      Implement automated alert triage with SOAR playbooks for common alert types.
+      Maintain network baselines and alert on significant deviations (traffic volume
+      spikes, new protocols, communications to known-bad IPs). Integrate threat
+      intelligence feeds to enrich network alerts with IOC context. Conduct network
+      threat hunting exercises quarterly, focusing on lateral movement, data staging,
+      and C2 communication patterns. Monitor for encrypted channel abuse using JA3/JA4
+      fingerprinting and certificate transparency logs.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - crowdstrike-falcon
+      - darktrace
+      - zeek
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-4", "AC-17", "AU-6"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.16"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-13.1"]
+    relationship: equivalent-to

@@ -1,0 +1,125 @@
+id: crowd-7
+family: oferta
+title: "Offering Structure and Issuer Requirements"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 15. A sociedade empresária emissora deve, para a realização de
+    oferta por meio de plataforma eletrônica de investimento participativo:
+    I — estar constituída no Brasil; II — não ser registrada como emissor
+    de valores mobiliários na CVM; III — não ser controlada, direta ou
+    indiretamente, por sociedade ou fundo de investimento que possua ativos
+    totais superiores a R$ 80.000.000,00 (oitenta milhões de reais);
+    IV — elaborar plano de negócios detalhado contendo, no mínimo, a
+    descrição do negócio, mercado-alvo, estratégia de crescimento,
+    projeções financeiras e riscos identificados.
+
+    § 1º A sociedade empresária emissora deve designar pessoa responsável
+    pelo fornecimento de informações à plataforma e aos investidores.
+
+    § 2º Os administradores da sociedade empresária emissora são
+    responsáveis pela veracidade, consistência e suficiência das
+    informações prestadas no âmbito da oferta.
+guidance:
+  prose: |
+    Article 15 establishes eligibility requirements for companies seeking
+    to raise capital through crowdfunding platforms.
+
+    **Issuer eligibility criteria:**
+    - Must be incorporated in Brazil
+    - Cannot already be a CVM-registered securities issuer (prevents
+      public companies from using the simplified regime)
+    - Cannot be controlled by entities with total assets exceeding R$80M
+      (prevents large corporate groups from using the small-company
+      exemption)
+    - Must prepare a detailed business plan
+
+    **Business plan requirements:**
+    The business plan must include at minimum: business description,
+    target market, growth strategy, financial projections, and identified
+    risks. This is the primary document for investor due diligence.
+
+    **Accountability:**
+    The issuer must designate a responsible contact person for information
+    flow. The issuer's management is personally liable for the truthfulness,
+    consistency, and sufficiency of offering information.
+
+    **Platform due diligence:**
+    While the article focuses on issuer obligations, platforms have an
+    implicit duty to verify issuer eligibility before allowing an offering
+    to launch.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Issuer onboarding and verification system:**
+      1. Build a multi-step issuer onboarding workflow that collects and
+         validates: corporate registration (CNPJ), articles of
+         incorporation, shareholder structure, financial statements.
+      2. Implement automated checks against CVM registries to verify
+         the issuer is not a registered securities issuer.
+      3. Build corporate structure analysis tool that traverses ownership
+         chains to identify controllers with assets > R$80M.
+
+      **Business plan management:**
+      4. Deploy structured business plan template with mandatory fields
+         (description, market, strategy, projections, risks).
+      5. Version-controlled document management for business plans with
+         audit trail of changes.
+      6. Implement designated contact person workflow with authentication
+         and authorization for issuer communications.
+    tools:
+      - postgresql
+      - elasticsearch
+      - minio
+      - api-gateway
+  devsecops:
+    prose: |
+      **Secure issuer verification pipeline:**
+      1. Implement integration tests for issuer eligibility checks
+         covering all rejection criteria (CVM-registered, controlled
+         by large entities, foreign incorporation).
+      2. SAST scanning for corporate structure traversal algorithms to
+         prevent bypass vulnerabilities (e.g., circular ownership
+         structures).
+      3. Code review requirements for any changes to eligibility logic
+         with compliance team approval.
+
+      **Data integrity:**
+      4. Database constraints enforcing mandatory fields in business
+         plan submissions.
+      5. Automated document validation (format, completeness, required
+         signatures) in the pipeline.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - jest
+      - sonarqube
+  secops:
+    prose: |
+      **Issuer compliance monitoring:**
+      1. Periodic re-verification of issuer eligibility (quarterly check
+         that issuer has not registered with CVM or been acquired by a
+         large entity since offering).
+      2. Cross-reference issuer declarations against public databases
+         (CNPJ, CVM registry, corporate filings).
+      3. Monitor for fraudulent issuer documentation using document
+         verification services.
+
+      **Enforcement:**
+      4. Escalation procedure for ineligible issuers discovered
+         post-offering launch (offering suspension, investor
+         notification).
+      5. Maintain complete audit trail of all issuer verifications
+         for CVM inspection.
+    tools:
+      - grc-platform
+      - kyc-service
+      - siem
+legal_references:
+  - framework_id: cvm-135
+    articles: ["art-12"]
+    relationship: complements
+  - framework_id: cvm-175
+    articles: ["art-3"]
+    relationship: complements

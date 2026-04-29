@@ -1,0 +1,124 @@
+id: rec-8
+family: assinatura
+title: "Certificate Lifecycle and Key Management for Prescribers"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 15. O sistema de prescrição eletrônica deve implementar controles
+    para o ciclo de vida do certificado digital do prescritor, incluindo:
+
+    I — notificação automática ao prescritor sobre a proximidade da
+    expiração do certificado digital, com antecedência mínima de 30
+    (trinta) dias;
+
+    II — bloqueio automático da funcionalidade de prescrição quando o
+    certificado digital do prescritor estiver expirado ou revogado;
+
+    III — procedimento de renovação de certificado que mantenha a
+    vinculação entre o prescritor e seu histórico de prescrições;
+
+    IV — registro de todos os eventos relacionados ao certificado digital
+    (emissão, renovação, revogação, expiração) em trilha de auditoria
+    inalterável;
+
+    V — procedimento de emergência para revogação imediata do certificado
+    em caso de comprometimento, perda ou roubo do dispositivo de
+    armazenamento.
+guidance:
+  prose: |
+    Article 15 addresses the complete lifecycle management of prescriber
+    digital certificates, from issuance to revocation.
+
+    **Certificate lifecycle events:**
+    - Issuance: initial certificate registration in the system
+    - Renewal: certificate replacement before expiration
+    - Revocation: immediate invalidation due to compromise
+    - Expiration: natural end of certificate validity period
+
+    **Proactive notifications:**
+    The 30-day advance notification is a minimum. Best practice is to
+    send notifications at 90, 60, 30, 15, and 7 days before expiration,
+    escalating urgency.
+
+    **Hard block on expiration:**
+    Once a certificate expires, the system must immediately block the
+    prescriber from issuing new prescriptions. This is automatic and
+    not subject to manual override.
+
+    **Emergency revocation:**
+    When a prescriber reports a lost or stolen token/smartcard, the
+    system must have a procedure for immediate certificate revocation
+    through the issuing CA, plus a local block on the prescriber's
+    signing capability pending new certificate issuance.
+
+    **Historical continuity:**
+    Certificate renewal must not break the association between the
+    prescriber and their prescription history. Systems must maintain
+    a mapping of all certificates (current and historical) linked to
+    each prescriber.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Certificate lifecycle management platform:**
+      1. Implement a certificate registry service that tracks all
+         prescriber certificates with their validity periods, serial
+         numbers, and issuing CAs.
+      2. Deploy an automated notification service that sends email
+         and in-app alerts at 90, 60, 30, 15, and 7 days before
+         certificate expiration.
+      3. Implement a certificate-to-prescriber mapping that maintains
+         the full history of certificates associated with each
+         prescriber, enabling verification of historical prescriptions.
+      4. Deploy an emergency revocation workflow that blocks the
+         prescriber in the local system within minutes and triggers
+         revocation with the issuing CA.
+      5. Implement a certificate auto-discovery mechanism for
+         prescribers who renew certificates independently.
+    tools:
+      - certificate-manager
+      - notification-service
+      - vault
+      - key-management
+      - event-bus
+  devsecops:
+    prose: |
+      **Certificate lifecycle testing:**
+      1. Create automated tests for all certificate lifecycle events
+         (issuance registration, renewal linking, revocation blocking,
+         expiration blocking).
+      2. Implement time-manipulation tests verifying notification
+         triggers at correct intervals before expiration.
+      3. Add tests for emergency revocation workflows, verifying
+         blocking latency is within acceptable limits.
+      4. Deploy security tests ensuring revoked or expired certificates
+         cannot be used to sign prescriptions through any code path.
+    tools:
+      - gitlab-ci
+      - time-based-testing
+      - security-testing
+      - workflow-testing
+  secops:
+    prose: |
+      **Certificate operations monitoring:**
+      1. Maintain a dashboard showing all prescriber certificates by
+         status (active, expiring soon, expired, revoked) with drill-
+         down capability.
+      2. Monitor emergency revocation request-to-completion times and
+         ensure SLA compliance (target: under 15 minutes).
+      3. Audit certificate renewal continuity quarterly, verifying
+         that all renewals maintain prescriber-history linkage.
+      4. Generate monthly reports on certificate lifecycle metrics
+         (expirations, renewals, revocations, notification effectiveness).
+    tools:
+      - certificate-dashboard
+      - sla-monitoring
+      - audit-logging
+      - compliance-reporting
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-4", "art-8", "art-9"]
+    relationship: implements
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-18"]
+    relationship: mapped

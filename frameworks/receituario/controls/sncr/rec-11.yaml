@@ -1,0 +1,127 @@
+id: rec-11
+family: sncr
+title: "SNCR Fraud Detection and Alert System"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 20. O SNCR deve implementar mecanismos de detecção de fraude e
+    emissão de alertas, incluindo:
+
+    I — detecção de prescrições duplicadas para o mesmo paciente, mesmo
+    medicamento e mesmo período de tratamento, emitidas por prescritores
+    diferentes;
+
+    II — detecção de padrões anormais de prescrição, tais como volume
+    excessivo de prescrições de medicamentos controlados por um único
+    prescritor em período determinado;
+
+    III — detecção de tentativas de dispensação múltipla da mesma
+    prescrição em estabelecimentos diferentes;
+
+    IV — cruzamento de informações com bases de dados de óbitos para
+    identificação de prescrições ou dispensações em nome de pacientes
+    falecidos;
+
+    V — emissão de alertas em tempo real para os estabelecimentos
+    farmacêuticos quando da identificação de prescrição suspeita.
+
+    Parágrafo único. Os alertas emitidos pelo SNCR devem ser registrados
+    e encaminhados à vigilância sanitária competente para apuração.
+guidance:
+  prose: |
+    Article 20 mandates fraud detection capabilities within the SNCR,
+    creating a national-level surveillance system for prescription fraud.
+
+    **Fraud detection patterns:**
+    1. Duplicate prescriptions: same patient + same drug + overlapping
+       treatment periods from different prescribers (doctor shopping)
+    2. Abnormal prescriber volume: unusually high controlled substance
+       prescription rates for a single prescriber
+    3. Multiple dispensation attempts: same prescription presented at
+       different pharmacies
+    4. Deceased patient detection: prescriptions or dispensations for
+       patients in the national death registry
+    5. Geographic anomalies: dispensation far from prescription origin
+       or patient address
+
+    **Real-time alerting:**
+    Alerts must be delivered to pharmacies in real time during the
+    pre-dispensation verification step (rec-7), enabling immediate
+    blocking of suspicious prescriptions.
+
+    **Regulatory reporting:**
+    All fraud alerts must be logged and forwarded to the relevant
+    health surveillance authority (VISA) for investigation. Systems
+    must support this reporting workflow.
+
+    **Privacy considerations:**
+    Fraud detection involves processing sensitive health data at scale.
+    Systems must comply with LGPD data minimization and purpose
+    limitation principles while maintaining detection effectiveness.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fraud detection engine:**
+      1. Implement a real-time stream processing engine for prescription
+         event analysis, detecting duplicate, abnormal volume, and
+         multi-dispensation patterns as events flow through the SNCR
+         integration pipeline.
+      2. Deploy a rules engine with configurable fraud detection
+         thresholds (e.g., maximum controlled substance prescriptions
+         per prescriber per week, geographic distance thresholds).
+      3. Integrate with the national death registry (SIM - Sistema de
+         Informacoes sobre Mortalidade) for deceased patient detection.
+      4. Implement a real-time alert distribution service that pushes
+         fraud alerts to pharmacies during the pre-dispensation
+         verification flow.
+      5. Deploy a fraud case management system for tracking alerts
+         from detection through investigation to resolution.
+    tools:
+      - kafka-streams
+      - flink
+      - rules-engine
+      - drools
+      - redis
+      - alert-service
+      - case-management
+  devsecops:
+    prose: |
+      **Fraud detection testing:**
+      1. Create synthetic fraud scenario datasets covering all five
+         detection patterns and verify correct alert generation.
+      2. Implement performance tests ensuring fraud detection latency
+         stays under 500ms for real-time alerting requirements.
+      3. Add false-positive analysis tests to calibrate detection
+         thresholds and minimize unnecessary pharmacy disruption.
+      4. Deploy privacy-by-design tests verifying LGPD compliance
+         in fraud detection data processing (data minimization,
+         purpose limitation, retention limits).
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - synthetic-data-generation
+      - privacy-testing
+  secops:
+    prose: |
+      **Fraud detection operations:**
+      1. Monitor fraud alert volumes and patterns daily, investigating
+         spikes that may indicate new fraud methods or system issues.
+      2. Track false-positive rates monthly and adjust detection
+         thresholds to balance sensitivity and specificity.
+      3. Coordinate with VISA (Vigilancia Sanitaria) on fraud alert
+         investigation workflows and regulatory reporting timelines.
+      4. Generate quarterly fraud analytics reports for ANVISA with
+         trends, patterns, and recommended regulatory actions.
+    tools:
+      - siem
+      - fraud-analytics-dashboard
+      - case-management
+      - regulatory-reporting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-11"]
+    relationship: complements
+  - framework_id: crimes-ciber
+    articles: ["art-1"]
+    relationship: mapped

@@ -1,0 +1,93 @@
+id: iot-5
+family: auth
+title: "Inactive Session Timeout"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve implementar rotinas de encerramento automático de
+    sessões inativas (timeout). Sessões de gerenciamento e administração
+    que permaneçam sem atividade por período determinado devem ser
+    encerradas automaticamente, exigindo nova autenticação para
+    restabelecimento do acesso.
+
+    (Ato 77/2021 §5.1.4, inciso IX; Ato 2436/2023 §4)
+guidance:
+  prose: |
+    This control prevents unauthorized access through abandoned
+    management sessions. An unattended, authenticated session on a
+    device management interface is a direct path to device compromise.
+
+    **Key requirements:**
+    - All management interfaces (web UI, SSH, serial console, TR-069)
+      must implement session inactivity timeout.
+    - After the timeout period, the session must be fully terminated
+      (not just locked) — re-authentication is required.
+    - The timeout value should be configurable but must have a secure
+      default (recommended: 5–15 minutes for web/SSH, 30 minutes for
+      serial console).
+
+    **Design considerations:**
+    - For web interfaces, implement both server-side session expiry and
+      client-side inactivity detection (JavaScript timer).
+    - SSH sessions should use ClientAliveInterval/ClientAliveCountMax
+      or equivalent.
+    - API token-based sessions should use short-lived tokens with
+      refresh mechanism.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement server-side session management with configurable
+         inactivity timeout (default: 10 minutes for web UI, 5 minutes
+         for SSH/CLI).
+      2. For web interfaces, set session cookies with appropriate expiry
+         and implement server-side session invalidation on timeout.
+      3. For SSH access, configure ClientAliveInterval=60 and
+         ClientAliveCountMax=5 (or equivalent in the embedded SSH
+         server).
+      4. For TR-069/USP sessions, implement connection request timeout
+         and session token expiry.
+      5. Log session timeout events with user, source IP, interface,
+         and duration for audit purposes.
+    tools:
+      - embedded-web-server
+      - openssh-embedded
+      - session-management-library
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Write integration tests that verify session timeout behavior:
+         authenticate, wait beyond timeout period, confirm session is
+         invalidated and re-authentication is required.
+      2. Test that timeout cannot be bypassed via keep-alive packets,
+         periodic API calls, or cookie manipulation.
+      3. Add SAST rules that flag session creation code without
+         corresponding timeout configuration.
+      4. Verify timeout defaults in firmware configuration files as
+         part of the release checklist.
+    tools:
+      - gitlab-ci
+      - selenium
+      - integration-testing
+      - sast-scanner
+  secops:
+    prose: |
+      1. During penetration testing, verify session timeout on all
+         management interfaces — authenticate and leave idle, confirm
+         session expires.
+      2. Attempt session fixation and session replay attacks after
+         timeout to verify complete session invalidation.
+      3. Review session timeout configuration across the deployed fleet
+         via TR-069 parameter polling to ensure secure defaults have
+         not been relaxed.
+      4. Document timeout values and test evidence for ANATEL
+         homologation.
+    tools:
+      - burp-suite
+      - penetration-testing-tools
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-12"]
+    relationship: complements

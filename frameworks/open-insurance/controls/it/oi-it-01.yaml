@@ -1,0 +1,85 @@
+id: oi-it-01
+family: it
+title: "Padroes de APIs REST e Especificacoes Tecnicas"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    As APIs do Open Insurance devem seguir padrões REST (Representational State
+    Transfer) e cumprir as especificações técnicas definidas pela estrutura de
+    governança, incluindo:
+
+    I - Especificações OpenAPI 3.0 como padrão de documentação de APIs;
+    II - Formato JSON para payloads de request e response;
+    III - Códigos de status HTTP padronizados conforme RFC 7231;
+    IV - Paginação padronizada para endpoints que retornam coleções;
+    V - Convenções de nomenclatura: camelCase para campos JSON, kebab-case para
+    paths de API;
+    VI - Versionamento de APIs no path (ex: /open-insurance/v1/);
+    VII - Idempotência para operações POST críticas;
+    VIII - Correlação de requests via header x-fapi-interaction-id.
+
+    As especificações técnicas são publicadas pela governança do Open Insurance e
+    têm força vinculante para todos os participantes.
+guidance:
+  prose: |
+    A padronizacao tecnica e o que garante interoperabilidade -- qualquer participante
+    deve conseguir consumir APIs de qualquer outro participante sem adaptacoes
+    customizadas.
+
+    As especificacoes OpenAPI 3.0 sao publicadas no repositorio oficial do Open
+    Insurance (GitHub) e incluem schemas completos de request/response, exemplos
+    e descricoes de campos.
+
+    O versionamento no path permite que novas versoes de API coexistam com versoes
+    anteriores durante periodo de transicao. A governanca define o cronograma de
+    deprecacao de versoes antigas.
+
+    O header x-fapi-interaction-id permite rastrear uma interacao end-to-end entre
+    participantes, facilitando diagnostico de problemas e auditoria. Cada chamada
+    de API deve incluir esse header (gerado pela receptora, retornado pela
+    transmissora).
+
+    A idempotencia para POST e critica em servicos de iniciacao (cotacao,
+    contratacao) para evitar duplicidade em caso de retry.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs REST seguindo rigorosamente as especificacoes OpenAPI
+         publicadas pelo Open Insurance.
+      2. Configurar API Gateway para enforcar convencoes (content-type, headers
+         obrigatorios, versionamento).
+      3. Implementar paginacao conforme padrao do ecossistema (cursor-based ou
+         offset-based conforme especificacao).
+      4. Implementar mecanismo de idempotencia (idempotency key) para endpoints POST.
+      5. Propagar e logar x-fapi-interaction-id em toda a cadeia de processamento.
+    tools:
+      - api-gateway
+      - api-documentation
+      - api-versioning
+      - distributed-tracing
+  devsecops:
+    prose: |
+      1. Validar automaticamente no pipeline que APIs estao conforme especificacao
+         OpenAPI oficial (linting + validacao de schema).
+      2. Contract testing contra specs publicadas pelo ecossistema.
+      3. Testes de paginacao, idempotencia e headers obrigatorios.
+      4. Validar convencoes de nomenclatura automaticamente.
+    tools:
+      - openapi-linter
+      - contract-testing
+      - api-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar conformidade das APIs com versao vigente da especificacao.
+      2. Auditar que todas as APIs obrigatorias estao implementadas e respondendo.
+      3. Rastrear interaction-ids para diagnostico de incidentes entre participantes.
+    tools:
+      - api-monitoring
+      - distributed-tracing
+      - compliance-dashboard
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4"]
+    relationship: complements

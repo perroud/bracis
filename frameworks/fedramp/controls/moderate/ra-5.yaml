@@ -1,0 +1,152 @@
+id: ra-5
+family: ra
+title: "Vulnerability Monitoring and Scanning"
+class: FedRAMP
+
+baselines: [low, moderate, high]
+
+parameters:
+  - id: ra-05_odp.01
+    label: "frequency for vulnerability scanning"
+    guidance: "FedRAMP Moderate/High parameter: Monthly for OS/infrastructure scans, monthly for web application scans, monthly for database scans."
+  - id: ra-05_odp.02
+    label: "response times for remediation"
+    guidance: "FedRAMP requirement: Critical/High - 30 days, Moderate - 90 days, Low - 180 days. Actively exploited vulnerabilities (CISA KEV) - 14 days."
+  - id: ra-05_odp.03
+    label: "personnel or roles to receive vulnerability reports"
+    guidance: "FedRAMP requirement: ISSO, system owner, authorizing agency, and FedRAMP PMO (via monthly ConMon)."
+
+statement:
+  prose: >-
+    a. Monitor and scan for vulnerabilities in the system and hosted
+       applications monthly and when new vulnerabilities potentially
+       affecting the system are identified and reported;
+    b. Employ vulnerability monitoring tools and techniques that
+       facilitate interoperability among tools and automate parts of
+       the vulnerability management process;
+    c. Analyze vulnerability scan reports and results from vulnerability
+       monitoring activities;
+    d. Remediate legitimate vulnerabilities in accordance with
+       FedRAMP-defined timelines: Critical/High within 30 days,
+       Moderate within 90 days, Low within 180 days;
+    e. Share information obtained from the vulnerability monitoring
+       process and control assessments with designated personnel to
+       help eliminate similar vulnerabilities in other systems;
+    f. Employ vulnerability monitoring tools that include the capability
+       to readily update the vulnerabilities to be scanned.
+
+guidance:
+  prose: >-
+    FedRAMP vulnerability scanning requirements are among the most
+    prescriptive in the framework. CSPs must conduct monthly scans
+    covering OS/infrastructure, web applications, and databases.
+    Scan results must be reported as part of monthly ConMon deliverables.
+    FedRAMP defines specific remediation timelines by severity that are
+    tracked in the POA&M. The CISA Known Exploited Vulnerabilities (KEV)
+    catalog creates an accelerated 14-day remediation requirement for
+    actively exploited vulnerabilities. FedRAMP requires authenticated
+    scanning (credentialed scans) for accuracy. False positives must
+    be documented and approved. Scanner coverage must include 100% of
+    the system inventory. CSPs must use vulnerability scoring (CVSS)
+    and provide trending analysis in ConMon reports.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, RA-5"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FedRAMP Vulnerability Scanning Requirements"
+    url: "https://www.fedramp.gov/assets/resources/documents/CSP_Vulnerability_Scanning_Requirements.pdf"
+  - citation: "CISA Known Exploited Vulnerabilities Catalog"
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+  - citation: "BOD 22-01: Reducing the Significant Risk of Known Exploited Vulnerabilities"
+    url: "https://www.cisa.gov/binding-operational-directive-22-01"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a multi-layer vulnerability scanning architecture: Nessus
+      or Qualys for authenticated OS/infrastructure scans, OWASP ZAP
+      or Burp Suite for web application scans, and database-specific
+      scanners for database assessments. Schedule monthly scan
+      executions with automated results aggregation into a central
+      vulnerability management platform (DefectDojo). Implement
+      automated CVSS scoring and severity assignment. Deploy continuous
+      container image scanning that evaluates all running images
+      against updated vulnerability databases. Integrate CISA KEV
+      catalog as an automated priority escalation trigger.
+      Implement scan coverage validation that compares scanned assets
+      against the system inventory to identify gaps. Build automated
+      ConMon vulnerability reporting dashboards that produce
+      FedRAMP-formatted reports.
+    tools:
+      - nessus
+      - qualys
+      - trivy
+      - grype
+      - defectdojo
+      - grafana
+      - prometheus
+      - cisa-kev-api
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning at every pipeline stage to
+      shift detection left: SAST for code vulnerabilities, SCA for
+      dependency vulnerabilities, container scanning for image
+      vulnerabilities, and DAST for runtime vulnerabilities. Configure
+      pipeline policies that enforce FedRAMP remediation SLAs by
+      blocking deployments with unresolved Critical/High findings
+      exceeding 30 days. Implement automated dependency updates
+      (Renovate) with priority handling for CISA KEV items. Generate
+      SBOM for every release and correlate with vulnerability databases
+      for ongoing monitoring. Track vulnerability metrics (MTTR by
+      severity, open counts, aging) as pipeline-generated dashboards.
+      Produce machine-readable scan reports in standardized formats
+      (SARIF, CycloneDX) for ConMon aggregation.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - renovate
+      - syft
+      - grype
+      - zap
+
+  secops:
+    prose: >-
+      Operate the FedRAMP vulnerability management programme with
+      monthly scanning cadence, POA&M tracking, and ConMon reporting.
+      Aggregate scan results from all sources into a unified
+      vulnerability register with deduplication and severity
+      normalization. Manage the POA&M with defined remediation
+      milestones and owner assignments. Track remediation against
+      FedRAMP SLAs: Critical/High (30 days), Moderate (90 days),
+      Low (180 days), KEV (14 days). Escalate overdue remediation
+      items to management and document risk acceptances for items
+      requiring extended timelines. Submit monthly vulnerability
+      scan reports and POA&M updates as ConMon deliverables. Conduct
+      post-remediation verification scans to confirm vulnerability
+      closure. Analyze vulnerability trends quarterly for management
+      reporting.
+    tools:
+      - defectdojo
+      - qualys
+      - nessus
+      - rapid7
+      - splunk
+      - servicenow
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["si-l2-001"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.8"]
+    relationship: supports
+  - framework_id: dora
+    articles: ["art-24"]
+    relationship: supports

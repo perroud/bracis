@@ -1,0 +1,107 @@
+id: art-19
+family: custodia-controladoria
+title: "Custodia Qualificada de Ativos"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 19. Os ativos financeiros e valores mobiliários integrantes da carteira
+    do fundo de investimento devem ser custodiados por entidade autorizada pela
+    CVM para o exercício da atividade de custódia de valores mobiliários.
+
+    Parágrafo 1. O custodiante é responsável pela guarda, liquidação física e
+    financeira dos ativos, pelo exercício dos direitos e obrigações decorrentes
+    dos ativos custodiados, e pela verificação da existência, integridade e
+    titularidade dos ativos.
+
+    Parágrafo 2. O custodiante deve validar as operações realizadas pelo gestor,
+    verificando a compatibilidade das operações com a política de investimento
+    e os limites estabelecidos no regulamento do fundo.
+guidance:
+  prose: |
+    O art. 19 define a obrigacao de custodia qualificada. E uma funcao critica
+    de controle que separa quem decide investir (gestor) de quem guarda os
+    ativos (custodiante).
+
+    **Custodia como controle:**
+    A custodia qualificada funciona como um check independente sobre o gestor.
+    O custodiante valida se as operacoes executadas pelo gestor sao compativeis
+    com o regulamento. E uma segunda linha de defesa.
+
+    **Responsabilidades do custodiante:**
+    (i) Guarda fisica e logica dos ativos; (ii) Liquidacao financeira;
+    (iii) Exercicio de direitos (dividendos, juros, eventos corporativos);
+    (iv) Verificacao de existencia e titularidade (o ativo realmente existe
+    e pertence ao fundo).
+
+    **Validacao de operacoes:**
+    O paragrafo 2 cria uma obrigacao de validacao pos-trade: o custodiante
+    deve verificar se cada operacao esta dentro dos limites do regulamento.
+    Isso exige acesso ao regulamento, a politica de investimento e aos
+    limites de concentracao.
+
+    **Impacto em TI:**
+    Sistemas de custodia devem receber e validar automaticamente as operacoes
+    do gestor contra regras do regulamento. Integracoes API entre OMS
+    (gestor) e sistema de custodia sao essenciais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com sistema de custodia:**
+      1. API de integracao bidirecional entre OMS do gestor e sistema de custodia:
+         envio de operacoes para validacao e recebimento de confirmacoes.
+      2. Validacao automatica pos-trade: regras do regulamento codificadas
+         no sistema de custodia para verificacao automatica.
+      3. Reconciliacao diaria automatizada entre posicoes do gestor e do
+         custodiante.
+
+      **Verificacao de ativos:**
+      4. Pipeline automatizado de verificacao de existencia de ativos:
+         consulta a depositarias (B3/CETIP) para confirmar titularidade.
+      5. Alertas para divergencias entre posicoes do gestor e do custodiante.
+    tools:
+      - terraform
+      - vault
+      - git
+      - opa-gatekeeper
+  devsecops:
+    prose: |
+      **Seguranca da integracao:**
+      1. Autenticacao mutua (mTLS) entre sistemas do gestor e custodiante.
+      2. Criptografia de dados em transito e repouso para informacoes de
+         ativos e operacoes.
+      3. Secret detection para credenciais de API de custodia.
+      4. SAST para validar integridade de regras de validacao pos-trade.
+
+      **Testes de reconciliacao:**
+      5. Testes automatizados de reconciliacao: simular divergencias e
+         verificar que o sistema detecta e alerta.
+      6. Pipeline de validacao de regras de enquadramento antes de deploy.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - vault
+  secops:
+    prose: |
+      **Monitoramento de custodia:**
+      1. Reconciliacao diaria automatizada com alerta para divergencias.
+      2. Dashboard de custodia: ativos custodiados, operacoes validadas,
+         divergencias pendentes, eventos corporativos.
+      3. Metricas de tempo de liquidacao e taxa de erros de custodia.
+
+      **Auditoria de custodia:**
+      4. Auditoria semestral de reconciliacao entre posicoes do gestor,
+         custodiante e depositaria.
+      5. Verificacao de existencia e titularidade de ativos por amostragem.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-5"]
+    relationship: complements

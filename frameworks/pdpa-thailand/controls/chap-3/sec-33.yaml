@@ -1,0 +1,114 @@
+id: sec-33
+family: chap-3
+title: "Right to Erasure"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 33. A data subject shall have the right to request the data controller to
+    delete, destroy, or anonymize personal data when:
+    (1) the personal data is no longer necessary for the purposes for which it was
+        collected, used, or disclosed;
+    (2) the data subject withdraws consent and the data controller has no other
+        lawful basis for processing;
+    (3) the data subject objects to the processing and the data controller has no
+        overriding legitimate grounds;
+    (4) the personal data has been collected, used, or disclosed unlawfully.
+
+    The data controller may refuse the request if retention is necessary for:
+    compliance with law, establishment/exercise/defense of legal claims,
+    or other legitimate grounds as prescribed by the PDPC.
+  parts:
+    - id: sec-33-1
+      label: "Paragraph 1"
+      prose: |
+        Right to request deletion, destruction, or anonymization of personal data.
+    - id: sec-33-2
+      label: "Paragraph 2"
+      prose: |
+        Four grounds for erasure: purpose fulfilled, consent withdrawn,
+        objection upheld, or unlawful processing.
+    - id: sec-33-3
+      label: "Paragraph 3"
+      prose: |
+        Exceptions: legal obligation, legal claims, or other grounds prescribed
+        by the PDPC.
+guidance:
+  prose: |
+    Section 33 implements the "right to be forgotten" from GDPR Article 17. This
+    is technically the most challenging right to implement because deletion must be
+    comprehensive across all systems.
+
+    Critical implementation considerations:
+
+    - **Deletion vs. Anonymization:** The PDPA offers three options: delete, destroy,
+      or anonymize. Anonymization is acceptable if truly irreversible. This can be
+      preferable for analytics use cases.
+
+    - **Comprehensive Scope:** Deletion must cover all copies: primary databases,
+      replicas, caches, search indices, backups (within retention schedules), logs,
+      analytics stores, third-party processors.
+
+    - **Backup Complexity:** Full deletion from backups may be impractical. Document
+      a policy: mark for deletion, exclude from restoration, and delete upon backup
+      rotation.
+
+    - **Cascading Deletion:** Data in related tables, derived datasets, and
+      aggregations must also be addressed. Foreign key relationships and data
+      lineage must be mapped.
+
+    - **Retention Conflicts:** Some data may be subject to legal retention obligations
+      (tax records, financial records). Document the analysis and retain only what
+      is legally required, deleting the rest.
+
+    - **Verification:** After deletion, verify the data is actually gone. Implement
+      deletion verification checks.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a deletion orchestration service that coordinates erasure across all
+         systems holding personal data for a given subject.
+      2. Implement soft-delete with configurable hard-delete schedules, allowing
+         verification before permanent removal.
+      3. Build anonymization functions for cases where analytics retention is needed
+         but identity must be removed.
+      4. Map data lineage to ensure cascading deletion reaches derived datasets.
+      5. Implement deletion verification: automated checks confirming data removal
+         from all registered systems.
+      6. Handle backup retention: maintain a deletion queue that excludes flagged
+         records from backup restorations.
+    tools:
+      - deletion-orchestration-service
+      - anonymization-engine
+      - data-lineage-mapper
+      - deletion-verification-tool
+      - backup-exclusion-manager
+  devsecops:
+    prose: |
+      1. Test deletion completeness: verify data removal from all systems including
+         caches, search indices, and replicas.
+      2. Validate anonymization irreversibility (re-identification risk testing).
+      3. Test cascading deletion across related tables and derived datasets.
+      4. Verify deletion does not break application functionality (null handling).
+    tools:
+      - deletion-completeness-tests
+      - anonymization-validator
+      - cascade-deletion-tests
+      - null-safety-tests
+  secops:
+    prose: |
+      1. Audit deletion request fulfillment through sampling and verification scans.
+      2. Monitor for "zombie data" — personal data that reappears after deletion.
+      3. Track deletion SLA compliance and escalate approaching deadlines.
+      4. Verify third-party processors have completed delegated deletions.
+    tools:
+      - deletion-audit-tool
+      - zombie-data-scanner
+      - sla-monitor
+      - third-party-deletion-tracker
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-VI"]
+    relationship: equivalent-to

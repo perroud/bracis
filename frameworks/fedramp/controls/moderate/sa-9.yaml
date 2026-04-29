@@ -1,0 +1,129 @@
+id: sa-9
+family: sa
+title: "External System Services"
+class: FedRAMP
+
+baselines: [moderate, high]
+
+parameters:
+  - id: sa-09_odp.01
+    label: "controls required for external services"
+    guidance: "FedRAMP requirement: External services processing, storing, or transmitting federal information must meet FedRAMP requirements or equivalent."
+  - id: sa-09_odp.02
+    label: "processes, methods, and techniques for monitoring"
+    guidance: "FedRAMP requirement: Continuous monitoring of external service compliance through ConMon, assessments, and contractual verification."
+
+statement:
+  prose: >-
+    a. Require that providers of external system services comply with
+       organizational security and privacy requirements and employ the
+       following controls: FedRAMP-authorized controls at the appropriate
+       baseline level or equivalent;
+    b. Define and document organizational oversight and user roles and
+       responsibilities with regard to external system services;
+    c. Employ security and privacy monitoring processes for external
+       system services to ensure compliance on an ongoing basis.
+  parts:
+    - id: sa-9_smt.a
+      label: "a."
+      prose: >-
+        FedRAMP Additional Requirement: All external services that
+        process, store, or transmit federal information must be
+        FedRAMP authorized at the appropriate impact level, or the
+        CSP must document the risk and obtain agency acceptance.
+        External services include any cloud service (IaaS, PaaS, SaaS)
+        leveraged by the CSP to deliver its authorized service.
+
+guidance:
+  prose: >-
+    FedRAMP places significant emphasis on external system services
+    because the security of a CSP's offering depends on the security
+    of its underlying service providers. Any external service that
+    processes, stores, or transmits federal data must itself be
+    FedRAMP authorized at the appropriate impact level. If an external
+    service is not FedRAMP authorized, the CSP must document this as
+    a risk, implement compensating controls, and obtain agency
+    acceptance. The CSP's SSP must clearly document all external
+    services in the system boundary description. The CSP remains
+    responsible for ensuring external services meet security
+    requirements regardless of contractual arrangements. This creates
+    a chain-of-trust requirement throughout the cloud supply chain.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SA-9"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FedRAMP Marketplace"
+    url: "https://marketplace.fedramp.gov/"
+  - citation: "FedRAMP Leveraged Authorization Guide"
+    url: "https://www.fedramp.gov/assets/resources/documents/CSP_Leveraged_Authorization_Guide.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a comprehensive inventory of all external services in
+      the platform's service catalog (Backstage) with FedRAMP
+      authorization status, impact level, authorization date, and
+      P-ATO/ATO number. Implement automated validation that checks
+      external service FedRAMP status against the FedRAMP Marketplace
+      API. Deploy monitoring of external service availability, security
+      posture, and compliance status. Implement architectural patterns
+      that isolate external service dependencies behind abstraction
+      layers enabling substitution when services lose authorization.
+      Document data flows to and from external services in the SSP
+      architecture diagrams. Implement compensating controls for any
+      non-FedRAMP external services with documented risk acceptance.
+    tools:
+      - backstage
+      - terraform
+      - grafana
+      - cloud-custodian
+      - dependency-track
+
+  devsecops:
+    prose: >-
+      Scan application dependencies and infrastructure configurations
+      for external service usage. Implement pipeline policies that
+      flag new external service dependencies for FedRAMP authorization
+      verification before deployment. Maintain an approved external
+      service registry and enforce it through admission control.
+      Track external service versions and configuration changes in
+      version control. Automate SSP documentation updates when
+      external service dependencies change. Implement integration
+      tests that validate external service security controls
+      (encryption, authentication, logging) meet FedRAMP requirements.
+    tools:
+      - gitlab-ci
+      - gitlab-dependency-scanning
+      - conftest
+      - checkov
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor external service security posture through vendor risk
+      management processes. Track FedRAMP authorization status of all
+      external services quarterly against the FedRAMP Marketplace.
+      Alert when external services approach authorization expiry or
+      are placed on the FedRAMP revocation list. Maintain contractual
+      documentation including SLAs, security requirements, and right-to-
+      audit clauses. Conduct annual assessments of external service
+      compliance with documented findings. Report external service
+      risk posture as part of ConMon deliverables. Maintain exit
+      strategies for critical external services.
+    tools:
+      - grc-platform
+      - bitsight
+      - securityscorecard
+      - servicenow
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9"]
+    relationship: derived-from
+  - framework_id: dora
+    articles: ["art-28"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.19", "a5.20", "a5.21", "a5.22"]
+    relationship: supports

@@ -1,0 +1,101 @@
+id: art-20
+family: cap-6
+title: "Custodia de Chaves Criptograficas"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 20. A prestadora de serviços de ativos virtuais que realize custódia deve
+    adotar controles rigorosos para gestão de chaves criptográficas, incluindo:
+    I - geração de chaves privadas em ambiente seguro e isolado, preferencialmente
+    em módulos de segurança de hardware (HSM) ou dispositivos equivalentes;
+    II - armazenamento da maior parte dos ativos virtuais custodiados em carteiras
+    offline (cold storage), mantendo em carteiras online (hot wallets) apenas o
+    volume necessário para operações correntes;
+    III - procedimentos de backup e recuperação de chaves privadas, com cópias
+    armazenadas em locais geograficamente distintos;
+    IV - controle de acesso multi-nível para uso de chaves privadas, incluindo
+    autorização de múltiplas pessoas para movimentação de ativos (multi-signature
+    ou computação multipartidária);
+    V - procedimentos de rotação de chaves quando aplicável;
+    VI - destruição segura de chaves quando não mais necessárias.
+guidance:
+  prose: |
+    O art. 20 e o controle mais critico para custodiantes: gestao de chaves
+    criptograficas privadas. Quem controla as chaves, controla os ativos.
+
+    **Seis controles de chaves:**
+    1. Geracao segura: HSM (Hardware Security Module) ou equivalente. A chave
+       NUNCA deve existir em formato legivel fora do HSM.
+    2. Cold storage predominante: maioria dos ativos em cold storage (offline),
+       apenas volume operacional em hot wallets
+    3. Backup geografico: copias de backup de chaves em locais fisicamente
+       separados (ex: cofres em cidades diferentes)
+    4. Multi-sig/MPC: nenhuma pessoa sozinha pode movimentar ativos
+    5. Rotacao: troca periodica de chaves quando o protocolo permite
+    6. Destruicao segura: chaves descartadas devem ser destruidas de forma
+       irrecuperavel (crypto-shredding)
+
+    **Proporcao cold/hot tipica:**
+    Pratica de mercado: 95-98% em cold storage, 2-5% em hot wallets.
+    A proporcao exata depende do volume de saques diarios.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de custodia de chaves:**
+      1. HSM FIPS 140-2 Level 3 ou superior para geracao e armazenamento de
+         chaves privadas (Thales Luna, AWS CloudHSM, Utimaco).
+      2. Cold storage com air-gapped computers dedicados, sem conexao de rede,
+         em sala-cofre com controle de acesso biometrico.
+      3. MPC (Multi-Party Computation) ou threshold signatures para autorizacao
+         de transacoes sem reconstrucao da chave completa.
+      4. Sistema de hot wallet com limites de saldo e reabastecimento automatico
+         a partir de cold storage via processo aprovado.
+      5. Backup de chaves em Shamir Secret Sharing (SSS) com shares
+         distribuidos em 3+ locais geograficamente distintos.
+      6. Monitoramento de saldo hot wallet com alertas e rebalanceamento.
+    tools:
+      - hsm
+      - cold-storage
+      - mpc-signer
+      - hot-wallet-management
+      - shamir-backup
+      - key-management
+  devsecops:
+    prose: |
+      **Seguranca de chaves no pipeline:**
+      1. Scan de codigo que detecta chaves privadas hardcoded ou em logs.
+      2. Secret detection em repositorios (GitLeaks, TruffleHog).
+      3. Testes de integracao com HSM em ambiente de staging.
+      4. Testes de fluxo de MPC/multi-sig (quorum, rejeicao, timeout).
+      5. Testes de backup e recovery de chaves (DR drill automatizado).
+    tools:
+      - secret-detection
+      - gitlab-ci
+      - hsm-testing
+      - mpc-testing
+      - dr-automation
+  secops:
+    prose: |
+      **Operacao de custodia de chaves:**
+      1. Procedimento formal de geracao de chaves (key ceremony) com testemunhas
+         e registro em video.
+      2. Inventario de chaves com status (ativa, backup, rotacionada, destruida).
+      3. Teste anual de recuperacao de backup (DR drill) em ambiente isolado.
+      4. Auditoria externa anual de controles de custodia de chaves.
+      5. Monitoramento 24/7 de transacoes de cold storage (qualquer movimentacao
+         e critica e deve ser investigada imediatamente).
+      6. Procedimento de destruicao segura com registro formal.
+    tools:
+      - key-ceremony
+      - key-inventory
+      - dr-testing
+      - external-auditor
+      - cold-storage-monitoring
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3", "art-7"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-18"]
+    relationship: implements

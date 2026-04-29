@@ -1,0 +1,102 @@
+id: si-l2-001
+family: si
+title: "Identify, report, and correct system flaws in a timely manner"
+class: CMMC-L2
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Identify, report, and correct information and information system
+    flaws in a timely manner.
+
+guidance:
+  prose: >-
+    This control requires a systematic vulnerability management process
+    covering identification (scanning), reporting (tracking), and
+    remediation (patching/fixing) of system flaws. "Timely manner"
+    means within risk-based SLAs: critical flaws require immediate
+    remediation, while lower-severity flaws have longer but still
+    defined timelines. The control covers all system layers:
+    operating systems, middleware, application code, libraries, and
+    firmware. Organizations must establish a flaw remediation process
+    that includes automated scanning, centralized tracking, and
+    verification of remediation effectiveness. This maps to NIST
+    SP 800-171 control 3.14.1 and NIST SP 800-53 SI-2, SI-5.
+
+references:
+  - citation: "NIST SP 800-171 Rev 2, 3.14.1"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, SI-2, SI-5"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated vulnerability scanning across all platform
+      layers: infrastructure (Nessus/Qualys), container images (Trivy),
+      running containers (runtime scanning), and application dependencies
+      (SCA). Deploy automated patching pipelines for operating systems
+      and base container images with rollback capabilities. Integrate
+      vulnerability scan results into a centralized vulnerability
+      management platform (DefectDojo) for deduplication, prioritization,
+      and tracking. Define SLA thresholds by severity: Critical (48 hours),
+      High (7 days), Medium (30 days), Low (90 days). Implement
+      automated compliance dashboards showing patch status and SLA
+      adherence across all platform components.
+    tools:
+      - trivy
+      - grype
+      - nessus
+      - qualys
+      - defectdojo
+      - renovate
+      - grafana
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability detection at every pipeline stage: SAST
+      for code flaws, SCA for dependency vulnerabilities, container
+      scanning for image vulnerabilities, and IaC scanning for
+      infrastructure misconfigurations. Configure pipeline policies
+      that block deployments when critical or high vulnerabilities are
+      detected. Implement automated dependency updates (Renovate/
+      Dependabot) with automated testing to validate updates do not
+      introduce regressions. Track flaw remediation cycle time from
+      detection to fix and report against defined SLAs. Generate SBOM
+      for every release to maintain visibility into component-level
+      vulnerability exposure.
+    tools:
+      - gitlab-sast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - renovate
+      - syft
+      - semgrep
+      - sonarqube
+
+  secops:
+    prose: >-
+      Operate a centralized vulnerability management programme that
+      aggregates findings from all scanning sources, prioritizes based
+      on exploitability and business impact, and tracks remediation to
+      completion. Monitor for active exploitation of known vulnerabilities
+      using threat intelligence feeds (CISA KEV catalog). Escalate
+      actively exploited vulnerabilities for emergency patching. Generate
+      flaw remediation compliance reports showing SLA adherence by
+      severity, aging analysis, and trend data. Conduct post-remediation
+      verification scans to confirm flaws are resolved.
+    tools:
+      - defectdojo
+      - qualys
+      - rapid7
+      - splunk
+      - cisa-kev
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SI-5"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a8.8", "a8.9"]
+    relationship: supports

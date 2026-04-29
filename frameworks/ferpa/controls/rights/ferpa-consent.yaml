@@ -1,0 +1,110 @@
+id: ferpa-consent
+family: rights
+title: "Consent Required for Disclosure"
+class: FERPA
+
+statement:
+  prose: >-
+    An educational agency or institution must obtain signed and dated written consent
+    from the parent or eligible student before disclosing personally identifiable
+    information (PII) from the student's education records, unless the disclosure
+    falls within one of the enumerated exceptions to the consent requirement.
+  parts:
+    - id: ferpa-consent-1
+      label: "34 CFR § 99.30(a)"
+      prose: >-
+        The parent or eligible student shall provide a signed and dated written
+        consent before an educational agency or institution discloses personally
+        identifiable information from the student's education records.
+    - id: ferpa-consent-2
+      label: "34 CFR § 99.30(b)"
+      prose: >-
+        The written consent must specify the records that may be disclosed, state
+        the purpose of the disclosure, and identify the party or class of parties
+        to whom the disclosure may be made.
+    - id: ferpa-consent-3
+      label: "34 CFR § 99.30(d)"
+      prose: >-
+        A parent or eligible student may use electronic signatures as defined by
+        the institution's policy, provided the signature identifies and authenticates
+        the individual as the source of the consent and indicates the individual's
+        approval of the information contained in the consent.
+
+guidance:
+  prose: >-
+    Written consent is the default requirement for any disclosure of PII from
+    education records. The consent must be specific — it must identify the records
+    to be disclosed, the purpose of the disclosure, and who will receive the records.
+    Blanket consent forms are insufficient. Electronic consent is permitted but must
+    meet authentication and integrity requirements. Institutions should maintain
+    copies of all consent forms as part of the student's record. The burden of
+    proving consent was obtained rests with the institution. Consent is not required
+    for the exceptions enumerated in 34 CFR § 99.31, but even when an exception
+    applies, institutions should apply the principle of minimum necessary disclosure.
+
+references:
+  - citation: "34 CFR § 99.30 - Consent for disclosure"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-D/section-99.30"
+  - citation: "34 CFR § 99.31 - Exceptions to consent"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-D/section-99.31"
+  - citation: "PTAC Best Practices for Data Governance"
+    url: "https://studentprivacy.ed.gov/resources"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a consent management platform that captures, stores, and verifies
+      parent/student consent for each disclosure. Build granular consent forms that
+      specify records, purpose, and recipients per 34 CFR § 99.30(b). Implement
+      electronic signature capabilities with strong authentication (MFA) to validate
+      signer identity. Store consent records immutably with tamper-evident logging.
+      Build consent verification checkpoints into all data disclosure APIs —
+      disclosures must be blocked unless valid consent exists or a documented
+      exception applies. Implement consent expiration and renewal workflows.
+      Deploy a consent dashboard for students/parents to view and manage their
+      active consents.
+    tools:
+      - keycloak
+      - okta
+      - vault
+      - postgresql
+      - redis
+
+  devsecops:
+    prose: >-
+      Test that disclosure APIs enforce consent verification before releasing
+      data. Verify that consent records include all required fields (records
+      specified, purpose, recipients). Test electronic signature authentication
+      flows for security and compliance. Scan for API endpoints that could
+      bypass consent checks. Implement integration tests for all consent
+      exception paths to ensure they are properly documented and logged.
+      Verify consent immutability — test that stored consent records cannot
+      be modified after creation.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - owasp-zap
+      - sonarqube
+      - checkov
+
+  secops:
+    prose: >-
+      Monitor all data disclosure events and verify consent exists for each
+      disclosure. Alert on disclosures that do not have corresponding consent
+      records or documented exceptions. Audit consent management processes for
+      completeness. Detect patterns of consent being granted and immediately
+      revoked (potential coercion indicator). Monitor electronic signature
+      authentication for anomalies. Generate periodic compliance reports showing
+      consent coverage across all disclosure activities.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AU-2", "AU-3", "IP-1", "IP-2"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.12", "A5.33", "A5.34"]
+    relationship: supports

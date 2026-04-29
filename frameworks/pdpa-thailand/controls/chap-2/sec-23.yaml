@@ -1,0 +1,110 @@
+id: sec-23
+family: chap-2
+title: "Consent Requirements"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 23. The request for consent must be made explicitly, in writing or through
+    electronic means. The request for consent must be clearly separated from other
+    information and must be presented in an easily accessible form, using clear and
+    plain language.
+
+    Consent must be freely given, specific, and informed. The data subject must be
+    informed of the purposes of the collection, use, or disclosure of personal data.
+    A request for consent that does not comply with this section shall not be binding
+    on the data subject.
+  parts:
+    - id: sec-23-1
+      label: "Paragraph 1"
+      prose: |
+        Consent requests must be explicit, in writing or electronic form, clearly
+        separated from other matters, and presented in plain language.
+    - id: sec-23-2
+      label: "Paragraph 2"
+      prose: |
+        Consent must be freely given, specific, and informed. The data subject
+        must know the purposes before consenting.
+    - id: sec-23-3
+      label: "Paragraph 3"
+      prose: |
+        Non-compliant consent requests are not binding on the data subject.
+    - id: sec-23-4
+      label: "Paragraph 4"
+      prose: |
+        The data subject may withdraw consent at any time. Withdrawal of consent
+        shall be as easy as giving consent. The data controller must inform the
+        data subject of the consequences of withdrawal before the withdrawal.
+guidance:
+  prose: |
+    Section 23 defines the quality standards for consent, closely mirroring GDPR
+    Article 7 and Recitals 32, 42, and 43. Invalid consent means no lawful basis,
+    which means the processing is unlawful.
+
+    Critical implementation requirements:
+
+    - **Freely Given:** Consent must not be coerced. Bundling consent with service
+      access ("consent or no service") is invalid unless the processing is strictly
+      necessary for the service. Granular consent options are required.
+
+    - **Specific:** Blanket consent covering "all purposes" is invalid. Each purpose
+      must have its own consent toggle. Group consent for multiple related purposes
+      is acceptable only if each purpose is individually described.
+
+    - **Informed:** The data subject must understand what they are consenting to.
+      Provide clear, non-legalistic descriptions of each purpose.
+
+    - **Explicit and Separable:** Consent must be a distinct action, not buried in
+      terms and conditions. Pre-ticked checkboxes are invalid.
+
+    - **Easy Withdrawal:** Withdrawing consent must be as easy as giving it. If
+      consent was given with one click, revocation must also be one click.
+
+    - **Record Keeping:** Maintain proof of consent (who, when, what, how). The
+      burden of proof lies with the data controller.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a consent management platform (CMP) that stores granular consent per
+         purpose, per data subject, with full audit trail.
+      2. Implement consent UX components: clear language, separate toggles per purpose,
+         no pre-ticked boxes, prominent withdrawal mechanism.
+      3. Ensure consent state is checked at every data processing point (not just at
+         collection time).
+      4. Build consent withdrawal flows that trigger downstream data deletion or
+         processing cessation within defined SLAs.
+      5. Store consent receipts: subject ID, timestamp, version of privacy notice,
+         purposes consented to, method of consent.
+    tools:
+      - consent-management-platform
+      - privacy-ux-components
+      - consent-receipt-store
+      - consent-enforcement-middleware
+  devsecops:
+    prose: |
+      1. Validate consent UI compliance in automated UI tests: no pre-ticked boxes,
+         separate consent actions, withdrawal accessibility.
+      2. Check that data processing code paths include consent verification calls.
+      3. Test consent withdrawal flows end-to-end, including downstream propagation.
+      4. Scan for dark patterns in consent UX (misleading buttons, asymmetric choices).
+    tools:
+      - ui-compliance-tests
+      - consent-flow-tests
+      - dark-pattern-scanner
+  secops:
+    prose: |
+      1. Monitor consent grant/revocation rates for anomalies (sudden spikes may
+         indicate UX issues or automated attacks).
+      2. Audit consent records for completeness and validity.
+      3. Verify that data processing ceases after consent withdrawal within SLA.
+      4. Alert on processing activities for data subjects who have withdrawn consent.
+    tools:
+      - consent-audit-dashboard
+      - consent-withdrawal-monitor
+      - siem
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 7", "recital 32", "recital 42", "recital 43"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 8"]
+    relationship: equivalent-to

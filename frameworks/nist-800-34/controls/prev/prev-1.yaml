@@ -1,0 +1,95 @@
+id: prev-1
+family: prev
+title: "Data Backup and Storage"
+class: NIST-800-34
+
+statement:
+  prose: >-
+    Data backup is a critical contingency planning countermeasure. Organizations
+    should ensure that regular backups of all critical data are performed and
+    that the backup media are stored at a secure off-site location. The frequency
+    of backups should be consistent with the organization's data recovery
+    requirements (e.g., RPO) as determined by the BIA. The types of backups
+    to be performed (e.g., full, incremental, differential) should be specified,
+    and the backup process should be documented and tested regularly. Backup
+    media should be tested periodically to ensure data integrity and the ability
+    to restore systems from the backups.
+
+guidance:
+  prose: >-
+    Effective backup strategies consider three factors: what data to back up,
+    how frequently to back up, and where to store backups. The BIA determines
+    RPO, which dictates backup frequency. Organizations should implement a
+    backup rotation scheme and maintain multiple generations of backups. Off-site
+    storage locations should be geographically separated from the primary site
+    to avoid common-cause failures. Electronic vaulting (e-vaulting), remote
+    journaling, and database replication provide near-real-time backup capabilities
+    for systems with stringent RPOs. All backup and restoration procedures should
+    be documented and regularly tested to ensure recoverability.
+
+references:
+  - citation: "NIST SP 800-34 Rev 1, Section 3.4.3"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-34/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated backup solutions across all infrastructure tiers.
+      Use cloud-native backup services for managed databases and storage.
+      Deploy Velero for Kubernetes cluster backup including persistent volumes,
+      configurations, and cluster state. Implement cross-region replication
+      for critical data stores. Configure backup schedules aligned with RPO
+      requirements from the BIA. Implement backup monitoring and alerting to
+      detect failures immediately. Use infrastructure-as-code to define backup
+      policies ensuring consistency. Test restoration procedures through
+      automated pipelines on a regular schedule.
+    tools:
+      - "Velero (Kubernetes backup)"
+      - "AWS Backup / Azure Backup / GCP Backup (cloud-native)"
+      - "Restic / Borg (file-level backup)"
+      - "PostgreSQL pg_dump / pg_basebackup (database backup)"
+      - "S3 cross-region replication (off-site storage)"
+  devsecops:
+    prose: >-
+      Implement application-aware backup strategies that capture application
+      state, configuration, and data consistently. Use database migration tools
+      to version-control schema changes, enabling point-in-time recovery.
+      Implement CI/CD pipeline stages that validate backup integrity through
+      automated restoration tests. Store application configuration and secrets
+      in version-controlled, encrypted formats. Implement blue/green or canary
+      deployment patterns that maintain rollback capabilities.
+    tools:
+      - "Database migration tools (Flyway, Liquibase)"
+      - "GitLab CI/CD (backup validation pipelines)"
+      - "Vault / SOPS (encrypted secrets backup)"
+      - "Container registries (image backup)"
+      - "Helm / Kustomize (configuration version control)"
+  secops:
+    prose: >-
+      Establish a comprehensive data backup policy defining backup frequency,
+      retention periods, storage locations, and encryption requirements. Implement
+      the 3-2-1 backup rule: three copies of data, on two different media types,
+      with one copy stored off-site. Test backup restoration procedures quarterly
+      at minimum. Maintain backup logs and monitor for failures. Ensure backup
+      media is encrypted in transit and at rest. Validate that backup retention
+      periods meet regulatory and organizational requirements. Document and
+      maintain backup procedures including restoration steps.
+    tools:
+      - "Enterprise backup solutions (Veeam, Commvault)"
+      - "Tape management systems"
+      - "Cloud storage (encrypted off-site)"
+      - "Backup monitoring platforms"
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-9"]
+    relationship: mapped
+  - framework_id: iso-22301
+    articles: ["cl-8-3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.13"]
+    relationship: supports
+  - framework_id: iso-27031
+    articles: ["8.3"]
+    relationship: mapped

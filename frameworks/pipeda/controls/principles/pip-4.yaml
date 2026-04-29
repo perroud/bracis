@@ -1,0 +1,98 @@
+id: pip-4
+family: principles
+title: "Principle 4 — Limiting Collection"
+class: PIPEDA
+statement:
+  prose: >-
+    The collection of personal information shall be limited to that which is necessary for the
+    purposes identified by the organization. Information shall be collected by fair and lawful means.
+  parts:
+    - id: pip-4.4.4.1
+      label: "4.4.1"
+      prose: >-
+        Organizations shall not collect personal information indiscriminately. Both the amount
+        and the type of information collected shall be limited to that which is necessary to
+        fulfil the purposes identified. Organizations shall specify the type of information
+        collected as part of their information-handling policies and practices, in accordance
+        with the Openness principle (Clause 4.8).
+    - id: pip-4.4.4.2
+      label: "4.4.2"
+      prose: >-
+        The requirement that personal information be collected by fair and lawful means is
+        intended to prevent organizations from collecting information by misleading or deceiving
+        individuals about the purpose for which information is being collected.
+guidance:
+  prose: >-
+    This is PIPEDA's data minimization principle. The OPC has been aggressive in enforcing this:
+    organizations collecting Social Insurance Numbers when not legally required, apps collecting
+    location data not needed for core functionality, and websites using tracking pixels beyond
+    what is necessary have all faced findings of violation. "Necessary" means genuinely required
+    for the stated purpose — not "useful," "nice to have," or "might need later." The "fair
+    and lawful means" requirement prohibits deceptive collection practices: dark patterns, hidden
+    data collection through third-party scripts, and misleading consent interfaces. In platform
+    engineering, this translates to: design APIs that accept only required fields, implement
+    schema validation that rejects over-collection, and audit data flows for unnecessary
+    personal information.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      DATA MINIMIZATION BY DESIGN: Design APIs to accept and return only the minimum fields
+      necessary for each operation. Implement field-level access control — services cannot access
+      data fields outside their declared needs. API SCHEMA ENFORCEMENT: Use strict schema
+      validation (JSON Schema, Protocol Buffers) to reject requests containing unnecessary
+      personal information fields. DATA FLOW ANALYSIS: Build automated data flow mapping that
+      identifies all points where personal information is collected. Flag collection points
+      that gather data beyond the declared purpose. COLLECTION AUDITING: Implement automated
+      auditing of data collection volumes and categories. Alert on collection anomalies that
+      may indicate over-collection. FIELD-LEVEL CONTROLS: Use database-level column access
+      controls (PostgreSQL RLS, attribute-based access) to enforce minimum necessary access.
+    tools:
+      - "JSON Schema / Protocol Buffers for strict API validation"
+      - "PostgreSQL row-level security and column-level grants"
+      - "Data flow mapping tools (automated lineage tracking)"
+      - "API gateway field filtering and projection"
+      - "Collection volume anomaly detection"
+  devsecops:
+    prose: >-
+      OVER-COLLECTION DETECTION: SAST rules must detect SELECT * queries on tables containing
+      personal information. Linting rules must flag API endpoints that return more personal
+      information fields than necessary. SCHEMA VALIDATION: CI/CD checks must verify that API
+      schemas define only necessary fields. New personal information fields require justification
+      in merge request descriptions. DATA FLOW REVIEW: Automated data flow analysis in pipelines
+      to detect new collection points. Privacy impact review required for new data collection.
+      DARK PATTERN DETECTION: Frontend code review automation to detect deceptive collection
+      patterns (pre-checked boxes, hidden fields, misleading copy).
+    tools:
+      - "Semgrep rules for SELECT * and over-fetching detection"
+      - "OpenAPI/Swagger schema validation in CI/CD"
+      - "Automated data flow analysis tools"
+      - "Frontend accessibility and dark pattern linters"
+      - "Merge request templates requiring data collection justification"
+  secops:
+    prose: >-
+      COLLECTION MONITORING: Monitor data ingestion volumes and categories. Alert on unexpected
+      increases in personal information collection. OVER-COLLECTION DETECTION: Analyze API
+      response payloads for personal information fields beyond declared purposes. DECEPTIVE
+      COLLECTION: Monitor for hidden data collection scripts, undeclared tracking pixels, and
+      unauthorized third-party data collection on organization properties. COMPLIANCE REPORTING:
+      Generate reports mapping collected data categories to declared purposes, highlighting
+      potential over-collection.
+    tools:
+      - "DLP tools for collection volume monitoring"
+      - "API response analysis for over-exposure"
+      - "Web application scanner for hidden collection scripts"
+      - "Data inventory and mapping dashboards"
+      - "Collection-to-purpose compliance reporting"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.c"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["7.4.1"]
+    relationship: supports

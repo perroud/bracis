@@ -1,0 +1,84 @@
+id: art-2
+family: cap-1
+title: "Definicoes"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 2. Para os fins desta Resolução Conjunta, consideram-se:
+
+    I - Interface dedicada: interface de programação de aplicativos (API) desenvolvida
+    exclusivamente para o compartilhamento de dados e serviços do Open Finance;
+
+    II - Instituição receptora de dados: instituição participante que recebe dados
+    de clientes de outra instituição participante, mediante consentimento;
+
+    III - Instituição transmissora de dados: instituição participante que transmite
+    dados de clientes para outra instituição participante, mediante consentimento;
+
+    IV - Iniciador de transação de pagamento: instituição participante que presta
+    serviço de iniciação de transação de pagamento sem deter os recursos do cliente;
+
+    V - Consentimento: manifestação livre, informada, prévia e inequívoca de vontade
+    do cliente, pela qual concorda com o compartilhamento de dados ou serviços.
+guidance:
+  prose: |
+    O art. 2 estabelece o glossario tecnico-regulatorio do ecossistema. As definicoes
+    sao criticas para a implementacao tecnica:
+
+    **Papeis no ecossistema:**
+    - Transmissor de dados (data holder): detentora dos dados do cliente
+    - Receptor de dados (data recipient): recebe dados mediante consentimento
+    - Iniciador de pagamento (ITP): inicia pagamentos sem deter recursos
+    - Detentora de conta: instituicao onde o cliente mantem conta
+
+    **Interface dedicada (API):**
+    As APIs devem ser interfaces segregadas, nao sendo permitido o uso de
+    screen scraping, web crawling ou qualquer tecnica de raspagem de dados.
+
+    **Consentimento:**
+    Alinhado com a LGPD (art. 5, XII), o consentimento no Open Finance e
+    granular, com prazo definido e revogavel a qualquer momento.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelagem de papeis e interfaces:**
+      1. Implementar modelo de dominio que represente os papeis do ecossistema
+         (transmissor, receptor, iniciador) como entidades do sistema.
+      2. Segregar APIs de Open Finance de APIs internas usando API gateways
+         dedicados ou rotas exclusivas.
+      3. Implementar discovery service integrado ao diretorio de participantes
+         para resolucao de endpoints de outros participantes.
+      4. Manter versionamento independente para APIs Open Finance.
+    tools:
+      - api-gateway
+      - kong
+      - service-mesh
+  devsecops:
+    prose: |
+      **Validacao de conformidade de interfaces:**
+      1. Validar schemas OpenAPI contra especificacoes oficiais do diretorio
+         em cada merge request.
+      2. Implementar contract testing entre APIs de transmissao e recepcao.
+      3. Garantir que nenhuma API de Open Finance use tecnicas de scraping
+         ou acesso nao-padronizado.
+    tools:
+      - openapi-validator
+      - pact
+      - spectral
+  secops:
+    prose: |
+      **Inventario de participantes e interfaces:**
+      1. Manter registro atualizado de todos os papeis exercidos pela
+         instituicao no ecossistema Open Finance.
+      2. Monitorar o diretorio de participantes para identificar novos
+         parceiros e validar certificados.
+      3. Auditar periodicamente que apenas interfaces dedicadas (APIs)
+         sao utilizadas para compartilhamento.
+    tools:
+      - grc-platform
+      - api-inventory
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: complements

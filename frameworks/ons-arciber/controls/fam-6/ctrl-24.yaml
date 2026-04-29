@@ -1,0 +1,102 @@
+id: ctrl-24
+family: fam-6
+title: "Continuidade de Operacoes do SIN e Plano de Recuperacao do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve estabelecer e manter um Plano de Continuidade de
+    Operações do ARCiber (PCARC) que garanta a manutenção ou rápida recuperação
+    das funções operacionais críticas do SIN em caso de incidente cibernético
+    grave. O PCARC deve definir procedimentos de operação manual (degradada)
+    para cenários em que sistemas de supervisão e controle do ARCiber se tornem
+    indisponíveis, critérios de retorno à operação normal após incidente e a
+    articulação com o ONS durante o período de recuperação. O plano deve ser
+    integrado ao Plano de Continuidade de Negócio (BCP) do agente e testado
+    ao menos anualmente.
+
+guidance:
+  prose: >-
+    A continuidade operacional do SIN e uma obrigacao regulatoria e de
+    responsabilidade publica dos agentes do setor eletrico. O PCARC deve
+    contemplar: (i) identificacao dos sistemas do ARCiber cujo comprometimento
+    causaria indisponibilidade de instalacoes criticas para o SIN;
+    (ii) procedimentos de operacao manual (modo degradado) para cada funcao
+    critica — operadores devem ser treinados para operar sem apoio dos sistemas
+    SCADA/EMS por periodo determinado; (iii) criterios para ativacao do PCARC:
+    qual nivel de comprometimento do ARCiber justifica ativar o modo degradado;
+    (iv) cadeia de decisao para operacao em modo degradado: quem autoriza,
+    quem executa, como comunicar ao ONS; (v) criterios de retorno a operacao
+    normal: quais verificacoes de seguranca sao necessarias antes de reintegrar
+    sistemas restaurados ao ARCiber; (vi) licooes aprendidas de incidentes
+    anteriores integradas ao plano.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar sistemas de supervisao e controle com capacidade de operacao
+      local autonoma (sem dependencia de conectividade WAN ao centro de controle)
+      para instalacoes criticas do SIN — usinas e subestacoes devem poder operar
+      localmente por periodo definido mesmo sem comunicacao com o centro de controle.
+      Configurar modos de fallback nos sistemas de controle para operacao em
+      modo manual ou semi-automatico quando sistemas de supervisao estao
+      indisponiveis. Implementar documentacao de operacao em modo degradado
+      acessivel offline (impressa ou em sistema isolado) em cada instalacao
+      critica. Manter topologia de rede com alternativas de comunicacao para
+      instalacoes criticas do SIN.
+    tools:
+      - scada-local-mode
+      - ups-systems
+      - redundant-communications
+      - gitlab
+  devsecops:
+    prose: >-
+      Implementar testes automatizados de failover dos sistemas de supervisao
+      do ARCiber (simulacao de indisponibilidade de servidor SCADA principal
+      com failover para servidor de backup). Manter documentacao tecnica de
+      recuperacao de sistemas do ARCiber como codigo versionado no repositorio,
+      com runbooks especificos por tipo de incidente. Criar e manter ambiente
+      de simulacao do ARCiber para treinos de recuperacao sem risco para a
+      producao. Automatizar notificacao ao ONS quando criterios de ativacao
+      do PCARC sao atingidos.
+    tools:
+      - gitlab
+      - servicenow
+      - ansible
+      - pagerduty
+  secops:
+    prose: >-
+      Realizar exercicios anuais de continuidade de operacoes incluindo cenarios
+      de incidente cibernetico grave no ARCiber, com participacao de operadores,
+      engenheiros, equipe de seguranca e alta administracao. Validar que operadores
+      em campo e nos centros de controle estao capacitados para operacao em
+      modo degradado sem apoio dos sistemas do ARCiber. Revisar e atualizar o
+      PCARC apos cada exercicio e apos incidentes que demonstraram lacunas.
+      Coordenar o PCARC com o Centro de Operacoes do ONS para garantir alinhamento
+      com os planos de contingencia do SIN. Manter lista de prioridade de
+      restauracao de sistemas do ARCiber baseada em criticidade para o SIN,
+      atualizada sempre que a composicao do ARCiber mudar.
+    tools:
+      - servicenow
+      - archer
+      - cortex-xsoar
+      - pagerduty
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9", "art. 12"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR7.1", "62443-3-3 SR7.4"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-009-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a5.29", "a5.30"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-4", "CP-8", "CP-10"]
+    relationship: mapped

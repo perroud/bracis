@@ -1,0 +1,160 @@
+id: ac-2
+family: ac
+title: "Account Management"
+class: FedRAMP
+
+baselines: [low, moderate, high]
+
+parameters:
+  - id: ac-02_odp.01
+    label: "prerequisites and criteria for group and role membership"
+    guidance: "FedRAMP requirement: Define conditions for group and role membership that align with least privilege and separation of duties."
+  - id: ac-02_odp.02
+    label: "authorized users"
+    guidance: "FedRAMP requirement: Identify authorized users of the system by role, group, or individual name."
+  - id: ac-02_odp.03
+    label: "policy, procedures, prerequisites, and criteria"
+    guidance: "FedRAMP requirement: Document account management policies governing creation, enabling, modification, disabling, and removal of accounts."
+  - id: ac-02_odp.04
+    label: "personnel or roles to be notified"
+    guidance: "FedRAMP requirement: Notify system administrators and ISSO when accounts are created, modified, enabled, disabled, or removed."
+  - id: ac-02_odp.05
+    label: "time period for account review"
+    guidance: "FedRAMP Moderate/High parameter: At least annually. FedRAMP requires review of system accounts at least annually for compliance."
+  - id: ac-02_odp.06
+    label: "atypical usage conditions"
+    guidance: "FedRAMP requirement: Monitor for usage from unusual locations, unusual times, or unusual devices."
+
+statement:
+  prose: >-
+    a. Define and document the types of accounts allowed and specifically
+       prohibited for use within the system;
+    b. Assign account managers;
+    c. Require prerequisites and criteria for group and role membership;
+    d. Specify authorized users of the system, group and role membership,
+       and access authorizations (i.e., privileges) and other attributes
+       (as required) for each account;
+    e. Require approvals by designated personnel or roles for requests
+       to create accounts;
+    f. Create, enable, modify, disable, and remove accounts in accordance
+       with organizational policy, procedures, prerequisites, and criteria;
+    g. Monitor the use of accounts;
+    h. Notify account managers and designated personnel or roles within
+       the organization when accounts are no longer required, when users
+       are terminated or transferred, and when system usage or
+       need-to-know changes for an individual;
+    i. Authorize access to the system based on a valid access
+       authorization, intended system usage, and other attributes as
+       required by the organization or associated missions and business
+       functions;
+    j. Review accounts for compliance with account management requirements
+       at least annually;
+    k. Establish and implement a process for changing shared or group
+       account authenticators (if deployed) when individuals are removed
+       from the group;
+    l. Align account management processes with personnel termination
+       and transfer processes.
+  parts:
+    - id: ac-2_smt.j
+      label: "j."
+      prose: >-
+        FedRAMP Additional Requirement: Review accounts for compliance
+        with account management requirements at least annually. For
+        High baselines, review at least every 90 days.
+
+guidance:
+  prose: >-
+    FedRAMP adds specific parameter values and additional requirements
+    to NIST 800-53 AC-2. Key FedRAMP-specific requirements include:
+    annual account reviews (quarterly for High), notification of account
+    changes to ISSOs, and explicit prohibition of shared/group accounts
+    for privileged access. CSPs must demonstrate automated account
+    management capabilities in their SSP, including automated disabling
+    of accounts after defined inactivity periods (90 days for Moderate,
+    35 days for High). FedRAMP also requires CSPs to maintain evidence
+    of account management activities for continuous monitoring reporting.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AC-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FedRAMP Moderate Baseline"
+    url: "https://www.fedramp.gov/baselines/"
+  - citation: "FedRAMP Continuous Monitoring Strategy Guide"
+    url: "https://www.fedramp.gov/assets/resources/documents/CSP_Continuous_Monitoring_Strategy_Guide.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity and account management through a
+      federated IdP (Keycloak, Okta) integrated with all platform
+      services. Automate account lifecycle management: provisioning on
+      role assignment, modification on role change, and deprovisioning
+      on termination through HR system integration (SCIM). Enforce
+      account type policies (individual, service, emergency) through
+      the IdP with prohibition of shared accounts for privileged access.
+      Implement automated inactivity detection that disables accounts
+      after 90 days of non-use (Moderate) or 35 days (High). Deploy
+      account review automation that generates compliance reports
+      listing all active accounts with their roles, last login, and
+      authorization basis. Configure notification workflows for account
+      lifecycle events routed to system administrators and ISSOs.
+    tools:
+      - keycloak
+      - okta
+      - scim
+      - terraform
+      - kubernetes-rbac
+      - hashicorp-vault
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce account management controls in CI/CD systems: require
+      individual accounts for all pipeline activities, implement
+      service account governance with scoped permissions and automated
+      rotation. Deploy pipeline policy checks that validate IAM
+      configurations meet FedRAMP account management requirements
+      before provisioning. Automate access review evidence generation
+      through scheduled pipeline jobs that query identity provider APIs
+      and produce compliance artifacts. Implement just-in-time
+      privileged access for production deployments with automatic
+      expiration and audit logging. Scan IaC for IAM misconfigurations
+      (wildcard policies, missing MFA requirements, overly permissive
+      roles).
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - checkov
+      - tfsec
+      - vault
+      - boundary
+
+  secops:
+    prose: >-
+      Monitor account activity through SIEM with correlation rules for
+      atypical usage patterns (unusual locations, times, devices).
+      Alert on account lifecycle anomalies: orphaned accounts, dormant
+      privileged accounts, unauthorized account creation, and failed
+      MFA enrollments. Conduct annual account reviews (quarterly for
+      High) with documented attestation from account managers. Track
+      account management metrics: total accounts by type, dormant
+      account count, time-to-deprovision for terminated users, and
+      access review completion rate. Generate FedRAMP continuous
+      monitoring evidence for account management control effectiveness.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - okta-syslog
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["fci-ac-l1-001", "ac-l2-001"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.16", "a5.18", "a8.2"]
+    relationship: supports

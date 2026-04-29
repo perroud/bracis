@@ -1,0 +1,97 @@
+id: pm-3
+family: pm
+title: "Unsupported Software Removal and End-of-Life Management"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Software and operating systems that have reached end-of-life and are no longer
+    receiving security updates from the vendor must be removed from devices in scope
+    or, where removal is not immediately possible, must be isolated from the internet
+    and other network devices to prevent exploitation of unpatched vulnerabilities.
+    The organisation must have a process for identifying software approaching end-of-life
+    and planning for its replacement or removal before vendor support ceases.
+
+guidance:
+  prose: >-
+    End-of-life software cannot be patched and represents a permanent unmitigated
+    vulnerability. The Cyber Essentials scheme takes a firm stance: unsupported software
+    must be removed or fully network-isolated. Common examples include legacy operating
+    systems (Windows 7, Windows Server 2012), outdated office suites, and deprecated
+    browser versions. Organisations must maintain awareness of vendor end-of-life
+    timelines and plan migrations well in advance. Where legacy software must be retained
+    for business reasons, it must be completely isolated from the internet and untrusted
+    networks, with documented risk acceptance at an appropriate management level.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Security Update Management"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Obsolete Products"
+    url: "https://www.ncsc.gov.uk/guidance/obsolete-platforms-security-guidance"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a comprehensive software asset inventory that includes vendor support
+      end dates. Implement automated alerts triggered 12, 6, and 3 months before
+      end-of-life dates. Use configuration management databases (CMDB) or asset
+      management platforms (ServiceNow, Snipe-IT) to track software lifecycle status.
+      Automate network isolation for systems identified as running end-of-life software
+      through NAC policies or firewall rules. Implement infrastructure policies that
+      prevent provisioning of resources using end-of-life operating systems or base
+      images. Plan and budget for technology refresh cycles aligned with vendor support
+      timelines.
+    tools:
+      - servicenow
+      - snipe-it
+      - aws-config
+      - azure-policy
+      - terraform
+      - ansible
+
+  devsecops:
+    prose: >-
+      Implement pipeline checks that detect end-of-life base images, runtimes, and
+      frameworks in application builds. Maintain a registry of approved base images
+      with automatic expiry aligned to vendor support dates. Use Renovate or
+      Dependabot to track dependency currency and flag libraries approaching
+      end-of-life. Fail CI/CD pipelines that attempt to build or deploy using
+      unsupported runtimes. Integrate end-of-life checking tools (endoflife.date API)
+      into pipeline workflows.
+    tools:
+      - renovate
+      - dependabot
+      - trivy
+      - gitlab-ci
+      - checkov
+
+  secops:
+    prose: >-
+      Run regular scans to identify end-of-life software across the estate. Generate
+      reports for asset owners showing software approaching or past end-of-life with
+      recommended remediation actions. Verify that network isolation controls are
+      effective for any systems that cannot be immediately upgraded. Track end-of-life
+      software reduction as a risk metric. Conduct annual technology lifecycle reviews
+      to identify upcoming end-of-life events and ensure replacement projects are
+      funded and scheduled.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - servicenow
+      - splunk
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A5.23"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-22", "SI-2", "CM-8"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-patch-apps", "e8-patch-os"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.2", "CIS 7.5"]
+    relationship: mapped

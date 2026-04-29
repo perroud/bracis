@@ -1,0 +1,111 @@
+id: art-11
+family: cap-3
+title: "Qualificacao de Instalacao (IQ)"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 11. A Qualificação de Instalação (IQ) deve verificar e documentar
+    que o sistema computadorizado foi instalado corretamente conforme as
+    especificações do fornecedor e os requisitos do fabricante.
+
+    Parágrafo 1. A IQ deve incluir, no mínimo:
+    I - verificação de hardware instalado versus especificações;
+    II - verificação de software instalado, incluindo versões e patches;
+    III - verificação de configuração de rede e conectividade;
+    IV - verificação de configuração do sistema operacional;
+    V - verificação de instalação de componentes de segurança;
+    VI - documentação de baseline de configuração;
+    VII - verificação de licenças de software.
+
+    Parágrafo 2. A IQ deve ser executada em ambiente que represente
+    fielmente o ambiente de produção e seus resultados devem ser
+    documentados em protocolo e relatório formais.
+guidance:
+  prose: |
+    A IQ e a primeira fase de qualificacao que verifica se o sistema
+    foi instalado corretamente no ambiente-alvo.
+
+    **Objetivos da IQ:**
+    - Confirmar que hardware e software estao conforme especificacao
+    - Documentar baseline de configuracao para controle de mudancas
+    - Verificar ambiente de execucao (SO, middleware, dependencias)
+    - Confirmar conectividade e interfaces com outros sistemas
+    - Verificar componentes de seguranca (antivirus, firewall, etc.)
+
+    **Checklist tipico de IQ:**
+    - Numero de serie e modelo do hardware
+    - Versao do sistema operacional e patches
+    - Versao do software aplicativo e modulos instalados
+    - Configuracao de rede (IP, DNS, portas)
+    - Configuracao de storage e backup
+    - Licencas de software validas
+    - Componentes de seguranca instalados e configurados
+    - Documentacao de baseline (snapshot de configuracao)
+
+    **Ambiente de qualificacao:**
+    A IQ deve ser realizada em ambiente identico ao de producao. Diferecas
+    entre ambiente de qualificacao e producao devem ser documentadas e
+    justificadas, e a IQ deve ser complementada em producao se necessario.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **IQ automatizada via infraestrutura como codigo:**
+      1. Definir infraestrutura como codigo (Terraform/Pulumi) que garanta
+         instalacao consistente e reproduzivel de sistemas GMP.
+      2. Implementar testes de infraestrutura automatizados (InSpec/ServerSpec)
+         que verifiquem configuracao de hardware, software, rede e seguranca
+         conforme especificacoes da IQ.
+      3. Gerar automaticamente relatorio de IQ a partir de resultados de
+         testes de infraestrutura com evidencias de configuracao.
+      4. Manter baseline de configuracao como artefato versionado que serve
+         como referencia para deteccao de drift.
+      5. Configurar drift detection que alerte quando configuracao divergir
+         do baseline documentado na IQ.
+    tools:
+      - terraform
+      - inspec
+      - serverspec
+      - drift-detection
+      - configuration-baseline
+  devsecops:
+    prose: |
+      **Pipeline de qualificacao de instalacao:**
+      1. Criar stage de IQ no pipeline que execute verificacoes automatizadas
+         de instalacao apos deploy em ambiente de qualificacao.
+      2. Verificar automaticamente versoes de software, dependencias,
+         configuracoes e conectividade como parte do pipeline.
+      3. Comparar artefatos instalados contra bill of materials (BOM)
+         definido na especificacao do sistema.
+      4. Gerar relatorio de IQ como artefato de pipeline com evidencias
+         de cada verificacao executada.
+      5. Bloquear progresso para OQ ate que IQ seja aprovada.
+    tools:
+      - gitlab-ci
+      - inspec
+      - bom-verification
+      - artifact-management
+  secops:
+    prose: |
+      **Governanca de qualificacao de instalacao:**
+      1. Manter protocolo padronizado de IQ com checklists especificos
+         por tipo de sistema (servidor, aplicacao, equipamento).
+      2. Garantir que IQ seja executada por pessoal qualificado e
+         independente da equipe de instalacao.
+      3. Revisar e aprovar relatorio de IQ pela unidade da qualidade
+         antes de prosseguir para OQ.
+      4. Manter registro de todas as IQs executadas com resultados,
+         desvios e acoes corretivas.
+      5. Verificar que baseline de configuracao esta documentado e
+         acessivel para referencia futura em gestao de mudancas.
+    tools:
+      - quality-management-system
+      - document-management
+      - validation-tracking
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-9"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["system-integration"]
+    relationship: mapped

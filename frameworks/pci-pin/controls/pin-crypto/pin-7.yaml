@@ -1,0 +1,90 @@
+id: pin-7
+family: pin-crypto
+title: "Cryptographic Key Storage and Protection"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    All cryptographic keys used for PIN protection must be stored within a secure
+    cryptographic device (SCD) or, when stored outside an SCD, must be encrypted under a
+    key-encrypting key (KEK) that itself resides within an SCD. Secret and private keys
+    must never exist in cleartext outside of an SCD boundary. When key components are stored
+    for backup or recovery purposes, they must be maintained under dual control and split
+    knowledge, with each component stored in a physically separate secure location. Key
+    storage mechanisms must prevent unauthorized access, modification, substitution, or
+    destruction of key material. Hardware security modules used for key storage must be
+    tamper-resistant and tamper-evident, meeting PCI PTS HSM or FIPS 140-2 Level 3
+    requirements.
+
+guidance:
+  prose: >-
+    The storage of cryptographic keys is a persistent vulnerability surface — unlike
+    transmission, which is transient, stored keys are continuously exposed to attack.
+    Organizations must maintain a complete inventory of all locations where PIN-related
+    key material exists, including HSMs, key backup media, disaster recovery sites, and
+    any legacy systems. The principle of key hierarchy is essential: working keys (PIN
+    encryption keys) should be encrypted under zone master keys, which are encrypted under
+    local master keys, which are protected by the HSM's internal master key. This layered
+    approach means that compromising any single storage location does not expose usable key
+    material. Backup key components must be tested periodically to verify they can be
+    successfully recombined and loaded.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 2, Key Storage"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Store all PIN encryption keys exclusively within PCI PTS HSM-certified hardware
+      security modules. Implement a key hierarchy with at least three levels: master key
+      (stored in HSM tamper-protected memory), zone master keys (encrypted under master
+      key), and working keys (encrypted under zone master keys). Deploy key backup
+      procedures using M-of-N key sharing schemes (e.g., 3-of-5 Shamir's Secret
+      Sharing) with components stored in geographically separate secure vaults.
+      Implement automated key integrity verification that periodically checks key
+      check values (KCVs) against the key inventory database.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - futurex-hsm
+      - key-backup-vault
+      - hsm-cluster
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code templates and configuration files for any references
+      to cleartext key material or insecure key storage locations (e.g., environment
+      variables, flat files). Implement IaC scanning rules that verify all key references
+      point to HSM key labels or encrypted key stores. Test key backup and restoration
+      procedures in staging environments. Verify that application configurations never
+      cache decrypted key material in memory beyond the duration of a single transaction.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - scanner-iac-scanning
+      - checkov
+      - tfsec
+  secops:
+    prose: >-
+      Monitor HSM tamper detection alerts for any physical intrusion attempts. Audit key
+      access logs to detect unauthorized key retrieval operations. Conduct quarterly
+      reviews of the key inventory to verify all stored keys are accounted for and match
+      their recorded key check values. Monitor backup vault access logs and alert on
+      any access outside scheduled backup/restoration windows. Test key recovery from
+      backup components annually.
+    tools:
+      - splunk
+      - elastic-siem
+      - thales-crypto-command-center
+      - physical-access-control-system
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-28"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.7.8"]
+    relationship: mapped

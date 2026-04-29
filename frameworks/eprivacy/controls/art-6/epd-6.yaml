@@ -1,0 +1,108 @@
+id: epd-6
+family: art-6
+title: "Traffic Data"
+class: ePrivacy
+statement:
+  prose: >-
+    1. Traffic data relating to subscribers and users processed and stored by the provider of a public
+    communications network or publicly available electronic communications service must be erased or made
+    anonymous when it is no longer needed for the purpose of the transmission of a communication without
+    prejudice to paragraphs 2, 3 and 5 of this Article and Article 15(1).
+
+    2. Traffic data necessary for the purposes of subscriber billing and interconnection payments may be
+    processed. Such processing is permissible only up to the end of the period during which the bill may
+    lawfully be challenged or payment pursued.
+
+    3. For the purpose of marketing electronic communications services or for the provision of value added
+    services, the provider of a publicly available electronic communications service may process the data
+    referred to in paragraph 1 to the extent and for the duration necessary for such services or marketing,
+    if the subscriber or user to whom the data relate has given his or her prior consent. Users or subscribers
+    shall be given the possibility to withdraw their consent for the processing of traffic data at any time.
+
+    5. Processing of traffic data, in accordance with paragraphs 1, 2, 3 and 4, must be restricted to
+    persons acting under the authority of providers of the public communications networks and publicly
+    available electronic communications services handling billing or traffic management, customer enquiries,
+    fraud detection, marketing electronic communications services or providing a value added service, and
+    must be restricted to what is necessary for the purposes of such activities.
+  parts:
+    - id: epd-6.1
+      label: "(1)"
+      prose: >-
+        Traffic data relating to subscribers and users processed and stored by the provider must be erased
+        or made anonymous when it is no longer needed for the purpose of the transmission of a communication.
+    - id: epd-6.2
+      label: "(2)"
+      prose: >-
+        Traffic data necessary for subscriber billing and interconnection payments may be processed only up
+        to the end of the period during which the bill may lawfully be challenged or payment pursued.
+    - id: epd-6.3
+      label: "(3)"
+      prose: >-
+        For marketing or value added services, traffic data may be processed with prior consent of the
+        subscriber or user, who must be able to withdraw consent at any time.
+    - id: epd-6.5
+      label: "(5)"
+      prose: >-
+        Processing of traffic data must be restricted to authorized persons handling billing, traffic
+        management, customer enquiries, fraud detection, marketing, or value added services, and must
+        be restricted to what is necessary for such activities.
+guidance:
+  prose: >-
+    Article 6 establishes strict rules for traffic data (metadata about communications: who communicated
+    with whom, when, how long, from where). The default rule is erasure or anonymization once the
+    communication is complete. Exceptions exist for billing (limited to billing dispute period), marketing
+    and value-added services (consent required), fraud detection, and the Article 15(1) national security
+    exception. The principle of minimum necessary processing applies: only authorized personnel may access
+    traffic data, and only for specified purposes. This is particularly relevant for telecommunications
+    providers, ISPs, and messaging platforms. Traffic data is highly sensitive because it reveals
+    communication patterns, social graphs, and behavioral information even without accessing content.
+    The CJEU has ruled repeatedly (Digital Rights Ireland, Tele2/Watson, La Quadrature du Net) that
+    general and indiscriminate retention of traffic data is incompatible with EU fundamental rights.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated traffic data lifecycle management. Build data classification pipelines that
+      tag all traffic data at ingestion with purpose, retention period, and legal basis. Implement
+      automated erasure/anonymization pipelines that process traffic data as soon as the communication
+      is complete (real-time or near-real-time). For billing retention, implement time-bounded data
+      stores with automated expiry aligned to national billing dispute periods. Build anonymization
+      services that irreversibly strip identifying information from traffic data needed for analytics.
+      Implement purpose-bound access controls using attribute-based access control (ABAC) that restrict
+      traffic data access to authorized roles (billing, fraud, marketing with consent). Build consent
+      verification checkpoints in all marketing and value-added service data pipelines.
+    tools:
+      - "Data lifecycle automation with TTL-based erasure (Apache Airflow, custom pipelines)"
+      - "Traffic data anonymization services (k-anonymity, differential privacy)"
+      - "ABAC policy engines (Open Policy Agent) for purpose-bound access control"
+      - "Consent verification middleware for marketing data pipelines"
+      - "Time-series databases with automated retention policies (TimescaleDB, InfluxDB)"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must verify that new data stores handling traffic data have retention policies
+      configured. Pipeline gates must block deployment of services that access traffic data without
+      declaring a purpose and legal basis. SAST rules must detect traffic data logging beyond what is
+      necessary for service delivery. Code review must verify that traffic data access is restricted
+      to authorized processing paths. Automated tests must verify that erasure and anonymization
+      pipelines function correctly and within required timeframes.
+    tools:
+      - "Database migration linters verifying TTL/retention on traffic data tables"
+      - "SAST rules detecting excessive traffic data logging"
+      - "Pipeline gates requiring purpose declaration for traffic data access"
+      - "Automated erasure/anonymization pipeline testing"
+  secops:
+    prose: >-
+      Monitor traffic data stores for retention period violations. Alert when traffic data exceeds
+      its declared retention period without erasure or anonymization. Monitor access patterns to traffic
+      data stores and alert on unauthorized access or purpose deviation. Conduct regular audits of
+      traffic data processing activities against declared purposes and legal bases. Monitor anonymization
+      effectiveness and test for re-identification risks. Track consent status for marketing-purpose
+      traffic data processing and enforce immediate cessation when consent is withdrawn.
+    tools:
+      - "Retention compliance monitoring with automated alerting"
+      - "Access pattern analysis for traffic data stores"
+      - "Anonymization effectiveness testing (re-identification risk assessment)"
+      - "Consent lifecycle tracking and enforcement monitoring"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5", "art-6", "art-17"]
+    relationship: complements

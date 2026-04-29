@@ -1,0 +1,112 @@
+id: basel-gov-pillar3
+family: governance
+title: "Pillar 3 — Market Discipline and Disclosure"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must publicly disclose quantitative and qualitative information about their
+    capital structure, risk exposures, risk assessment processes, and capital adequacy under
+    Pillar 3 of the Basel framework to enable market participants to assess the bank's risk
+    profile and capital adequacy. The BCBS Pillar 3 disclosure requirements were
+    consolidated and significantly enhanced in the Revised Pillar 3 disclosure requirements
+    (January 2015), the Second phase of Basel III Pillar 3 disclosures (March 2017), and the
+    Pillar 3 disclosure requirements for TLAC holdings (November 2016). Disclosures must be
+    published at least quarterly for quantitative tables and at least annually for qualitative
+    information, and must be made in a dedicated Pillar 3 report, in a separate section of
+    the annual report, or in a standalone supplement. Key mandatory templates include:
+    Overview of risk management, risk-weighted assets, and capital resources (OV1); Credit
+    risk by approach and portfolio (CR1-CR10); Counterparty credit risk (CCR1-CCR8);
+    Securitisation (SEC1-SEC4); Market risk (MR1-MR4); Operational risk (OR1-OR2);
+    Leverage ratio (LR1-LR2); and Liquidity metrics (LIQ1, LIQ2). From 2023 (CRR3 in the
+    EU), FRTB-specific disclosure templates (MAR-series) are mandatory.
+
+guidance:
+  prose: >-
+    Pillar 3 disclosure is the primary mechanism by which market participants can hold banks
+    accountable for their risk management practices and capital adequacy. Supervisors expect
+    Pillar 3 data to be consistent with information disclosed in the financial statements
+    and internal management reporting. Banks should develop automated reconciliation between
+    Pillar 3 template data and published financial statements to prevent unexplained
+    discrepancies. Material developments — such as a significant change in risk profile,
+    capital depletion, or a material operational loss — should trigger a prompt ad hoc
+    disclosure outside the normal quarterly cycle. The BCBS Pillar 3 phase 3 requirements
+    include climate-related financial risk disclosures aligned with TCFD, representing the
+    increasing intersection between Basel prudential requirements and sustainability
+    reporting frameworks (IFRS S2, CSRD). Banks should also disclose their remuneration
+    policies in sufficient detail to allow assessment of whether incentive structures are
+    aligned with sound risk management.
+
+references:
+  - citation: "BCBS, Revised Pillar 3 disclosure requirements, January 2015"
+    url: "https://www.bis.org/publ/bcbs309.htm"
+  - citation: "BCBS, Pillar 3 disclosure requirements — updated framework, December 2018"
+    url: "https://www.bis.org/bcbs/publ/d455.htm"
+  - citation: "BCBS, Pillar 3 disclosure requirements for climate-related financial risks, November 2021"
+    url: "https://www.bis.org/bcbs/publ/d530.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a Pillar 3 reporting automation platform that feeds all mandatory BCBS
+      disclosure templates (OV1, CR-series, CCR-series, MR-series, LR-series, LIQ-series,
+      SEC-series, OR-series) from the same source data used for internal capital reporting
+      and regulatory supervisory reporting (COREP/FFIEC). Implement automated reconciliation
+      checks comparing Pillar 3 RWA values against COREP RWA values and Pillar 3 capital
+      values against the published accounts. Generate the quarterly Pillar 3 PDF and XBRL
+      packages automatically from the platform, reducing manual preparation time. Maintain
+      full data lineage from the Pillar 3 template cell back to the source transaction or
+      model output.
+    tools:
+      - dbt
+      - apache-airflow
+      - postgresql
+      - grafana
+      - xbrl-tagging
+      - terraform
+
+  devsecops:
+    prose: >-
+      Version-control all Pillar 3 template definitions, mapping rules (from internal
+      data items to disclosure template cells), and automated reconciliation checks in Git.
+      Implement change control so that any change to a Pillar 3 mapping — for example,
+      reflecting a change in the Basel Framework disclosure requirements — goes through a
+      full review and testing cycle before production. Build automated tests that compare
+      current quarter Pillar 3 output against prior quarter and flag movements above a
+      materiality threshold for human review and commentary. Tag all Pillar 3 report
+      generations with the software version and data snapshot used, ensuring full
+      reproducibility.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Protect draft Pillar 3 reports before publication — they contain market-sensitive
+      capital and risk information that could be misused if leaked ahead of the public
+      disclosure date. Restrict access to pre-publication Pillar 3 drafts to the Finance,
+      Risk, and Compliance teams, and audit all access. After publication, archive all
+      Pillar 3 reports in an immutable, publicly accessible repository for at least 10 years.
+      Implement a pre-publication review checklist that includes: consistency checks with
+      financial statements, comparison against prior disclosure, sign-off by CFO and CRO,
+      and legal review for any qualitative narrative disclosures.
+    tools:
+      - sharepoint-dlm
+      - hashicorp-vault
+      - splunk
+      - cyberark
+
+legal_references:
+  - framework_id: sox
+    articles: ["sec-302", "sec-404"]
+    relationship: equivalent-to
+  - framework_id: cobit-2019
+    articles: ["MEA03", "EDM01", "APO09"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-1", "PM-9", "AU-9", "SI-12"]
+    relationship: mapped

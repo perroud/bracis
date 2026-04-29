@@ -1,0 +1,131 @@
+id: art-5
+family: cap-2
+title: "Electronic Insurance Proposals — Authenticated and Integrity-Verifiable"
+class: CNSP-408
+baselines: [seguradoras-digitais]
+statement:
+  prose: |
+    Art. 5º. As propostas de seguro e de previdência complementar aberta poderão ser
+    preenchidas e formalizadas por meio remoto seguro aceito pelas partes como válido,
+    necessariamente de forma autenticada e passível de comprovação da autoria e
+    integridade.
+guidance:
+  prose: |
+    Article 5 establishes the requirements for electronic insurance proposals and open
+    pension plan applications. This is a critical article because the proposal is the
+    foundational legal act that initiates the contractual relationship.
+
+    **Secure remote means accepted by the parties:**
+    The remote means used must be "secure" and "accepted by the parties as valid."
+    This dual requirement means:
+    1. Technical security: the channel must implement adequate security controls
+    2. Mutual acceptance: both the supervised entity and the client must agree that
+       the remote means is a valid channel for formalization
+
+    **Authenticated:**
+    The proposal must be formalized in an authenticated manner. This means the identity
+    of the person completing and submitting the proposal must be verified. Authentication
+    methods may include:
+    - Digital certificate (ICP-Brasil) for highest assurance
+    - Gov.br login (government digital identity)
+    - Biometric authentication (facial, fingerprint)
+    - OTP/token-based authentication
+    - Knowledge-based authentication with document verification
+
+    **Provable authorship and integrity:**
+    Two requirements that go beyond mere authentication:
+    1. Authorship: it must be possible to prove WHO submitted the proposal
+    2. Integrity: it must be possible to prove the proposal was NOT altered after submission
+
+    These requirements effectively mandate some form of digital signature or equivalent
+    non-repudiation mechanism for insurance proposals.
+
+    **Scope limitation:**
+    This article applies to "propostas de seguro" and "previdência complementar aberta."
+    Capitalization products and insurance by "bilhete" (ticket/certificate) are covered
+    by Art. 6, which has different (more flexible) requirements.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Digital proposal platform:**
+      1. Web and mobile application for electronic proposal submission with
+         multi-step form validation and real-time risk assessment.
+      2. Identity verification service integrating with ICP-Brasil, Gov.br,
+         and biometric providers for authenticated proposal submission.
+      3. Digital signature infrastructure supporting:
+         - ICP-Brasil certificates (qualified electronic signatures)
+         - Advanced electronic signatures (biometric + document verification)
+         - Gov.br authentication for simplified proposals
+      4. Proposal integrity sealing: cryptographic hash of the completed proposal
+         stored immutably at submission time.
+
+      **Consent and acceptance management:**
+      5. Terms of service and channel acceptance workflow: explicit client consent
+         to use the specific remote means for formalization.
+      6. Evidence capture: screenshots, clickstream, IP address, device fingerprint,
+         timestamp of acceptance.
+      7. Proposal versioning: if the proposal is modified after initial submission,
+         each version is hashed and signed separately.
+      8. Integration with core insurance system for automatic proposal processing.
+    tools:
+      - digital-signature-platform
+      - identity-verification
+      - biometric-sdk
+      - pki-infrastructure
+      - document-management
+  devsecops:
+    prose: |
+      **Authentication and signing validation:**
+      1. Integration tests verifying that proposals cannot be submitted without
+         proper authentication (identity verification step).
+      2. Automated tests for digital signature generation and validation.
+      3. Penetration testing of the proposal submission flow (authentication
+         bypass, proposal tampering, replay attacks).
+      4. SAST analysis of authentication and signature code for vulnerabilities.
+
+      **Compliance checks:**
+      5. Pipeline gate: all proposal templates must include authentication
+         method and signature fields in their schema.
+      6. Automated validation that proposal hashes are correctly generated
+         and stored at submission time.
+      7. Regression tests for multi-browser/multi-device proposal submission.
+      8. Accessibility testing for the authentication flow (WCAG 2.1).
+    tools:
+      - gitlab-ci
+      - burp-suite
+      - sast-scanner
+      - selenium
+      - accessibility-scanner
+  secops:
+    prose: |
+      **Authentication monitoring:**
+      1. Monitor authentication failure rates in proposal submission flows —
+         detect fraud attempts and usability issues.
+      2. Track authentication method distribution (ICP-Brasil vs. Gov.br vs.
+         biometric) for compliance reporting.
+      3. Fraud detection: anomaly detection on proposal submission patterns
+         (velocity, geolocation, device fingerprint).
+      4. Alert on proposals submitted with expired or revoked certificates.
+
+      **Integrity and non-repudiation:**
+      5. Periodic verification of stored proposal hashes against actual documents.
+      6. Audit trail review: ensure every proposal has complete authorship
+         and integrity evidence.
+      7. Dispute resolution support: ability to produce cryptographic proof
+         of proposal authorship and integrity for legal proceedings.
+      8. Annual compliance assessment of the electronic proposal process.
+    tools:
+      - siem
+      - fraud-detection
+      - grc-platform
+      - forensics-toolkit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11"]
+    relationship: complements
+  - framework_id: susep-638
+    articles: ["art-3", "art-5"]
+    relationship: complements
+  - framework_id: cnsp-381
+    articles: ["art-4"]
+    relationship: complements

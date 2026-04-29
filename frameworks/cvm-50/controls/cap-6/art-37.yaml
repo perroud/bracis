@@ -1,0 +1,93 @@
+id: art-37
+family: cap-6
+title: "Prazos para Comunicacao ao COAF"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 37. As comunicações ao COAF devem ser realizadas nos seguintes prazos:
+
+    I - para operações suspeitas de financiamento do terrorismo ou que envolvam
+    pessoas ou entidades em listas de sanções: imediatamente, e no prazo máximo
+    de 24 horas após a identificação;
+
+    II - para operações com suspeita de lavagem de dinheiro já realizadas:
+    no prazo máximo de 15 dias úteis após a identificação;
+
+    III - para tentativas de operações suspeitas: no prazo máximo de 15 dias
+    úteis após a identificação; e
+
+    IV - para situações suspeitas relacionadas a clientes (sem operação específica):
+    no prazo máximo de 30 dias corridos após a identificação.
+guidance:
+  prose: |
+    Os prazos do art. 37 refletem a urgencia de diferentes categorias de suspeita.
+
+    **Urgencia do terrorismo (inciso I — 24 horas):**
+    O financiamento do terrorismo tem dimensao de seguranca publica imediata.
+    Recursos destinados a um ato terrorista iminente nao podem esperar 15 dias
+    para ser comunicados. A comunicacao de 24 horas permite que o COAF alerte
+    as forcas de seguranca com agilidade.
+
+    **Prazo de 15 dias para lavagem (incisos II e III):**
+    Para lavagem de dinheiro em geral, 15 dias uteis sao suficientes para
+    completar a investigacao interna e preparar uma comunicacao de qualidade.
+    Nao e para "pensar se deve comunicar" — e o prazo para investigar e documentar.
+
+    **Prazo de 30 dias para situacoes suspeitas (inciso IV):**
+    Situacoes suspeitas sem operacao especifica (ex: comportamento anomalo
+    do cliente durante onboarding, informacoes inconsistentes) tem prazo
+    ligeiramente maior porque nao ha transacao especifica como evidencia central.
+
+    **O prazo começa quando?**
+    "Apos a identificacao" — isto e, quando o alerta foi gerado (automaticamente)
+    ou quando o analista tomou ciencia da situacao suspeita. Nao e a data da
+    operacao suspeita, mas a data de identificacao pelo compliance.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de prazos:**
+      1. Classificacao automatica de alertas por categoria do art. 37:
+         terrorismo/sancao (24h), lavagem realizada (15 dias uteis),
+         tentativa (15 dias uteis), situacao suspeita (30 dias corridos).
+      2. Contagem de prazo automatica iniciando na data de identificacao
+         do alerta — calendário de dias uteis configurado corretamente
+         (sem contar fins de semana e feriados nacionais).
+      3. Alertas progressivos de prazo: notificacao ao analista em 50% do prazo,
+         ao supervisor em 80%, ao compliance officer em 95%, ao diretor em 100%.
+      4. Bloqueio de comunicacao intempestiva: sistema impede submissao ao
+         SISCOAF apos o prazo com workflow de escalacao para aprovacao da diretoria.
+    tools:
+      - workflow-engine
+      - coaf-reporting
+      - notification-service
+      - calendar-service
+  devsecops:
+    prose: |
+      **Testes de prazo:**
+      1. Testes de calculo de prazo: garantir que dias uteis sao calculados
+         corretamente incluindo feriados nacionais.
+      2. Testes de alertas progressivos: em diferentes percentuais do prazo,
+         notificacoes corretas sao enviadas ao nivel correto.
+      3. Testes de classificacao: alerta de sancao deve ser classificado
+         como urgente (24h), nao como padrao (15 dias).
+    tools:
+      - test-automation
+      - gitlab-ci
+      - calendar-testing
+  secops:
+    prose: |
+      **Conformidade de prazos:**
+      1. Relatorio mensal de comunicacoes por status de prazo: dentro do prazo,
+         proximo do prazo, atrasado.
+      2. KPI: percentual de comunicacoes realizadas dentro do prazo legal.
+      3. Investigacao de todas as comunicacoes fora do prazo com plano de
+         acao para prevencao de reincidencia.
+    tools:
+      - coaf-management
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-26", "art-27"]
+    relationship: equivalent-to

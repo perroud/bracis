@@ -1,0 +1,114 @@
+id: art-16
+family: cap-2
+title: "Eliminação dos Dados Pessoais após Término do Tratamento"
+class: LGPD
+baselines: [all]
+statement:
+  prose: |
+    Art. 16. Os dados pessoais serão eliminados após o término de seu tratamento, no âmbito
+    e nos limites técnicos das atividades, autorizada a conservação para as seguintes
+    finalidades:
+  parts:
+    - id: art-16-i
+      label: "I"
+      prose: |
+        cumprimento de obrigação legal ou regulatória pelo controlador;
+    - id: art-16-ii
+      label: "II"
+      prose: |
+        estudo por órgão de pesquisa, garantida, sempre que possível, a anonimização dos
+        dados pessoais;
+    - id: art-16-iii
+      label: "III"
+      prose: |
+        transferência a terceiro, desde que respeitados os requisitos de tratamento de
+        dados dispostos nesta Lei; ou
+    - id: art-16-iv
+      label: "IV"
+      prose: |
+        uso exclusivo do controlador, vedado seu acesso por terceiro, e desde que
+        anonimizados os dados.
+guidance:
+  prose: |
+    O art. 16 complementa o art. 15 estabelecendo que a regra geral após o término
+    do tratamento é a eliminação dos dados. As exceções são taxativas (quatro hipóteses).
+
+    **Regra geral: ELIMINAR.**
+    A conservação é exceção e deve ser justificada em uma das quatro hipóteses.
+
+    **I — Obrigação legal ou regulatória:**
+    Exemplos comuns: retenção fiscal (5 anos — CTN), registros trabalhistas (5 anos
+    após extinção do contrato — CLT), registros de acesso à internet (1 ano — Marco
+    Civil da Internet), dados bancários (5 anos — BACEN), prontuários médicos (20 anos).
+
+    **II — Pesquisa:**
+    Dados podem ser conservados para pesquisa, preferencialmente anonimizados. A
+    anonimização não é obrigatória (o texto diz "sempre que possível"), mas é
+    fortemente recomendada.
+
+    **III — Transferência a terceiro:**
+    Dados podem ser transferidos a terceiro antes da eliminação, desde que haja base
+    legal para essa transferência. Ex.: portabilidade (art. 18, V).
+
+    **IV — Uso exclusivo do controlador com anonimização:**
+    Dados anonimizados podem ser conservados para uso exclusivo do controlador (analytics,
+    business intelligence). A anonimização deve ser irreversível — pseudonimização
+    não é suficiente.
+
+    **"Nos limites técnicos das atividades":**
+    A lei reconhece que a eliminação absoluta pode ser tecnicamente inviável (ex.: dados
+    em backups distribuídos). A obrigação é fazer o melhor esforço técnico possível.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar classificação de dados com tag de "motivo de retenção" vinculada
+         a uma das quatro exceções do art. 16 quando aplicável.
+      2. Criar tabela de retenção legal por tipo de dado e obrigação regulatória
+         correspondente (fiscal, trabalhista, bancária, saúde).
+      3. Implementar pipeline de anonimização para dados que serão conservados para
+         analytics (inciso IV) com técnicas de k-anonimato, l-diversidade ou
+         differential privacy.
+      4. Criar mecanismo de eliminação em cascata que propague para todos os sistemas,
+         incluindo caches, filas de mensagens e data warehouses.
+      5. Implementar "tombstone records" para rastrear dados eliminados e impedir
+         reingresso inadvertido.
+      6. Manter log imutável de eliminação como evidência de conformidade.
+    tools:
+      - data-lifecycle-management
+      - anonymization-engine
+      - data-classification
+      - retention-policy-engine
+      - audit-trail
+  devsecops:
+    prose: |
+      1. Validar que toda categoria de dado pessoal tem política de retenção definida
+         com justificativa legal quando a retenção excede o término do tratamento.
+      2. Testar que a anonimização utilizada é irreversível (inciso IV) — executar
+         testes de re-identificação.
+      3. Implementar testes de eliminação em cascata que verifiquem remoção de dados
+         em todos os sistemas downstream.
+      4. Validar que backups expiram dentro do prazo de retenção ou possuem processo
+         documentado de eliminação seletiva.
+    tools:
+      - anonymization-testing
+      - data-integrity-validation
+      - compliance-as-code
+      - backup-lifecycle-testing
+  secops:
+    prose: |
+      1. Auditar periodicamente dados conservados após término do tratamento para
+         validar que estão enquadrados em uma das exceções do art. 16.
+      2. Monitorar acessos a dados anonimizados conservados sob o inciso IV para
+         garantir que não há tentativa de re-identificação.
+      3. Verificar que dados cuja obrigação legal de retenção expirou foram
+         efetivamente eliminados.
+      4. Alertar sobre dados retidos sem justificativa legal válida.
+    tools:
+      - data-discovery
+      - access-monitoring
+      - retention-audit
+      - compliance-dashboard
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(e)", "art. 17", "art. 89"]
+    relationship: equivalent-to

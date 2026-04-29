@@ -1,0 +1,106 @@
+id: iot-9
+family: update
+title: "Secure Software/Firmware Update Mechanism"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve possuir mecanismos automatizados de atualização de
+    software e firmware utilizando métodos adequados de criptografia,
+    autenticação e verificação de integridade. O mecanismo de atualização
+    deve garantir que apenas software autêntico e íntegro, proveniente do
+    fabricante ou de fonte autorizada, seja instalado no equipamento.
+
+    O equipamento deve permitir a verificação manual de disponibilidade
+    de atualizações e informar ao usuário sobre alterações realizadas,
+    especialmente aquelas relacionadas à segurança. As atualizações devem
+    preservar as configurações existentes do equipamento, salvo quando a
+    atualização exigir redefinição por motivos de segurança.
+
+    (Ato 77/2021 §5.1.1)
+guidance:
+  prose: |
+    This control mandates a secure, authenticated firmware update
+    mechanism — one of the most critical security features for IoT
+    devices. Without secure updates, devices cannot be patched against
+    newly discovered vulnerabilities.
+
+    **Required capabilities:**
+    - Automatic update checking and notification to the user.
+    - Cryptographic verification of update packages before installation:
+      digital signature (RSA/ECDSA) and integrity hash (SHA-256+).
+    - Authentication of the update source (the device must verify it is
+      communicating with the legitimate update server).
+    - Preservation of user configuration across updates.
+    - User-accessible manual update check (e.g., "Check for updates"
+      button in the web UI).
+    - Clear changelog/release notes informing users about security fixes.
+
+    **Security properties of the update mechanism:**
+    - Update packages must be signed with a private key held only by the
+      manufacturer — the device verifies using the embedded public key.
+    - The update transport must use TLS to prevent MITM injection of
+      malicious firmware.
+    - The device must reject unsigned, improperly signed, or tampered
+      update packages.
+    - Rollback protection should be considered: prevent downgrade to a
+      known-vulnerable firmware version.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a dual-image (A/B) partition scheme for firmware to
+         enable atomic updates with automatic rollback on boot failure.
+      2. Sign firmware packages with ECDSA (P-256 or Ed25519) using a
+         manufacturer-held private key stored in an HSM.
+      3. Embed the manufacturer's public key in the device bootloader
+         (immutable) for signature verification.
+      4. Implement update transport over HTTPS with certificate pinning
+         to the manufacturer's update server.
+      5. Design the update process to preserve user configuration in a
+         separate partition/NVRAM area that survives firmware writes.
+      6. Expose update status and version information via TR-069/USP
+         parameters for fleet management.
+    tools:
+      - swupdate
+      - rauc
+      - hardware-security-module
+      - firmware-signing-pipeline
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Integrate firmware signing into the CI/CD pipeline: every
+         release build is automatically signed with the manufacturer's
+         key via HSM API.
+      2. Add pipeline tests that verify: (a) unsigned firmware is
+         rejected by the device, (b) firmware with corrupted signature
+         is rejected, (c) firmware from unauthorized source is rejected.
+      3. Implement automated regression testing: apply update, verify
+         device boots correctly, verify user configuration is preserved.
+      4. Maintain a firmware version manifest (signed) that the device
+         can query to detect available updates.
+    tools:
+      - gitlab-ci
+      - firmware-signing-service
+      - integration-testing
+      - ota-testing-framework
+  secops:
+    prose: |
+      1. Monitor the firmware update infrastructure for compromise:
+         verify the signing key has not been leaked, the update server
+         has not been tampered with.
+      2. Test the update mechanism during penetration testing: attempt
+         to install unsigned firmware, downgraded firmware, and firmware
+         from a rogue update server.
+      3. Track firmware version distribution across the deployed fleet
+         via TR-069/USP to identify devices running outdated versions.
+      4. Maintain update delivery logs and signature verification
+         evidence for ANATEL audits.
+    tools:
+      - tr-069-acs
+      - fleet-management-dashboard
+      - penetration-testing-tools
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7", "art-12"]
+    relationship: complements

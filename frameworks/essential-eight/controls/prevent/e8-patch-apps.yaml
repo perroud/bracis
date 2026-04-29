@@ -1,0 +1,132 @@
+id: e8-patch-apps
+family: prevent
+title: "Patch Applications"
+class: EssentialEight
+
+maturity_levels: [ml1, ml2, ml3]
+
+statement:
+  prose: >-
+    Patches, updates, or vendor mitigations for security vulnerabilities in internet-facing
+    services, office productivity suites, web browsers, email clients, PDF software, and
+    security products are applied in a timely manner. Applications that are no longer
+    supported by vendors are removed or replaced. This reduces the window of opportunity
+    for adversaries to exploit known vulnerabilities.
+
+guidance:
+  prose: >-
+    Patching applications is critical because known vulnerabilities in commonly used
+    software are among the most exploited attack vectors. The Essential Eight requires
+    organisations to scan for and remediate vulnerabilities within defined timeframes
+    based on severity and exposure. Automated vulnerability scanning and patch deployment
+    tools are essential to meet the required timeframes at scale.
+
+  maturity_levels:
+    ml1:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities.
+        A vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities. Patches, updates, or vendor mitigations for
+        security vulnerabilities in internet-facing services are applied within two weeks
+        of release. Patches, updates, or vendor mitigations for security vulnerabilities
+        in office productivity suites, web browsers, email clients, PDF software, and
+        security products are applied within one month of release. Applications that are
+        no longer supported by vendors are removed.
+    ml2:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities.
+        A vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities at least fortnightly. Patches, updates, or
+        vendor mitigations for security vulnerabilities in internet-facing services are
+        applied within two weeks of release, or within 48 hours if an exploit exists.
+        Patches, updates, or vendor mitigations for security vulnerabilities in office
+        productivity suites, web browsers, email clients, PDF software, and security
+        products are applied within two weeks of release. Applications that are no longer
+        supported by vendors are removed.
+    ml3:
+      prose: >-
+        An automated method of asset discovery is used at least fortnightly to support
+        the detection of assets for subsequent vulnerability scanning activities.
+        A vulnerability scanner with an up-to-date vulnerability database is used for
+        vulnerability scanning activities at least daily. Patches, updates, or vendor
+        mitigations for security vulnerabilities in internet-facing services are applied
+        within 48 hours of release, or within 48 hours of an exploit being identified.
+        Patches, updates, or vendor mitigations for security vulnerabilities in office
+        productivity suites, web browsers, email clients, PDF software, and security
+        products are applied within 48 hours of release. Applications that are no longer
+        supported by vendors are removed.
+
+references:
+  - citation: "ASD Essential Eight Maturity Model - Patch Applications"
+    url: "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model"
+  - citation: "NIST SP 800-53 SI-2 - Flaw Remediation"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized patch management platforms (WSUS, SCCM, Intune for Windows;
+      Landscape for Ubuntu; Satellite for RHEL) integrated with vulnerability scanners.
+      Automate container base image rebuilds when upstream patches are released using
+      CI/CD pipelines triggered by vulnerability feed webhooks. Implement Renovate or
+      Dependabot for automated dependency update pull requests across all repositories.
+      Use Infrastructure-as-Code to enforce minimum OS and application versions across
+      fleet deployments. Maintain a software inventory linked to CVE feeds to automatically
+      identify affected assets when new vulnerabilities are disclosed.
+    tools:
+      - wsus
+      - sccm
+      - intune
+      - renovate
+      - dependabot
+      - trivy
+      - terraform
+      - ansible
+
+  devsecops:
+    prose: >-
+      Integrate Software Composition Analysis (SCA) tools into CI/CD pipelines to detect
+      vulnerable dependencies before deployment. Configure pipeline gates that block
+      deployments containing dependencies with known critical or high-severity CVEs beyond
+      the allowed patching window. Automate dependency updates via merge request bots
+      (Renovate, Dependabot) with automated test execution. Implement container scanning
+      in image build pipelines to detect vulnerable base image packages. Track mean time
+      to patch (MTTP) as a DevSecOps KPI and report deviations from target SLAs.
+    tools:
+      - gitlab-dependency-scanning
+      - renovate
+      - dependabot
+      - grype
+      - trivy
+      - snyk
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Run automated vulnerability scans at the cadence required by the target maturity
+      level (fortnightly for ML1/ML2, daily for ML3). Correlate vulnerability scan results
+      with asset criticality and internet exposure to prioritize remediation. Configure
+      SIEM alerts for assets exceeding patching SLA thresholds. Generate compliance
+      dashboards showing patch status across the fleet with drill-down by severity, age,
+      and asset group. Maintain a risk register for applications that cannot be patched
+      within SLA, documenting compensating controls.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - splunk
+      - elastic-siem
+      - servicenow-vuln-response
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5", "CM-8"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 7.1", "CIS 7.2", "CIS 7.3", "CIS 7.4"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.19"]
+    relationship: supports

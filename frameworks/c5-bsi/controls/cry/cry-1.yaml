@@ -1,0 +1,92 @@
+id: cry-1
+family: cry
+title: "Cryptographic Policy"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall develop and implement a policy on the use
+    of cryptographic controls for protection of information. The policy
+    shall define the approach to cryptographic key management, including
+    the generation, distribution, storage, archiving, retrieval,
+    revocation, and destruction of cryptographic keys. The selection
+    of cryptographic algorithms and key lengths shall be based on
+    current best practice and take into account the classification of
+    the information to be protected.
+
+guidance:
+  prose: >-
+    A cryptographic policy provides the foundation for consistent and
+    secure use of encryption across all cloud services. The policy
+    should mandate encryption of data at rest and in transit using
+    algorithms and key lengths that meet current industry standards
+    (e.g., AES-256 for symmetric encryption, RSA-2048/ECDSA-P256
+    minimum for asymmetric). Key management is often the weakest link —
+    the policy must address the full key lifecycle, separation of duties
+    for key management, and provisions for customer-managed keys
+    (BYOK/HYOK). The policy should also address cryptographic agility
+    to prepare for post-quantum cryptography migration.
+
+references:
+  - citation: "C5:2020, CRY-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized key management using hardware security modules
+      (HSMs) or cloud-native KMS (AWS KMS, Azure Key Vault, GCP Cloud
+      KMS). Enforce encryption at rest for all storage services through
+      platform-level defaults and policy-as-code. Configure TLS 1.2+
+      as the minimum for all service-to-service and external communications.
+      Implement automated key rotation policies and enforce them through
+      infrastructure-as-code. Provide customer-managed key (CMK)
+      capabilities for tenants requiring BYOK.
+    tools:
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - gcp-cloud-kms
+      - terraform
+      - cert-manager
+
+  devsecops:
+    prose: >-
+      Scan IaC templates for unencrypted storage resources and enforce
+      encryption-by-default policies in CI/CD pipelines. Validate TLS
+      configurations and certificate validity as part of deployment
+      checks. Detect hardcoded secrets and cryptographic keys in source
+      code using secret scanning tools. Enforce minimum algorithm and
+      key length requirements through pipeline policy checks.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - gitleaks
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor certificate expiration and key rotation compliance across
+      all services. Alert on use of deprecated cryptographic algorithms
+      or weak key lengths. Track key management events (creation,
+      rotation, revocation, deletion) in the SIEM for audit purposes.
+      Implement dashboards showing encryption coverage across all data
+      stores and communication channels.
+    tools:
+      - splunk
+      - elastic-siem
+      - vault
+      - cert-manager
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.24"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["CEK-01", "CEK-03", "CEK-04"]
+    relationship: mapped

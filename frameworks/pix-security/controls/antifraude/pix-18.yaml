@@ -1,0 +1,99 @@
+id: pix-18
+family: antifraude
+title: "Gestao de Risco Operacional do Pix"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP participante do arranjo Pix deve implementar gestão de risco operacional
+    específica para o canal Pix, abrangendo riscos de fraude, riscos de indisponibilidade,
+    riscos de integridade de dados, riscos de liquidez no SPI e riscos de reputação. A
+    gestão de risco deve incluir identificação, avaliação, mitigação, monitoramento e
+    reporte de riscos, com revisão periódica e atualização conforme evolução das ameaças
+    e do arranjo.
+guidance:
+  prose: |
+    **Categorias de risco operacional no Pix:**
+
+    1. **Risco de fraude:**
+       - Fraude contra o pagador (engenharia social, phishing, sequestro)
+       - Fraude pelo recebedor (golpe do Pix, falso QR Code)
+       - Conta mula / laranja (lavagem de dinheiro)
+
+    2. **Risco de indisponibilidade:**
+       - Falha no SPI ou DICT (infraestrutura BCB)
+       - Falha na RSFN (enlace de comunicacao)
+       - Falha no sistema do PSP (aplicacao, banco de dados)
+
+    3. **Risco de integridade de dados:**
+       - Mensagem corrompida ou adulterada
+       - Divergencia entre valor debitado e creditado
+       - Falha de idempotencia (transacao duplicada)
+
+    4. **Risco de liquidez:**
+       - Saldo insuficiente na conta PI no BCB
+       - Falha na gestao de liquidez intraday
+
+    5. **Risco de reputacao:**
+       - Indisponibilidade percebida pelo usuario
+       - Fraude com repercussao mediatica
+       - Penalidades do BCB tornadas publicas
+
+    **Mitigacao:**
+    Cada categoria de risco deve ter controles preventivos, detectivos e corretivos
+    documentados, testados e monitorados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de resiliencia:**
+      1. Arquitetura de alta disponibilidade com failover automatico para todos os
+         componentes do canal Pix.
+      2. Circuit breakers em integracao com SPI, DICT e servicos internos.
+      3. Gestao automatizada de liquidez na conta PI com alertas de saldo minimo.
+      4. Monitoramento de integridade de dados em tempo real (checksums, reconciliacao).
+
+      **Observabilidade:**
+      5. Metricas de risco operacional exportadas para dashboard executivo.
+      6. Alertas configurados para cada categoria de risco com escalacao automatica.
+      7. Testes periodicos de recuperacao de desastre especificos para o canal Pix.
+    tools:
+      - kubernetes
+      - service-mesh
+      - prometheus
+      - grafana
+      - chaos-engineering
+  devsecops:
+    prose: |
+      **Testes de resiliencia:**
+      1. Chaos engineering: injecao de falhas em componentes do canal Pix.
+      2. Testes de carga extrema: simulacao de volume 5x acima do pico historico.
+      3. Testes de recuperacao: validar que o sistema se recupera automaticamente.
+      4. Game days: simulacao de incidente Pix com equipe completa.
+    tools:
+      - chaos-engineering
+      - load-testing
+      - gitlab-ci
+      - game-day-platform
+  secops:
+    prose: |
+      **Gestao de risco operacional:**
+      1. Registro de riscos (risk register) especifico para o canal Pix.
+      2. Avaliacao de risco trimestral com atualizacao do registro.
+      3. Indicadores de risco (KRIs) com thresholds e acoes automaticas.
+      4. Plano de continuidade de negocios (BCP) especifico para Pix.
+      5. Relatorio de risco operacional ao comite de riscos e ao BCB.
+    tools:
+      - grc-platform
+      - risk-register
+      - bcp-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3", "art-9"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-9"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-1"]
+    relationship: complements

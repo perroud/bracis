@@ -1,0 +1,198 @@
+id: art-15
+family: cap-4
+title: "Gestão de Riscos de Terceiros e Monitoramento Contínuo"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 15. As supervisionadas devem manter, no País, os dados, os registros e
+    as informações relativas aos serviços contratados, bem como a documentação e
+    os contratos referentes ao objeto da contratação, inclusive os meios para
+    demonstrar à SUSEP o cumprimento do disposto nesta Resolução.
+
+    Parágrafo único. Os contratos de que trata o caput devem prever:
+    I - a indicação dos países e das regiões em cada país onde os serviços
+    poderão ser prestados e os dados poderão ser armazenados, processados e
+    gerenciados;
+    II - a adoção de medidas de segurança para transmissão e armazenamento de dados;
+    III - a manutenção, enquanto os serviços estiverem sendo prestados, de cópias
+    de segurança dos dados e das informações processados, em local indicado pela
+    supervisionada;
+    IV - o fornecimento de informações e de recursos de gestão adequados ao
+    monitoramento dos serviços a serem prestados;
+    V - a identificação e a segregação dos dados dos clientes da supervisionada
+    por meio de controles lógicos ou físicos;
+    VI - a possibilidade de auditoria pela supervisionada, por empresa por ela
+    indicada e pela SUSEP.
+guidance:
+  prose: |
+    O art. 15 estabelece requisitos de gestão contratual e monitoramento contínuo
+    dos prestadores de serviços de nuvem.
+
+    **Manutenção de dados e documentação no País (caput):**
+    Requisito de que dados, registros, informações e documentação referentes aos
+    serviços contratados devem ser mantidos no Brasil. Isso inclui:
+    - Cópia dos contratos e SLAs
+    - Documentação técnica dos serviços
+    - Registros de conformidade
+    - Evidências de compliance
+    Mesmo que os dados estejam no exterior (art. 14), a documentação de gestão
+    deve estar acessível no Brasil.
+
+    **Cláusulas contratuais obrigatórias (parágrafo único):**
+
+    **I — Indicação de países e regiões:**
+    Repete o requisito do art. 14, § 1º, I, mas aqui como cláusula contratual
+    obrigatória. O contrato deve especificar as localizações.
+
+    **II — Medidas de segurança:**
+    O contrato deve explicitar as medidas de segurança para:
+    - Transmissão: criptografia em trânsito (TLS 1.2+, VPN, links dedicados)
+    - Armazenamento: criptografia em repouso, controle de acesso, isolamento
+
+    **III — Cópias de segurança:**
+    O provedor deve manter backups dos dados enquanto o serviço estiver ativo.
+    A supervisionada define o local do backup — pode ser diferente da localização
+    principal dos dados.
+
+    **IV — Informações para monitoramento:**
+    O provedor deve fornecer:
+    - Dashboards de monitoramento
+    - Relatórios periódicos de SLA
+    - APIs para coleta de métricas
+    - Logs de acesso e operações
+
+    **V — Segregação de dados:**
+    Os dados dos clientes (segurados, beneficiários) devem estar segregados:
+    - Controles lógicos: schemas separados, criptografia com chaves diferentes,
+      namespaces isolados
+    - Controles físicos: servidores dedicados, regiões exclusivas
+    Deve impedir que outros clientes do provedor acessem dados da supervisionada.
+
+    **VI — Direito de auditoria:**
+    Tríplice direito de auditoria:
+    1. Pela supervisionada
+    2. Por empresa indicada pela supervisionada (auditoria externa)
+    3. Pela SUSEP
+    O contrato deve garantir esses três direitos sem restrições.
+
+    **Em inspeções, a SUSEP verifica:**
+    1. Contratos com todas as cláusulas obrigatórias
+    2. Documentação mantida no País
+    3. Evidências de monitoramento contínuo
+    4. Relatórios de SLA e compliance do provedor
+    5. Capacidade de exercer direito de auditoria
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Monitoramento técnico contínuo (inciso IV):**
+      1. Cloud monitoring centralizado:
+         - Dashboards de disponibilidade, performance e segurança por provedor
+         - Alertas automáticos para degradação de SLA
+         - Métricas de latência, throughput e taxa de erro
+      2. CSPM (Cloud Security Posture Management):
+         - Verificação contínua de configurações de segurança
+         - Detecção de drift de configuração
+         - Compliance checking contra benchmarks (CIS, NIST)
+      3. Log aggregation do provedor:
+         - AWS CloudTrail, Azure Activity Log, GCP Audit Logs centralizados
+         - Retenção conforme art. 8 (mínimo 5 anos)
+
+      **Segregação de dados (inciso V):**
+      4. Isolamento de workloads:
+         - VPCs/VNets dedicadas para dados de clientes
+         - Network policies para microsegmentação
+         - Encryption at rest com chaves por tenant/classificação
+      5. Controles de acesso:
+         - RBAC granular por ambiente e classificação de dados
+         - Just-in-time access para ambientes sensíveis
+         - Logging de todo acesso a dados de clientes
+
+      **Cópias de segurança (inciso III):**
+      6. Backup automatizado com retenção configurável.
+      7. Testes periódicos de restauração (mínimo trimestral).
+      8. Backup em localização definida pela supervisionada.
+    tools:
+      - cspm
+      - cloud-monitoring
+      - siem
+      - backup-automation
+      - encryption-key-management
+      - network-segmentation
+  devsecops:
+    prose: |
+      **Segurança na transmissão e armazenamento (inciso II):**
+      1. Políticas de IaC para garantir:
+         - TLS 1.2+ obrigatório para toda comunicação
+         - Criptografia em repouso habilitada em todos os serviços de armazenamento
+         - Chaves de criptografia gerenciadas pela supervisionada (BYOK)
+      2. Pipeline checks para segregação (inciso V):
+         - Validação de isolamento de rede por ambiente
+         - Verificação de políticas de acesso por classificação de dados
+         - Testes automatizados de isolamento entre tenants
+
+      **Monitoramento via pipeline:**
+      3. Infrastructure compliance scanning em cada deploy:
+         - Checkov/tfsec para validação de configurações de segurança
+         - OPA policies para conformidade com requisitos contratuais
+      4. Relatórios automatizados de compliance gerados pelo pipeline.
+
+      **Auditoria (inciso VI):**
+      5. Audit trail completo de todas as operações de infraestrutura via GitOps.
+      6. Histórico de deploys e alterações de configuração.
+    tools:
+      - terraform
+      - checkov
+      - opa-gatekeeper
+      - gitlab-ci
+      - vault
+      - gitops
+  secops:
+    prose: |
+      **Gestão contratual:**
+      1. Checklist de cláusulas obrigatórias (parágrafo único, I a VI) para
+         todos os contratos de serviços de nuvem.
+      2. Revisão jurídica de conformidade com a CNSP 381 antes da assinatura.
+      3. Repositório centralizado de contratos no País com acesso controlado.
+
+      **Monitoramento de SLAs e compliance:**
+      4. Processo de monitoramento contínuo dos prestadores:
+         - Relatórios mensais de SLA de disponibilidade
+         - Relatórios trimestrais de segurança do provedor
+         - Revisão anual de certificações do provedor (SOC 2, ISO 27001)
+         - Verificação de incidentes públicos do provedor
+      5. Métricas de monitoramento:
+         - Uptime vs. SLA contratual
+         - Tempo de resposta a tickets de suporte
+         - Conformidade com requisitos de segurança
+         - Status de backups e testes de restauração
+
+      **Auditoria (inciso VI):**
+      6. Plano de auditoria periódica dos provedores (mínimo anual):
+         - Auditoria interna ou por empresa contratada
+         - Escopo: segurança, continuidade, compliance, segregação
+         - Relatório com findings e plano de remediação
+      7. Cooperação com SUSEP em caso de auditoria regulatória.
+
+      **Segregação de dados (inciso V):**
+      8. Validação periódica de segregação lógica e/ou física de dados.
+      9. Testes de isolamento para confirmar que dados de clientes estão protegidos.
+    tools:
+      - vendor-risk-management
+      - grc-platform
+      - contract-management
+      - audit-management
+      - compliance-reporting
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-15", "art-16"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-46", "art-50"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23", "A.5.30"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-12", "AU-11", "CP-9", "SC-8", "SC-28"]
+    relationship: supports

@@ -1,0 +1,95 @@
+id: art-35
+family: cap-5
+title: "Preservacao de Evidencias em Investigacoes"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 35. As evidências e os registros coletados durante o processo de
+    investigação interna devem ser preservados e mantidos de forma segura
+    por prazo mínimo de dez anos, independentemente do resultado da investigação.
+
+    Parágrafo único. A preservação das evidências deve garantir:
+    I - a integridade: nenhuma alteração nos documentos e dados coletados;
+    II - a confidencialidade: acesso restrito a pessoas autorizadas; e
+    III - a disponibilidade: possibilidade de disponibilização imediata
+    para a CVM, o COAF e outras autoridades competentes quando solicitado.
+guidance:
+  prose: |
+    O art. 35 determina que evidencias de investigacoes — mesmo aquelas que
+    nao resultaram em comunicacao ao COAF — devem ser preservadas por 10 anos.
+
+    **Por que preservar evidencias de investigacoes nao comunicadas:**
+    Uma investigacao que concluiu "nao suspeito" em 2024 pode precisar ser
+    revisitada em 2030 se uma investigacao criminal identificar que o cliente
+    era parte de uma organizacao criminosa. A evidencia de que o participante
+    realizou investigacao de boa-fe protege contra acusacao de cumplicidade.
+
+    **A triade CIA para evidencias:**
+    - Integridade: documentos nao podem ser alterados apos a investigacao.
+      Hash ou assinatura digital dos documentos no momento de gravacao.
+    - Confidencialidade: informacoes de PLD/FT sao sigilosas. Acesso
+      controlado e logado.
+    - Disponibilidade: 10 anos de retencao com capacidade de recuperacao
+      em horas, nao semanas.
+
+    **Implicacoes de storage:**
+    10 anos de evidencias de investigacoes implica gerenciamento de storage
+    de longo prazo. O plano de arquivamento deve garantir que evidencias
+    sejam acessiveis mesmo que os sistemas originais sejam descontinuados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquivamento de evidencias de investigacao:**
+      1. Repositorio de evidencias com armazenamento WORM para documentos
+         de investigacao: uma vez gravado, nao pode ser alterado.
+      2. Hash SHA-256 de cada documento de evidencia no momento de upload.
+      3. Politica de ciclo de vida: evidencias migradas para cold storage
+         apos 2 anos, mantidas acessiveis por 10 anos.
+      4. ACL por caso: apenas o analista responsavel, supervisor e compliance
+         officer tem acesso a evidencias de um caso especifico.
+
+      **Recuperabilidade:**
+      5. API de recuperacao de evidencias: dado o ID do caso, retornar todos
+         os documentos e registros com integridade verificada.
+      6. Formato auto-contido: evidencias exportadas em formato que nao
+         depende do sistema atual para ser lido.
+    tools:
+      - worm-storage
+      - document-management
+      - data-archival
+      - audit-trail
+  devsecops:
+    prose: |
+      **Testes de integridade de evidencias:**
+      1. Testes de que evidencias nao podem ser modificadas apos upload.
+      2. Testes de que hash de documentos e verificado na recuperacao.
+      3. Testes de ciclo de vida: evidencias em cold storage sao recuperaveis.
+      4. Testes de ACL: usuario sem permissao nao pode acessar evidencias.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - storage-testing
+  secops:
+    prose: |
+      **Governanca de evidencias:**
+      1. Auditoria anual de integridade: amostra de evidencias com verificacao
+         de hash.
+      2. Teste de recuperacao: solicitar evidencias de caso com 5+ anos de idade
+         e verificar disponibilidade e integridade.
+      3. Revisao do plano de archival: garantir que migracao de sistemas nao
+         cause perda de evidencias arquivadas.
+    tools:
+      - storage-audit
+      - compliance-management
+      - disaster-recovery
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-19"]
+    relationship: equivalent-to
+  - framework_id: cvm-35
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

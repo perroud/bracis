@@ -1,0 +1,94 @@
+id: oi-sa-03
+family: sa
+title: "Seguranca das APIs e Protecao contra Ataques"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Os participantes do Open Insurance devem implementar mecanismos de segurança
+    para proteger as APIs contra ataques e uso indevido, incluindo:
+
+    I - Rate limiting e throttling para prevenir abusos e ataques de negação de
+    serviço (DoS/DDoS);
+    II - Validação rigorosa de input em todos os endpoints (injection prevention);
+    III - Proteção contra ataques de manipulação de parâmetros e replay;
+    IV - Logging completo de todas as chamadas de API com metadados de segurança
+    (IP, certificado, token, timestamp, resposta);
+    V - Proteção de dados em trânsito via TLS 1.2 ou superior;
+    VI - Proteção contra ataques de enumeração de recursos (IDOR);
+    VII - Implementação de headers de segurança HTTP conforme melhores práticas.
+
+    A SUSEP pode exigir testes de intrusão periódicos para validar a segurança
+    das APIs dos participantes.
+guidance:
+  prose: |
+    As APIs do Open Insurance sao alvos de alto valor por exporem dados financeiros
+    e pessoais sensiveis. A superficie de ataque inclui:
+
+    - Ataques de autenticacao: tentativas de bypass de OAuth/FAPI
+    - Injection: SQL injection, NoSQL injection, command injection via parametros
+    - IDOR (Insecure Direct Object Reference): acesso a dados de outros clientes
+      manipulando identificadores
+    - DoS/DDoS: sobrecarga intencional para derrubar o servico
+    - Replay: reutilizacao de tokens ou requests capturados
+    - Data scraping: coleta massiva de dados abertos ou protegidos
+
+    O rate limiting deve ser implementado em multiplos niveis: por IP, por
+    certificado de participante, por token de acesso e por consentimento. Os
+    limites devem ser definidos em acordo com o SLA do ecossistema.
+
+    Testes de intrusao (pentest) devem ser realizados no minimo anualmente e
+    apos mudancas significativas na infraestrutura de APIs.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Configurar WAF (Web Application Firewall) na frente das APIs do Open Insurance.
+      2. Implementar rate limiting em multiplos niveis (IP, certificado, token, consentimento).
+      3. Configurar TLS 1.2+ com cipher suites fortes (ECDHE, AES-256-GCM).
+      4. Implementar validacao de input com schemas JSON rigorosos.
+      5. Configurar headers de seguranca: Content-Security-Policy, X-Content-Type-Options,
+         Strict-Transport-Security, X-Frame-Options.
+      6. Implementar logging centralizado com correlacao de requests.
+    tools:
+      - waf
+      - api-gateway
+      - rate-limiter
+      - siem
+      - tls-configuration
+  devsecops:
+    prose: |
+      1. SAST em todo codigo de API para detectar vulnerabilidades de injection,
+         IDOR e falhas de autorizacao.
+      2. DAST automatizado contra APIs em ambiente de staging.
+      3. Dependency scanning para vulnerabilidades em bibliotecas.
+      4. Container scanning para imagens Docker das APIs.
+      5. Fuzzing de endpoints de API para detectar falhas de validacao de input.
+      6. Testes de intrusao anuais com escopo especifico para APIs Open Insurance.
+    tools:
+      - sast
+      - dast
+      - dependency-scanning
+      - container-scanning
+      - api-fuzzing
+      - pentest
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar logs de API em tempo real para detectar padroes de ataque.
+      2. Implementar regras de correlacao no SIEM para detectar tentativas de
+         exploracao de APIs.
+      3. Resposta automatizada a ataques detectados (bloqueio de IP, revogacao de
+         certificado temporaria).
+      4. Revisao periodica de alertas e tuning de regras de deteccao.
+    tools:
+      - siem
+      - soar
+      - waf
+      - threat-intelligence
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-3", "art-4", "art-9"]
+    relationship: complements
+  - framework_id: susep-638
+    articles: ["art-3", "art-4"]
+    relationship: complements

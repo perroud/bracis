@@ -1,0 +1,109 @@
+id: cscf-6.4
+family: obj-3
+title: "Logging and Monitoring"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Detect anomalous activity to transaction records and SWIFT messaging
+    systems through continuous monitoring and analysis of security events.
+    Transaction-level monitoring must identify suspicious patterns including
+    unusual transaction volumes, unexpected beneficiaries, off-hours
+    activity, and deviations from established business patterns.
+  parts:
+    - id: cscf-6.4.a
+      label: "6.4.a"
+      prose: >-
+        Transaction monitoring rules are implemented to detect anomalous
+        patterns: unusual transaction volumes, high-value transactions
+        to new or infrequent counterparties, transactions outside normal
+        business hours, and rapid sequential transaction submissions.
+    - id: cscf-6.4.b
+      label: "6.4.b"
+      prose: >-
+        SWIFT message logs are correlated with back-office transaction
+        records to detect discrepancies that could indicate unauthorized
+        message manipulation or injection.
+    - id: cscf-6.4.c
+      label: "6.4.c"
+      prose: >-
+        Alerts from transaction monitoring are investigated by trained
+        personnel with defined escalation procedures and response
+        timelines.
+
+guidance:
+  prose: >-
+    While Control 5.4 addresses infrastructure-level logging, this control
+    focuses on transaction-level anomaly detection. SWIFT attacks typically
+    involve submitting fraudulent payment instructions during off-hours or
+    weekends when fewer staff are monitoring. Transaction monitoring must go
+    beyond simple threshold alerting to include behavioral analytics that
+    establish baselines of normal activity and flag deviations. Organizations
+    should leverage SWIFT's own Transaction Screening (Sanctions Screening)
+    and Payment Controls services alongside internal monitoring. Reconciliation
+    between SWIFT statements and internal records is essential for detecting
+    message manipulation that might bypass real-time monitoring.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 6.4"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "SWIFT Customer Security Programme — Daily Validation Reports"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement transaction monitoring using SWIFT's own tools (Transaction
+      Screening, Payment Controls) complemented by internal fraud detection
+      systems. Deploy SIEM correlation rules matching SWIFT message types
+      (MT103, MT202) with internal payment records. Build behavioral
+      analytics baselines for transaction volumes, values, counterparties,
+      and timing. Automate daily reconciliation between SWIFT statements
+      and internal transaction databases.
+    tools:
+      - swift-transaction-screening
+      - swift-payment-controls
+      - splunk
+      - elastic-security
+      - sas-fraud-management
+
+  devsecops:
+    prose: >-
+      Version-control all transaction monitoring rules and detection logic.
+      Test detection rules against historical transaction data to validate
+      effectiveness and tune thresholds. Automate deployment of updated
+      monitoring rules through CI/CD pipelines. Include fraud scenario
+      test cases in integration testing suites.
+    tools:
+      - sigma
+      - detection-as-code
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Staff transaction monitoring during all SWIFT operating hours with
+      escalation procedures for off-hours. Investigate alerts within
+      defined SLAs (critical: 30 minutes, high: 2 hours). Conduct daily
+      reconciliation reviews. Report transaction anomaly metrics to
+      management weekly. Participate in SWIFT ISAC threat intelligence
+      sharing.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - swift-isac
+      - ibm-qradar
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-4", "AU-6", "AU-6(1)", "AU-13"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.16"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-10.4", "req-10.7"]
+    relationship: complements

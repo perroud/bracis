@@ -1,0 +1,77 @@
+id: art-16
+family: cap-4
+title: "Segmentacao de Redes"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 16. As redes dos órgãos e entidades devem ser segmentadas de forma a
+    isolar:
+
+    I - redes de produção das redes de desenvolvimento e homologação;
+    II - redes de serviços críticos das redes de uso geral;
+    III - redes de acesso público (DMZ) das redes internas;
+    IV - redes de dispositivos IoT e sistemas de controle industrial, quando
+    aplicável.
+guidance:
+  prose: |
+    O art. 16 detalha a segmentacao obrigatoria: producao isolada de dev/hml,
+    servicos criticos isolados, DMZ separada, IoT/SCADA segregado.
+
+    **Zonas de seguranca obrigatorias:**
+    1. Producao: ambiente de servicos em operacao
+    2. Desenvolvimento/Homologacao: ambientes nao-produtivos
+    3. DMZ: servicos expostos a internet
+    4. Corporativa: estacoes de trabalho, e-mail
+    5. IoT/OT: sensores, cameras, SCADA (quando aplicavel)
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.22 (Segregation of networks)
+    - NIST 800-53 rev5: SC-7(3) (Access Points)
+    - CIS Controls v8: 12.2 (Network Segmentation)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Microsegmentacao:**
+      1. VPCs separadas para producao, staging, desenvolvimento.
+      2. Transit Gateway ou VPC Peering com controle granular de trafego.
+      3. Kubernetes namespaces com network policies restritivas.
+      4. Service mesh com mTLS para comunicacao entre microsservicos.
+      5. IoT gateway dedicado com VLAN isolada e firewall dedicado.
+    tools:
+      - vpc-architecture
+      - transit-gateway
+      - kubernetes-namespaces
+      - iot-gateway
+  devsecops:
+    prose: |
+      **Isolamento de ambientes:**
+      1. Ambientes de review/staging em VPCs separadas de producao.
+      2. Pipeline runners em rede isolada sem acesso direto a producao.
+      3. Testes de integracao em rede de sandbox.
+      4. Deploy para producao via jumpbox/bastion com auditoria.
+    tools:
+      - environment-isolation
+      - runner-network
+      - bastion-host
+  secops:
+    prose: |
+      **Verificacao de segmentacao:**
+      1. Teste trimestral de isolamento entre segmentos (nao deve haver bypass).
+      2. Alerta para trafego anomalo entre segmentos (east-west traffic).
+      3. Inventario de fluxos de trafego autorizados entre segmentos.
+      4. Pen testing focado em movimentacao lateral entre redes.
+    tools:
+      - segmentation-testing
+      - east-west-monitoring
+      - traffic-flow-inventory
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.22"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7(3)", "SC-7(21)"]
+    relationship: mapped

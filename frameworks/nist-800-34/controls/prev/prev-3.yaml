@@ -1,0 +1,99 @@
+id: prev-3
+family: prev
+title: "Alternate Processing Site"
+class: NIST-800-34
+
+statement:
+  prose: >-
+    Organizations should identify an alternate processing site and initiate
+    necessary agreements to permit the transfer and resumption of information
+    system operations for essential missions and business functions within
+    the recovery time objectives when the primary processing capabilities
+    are unavailable. The alternate processing site should provide equivalent
+    information security safeguards to those of the primary site. Types of
+    alternate processing sites include cold sites, warm sites, hot sites,
+    mirrored sites, and mobile sites. The selection should be based on the
+    BIA results, specifically the recovery time objectives and the
+    organization's budget constraints.
+
+guidance:
+  prose: >-
+    Alternate processing site selection depends on the organization's RTO
+    and budget. Cold sites provide basic infrastructure but require significant
+    setup time (days to weeks). Warm sites have pre-installed hardware and
+    connectivity, requiring hours to become operational. Hot sites maintain
+    near-real-time data replication and can be operational within minutes to
+    hours. Mirrored sites provide real-time identical processing capability.
+    Mobile sites offer flexible temporary processing capability. Organizations
+    should consider geographic separation, connectivity requirements,
+    environmental controls, security equivalence, and service level agreements
+    when selecting an alternate site. Cloud-based recovery as a service
+    (DRaaS) provides flexible, cost-effective alternatives to traditional
+    physical alternate sites.
+
+references:
+  - citation: "NIST SP 800-34 Rev 1, Section 3.4.1"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-34/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement multi-region cloud deployments with automated failover
+      capabilities. Use Kubernetes federation or multi-cluster management
+      for containerized workloads across regions. Deploy infrastructure-as-code
+      templates that can instantiate complete environments in alternate
+      regions within RTO requirements. Implement DNS-based global load
+      balancing for automatic traffic redirection. Configure database
+      replication with automated failover (e.g., Aurora Global Database,
+      CockroachDB multi-region). Test failover procedures regularly using
+      automated game day exercises.
+    tools:
+      - "Kubernetes federation / multi-cluster (Rancher, Anthos)"
+      - "AWS Route 53 / Cloudflare (DNS failover)"
+      - "Terraform / Pulumi (multi-region IaC)"
+      - "Aurora Global / CockroachDB (multi-region database)"
+      - "Consul (service discovery across sites)"
+  devsecops:
+    prose: >-
+      Design applications for multi-region deployment from the outset. Implement
+      stateless application architectures that enable easy migration between
+      processing sites. Use containerization to ensure application portability
+      across environments. Maintain deployment pipelines capable of deploying
+      to alternate processing sites. Implement database migration tools that
+      support cross-region schema management. Test application functionality
+      at alternate processing sites as part of CI/CD pipeline validation.
+    tools:
+      - "Docker / containerd (application portability)"
+      - "Helm / Kustomize (multi-environment deployment)"
+      - "ArgoCD / Flux (multi-cluster GitOps)"
+      - "GitLab CI/CD (multi-region deployment pipelines)"
+      - "Database migration tools (Flyway, Liquibase)"
+  secops:
+    prose: >-
+      Evaluate and select alternate processing sites based on BIA-determined
+      RTOs and budget constraints. Negotiate and document service level
+      agreements for alternate processing sites. Ensure security controls
+      at alternate sites are equivalent to primary site controls. Conduct
+      regular site assessments and audits. Maintain current configurations
+      and documentation for alternate site activation. Coordinate with
+      alternate site personnel for regular testing exercises. Review and
+      update alternate site agreements annually.
+    tools:
+      - "DRaaS providers (Zerto, VMware SRM)"
+      - "Cloud providers (AWS, Azure, GCP DR regions)"
+      - "SLA management platforms"
+      - "Site assessment checklists"
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-7"]
+    relationship: mapped
+  - framework_id: iso-22301
+    articles: ["cl-8-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30"]
+    relationship: supports
+  - framework_id: iso-27031
+    articles: ["8.4"]
+    relationship: mapped

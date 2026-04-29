@@ -1,0 +1,107 @@
+id: owasp-a01-idor
+family: a01
+title: "A01:2021 — Insecure Direct Object Reference (IDOR)"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Insecure Direct Object Reference (IDOR) occurs when an application uses user-controllable
+    input to access objects directly without performing sufficient authorization checks. Attackers
+    can manipulate references to access unauthorized data — for example, changing a numeric
+    account ID in a URL (/api/accounts/1234 to /api/accounts/1235) to access another user's
+    account, or modifying a filename parameter to read arbitrary files. IDOR vulnerabilities
+    exist in any application that exposes internal implementation objects (database keys,
+    filenames, directory paths) as references in the interface without verifying that the
+    requesting user is authorized to access the referenced object.
+
+guidance:
+  prose: >-
+    IDOR is one of the most prevalent and impactful subcategories of Broken Access Control.
+    The root cause is exposing internal identifiers directly to users and then trusting those
+    identifiers without server-side ownership validation. Prevention requires that every access
+    to a data object must verify that the authenticated user is authorized to access that
+    specific object instance, not just the object type or API endpoint. Using indirect
+    references (session-scoped maps, hashed identifiers, or UUIDs instead of sequential integers)
+    reduces but does not eliminate the risk — the server-side ownership check remains mandatory.
+    IDOR affects all layers: API endpoints, file downloads, report generation, websocket channels,
+    and GraphQL queries. Automated scanners struggle to detect IDOR because it requires business
+    logic context; manual testing with two accounts and cross-account resource access attempts
+    is the most reliable detection method.
+
+references:
+  - citation: "OWASP IDOR Testing Guide"
+    url: "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References"
+  - citation: "OWASP Insecure Direct Object Reference Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design APIs to validate object ownership at the data access layer, not only at the route
+      level. Implement resource-scoped middleware that automatically appends an ownership filter
+      to all database queries based on the authenticated user's identity. Prefer UUIDs (v4) over
+      sequential integer IDs for all resource identifiers exposed in APIs; sequential IDs make
+      enumeration trivial. Implement ReBAC (Relationship-Based Access Control) using systems such
+      as SpiceDB or OpenFGA to model and enforce object-level ownership relationships centrally.
+      Use database row-level security (e.g., PostgreSQL RLS) to enforce that queries return only
+      records the current user owns, making IDOR impossible at the query level. Apply indirect
+      references for file downloads: map session-scoped tokens to file paths server-side, never
+      expose filesystem paths to clients.
+    tools:
+      - spicedb
+      - openfga
+      - opa
+      - postgresql
+      - keycloak
+      - vault
+
+  devsecops:
+    prose: >-
+      Write explicit IDOR test cases in the integration test suite using two distinct test users
+      (user A and user B), where user A attempts to access resources created by user B and
+      confirms a 403 response. Include IDOR checks in DAST configurations — most DAST tools
+      support parameter tampering rules; configure them to replace ID values with known
+      cross-user IDs. Add Semgrep rules to flag patterns where a request parameter is used
+      directly in a database query without an explicit ownership filter. Review code in pull
+      requests for any ORM query that uses a user-supplied ID without a `.where(user_id: current_user.id)`
+      or equivalent ownership constraint. Add property-based fuzzing of numeric ID parameters
+      in API endpoints to detect enumeration vulnerabilities.
+    tools:
+      - semgrep
+      - burp-suite
+      - owasp-zap
+      - gitlab-sast
+      - nuclei
+      - pytest
+      - jest
+
+  secops:
+    prose: >-
+      Build detection rules that identify successful access to resources where the resource owner
+      differs from the authenticated user. Log the owner of every accessed resource alongside the
+      requester identity and correlate in the SIEM. Alert on patterns where a single user ID
+      accesses a high volume of distinct resource IDs in a short period (enumeration behavior).
+      Implement WAF rules that detect sequential or predictable ID patterns in query parameters
+      and rate-limit such requests. Review application logs for 200-status responses to requests
+      that deviate from normal per-user access patterns. Treat any confirmed IDOR as a high-severity
+      incident requiring immediate scoping of affected data and breach notification assessment.
+    tools:
+      - splunk
+      - elastic-siem
+      - cloudflare-waf
+      - aws-waf
+      - datadog-security
+      - crowdstrike
+
+legal_references:
+  - framework_id: owasp-asvs
+    articles: ["V4.2.1", "V4.2.2"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-4"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["7.2.1", "7.2.3"]
+    relationship: implements

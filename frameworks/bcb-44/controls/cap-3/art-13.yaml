@@ -1,0 +1,109 @@
+id: art-13
+family: cap-3
+title: "Identificacao e Tratamento de PEP"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 13. As instituições de pagamento devem adotar procedimentos específicos
+    para identificação de pessoas politicamente expostas (PEP), incluindo:
+
+    I - verificação da condição de PEP do cliente e de seus familiares, representantes
+    e estreitos colaboradores no momento do onboarding e periodicamente;
+
+    II - obtenção de aprovação de nível hierárquico superior para o estabelecimento
+    ou a manutenção de relação de negócio com PEP;
+
+    III - adoção de medidas reforçadas de monitoramento das operações realizadas
+    por PEP;
+
+    IV - identificação da origem dos recursos envolvidos nas operações de PEP.
+
+    § 1. A condição de PEP persiste por, no mínimo, cinco anos após o término
+    do exercício da função pública.
+
+    § 2. O fato de o cliente ter deixado de exercer a função pública não afasta
+    a necessidade de manutenção das medidas reforçadas durante o período previsto
+    no parágrafo 1.
+guidance:
+  prose: |
+    O art. 13 e um dos mais criticos da resolucao do ponto de vista operacional:
+    PEP concentra o maior risco de corrupcao e lavagem de ativos publicos.
+
+    **Quem e PEP (lista exemplificativa):**
+    - Presidente da Republica, governadores, prefeitos (municip. > 100 mil hab.)
+    - Ministros, secretarios estaduais e municipais
+    - Membros do Congresso, Assembleias Legislativas, Cameras Municipais
+    - Magistrados e membros do Ministerio Publico de nivel superior
+    - Presidentes e diretores de autarquias, estatais e fundacoes publicas
+    - Militares a partir de Oficial General (Brigadeiro, General, Almirante)
+    - Dirigentes de partidos politicos
+    - Cargos equivalentes no exterior
+
+    **Familiares PEP:**
+    - Conjuges, companheiros, pais, filhos, irmaos (1 e 2 grau)
+    - Entidades juridicas em que o PEP seja beneficiario final
+
+    **Regra dos 5 anos (ss 1 e 2):**
+    Ex-ministro deixou o cargo em 2022 → continua sendo PEP ate 2027.
+    Isso e diferente da regra internacional FATF que nao define prazo fixo
+    (abordagem baseada em risco).
+
+    **Aprovacao hierarquica (inciso II):**
+    O compliance officer ou diretor de PLD/FT deve aprovar explicitamente cada
+    relacao de negocio com PEP. Nao e automatico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de gestao de PEP:**
+      1. Integrar provedor de lista PEP com cobertura global e nacional:
+         - Listas da Controladoria-Geral da Uniao (CGU)
+         - Lista do Tribunal Superior Electoral (TSE) - cargos eletivos
+         - Listas comerciais com cobertura global (WorldCheck, Dow Jones RMS,
+           Refinitiv, ComplyAdvantage)
+      2. Fuzzy matching para identificacao de PEP: tolerar variacao de nomes
+         (abreviacoes, acentos, ordenacao diferente).
+      3. Workflow de aprovacao de PEP: onboarding identificado como PEP →
+         suspensao do processo → notificacao compliance manager → aprovacao
+         ou rejeicao formal → log de decisao.
+      4. Monitoramento especial de PEP: regras de alerta com limiares menores,
+         verificacao mensal de origem dos recursos.
+      5. Alertas de revalidacao: verificar a cada 12 meses se o PEP ainda
+         esta dentro do periodo de 5 anos e se houve mudanca de status.
+    tools:
+      - aml-screening
+      - sanctions-screening
+      - kyc-platform
+      - workflow-automation
+  devsecops:
+    prose: |
+      **Automacao e testes PEP:**
+      1. Script de importacao e atualizacao das listas PEP (CGU, TSE, comercial)
+         com frequencia minima semanal.
+      2. Testes de matching: nomes com variacao, PEP com mandato expirado,
+         familiares de PEP, PEP estrangeiro.
+      3. Testes do workflow de aprovacao: garantir que conta PEP NAO seja ativada
+         sem aprovacao explicita do compliance manager.
+      4. Monitoramento de integridade das listas: alertar se atualizacao falhar.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - list-management
+  secops:
+    prose: |
+      **Supervisao de PEP:**
+      1. Relatorio mensal de todos os clientes PEP ativos com status de
+         monitoramento e ultima revisao.
+      2. Verificacao de PEPs com prazo de 5 anos a vencer nos proximos 6 meses
+         (para preparar reclassificacao para risco padrao, se aplicavel).
+      3. Auditoria de decisoes de onboarding de PEP: revisar aprovacoes dos
+         ultimos 12 meses para garantir conformidade.
+      4. Monitorar noticias e publicacoes sobre PEPs do portfolio (adverse media).
+    tools:
+      - aml-platform
+      - grc-platform
+      - adverse-media-monitoring
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-16", "art-17"]
+    relationship: equivalent-to

@@ -1,0 +1,98 @@
+id: ivs-03
+family: ivs
+title: "Network Security"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Implement network security controls to ensure secure network architecture,
+    including network segmentation, traffic filtering, and monitoring.
+    Network environments shall be designed and configured to restrict and
+    monitor traffic between trusted and untrusted network segments. Network
+    security mechanisms shall be reviewed and updated at planned intervals.
+
+guidance:
+  prose: >-
+    Network security controls should implement defense-in-depth principles
+    with multiple layers of network segmentation and traffic filtering.
+    Cloud virtual networks should be architected with separate segments for
+    public-facing services, application tiers, data tiers, and management
+    planes. Micro-segmentation should be applied within cloud environments
+    to limit lateral movement. All network traffic between segments should
+    be encrypted. Network access control lists and security groups should
+    follow a deny-by-default model, allowing only explicitly required
+    traffic. Egress filtering should be implemented to prevent data
+    exfiltration. Network flow logs should be captured, analyzed, and
+    retained for security monitoring and forensic purposes.
+
+references:
+  - citation: "CSA CCM v4.0 IVS-03"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using cloud VPCs/VNets with separate
+      subnets for each tier (ingress, application, data, management).
+      Deploy service mesh with mTLS for encrypted, authenticated
+      workload-to-workload communication. Enforce Kubernetes network
+      policies that deny all traffic by default and explicitly allow
+      only required service-to-service flows. Implement egress gateways
+      to control and audit outbound traffic. Use cloud-native network
+      firewalls and WAF for perimeter protection. Deploy DNS-based
+      traffic policies and implement private endpoints for cloud
+      service access.
+    tools:
+      - cilium
+      - calico
+      - istio
+      - aws-vpc
+      - azure-vnet
+      - gcp-vpc
+
+  devsecops:
+    prose: >-
+      Validate network security configurations in infrastructure-as-code
+      before deployment. Scan for overly permissive security group rules,
+      missing network policies, and unencrypted network paths. Enforce
+      that all Kubernetes deployments include network policies. Test
+      network segmentation effectiveness as part of integration testing.
+      Include network security rule reviews in pull request processes
+      for infrastructure changes. Automate network security compliance
+      checks against CIS benchmarks.
+    tools:
+      - checkov
+      - tfsec
+      - kics
+      - trivy
+      - kubeaudit
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Capture and analyze network flow logs across all cloud environments
+      for threat detection. Implement network intrusion detection systems
+      (NIDS) monitoring for known attack patterns and anomalous traffic.
+      Alert on unexpected network connections, port scanning, and
+      lateral movement indicators. Monitor DNS queries for data
+      exfiltration and command-and-control communication. Conduct
+      regular network segmentation validation through automated testing.
+      Integrate network security events with SIEM for correlation.
+    tools:
+      - zeek
+      - suricata
+      - aws-vpc-flow-logs
+      - azure-nsg-flow-logs
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8-20", "a8-21", "a8-22", "a8-23"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-8", "AC-4"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC6.1", "CC6.6"]
+    relationship: mapped

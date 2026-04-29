@@ -1,0 +1,100 @@
+id: v9.1.1
+family: v9
+title: "Client Communication Security"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that TLS is used for all client connectivity, and does not fall back to
+    insecure or unencrypted communications. Verify that connections to and from the
+    server use trusted TLS certificates. The application must enforce TLS 1.2 or higher
+    for all communications. Weak cipher suites, including those using NULL encryption,
+    anonymous key exchange, DES, RC4, and export-grade ciphers, must be disabled.
+
+guidance:
+  prose: >-
+    Transport Layer Security (TLS) protects data in transit from eavesdropping, tampering,
+    and message forgery. All client-server communications must be encrypted regardless of
+    whether the data is considered sensitive, because unencrypted connections expose session
+    tokens, cookies, and authentication credentials. TLS 1.0 and 1.1 are deprecated due to
+    known vulnerabilities (BEAST, POODLE). TLS 1.2 with strong cipher suites is the minimum
+    acceptable configuration; TLS 1.3 should be preferred where supported. HSTS (HTTP Strict
+    Transport Security) headers must be deployed to prevent protocol downgrade attacks.
+    Certificate validation must be enforced in all environments, including development and
+    staging, to prevent man-in-the-middle attacks. Certificate pinning provides additional
+    protection for mobile applications and critical API integrations.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V9.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP TLS Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure TLS termination at the load balancer or reverse proxy with TLS 1.2 minimum
+      (TLS 1.3 preferred). Use only strong cipher suites: ECDHE-based key exchange with
+      AES-256-GCM or ChaCha20-Poly1305. Deploy HSTS headers with max-age of at least one
+      year and includeSubDomains. Submit domains to the HSTS preload list. Implement
+      automatic certificate provisioning and rotation using cert-manager or Let's Encrypt.
+      Enable OCSP stapling to improve certificate validation performance. Configure mutual
+      TLS (mTLS) for service-to-service communication within the internal network using a
+      service mesh. Disable TLS renegotiation and compression to prevent related attacks.
+    tools:
+      - cert-manager
+      - lets-encrypt
+      - nginx
+      - envoy
+      - istio
+      - linkerd
+      - cloudflare
+      - aws-acm
+
+  devsecops:
+    prose: >-
+      Include TLS configuration scanning in CI/CD pipelines using testssl.sh or sslyze.
+      Validate that IaC templates configure TLS 1.2+ exclusively and disable weak cipher
+      suites. Write automated tests that verify HSTS headers are present with correct
+      directives. Scan for hardcoded certificate exceptions or TLS verification disabling
+      in application code (verify=False, NODE_TLS_REJECT_UNAUTHORIZED=0). Include
+      certificate expiration monitoring in the deployment pipeline. Validate certificate
+      chain integrity before deployment.
+    tools:
+      - testssl-sh
+      - sslyze
+      - checkov
+      - semgrep
+      - gitlab-ci
+      - trivy
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor for TLS downgrade attempts and connections using deprecated protocols.
+      Configure alerts for certificate expiration approaching (30, 14, 7 days). Scan
+      external-facing services weekly using SSL Labs or equivalent to verify TLS
+      configuration. Monitor Certificate Transparency logs for unauthorized certificates
+      issued for organizational domains. Alert on mTLS certificate failures within the
+      service mesh that may indicate unauthorized service communication attempts. Track
+      cipher suite usage distribution to identify clients using weak configurations.
+    tools:
+      - qualys-ssl-labs
+      - sslyze
+      - splunk
+      - elastic-siem
+      - certificate-transparency-monitor
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-23"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["4.2.1"]
+    relationship: implements

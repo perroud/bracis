@@ -1,0 +1,131 @@
+id: rec-19
+family: dispensacao
+title: "Patient Access to Prescription Data and Digital Receipt"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 37. O paciente tem direito de acesso aos dados de suas prescrições
+    eletrônicas, devendo o sistema garantir:
+
+    I — disponibilização de cópia digital da prescrição eletrônica ao
+    paciente, em formato legível e verificável, por meio de aplicativo,
+    portal web ou correio eletrônico;
+
+    II — histórico completo de prescrições e dispensações associadas ao
+    paciente, acessível mediante autenticação segura;
+
+    III — comprovante de dispensação digital emitido ao paciente no
+    momento da entrega do medicamento, contendo a identificação do
+    medicamento dispensado, lote, validade e farmácia responsável;
+
+    IV — possibilidade de o paciente autorizar ou revogar o
+    compartilhamento de seus dados de prescrição com outros profissionais
+    de saúde ou familiares;
+
+    V — mecanismo de portabilidade que permita ao paciente transferir
+    seu histórico de prescrições entre diferentes sistemas de saúde.
+
+    Parágrafo único. O acesso do paciente deve utilizar autenticação forte,
+    preferencialmente vinculada à conta gov.br nível prata ou ouro.
+guidance:
+  prose: |
+    Article 37 establishes patient data access rights for electronic
+    prescriptions, aligning with LGPD data subject rights and promoting
+    patient empowerment.
+
+    **Patient access channels:**
+    - Mobile application
+    - Web portal
+    - Email delivery of prescription copies
+    - All channels require strong authentication
+
+    **Access scope:**
+    - Digital copy of each prescription (readable and verifiable)
+    - Complete prescription and dispensation history
+    - Digital dispensation receipt at medication delivery
+
+    **Data sharing control:**
+    Patients can authorize or revoke sharing of their prescription
+    data with other healthcare professionals or family members. This
+    implements the LGPD consent principle for health data.
+
+    **Data portability:**
+    Patients can transfer their prescription history between healthcare
+    systems, preventing vendor lock-in and supporting continuity of
+    care when changing providers.
+
+    **Authentication:**
+    The regulation prefers integration with gov.br (Brazilian government
+    digital identity) at silver or gold level, which provides verified
+    identity with MFA.
+
+    **LGPD alignment:**
+    This article directly implements LGPD articles 18 (data subject
+    rights) and 20 (data portability) in the prescription context.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Patient access platform:**
+      1. Implement a patient-facing portal and mobile application with
+         OAuth 2.0 / OpenID Connect authentication, preferably
+         federated with gov.br identity provider.
+      2. Deploy a prescription document service that generates
+         verifiable prescription copies in PDF/A format with embedded
+         digital signature verification data.
+      3. Implement a dispensation receipt generation service that
+         creates digital receipts at the point of medication delivery,
+         delivered via push notification, email, or SMS.
+      4. Deploy a consent management platform for patient-controlled
+         data sharing authorization and revocation.
+      5. Implement a FHIR-based data portability export that generates
+         a complete patient prescription history in standard format
+         for transfer to other systems.
+    tools:
+      - patient-portal
+      - mobile-app
+      - gov-br-oauth
+      - pdf-a-generator
+      - consent-management
+      - fhir-export
+  devsecops:
+    prose: |
+      **Patient access testing:**
+      1. Create user journey tests for all patient access scenarios
+         (view prescription, download copy, view history, manage
+         consent, export data).
+      2. Implement authentication tests verifying gov.br federation
+         and fallback authentication methods.
+      3. Add consent management tests covering authorization grant,
+         revocation, and downstream data sharing enforcement.
+      4. Deploy data portability tests verifying FHIR export
+         completeness and reimportability.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - authentication-tests
+      - consent-tests
+      - portability-tests
+  secops:
+    prose: |
+      **Patient access operations:**
+      1. Monitor patient portal and mobile app availability and
+         performance, ensuring acceptable user experience.
+      2. Track patient data access request volumes and response
+         times for LGPD compliance reporting.
+      3. Audit consent management records quarterly for completeness
+         and proper enforcement of revocations.
+      4. Review data portability export logs monthly for data
+         completeness and potential data leakage.
+    tools:
+      - application-monitoring
+      - lgpd-compliance-dashboard
+      - consent-audit
+      - data-access-logging
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-18", "art-20"]
+    relationship: implements
+  - framework_id: gov-digital
+    articles: ["art-3", "art-5"]
+    relationship: complements

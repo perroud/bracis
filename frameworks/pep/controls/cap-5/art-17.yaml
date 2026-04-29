@@ -1,0 +1,122 @@
+id: art-17
+family: cap-5
+title: "Trilha de Auditoria e Rastreabilidade"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 17. O sistema PEP deve manter trilha de auditoria (audit
+    trail) completa e imutável que registre todas as operações
+    realizadas sobre os dados do prontuário.
+
+    I - A trilha de auditoria deve registrar, no mínimo: identificação
+    do usuário, data e hora da operação, tipo de operação realizada
+    (consulta, inserção, alteração, impressão, exportação), dados
+    acessados e endereço de origem do acesso;
+
+    II - Os registros de auditoria devem ser armazenados de forma
+    imutável, impedindo alteração ou exclusão por qualquer usuário,
+    incluindo administradores do sistema;
+
+    III - A trilha de auditoria deve ser preservada pelo mesmo prazo
+    de guarda do prontuário (mínimo 20 anos);
+
+    IV - Os registros de auditoria devem estar disponíveis para
+    consulta por autoridades competentes, comissões de ética e
+    ouvidorias no prazo máximo de 48 horas após solicitação.
+guidance:
+  prose: |
+    O art. 17 define a trilha de auditoria como componente
+    obrigatorio e critico do PEP. E a unica forma de provar
+    QUEM acessou QUAIS dados e QUANDO.
+
+    **Imutabilidade (inciso II):**
+    A trilha de auditoria deve ser tecnicamente inviolavel. Nem
+    mesmo o DBA ou o administrador do sistema podem alterar logs
+    de auditoria. Isso exige storage separado com controle de
+    acesso restrito (write-only para o sistema, read-only para
+    auditores).
+
+    **Prazo de 20 anos (inciso III):**
+    A trilha de auditoria deve acompanhar o prontuario durante
+    todo o periodo de guarda. Isso e essencial para investigacoes
+    de vazamento de dados, mesmo anos apos o fato.
+
+    **Cenarios de uso:**
+    - Paciente alega que seus dados foram acessados indevidamente:
+      a trilha prova quem acessou e quando
+    - Investigacao de vazamento de dados de saude: a trilha
+      identifica a origem
+    - Processo etico: a trilha comprova que o profissional
+      registrou ou nao registrou determinada informacao
+    - Auditoria de operadora: a trilha comprova a realizacao
+      dos procedimentos
+
+    **Disponibilidade em 48h (inciso IV):**
+    O sistema deve permitir busca e exportacao de logs de auditoria
+    de forma eficiente, mesmo para periodos antigos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de auditoria imutavel:**
+      1. Implementar audit trail como servico separado do PEP,
+         com storage imutavel (append-only log, WORM storage
+         ou blockchain privada).
+      2. Registrar TODOS os acessos a dados de paciente, incluindo
+         leitura, com granularidade de campo quando possivel
+         (quem viu o diagnostico vs. quem viu dados demograficos).
+      3. Armazenar logs de auditoria em infraestrutura separada
+         do banco de dados principal do PEP, com controle de
+         acesso independente.
+      4. Implementar busca eficiente em logs historicos (indexacao
+         por paciente, profissional, data, tipo de operacao)
+         para atender solicitacoes em ate 48h.
+      5. Garantir que logs de auditoria sigam a mesma politica
+         de retencao e migracao dos prontuarios (20+ anos).
+    tools:
+      - audit-log-service
+      - worm-storage
+      - log-indexer
+      - time-series-database
+  devsecops:
+    prose: |
+      **Validacao da trilha de auditoria:**
+      1. Testar que TODA operacao no PEP gera registro de
+         auditoria correspondente (100% de cobertura).
+      2. Testar imutabilidade: tentativas de alterar ou deletar
+         registros de auditoria devem falhar e ser logadas.
+      3. Validar que logs contem todos os campos obrigatorios
+         (usuario, data/hora, operacao, dados, origem).
+      4. Testar performance de busca em logs antigos: consulta
+         deve retornar resultados em tempo util.
+    tools:
+      - gitlab-ci
+      - audit-coverage-tests
+      - immutability-tests
+      - log-search-performance-tests
+  secops:
+    prose: |
+      **Operacao e monitoramento de auditoria:**
+      1. Configurar alertas automaticos no SIEM para padroes
+         suspeitos: acesso massivo a prontuarios, acesso fora
+         de horario, acesso a paciente VIP, acesso por usuario
+         desligado.
+      2. Realizar revisao semanal de alertas de auditoria e
+         investigar anomalias identificadas.
+      3. Criar processo de atendimento a solicitacoes de
+         auditoria (comissoes de etica, ouvidoria, autoridades)
+         com SLA de 48 horas.
+      4. Testar trimestralmente a capacidade de recuperar e
+         exportar logs de auditoria para periodos antigos.
+    tools:
+      - siem
+      - alert-management
+      - audit-request-workflow
+      - log-export
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-38"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-b"]
+    relationship: mapped

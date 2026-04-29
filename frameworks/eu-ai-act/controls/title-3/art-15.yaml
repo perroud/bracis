@@ -1,0 +1,154 @@
+id: art-15
+family: title-3
+title: "Accuracy, Robustness and Cybersecurity"
+class: EU-AI-Act
+
+statement:
+  prose: >-
+    High-risk AI systems shall be designed and developed in such a way that they
+    achieve an appropriate level of accuracy, robustness, and cybersecurity, and
+    that they perform consistently in those respects throughout their lifecycle.
+  parts:
+    - id: art-15.1
+      label: "1."
+      prose: >-
+        High-risk AI systems shall be designed and developed in such a way that they
+        achieve, in the light of their intended purpose, an appropriate level of
+        accuracy, robustness and cybersecurity, and perform consistently in those
+        respects throughout their lifecycle. The levels of accuracy and the relevant
+        accuracy metrics shall be declared in the accompanying instructions for use.
+    - id: art-15.2
+      label: "2."
+      prose: >-
+        The levels of accuracy shall be communicated to deployers in a clear,
+        transparent, and comprehensible manner together with the instructions for use.
+    - id: art-15.3
+      label: "3."
+      prose: >-
+        High-risk AI systems shall be as resilient as possible regarding errors, faults
+        or inconsistencies that may occur within the system or the environment in which
+        the system operates, in particular due to their interaction with natural persons
+        or other systems. Technical and organisational measures shall be taken in this
+        regard.
+    - id: art-15.4
+      label: "4."
+      prose: >-
+        High-risk AI systems shall be resilient against attempts by unauthorised third
+        parties to alter their use, outputs, or performance by exploiting system
+        vulnerabilities. The technical solutions to address AI-specific vulnerabilities
+        shall include, where appropriate, measures to prevent, detect, respond to,
+        resolve and control for attacks trying to manipulate the training data set
+        (data poisoning), or pre-trained components used in training (model poisoning),
+        inputs designed to cause the AI model to make a mistake (adversarial examples
+        or model evasion), confidentiality attacks, or model flaws.
+    - id: art-15.5
+      label: "5."
+      prose: >-
+        High-risk AI systems shall be designed and developed in such a way that they
+        achieve an appropriate level of cybersecurity. The cybersecurity measures shall
+        be commensurate with the risks and be appropriate to the circumstances and risks
+        relating to the category of the high-risk AI system.
+
+guidance:
+  prose: >-
+    Article 15 addresses three interrelated technical quality dimensions: accuracy
+    (the system produces correct outputs), robustness (the system performs reliably
+    under adverse conditions), and cybersecurity (the system resists malicious
+    interference). This is the most technically intensive requirement, demanding
+    specific measures against AI-specific attack vectors including data poisoning,
+    model poisoning, adversarial examples, model evasion, model inversion, and
+    membership inference attacks. Accuracy metrics must be declared and communicated
+    to deployers, creating accountability for performance claims. Robustness extends
+    beyond adversarial attacks to include graceful degradation under edge cases,
+    distributional shift, and interaction with unexpected inputs. Cybersecurity
+    measures must be proportional to the risk level and must address the full AI
+    supply chain including pre-trained components and third-party datasets.
+
+references:
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 15"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "ENISA Securing Machine Learning Algorithms"
+    url: "https://www.enisa.europa.eu/publications/securing-machine-learning-algorithms"
+  - citation: "NIST AI 100-2e2023 — Adversarial Machine Learning"
+    url: "https://csrc.nist.gov/pubs/ai/100/2/e2023/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy continuous model monitoring infrastructure that tracks accuracy metrics,
+      prediction drift, and data distribution changes in real-time for all high-risk
+      AI systems. Implement automated adversarial testing frameworks integrated into
+      the ML platform that periodically evaluate model robustness against known attack
+      vectors including adversarial examples, data poisoning simulations, and model
+      evasion techniques. Build AI-specific security controls into the serving
+      infrastructure including input validation, output sanitisation, rate limiting,
+      and anomaly detection on inference requests. Implement model integrity
+      verification using cryptographic signing of model artifacts at each stage of
+      the ML pipeline from training to deployment. Deploy canary analysis and
+      progressive rollout mechanisms for model updates that detect accuracy
+      degradation before full production exposure.
+    tools:
+      - mlflow
+      - grafana
+      - prometheus
+      - kubeflow
+      - istio
+      - trivy
+      - cosign
+
+  devsecops:
+    prose: >-
+      Integrate adversarial robustness testing into CI/CD pipelines using frameworks
+      that generate adversarial examples and measure model resilience across defined
+      attack types. Enforce accuracy regression gates that block model deployments
+      when accuracy metrics fall below declared thresholds on validation and test
+      datasets. Include AI-specific security scanning in pipelines covering model
+      artifact integrity verification, dependency vulnerability scanning for ML
+      libraries, and static analysis for common ML security anti-patterns. Implement
+      model provenance tracking that cryptographically chains training data, training
+      code, hyperparameters, and resulting model artifacts to enable supply chain
+      integrity verification. Require cybersecurity assessment artifacts covering
+      AI-specific threat vectors as mandatory pipeline prerequisites for high-risk
+      AI system deployments.
+    tools:
+      - gitlab-ci
+      - adversarial-robustness-toolbox
+      - trivy
+      - cosign
+      - conftest
+      - pytest
+      - checkov
+
+  secops:
+    prose: >-
+      Monitor production AI systems for adversarial attack indicators including
+      anomalous input patterns, unusual query distributions, systematic probing
+      behaviour, and sudden accuracy degradation that could indicate ongoing model
+      evasion or data poisoning attempts. Configure SIEM rules specific to AI system
+      security events that correlate inference logs with network traffic patterns to
+      detect extraction attacks, membership inference attempts, or model inversion
+      activities. Implement continuous vulnerability management for AI systems
+      including scanning for known vulnerabilities in ML frameworks, monitoring
+      advisories for pre-trained model components, and tracking supply chain risk
+      for third-party datasets. Conduct periodic AI-specific penetration testing
+      covering adversarial attacks, data poisoning, and model extraction scenarios.
+      Maintain incident response procedures specific to AI system compromise including
+      model rollback, data quarantine, and impact assessment protocols.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - adversarial-robustness-toolbox
+      - grafana
+      - grc-platform
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.8", "a8.9", "a8.12", "a8.28"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-01", "PR.DS-02", "DE.CM-01", "DE.AE-02"]
+    relationship: supports
+  - framework_id: gdpr
+    articles: ["art-32"]
+    relationship: complements

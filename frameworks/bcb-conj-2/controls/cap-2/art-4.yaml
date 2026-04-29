@@ -1,0 +1,190 @@
+id: art-4
+family: cap-2
+title: "Conteudo Minimo da Notificacao"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 4. A notificação de que trata o art. 3 deve conter, no mínimo:
+    I - a descrição do incidente, incluindo a data e a hora da detecção;
+    II - a classificação de severidade do incidente;
+    III - os sistemas e as infraestruturas afetados;
+    IV - o impacto do incidente, incluindo a estimativa de número de clientes,
+    usuários e instituições afetados;
+    V - as medidas adotadas e as em curso para o tratamento do incidente;
+    VI - a identificação dos prestadores de serviços contratados, quando o
+    incidente tiver origem nesses prestadores;
+    VII - outras informações consideradas relevantes.
+guidance:
+  prose: |
+    O art. 4 detalha o conteudo minimo obrigatorio da notificacao ao BCB.
+    Cada inciso corresponde a uma secao do formulario de notificacao.
+
+    **I - Descricao do incidente:**
+    Deve incluir:
+    - Tipo de incidente (ransomware, DDoS, vazamento, fraude, etc.)
+    - Data e hora exatas da deteccao (fuso horario de Brasilia)
+    - Data e hora estimadas do inicio do incidente (se diferente da deteccao)
+    - Vetor de ataque (se conhecido naquele momento)
+    - Narrativa cronologica dos eventos
+
+    **II - Classificacao de severidade:**
+    O BCB nao define uma escala unica, mas espera que a instituicao utilize
+    classificacao documentada e consistente. Recomenda-se:
+    - Critico: ameaca a estabilidade do SFN ou comprometimento massivo de dados
+    - Alto: interrupcao significativa de servicos ou vazamento de dados relevante
+    - Medio: degradacao de servicos ou acesso nao autorizado limitado
+    - Baixo: evento de seguranca com impacto operacional minimo
+    A classificacao deve ser justificada com base em criterios objetivos.
+
+    **III - Sistemas e infraestruturas afetados:**
+    Descricao tecnica e funcional dos sistemas impactados:
+    - Nome do sistema e sua funcao de negocio
+    - Tipo de infraestrutura (on-premises, nuvem publica, hibrida)
+    - Se integra infraestruturas criticas do SFN (SPB, STR, PIX)
+    - Localizacao dos dados afetados (pais, datacenter, regiao)
+
+    **IV - Impacto e estimativa de afetados:**
+    Quantificacao do impacto:
+    - Numero de clientes pessoa fisica afetados
+    - Numero de clientes pessoa juridica afetados
+    - Numero de instituicoes financeiras afetadas (se aplicavel)
+    - Volume financeiro estimado de transacoes afetadas
+    - Duracao da interrupcao (se aplicavel)
+
+    **V - Medidas adotadas e em curso:**
+    Descricao das acoes de resposta:
+    - Acoes de contencao ja executadas
+    - Acoes de erradicacao em andamento
+    - Plano de recuperacao com estimativa de prazo
+    - Medidas preventivas para evitar recorrencia
+
+    **VI - Prestadores de servicos:**
+    Quando o incidente se origina em terceiro:
+    - Identificacao do prestador (razao social, CNPJ)
+    - Tipo de servico contratado
+    - Localizacao do servico
+    - Status da comunicacao com o prestador
+
+    **VII - Outras informacoes relevantes:**
+    Campo aberto para informacoes adicionais que o BCB possa considerar relevantes,
+    como: cobertura da midia, acoes judiciais em curso, notificacoes a outros orgaos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Template automatizado de notificacao:**
+      1. Formulario estruturado de notificacao com campos obrigatorios mapeados
+         1:1 para cada inciso do art. 4.
+      2. Pre-preenchimento automatico com dados do SIEM e do incident management:
+         - Inciso I: data/hora do alerta, tipo de evento, descricao do alerta.
+         - Inciso III: sistemas afetados extraidos do CMDB.
+         - Inciso IV: numero de clientes estimado via metricas de uso dos sistemas.
+      3. Validacao automatica: formulario nao pode ser enviado sem todos os campos
+         obrigatorios preenchidos.
+
+      **Classificacao de severidade automatizada (inciso II):**
+      4. Motor de scoring de severidade baseado em:
+         - Criticidade do sistema afetado (Tier 1/2/3)
+         - Tipo de dados comprometidos (pessoais sensiveis > pessoais > operacionais)
+         - Numero estimado de afetados
+         - Impacto na disponibilidade (SLO violation severity)
+         - Integracao com infraestrutura do SFN
+      5. Sugestao automatica de classificacao com justificativa, sujeita a revisao
+         humana.
+
+      **Enriquecimento de impacto (inciso IV):**
+      6. Query automatica de metricas de uso dos sistemas afetados para estimar
+         numero de clientes impactados.
+      7. Correlacao com dados de transacoes para estimar volume financeiro afetado.
+      8. Dashboard de impacto em tempo real atualizado durante o incidente.
+
+      **Rastreamento de terceiros (inciso VI):**
+      9. Integracao com cadastro de fornecedores: ao identificar terceiro como origem,
+         puxar automaticamente razao social, CNPJ, tipo de servico.
+      10. Registro automatico de timeline de comunicacao com o terceiro.
+    tools:
+      - incident-management
+      - siem
+      - cmdb
+      - monitoring-alerting
+      - third-party-risk
+      - dlp
+  devsecops:
+    prose: |
+      **Dados para notificacao originados no pipeline:**
+      1. SBOM (Software Bill of Materials) disponivel para preencher inciso III
+         (sistemas afetados) com detalhamento tecnico de componentes.
+      2. Git log e deploy history para determinar data/hora do incidente
+         correlacionando com mudancas recentes (inciso I).
+      3. Artefato de classificacao de criticidade do sistema no repositorio para
+         alimentar automaticamente a classificacao de severidade (inciso II).
+
+      **Automacao de coleta de evidencias:**
+      4. Pipeline de coleta forense disparado automaticamente em incidentes Tier 1:
+         - Snapshot de logs
+         - Captura de estado de containers
+         - Dump de configuracoes
+         - Export de metricas
+      5. Provenance chain para rastrear artefatos envolvidos no incidente.
+
+      **Integracao com template de notificacao:**
+      6. API que exporta dados do pipeline (SBOM, vulnerabilities, deploy history)
+         para o formulario de notificacao ao BCB.
+      7. Correlacao automatica entre vulnerabilidades detectadas no pipeline e o
+         incidente notificado.
+    tools:
+      - gitlab-ci
+      - sbom-generator
+      - artifact-registry
+      - centralized-logging
+      - forensic-tools
+  secops:
+    prose: |
+      **Processo de preenchimento da notificacao:**
+      1. Responsavel designado pelo preenchimento (analista de incidentes senior).
+      2. Revisao obrigatoria por CISO e juridico antes do envio ao BCB.
+      3. Checklist de completude: todos os sete incisos devem estar preenchidos.
+      4. Controle de qualidade: informacoes devem ser factuais, sem especulacoes.
+
+      **Classificacao de severidade (inciso II):**
+      5. Matriz de severidade documentada e aprovada pela diretoria:
+         | Criterio           | Critico         | Alto           | Medio          | Baixo         |
+         |--------------------|-----------------|----------------|----------------|---------------|
+         | Clientes afetados  | > 100.000       | > 10.000       | > 1.000        | < 1.000       |
+         | Dados pessoais     | Sensiveis       | Cadastrais     | Operacionais   | Nenhum        |
+         | Infraestrutura SFN | Sim             | Parcial        | Nao            | Nao           |
+         | Disponibilidade    | > 4h            | > 1h           | > 15min        | < 15min       |
+         | Volume financeiro  | > R$ 10M        | > R$ 1M        | > R$ 100K      | < R$ 100K     |
+      6. Documentacao da justificativa da classificacao escolhida.
+
+      **Estimativa de impacto (inciso IV):**
+      7. Metodologia documentada para estimar numero de afetados:
+         - Usuarios unicos dos sistemas afetados no periodo do incidente
+         - Transacoes processadas pelos sistemas afetados no periodo
+         - Registros de dados potencialmente comprometidos
+      8. Atualizacao da estimativa conforme investigacao avanca.
+
+      **Canal de envio ao BCB:**
+      9. Utilizacao do sistema de comunicacao oficial do BCB (ex: UNICAD, e-mail
+         oficial da area de supervisao).
+      10. Confirmacao de recebimento pelo BCB documentada.
+      11. Registro interno de toda comunicacao com o regulador.
+    tools:
+      - incident-management
+      - grc-platform
+      - soar
+      - communication-tools
+      - forensic-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26", "A.6.8"]
+    relationship: supports

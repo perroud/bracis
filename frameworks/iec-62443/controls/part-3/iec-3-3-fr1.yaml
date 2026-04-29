@@ -1,0 +1,100 @@
+id: iec-3-3-fr1
+family: part-3
+title: "FR1: Identification and Authentication Control (IAC)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr1
+
+statement:
+  prose: >-
+    The control system shall provide the capability to identify and authenticate
+    all human users, software processes, and devices before allowing access to
+    the control system. Authentication mechanisms shall be commensurate with
+    the target security level of the zone. SL 1 requires unique identification;
+    SL 2 requires role-based access with passwords; SL 3 requires multi-factor
+    authentication; SL 4 requires multi-factor authentication with hardware
+    tokens or biometric verification.
+
+guidance:
+  prose: >-
+    Identification and authentication in IACS environments must balance
+    security with operational requirements including emergency access and
+    safety-critical response times. Key considerations include: implementing
+    unique user accounts for all personnel accessing IACS (no shared accounts
+    except for documented emergency access); integrating with a centralized
+    identity provider where feasible while maintaining local fallback
+    authentication for safety-critical systems that must operate during
+    network outages; enforcing role-based access control aligned with the
+    Purdue model levels; implementing device authentication for all
+    controllers, I/O modules, and network devices using certificates or
+    pre-shared keys; authenticating software processes and inter-zone
+    communications using mutual TLS or equivalent mechanisms; managing
+    service accounts with automated credential rotation; providing emergency
+    bypass procedures that are audited, time-limited, and require post-event
+    review; and implementing session management with automatic timeout
+    appropriate for the operational context (longer for operator HMIs in
+    active use, shorter for engineering workstations).
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 1.1 through SR 1.13"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy an identity provider with OT-specific integrations that supports
+      RADIUS, TACACS+, and LDAP for legacy industrial equipment. Implement
+      certificate-based device authentication using a dedicated PKI for the
+      IACS environment. Deploy privileged access management (PAM) solutions
+      with session recording for all administrative access to control systems.
+      Implement jump servers at zone boundaries that enforce authentication
+      before granting access to higher-security zones. Configure multi-factor
+      authentication for all remote access to IACS networks using hardware
+      tokens rated for industrial environments.
+    tools:
+      - cyberark
+      - beyondtrust
+      - keycloak
+      - freeipa
+      - step-ca
+
+  devsecops:
+    prose: >-
+      Enforce authentication requirements in the CI/CD pipeline based on the
+      target zone's security level. Implement automated checks that verify
+      default credentials have been changed in all deployed configurations.
+      Scan code and configuration files for hardcoded credentials or
+      authentication bypasses. Require that all service-to-service
+      communication uses mutual TLS with certificates managed through a
+      secrets management system. Implement pipeline-level authentication
+      that prevents unauthorized deployments to IACS zones.
+    tools:
+      - vault
+      - cert-manager
+      - gitleaks
+      - trivy
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor authentication events across all IACS zones for anomalies
+      including brute force attempts, credential stuffing, use of shared
+      accounts, and authentication from unexpected sources. Implement
+      user behavior analytics tuned for OT operator patterns (shift-based
+      access, expected HMI interaction patterns). Alert on emergency access
+      bypass usage and ensure post-event review is completed. Monitor for
+      unauthorized device connections to the IACS network through
+      802.1X enforcement and network access control.
+    tools:
+      - splunk-uba
+      - cisco-ise
+      - nozomi-networks
+      - fortinet-fortinac
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-3", "IA-4", "IA-5", "IA-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.16", "a5.17", "a8.5"]
+    relationship: supports

@@ -1,0 +1,121 @@
+id: art-23
+family: cap-5
+title: "Guias de Execucao e Cobranca"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 23. O registro de atendimentos realizados e a cobrança de
+    serviços prestados devem ser efetuados por meio de guias TISS de
+    execução, agrupadas em lotes para envio às operadoras.
+
+    Parágrafo 1. As guias de execução incluem:
+    I - Guia de SP/SADT de execução: para registro de exames,
+    procedimentos e terapias realizados;
+    II - Guia de internação de execução: para registro de internações
+    com diárias, materiais, medicamentos e honorários;
+    III - Guia de honorários: para cobrança específica de honorários
+    de equipe médica;
+    IV - Guia de tratamento odontológico de execução: para registro
+    de procedimentos dentários realizados.
+
+    Parágrafo 2. Os lotes de guias devem ser enviados eletronicamente
+    via web service TISS, contendo:
+    I - Identificação do lote (número sequencial, data, prestador);
+    II - Guias de execução com dados completos do atendimento;
+    III - Valores cobrados conforme tabela contratual;
+    IV - Hash de integridade do lote.
+
+    Parágrafo 3. A operadora deve retornar protocolo de recebimento
+    do lote e, posteriormente, o resultado da análise de cada guia.
+guidance:
+  prose: |
+    O art. 23 trata do fluxo de faturamento, onde o prestador registra
+    os atendimentos realizados e cobra da operadora.
+
+    **Fluxo de cobranca TISS:**
+    1. Prestador registra atendimento em guia de execucao
+    2. Prestador agrupa guias em lote
+    3. Prestador envia lote via web service TISS
+    4. Operadora retorna protocolo de recebimento
+    5. Operadora analisa cada guia (auditoria de contas)
+    6. Operadora retorna demonstrativo de analise (pago, glosado)
+
+    **Tipos de glosa:**
+    - Glosa administrativa: dados incompletos, prazo vencido
+    - Glosa tecnica: procedimento incompativel com CID, duplicidade
+    - Glosa linear: reducao de valores acima do contratual
+
+    **Lotes de guias:**
+    - Um lote pode conter de 1 a N guias
+    - Cada guia dentro do lote e processada individualmente
+    - O lote pode ser parcialmente aceito (algumas guias glosadas)
+    - Hash de integridade garante que lote nao foi alterado
+
+    **Valores e tabelas:**
+    - Valores cobrados conforme tabela contratual entre operadora e
+      prestador (CBHPM, tabela propria)
+    - Materiais e medicamentos: valor de custo + taxa de servico
+    - OPME: autorizacao previa obrigatoria + rastreabilidade
+
+    **Prazos:**
+    - Envio do lote: conforme contrato (geralmente mensal)
+    - Analise pela operadora: conforme contrato, maximo 30 dias
+    - Pagamento: conforme contrato, apos analise
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de faturamento TISS:**
+      1. Implementar modulo de criacao de guias de execucao integrado
+         ao PEP/sistema assistencial, populando automaticamente dados
+         do atendimento.
+      2. Criar servico de loteamento que agrupe guias por operadora,
+         calcule hash de integridade e envie via web service TISS.
+      3. Implementar reconciliacao automatica entre guias enviadas
+         e protocolos de recebimento/demonstrativos de analise.
+      4. Configurar retry automatico para lotes rejeitados por
+         falhas transientes (timeout, indisponibilidade).
+    tools:
+      - billing-module
+      - batch-processing
+      - reconciliation-service
+      - retry-mechanism
+  devsecops:
+    prose: |
+      **Validacao de faturamento no pipeline:**
+      1. Implementar testes de integridade de lotes: verificar que
+         hash calculado corresponde ao conteudo do lote.
+      2. Criar testes de validacao de valores: cobrado versus tabela
+         contratual, limites, duplicidades.
+      3. Automatizar testes de reconciliacao: envio de lote, recebimento
+         de protocolo, recebimento de demonstrativo.
+      4. Incluir testes de cenarios de glosa: administrativa, tecnica
+         e linear, validando codigos de motivo.
+    tools:
+      - integrity-testing
+      - value-validation
+      - reconciliation-testing
+      - glosa-testing
+  secops:
+    prose: |
+      **Gestao operacional de faturamento TISS:**
+      1. Monitorar taxa de glosa por operadora, tipo e motivo, com
+         alertas para desvios significativos.
+      2. Implementar dashboard de reconciliacao financeira: guias
+         enviadas vs. pagas vs. glosadas vs. em recurso.
+      3. Auditar periodicamente a conformidade das guias de execucao
+         com os registros assistenciais (PEP, prontuario).
+      4. Reportar metricas de faturamento TISS (volume, valor,
+         taxa de glosa, prazo medio de recebimento) mensalmente.
+    tools:
+      - glosa-analytics
+      - financial-reconciliation
+      - billing-audit
+      - financial-reporting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-11"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1101"]
+    relationship: mapped

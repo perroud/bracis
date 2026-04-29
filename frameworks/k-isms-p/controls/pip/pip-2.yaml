@@ -1,0 +1,91 @@
+id: pip-2
+family: pip
+title: "Personal Information Destruction"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    When personal information is no longer necessary for the purpose of
+    collection or when the retention period has expired, the organization
+    shall destroy the personal information without delay using methods that
+    prevent recovery. For electronic files, secure deletion or overwriting
+    methods shall be used. For printed documents, shredding or incineration
+    shall be applied. The organization shall document the destruction
+    including the date, method, items destroyed, and the person responsible
+    for destruction. Where complete destruction is not feasible, the
+    organization shall de-identify the information to prevent re-identification.
+
+guidance:
+  prose: |
+    Personal information destruction is a strictly audited area in K-ISMS-P
+    certification. KISA requires evidence that destruction is performed
+    systematically rather than ad hoc. Destruction methods must render
+    personal information irrecoverable, meaning simple deletion from a
+    file system is insufficient. For databases, organizations must demonstrate
+    that backup copies are also destroyed or that retention policies apply
+    to backup media. KISA publishes specific guidance on acceptable
+    destruction methods, and auditors may request demonstration of the
+    destruction process. De-identification as an alternative to destruction
+    must meet KISA's standards, which require that re-identification is
+    not reasonably possible using available technology.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 3.3 — Personal Information Destruction"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement automated data destruction workflows triggered by retention
+      policy expiration. Deploy cryptographic erasure for encrypted data
+      stores by destroying the encryption keys. Configure storage systems
+      to perform secure overwrite rather than logical deletion. Build
+      destruction verification tools that confirm data is irrecoverable.
+      Ensure backup retention policies align with destruction requirements.
+    tools:
+      - hashicorp-vault
+      - aws-kms
+      - terraform
+      - custom-data-lifecycle
+
+  devsecops:
+    prose: |
+      Implement automated testing of data destruction functions to verify
+      irrecoverability. Include destruction procedure validation in CI/CD
+      pipelines for data management components. Scan for anti-patterns
+      such as soft-delete implementations that retain personal information
+      beyond the declared retention period. Verify that database migration
+      scripts do not inadvertently preserve personal information that
+      should be destroyed.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - conftest
+      - custom-destruction-validator
+
+  secops:
+    prose: |
+      Audit destruction logs for completeness and verify that destruction
+      records include all required fields. Monitor for personal information
+      that exists beyond its retention period in any storage medium
+      including backups and archives. Conduct periodic forensic verification
+      that destroyed data cannot be recovered. Generate destruction
+      compliance reports for KISA certification assessments.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - onetrust
+
+legal_references:
+  - framework_id: iso-27701
+    articles: ["clause-7.4.5"]
+    relationship: equivalent-to
+  - framework_id: gdpr
+    articles: ["art-17"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-6", "SI-12"]
+    relationship: mapped

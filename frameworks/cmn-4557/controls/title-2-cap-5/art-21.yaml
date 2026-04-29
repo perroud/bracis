@@ -1,0 +1,133 @@
+id: art-21
+family: title-2-cap-5
+title: "Risco de Liquidez Intraday"
+class: CMN-4557
+statement:
+  prose: |
+    Art. 21. A estrutura de gerenciamento do risco de liquidez deve contemplar o
+    monitoramento da liquidez intraday, incluindo:
+    I - o acompanhamento do fluxo de pagamentos e recebimentos ao longo do dia;
+    II - a manutenção de reservas adequadas para cumprimento de obrigações de pagamento;
+    III - procedimentos para administração da posição de liquidez intraday;
+    IV - integração com os sistemas de pagamento (SPB).
+guidance:
+  prose: |
+    O art. 21 trata do risco de liquidez intraday, que e critico para instituicoes
+    participantes do Sistema de Pagamentos Brasileiro (SPB).
+
+    **Risco de liquidez intraday:**
+    Risco de nao conseguir honrar obrigacoes de pagamento ao longo do dia. Diferente do
+    risco de liquidez de medio prazo, o intraday opera em janelas de horas ou minutos.
+
+    **Contexto do SPB:**
+    O Sistema de Pagamentos Brasileiro opera com liquidacao em tempo real (LBTR -
+    Liquidacao Bruta em Tempo Real) para pagamentos de alto valor. Isso significa que
+    a instituicao precisa ter saldo suficiente na conta Reservas Bancarias no BCB ao
+    longo de todo o dia.
+
+    **Fluxo de pagamentos intraday (inciso I):**
+    - Monitoramento em tempo real de entradas e saidas de caixa
+    - Projecao de fluxo intraday: pagamentos programados vs. recursos esperados
+    - Picos de concentracao: horarios com maior volume de pagamentos
+    - Net settlement: liquidacao liquida em camaras de compensacao
+
+    **Reservas intraday (inciso II):**
+    - Saldo minimo em Reservas Bancarias para cumprimento do compulsorio
+    - Colchao adicional para pagamentos inesperados ou atrasos de recebimentos
+    - Acesso a facilidades de liquidez intradia do BCB (operacoes compromissadas intraday)
+    - Buffer para chamadas de margem da B3
+
+    **Administracao da posicao (inciso III):**
+    - Sequenciamento de pagamentos para otimizar uso de recursos
+    - Throttling: adiamento de pagamentos nao urgentes quando liquidez esta apertada
+    - Gestao ativa de colateral para maximizar capacidade de obtencao de liquidez
+    - Comunicacao proativa com contrapartes quando delay e esperado
+
+    **Integracao com SPB (inciso IV):**
+    - STR (Sistema de Transferencia de Reservas): pagamentos de alto valor
+    - SPI (Sistema de Pagamentos Instantaneos - PIX): pagamentos 24/7
+    - Camaras de compensacao: CIP, B3, COMPE
+    - Mensageria RSFN (Rede do Sistema Financeiro Nacional)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Liquidity monitoring intraday:**
+      1. Real-time cash position monitor com integracao STR, SPI e camaras.
+      2. Intraday cash flow projection: pagamentos programados vs. recebimentos esperados.
+      3. Dashboard intraday com saldo em Reservas Bancarias minuto a minuto.
+      4. Alertas de threshold: saldo minimo, saldo projetado negativo, concentracao.
+
+      **Integracao SPB (inciso IV):**
+      5. Integracao real-time com STR (Sistema de Transferencia de Reservas).
+      6. Integracao real-time com SPI (PIX) para monitoramento de fluxo.
+      7. Integracao com camaras de compensacao (CIP, B3, COMPE).
+      8. Processamento RSFN (mensageria ISO 20022) com baixa latencia.
+
+      **Otimizacao de liquidez:**
+      9. Payment sequencing engine para otimizar uso de recursos intraday.
+      10. Collateral optimization para maximizar capacidade de liquidez.
+      11. Intraday repo automation com BCB.
+      12. Netting optimization para reduzir necessidade de liquidez bruta.
+
+      **Alta disponibilidade:**
+      13. Sistemas de liquidez intraday com SLA de 99.99% de disponibilidade.
+      14. Failover automatizado em menos de 1 minuto para sistemas SPB.
+      15. Backup de conectividade com BCB (links redundantes).
+      16. BCP especifico para SPB com procedimentos de contingencia do BCB.
+    tools:
+      - treasury-management
+      - payment-hub
+      - monitoring-alerting
+      - messaging-platform
+  devsecops:
+    prose: |
+      **Sistemas de pagamento no pipeline:**
+      1. CI/CD rigoroso para sistemas SPB com testes de integracao completos.
+      2. Performance testing: latencia de processamento de pagamentos dentro do SLA.
+      3. Regression testing extensivo: mudancas nao podem impactar processamento SPB.
+      4. Canary deployments para sistemas de pagamento (zero-downtime obrigatorio).
+
+      **Monitoramento de qualidade:**
+      5. End-to-end monitoring de fluxo de pagamentos no pipeline.
+      6. Reconciliacao automatizada de pagamentos enviados vs. confirmados.
+      7. Alertas de anomalia: volume, valor ou padrao incomum de pagamentos.
+      8. Synthetic monitoring: transacoes sinteticas para validar disponibilidade.
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - monitoring-alerting
+      - synthetic-monitoring
+  secops:
+    prose: |
+      **Governanca de liquidez intraday:**
+      1. Politica de liquidez intraday aprovada pelo ALCO.
+      2. Limites de saldo minimo em Reservas Bancarias definidos e monitorados.
+      3. Procedimentos de escalacao para stress intraday de liquidez.
+      4. Comunicacao com BCB em caso de incapacidade de pagamento intraday.
+
+      **Monitoramento operacional:**
+      5. Desk de tesouraria monitorando posicao intraday em tempo real.
+      6. Relatorio intraday de posicao de liquidez para risk management.
+      7. Analise pos-dia (end-of-day) de picos e vales de liquidez.
+      8. Tendencias de uso de facilidades intraday do BCB.
+
+      **Continuidade de pagamentos:**
+      9. BCP especifico para sistemas de pagamento (SPB, PIX).
+      10. Procedimentos de contingencia manuais para pagamentos criticos.
+      11. Teste anual de contingencia de pagamentos com BCB.
+      12. Comunicacao proativa com contrapartes em caso de delay de pagamentos.
+    tools:
+      - treasury-management
+      - risk-management-platform
+      - communication-platform
+      - grc-platform
+legal_references:
+  - framework_id: basel-iii
+    articles: ["pillar-2"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "SI-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.8.1"]
+    relationship: supports

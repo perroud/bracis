@@ -1,0 +1,132 @@
+id: cip-013-r1
+family: cip-013
+title: "Supply Chain Risk Management"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall develop one or more documented supply
+    chain cyber security risk management plan(s) for High and Medium
+    Impact BES Cyber Systems. The plan(s) shall include the applicable
+    requirement parts.
+  parts:
+    - id: cip-013-r1.1
+      label: "1.1"
+      prose: >-
+        One or more process(es) used in planning for the procurement
+        of BES Cyber Systems to identify and assess cyber security
+        risk(s) to the Bulk Electric System from vendor products or
+        services resulting from: (i) procuring and installing vendor
+        equipment and software; and (ii) transitions from one vendor(s)
+        to another vendor(s).
+    - id: cip-013-r1.2
+      label: "1.2"
+      prose: >-
+        One or more process(es) used in procuring BES Cyber Systems
+        that address the following, as applicable: notification by the
+        vendor of vendor-identified incidents related to the products
+        or services provided to the Responsible Entity; coordination
+        of responses to vendor-identified incidents; notification by
+        vendors when remote or onsite access should no longer be
+        granted to vendor representatives; disclosure by vendors of
+        known vulnerabilities related to the products or services
+        provided to the Responsible Entity; verification of software
+        integrity and authenticity of all software and patches provided
+        by the vendor; and coordination of controls for vendor-initiated
+        interactive remote access and system-to-system remote access.
+    - id: cip-013-r1.3
+      label: "1.3"
+      prose: >-
+        One or more process(es) to review and verify that the plan(s)
+        address the applicable items in parts 1.1 and 1.2. The review
+        shall be conducted at least once every 15 calendar months.
+
+guidance:
+  prose: >-
+    CIP-013 R1 addresses supply chain risk, which is increasingly
+    recognized as a critical attack vector for critical infrastructure
+    (as demonstrated by incidents like SolarWinds and Log4j). The
+    requirement mandates formal supply chain risk management for the
+    procurement of High and Medium Impact BES Cyber Systems. Key
+    elements include: pre-procurement risk assessment, vendor incident
+    notification procedures, vulnerability disclosure, software integrity
+    verification, and vendor remote access controls. The 15-month
+    review cycle ensures the plan stays current with evolving supply
+    chain threats. Entities should maintain a vendor risk registry
+    that tracks identified risks, mitigations, and open items. Software
+    integrity verification (part 1.2) should include hash verification,
+    digital signature validation, and provenance tracking.
+
+references:
+  - citation: "NERC CIP-013-2 — Supply Chain Risk Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-013-2.pdf"
+  - citation: "NIST SP 800-161 Rev. 1 — Cybersecurity Supply Chain Risk Management"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement software supply chain security through SBOM (Software
+      Bill of Materials) generation for all BES Cyber System software.
+      Deploy artifact signing and verification in the container image
+      and package registries. Implement automated vulnerability
+      tracking for all vendor-supplied components using CVE databases
+      and vendor advisory feeds. Deploy vendor access management
+      through dedicated jump hosts with time-limited, audited sessions.
+      Maintain a vendor risk registry as a structured data store
+      linked to the BES Cyber System inventory. Implement software
+      integrity verification pipelines that validate checksums and
+      digital signatures before deployment.
+    tools:
+      - sigstore
+      - syft
+      - grype
+      - terraform
+      - vault
+      - backstage
+
+  devsecops:
+    prose: >-
+      Integrate dependency scanning and SBOM generation into all
+      CI/CD pipelines for BES Cyber System software. Implement
+      automated software integrity verification (checksum validation,
+      signature verification) as pipeline gates. Create supply chain
+      risk assessment templates as version-controlled documents with
+      mandatory completion before procurement. Deploy artifact signing
+      in the CI pipeline so that all internally-built components
+      have verifiable provenance. Monitor vendor security advisories
+      through automated feeds and correlate with deployed components.
+      Enforce vendor software update verification before deployment
+      to BES Cyber System environments.
+    tools:
+      - gitlab-ci
+      - scanner_dependency_scanning
+      - scanner_container_scanning
+      - syft
+      - cosign
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor vendor security advisories and correlate with deployed
+      BES Cyber System components. Track vendor remote access sessions
+      with enhanced monitoring and alerting. Maintain a vendor
+      incident notification log and track response coordination.
+      Monitor for unauthorized vendor access and alert on anomalies.
+      Generate supply chain risk reports showing vendor risk posture,
+      vulnerability status, and open risk items. Verify software
+      integrity for all vendor-supplied updates before deployment.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - tenable
+      - grype
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-12", "SR-1", "SR-2", "SR-3", "SR-6"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-4", "3-3-5.13"]
+    relationship: supports

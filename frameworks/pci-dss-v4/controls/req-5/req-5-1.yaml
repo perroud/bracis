@@ -1,0 +1,108 @@
+id: req-5.1
+family: req-5
+title: "Protect All Systems and Networks from Malicious Software"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for protecting all systems and networks from malicious
+    software are defined and understood. An anti-malware solution is deployed on all
+    system components except for those determined to not be at risk from malware, based
+    on periodic evaluations. The anti-malware solution detects all known types of malware,
+    removes, blocks, or contains all known types of malware, and is kept current through
+    automatic updates. Anti-malware mechanisms and processes are active, maintained, and
+    monitored. Anti-phishing mechanisms protect users against phishing attacks.
+  parts:
+    - id: req-5.1.a
+      label: "5.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 5
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-5.1.b
+      label: "5.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 5 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Malicious software (malware) encompasses viruses, worms, Trojans, ransomware,
+    spyware, rootkits, and other forms of malicious code. Anti-malware solutions must
+    be deployed on all system components commonly affected by malware. For system
+    components not commonly affected (e.g., mainframes, certain Unix/Linux systems),
+    periodic evaluations must confirm continued low risk. Anti-malware solutions should
+    use multiple detection methods including signature-based, heuristic, and behavioral
+    analysis. PCI DSS v4.0.1 adds anti-phishing mechanisms as a requirement, recognizing
+    phishing as a primary initial attack vector for payment card compromises. Solutions
+    should be centrally managed, generate logs sent to a central monitoring system, and
+    be protected from being disabled by users.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 5"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy runtime security agents on all compute nodes in the CDE. Use Falco or
+      similar runtime detection tools on Kubernetes nodes to detect anomalous process
+      execution, file access patterns, and network connections indicative of malware.
+      Implement container image scanning in the registry to detect malware and known
+      malicious packages before images are deployed. Use read-only file systems for
+      containers to prevent malware persistence. Deploy admission controllers that
+      reject containers without verified signatures. Implement network-level malware
+      detection at ingress points using WAF with malware payload inspection.
+    tools:
+      - falco
+      - sysdig-secure
+      - aqua-security
+      - crowdstrike-falcon
+      - trivy
+      - clamav
+      - opa-gatekeeper
+      - cosign
+
+  devsecops:
+    prose: >-
+      Integrate malware scanning into the CI/CD pipeline at multiple stages: scan
+      source code dependencies for known malicious packages, scan built artifacts
+      for embedded malware, and scan container images before pushing to registries.
+      Use software composition analysis (SCA) tools to detect typosquatting and
+      supply chain attacks in package dependencies. Implement signed commits and
+      container image signing to ensure artifact integrity. Block deployment of
+      unsigned or unscanned artifacts.
+    tools:
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - snyk
+      - grype
+      - trivy
+      - cosign
+      - sigstore
+
+  secops:
+    prose: >-
+      Centrally manage and monitor anti-malware solutions across all endpoints.
+      Ensure definition updates are applied automatically and alert on endpoints
+      with outdated definitions. Monitor for malware detections and correlate
+      with network traffic logs to identify command-and-control communications.
+      Implement email security gateways with anti-phishing capabilities including
+      DMARC, DKIM, and SPF enforcement. Deploy endpoint detection and response
+      (EDR) solutions with behavioral analysis. Conduct periodic malware simulation
+      exercises to validate detection capabilities.
+    tools:
+      - crowdstrike-falcon
+      - sentinelone
+      - microsoft-defender
+      - proofpoint
+      - mimecast
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-4", "SI-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.7"]
+    relationship: supports

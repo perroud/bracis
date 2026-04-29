@@ -1,0 +1,101 @@
+id: art-24
+family: cap-5
+title: "Conclusao da Analise e Decisao de Comunicacao"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 24. Após a conclusão da análise de que trata o art. 21, a instituição
+    de pagamento deve:
+
+    I - decidir pela comunicação ao COAF, quando concluir que a operação ou
+    situação é suspeita, observados os prazos previstos no art. 26;
+
+    II - arquivar o resultado da análise com a justificativa da decisão tomada,
+    inclusive quando decidir pelo não encaminhamento ao COAF;
+
+    III - bloquear preventivamente operações ou relações de negócio quando
+    houver forte indicativo de envolvimento em lavagem de dinheiro ou
+    financiamento do terrorismo, antes mesmo da comunicação formal ao COAF;
+
+    IV - nunca comunicar ao cliente investigado sobre a investigação ou
+    sobre a comunicação realizada ao COAF (vedação de "tipping off").
+guidance:
+  prose: |
+    O art. 24 fecha o ciclo do monitoramento: o que fazer depois da analise.
+
+    **Quatro obrigacoes distintas:**
+    1. Decidir pela comunicacao (inciso I): se concluir que e suspeito, comunicar ao COAF.
+    2. Documentar tudo (inciso II): inclusive o "nao" -- por que decidiu nao comunicar.
+    3. Bloquear quando necessario (inciso III): em casos graves, bloquear antes de comunicar.
+    4. Nunca alertar o investigado (inciso IV): sigilo absoluto.
+
+    **Obrigacao de documentar o "nao" (inciso II):**
+    Esse e um ponto frequentemente negligenciado. Se o analista conclui que e
+    "falso positivo", a justificativa deve ser documentada e arquivada. Em caso
+    de inspecao, o BCB pode questionar por que determinado caso nao foi comunicado.
+
+    **Tipping off (inciso IV):**
+    E crime no Brasil (art. 10-A da Lei 9.613/98). O banco nao pode:
+    - Perguntar ao cliente "por que voce fez essa transacao?" se isso revelar investigacao
+    - Avisar que a conta sera bloqueada por suspeita de lavagem
+    - Compartilhar com terceiros que uma comunicacao ao COAF foi feita
+    A excecao e a pergunta normal de diligencia padrao, que nao revela investigacao.
+
+    **Bloqueio preventivo (inciso III):**
+    O bloqueio pode ser realizado mesmo sem ordem judicial em casos urgentes,
+    mas deve ser imediatamente comunicado ao BCB.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de decisao e encerramento de casos:**
+      1. Interface de case management com opcoes de decisao:
+         - "Comunicar ao COAF" → iniciar fluxo de SAR (art. 26)
+         - "Encerrar sem comunicacao" → obrigar preenchimento de campo
+           "justificativa_nao_comunicacao" (texto livre, obrigatorio)
+         - "Bloquear preventivamente" → acionar bloqueio e notificar BCB
+      2. Validacao: case NAO pode ser encerrado sem justificativa documentada.
+      3. Bloqueio preventivo: acao que requer confirmacao do compliance officer
+         ou diretor de PLD/FT; executa bloqueio no core de pagamentos e
+         gera alerta para o BCB.
+      4. Log auditavel: todas as decisoes, com usuario, timestamp e justificativa,
+         armazenados de forma imutavel.
+      5. Controle de "tipping off": nenhuma notificacao automatica ao cliente
+         e gerada por acoes de investigacao ou bloqueio preventivo.
+    tools:
+      - case-management
+      - aml-platform
+      - payment-core
+      - audit-logging
+  devsecops:
+    prose: |
+      **Garantias de processo:**
+      1. Testes de validacao: garantir que case management NAO permite fechar
+         caso sem justificativa documentada.
+      2. Testes de bloqueio: verificar que acao de bloqueio preventivo executa
+         em todos os sistemas relevantes (core de pagamentos, canais digitais).
+      3. Testes de segregacao: garantir que notificacoes ao cliente sao suprimidas
+         durante processo de investigacao ativa.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - security-testing
+  secops:
+    prose: |
+      **Auditoria de qualidade das decisoes:**
+      1. Revisao mensal de casos encerrados sem comunicacao: amostragem para
+         verificar qualidade das justificativas.
+      2. Monitoramento de taxa de comunicacao: se taxa de SAR for muito baixa,
+         pode indicar subnotificacao.
+      3. Auditoria de casos de "tipping off": verificar que nenhuma notificacao
+         ao cliente foi gerada em casos de investigacao.
+      4. Revisao pos-investigacao: quando uma investigacao policial confirma
+         suspeita nao comunicada, analisar o que falhou no processo.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-24"]
+    relationship: equivalent-to

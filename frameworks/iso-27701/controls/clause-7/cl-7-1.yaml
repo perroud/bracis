@@ -1,0 +1,110 @@
+id: cl-7.1
+family: clause-7
+title: "Operational planning and control for PII processing"
+class: ISO27701
+baselines: [pii-controller, pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization shall plan, implement, and control the processes needed to meet
+    PII processing requirements and to implement the actions determined in the PIMS
+    planning phase. The organization shall implement control of planned changes and
+    review the consequences of unintended changes, taking action to mitigate any
+    adverse effects. The organization shall ensure that outsourced processes involving
+    PII processing are determined and controlled, including contractual arrangements
+    with PII processors that specify the subject matter and duration of processing,
+    the nature and purpose of processing, the type of PII and categories of PII
+    principals, and the obligations and rights of the PII controller.
+
+guidance:
+  prose: >-
+    This clause extends ISO 27001 Clause 8.1 (Operational planning and control) with
+    specific requirements for PII processing operations. The key addition is the
+    requirement to control outsourced PII processing through binding contractual
+    arrangements. These contracts must be detailed enough to satisfy regulatory
+    requirements (e.g., GDPR Article 28 processor agreements, LGPD Article 39
+    processor obligations). Operational controls must cover the entire PII lifecycle:
+    collection, storage, use, sharing, retention, and deletion. Change management
+    processes must include privacy impact evaluation — any change to systems
+    processing PII must be assessed for privacy implications before implementation.
+    The organization must maintain documented procedures for all PII processing
+    operations and ensure these procedures are followed consistently.
+
+references:
+  - citation: "ISO/IEC 27701:2019, Clause 7.1"
+    url: "https://www.iso.org/standard/71670.html"
+  - citation: "ISO/IEC 27001:2022, Clause 8.1"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement PII lifecycle management as a platform capability. Build a data
+      processing orchestration layer that enforces the operational controls defined
+      in the PIMS: collection restrictions, purpose-bound access, retention
+      enforcement, and secure deletion. Use policy-as-code to encode PII processing
+      rules and enforce them through admission controllers and runtime policies.
+      Implement automated contract management for third-party PII processors,
+      with machine-readable data processing agreements stored alongside
+      infrastructure configurations. Build change management gates that require
+      privacy impact evaluation for any infrastructure change affecting PII
+      processing workloads. Provide pre-approved PII processing patterns as
+      reusable platform modules (e.g., consent-managed collection endpoints,
+      TTL-enforced storage, audit-logged access layers).
+    tools:
+      - kubernetes-admission-controllers
+      - open-policy-agent
+      - terraform-modules
+      - contract-management-system
+      - change-management-gates
+      - data-lifecycle-orchestrator
+
+  devsecops:
+    prose: >-
+      Integrate PII operational controls into the CI/CD pipeline. Build pipeline
+      stages that validate PII processing changes against documented procedures:
+      verify data processing agreements exist for third-party integrations, verify
+      retention policies are configured for new data stores, verify access controls
+      match the declared processing scope. Implement automated change impact
+      assessment that flags PII-relevant changes for privacy review. Build
+      deployment gates that verify operational prerequisites before releasing
+      changes to PII processing systems. Maintain PII processing runbooks in
+      version control alongside application code, with automated validation
+      that runbooks stay in sync with implemented procedures.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - checkov
+      - custom-privacy-validators
+      - runbook-validation
+      - deployment-gates
+
+  secops:
+    prose: >-
+      Monitor PII processing operations for deviations from documented procedures.
+      Implement SIEM rules that detect: unauthorized PII processing activities,
+      processing outside contracted scope for third parties, data retention
+      violations, unauthorized data sharing. Build operational dashboards showing
+      real-time PII processing status across all systems. Monitor third-party
+      PII processor compliance through API integrations and audit log analysis.
+      Implement automated incident triggers when operational controls fail or
+      are bypassed. Generate periodic operational compliance reports for
+      management review.
+    tools:
+      - splunk
+      - elastic-siem
+      - third-party-risk-monitoring
+      - operational-dashboards
+      - soar-playbooks
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28", "art-29", "art-32"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-39", "art-46"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.19", "a5.20", "a5.21"]
+    relationship: extends

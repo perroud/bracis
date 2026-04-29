@@ -1,0 +1,113 @@
+id: 164.308-a4
+family: security-rule-administrative
+title: "Information Access Management"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement policies and procedures for authorizing access to electronic protected
+    health information that are consistent with the applicable requirements of the
+    Privacy Rule.
+  parts:
+    - id: 164.308-a4-ii-A
+      label: "164.308(a)(4)(ii)(A)"
+      prose: >-
+        Isolating Health Care Clearinghouse Functions (Required). If a health care
+        clearinghouse is part of a larger organization, the clearinghouse must implement
+        policies and procedures that protect the electronic protected health information
+        of the clearinghouse from unauthorized access by the larger organization.
+    - id: 164.308-a4-ii-B
+      label: "164.308(a)(4)(ii)(B)"
+      prose: >-
+        Access Authorization (Addressable). Implement policies and procedures for
+        granting access to electronic protected health information, for example through
+        access to a workstation, transaction, program, process, or other mechanism.
+    - id: 164.308-a4-ii-C
+      label: "164.308(a)(4)(ii)(C)"
+      prose: >-
+        Access Establishment and Modification (Addressable). Implement policies and
+        procedures that, based upon the entity's access authorization policies,
+        establish, document, review, and modify a user's right of access to a workstation,
+        transaction, program, or process.
+
+guidance:
+  prose: >-
+    Information Access Management operationalizes the principle of minimum necessary
+    access to ePHI. Organizations must define role-based access profiles that align with
+    job functions and limit access to only the ePHI necessary for each role. Access
+    authorization policies should define who can approve access requests, what levels of
+    access are available, and how access changes are documented. Access must be reviewed
+    periodically and modified when job responsibilities change. The isolating health care
+    clearinghouse function requirement is specifically for clearinghouses operating within
+    larger organizations, ensuring that ePHI is logically or physically separated from the
+    larger entity's systems. Access establishment must include a formal request and approval
+    workflow with documented justification.
+
+references:
+  - citation: "45 CFR 164.308(a)(4)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.308"
+  - citation: "45 CFR 164.514(d) - Minimum Necessary Standard"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-E/section-164.514"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) with granular roles mapped to
+      minimum necessary ePHI access. Use Kubernetes namespaces and network policies to
+      isolate ePHI workloads from non-ePHI workloads. Implement attribute-based access
+      control (ABAC) where roles alone are insufficient (e.g., department-specific PHI
+      access). Deploy centralized access management through the IdP with automated
+      provisioning workflows. Use data classification labels to tag ePHI at the
+      infrastructure level and enforce access policies based on classification. Implement
+      API gateways with access control policies that enforce minimum necessary at the
+      data field level.
+    tools:
+      - keycloak
+      - okta
+      - kubernetes-rbac
+      - opa
+      - kong
+      - aws-iam
+      - azure-rbac
+      - vault
+
+  devsecops:
+    prose: >-
+      Implement access control testing in CI/CD pipelines that validate RBAC
+      configurations before deployment. Enforce that access control policies are
+      defined as code and reviewed through merge requests with security team approval.
+      Test minimum necessary access patterns by running automated authorization tests
+      that verify users can only access ePHI appropriate to their role. Include access
+      control regression tests in the test suite for applications handling ePHI.
+      Implement data masking in non-production environments to prevent unnecessary
+      ePHI exposure.
+    tools:
+      - gitlab-ci
+      - conftest
+      - opa
+      - terraform
+      - data-masking-tools
+
+  secops:
+    prose: >-
+      Monitor access authorization workflows for compliance with established policies.
+      Detect unauthorized access to ePHI and alert the security team. Conduct quarterly
+      access reviews with department managers to verify that access levels remain
+      appropriate. Track access modification requests from initiation through
+      completion, ensuring documentation at each step. Monitor for excessive data
+      access that may violate the minimum necessary principle. Generate compliance
+      reports showing access authorization compliance rates.
+    tools:
+      - sailpoint
+      - saviynt
+      - splunk
+      - elastic-siem
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "AC-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A8.2", "A8.3"]
+    relationship: supports

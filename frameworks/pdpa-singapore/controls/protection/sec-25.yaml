@@ -1,0 +1,113 @@
+id: sec-25
+family: protection
+title: "Retention Limitation Obligation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) An organisation shall not retain personal data, or a document containing
+    personal data, for any purpose, after the purpose for which the personal data
+    was collected is no longer being served by the retention of the personal data,
+    and the retention is no longer necessary for any legal or business purpose.
+
+    (2) Where an organisation no longer retains the personal data or the document
+    containing the personal data for any purpose referred to in subsection (1), the
+    organisation shall —
+    (a) in the case of personal data in electronic form, delete the personal data or
+    anonymise the personal data; or
+    (b) in the case of personal data in any other form, destroy the document or
+    anonymise the personal data contained in the document.
+
+guidance:
+  prose: |
+    Section 25 establishes a two-part retention limitation obligation:
+
+    1. **Retention limit:** Organizations must not keep personal data beyond the
+       point where it serves its original collection purpose AND there is no legal
+       or business necessity for continued retention.
+
+    2. **Disposal obligation:** Once retention is no longer justified, electronic
+       personal data must be deleted or anonymized, and physical documents must be
+       destroyed or anonymized.
+
+    Key considerations:
+
+    - "Legal purpose" includes retention required by other laws (e.g., tax records,
+      employment records, anti-money laundering records).
+    - "Business purpose" must be legitimate and documented — speculative future use
+      is not sufficient.
+    - Anonymization is an acceptable alternative to deletion, but must be irreversible.
+    - The PDPC expects organizations to have documented retention policies with
+      specific retention periods for each category of personal data.
+
+    This obligation applies to ALL copies of the data, including backups, caches,
+    logs, and data held by data intermediaries.
+
+references:
+  - citation: "PDPA 2012, Section 25"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a data retention policy engine that automatically enforces
+         retention periods based on data category, collection purpose, and applicable
+         legal requirements.
+      2. Build automated data lifecycle management — data expiration triggers
+         deletion or anonymization workflows at the end of the retention period.
+      3. Implement secure deletion procedures that ensure data is irrecoverable,
+         including from backups, caches, and logs.
+      4. Deploy anonymization pipelines using k-anonymity, differential privacy, or
+         data masking for data that needs to be retained in non-identifiable form.
+      5. Create a retention schedule registry that documents the retention period,
+         legal basis, and disposal method for each data category.
+      6. Implement cascade deletion across all data stores — when a primary record
+         is deleted, all related copies are also deleted.
+    tools:
+      - data-lifecycle-management
+      - retention-engine
+      - backstage
+      - anonymization-engine
+      - opa
+
+  devsecops:
+    prose: |
+      1. Implement automated tests validating that retention policies are enforced
+         correctly — data past its retention period is deleted or anonymized.
+      2. Scan for orphaned personal data in databases, logs, and caches that may
+         have been missed by retention enforcement.
+      3. Validate secure deletion — verify that deleted data is not recoverable from
+         databases, file systems, or backups.
+      4. Test anonymization effectiveness — verify that anonymized data cannot be
+         re-identified.
+    tools:
+      - gitlab-ci
+      - data-validation
+      - anonymization-testing
+      - secure-deletion-verification
+
+  secops:
+    prose: |
+      1. Audit retention policy compliance quarterly — verify that data past its
+         retention period has been deleted or anonymized.
+      2. Monitor for data retention violations — personal data retained beyond
+         approved retention periods.
+      3. Track deletion and anonymization activities for compliance reporting.
+      4. Verify that data intermediaries also comply with retention limitations.
+    tools:
+      - compliance-dashboard
+      - data-discovery
+      - siem
+      - retention-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5", "art-17"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.4.7"]
+    relationship: supports

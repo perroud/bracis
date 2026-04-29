@@ -1,0 +1,105 @@
+id: art-9
+family: cap-3
+title: "Criptografia de Dados"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 9. Os órgãos e entidades devem exigir que os provedores de serviços de
+    computação em nuvem implementem criptografia para proteção dos dados:
+    I - em repouso (at rest): todos os dados armazenados devem ser criptografados
+    com algoritmos e tamanhos de chave compatíveis com as recomendações do
+    Gabinete de Segurança Institucional;
+    II - em trânsito (in transit): todas as comunicações devem utilizar protocolos
+    criptográficos seguros, com versão mínima TLS 1.2;
+    III - em processamento (in use): quando disponível, utilizar tecnologias de
+    computação confidencial para proteção de dados durante o processamento.
+
+    Parágrafo único. As chaves criptográficas utilizadas para proteção de dados
+    classificados ou pessoais devem, preferencialmente, ser gerenciadas pelo
+    órgão ou entidade contratante (Bring Your Own Key - BYOK) ou, quando
+    possível, mantidas pelo órgão (Hold Your Own Key - HYOK).
+guidance:
+  prose: |
+    O art. 9 estabelece requisitos de criptografia em tres estados do dado,
+    acompanhando tendencia internacional de protecao completa do ciclo de vida.
+
+    **Tres estados de protecao:**
+    1. At rest: AES-256 (minimo), chaves rotacionadas periodicamente
+    2. In transit: TLS 1.2+ (minimo), preferencialmente TLS 1.3
+    3. In use: computacao confidencial (Intel SGX, AMD SEV, ARM TrustZone)
+
+    **Gestao de chaves (BYOK/HYOK):**
+    - BYOK: orgao gera e importa chaves para o provedor de nuvem
+    - HYOK: orgao mantem chaves em HSM proprio, provedor nunca ve a chave
+    - HYOK e mais seguro mas limita funcionalidades do provedor
+
+    **Mapeamento CSA CCM v4:**
+    - CEK-01: Encryption and Key Management Entitlement
+    - CEK-02: Encryption and Key Management Roles and Responsibilities
+    - CEK-03: Data Encryption
+    - CEK-04: Encryption Algorithm
+
+    **Mapeamento NIST SP 800-53:**
+    - SC-13: Cryptographic Protection
+    - SC-28: Protection of Information at Rest
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de criptografia:**
+      1. Habilitar criptografia at rest padrao em todos os servicos de armazenamento
+         (S3, EBS, RDS, Azure Storage, GCS) com AES-256.
+      2. Configurar TLS 1.3 em todos os endpoints, load balancers e API gateways.
+         Desabilitar TLS 1.0 e 1.1.
+      3. Implementar BYOK usando AWS KMS Custom Key Store, Azure Key Vault com
+         HSM, ou Google Cloud External Key Manager.
+      4. Para dados classificados: implementar HYOK com HSM on-premises (Thales
+         Luna, Entrust nShield) integrado ao provedor de nuvem.
+      5. Avaliar computacao confidencial para workloads sensiveis: AWS Nitro
+         Enclaves, Azure Confidential Computing, GCP Confidential VMs.
+    tools:
+      - kms
+      - hsm
+      - tls-configuration
+      - confidential-computing
+      - byok-management
+  devsecops:
+    prose: |
+      **Validacao de criptografia no pipeline:**
+      1. Scan de configuracao que verifique criptografia at rest habilitada em
+         todos os recursos de armazenamento.
+      2. Testes de TLS que verifiquem versao minima 1.2, cipher suites seguros
+         e certificados validos.
+      3. Deteccao de credenciais e chaves hardcoded em codigo fonte.
+      4. Validacao de que politicas de IaC exijam criptografia em todos os
+         recursos de armazenamento.
+      5. Teste de rotacao de chaves criptograficas.
+    tools:
+      - gitlab-ci
+      - tls-scanner
+      - secret-detection
+      - iac-scanner
+      - kms-policy-validator
+  secops:
+    prose: |
+      **Monitoramento de criptografia:**
+      1. Monitoramento continuo de configuracao de criptografia via CSPM.
+      2. Alertas para recursos sem criptografia at rest ou com TLS desatualizado.
+      3. Auditoria trimestral de inventario de chaves criptograficas.
+      4. Rotacao programada de chaves conforme politica do orgao.
+      5. Monitoramento de expiracoes de certificados TLS.
+    tools:
+      - cspm
+      - certificate-manager
+      - kms-audit
+      - siem
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-10"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: csa-ccm-v4
+    articles: ["CEK-01", "CEK-02", "CEK-03", "CEK-04"]
+    relationship: mapped

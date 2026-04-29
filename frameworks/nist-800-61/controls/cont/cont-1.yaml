@@ -1,0 +1,86 @@
+id: cont-1
+family: cont
+title: "Containment Strategy Selection"
+class: NIST-800-61
+
+statement:
+  prose: >-
+    Organizations should develop and document containment strategies for each major incident
+    type. Containment strategies should be selected based on criteria including the potential
+    for damage and theft of resources, the need for evidence preservation, service availability
+    requirements, the time and resources needed to implement the strategy, the effectiveness
+    of the strategy, and the duration of the containment solution. Organizations should have
+    pre-approved containment strategies that can be executed rapidly without requiring
+    management approval for each action, while ensuring that containment actions do not
+    cause additional damage or alert the attacker to the response effort.
+
+guidance:
+  prose: >-
+    Containment is a critical phase because it prevents the incident from causing further
+    damage while the response team prepares for eradication and recovery. NIST SP 800-61
+    Rev 3 emphasizes that containment strategies should be developed in advance for each
+    incident category, as waiting to develop a strategy during an active incident wastes
+    valuable time. Organizations must balance the need for rapid containment against the
+    potential for containment actions to cause additional disruption. For example, isolating
+    a compromised server may contain the threat but also disrupts business operations.
+    Evidence preservation should be considered before containment actions that may destroy
+    volatile data. Short-term containment focuses on limiting immediate damage, while
+    long-term containment provides a stable environment for eradication planning.
+
+references:
+  - citation: "NIST SP 800-61 Rev 3, Section 4.1"
+    url: "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated containment capabilities including network isolation through
+      network policies, pod termination and rescheduling, service mesh traffic blocking,
+      and DNS sinkholing. Pre-define containment playbooks that can be executed automatically
+      or with minimal human intervention. Implement circuit breaker patterns in service
+      meshes that can isolate compromised services. Deploy microsegmentation that limits
+      blast radius of compromised workloads. Maintain the ability to snapshot running
+      workloads for forensic preservation before containment actions are taken.
+    tools:
+      - "Kubernetes NetworkPolicy / Cilium (network isolation)"
+      - "Istio / Linkerd (service mesh circuit breakers)"
+      - "Falco + Response Engine (automated containment)"
+      - "Velero (pre-containment snapshots)"
+      - "DNS sinkholing tools"
+  devsecops:
+    prose: >-
+      Implement automated rollback capabilities in CI/CD pipelines that can revert
+      deployments to known-good states. Maintain the ability to disable feature flags
+      and circuit breakers that can isolate compromised functionality without full
+      service disruption. Document containment procedures in runbooks stored alongside
+      application code. Implement branch protection and access controls that can be
+      tightened during active incidents to prevent attacker persistence in code
+      repositories.
+    tools:
+      - "GitLab CI/CD (automated rollback)"
+      - "Feature flag platforms (LaunchDarkly, Unleash)"
+      - "GitLab Protected Branches (access tightening)"
+      - "ArgoCD / Flux (GitOps rollback)"
+  secops:
+    prose: >-
+      Develop pre-approved containment strategies for each incident category documented
+      in response playbooks. Implement network containment capabilities including firewall
+      rule updates, VLAN isolation, and DNS blackholing. Deploy endpoint containment through
+      EDR tools that can isolate hosts from the network while maintaining management
+      connectivity. Implement account containment procedures including password resets,
+      session termination, and MFA enforcement. Ensure containment actions are logged and
+      documented for post-incident review.
+    tools:
+      - "EDR (CrowdStrike, SentinelOne — host isolation)"
+      - "Firewall management (Panorama, FortiManager)"
+      - "SOAR (automated containment playbooks)"
+      - "Active Directory (account containment)"
+      - "NAC (network access control)"
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["RS.MI-01", "RS.MI-02"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4"]
+    relationship: complements

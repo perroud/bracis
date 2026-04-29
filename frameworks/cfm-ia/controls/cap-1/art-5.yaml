@@ -1,0 +1,125 @@
+id: art-5
+family: cap-1
+title: "Vedacoes e Limites de Uso de IA na Medicina"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 5. É vedado o uso de sistemas de inteligência artificial na medicina
+    para:
+
+    I - substituir integralmente o julgamento clínico do médico em decisões
+    diagnósticas ou terapêuticas;
+
+    II - tomar decisões autônomas sobre início, alteração ou suspensão de
+    tratamento sem validação prévia por médico habilitado;
+
+    III - realizar triagem definitiva de pacientes em contexto de urgência
+    ou emergência sem supervisão médica presencial ou remota em tempo real;
+
+    IV - selecionar ou priorizar pacientes para acesso a tratamentos com
+    base em critérios discriminatórios, incluindo critérios econômicos não
+    relacionados a indicação clínica;
+
+    V - processar dados clínicos de pacientes para finalidades distintas
+    daquelas consentidas, incluindo comercialização de dados de saúde ou
+    perfilamento para fins não clínicos.
+
+    Parágrafo único. Sistemas de IA em fase experimental somente poderão
+    ser utilizados em atividades médicas no âmbito de pesquisas clínicas
+    aprovadas por Comitê de Ética em Pesquisa (CEP) e pela Comissão Nacional
+    de Ética em Pesquisa (CONEP), quando aplicável.
+guidance:
+  prose: |
+    O art. 5 estabelece limites absolutos que nenhum sistema de IA pode
+    ultrapassar, independentemente de sua precisao ou sofisticacao tecnica.
+
+    **Analise das vedacoes:**
+
+    - Inciso I: proibe IA totalmente autonoma na medicina. Mesmo que um
+      modelo tenha acuracia superior a do medico medio, a decisao final
+      deve ser humana. Isso se aplica a radiologia, patologia e qualquer
+      especialidade.
+
+    - Inciso II: impede que sistemas de IA ajustem tratamentos (ex: dose
+      de insulina, quimioterapia) sem validacao medica. Sistemas de
+      closed-loop (ex: bombas de insulina com IA) devem ter medico
+      supervisionando parametros e limiares.
+
+    - Inciso III: em urgencia/emergencia, a IA pode auxiliar triagem, mas
+      um medico deve estar presente (presencial ou tele) para validar em
+      tempo real. Triagem "autonoma" por IA em pronto-socorro e vedada.
+
+    - Inciso IV: proibe algoritmos de racionamento de saude baseados em
+      fatores discriminatorios. Modelos de priorizacao devem usar apenas
+      criterios clinicos objetivos.
+
+    - Inciso V: proibe desvio de finalidade dos dados. Dados coletados para
+      diagnostico nao podem ser usados para marketing, venda de insights
+      ou perfilamento comercial sem consentimento especifico.
+
+    **Pesquisa clinica (paragrafo unico):** sistemas experimentais de IA
+    so podem ser usados em pacientes dentro de protocolos aprovados por
+    CEP/CONEP, seguindo as normas da Resolucao CNS 466/2012.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles tecnicos de vedacoes:**
+      1. Implementar guardrails arquiteturais que impecam modelos de IA
+         de executar acoes autonomas sem validacao humana: toda saida
+         de modelo deve passar por camada de aprovacao medica.
+      2. Configurar circuit breakers em sistemas de monitoramento continuo
+         que exijam confirmacao medica antes de qualquer acao automatica
+         sobre tratamento do paciente.
+      3. Implementar controle de acesso granular a dados clinicos com
+         finalidade documentada (purpose limitation), bloqueando uso de
+         dados para fins nao autorizados.
+      4. Segregar ambientes de pesquisa clinica (sandbox) dos ambientes
+         de producao, com controles de acesso e auditoria distintos.
+    tools:
+      - api-gateway
+      - circuit-breaker
+      - access-control
+      - data-governance
+      - sandbox-environment
+  devsecops:
+    prose: |
+      **Validacoes de vedacoes no pipeline:**
+      1. Implementar testes automatizados que verifiquem que nenhum
+         endpoint de modelo retorna decisao sem campo de validacao
+         medica obrigatorio (human-in-the-loop enforcement).
+      2. Bloquear deploy de modelos classificados como "autonomos"
+         sem evidencia de supervisao humana no fluxo.
+      3. Implementar analise estatica de codigo que detecte padroes
+         de decisao autonoma (ex: chamadas diretas a APIs de prescricao
+         sem gate de aprovacao medica).
+      4. Validar no pipeline que dados de treinamento possuem
+         consentimento documentado para a finalidade especifica do modelo.
+    tools:
+      - gitlab-ci
+      - static-analysis
+      - consent-validation
+      - architecture-tests
+  secops:
+    prose: |
+      **Monitoramento operacional de vedacoes:**
+      1. Implementar monitoramento em tempo real que detecte tentativas
+         de uso autonomo de IA (decisoes sem validacao medica registrada).
+      2. Criar alertas para acesso a dados clinicos por sistemas ou
+         usuarios fora do escopo de finalidade autorizada.
+      3. Auditar trimestralmente todos os fluxos de dados de IA medica
+         para verificar aderencia ao consentimento do paciente.
+      4. Manter registro de todas as pesquisas clinicas com IA em
+         andamento, com referencia cruzada a aprovacao CEP/CONEP.
+    tools:
+      - siem
+      - data-loss-prevention
+      - audit-tools
+      - research-registry
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-5", "art-14"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-16"]
+    relationship: complements

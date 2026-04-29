@@ -1,0 +1,125 @@
+id: nist-63-fal3
+family: federation
+title: "FAL3 — Holder-of-Key Assertions"
+class: SP800-63C
+
+baselines: [fal3]
+
+statement:
+  prose: >-
+    At FAL3, in addition to the requirements of FAL1 and FAL2, the subscriber
+    SHALL present proof of possession of a cryptographic key referenced in
+    the assertion in addition to the assertion artifact itself. The key
+    presented by the subscriber SHALL be cryptographically bound to the assertion
+    by the IdP at assertion issuance time. The RP SHALL verify the subscriber's
+    proof of possession of the key before accepting the identity information in
+    the assertion. The binding SHALL be done in such a way that the subscriber
+    cannot present the key binding from one session to another and the RP can
+    verify that the same subscriber who received the assertion from the IdP is
+    presenting the assertion to the RP. FAL3 provides protection against
+    assertion theft because a stolen assertion cannot be used by an adversary
+    who does not also possess the subscriber's cryptographic key.
+
+guidance:
+  prose: >-
+    FAL3 is the highest federation assurance level and implements the holder-of-key
+    (HoK) binding model, also known as proof-of-possession or bound tokens. Unlike
+    bearer tokens (FAL1/FAL2), FAL3 tokens are bound to a specific cryptographic
+    key held by the subscriber, so a stolen token is useless without the
+    corresponding private key. In OIDC, FAL3 is implemented using DPoP (Demonstrating
+    Proof of Possession) per RFC 9449, or mTLS certificate-bound tokens per RFC 8705.
+    In SAML, the HoK subject confirmation method implements the equivalent binding.
+    DPoP works by having the client generate an ephemeral key pair for each
+    session, including the public key in the token request, receiving a DPoP-bound
+    access token, and then presenting a DPoP proof (a signed JWT containing the
+    HTTP method, URL, and timestamp) on every API call. The RP validates the DPoP
+    proof signature against the public key embedded in the token. FAL3 is appropriate
+    for the highest-value federal transactions such as access to classified systems,
+    financial authorization above defined thresholds, and healthcare systems with
+    highly sensitive patient data.
+
+references:
+  - citation: "NIST SP 800-63C Section 4.3 — Federation Assurance Level 3"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "RFC 9449 — OAuth 2.0 Demonstrating Proof of Possession (DPoP)"
+    url: "https://datatracker.ietf.org/doc/html/rfc9449"
+  - citation: "RFC 8705 — OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"
+    url: "https://datatracker.ietf.org/doc/html/rfc8705"
+  - citation: "OASIS SAML 2.0 Holder-of-Key Web Browser SSO Profile"
+    url: "https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-holder-of-key-browser-sso.pdf"
+
+related_controls:
+  - id: nist-63-fal2
+    relationship: extends
+    description: "FAL3 adds holder-of-key binding to all FAL2 requirements."
+  - id: nist-63-aal3
+    relationship: complements
+    description: "FAL3 is typically paired with AAL3 for the highest-assurance federated transactions."
+  - id: nist-63-assertions
+    relationship: implements
+    description: "Holder-of-key binding is an advanced assertion requirement implemented at FAL3."
+  - id: nist-63-oidc-saml
+    relationship: implements
+    description: "DPoP (OIDC) and SAML HoK provide the FAL3 binding mechanism in respective protocols."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement DPoP (RFC 9449) in the authorization server and all API
+      gateways for FAL3 federated sessions. The client (subscriber's browser
+      or native app) generates an ephemeral key pair (P-256 or RSA 2048) at
+      session start. The authorization request includes the DPoP public key
+      in the dpop_jkt parameter, binding it to the authorization code. At
+      token issuance, the authorization server embeds the cnf/jkt claim in
+      the access token, containing the SHA-256 thumbprint of the DPoP public
+      key. The client presents a DPoP proof JWT on every API call, signed with
+      the ephemeral private key. The API gateway validates the DPoP proof:
+      (1) signature over the htm (HTTP method), htu (HTTP URL), and iat,
+      (2) matching cnf/jkt in the access token, and (3) nonce freshness to
+      prevent replay. For mTLS-bound tokens, configure the gateway to require
+      client certificate presentation and validate the certificate thumbprint
+      against the cnf/x5t#S256 claim in the token.
+    tools:
+      - keycloak
+      - okta
+      - envoy
+      - nginx
+      - vault
+
+  devsecops:
+    prose: >-
+      Build integration tests for DPoP validation: attempt to use a DPoP-bound
+      access token without a DPoP proof header and confirm rejection. Test
+      that a DPoP proof signed with a key that does not match the cnf/jkt
+      in the token is rejected. Validate DPoP nonce replay prevention: submit
+      the same DPoP proof twice and confirm the second is rejected. Test the
+      mTLS path: attempt to use a certificate-bound token with a different
+      client certificate and confirm rejection. Include DPoP key rotation
+      tests: after session key regeneration, old DPoP proofs must be rejected
+      and new proofs with the new key accepted. Integrate DPoP library
+      version updates into the dependency scanning pipeline.
+    tools:
+      - gitlab-ci
+      - pytest
+      - playwright
+      - trivy
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor FAL3 DPoP proof validation events for replay attempts and
+      key mismatch errors. Alert on high rates of DPoP proof rejection,
+      which may indicate client implementation issues or active token theft
+      attempts. Monitor the authorization server's ephemeral key registration
+      events to detect anomalous key generation patterns. For mTLS-bound
+      tokens, monitor certificate expiration and alert on use of expired
+      client certificates. Conduct adversarial testing of the DPoP
+      implementation to confirm that stolen access tokens cannot be used
+      without the corresponding ephemeral private key. Document FAL3
+      enforcement as evidence for compliance audits requiring the highest
+      federation assurance level.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - pagerduty

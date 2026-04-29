@@ -1,0 +1,133 @@
+id: udi-1
+family: udi
+title: "Unique Device Identification System"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    The UDI system shall comprise the following: (a) production of a UDI
+    that comprises the following: (i) a UDI device identifier ('UDI-DI')
+    specific to a manufacturer and a device, providing access to the
+    information laid down in Part B of Annex VI, (ii) a UDI production
+    identifier ('UDI-PI') that identifies the unit of device production
+    and if applicable the packaged devices, as specified in Part C of
+    Annex VI; (b) placing of the UDI on the label of the device or on
+    its packaging; (c) storage of the UDI by economic operators,
+    health institutions and healthcare professionals, in accordance with
+    the conditions laid down in paragraphs 8 and 9; (d) establishment of
+    an electronic system for unique device identification (the 'UDI
+    database') in accordance with Article 28.
+
+    The manufacturer shall assign a UDI to the device and to all higher
+    levels of packaging. The UDI-DI of any higher level of packaging
+    shall identify that packaging but shall not serve as a replacement
+    for the UDI-DI of the device.
+
+    For software, the UDI-DI shall be the software identification. The
+    UDI-PI shall identify the software version. For software which is
+    downloaded and not delivered on physical media, only the UDI-DI shall
+    be required on the label while both the UDI-DI and UDI-PI shall
+    appear in the software itself.
+guidance:
+  prose: |
+    Articles 27–29 and Annex VI establish the UDI system requirements.
+    For software medical devices, UDI implementation has specific
+    considerations:
+
+    - The UDI-DI identifies the software product (unique per product
+      per manufacturer).
+    - The UDI-PI corresponds to the software version number.
+    - For downloadable software (SaMD), the UDI must appear within
+      the software itself (e.g., in the about screen, settings page,
+      or API metadata).
+    - Each major software version change requires a new UDI-PI.
+    - The UDI must be registered in the EUDAMED database.
+
+    UDI implementation timeline under EU MDR:
+    - Class III and implantable devices: from date of application.
+    - Class IIa and IIb: May 2025 (with extensions granted).
+    - Class I: May 2027 (with extensions granted).
+
+    For SaMD, the UDI system enables:
+    - Traceability of software versions across healthcare facilities.
+    - Rapid identification of affected installations during recalls.
+    - Post-market surveillance data correlation by device version.
+    - Supply chain transparency for distributors and importers.
+references:
+  - citation: "EU MDR 2017/745, Articles 27–29, Annex VI"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+  - citation: "MDCG 2018-5 — UDI assignment to medical device software"
+    url: "https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2018_5_udi_sn_en_0.pdf"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement UDI generation as part of the software build pipeline,
+         automatically assigning the UDI-DI (static, per product) and
+         UDI-PI (dynamic, derived from semantic version) to each build
+         artifact.
+      2. Embed the UDI (UDI-DI + UDI-PI) in the software binary
+         metadata, user-facing interface (about screen), API response
+         headers, and deployment manifests.
+      3. Configure a UDI registry integration that automatically
+         submits or updates UDI data in EUDAMED (or the designated
+         issuing entity database: GS1, HIBCC, or ICCBBA) when a new
+         software version is released.
+      4. Implement deployment tracking that records which UDI-PI
+         (software version) is deployed at each customer site,
+         enabling rapid identification of affected installations
+         during field safety corrective actions.
+    tools:
+      - gitlab-ci
+      - artifact-registry
+      - eudamed-integration
+      - deployment-tracking
+      - udi-generator
+  devsecops:
+    prose: |
+      1. Automate UDI embedding in the CI/CD pipeline: the build
+         process must inject the UDI-DI and UDI-PI into the
+         application binary, container image labels, and deployment
+         descriptors without manual intervention.
+      2. Implement pipeline validation checks that verify UDI presence
+         and format compliance in built artifacts before release,
+         blocking releases that lack valid UDI identifiers.
+      3. Configure SBOM generation that associates the UDI with the
+         complete software bill of materials, enabling traceability
+         from UDI to every third-party component included in the
+         release.
+      4. Implement automated testing that verifies the UDI displayed
+         in the user interface and API metadata matches the build-time
+         UDI assignment.
+    tools:
+      - gitlab-ci
+      - container-labels
+      - sbom-tooling
+      - udi-validation
+      - automated-testing
+  secops:
+    prose: |
+      1. Maintain a UDI assignment procedure documenting how UDI-DI
+         values are assigned, how UDI-PI values are derived from
+         software versions, and the process for updating UDI records
+         when versions change.
+      2. Register all UDI data in EUDAMED, including device description,
+         intended purpose, risk class, MDD/MDR status, notified body,
+         and all applicable UDI-DI/UDI-PI combinations.
+      3. Implement UDI traceability records that enable identification
+         of all deployment locations for any given UDI-PI, supporting
+         recall effectiveness verification.
+      4. Conduct periodic UDI data quality audits to verify that
+         EUDAMED records are accurate, complete, and up to date for
+         all marketed software versions.
+    tools:
+      - eudamed
+      - udi-management
+      - traceability-system
+      - audit-management
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-19"]
+    relationship: mapped
+  - framework_id: fda-21-cfr-11
+    articles: ["11.10"]
+    relationship: mapped

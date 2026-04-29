@@ -1,0 +1,89 @@
+id: cont-2
+family: cont
+title: "Evidence Collection and Handling"
+class: NIST-800-61
+
+statement:
+  prose: >-
+    Organizations should collect and preserve evidence during incident response in a manner
+    that supports potential legal or disciplinary actions and enables thorough post-incident
+    analysis. Evidence collection should follow established forensic procedures including
+    maintaining a chain of custody, using forensically sound collection methods, documenting
+    the collection process, and storing evidence securely. Organizations should identify the
+    types of evidence that may be relevant to different incident types and establish procedures
+    for collecting volatile and non-volatile data. Evidence retention policies should comply
+    with applicable legal and regulatory requirements.
+
+guidance:
+  prose: >-
+    Evidence collection during incident response serves multiple purposes: it supports
+    analysis of the incident, enables reconstruction of the attack timeline, may be needed
+    for legal proceedings, and supports organizational learning. NIST SP 800-61 Rev 3
+    emphasizes the importance of collecting evidence early in the response process before
+    volatile data is lost. The order of volatility should guide collection priorities: CPU
+    registers and cache, routing tables, ARP cache, process table, kernel statistics, main
+    memory, temporary file systems, disk data, remote logging and monitoring data, and
+    physical configurations. Organizations operating in cloud environments face additional
+    challenges related to evidence collection from shared infrastructure and ephemeral
+    resources. Chain of custody documentation should record who collected the evidence,
+    when, how, and where it has been stored.
+
+references:
+  - citation: "NIST SP 800-61 Rev 3, Section 4.2"
+    url: "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+  - citation: "NIST SP 800-86, Guide to Integrating Forensic Techniques into Incident Response"
+    url: "https://csrc.nist.gov/pubs/sp/800/86/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated evidence collection that captures container state, pod logs,
+      network flows, and system snapshots before containment actions are taken. Configure
+      immutable logging with write-once storage (S3 Object Lock, GCS retention policies)
+      that prevents evidence tampering. Deploy disk and memory snapshot capabilities for
+      virtual machines and containers. Implement centralized audit logging that records
+      all administrative actions. Ensure timestamp consistency across all systems using
+      NTP synchronization. Maintain forensic tooling as pre-built container images for
+      rapid deployment.
+    tools:
+      - "Velero (cluster state snapshots)"
+      - "S3 Object Lock / GCS retention (immutable storage)"
+      - "Kubernetes audit logging"
+      - "Falco + sysdig (system call capture)"
+      - "Packet capture tools (tcpdump, Wireshark)"
+  devsecops:
+    prose: >-
+      Ensure CI/CD pipeline logs are retained in immutable storage for forensic analysis.
+      Implement Git repository audit logging that captures all operations including pushes,
+      merges, and access changes. Maintain artifact repositories with retention policies
+      that preserve build artifacts needed for forensic analysis. Implement signing and
+      verification of build artifacts to detect tampering. Document evidence collection
+      procedures for software supply chain incidents.
+    tools:
+      - "GitLab Audit Events"
+      - "Container Registry (artifact retention)"
+      - "Sigstore / Cosign (artifact signing)"
+      - "GitLab CI/CD job logs"
+  secops:
+    prose: >-
+      Establish forensic evidence collection procedures that follow industry standards
+      and legal requirements. Deploy forensic collection tools that create forensically
+      sound disk images, memory dumps, and network captures. Implement chain of custody
+      tracking using evidence management tools. Train incident responders in forensic
+      evidence handling procedures. Establish relationships with digital forensics firms
+      for complex investigations. Implement evidence storage with access controls, integrity
+      verification, and retention management.
+    tools:
+      - "Velociraptor (endpoint forensics)"
+      - "FTK Imager / dd (disk imaging)"
+      - "Volatility / Rekall (memory forensics)"
+      - "Wireshark / Zeek (network forensics)"
+      - "Evidence management platforms"
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["RS.AN-03"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "AU-11"]
+    relationship: complements

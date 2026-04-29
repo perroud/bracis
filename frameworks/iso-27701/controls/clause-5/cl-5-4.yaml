@@ -1,0 +1,113 @@
+id: cl-5.4
+family: clause-5
+title: "PIMS planning — PII risk assessment and treatment planning"
+class: ISO27701
+baselines: [pii-controller, pii-processor, combined]
+
+statement:
+  prose: >-
+    When planning for the PIMS, the organization shall determine the risks and
+    opportunities related to PII processing that need to be addressed to ensure
+    the PIMS can achieve its intended outcomes, prevent or reduce undesired effects
+    on PII principals, and achieve continual improvement. The organization shall plan
+    actions to address these risks and opportunities, how to integrate and implement
+    those actions into its PIMS processes, and how to evaluate the effectiveness of
+    those actions. The organization shall establish privacy-specific information security
+    objectives at relevant functions and levels, ensuring they are consistent with the
+    privacy policy, measurable, monitored, communicated, updated as appropriate, and
+    documented. The organization shall consider privacy risks to PII principals when
+    assessing information security risks, not only risks to the organization itself.
+
+guidance:
+  prose: >-
+    This clause extends ISO 27001 Clause 6 (Planning) with a critical privacy-specific
+    shift: risk assessment must consider risks to PII principals, not only organizational
+    risks. A data breach that is low-impact to the organization may be high-impact to
+    the individuals whose data is exposed. The risk assessment methodology must
+    incorporate privacy impact factors such as: volume of PII affected, sensitivity of
+    data categories, vulnerability of PII principal populations (children, patients,
+    employees), likelihood of re-identification, cross-border transfer implications,
+    and potential for discrimination or financial harm. Planning should result in a
+    privacy risk treatment plan that maps identified risks to specific controls from
+    Annex A (controllers) and/or Annex B (processors), with clear ownership, timelines,
+    and acceptance criteria. The organization must maintain a Statement of Applicability
+    that extends the ISO 27001 SoA to include Annex A and/or Annex B controls.
+
+references:
+  - citation: "ISO/IEC 27701:2019, Clause 5.4"
+    url: "https://www.iso.org/standard/71670.html"
+  - citation: "ISO/IEC 27001:2022, Clause 6"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a privacy risk registry as a platform service that integrates with the
+      PII processing inventory. Implement automated risk scoring that considers both
+      organizational and PII principal impact dimensions. Provide risk assessment
+      templates as self-service tooling for development teams, with pre-populated
+      threat scenarios based on the type of PII processing declared in their service
+      manifests. Integrate the risk registry with the infrastructure provisioning
+      pipeline so that services handling high-risk PII categories automatically receive
+      enhanced controls (encryption at rest, stricter access policies, additional
+      logging). Maintain machine-readable risk treatment plans in version control,
+      linked to specific infrastructure configurations and control implementations.
+      Implement dashboards showing risk treatment progress, residual risk levels,
+      and alignment with the Statement of Applicability.
+    tools:
+      - risk-registry-platform
+      - backstage-catalog
+      - open-policy-agent
+      - terraform
+      - grafana-dashboards
+
+  devsecops:
+    prose: >-
+      Integrate privacy risk assessment checkpoints into the development lifecycle.
+      Require a lightweight privacy risk assessment for every feature that introduces
+      or modifies PII processing, tracked as a merge request artifact. CI pipelines
+      should automatically evaluate whether changes introduce new PII processing
+      patterns that require updated risk assessments. Build pipeline gates that
+      block deployment of high-risk PII processing changes without an approved
+      risk treatment plan. Implement automated DPIA (Data Protection Impact Assessment)
+      triggers based on risk criteria defined in the PIMS, such as large-scale
+      processing, new technologies, or automated decision-making. Maintain risk
+      treatment evidence (test results, configuration validations, approval records)
+      as pipeline artifacts linked to specific deployments.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - risk-assessment-templates
+      - dpia-automation
+      - pipeline-approval-gates
+      - compliance-evidence-store
+
+  secops:
+    prose: >-
+      Implement continuous privacy risk monitoring using SIEM correlation rules
+      that detect materialization of identified risks. Map risk scenarios to
+      detection rules: unauthorized PII access, excessive data collection,
+      retention policy violations, cross-border transfer anomalies. Build
+      risk heat maps that update in real time based on security event telemetry.
+      Alert on risk indicator threshold breaches and trigger risk reassessment
+      workflows. Monitor the effectiveness of risk treatments by tracking
+      control performance metrics. Generate periodic risk posture reports
+      comparing current risk levels against risk appetite thresholds defined
+      in the PIMS.
+    tools:
+      - splunk
+      - elastic-siem
+      - risk-monitoring-dashboards
+      - soar-playbooks
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-24", "art-25", "art-35", "art-36"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-50"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.1"]
+    relationship: extends

@@ -1,0 +1,133 @@
+id: nist-63-biometrics
+family: identity-assurance
+title: "Biometric Collection and Use"
+class: SP800-63A
+
+baselines: [ial2, ial3, aal3]
+
+statement:
+  prose: >-
+    Biometrics shall only be used as part of identity proofing, authentication,
+    or recovery at the levels where they are required or permitted by NIST SP
+    800-63A and 800-63B. The CSP shall collect biometric samples only with the
+    applicant's knowledge and consent. Biometric comparison performed by the
+    CSP shall use systems certified to meet applicable presentation attack
+    detection (PAD) requirements. For IAL2, a certified biometric system with
+    a false match rate of 1 in 1,000 or better shall be used. For IAL3 and
+    AAL3, a false match rate of 1 in 100,000 or better shall be used. The
+    CSP shall implement liveness detection to distinguish live applicants from
+    presentation attacks using photographs, videos, or 3D masks. Biometric
+    samples shall be used only to generate biometric templates, which shall
+    be protected with cryptographic techniques. Raw biometric samples shall
+    be destroyed as soon as the template is generated unless required for
+    specific operational purposes, in which case retention must be disclosed
+    and consented to.
+
+guidance:
+  prose: >-
+    Biometrics in the 800-63 framework serve primarily as a binding mechanism
+    between a physical person and a digital credential — they do not replace
+    authenticators. NIST explicitly warns against using biometrics alone as
+    authentication factors due to permanence (you cannot revoke a compromised
+    fingerprint) and performance characteristics (False Accept Rates, False
+    Reject Rates). Organizations must evaluate the presentation attack detection
+    capability of their biometric solution against current attack vectors,
+    including deepfake-generated face images which present a significant
+    emerging threat to facial recognition-based proofing. The EU AI Act and
+    domestic privacy laws (BIPA in Illinois, CCPA/CPRA in California) impose
+    additional restrictions on biometric data collection beyond the NIST
+    requirements. Organizations must map applicable legal obligations onto
+    the technical implementation. Biometric templates must be protected using
+    irreversibility techniques (such as fuzzy extractors or cancellable
+    biometrics) so that a compromised template cannot be reversed to recover
+    the original biometric sample.
+
+references:
+  - citation: "NIST SP 800-63A Section 5.2.3 — Biometric Considerations"
+    url: "https://doi.org/10.6028/NIST.SP.800-63a"
+  - citation: "NIST SP 800-63B Section 5.2.3 — Use of Biometrics"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "ISO/IEC 30107-3 — Presentation Attack Detection"
+    url: "https://www.iso.org/standard/67381.html"
+  - citation: "NIST IR 8382 — Biometric Performance Testing"
+    url: "https://doi.org/10.6028/NIST.IR.8382"
+
+related_controls:
+  - id: nist-63-ial2
+    relationship: complements
+    description: "Biometric comparison may be used at IAL2 as the verification mechanism."
+  - id: nist-63-ial3
+    relationship: implements
+    description: "Biometric collection is mandatory at IAL3; this control defines the requirements."
+  - id: nist-63-aal3
+    relationship: complements
+    description: "AAL3 multi-factor crypto authenticators may incorporate biometrics as a local verification step."
+  - id: nist-63-privacy-proofing
+    relationship: implements
+    description: "Biometric collection requires explicit consent and a privacy notice under 800-63A privacy requirements."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate a biometric SDK or cloud service that is ISO/IEC 30107-3
+      certified for Presentation Attack Detection (PAD) Level 2 or higher.
+      Implement the biometric capture as an isolated service with a strict
+      API contract: accept the raw sample, generate the template, verify
+      against the reference template or identity document, return a match
+      result with confidence score, and immediately discard the raw sample.
+      Store biometric templates in a dedicated, access-controlled template
+      store with hardware encryption (HSM-backed keys). Implement cancellable
+      biometrics using a random transformation key so that compromised
+      templates can be invalidated without re-collection. Build liveness
+      detection into all remote biometric capture flows using active challenges
+      (blink, nod) combined with passive PAD algorithms. Log all biometric
+      comparison events (not the biometric data itself) with timestamps,
+      match scores, and session identifiers for audit purposes.
+    tools:
+      - aws-rekognition
+      - azure-face-api
+      - id.me
+      - socure
+      - vault
+      - hsm
+
+  devsecops:
+    prose: >-
+      Implement static analysis rules in CI/CD that prevent logging of raw
+      biometric data or full biometric templates. Validate that biometric
+      service containers do not write sample data to ephemeral storage or
+      share it across service boundaries. Include dependency scanning for
+      biometric SDK libraries with known vulnerabilities. Build integration
+      tests that verify the biometric service returns only match/no-match
+      results and confidence scores, never raw samples. Include in the
+      deployment pipeline a check that biometric template encryption keys
+      are stored in the approved HSM or KMS and not in application config.
+      Test that the biometric service correctly implements the consent-check
+      gate: any request without a valid consent record must be rejected.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - vault
+      - trivy
+      - open-policy-agent
+
+  secops:
+    prose: >-
+      Monitor the biometric service for anomalous usage patterns: high match
+      failure rates may indicate a spoofing campaign; unusually high success
+      rates may indicate a compromised comparison threshold. Alert on any
+      access to the biometric template store outside of the authorized
+      biometric service. Implement integrity monitoring on the biometric
+      service binary and configuration to detect tampering that could lower
+      match thresholds. Conduct quarterly audits of consent records to ensure
+      all stored biometric templates have associated valid consent. Monitor
+      for deepfake-enabled presentation attacks by reviewing PAD vendor
+      advisories and updating detection models. Establish an incident response
+      playbook specifically for biometric template compromise, including
+      immediate template invalidation, re-collection notification, and
+      regulatory reporting obligations.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - pagerduty

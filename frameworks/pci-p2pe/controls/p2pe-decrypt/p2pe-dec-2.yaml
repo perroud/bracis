@@ -1,0 +1,118 @@
+id: p2pe-dec-2
+family: p2pe-decrypt
+title: "HSM-Based Decryption Operations"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    Decryption of account data shall occur exclusively within a Hardware
+    Security Module (HSM) or Secure Cryptographic Device (SCD) that meets
+    PCI PTS HSM requirements or FIPS 140-2 Level 3 (or higher)
+    certification. Cleartext account data shall not exist outside the HSM
+    boundary except as necessary for immediate forwarding to the
+    authorization network. The HSM shall enforce access controls that
+    prevent extraction of decryption keys and shall log all cryptographic
+    operations. Dual control and split knowledge shall be enforced for all
+    HSM administrative functions.
+  parts:
+    - id: p2pe-dec-2.a
+      label: "Domain 3, 3C"
+      prose: >-
+        All decryption of P2PE-encrypted account data occurs within a
+        PCI PTS-approved HSM or FIPS 140-2 Level 3+ certified secure
+        cryptographic device.
+    - id: p2pe-dec-2.b
+      label: "Domain 3, 3D"
+      prose: >-
+        HSM administrative functions (key loading, configuration changes,
+        firmware updates) require dual control and split knowledge, and
+        all cryptographic operations are logged.
+
+guidance:
+  prose: >-
+    HSMs provide a tamper-resistant hardware boundary that protects
+    decryption keys and ensures decryption occurs in a controlled
+    environment. The PCI PTS HSM requirements define specific security
+    characteristics including tamper-evidence, tamper-response, key
+    management capabilities, and operational security. FIPS 140-2 Level 3
+    (or the newer FIPS 140-3) certification provides an equivalent
+    assurance level. The HSM must be configured so that cleartext output
+    is only available to the authorized application through a secure API,
+    and never exposed via management interfaces, debug ports, or
+    diagnostic outputs. Dual control means two or more people are required
+    for each sensitive operation; split knowledge means no single person
+    knows the complete key or password.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 3 — Decryption Environment"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI PTS HSM Security Requirements v4.0"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "FIPS 140-2 — Security Requirements for Cryptographic Modules"
+    url: "https://csrc.nist.gov/publications/detail/fips/140/2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy PCI PTS-approved HSMs (Thales PayShield, Futurex Vectera,
+      Utimaco) in the decryption environment with redundant units for high
+      availability. Configure HSM access controls so that only the
+      decryption application service account can invoke decrypt operations.
+      Implement HSM clustering for failover with synchronized key material.
+      Use cloud HSM services (AWS CloudHSM, Azure Dedicated HSM, GCP Cloud
+      HSM) only if they meet PCI PTS HSM or FIPS 140-2 Level 3
+      requirements. Automate HSM health monitoring and integrate with
+      infrastructure alerting.
+    tools:
+      - thales-payshield
+      - futurex-vectera
+      - utimaco-cryptoserver
+      - aws-cloudhsm
+      - azure-dedicated-hsm
+      - gcp-cloud-hsm
+
+  devsecops:
+    prose: >-
+      Enforce that decryption application code interacts with the HSM
+      exclusively through a defined API abstraction layer. Scan code for
+      any software-based decryption of payment data outside the HSM. Test
+      that the decryption application gracefully handles HSM failures
+      without exposing partial cleartext or key material. Include HSM
+      configuration validation in deployment pipelines to verify access
+      controls, logging settings, and firmware versions.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - hsm-configuration-validator
+      - integration-test-framework
+
+  secops:
+    prose: >-
+      Monitor HSM audit logs for unauthorized access attempts, failed
+      authentication, unexpected cryptographic operations, or administrative
+      actions. Alert on HSM tamper events or hardware faults. Track HSM
+      firmware versions and validate against vendor security advisories.
+      Conduct annual HSM security assessments including physical inspection,
+      access control review, and key ceremony audit. Maintain chain-of-
+      custody documentation for all HSM hardware.
+    tools:
+      - splunk
+      - elastic-siem
+      - hsm-syslog-integration
+      - nagios
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.5", "req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: pci-pin
+    articles: ["pin-crypto-2", "pin-crypto-3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-12(1)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports

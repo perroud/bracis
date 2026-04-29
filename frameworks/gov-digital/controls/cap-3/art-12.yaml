@@ -1,0 +1,108 @@
+id: art-12
+family: cap-3
+title: "Gov.br Digital Identity Platform"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 12. A identificação do cidadão para a prestação de serviços
+    públicos digitais será realizada preferencialmente por meio da base
+    de dados da plataforma de governo digital, que poderá utilizar as
+    seguintes fontes:
+    I — bases de dados de órgãos e entidades da administração pública
+    federal direta e indireta;
+    II — dados de identificação civil;
+    III — dados biométricos;
+    IV — outras bases de dados que possam contribuir para a identificação
+    do cidadão, incluídas aquelas mantidas pelo setor privado.
+
+    Parágrafo único. A identificação de que trata o caput será realizada
+    de forma a proteger os dados pessoais do cidadão, nos termos da
+    Lei nº 13.709, de 14 de agosto de 2018 (Lei Geral de Proteção de
+    Dados Pessoais).
+guidance:
+  prose: |
+    Article 12 establishes the gov.br platform as the primary identity
+    provider for all government digital services, defining four categories
+    of data sources for citizen identification.
+
+    **Identity data sources:**
+    - **Federal databases (I):** CPF (Receita Federal), CNIS (INSS),
+      voter registration (TSE), military service, CTPS digital
+    - **Civil identification data (II):** RG, birth/marriage certificates,
+      CNH (DENATRAN/SENATRAN)
+    - **Biometric data (III):** Fingerprints (TSE, DENATRAN), facial
+      recognition (gov.br app)
+    - **Private sector databases (IV):** Banking data (for identity
+      verification), credit bureau data, telecom subscriber data
+
+    **LGPD compliance requirement (sole paragraph):**
+    All identity verification must comply with LGPD. This means:
+    - Explicit legal basis for data processing (art. 7 or art. 11 LGPD)
+    - Data minimization — only request data necessary for the identity
+      verification level required
+    - Purpose limitation — identity data must not be used beyond
+      authentication
+    - Transparent processing — citizens must know which data sources
+      are being consulted
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Identity federation infrastructure:**
+      1. Implement an identity federation layer that integrates with the
+         gov.br identity platform as the primary identity provider (IdP)
+         for all government digital services.
+      2. Deploy OpenID Connect (OIDC) / OAuth 2.0 integration with the
+         gov.br login service, supporting all authentication levels.
+      3. Implement a data minimization layer that only requests identity
+         attributes required by the specific service, not the full
+         identity profile.
+      4. Deploy secure biometric verification infrastructure with
+         liveness detection for facial recognition and fingerprint
+         verification.
+      5. Implement identity proofing workflows that progressively
+         verify citizen identity through multiple data sources.
+    tools:
+      - govbr-oidc
+      - identity-federation
+      - biometric-service
+      - identity-proofing
+  devsecops:
+    prose: |
+      **Identity integration security pipeline:**
+      1. Implement automated tests for gov.br OIDC integration, verifying
+         correct token handling, scope management, and session lifecycle.
+      2. Add security scanning for identity-related code paths: token
+         validation, biometric data handling, and PII protection.
+      3. Validate LGPD compliance for identity data flows — ensure no
+         identity attributes are stored beyond what is explicitly needed.
+      4. Test identity data minimization: verify services only request
+         scopes matching their required authentication level.
+    tools:
+      - gitlab-ci
+      - oidc-testing
+      - pii-scanner
+      - scope-validator
+  secops:
+    prose: |
+      **Identity governance and LGPD compliance:**
+      1. Maintain an inventory of all identity data sources consumed by
+         government services with their legal basis under LGPD.
+      2. Monitor identity verification transactions for anomalies that
+         may indicate fraud or unauthorized access.
+      3. Audit identity data retention to ensure compliance with LGPD
+         data minimization and purpose limitation principles.
+      4. Track biometric data usage and ensure explicit consent or legal
+         basis exists for each biometric verification flow.
+    tools:
+      - identity-governance
+      - fraud-detection
+      - lgpd-audit
+      - biometric-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-46"]
+    relationship: complements
+  - framework_id: icp-brasil
+    articles: ["art-1"]
+    relationship: implements

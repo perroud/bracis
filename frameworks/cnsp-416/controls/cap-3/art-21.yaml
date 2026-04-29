@@ -1,0 +1,117 @@
+id: art-21
+family: cap-3
+title: "Gestao de Risco Operacional e Cibernetico"
+class: CNSP-416
+baselines: [todas-supervisionadas]
+statement:
+  prose: |
+    Art. 21. A EGR deve contemplar gestão específica do risco operacional, incluindo
+    o risco cibernético, o risco de modelos e o risco de conduta.
+
+    § 1. A gestão do risco operacional deve incluir:
+    I - processo de coleta e análise de dados de perdas operacionais;
+    II - autoavaliação de riscos e controles (RCSA);
+    III - indicadores-chave de risco operacional;
+    IV - plano de continuidade de negócios específico para risco operacional.
+
+    § 2. O risco cibernético deve ser tratado como subcategoria do risco operacional,
+    em alinhamento com as disposições da regulamentação cibernética da SUSEP.
+
+    § 3. O risco de modelos deve contemplar processo de validação independente dos
+    modelos utilizados na gestão de riscos, aprecificação e provisionamento.
+guidance:
+  prose: |
+    O art. 21 detalha o risco operacional como categoria especial dentro da EGR.
+    O risco operacional e o mais heterogeneo — cobre tudo que nao e risco de mercado
+    ou credito puro.
+
+    **Categorias de risco operacional no seguros:**
+    1. Risco de processo: erros na emissao de apolices, erros de regulacao de sinistros
+    2. Risco de pessoal: fraude interna, erro humano, perda de funcionarios-chave
+    3. Risco de sistema: falha de sistemas core (policy, sinistros, contabilidade)
+    4. Risco de evento externo: fraude externa, desastres naturais, vandalismo
+    5. Risco cibernetico: ataques, ransomware, vazamento de dados (remetendo CNSP 381)
+    6. Risco de modelo: modelo atuarial mal calibrado = provisao insuficiente
+
+    **Base de dados de perdas (I):**
+    Coleta historica de eventos de risco operacional: frequencia, impacto, causa raiz.
+    Usado para calibrar modelos e demonstrar padroes para a administracao.
+
+    **RCSA (Risk and Control Self-Assessment) (II):**
+    Processo no qual as proprias areas de negocio identificam seus riscos e avaliam
+    a adequacao dos controles. Bottom-up approach complementar ao top-down do CRO.
+
+    **Risco de modelos (ss 3):**
+    Se o modelo atuarial que calcula as provisoes tecnicas esta errado, a entidade
+    pode ter capital insuficiente sem saber. Validacao independente e critica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de risco operacional:**
+      1. Modulo de risco operacional no GRC: registro de eventos de perda, RCSA,
+         KRIs operacionais, plano de acao.
+      2. Base de dados de perdas operacionais com categorias BCBS (fraude interna,
+         fraude externa, empregados, clientes, sistemas, negocio, danos fisicos).
+      3. Integracao SIEM → GRC para alimentar automaticamente a base de perdas
+         ciberneticas (incidentes de seguranca como eventos de risco operacional).
+      4. Dashboard de risco operacional: top-10 riscos, tendencias, KRIs.
+
+      **Validacao de modelos:**
+      5. Ambiente de sandbox para modelos atuariais: teste sem impacto em producao.
+      6. Versioning de modelos: Git para codigo de modelos, rastreabilidade completa.
+      7. Comparacao automatizada: modelo antigo vs. modelo novo (backtesting).
+      8. Documentacao de modelos: assumptions, limites, validacao.
+    tools:
+      - grc-platform
+      - siem
+      - risk-engine
+      - actuarial-system
+  devsecops:
+    prose: |
+      **Risco operacional de TI no pipeline:**
+      1. RCSA de TI integrado ao processo de desenvolvimento: quais riscos operacionais
+         cada novo sistema introduce?
+      2. Coleta automatizada de eventos de risco operacional de TI (failures, incidents).
+      3. KRIs de TI como contribuicao ao framework de risco operacional.
+      4. Failure Mode Analysis para sistemas criticos antes do deploy.
+
+      **Risco de modelos:**
+      5. Code review obrigatorio para mudancas em modelos atuariais e de risco.
+      6. Testes de regressao para modelos: comparar output com baseline aprovado.
+      7. MLOps practices: versionamento, monitoramento e validacao de modelos de ML.
+    tools:
+      - gitlab-ci
+      - grc-platform
+      - siem
+      - mlops-platform
+  secops:
+    prose: |
+      **Programa de risco operacional:**
+      1. RCSA anual: todas as areas principais fazem auto-avaliacao de riscos.
+      2. Revisao e desafio do CRO/equipe de risco aos resultados do RCSA.
+      3. Prioridade de controles baseada nos resultados do RCSA.
+      4. Captura de incidentes operacionais: todos os eventos registrados na base de perdas.
+
+      **Validacao de modelos:**
+      5. Processo formal de validacao independente de modelos atuariais e de risco.
+      6. Validadores independentes das areas que desenvolvem os modelos.
+      7. Relatorio de validacao com achados, recomendacoes e resposta da area.
+      8. Re-validacao quando houver mudancas relevantes no modelo ou no ambiente.
+    tools:
+      - grc-platform
+      - actuarial-system
+      - reporting-platform
+      - document-management
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-15", "art-16", "art-17", "art-18"]
+    relationship: equivalent-to
+  - framework_id: cnsp-381
+    articles: ["art-3", "art-4"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "SI-4", "CA-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.30", "A.8.16"]
+    relationship: supports

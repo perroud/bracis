@@ -1,0 +1,106 @@
+id: sec-1798-106
+family: consumer-rights
+title: "Right to Correct Inaccurate Personal Information"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right to request a business that maintains inaccurate personal
+    information about the consumer to correct that inaccurate personal information, taking into
+    account the nature of the personal information and the purposes of the processing of the
+    personal information.
+
+    (b) A business that collects personal information about consumers shall disclose, pursuant
+    to Section 1798.130, the consumer's right to request correction of inaccurate personal
+    information.
+
+    (c) A business that receives a verifiable consumer request to correct inaccurate personal
+    information shall use commercially reasonable efforts to correct the inaccurate personal
+    information as directed by the consumer, pursuant to Section 1798.130 and regulations
+    adopted pursuant to paragraph (8) of subdivision (a) of Section 1798.185.
+
+guidance:
+  prose: |
+    Section 1798.106 was added by CPRA (effective January 1, 2023) and grants consumers the
+    right to correct inaccurate personal information. Key considerations:
+
+    1. **CPRA addition:** This right did not exist under the original CCPA. It aligns CCPA/CPRA
+       more closely with GDPR Article 16 (right to rectification) and LGPD Article 18-III.
+
+    2. **Commercially reasonable efforts:** The standard is "commercially reasonable efforts"
+       — not absolute perfection. The business must act in good faith to correct information
+       as directed by the consumer.
+
+    3. **Nature and purpose consideration:** The correction must account for the nature of the
+       PI and the purposes for which it is processed. A business may request documentation to
+       verify the accuracy of the corrected information.
+
+    4. **Propagation requirement:** CPPA regulations require businesses to instruct all service
+       providers, contractors, and third parties that maintain the PI to also correct it.
+
+    5. **Scope:** Applies to all PI a business maintains, including information received from
+       third parties or inferred/derived data.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement consumer-facing correction request interface in the privacy portal with
+         fields for identifying the inaccurate data and providing the corrected value.
+      2. Build a correction workflow engine that routes requests through verification,
+         approval, and propagation stages.
+      3. Create a master data management (MDM) layer that serves as the single source of truth
+         for consumer PI, enabling corrections to propagate to all downstream systems.
+      4. Implement correction propagation to all service providers, contractors, and third
+         parties via API/webhook notifications.
+      5. Maintain a correction audit trail documenting the original value, corrected value,
+         timestamp, verification steps, and propagation status.
+      6. Build version history for consumer PI to support dispute resolution and auditing.
+    tools:
+      - privacy-portal
+      - workflow-engine
+      - master-data-management
+      - data-lineage
+      - backstage
+      - event-driven-architecture
+
+  devsecops:
+    prose: |
+      1. Implement automated tests for correction workflows — verify that corrections
+         propagate to all downstream systems and data stores.
+      2. Test that correction requests are properly validated and do not introduce data
+         integrity issues (SQL injection, XSS via corrected values).
+      3. Validate that correction audit trails capture complete before/after state.
+      4. Test that service provider/contractor APIs correctly process correction directives.
+      5. Implement schema validation for correction payloads to prevent malformed data.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - postman
+      - api-testing
+      - sonarqube
+
+  secops:
+    prose: |
+      1. Monitor correction request fulfillment timelines against the 45-day SLA.
+      2. Audit correction propagation completeness — verify that all downstream systems
+         reflect the corrected data.
+      3. Monitor for patterns of suspicious correction requests that may indicate identity
+         fraud or social engineering attempts.
+      4. Track correction request volumes and types for compliance reporting.
+      5. Verify that corrected data is consistent across all systems via periodic reconciliation.
+    tools:
+      - dsar-tracking
+      - siem
+      - compliance-dashboard
+      - data-discovery
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 16"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-iii"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["A.7.3.6"]
+    relationship: supports

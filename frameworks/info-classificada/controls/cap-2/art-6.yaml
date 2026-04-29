@@ -1,0 +1,93 @@
+id: art-6
+family: cap-2
+title: "Security Clearance Requirement"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 6. O acesso, a divulgação e o tratamento de informação
+    classificada ficarão restritos a pessoas que possuam necessidade de
+    conhecer e que sejam devidamente credenciadas na forma deste Decreto,
+    sem prejuízo das atribuições dos agentes públicos autorizados por lei.
+
+    Parágrafo único. O acesso à informação classificada em qualquer grau
+    de sigilo a pessoa não credenciada ou não autorizada poderá,
+    excepcionalmente, ser permitido mediante assinatura de Termo de
+    Compromisso de Manutenção de Sigilo — TCMS, conforme modelo contido
+    no Anexo, pelo qual a pessoa se obrigará a manter o sigilo da
+    informação, sob pena de responsabilidade penal, civil e administrativa,
+    na forma da lei.
+guidance:
+  prose: |
+    Article 6 establishes the dual-gate access model: a person must satisfy
+    BOTH conditions to access classified information:
+
+    1. **Need-to-know:** The information must be indispensable for the
+       person's role or assigned task.
+    2. **Security clearance:** The person must hold a valid credential
+       (credencial de segurança) at or above the classification level.
+
+    **Exception — TCMS (Termo de Compromisso de Manutenção de Sigilo):**
+    In exceptional cases, uncredentialed persons may access classified
+    information by signing a TCMS — a legally binding NDA that subjects
+    the signer to criminal, civil, and administrative liability for
+    disclosure. This is a temporary measure, not a substitute for proper
+    clearance.
+
+    **Compliance criticality:**
+    This is the foundational access control rule. Every access grant must
+    be traceable to a valid clearance and a demonstrated need-to-know.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Dual-gate access control implementation:**
+      1. Implement attribute-based access control (ABAC) requiring:
+         - clearance_level >= document_classification_level
+         - need_to_know_projects CONTAINS document_project
+      2. Deploy clearance verification service that checks credential
+         validity in real-time before granting access.
+      3. Implement TCMS digital workflow for exceptional access:
+         - Digital signature of TCMS document
+         - Time-limited access with automatic revocation
+         - Full audit trail of TCMS-based access
+      4. Enforce that no system bypass allows access without both gates.
+    tools:
+      - abac-engine
+      - clearance-service
+      - digital-signature
+      - access-control
+  devsecops:
+    prose: |
+      **Clearance validation in development workflows:**
+      1. Integrate clearance verification into repository access controls:
+         classified repositories require active clearance.
+      2. Implement automated TCMS generation for contractors and temporary
+         collaborators accessing classified codebases.
+      3. Add access logging to all classified repository interactions
+         for audit trail compliance.
+    tools:
+      - gitlab-access-control
+      - audit-logging
+      - tcms-workflow
+  secops:
+    prose: |
+      **Clearance and need-to-know governance:**
+      1. Maintain a centralized clearance database linked to IAM systems.
+      2. Review need-to-know assignments quarterly: remove access when
+         the role or project no longer requires it.
+      3. Track all TCMS exceptions: who, what level, for how long,
+         and verify that exceptional access was properly terminated.
+      4. Audit access logs against clearance records to detect
+         unauthorized access attempts.
+    tools:
+      - clearance-database
+      - iam-platform
+      - audit-management
+      - access-review
+legal_references:
+  - framework_id: lai
+    articles: ["art-25"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "PS-3"]
+    relationship: mapped

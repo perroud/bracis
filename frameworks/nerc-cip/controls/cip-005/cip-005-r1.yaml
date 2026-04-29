@@ -1,0 +1,125 @@
+id: cip-005-r1
+family: cip-005
+title: "Electronic Security Perimeter"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes that collectively include the applicable requirement
+    parts to manage electronic access to BES Cyber Systems by
+    establishing an Electronic Security Perimeter (ESP).
+  parts:
+    - id: cip-005-r1.1
+      label: "1.1"
+      prose: >-
+        All applicable Cyber Assets connected to a network via a
+        routable protocol shall reside within a defined Electronic
+        Security Perimeter.
+    - id: cip-005-r1.2
+      label: "1.2"
+      prose: >-
+        All External Routable Connectivity must be through an
+        identified Electronic Access Point (EAP).
+    - id: cip-005-r1.3
+      label: "1.3"
+      prose: >-
+        Require inbound and outbound access permissions, including
+        the reason for granting access, and deny all other access
+        by default.
+    - id: cip-005-r1.4
+      label: "1.4"
+      prose: >-
+        Where technically feasible, perform authentication when
+        establishing Dial-up Connectivity with applicable Cyber
+        Assets.
+    - id: cip-005-r1.5
+      label: "1.5"
+      prose: >-
+        Have one or more methods for detecting known or suspected
+        malicious communications for both inbound and outbound
+        communications.
+
+guidance:
+  prose: >-
+    CIP-005 R1 requires the establishment of clearly defined Electronic
+    Security Perimeters around all routable-protocol BES Cyber Assets.
+    The ESP functions as the logical boundary that separates BES Cyber
+    Systems from external networks. All traffic crossing the ESP must
+    pass through an Electronic Access Point (EAP) where it can be
+    inspected and controlled. The default-deny posture (part 1.3) is
+    a fundamental security principle that requires explicit justification
+    for every allowed traffic flow. Part 1.5 requires malicious
+    communication detection (IDS/IPS capabilities) at the ESP boundary.
+    Network segmentation and micro-segmentation are key implementation
+    strategies for complex OT/IT converged environments.
+
+references:
+  - citation: "NERC CIP-005-7 — Electronic Security Perimeter(s)"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-005-7.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define Electronic Security Perimeters as Infrastructure-as-Code
+      using network policies, firewall rules, and security groups.
+      Implement network segmentation that isolates BES Cyber Systems
+      into dedicated VLANs or network segments with explicit EAPs.
+      Deploy default-deny firewall policies with documented exceptions
+      for each allowed traffic flow. Implement IDS/IPS at all EAPs
+      for malicious communication detection. Use network policy
+      controllers (Calico, Cilium) for micro-segmentation in
+      containerized environments. Maintain network topology diagrams
+      as code artifacts that are automatically validated against
+      actual network configurations.
+    tools:
+      - terraform
+      - calico
+      - cilium
+      - palo-alto
+      - suricata
+      - grafana
+
+  devsecops:
+    prose: >-
+      Store firewall rules and network policies as version-controlled
+      code with mandatory merge request approval for any changes.
+      Implement CI pipeline validation that ensures all network policy
+      changes include documented justification for access grants.
+      Create automated tests that verify default-deny posture and
+      that only authorized traffic flows are permitted. Deploy
+      infrastructure scanning tools that detect ESP boundary
+      violations (assets outside defined perimeters). Enforce that
+      every access rule change references an approved change request
+      with business justification.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - checkov
+      - conftest
+      - tfsec
+
+  secops:
+    prose: >-
+      Monitor all traffic at Electronic Access Points and alert on
+      unauthorized access attempts. Deploy IDS/IPS signatures tuned
+      for OT/ICS protocols (Modbus, DNP3, IEC 61850). Correlate
+      firewall logs with authorized access lists to detect policy
+      violations. Generate periodic reports showing ESP integrity,
+      access rule utilization, and detected malicious communications.
+      Monitor for network topology changes that could compromise
+      ESP boundaries.
+    tools:
+      - suricata
+      - snort
+      - splunk
+      - elastic-siem
+      - palo-alto
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "AC-4", "SI-4"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.2", "3-3-5.3"]
+    relationship: supports

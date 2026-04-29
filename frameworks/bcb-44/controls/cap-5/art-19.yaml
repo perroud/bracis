@@ -1,0 +1,98 @@
+id: art-19
+family: cap-5
+title: "Sistema de Monitoramento de Operacoes"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 19. As instituições de pagamento devem implementar sistema de monitoramento
+    de operações compatível com o porte e o perfil de risco da instituição,
+    contemplando:
+
+    I - monitoramento contínuo das operações realizadas pelos clientes;
+
+    II - seleção de operações e situações suspeitas para análise aprofundada;
+
+    III - parâmetros e critérios de seleção baseados em abordagem de risco,
+    incluindo perfil do cliente, tipo de operação, volume e frequência;
+
+    IV - mecanismos automatizados de detecção de padrões suspeitos, proporcionais
+    ao volume de operações processadas.
+guidance:
+  prose: |
+    O art. 19 e o coracão tecnico do programa de PLD/FT: sem monitoramento
+    efetivo, todos os outros controles sao insuficientes.
+
+    **Monitoramento continuo (inciso I) -- o que significa:**
+    Para IPs com alto volume (PIX, contas digitais), "continuo" significa que
+    cada transacao e avaliada em tempo real ou quasi-real. Nao e aceitavel
+    processar transacoes em lote apenas no fim do dia.
+
+    **Abordagem baseada em risco (inciso III):**
+    As regras de monitoramento devem refletir os riscos especificos da IP:
+    - IP com foco em remessas internacionais: regras especificas para transferencias
+      para paises de alto risco.
+    - IP com foco em PIX: regras de fragmentacao, horario atipico, recebedores novos.
+    - IP com marketplace: regras de pagamentos a multiples vendedores.
+
+    **Mecanismos automatizados (inciso IV):**
+    "Proporcionais ao volume" significa que uma IP com 1 milhao de transacoes
+    diarias NAO pode monitorar manualmente. Deve usar sistemas automatizados de
+    AML (Anti-Money Laundering) com machine learning ou regras baseadas em
+    indicadores quantitativos.
+
+    **Resultado esperado:**
+    Lista de alertas (casos) para analise por analistas de compliance.
+    Cada alerta deve conter: o que foi detectado, dados do cliente, historico
+    relevante, nivel de urgencia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura do sistema de monitoramento AML:**
+      1. Plataforma AML com capacidade de processar transacoes em tempo real
+         (latencia < 30 segundos do evento ao alerta).
+      2. Motor de regras configuravel: permitir adicionar, alterar e remover
+         regras sem redeployment do sistema.
+      3. Modulo de analise comportamental: calcular perfil transacional de cada
+         cliente (baseline) e alertar quando desvios significativos sao detectados.
+      4. Casos de trabalho (casos/alertas) com todos os dados necessarios para
+         analise: historico do cliente, transacoes relacionadas, scores de risco,
+         notas de analises anteriores.
+      5. Workflow de analise: alerta gerado → fila de analise → analista
+         designado → analise → decisao (suspeito/falso positivo) → registro.
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - event-streaming
+      - case-management
+  devsecops:
+    prose: |
+      **Gestao do ciclo de vida das regras:**
+      1. Versionamento de todas as regras de monitoramento no repositorio de codigo.
+      2. Pipeline de aprovacao de alteracoes em regras: desenvolvimento → teste
+         em staging com dados historicos → aprovacao compliance → producao.
+      3. Metricas de efetividade por regra: taxa de alertas gerados, taxa de
+         falsos positivos, taxa de conversao em SAR.
+      4. Testes de regressao: alteracao de uma regra nao deve aumentar
+         drasticamente a taxa de falsos positivos.
+    tools:
+      - gitlab-ci
+      - rule-engine
+      - model-testing
+  secops:
+    prose: |
+      **KPIs do sistema de monitoramento:**
+      1. Volume diario de alertas gerados por regra.
+      2. Tempo medio de analise de alerta (SLA de analise).
+      3. Taxa de falsos positivos por regra (meta: < 90%).
+      4. Taxa de conversao de alerta em SAR (indicador de qualidade das regras).
+      5. Backlog de alertas nao analisados (risco operacional).
+      6. Cobertura: percentual de clientes ativos com pelo menos uma regra ativa.
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-22"]
+    relationship: equivalent-to

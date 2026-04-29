@@ -1,0 +1,117 @@
+id: art-11
+family: cap-4
+title: "Compartilhamento de Informacoes"
+class: REGIC
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 11. O compartilhamento de informações entre os participantes da ReGIC
+    observará as seguintes diretrizes:
+
+    I — as informações compartilhadas serão classificadas quanto ao nível de
+    sensibilidade e restrição de disseminação;
+
+    II — o compartilhamento deverá preservar o sigilo de informações sensíveis,
+    estratégicas ou classificadas, conforme legislação vigente;
+
+    III — as informações de incidentes compartilhadas serão utilizadas
+    exclusivamente para fins de prevenção, tratamento e resposta a incidentes
+    cibernéticos;
+
+    IV — o CTIR Gov poderá desidentificar informações antes de compartilhá-las
+    com a rede, quando necessário para preservar a segurança do órgão afetado;
+
+    V — os participantes deverão adotar medidas de proteção adequadas para
+    as informações recebidas por meio da ReGIC.
+guidance:
+  prose: |
+    O art. 11 regulamenta o compartilhamento de threat intelligence dentro da ReGIC.
+
+    **Classificacao de sensibilidade (inciso I):**
+    O decreto exige classificacao do material compartilhado. Na pratica, a ReGIC
+    utiliza o Traffic Light Protocol (TLP) da FIRST:
+    - TLP:RED — apenas para destinatarios especificos
+    - TLP:AMBER — compartilhamento limitado a organizacao e clientes
+    - TLP:GREEN — compartilhamento com comunidade
+    - TLP:CLEAR — sem restricao
+
+    **Sigilo (inciso II):**
+    Informacoes classificadas (Lei 12.527/2011 — LAI) e sensiveis (LGPD) devem
+    manter sua classificacao mesmo quando compartilhadas na ReGIC.
+
+    **Finalidade exclusiva (inciso III):**
+    Informacoes da ReGIC nao podem ser usadas para outros fins (ex: investigacao
+    policial, auditoria interna). Protege a confianca na rede de compartilhamento.
+
+    **Desidentificacao (inciso IV):**
+    O CTIR Gov pode anonimizar o orgao de origem antes de compartilhar com a
+    rede. Isso permite compartilhar IoCs e TTPs sem expor qual orgao foi
+    comprometido, protegendo reputacao e seguranca.
+
+    **Protecao de informacoes recebidas (inciso V):**
+    Cada participante deve proteger as informacoes recebidas da ReGIC com
+    controles adequados ao nivel de classificacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de compartilhamento seguro:**
+      1. Implementar plataforma MISP (Malware Information Sharing Platform) ou
+         equivalente para compartilhamento estruturado de IoCs com TLP.
+      2. Controles de acesso baseados no nivel TLP: informacoes TLP:RED
+         acessiveis apenas a equipe designada da ETIR.
+      3. Sistema de classificacao automatica de informacoes compartilhadas
+         com validacao de TLP antes do envio.
+      4. Criptografia end-to-end para transporte de informacoes sensiveis
+         entre participantes da ReGIC.
+      5. Audit trail imutavel de todas as informacoes compartilhadas e
+         recebidas, com registro de quem acessou.
+    tools:
+      - misp
+      - stix-taxii-server
+      - tlp-classification-engine
+      - encryption-layer
+      - audit-trail
+  devsecops:
+    prose: |
+      **Pipeline de threat intelligence:**
+      1. Pipeline automatizado que ingere IoCs da ReGIC (via MISP/STIX) e
+         aplica em regras de deteccao (SIEM, WAF, IDS/IPS).
+      2. Automacao que valida classificacao TLP antes de compartilhar
+         informacoes com a ReGIC.
+      3. Pipeline de desidentificacao que remove dados sensiveis do orgao
+         antes do compartilhamento (IP internos, hostnames, usuarios).
+      4. Testes de integridade que verificam se informacoes TLP:RED nao
+         vazaram para canais de menor classificacao.
+    tools:
+      - gitlab-ci
+      - misp-connector
+      - data-sanitizer
+      - dlp-scanner
+  secops:
+    prose: |
+      **Gestao de informacoes compartilhadas:**
+      1. Procedimento documentado de classificacao TLP para todas as
+         informacoes enviadas a ReGIC.
+      2. Controle de acesso rigoroso: apenas equipe da ETIR com need-to-know
+         acessa informacoes da ReGIC.
+      3. Treinamento em TLP e handling de informacoes classificadas para
+         toda a equipe que interage com a ReGIC.
+      4. Revisao periodica de informacoes armazenadas da ReGIC com politica
+         de retencao e destruicao conforme nivel de classificacao.
+      5. Monitorar e reportar qualquer vazamento ou uso indevido de
+         informacoes recebidas da ReGIC.
+    tools:
+      - grc-platform
+      - data-classification
+      - access-control
+      - dlp-monitoring
+legal_references:
+  - framework_id: pnsi
+    articles: ["art-3", "art-4"]
+    relationship: derived-from
+  - framework_id: gsi-in1
+    articles: ["art-5", "art-6"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-11", "art-12"]
+    relationship: complements

@@ -1,0 +1,125 @@
+id: art-16
+family: cap-3
+title: "Documentacao Tecnica Obrigatoria"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 16. Todo sistema de IA médica classificado como risco alto ou muito
+    alto deve possuir documentação técnica completa que inclua:
+
+    I - descrição detalhada da finalidade clínica, escopo de uso, população-alvo
+    e limitações do sistema;
+
+    II - descrição da arquitetura do modelo, algoritmos utilizados, features
+    de entrada e processo de treinamento;
+
+    III - caracterização dos dados de treinamento: fonte, volume, período de
+    coleta, distribuição demográfica, processo de curadoria e potenciais
+    vieses identificados;
+
+    IV - resultados de validação clínica com métricas de performance
+    desagregadas por subgrupo relevante (idade, sexo, etnia, comorbidades),
+    incluindo intervalos de confiança;
+
+    V - análise de vieses algorítmicos realizada, metodologia utilizada e
+    medidas de mitigação implementadas;
+
+    VI - descrição do mecanismo de explicabilidade implementado e seus
+    limites;
+
+    VII - plano de monitoramento pós-deploy, incluindo métricas monitoradas,
+    limiares de alerta e procedimento de resposta;
+
+    VIII - registro de versões do modelo com histórico de alterações,
+    retreinamentos e reclassificações de risco.
+guidance:
+  prose: |
+    O art. 16 cria requisito de documentacao tecnica obrigatoria equivalente
+    ao "technical file" do EU AI Act e ao "510(k) summary" da FDA para
+    dispositivos medicos com IA.
+
+    **Estrutura da documentacao:**
+
+    A documentacao exigida e essencialmente uma model card expandida com
+    informacoes tecnicas detalhadas. Os 8 incisos cobrem todo o ciclo
+    de vida do modelo:
+
+    - Incisos I-II: o que o sistema faz e como funciona
+    - Inciso III: com que dados foi treinado
+    - Inciso IV: como foi validado e qual sua performance real
+    - Inciso V: se ha vieses e o que foi feito
+    - Inciso VI: como explica suas decisoes
+    - Inciso VII: como sera monitorado em producao
+    - Inciso VIII: historico de evolucao
+
+    **Padrao de documentacao:**
+    A Resolucao nao especifica formato, mas a comunidade de IA medica
+    converge para model cards (Mitchell et al., 2019) como formato
+    padrao. Frameworks como HL7 FHIR AI podem ser utilizados para
+    interoperabilidade.
+
+    **Destinatario principal:** a documentacao deve ser compreensivel
+    para medicos, nao apenas para engenheiros. Termos tecnicos devem
+    ser acompanhados de explicacao em linguagem clinica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de documentacao tecnica:**
+      1. Implementar template padronizado de documentacao tecnica no
+         model registry, cobrindo todos os 8 incisos do art. 16.
+      2. Automatizar preenchimento de secoes da documentacao a partir
+         de metadados do pipeline: metricas, dados de treinamento,
+         versao do modelo, features utilizadas.
+      3. Implementar versionamento da documentacao vinculado ao
+         versionamento do modelo: cada versao do modelo tem
+         documentacao correspondente.
+      4. Criar repositorio centralizado de documentacao tecnica com
+         controle de acesso e busca, acessivel a medicos e auditores.
+    tools:
+      - model-cards
+      - ml-registry
+      - documentation-system
+      - version-control
+  devsecops:
+    prose: |
+      **Documentacao automatizada no pipeline:**
+      1. Automatizar geracao de documentacao tecnica como artefato do
+         pipeline de ML: metricas por subgrupo, dados de treinamento,
+         explicabilidade — preenchidos automaticamente.
+      2. Implementar gate no CI/CD que bloqueia deploy de modelos de
+         risco alto/muito alto sem documentacao completa (todos os
+         8 incisos preenchidos e aprovados).
+      3. Automatizar deteccao de inconsistencias: se modelo muda mas
+         documentacao nao e atualizada, bloquear deploy.
+      4. Gerar diff de documentacao entre versoes para facilitar
+         revisao e aprovacao de atualizacoes.
+    tools:
+      - gitlab-ci
+      - documentation-generation
+      - compliance-gate
+      - doc-diff
+  secops:
+    prose: |
+      **Governanca de documentacao:**
+      1. Auditar completude da documentacao tecnica periodicamente:
+         verificar que todos os 8 incisos estao preenchidos e
+         atualizados para cada modelo de risco alto/muito alto.
+      2. Validar que documentacao e compreensivel para medicos:
+         revisao por medico responsavel tecnico obrigatoria.
+      3. Manter documentacao disponivel para auditoria do CRM e
+         outros orgaos reguladores em formato padronizado.
+      4. Verificar que historico de versoes (inciso VIII) esta
+         completo e consistente com registros do model registry.
+    tools:
+      - grc-platform
+      - audit-tools
+      - documentation-review
+      - regulatory-readiness
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-11", "anexo-iv"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["govern-5", "map-5"]
+    relationship: mapped

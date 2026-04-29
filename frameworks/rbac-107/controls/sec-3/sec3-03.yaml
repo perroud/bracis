@@ -1,0 +1,137 @@
+id: sec3-03
+family: sec-3
+title: "Continuidade Operacional e Resiliencia Cibernetica do Aerodromo"
+class: RBAC-107
+baselines: [aerodrome-operators]
+statement:
+  prose: |
+    O operador de aeródromo deve estabelecer e manter planos de continuidade
+    operacional que garantam a manutenção segura das operações aeroportuárias
+    durante e após incidentes cibernéticos nos sistemas TIC críticos.
+
+    O plano de continuidade operacional deve:
+    I - identificar os processos operacionais críticos do aeródromo que dependem
+        de sistemas TIC e definir níveis de serviço mínimos aceitáveis durante
+        degradação cibernética;
+    II - estabelecer procedimentos de operação degradada para cada processo
+         crítico identificado, garantindo que operações de voo e segurança AVSEC
+         sejam mantidas em nível aceitável durante falha de sistemas TIC;
+    III - definir objetivos de tempo de recuperação (RTO) e ponto de recuperação
+         (RPO) para cada sistema TIC crítico, validados operacionalmente com
+         as equipes de operações aeroportuárias;
+    IV - incluir estratégias de comunicação com passageiros, companhias aéreas
+         e órgãos reguladores durante crises cibernéticas que afetem as operações;
+    V - ser integrado ao Plano de Emergência Aeroportuária (PEA) e ao PSAC,
+        garantindo coordenação unificada de resposta a crises com dimensão
+        cibernética;
+    VI - ser revisado e testado com frequência mínima anual, com resultados
+         documentados e submetidos à ANAC quando solicitado.
+guidance:
+  prose: |
+    A continuidade operacional em um aerodromo tem implicacoes de seguranca
+    publica que exigem nivel de planejamento e rigor superiores ao ambiente
+    corporativo convencional.
+
+    **Processos criticos aeroportuarios e seus sistemas TIC:**
+    O operador deve mapear a dependencia de cada processo critico em sistemas TIC:
+    - Embarque de passageiros: DCS, CUTE, FIDS, impressoras de boardingpass
+    - Controle de fronteira e seguranca: ACS, CFTV, sistemas de deteccao
+    - Operacoes de pista: sistemas de lighting, ATIS, comunicacoes
+    - Bagagens: BHS, raio-X de bagagem, sistemas de rastreamento
+    - Combustivel e servicos de aeronave: sistemas de agendamento e controle
+
+    **Principio da degradacao gracil (graceful degradation):**
+    Para cada processo critico, o plano deve prever como o processo funcionara
+    com um ou mais sistemas TIC indisponiveis, definindo o nivel minimo de
+    operacao aceitavel e quando declarar estado de emergencia.
+
+    **Testes realistas:**
+    Testes de continuidade operacional devem incluir cenarios realistas de
+    ataque cibernetico (ex: ransomware no sistema de check-in) com participacao
+    das equipes operacionais, nao apenas da equipe de TIC.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura resiliente para operacoes aeroportuarias:**
+      1. Implementar sistemas de check-in com capacidade de operacao offline
+         (local caching, modo degradado) para continuidade das operacoes por
+         periodo minimo de 4 horas sem conectividade com servidores centrais.
+      2. Provisionar sistemas de controle de acesso com capacidade de operacao
+         local autonoma (edge computing no dispositivo/controladora local),
+         mantendo acesso a areas criticas mesmo com perda de conectividade
+         com servidores centrais.
+      3. Implementar infraestrutura de comunicacao redundante (fibra + radio,
+         conexao primaria + backup celular 4G/5G) para sistemas criticos,
+         com failover automatico testado.
+      4. Manter hardware spare (servidores, switches, equipamentos de rede)
+         pre-configurado e disponivel para substituicao rapida em caso de
+         comprometimento fisico ou logico de equipamentos criticos.
+      5. Implementar monitoramento de resiliencia com metricas de disponibilidade
+         historica por sistema, identificando pontos de falha unica (SPOF)
+         para remediation proativa.
+    tools:
+      - edge-computing
+      - redundant-networking
+      - high-availability
+      - infrastructure-monitoring
+  devsecops:
+    prose: |
+      **Testes de resiliencia e continuidade no pipeline:**
+      1. Implementar testes de chaos engineering para sistemas TIC criticos
+         em ambiente de homologacao, simulando falhas de componentes e
+         validando o comportamento de fallback e recuperacao automatica.
+      2. Automatizar testes de RTO e RPO em ambiente de DR, com resultados
+         rastreados ao longo do tempo para identificar regressoes na capacidade
+         de recuperacao.
+      3. Manter documentacao de arquitetura de resiliencia atualizada (diagramas
+         de failover, dependencias de sistemas) como artefato versionado no
+         repositorio, com revisao obrigatoria a cada mudanca de infraestrutura.
+      4. Implementar pipeline de testes de backup com validacao automatica de
+         integridade e restaurabilidade dos backups criticos (backup testing-as-code).
+      5. Rastrear debitos tecnicos de resiliencia (SPOFs identificados, sistemas
+         sem failover, backups nao testados) em backlog priorizado com SLA
+         de remediation por criticidade.
+    tools:
+      - chaos-engineering
+      - dr-testing
+      - backup-testing
+      - resilience-tracking
+  secops:
+    prose: |
+      **Operacao de continuidade durante crises ciberneticas:**
+      1. Manter runbook de continuidade operacional impresso e disponivel offline
+         (papel) para cenarios em que os sistemas de TI estejam completamente
+         indisponiveis, incluindo procedimentos manuais passo a passo para
+         operadores de check-in, seguranca e operacoes aeroportuarias.
+      2. Realizar exercicio anual de simulacao de crise cibernetica com ativacao
+         real dos procedimentos manuais de contingencia, envolvendo equipes
+         de operacoes, AVSEC, TIC e comunicacao, com observadores externos
+         da ANAC quando possivel.
+      3. Manter base de conhecimento de licoes aprendidas de incidentes de
+         continuidade operacional de outros aerodromos (analogos publicados,
+         relatorios do A-ISAC, comunicados da ANAC) para aprimoramento continuo.
+      4. Definir criterios de retorno a operacao normal apos incidente cibernetico,
+         incluindo validacao de integridade dos sistemas antes da reativacao,
+         para garantir que sistemas comprometidos nao retornem a producao sem
+         verificacao completa.
+      5. Reportar trimestralmente a diretoria do aerodromo o status de prontidao
+         para continuidade operacional, incluindo resultados de testes de backup,
+         status de sistemas redundantes e indicadores de resiliencia.
+    tools:
+      - operational-runbook
+      - crisis-management
+      - continuity-metrics
+      - return-to-normal-checklist
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["5.30", "8.13", "8.14"]
+    relationship: mapped
+  - framework_id: rbac-108
+    articles: ["relevant"]
+    relationship: complements
+  - framework_id: pnciber
+    articles: ["art-3"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-6", "art-7"]
+    relationship: mapped

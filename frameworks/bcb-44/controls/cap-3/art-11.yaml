@@ -1,0 +1,105 @@
+id: art-11
+family: cap-3
+title: "Diligencia Reforcada"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 11. As instituições de pagamento devem adotar procedimentos de diligência
+    reforçada para os seguintes clientes e situações:
+
+    I - pessoas politicamente expostas (PEP) e seus familiares e estreitos colaboradores;
+
+    II - clientes com residência, sede ou domicílio em países ou territórios com
+    deficiências estratégicas de PLD/FT identificados pelo GAFI;
+
+    III - clientes de setores econômicos de maior risco de lavagem de dinheiro,
+    tais como comércio de joias, metais preciosos, arte e antiguidades, imóveis
+    e ativos virtuais;
+
+    IV - clientes com operações que envolvam altos valores ou que apresentem
+    complexidade elevada sem justificativa econômica aparente;
+
+    V - qualquer outra situação em que a instituição identifique risco elevado.
+
+    Parágrafo único. A diligência reforçada compreende, no mínimo, a obtenção de
+    informações adicionais sobre a origem dos recursos, a natureza e a finalidade
+    da relação de negócio, e a realização de monitoramento mais intensivo.
+guidance:
+  prose: |
+    O art. 11 define os casos em que a IP deve ir alem do KYC padrao.
+    Diligencia reforcada nao e uma opcao -- e obrigatoria nessas situacoes.
+
+    **O que diferencia diligencia reforcada da padrao:**
+    - Obtencao de informacoes sobre ORIGEM DOS RECURSOS (nao apenas quem e o cliente)
+    - Verificacao da finalidade economica das transacoes
+    - Aprovacao por nivel hierarquico superior (compliance manager ou diretor)
+    - Frequencia maior de atualizacao cadastral
+    - Monitoramento transacional com limiares menores e regras mais sensiveis
+    - Revisao periodica mais frequente (ex: semestral em vez de anual)
+
+    **Paises FATF com deficiencias (inciso II):**
+    FATF publica duas listas: "black list" (jurisdicoes com deficiencias graves,
+    sujeitas a contramedidas) e "grey list" (sob monitoramento intensificado).
+    Atualizar o sistema sempre que a FATF publicar nova lista (tipicamente fev, jun, out).
+
+    **Ativos virtuais (inciso III):**
+    Criptoativos sao explicitamente mencionados como setor de alto risco. IPs
+    que permitem transacoes com criptoativos devem aplicar diligencia reforcada
+    automaticamente nesses clientes/operacoes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Workflow de diligencia reforcada:**
+      1. Identificacao automatica de clientes/situacoes que ativam art. 11:
+         - Flag PEP (automatico por consulta a lista + autodeclaracao)
+         - Flag pais de alto risco (automatico por pais de residencia/sede)
+         - Flag setor de alto risco (por CNAE/codigo de atividade economica)
+         - Flag operacao complexa (por regras de monitoramento)
+      2. Formulario adicional de diligencia reforcada: origem dos recursos
+         (renda, heranca, venda de bens, investimentos), finalidade da conta.
+      3. Solicitacao de documentos comprobatorios da origem dos recursos:
+         - Extratos bancarios, declaracao de IR, contratos de prestacao de servicos.
+      4. Workflow de aprovacao com nivel hierarquico superior: compliance manager
+         deve aprovar explicitamente cada cliente de alto risco.
+      5. Monitoramento dedicado: criar perfil de monitoramento especial com
+         limiares menores e alertas automaticos para qualquer desvio.
+    tools:
+      - kyc-platform
+      - aml-screening
+      - transaction-monitoring
+      - workflow-automation
+  devsecops:
+    prose: |
+      **Automacao de identificacao de alto risco:**
+      1. Integrar feed atualizado das listas FATF (blacklist + greylist) no sistema,
+         com atualizacao automatica via API ou importacao periodica.
+      2. Integrar tabela de CNAE de alto risco (atualizar conforme orientacoes COAF).
+      3. Testes automatizados de identificacao de PEP, pais de risco e setor de risco.
+      4. Pipeline que valida integridade das listas de risco ao deployar.
+    tools:
+      - aml-screening
+      - sanctions-screening
+      - gitlab-ci
+      - list-management
+  secops:
+    prose: |
+      **Supervisao da diligencia reforcada:**
+      1. Relatorio semanal de clientes em diligencia reforcada e status de cada
+         fase do processo (documento solicitado, aprovado, pendente).
+      2. Auditoria mensal: verificar que cada cliente identificado como alto risco
+         tem efetivamente diligencia reforcada ativa.
+      3. Monitorar clientes PEP especificamente: atualizacoes na carreira publica
+         que mudem o nivel de exposicao.
+      4. Revisao das listas FATF apos cada publicacao bimestral.
+    tools:
+      - aml-platform
+      - grc-platform
+      - regulatory-intelligence
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-15", "art-16", "art-17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

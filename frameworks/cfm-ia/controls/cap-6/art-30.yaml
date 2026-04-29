@@ -1,0 +1,127 @@
+id: art-30
+family: cap-6
+title: "Anonimizacao e Pseudonimizacao de Dados de Saude"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 30. Dados de saúde utilizados para treinamento e validação de
+    sistemas de IA médica devem ser anonimizados ou pseudonimizados:
+
+    I - a anonimização deve utilizar técnicas reconhecidas que garantam
+    a impossibilidade de reidentificação do titular, considerando meios
+    razoáveis disponíveis no momento do tratamento;
+
+    II - quando a anonimização completa não for viável sem perda
+    significativa de utilidade clínica dos dados, deve-se utilizar
+    pseudonimização com controles adicionais de segurança;
+
+    III - dados pseudonimizados permanecem como dados pessoais para
+    fins da LGPD, exigindo base legal e todos os controles aplicáveis;
+
+    IV - a chave de pseudonimização deve ser armazenada separadamente
+    dos dados pseudonimizados, com controle de acesso restrito e
+    criptografia;
+
+    V - devem ser implementadas técnicas de proteção contra ataques
+    de reidentificação, incluindo avaliação periódica do risco de
+    reidentificação com novas fontes de dados disponíveis.
+guidance:
+  prose: |
+    O art. 30 trata de um desafio tecnico real: dados de saude sao
+    dificeis de anonimizar sem perder valor clinico.
+
+    **Desafios de anonimizacao em saude:**
+
+    - Dados medicos sao inerentemente ricos em informacao pessoal:
+      data de nascimento, diagnosticos raros, sequencias geneticas.
+
+    - Diagnosticos raros podem reidentificar pacientes mesmo sem
+      nome: "mulher de 34 anos com linfoma de Hodgkin em hospital X
+      em janeiro de 2025" pode identificar unica paciente.
+
+    - Imagens medicas podem conter informacoes identificadoras:
+      metadados DICOM, textos sobrepostos, caracteristicas faciais
+      em imagens de cabeca/pescoco.
+
+    **Tecnicas de anonimizacao (inciso I):**
+    - k-anonimidade: cada registro e indistinguivel de pelo menos
+      k-1 outros registros.
+    - l-diversidade: cada grupo de k registros tem pelo menos l
+      valores distintos para atributos sensiveis.
+    - Differential privacy: adicao de ruido estatistico que preserva
+      utilidade mas impede reidentificacao.
+
+    **Pseudonimizacao (incisos II-IV):**
+    Quando anonimizacao plena comprometer utilidade clinica (ex:
+    dados longitudinais que exigem linkage), pseudonimizacao e
+    alternativa. Mas dados pseudonimizados continuam sendo dados
+    pessoais sob LGPD.
+
+    **Risco de reidentificacao (inciso V):**
+    A anonimizacao nao e estatica. Com novas fontes de dados (redes
+    sociais, registros publicos), dados antes anonimizados podem se
+    tornar reidentificaveis. Avaliacao periodica e obrigatoria.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de anonimizacao/pseudonimizacao:**
+      1. Implementar pipeline automatizado de de-identification para
+         dados de saude: remocao de identificadores diretos (nome,
+         CPF, endereco), generalizacao de quase-identificadores
+         (data de nascimento para faixa etaria, CEP para regiao).
+      2. Configurar scrubbing automatico de metadados DICOM em
+         imagens medicas: remocao de nome do paciente, instituicao,
+         datas e outros identificadores embutidos.
+      3. Implementar vault segregado para chaves de pseudonimizacao,
+         com controle de acesso role-based e auditoria de acesso.
+      4. Automatizar avaliacao de risco de reidentificacao com
+         ferramentas como ARX ou sdcMicro antes de disponibilizar
+         dataset para treinamento.
+    tools:
+      - de-identification-pipeline
+      - dicom-scrubber
+      - key-vault
+      - reidentification-risk
+  devsecops:
+    prose: |
+      **Anonimizacao integrada ao pipeline de ML:**
+      1. Implementar gate no pipeline de treinamento que verifica
+         se dados foram anonimizados/pseudonimizados conforme
+         politica antes de iniciar treinamento.
+      2. Automatizar deteccao de PII residual em datasets: scan
+         de textos, metadados e features que possam identificar
+         pacientes.
+      3. Implementar testes de reidentificacao como parte do
+         pipeline: tentativa automatizada de vincular registros
+         anonimizados a dados conhecidos.
+      4. Bloquear treinamento com dados nao processados pelo
+         pipeline de de-identification.
+    tools:
+      - gitlab-ci
+      - pii-scanner
+      - reidentification-tests
+      - data-governance
+  secops:
+    prose: |
+      **Governanca de anonimizacao:**
+      1. Auditar periodicamente efetividade da anonimizacao:
+         contratar avaliacao independente de risco de reidentificacao.
+      2. Monitorar acesso a chaves de pseudonimizacao: qualquer
+         acesso deve ser justificado e registrado.
+      3. Reavaliar risco de reidentificacao quando novas fontes
+         de dados publicas se tornarem disponiveis.
+      4. Manter documentacao de tecnicas de anonimizacao utilizadas
+         por dataset para auditoria e replicabilidade.
+    tools:
+      - privacy-audit
+      - access-monitoring
+      - risk-assessment
+      - documentation-system
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5", "art-12", "art-13"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-10"]
+    relationship: mapped

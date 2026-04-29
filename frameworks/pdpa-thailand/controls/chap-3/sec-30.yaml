@@ -1,0 +1,108 @@
+id: sec-30
+family: chap-3
+title: "Rights of the Data Subject"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 30. A data subject shall have the following rights:
+    (1) the right to be informed;
+    (2) the right of access to personal data;
+    (3) the right to data portability;
+    (4) the right to object to the collection, use, or disclosure of personal data;
+    (5) the right to erasure or destruction of personal data;
+    (6) the right to restrict the processing of personal data;
+    (7) the right to rectification of personal data.
+
+    The data controller shall provide appropriate and convenient means for the data
+    subject to exercise these rights. The data controller shall act on the request
+    without undue delay and in any event within 30 days of receipt.
+  parts:
+    - id: sec-30-1
+      label: "Paragraph 1"
+      prose: |
+        Enumeration of seven fundamental data subject rights.
+    - id: sec-30-2
+      label: "Paragraph 2"
+      prose: |
+        Data controller must provide convenient means for exercising rights
+        and respond within 30 days.
+    - id: sec-30-3
+      label: "Paragraph 3"
+      prose: |
+        If the data controller refuses a request, it must inform the data
+        subject of the reasons and the right to lodge a complaint with the PDPC.
+guidance:
+  prose: |
+    Section 30 establishes the comprehensive set of data subject rights under the
+    PDPA, mirroring GDPR Articles 12-22. These rights are the most operationally
+    intensive provisions for engineering teams.
+
+    Key considerations:
+
+    - **30-Day SLA:** All requests must be processed within 30 days. This requires
+      automated workflows, not manual email processing.
+
+    - **Convenient Means:** The data subject must have easy access to exercise
+      rights. A self-service portal is the standard approach.
+
+    - **Identity Verification:** Before fulfilling requests, verify the requestor's
+      identity to prevent unauthorized data disclosure.
+
+    - **Multi-System Fulfillment:** Rights requests typically span multiple systems.
+      A centralized orchestration service must coordinate across databases, backups,
+      third-party processors, and analytics platforms.
+
+    - **Refusal Documentation:** If a request is refused (e.g., legal obligation to
+      retain), the refusal must be documented with reasons and communicated to the
+      data subject with information about complaint procedures.
+
+    - **Volume Planning:** For consumer-facing businesses, plan for high-volume
+      DSR processing. Manual processes will not scale.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a Data Subject Request (DSR) portal: self-service interface for
+         submitting access, deletion, portability, objection, and rectification requests.
+      2. Implement identity verification in the DSR flow (email verification, MFA,
+         or government ID for high-risk requests).
+      3. Build a DSR orchestration engine that coordinates fulfillment across all
+         systems holding personal data.
+      4. Implement SLA tracking with automated escalation when the 30-day deadline
+         approaches.
+      5. Create a unified personal data index mapping data subjects to all systems
+         where their data is stored.
+    tools:
+      - dsr-portal
+      - identity-verification-service
+      - dsr-orchestration-engine
+      - personal-data-index
+  devsecops:
+    prose: |
+      1. Test DSR flows end-to-end for each right type (access, deletion, portability,
+         objection, rectification).
+      2. Validate that deletion requests remove data from all systems including caches,
+         logs, and backups (within retention policies).
+      3. Verify portability exports produce machine-readable, structured formats.
+      4. Load-test DSR processing to validate scalability under peak request volumes.
+    tools:
+      - dsr-test-suite
+      - data-deletion-validator
+      - portability-format-checker
+      - dsr-load-tests
+  secops:
+    prose: |
+      1. Monitor DSR processing metrics: request volumes, response times, SLA compliance.
+      2. Alert when DSR processing approaches the 30-day deadline.
+      3. Audit DSR fulfillment completeness (was data actually deleted from all systems?).
+      4. Track refusal rates and reasons for compliance reporting.
+    tools:
+      - dsr-dashboard
+      - sla-monitor
+      - deletion-verification-audit
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 12", "art. 13", "art. 14", "art. 15", "art. 16", "art. 17", "art. 18", "art. 20", "art. 21"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18"]
+    relationship: equivalent-to

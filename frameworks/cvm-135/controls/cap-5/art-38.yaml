@@ -1,0 +1,101 @@
+id: art-38
+family: cap-5
+title: "Continuidade Operacional de Camaras e Sistemas de Liquidacao"
+class: CVM-135
+baselines: [infraestruturas-mercado]
+statement:
+  prose: |
+    Art. 38. As câmaras de compensação e liquidação devem implementar e manter:
+    I - plano de continuidade de negócios (PCN) que assegure a retomada de
+    operações críticas em prazo compatível com o ciclo de liquidação,
+    limitado a 2 (duas) horas para funções essenciais;
+    II - infraestrutura de contingência (site de disaster recovery) capaz
+    de assumir integralmente as funções de produção;
+    III - testes periódicos de ativação do site de contingência, incluindo
+    testes com participantes do mercado, com frequência mínima semestral;
+    IV - redundância de componentes críticos de hardware, software e
+    comunicação, eliminando pontos únicos de falha;
+    V - procedimentos de comunicação com participantes, CVM e Banco Central
+    em caso de ativação do plano de continuidade; e
+    VI - RTO (Recovery Time Objective) máximo de 2 horas e RPO (Recovery
+    Point Objective) próximo a zero para operações de liquidação.
+
+    Parágrafo único. A CVM poderá exigir testes de continuidade adicionais
+    em caso de eventos que aumentem o risco operacional.
+guidance:
+  prose: |
+    O art. 38 trata da resiliencia operacional de camaras de liquidacao,
+    que sao as infraestruturas mais criticas do mercado de capitais.
+
+    **RTO de 2 horas:**
+    O limite de 2 horas para retomada de funcoes essenciais e alinhado
+    com os principios PFMI e reflete a criticidade sistemica das CCPs.
+    Uma parada prolongada pode causar inadimplencias em cascata.
+
+    **RPO proximo a zero:**
+    A perda de dados de liquidacao e inaceitavel, pois cada operacao
+    tem valor financeiro concreto. Isso exige replicacao sincrona ou
+    quase sincrona entre sites.
+
+    **Testes com participantes:**
+    Testes de contingencia devem incluir participantes do mercado
+    (corretoras, bancos) para validar a cadeia completa de
+    comunicacao e processamento em cenario de desastre.
+
+    **Eliminacao de pontos unicos de falha:**
+    Nenhum componente individual (servidor, switch, link de comunicacao,
+    banco de dados) deve ser capaz de, sozinho, interromper as funcoes
+    criticas de liquidacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de alta disponibilidade:**
+      1. Arquitetura active-active ou active-standby com replicacao
+         sincrona de dados entre sites primario e DR.
+      2. Redundancia N+1 em todos os componentes criticos: servidores,
+         storage, networking, bancos de dados.
+      3. RTO automatizado com failover orquestrado que atinja 2 horas
+         sem intervencao manual para funcoes essenciais.
+
+      **Testes de continuidade:**
+      4. Ambiente de testes de DR que replique fielmente producao para
+         exercicios semestrais com participantes.
+    tools:
+      - disaster-recovery
+      - high-availability
+      - data-replication
+      - failover-orchestration
+  devsecops:
+    prose: |
+      **Automacao de continuidade:**
+      1. Runbooks automatizados de failover com testes de regressao
+         que validem RPO e RTO apos cada alteracao de infraestrutura.
+      2. Pipeline de teste de continuidade que simule falhas de
+         componentes e valide recuperacao automatica.
+      3. Monitoramento continuo de integridade da replicacao com
+         alertas para lag ou divergencia de dados.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - replication-monitoring
+      - runbook-automation
+  secops:
+    prose: |
+      **Governanca de continuidade:**
+      1. Testes semestrais de DR com participantes documentados e
+         avaliados, com plano de acao para gaps identificados.
+      2. Monitoramento 24/7 de saude da infraestrutura de contingencia
+         com alertas para degradacao.
+      3. Relatorio semestral a CVM sobre resultados de testes de
+         continuidade e adequacao da infraestrutura.
+    tools:
+      - bcm-platform
+      - infrastructure-monitoring
+      - regulatory-reporting
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-9", "art-10"]
+    relationship: complements
+  - framework_id: bcb-304
+    articles: ["art-1"]
+    relationship: complements

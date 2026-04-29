@@ -1,0 +1,103 @@
+id: iot-6
+family: comms
+title: "Encrypted Remote Management"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O gerenciamento remoto do equipamento deve utilizar métodos adequados
+    de autenticação e criptografia, baseados em padronização
+    internacionalmente reconhecida. O acesso remoto ao equipamento deve
+    ser protegido por protocolos criptográficos que garantam a
+    confidencialidade e a integridade das comunicações de gerenciamento.
+
+    O equipamento deve permitir o controle de acesso por origem, como
+    segmento de rede ou URL, restringindo quais entidades podem
+    estabelecer sessões de gerenciamento remoto.
+
+    (Ato 77/2021 §5.1.2)
+guidance:
+  prose: |
+    This control mandates that all remote management traffic be
+    encrypted using internationally standardized protocols. Unencrypted
+    management protocols (Telnet, HTTP, SNMPv1/v2c) must not be used
+    for device administration.
+
+    **Acceptable protocols:**
+    - HTTPS (TLS 1.2+ with strong cipher suites) for web management.
+    - SSH v2 for CLI management.
+    - SNMPv3 with authentication and privacy (authPriv) for monitoring.
+    - TR-069 over TLS for ACS communication.
+    - TR-369 (USP) over MTP with TLS for next-gen management.
+
+    **Source-based access control:**
+    - The device must support ACLs that restrict management access to
+      specific IP ranges, subnets, or VLANs.
+    - Default configuration should restrict management access to the
+      LAN segment only — WAN-side management must be explicitly enabled
+      and further restricted by source IP/range.
+
+    **Certificate handling:**
+    - Devices should validate server certificates when connecting to
+      management servers (ACS, cloud platforms).
+    - Self-signed certificates should trigger user warnings, not be
+      silently accepted.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Disable all unencrypted management protocols (Telnet, HTTP,
+         SNMPv1/v2c) by default in the firmware build configuration.
+      2. Implement TLS 1.2+ with a restricted cipher suite (e.g.,
+         TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256) for
+         the embedded web server.
+      3. Configure the SSH server to support only SSH v2 with modern
+         key exchange algorithms (curve25519-sha256, ecdh-sha2-nistp256).
+      4. Implement IP-based ACLs for management access with a default
+         policy of LAN-only. Expose WAN management as an opt-in
+         setting with mandatory source IP restriction.
+      5. For TR-069, implement TLS mutual authentication between the
+         device and the ACS with certificate pinning or CA validation.
+    tools:
+      - embedded-tls-library
+      - openssh-embedded
+      - acl-engine
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Run TLS configuration tests (testssl.sh, sslyze) against the
+         device management interface in the CI pipeline to verify only
+         strong cipher suites and TLS 1.2+ are accepted.
+      2. Add integration tests that attempt to connect via unencrypted
+         protocols (HTTP, Telnet, SNMPv1) and verify they are rejected
+         by default.
+      3. Scan firmware images for deprecated cryptographic libraries or
+         weak cipher suite configurations.
+      4. Test ACL enforcement: verify management access is blocked from
+         unauthorized source IPs/subnets.
+    tools:
+      - gitlab-ci
+      - testssl-sh
+      - sslyze
+      - nmap
+      - integration-testing
+  secops:
+    prose: |
+      1. During penetration testing, scan all device ports for
+         unencrypted management services and verify none are reachable.
+      2. Validate TLS certificate handling: attempt connections with
+         expired, self-signed, and mismatched certificates to verify
+         proper validation behavior.
+      3. Verify ACL effectiveness by attempting management access from
+         WAN-side and unauthorized subnets.
+      4. Audit the deployed fleet via TR-069 to confirm WAN management
+         is disabled or properly restricted across all devices.
+    tools:
+      - nmap
+      - burp-suite
+      - sslyze
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7", "art-12"]
+    relationship: complements

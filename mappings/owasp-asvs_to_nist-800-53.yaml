@@ -1,0 +1,597 @@
+id: owasp-asvs_to_nist-800-53
+title: "OWASP ASVS v4.0 to NIST SP 800-53 Rev 5 Control Mapping"
+source_framework: owasp-asvs
+target_framework: nist-800-53-rev5
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+
+mappings:
+  # ──────────────────────────────────────────────────────────────────────
+  # V1 — Architecture, Design and Threat Modeling
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v1.1.1
+    target_controls:
+      - id: cm-2
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          ASVS v1.1.1 requires a secure SDLC with threat modeling at every design
+          change. NIST CM-2 requires developing and maintaining a baseline configuration
+          under configuration control. Both share the need for documented, reviewed
+          system design artifacts, though CM-2 focuses on configuration baselines while
+          v1.1.1 focuses on security integration throughout development.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v1.1.1 mandates threat modeling to identify countermeasures and guide
+          security testing. NIST CM-6 establishes secure configuration settings for
+          system components. Threat modeling outputs directly inform which configuration
+          hardening measures are necessary, making these controls complementary.
+      - id: sr-3
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          ASVS v1.1.1 requires threat modeling that identifies threats across all
+          development stages, including supply chain risks. NIST SR-3 establishes
+          processes to identify and address supply chain weaknesses. Both controls
+          address proactive risk identification during system development, with SR-3
+          specifically targeting supply chain elements.
+      - id: si-4
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v1.1.1 requires threat model outputs to guide security testing and
+          monitoring. NIST SI-4 requires system monitoring to detect attacks and
+          unauthorized connections. Threat model outputs directly inform the monitoring
+          objectives and detection rules deployed under SI-4.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V2 — Authentication
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v2.1.1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ASVS v2.1.1 requires passwords of at least 12 characters supporting up to
+          128 characters, with no maximum length restriction. NIST IA-2 requires unique
+          identification and authentication of organizational users. The password length
+          requirement is a specific implementation of the broader IA-2 authentication
+          mandate, aligned with NIST SP 800-63B guidance on memorized secrets.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v2.1.1 defines password strength requirements for user accounts. NIST
+          AC-2 manages account lifecycle including the specification of access
+          authorizations and authenticator requirements. Password policy is a
+          prerequisite for the account management process defined in AC-2.
+
+  - source_control: v2.2.1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ASVS v2.2.1 requires anti-automation controls including rate limiting, CAPTCHA,
+          breached password blocking, and soft lockouts with no more than 100 failed
+          attempts per hour. NIST IA-2 requires robust identification and authentication.
+          These anti-automation measures directly implement the protection of
+          authentication mechanisms that IA-2 demands.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v2.2.1 enforces account lockout thresholds and progressive delays on
+          failed attempts. NIST AC-2 requires monitoring account usage and managing
+          accounts including disabling for atypical usage. The lockout and rate limiting
+          controls complement account monitoring requirements.
+      - id: si-4
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v2.2.1 requires detection of credential stuffing and brute-force attacks.
+          NIST SI-4 requires monitoring systems to detect attacks and indicators of
+          potential attacks. The anti-automation controls serve as application-level
+          monitoring that feeds into the broader system monitoring capability.
+
+  - source_control: v2.8.1
+    target_controls:
+      - id: ia-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          ASVS v2.8.1 requires TOTP-based multi-factor authentication with single-use
+          tokens and defined lifetimes. NIST IA-2 and its enhancements IA-2(1) and
+          IA-2(2) require multi-factor authentication for privileged and non-privileged
+          accounts. TOTP implementation is a direct realization of the MFA requirement
+          in IA-2.
+      - id: ac-3
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v2.8.1 requires MFA step-up for high-value transactions and account
+          management functions. NIST AC-3 enforces approved authorizations for logical
+          access. MFA step-up is an access enforcement mechanism that strengthens
+          authorization decisions for sensitive operations.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V3 — Session Management
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v3.1.1
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.75
+        rationale: >
+          ASVS v3.1.1 requires secure session token generation with 128-bit entropy,
+          server-side invalidation on logout, and prohibition of session tokens in URLs.
+          NIST AC-3 enforces approved authorizations for logical access. Session tokens
+          are the mechanism by which access enforcement persists across HTTP requests;
+          weak session management directly undermines access control.
+      - id: ia-2
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          ASVS v3.1.1 requires cryptographically secure session identifiers with
+          server-side lifecycle management. NIST IA-2 requires unique identification
+          and authentication. Session management extends the initial authentication
+          event across the user's interaction, maintaining the authenticated state
+          that IA-2 establishes.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v3.1.1 requires session invalidation on logout and non-reuse of
+          invalidated session identifiers. NIST AC-2 manages account lifecycle including
+          monitoring of account usage. Session termination is part of the broader
+          account activity management that AC-2 addresses.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V4 — Access Control
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v4.1.1
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          ASVS v4.1.1 requires server-side access control enforcement, deny-by-default
+          behavior, and fail-secure authorization decisions. NIST AC-3 requires enforcing
+          approved authorizations for logical access to information and system resources.
+          This is a near-direct mapping: both controls mandate centralized, server-side
+          access enforcement with consistent policy application.
+      - id: ac-6
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          ASVS v4.1.1 mandates deny-by-default access control where all access must be
+          explicitly authorized. NIST AC-6 requires least privilege, allowing only
+          necessary access. Deny-by-default is the foundational implementation pattern
+          for least privilege, ensuring no access is granted without explicit authorization.
+      - id: ac-1
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v4.1.1 requires a centralized policy decision point for access control.
+          NIST AC-1 requires developing and documenting access control policies and
+          procedures. The centralized PDP design pattern is the technical implementation
+          of the policy framework that AC-1 mandates.
+
+  - source_control: v4.2.1
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          ASVS v4.2.1 requires protection against IDOR attacks with per-record
+          authorization checks on every CRUD operation. NIST AC-3 requires enforcing
+          approved authorizations for logical access. Operation-level authorization
+          is the granular implementation of access enforcement at the data object level.
+      - id: ac-6
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ASVS v4.2.1 mandates verification that users are authorized to access specific
+          records, not merely authenticated. NIST AC-6 requires least privilege. Per-record
+          authorization ensures users can only access the specific resources their role
+          requires, directly implementing least privilege at the data level.
+      - id: ac-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v4.2.1 requires user-to-resource authorization validation. NIST AC-2
+          manages account types, roles, and access authorizations. The operation-level
+          access control depends on the role and permission definitions managed through
+          AC-2's account management processes.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V5 — Validation, Sanitization and Encoding
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v5.1.1
+    target_controls:
+      - id: si-4
+        relationship: implements
+        confidence: 0.70
+        rationale: >
+          ASVS v5.1.1 requires server-side input validation using allow-lists with
+          defenses against HTTP parameter pollution. NIST SI-4 requires monitoring
+          systems to detect attacks. Input validation acts as an application-level
+          detection and prevention mechanism that identifies malicious input patterns
+          characteristic of injection attacks.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v5.1.1 mandates strict schema validation at the API gateway and
+          application layers. NIST SC-7 monitors and controls communications at system
+          boundaries. Input validation at the application boundary is a logical extension
+          of boundary protection, filtering malicious content before it enters the
+          processing pipeline.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v5.1.1 requires configuring API gateways and parsers with strict
+          validation rules. NIST CM-6 establishes and documents secure configuration
+          settings. The validation configuration (schema definitions, parser settings,
+          size limits) represents security-critical configuration settings for
+          application components.
+
+  - source_control: v5.2.1
+    target_controls:
+      - id: si-4
+        relationship: implements
+        confidence: 0.70
+        rationale: >
+          ASVS v5.2.1 requires HTML sanitization using approved libraries to prevent
+          XSS. NIST SI-4 requires monitoring systems to detect attacks. Server-side
+          sanitization is a detection and prevention mechanism that neutralizes XSS
+          attack payloads before they reach the browser context.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v5.2.1 mandates Content-Security-Policy headers and sanitized domain
+          isolation for user-generated content. NIST SC-7 requires boundary protection
+          including controlled communications at interfaces. CSP headers and content
+          isolation are browser-level boundary protection mechanisms that complement
+          network-level controls.
+
+  - source_control: v5.3.1
+    target_controls:
+      - id: si-4
+        relationship: implements
+        confidence: 0.75
+        rationale: >
+          ASVS v5.3.1 requires context-aware output encoding to prevent injection
+          attacks (XSS, SQL injection, OS command injection, LDAP injection). NIST SI-4
+          requires monitoring and detecting attacks. Output encoding directly prevents
+          the exploitation of injection vulnerabilities that SI-4's monitoring seeks to
+          detect.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v5.3.1 mandates parameterized queries and context-specific encoding at
+          every output point. NIST SC-7 implements boundary protection. Output encoding
+          is an application-layer boundary control that prevents injection payloads from
+          crossing the trust boundary between user input and interpreters (SQL engines,
+          browsers, OS shells).
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V6 — Stored Cryptography
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v6.2.1
+    target_controls:
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v6.2.1 requires use of approved cryptographic algorithms (AES-256,
+          RSA-2048+, SHA-256+) with authenticated encryption modes. NIST SC-7 requires
+          boundary protection including encrypted communications. Cryptographic algorithm
+          selection underpins the encryption used in boundary protection mechanisms,
+          ensuring that communications at boundaries use strong encryption.
+      - id: ia-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v6.2.1 mandates Argon2id for password storage and HMAC-SHA256+ for
+          message authentication. NIST IA-2 requires identification and authentication
+          of users. Secure credential storage through approved hashing algorithms is a
+          critical component of the authentication infrastructure that IA-2 requires.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v6.2.1 requires configuring cryptographic modules to fail securely and
+          banning deprecated algorithms. NIST CM-6 establishes secure configuration
+          settings. Cryptographic algorithm and cipher suite configuration is a key
+          dimension of system hardening addressed by CM-6.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V7 — Error Handling and Logging
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v7.1.1
+    target_controls:
+      - id: au-2
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          ASVS v7.1.1 requires logging all security-relevant events including
+          authentication successes and failures, access control failures, and input
+          validation failures with full context (who, what, when, where, outcome). NIST
+          AU-2 requires identifying and specifying event types for logging. This is a
+          direct implementation: v7.1.1 specifies the exact event types and content that
+          AU-2 mandates.
+      - id: au-6
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          ASVS v7.1.1 requires structured logging with sufficient context for incident
+          investigation and forensics. NIST AU-6 requires review and analysis of audit
+          records for inappropriate or unusual activity. Well-structured, contextual logs
+          are a prerequisite for the effective audit review and analysis that AU-6 demands.
+      - id: si-4
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          ASVS v7.1.1 requires logging security events to a centralized, immutable store
+          with real-time shipping. NIST SI-4 requires system monitoring to detect attacks.
+          The security event logs generated under v7.1.1 are the primary data source for
+          the monitoring and detection capabilities mandated by SI-4.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V8 — Data Protection
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v8.1.1
+    target_controls:
+      - id: ac-3
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          ASVS v8.1.1 requires protecting sensitive data from caching in server
+          components and client-side storage, with data classification driving
+          protection controls. NIST AC-3 enforces approved authorizations for logical
+          access. Data classification and cache control are access enforcement mechanisms
+          that prevent unauthorized data exposure through storage and caching pathways.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v8.1.1 mandates Cache-Control headers (no-store, no-cache, private) for
+          responses containing sensitive data. NIST SC-7 requires boundary protection
+          including controlling communications at interfaces. Cache-Control directives
+          are boundary-level controls that prevent sensitive data leakage through
+          intermediary caching at CDNs, proxies, and load balancers.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v8.1.1 requires configuring reverse proxies and CDNs to respect
+          Cache-Control directives and implementing field-level encryption. NIST CM-6
+          establishes secure configuration settings for system components. Cache and
+          encryption configuration for data protection are security-critical
+          configuration settings.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V9 — Communications
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v9.1.1
+    target_controls:
+      - id: sc-7
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ASVS v9.1.1 requires TLS 1.2+ for all client communications with strong
+          cipher suites, HSTS enforcement, and prohibition of fallback to unencrypted
+          connections. NIST SC-7 requires monitoring and controlling communications at
+          managed interfaces. TLS enforcement is a direct implementation of boundary
+          protection for communication channels between clients and the system.
+      - id: ia-2
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v9.1.1 mandates trusted TLS certificates and mutual TLS for
+          service-to-service communication. NIST IA-2 requires identification and
+          authentication of users and processes. mTLS certificates authenticate
+          communicating parties, extending identification and authentication to the
+          transport layer.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v9.1.1 requires specific TLS configuration: minimum version 1.2, disabled
+          weak cipher suites, HSTS max-age of at least one year. NIST CM-6 establishes
+          secure configuration settings using recognized benchmarks. TLS configuration
+          is one of the most critical security configuration settings, directly addressed
+          by CIS Benchmarks and vendor hardening guides referenced in CM-6.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V10 — Malicious Code
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v10.1.1
+    target_controls:
+      - id: sr-3
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          ASVS v10.1.1 requires code integrity controls including static analysis for
+          malicious code, signed commits, branch protection, SBOM generation, and
+          deployment artifact verification. NIST SR-3 requires establishing supply chain
+          controls to protect against supply chain risks. Code integrity verification,
+          artifact signing, and dependency provenance tracking are direct implementations
+          of supply chain protection controls.
+      - id: cm-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v10.1.1 mandates branch protection, code review requirements, and signed
+          commits for production branches. NIST CM-2 requires maintaining a baseline
+          configuration under configuration control. Branch protection and signed commits
+          ensure the integrity of the configuration baseline by preventing unauthorized
+          modifications to the codebase.
+      - id: si-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v10.1.1 requires monitoring for unauthorized changes to production
+          deployments and comparing running artifacts against signed build outputs. NIST
+          SI-4 requires system monitoring to detect attacks. Runtime integrity monitoring
+          of deployed code is a specialized monitoring capability that detects supply
+          chain compromises and unauthorized modifications.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V11 — Business Logic
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v11.1.1
+    target_controls:
+      - id: ac-3
+        relationship: implements
+        confidence: 0.75
+        rationale: >
+          ASVS v11.1.1 requires sequential workflow enforcement, rate limits, and
+          transaction controls that prevent users from skipping steps or manipulating
+          business-critical operations. NIST AC-3 enforces approved authorizations for
+          logical access. Business logic flow enforcement is a form of access control
+          that restricts which operations users can perform based on the current
+          workflow state.
+      - id: si-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v11.1.1 requires detection and rejection of automated exploitation of
+          business-critical operations and monitoring for fraud patterns. NIST SI-4
+          requires monitoring for attacks and indicators of potential attacks. Business
+          logic abuse detection is application-level monitoring that identifies
+          exploitation patterns not detectable by network or infrastructure monitoring.
+      - id: au-2
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v11.1.1 requires event sourcing or audit logging for all business-critical
+          state changes. NIST AU-2 identifies event types for logging. Business logic
+          state transitions represent security-relevant events that should be included
+          in the event types logged under AU-2.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V12 — File Upload
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v12.1.1
+    target_controls:
+      - id: si-4
+        relationship: implements
+        confidence: 0.75
+        rationale: >
+          ASVS v12.1.1 requires file content validation using magic bytes, antivirus
+          scanning (ClamAV), size limits, and decompression bomb protection. NIST SI-4
+          requires monitoring systems to detect attacks. File upload validation is an
+          application-level monitoring and detection capability that identifies malicious
+          content (web shells, malware, zip bombs) at the point of ingestion.
+      - id: sc-7
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v12.1.1 mandates storing uploaded files outside the web root with no
+          execute permissions and serving through pre-signed URLs or media proxies. NIST
+          SC-7 requires boundary protection with network segmentation. Isolating uploaded
+          file storage from the web-accessible boundary prevents uploaded malicious files
+          from being executed within the application boundary.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v12.1.1 requires configuring file size limits at load balancer, API
+          gateway, and application levels with specific decompression limits. NIST CM-6
+          establishes secure configuration settings. File upload limits and storage
+          configuration are security-critical settings that must be established and
+          monitored.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V13 — API and Web Service
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v13.1.1
+    target_controls:
+      - id: sc-7
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          ASVS v13.1.1 requires consistent parser behavior across all request processing
+          layers, API authentication enforcement, schema validation, rate limiting, and
+          proper security headers. NIST SC-7 monitors and controls communications at
+          managed interfaces. API gateway enforcement of authentication, validation, and
+          rate limiting is a direct implementation of boundary protection at the
+          application interface layer.
+      - id: ac-3
+        relationship: implements
+        confidence: 0.80
+        rationale: >
+          ASVS v13.1.1 mandates consistent authentication and authorization enforcement
+          across all API endpoints including REST, GraphQL, gRPC, and WebSocket. NIST
+          AC-3 enforces approved authorizations for logical access. API-level access
+          enforcement is a specific implementation of access control at the service
+          boundary.
+      - id: si-4
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v13.1.1 requires monitoring API traffic for abuse patterns, rate limit
+          violations, and enumeration attempts. NIST SI-4 requires system monitoring
+          to detect attacks. API traffic analysis is application-specific monitoring
+          that detects attack patterns unique to web service interfaces.
+      - id: cm-6
+        relationship: complements
+        confidence: 0.55
+        rationale: >
+          ASVS v13.1.1 requires standardizing URL parsing, encoding, and normalization
+          across all layers with CORS policies and content-type validation. NIST CM-6
+          establishes secure configuration settings. Parser and CORS configuration
+          represents security-critical settings that must be consistently applied
+          across all processing layers.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # V14 — Configuration
+  # ──────────────────────────────────────────────────────────────────────
+  - source_control: v14.1.1
+    target_controls:
+      - id: cm-2
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ASVS v14.1.1 requires hardened build and deployment configurations with
+          immutable infrastructure, removal of debug features, and server hardening per
+          industry recommendations. NIST CM-2 requires developing and maintaining a
+          baseline configuration under configuration control. Hardened deployment
+          configurations with CIS benchmark compliance directly implement the baseline
+          configuration requirement.
+      - id: cm-6
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          ASVS v14.1.1 mandates removal of unnecessary services, ports, protocols, and
+          features, with environment-specific configuration injection and distroless base
+          images. NIST CM-6 requires secure configuration settings reflecting the most
+          restrictive mode consistent with operational requirements. This is a near-direct
+          mapping: both controls require hardened configurations with minimal attack surface.
+      - id: sr-3
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          ASVS v14.1.1 requires secure CI/CD pipelines with access controls and integrity
+          verification at each build step, including signed build artifacts. NIST SR-3
+          establishes supply chain controls. Secure build pipelines and artifact signing
+          are supply chain protection measures that complement the broader SCRM processes
+          in SR-3.
+      - id: ac-6
+        relationship: complements
+        confidence: 0.60
+        rationale: >
+          ASVS v14.1.1 requires least-privilege access for CI/CD pipelines to deployment
+          targets, with containers running as non-root with dropped capabilities. NIST
+          AC-6 requires least privilege for all users and processes. Pipeline and container
+          privilege minimization is a specific application of least privilege in the
+          build and deployment context.

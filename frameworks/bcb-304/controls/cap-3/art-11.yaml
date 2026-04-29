@@ -1,0 +1,94 @@
+id: art-11
+family: cap-3
+title: "Vedacao de Uso de Ativos de Clientes"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 11. É vedado à prestadora de serviços de ativos virtuais:
+    I - utilizar os ativos virtuais ou recursos financeiros dos clientes para
+    finalidade diversa da instrução do próprio cliente;
+    II - conceder empréstimos ou financiamentos com recursos ou ativos virtuais
+    dos clientes, salvo quando expressamente autorizada para tal atividade;
+    III - dar em garantia os ativos virtuais ou recursos financeiros dos clientes;
+    IV - realizar operações por conta própria utilizando informações privilegiadas
+    sobre ordens de clientes (front-running);
+    V - intermediar operações entre a própria prestadora e seus clientes sem
+    divulgação adequada (self-dealing).
+
+    Parágrafo único. A prestadora deve manter controles internos que impeçam as
+    práticas vedadas neste artigo.
+guidance:
+  prose: |
+    O art. 11 estabelece vedacoes absolutas que protegem clientes contra
+    comportamentos predatorios da VASP.
+
+    **Cinco vedacoes:**
+    1. Desvio de finalidade: usar ativos de clientes para qualquer proposito
+       diferente do instruido pelo cliente
+    2. Emprestimos nao autorizados: similar ao que causou colapso de Celsius e
+       BlockFi -- emprestar ativos de clientes sem autorizacao explicita
+    3. Garantia com ativos de clientes: dar em garantia ativos que nao sao seus
+    4. Front-running: usar informacao privilegiada sobre ordens de clientes
+       para operar antes deles
+    5. Self-dealing: intermediar operacoes onde a VASP e contraparte sem
+       divulgacao adequada
+
+    **Controles internos obrigatorios:**
+    Nao basta proibir -- a VASP deve implementar controles tecnicos que
+    IMPEDEM fisicamente essas praticas (principle of technical enforcement).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles tecnicos de prevencao:**
+      1. Separacao logica e fisica de carteiras de clientes e da empresa nos
+         sistemas de assinatura (chaves diferentes, HSMs diferentes).
+      2. Smart contracts ou logica de backend que impede movimentacao de ativos
+         de clientes para carteiras da empresa sem ordem explicita do cliente.
+      3. Chinese wall tecnico: equipe de trading proprietario SEM acesso a dados
+         de ordens de clientes (segregacao de sistemas e acessos).
+      4. Sistema de deteccao de front-running que compara timestamps de ordens
+         de clientes com operacoes proprias da empresa.
+      5. Disclosure automatico em operacoes onde a VASP atua como contraparte.
+    tools:
+      - access-control
+      - chinese-wall
+      - trade-surveillance
+      - disclosure-engine
+      - wallet-segregation
+  devsecops:
+    prose: |
+      **Validacao de controles de vedacao:**
+      1. Testes automatizados que tentam executar operacoes vedadas e verificam
+         que sao bloqueadas pelo sistema.
+      2. Code review focado em logica de movimentacao de ativos para detectar
+         possibilidade de mistura de fundos.
+      3. Scan de acessos que verifica segregacao entre equipes (chinese wall).
+      4. Testes de cenario de front-running e self-dealing.
+    tools:
+      - gitlab-ci
+      - access-audit
+      - scenario-testing
+      - code-review
+  secops:
+    prose: |
+      **Monitoramento de vedacoes:**
+      1. Monitoramento em tempo real de movimentacoes entre carteiras de clientes
+         e carteiras proprias.
+      2. Auditoria periodica de operacoes proprias vs. ordens de clientes
+         (deteccao de front-running).
+      3. Revisao semestral de controles de chinese wall.
+      4. Canal de denuncia para funcionarios reportarem violacoes.
+      5. Relatorio trimestral de compliance sobre aderencia as vedacoes.
+    tools:
+      - trade-surveillance
+      - audit-trail
+      - whistleblower-channel
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-22"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: complements

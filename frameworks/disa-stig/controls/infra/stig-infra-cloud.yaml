@@ -1,0 +1,134 @@
+id: stig-infra-cloud
+family: infra
+title: "Cloud Service Security and FedRAMP Authorization Requirements"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Cloud services used by DoD systems must be authorized through the DoD
+    Cloud Authorization Process or hold a FedRAMP authorization at the impact
+    level corresponding to the data sensitivity of the system (FedRAMP Moderate
+    for systems with CUI; FedRAMP High or DoD IL4/IL5/IL6 for systems with
+    higher impact data). Cloud deployments must be configured in accordance
+    with the applicable DISA STIG for the cloud service (AWS, Azure, GCP,
+    Oracle Cloud). Cloud accounts and subscriptions must enforce MFA for all
+    human access, logging must be enabled for all management-plane and data-
+    plane operations, and privileged access to cloud management consoles must
+    be through a PAM solution. Cloud storage must enforce encryption at rest
+    and in transit, object-level logging, and access controls that prevent
+    public exposure of sensitive data. Infrastructure-as-code templates must
+    be used for all cloud resource provisioning, and manual changes to
+    production cloud environments must be detected and remediated.
+
+guidance:
+  prose: >-
+    DoD cloud usage is governed by the DoD Cloud Computing Security Requirements
+    Guide (CC SRG) and DISA Cloud Authorization Process. Using a cloud service
+    that lacks the appropriate FedRAMP or DoD authorization for the data impact
+    level is a CAT I finding because it means the security controls of that
+    service have not been validated for DoD use.
+
+    Cloud misconfiguration is one of the most common causes of data breaches
+    involving government data. Publicly exposed S3 buckets, overly permissive
+    IAM roles, disabled cloud logging (CloudTrail, Azure Monitor), and unrestricted
+    security groups have resulted in significant data exposures in government
+    environments. The infrastructure-as-code requirement enforces that all cloud
+    configurations are version-controlled, reviewed, and auditable — eliminating
+    the category of "cowboy cloud" where administrators make manual changes
+    that leave no audit trail and drift from the approved baseline.
+
+    The cloud shared responsibility model must be clearly understood and
+    documented: the cloud provider is responsible for security OF the cloud
+    (physical infrastructure, hypervisor, managed service hardening); the
+    customer (DoD) is responsible for security IN the cloud (data, access
+    management, network configuration, workload configuration).
+
+references:
+  - citation: "DISA Cloud Computing Security Requirements Guide (CC SRG), V1R4"
+    url: "https://public.cyber.mil/dccs/"
+  - citation: "DISA STIG — Amazon Web Services Foundation, V1R3"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, SA-9, CA-3, SC-7, AU-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FedRAMP Cloud Service Provider Authorization Process"
+    url: "https://www.fedramp.gov/program-basics/how-it-works/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provision all cloud resources using Terraform with state stored in an
+      approved, access-controlled backend (S3 with encryption and versioning,
+      Terraform Cloud). Enforce cloud security guardrails using AWS Organizations
+      SCPs, Azure Policy, or GCP Organization Policies that prevent actions
+      that violate DoD requirements (disabling CloudTrail, creating public S3
+      buckets, disabling encryption). Enable cloud audit logging across all
+      services: AWS CloudTrail (management and data events), Azure Activity Log
+      with Diagnostic Settings, GCP Cloud Audit Logs. Configure CloudTrail logs
+      to ship to an immutable S3 bucket in a separate security account. Use
+      cloud security posture management (CSPM) tools to continuously scan
+      cloud configurations against DISA STIG and FedRAMP benchmarks. Implement
+      just-in-time cloud console access through a PAM solution.
+    tools:
+      - terraform
+      - aws-config
+      - azure-policy
+      - cloud-custodian
+      - prisma-cloud
+      - aws-security-hub
+      - microsoft-defender-for-cloud
+
+  devsecops:
+    prose: >-
+      Scan all Terraform code in CI pipelines using tfsec, Checkov, and
+      Terrascan against DISA cloud STIG rules and FedRAMP baseline requirements.
+      Enforce IaC immutability policies that require all cloud changes to flow
+      through approved CI/CD pipelines — direct console access for production
+      changes is prohibited except for break-glass emergency procedures.
+      Implement drift detection that compares Terraform state against actual
+      cloud resources and alerts on discrepancies. Validate cloud authorization
+      level in pipeline policies — reject deployments that attempt to use
+      cloud services not on the DoD-approved cloud service catalog for the
+      required impact level.
+    tools:
+      - tfsec
+      - checkov
+      - terrascan
+      - gitlab-ci
+      - conftest
+      - driftctl
+
+  secops:
+    prose: >-
+      Ingest all cloud audit logs (CloudTrail, Azure Activity Log) into the
+      SIEM and implement correlation rules for cloud-specific attack patterns:
+      root account usage (AWS), credential exfiltration via metadata service
+      (IMDS), IAM role privilege escalation, security group modifications,
+      CloudTrail disabling attempts, and unusual cross-region or cross-account
+      activity. Conduct cloud security assessments quarterly using CSPM tools
+      against the applicable DISA cloud STIG. Verify the cloud service's
+      FedRAMP/DoD authorization remains current (authorizations expire and
+      must be renewed). Include cloud security posture findings in continuous
+      monitoring reports to the AO.
+    tools:
+      - splunk
+      - aws-security-hub
+      - microsoft-defender-cloud
+      - prisma-cloud
+      - wiz
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "CA-3", "SC-7", "AU-2", "SC-28"]
+    relationship: derived-from
+  - framework_id: fedramp
+    articles: ["sa-9", "ca-3", "au-2"]
+    relationship: equivalent-to
+  - framework_id: cmmc-v2
+    articles: ["CA.L2-3.12.3", "AU.L2-3.3.1"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["ID.SC-02", "GV.OC-05", "PR.IR-01"]
+    relationship: supports

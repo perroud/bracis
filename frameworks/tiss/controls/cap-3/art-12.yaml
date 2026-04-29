@@ -1,0 +1,114 @@
+id: art-12
+family: cap-3
+title: "Criptografia de Dados em Transito e em Repouso"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 12. Todas as transações TISS devem ser protegidas por criptografia
+    em trânsito, utilizando protocolo TLS versão 1.2 ou superior.
+
+    Parágrafo 1. Os dados de saúde armazenados em sistemas que processam
+    transações TISS devem ser protegidos por criptografia em repouso,
+    utilizando algoritmos de criptografia simétrica com chaves de no
+    mínimo 256 bits.
+
+    Parágrafo 2. As chaves criptográficas devem ser gerenciadas conforme
+    boas práticas de gestão de chaves, incluindo:
+    I - Armazenamento seguro de chaves em módulos de segurança (HSM)
+    ou cofres de chaves;
+    II - Rotação periódica de chaves conforme política da organização;
+    III - Segregação de chaves entre ambientes (produção, homologação,
+    desenvolvimento).
+
+    Parágrafo 3. A integridade das mensagens TISS deve ser garantida
+    por hash criptográfico (SHA-256 ou superior) incluído em cada
+    transação.
+guidance:
+  prose: |
+    O art. 12 define requisitos de criptografia para protecao de dados
+    de saude em todas as fases do ciclo de vida da transacao TISS.
+
+    **Criptografia em transito:**
+    - TLS 1.2 (minimo) ou TLS 1.3 (recomendado)
+    - Cipher suites aprovados: AES-GCM, ChaCha20-Poly1305
+    - Perfect Forward Secrecy (PFS) obrigatorio
+    - Certificados ICP-Brasil para autenticacao de endpoints
+
+    **Criptografia em repouso:**
+    - AES-256-GCM ou AES-256-CBC para dados armazenados
+    - Criptografia full-disk para servidores de banco de dados
+    - Criptografia column-level para campos sensiveis (CID, CPF,
+      dados clinicos)
+    - Backups criptografados com chave distinta
+
+    **Gestao de chaves:**
+    - HSM (Hardware Security Module) para chaves master
+    - Vault (HashiCorp Vault, AWS KMS, Azure Key Vault) para
+      chaves de aplicacao
+    - Rotacao: anual para chaves master, semestral para chaves
+      de sessao
+    - Segregacao completa entre ambientes
+
+    **Hash de integridade:**
+    - SHA-256 como minimo para hash de mensagens TISS
+    - Hash incluido no envelope XML da transacao
+    - Validacao obrigatoria pelo receptor antes de processar
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura criptografica TISS:**
+      1. Configurar TLS 1.3 (preferencialmente) em todos os endpoints
+         TISS com cipher suites restritos e PFS habilitado.
+      2. Implementar criptografia at-rest com AES-256-GCM para todos
+         os datastores que armazenam dados TISS (PostgreSQL TDE,
+         encrypted volumes, S3 SSE-KMS).
+      3. Integrar HSM ou KMS para gestao centralizada de chaves
+         criptograficas, com rotacao automatizada.
+      4. Implementar calculo e validacao de hash SHA-256 como
+         middleware obrigatorio no pipeline de mensagens TISS.
+    tools:
+      - hsm
+      - kms
+      - tls-configuration
+      - encryption-at-rest
+  devsecops:
+    prose: |
+      **Validacao criptografica no pipeline:**
+      1. Implementar testes automatizados de configuracao TLS
+         (testssl.sh, SSLyze) verificando versao, cipher suites e PFS.
+      2. Incluir verificacao de criptografia at-rest em testes de
+         infraestrutura (InSpec, Terraform compliance).
+      3. Automatizar validacao de hash SHA-256 em transacoes TISS
+         de teste, rejeitando mensagens com integridade comprometida.
+      4. Scanning de codigo para detectar uso de algoritmos
+         criptograficos obsoletos (MD5, SHA-1, DES, RC4).
+    tools:
+      - tls-testing
+      - infra-compliance
+      - hash-validation
+      - crypto-scanning
+  secops:
+    prose: |
+      **Gestao operacional de criptografia:**
+      1. Monitorar continuamente a configuracao TLS de endpoints TISS
+         com alertas para degradacao (cipher suites fracos, certificados
+         expirados).
+      2. Auditar trimestralmente a gestao de chaves: rotacao, acesso,
+         segregacao entre ambientes.
+      3. Manter inventario de todos os ativos criptograficos (chaves,
+         certificados, HSMs) com datas de expiracao e responsaveis.
+      4. Testar restauracao de backups criptografados semestralmente
+         para garantir capacidade de recuperacao.
+    tools:
+      - tls-monitoring
+      - key-audit
+      - crypto-inventory
+      - backup-testing
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312-a-2-iv", "164-312-e-2-ii"]
+    relationship: mapped

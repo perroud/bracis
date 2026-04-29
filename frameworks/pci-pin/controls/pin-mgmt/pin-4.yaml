@@ -1,0 +1,85 @@
+id: pin-4
+family: pin-mgmt
+title: "PIN Verification and Validation"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    The PIN verification process at the issuer or its agent must ensure that the
+    cardholder-entered PIN is compared against the reference PIN value within a secure
+    cryptographic device. PIN verification must use either the online method (encrypted
+    PIN sent to issuer's HSM for real-time comparison) or the offline method (PIN verified
+    by the ICC/chip using the card's stored reference value). For online verification, the
+    issuer's HSM must decrypt the PIN block, derive or retrieve the reference PIN, perform
+    the comparison, and return only a pass/fail result — the cleartext PIN must never leave
+    the SCD. Failed PIN attempts must be tracked and the card must be blocked after a
+    configurable number of consecutive failures, typically three.
+
+guidance:
+  prose: >-
+    PIN verification is the final step in the PIN security chain and must be as rigorously
+    protected as PIN entry and transmission. The verification HSM must be configured so that
+    only a boolean result (PIN correct / PIN incorrect) is returned to the host system —
+    no partial match information, no cleartext PIN, and no data that could be used to reduce
+    the PIN search space. The PIN try counter is critical for preventing brute-force
+    attacks; issuers must ensure that the counter cannot be reset by normal transaction
+    processing and that blocking is enforced consistently across all channels (ATM, POS,
+    online). Offline PIN verification on EMV chip cards relies on the card's own secure
+    element, which must be provisioned with the correct reference PIN during personalization.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 1, PIN Verification"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure issuer HSMs to perform PIN verification internally and return only
+      pass/fail results to host authorization systems. Implement PIN try counters in
+      the card management system with configurable thresholds (default: 3 consecutive
+      failures triggers card block). Deploy separate PIN verification key (PVK) hierarchies
+      for production and test environments. Implement real-time synchronization of PIN
+      try counters across all transaction channels. For offline PIN verification, ensure
+      the personalization system provisions EMV cards with the correct reference PIN
+      within a certified secure environment.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - card-management-system
+      - emv-personalization-bureau
+  devsecops:
+    prose: >-
+      Write integration tests that verify the authorization host receives only boolean
+      PIN verification results from the HSM — never cleartext PINs or partial match
+      data. Test PIN try counter logic across all transaction channels to verify
+      counter synchronization and blocking behavior. Implement negative tests that
+      confirm the system blocks cards after the configured number of failed attempts.
+      Scan code paths between HSM and host for any logging of PIN verification internals.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - integration-test-framework
+  secops:
+    prose: >-
+      Monitor PIN verification failure rates across the issuer portfolio to detect
+      brute-force attacks or compromised card batches. Alert on unusual patterns such
+      as high failure rates from specific acquirers, geographic clusters of failures,
+      or rapid sequential attempts. Audit HSM PIN verification logs for anomalous
+      volumes. Review PIN try counter reset procedures to verify dual control is
+      enforced for all counter resets.
+    tools:
+      - splunk
+      - elastic-siem
+      - fraud-detection-system
+      - sas-fraud-management
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-8.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "AC-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.5", "A.5.17"]
+    relationship: mapped

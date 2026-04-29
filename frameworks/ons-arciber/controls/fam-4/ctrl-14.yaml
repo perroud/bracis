@@ -1,0 +1,98 @@
+id: ctrl-14
+family: fam-4
+title: "Gestao de Patches e Atualizacoes de Seguranca no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar processo formal de gestão de patches e
+    atualizações de segurança para todos os sistemas do ARCiber, incluindo
+    sistemas operacionais, aplicações, firmware de PLCs/RTUs/IEDs e software
+    embarcado de dispositivos de rede industrial. O processo deve contemplar
+    a avaliação de criticidade de vulnerabilidades no contexto do ARCiber,
+    testes de patches em ambiente não produtivo antes da aplicação, e prazos
+    máximos de remediação baseados na severidade. Para sistemas onde patches
+    não podem ser aplicados, devem ser implementados controles compensatórios
+    documentados e aprovados pelo RSCA.
+
+guidance:
+  prose: >-
+    A gestao de patches em ambientes OT/ICS e particularmente desafiadora:
+    (i) fabricantes de sistemas OT validam patches — aplicar um patch nao
+    validado pode violar o suporte do fabricante ou causar falhas operacionais;
+    (ii) janelas de manutencao sao restritas — sistemas do SIN podem ter
+    disponibilidade 24/7/365 com janelas de parada planejada anuais;
+    (iii) sistemas legados sem suporte ativo do fabricante — patches nao estao
+    mais disponlveis. O processo deve definir: prazos por severidade CVSS
+    (critico <= 30 dias com janela de manutencao, alto <= 90 dias, medio <= 180
+    dias); processo de aprovacao de patches com validacao tecnica; ambiente de
+    testes OT isolado para validacao previa; e processo de excecao formal para
+    patches que nao podem ser aplicados, com controles compensatorios (network
+    isolation, monitoramento intensificado, deteccao de exploits especificos).
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar ferramenta de gerenciamento de vulnerabilidades com suporte
+      a ativos OT (Tenable.OT, Nozomi Networks, Claroty) para identificacao
+      continua de vulnerabilidades nos sistemas do ARCiber sem scan ativo invasivo.
+      Configurar feeds de inteligencia de vulnerabilidades especificos para OT/ICS:
+      ICS-CERT/CISA advisories, alertas dos fabricantes (Siemens ProductCERT,
+      Schneider Electric, ABB, GE). Implementar ambiente de testes OT isolado
+      para validacao de patches antes da aplicacao em producao. Manter lista
+      de patches aprovados e testados por tipo de ativo do ARCiber no repositorio
+      GitLab como fonte da verdade.
+    tools:
+      - tenable-ot
+      - nozomi-networks
+      - claroty
+      - gitlab
+      - ansible
+  devsecops:
+    prose: >-
+      Automatizar a verificacao de vulnerabilidades conhecidas (CVE) contra o
+      inventario de versoes de software/firmware do ARCiber como parte do
+      pipeline de gestao de ativos. Implementar processo de aprovacao de patches
+      via GitLab MR com aprovacao dupla (engenheiro OT + RSCA). Manter em
+      repositorio GitLab o registro de patches pendentes, em teste e aplicados,
+      com SLA de cada item rastreado. Gerar alertas automaticos para vulnerabilidades
+      criticas (CVSS >= 9.0) em sistemas do ARCiber para acao imediata do RSCA.
+    tools:
+      - gitlab-ci
+      - tenable-ot
+      - servicenow
+      - ansible
+  secops:
+    prose: >-
+      Monitorar continuamente fontes de inteligencia de vulnerabilidades OT/ICS
+      (CISA ICS-CERT, CVE Database, alertas de fabricantes). Manter registro
+      de todas as vulnerabilidades identificadas no ARCiber com status de
+      remediacao e justificativa para excecoes. Realizar avaliacao de risco para
+      vulnerabilidades que nao podem ser remediadas por patch e definir controles
+      compensatorios adequados. Reportar ao ONS/ANEEL vulnerabilidades criticas
+      nos sistemas do ARCiber conforme exigido pelos Procedimentos de Rede.
+      Revisar trimestralmente o backlog de patches pendentes e status das excecoes.
+    tools:
+      - tenable-ot
+      - servicenow
+      - splunk
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9", "art. 10"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-3", "62443-3-3 SR7.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.8"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5", "CM-5"]
+    relationship: mapped

@@ -1,0 +1,115 @@
+id: art-11
+family: cap-4
+title: "Mandatory Electronic Signatures in Government"
+class: ICP-BRASIL
+baselines: [government]
+statement:
+  prose: |
+    Art. 11 da Lei 14.063/2020. Os atos da administração pública federal
+    poderão ser assinados eletronicamente, observados os níveis de assinatura
+    previstos nesta Lei, e serão válidos para todos os efeitos legais.
+
+    § 1º A assinatura eletrônica poderá ser utilizada em qualquer interação
+    eletrônica com ente público, independentemente de cadastramento prévio,
+    observados os níveis de assinatura previstos nesta Lei.
+
+    § 2º Os entes públicos deverão oferecer mecanismo de assinatura eletrônica
+    ao cidadão, observado o nível mínimo de assinatura exigido para o ato
+    específico.
+
+    § 3º O Poder Executivo federal estabelecerá o nível mínimo de assinatura
+    eletrônica exigido para cada tipo de interação e ato administrativo.
+guidance:
+  prose: |
+    Article 11 establishes the mandate for electronic signature adoption
+    across the Brazilian federal public administration.
+
+    **Key provisions:**
+    1. **Universal validity:** Government acts signed electronically with
+       appropriate signature levels are valid for all legal purposes.
+    2. **No prior registration:** Citizens can use electronic signatures
+       in government interactions without needing pre-registration with
+       each agency (gov.br serves as universal identity).
+    3. **Obligation to provide mechanisms:** Government entities MUST offer
+       electronic signature capabilities to citizens — they cannot require
+       physical signatures when electronic alternatives exist.
+    4. **Minimum level specification:** The federal executive branch defines
+       minimum signature levels per interaction type, preventing agencies
+       from arbitrarily requiring higher levels.
+
+    **Integration with gov.br:**
+    In practice, the gov.br platform (formerly Brasil Cidadao) serves as
+    the primary mechanism for citizen electronic signatures:
+    - Bronze level: simple signature (self-registration)
+    - Silver level: simple/advanced signature (validated against government
+      databases)
+    - Gold level: advanced signature (biometric validation or ICP-Brasil
+      certificate)
+
+    **Impact on digital government transformation:**
+    This article is the legal foundation for paperless government. All
+    agencies must migrate physical signature workflows to electronic
+    equivalents, choosing the appropriate signature level.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Government electronic signature infrastructure:**
+      1. Integrate with gov.br Login via OpenID Connect for citizen
+         authentication at all three levels (bronze, silver, gold).
+      2. Implement gov.br Assinatura service for document signing that
+         automatically applies the appropriate signature level based on
+         the authenticated user's account level.
+      3. Deploy document workflow engine that routes documents through
+         appropriate signature collection based on configured minimum
+         signature level per document type.
+      4. Ensure all government-facing APIs accept electronically signed
+         documents without requiring physical originals.
+      5. Implement signature level upgrade mechanism: allow citizens to
+         upgrade their gov.br level to meet higher signature requirements.
+    tools:
+      - gov-br-integration
+      - document-workflow
+      - identity-provider
+      - signature-service
+      - api-gateway
+  devsecops:
+    prose: |
+      **Government signature compliance in development:**
+      1. Implement test suite covering all gov.br authentication levels
+         and their mapping to signature levels (bronze=simple,
+         silver=simple/advanced, gold=advanced).
+      2. Add pipeline checks verifying that each government-facing endpoint
+         enforces the minimum signature level for its document type.
+      3. Test accessibility of signature mechanisms: ensure compliance
+         with e-MAG (Modelo de Acessibilidade em Governo Eletronico).
+      4. Automate end-to-end testing of citizen signature flows from
+         authentication through document submission and receipt.
+    tools:
+      - gitlab-ci
+      - gov-br-testing
+      - accessibility-testing
+      - e2e-testing
+  secops:
+    prose: |
+      **Government signature operations:**
+      1. Monitor gov.br integration availability and fail gracefully
+         when the platform is unavailable, providing alternative paths.
+      2. Track signature level distribution across government services
+         to identify over-requirement (requiring qualified where simple
+         suffices) or under-requirement patterns.
+      3. Generate monthly reports on electronic signature adoption rates
+         versus physical signature for digital government KPIs.
+      4. Maintain compliance evidence for audit by TCU (Tribunal de
+         Contas da Uniao) and CGU (Controladoria-Geral da Uniao).
+    tools:
+      - availability-monitoring
+      - compliance-reporting
+      - kpi-dashboard
+      - audit-evidence
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-10", "art-11", "art-12"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-23"]
+    relationship: complements

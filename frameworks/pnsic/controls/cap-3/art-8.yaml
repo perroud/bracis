@@ -1,0 +1,128 @@
+id: art-8
+family: cap-3
+title: "Areas Prioritarias nos Setores de Telecomunicacoes, Transportes e Agua"
+class: PNSIC
+baselines: [critical-infrastructure]
+statement:
+  prose: |
+    Art. 8. Nos setores de telecomunicações, transportes e água, as áreas
+    prioritárias de atuação da PNSIC e da ENSIC são:
+
+    Telecomunicações:
+    I - segurança de infraestruturas de backbone de internet e redes de
+    telefonia fixa e móvel (2G/3G/4G/5G);
+    II - proteção de pontos de troca de tráfego (PTTs/IXPs) e sistemas
+    de roteamento e denominação (DNS, BGP);
+    III - resiliência de infraestruturas submarinas de cabos e satélites.
+
+    Transportes:
+    IV - segurança de sistemas de controle de tráfego aéreo (DECEA/CGNA);
+    V - proteção de sistemas de gestão portuária e controle de carga;
+    VI - resiliência de sistemas de gerenciamento de tráfego rodoviário
+    e ferroviário de alta velocidade.
+
+    Água:
+    VII - segurança de sistemas SCADA de estações de tratamento de água
+    e sistemas de distribuição;
+    VIII - proteção contra contaminação deliberada por comprometimento
+    de sistemas de controle químico de tratamento.
+guidance:
+  prose: |
+    O art. 8 detalha as areas criticas em tres dos cinco setores prioritarios
+    da PNSIC, com particularidades tecnicas distintas em cada um.
+
+    **Telecomunicacoes como infraestrutura transversal:**
+    Telecomunicacoes e unica entre os setores criticos por ser necessaria
+    para a operacao de todos os outros. Um ataque ao backbone de internet
+    brasileiro (ex: PTT Sao Paulo, o maior da America Latina) poderia
+    paralisar simultaneamente operacoes de energia, financas, transportes
+    e saude. O BGP hijacking e o DNS spoofing sao vetores de ataque especificos
+    com historico de incidentes significativos.
+
+    **Aviacao como setor de risco humano imediato:**
+    Um ataque ao sistema de controle de trafego aereo (DECEA/CGNA) tem
+    potencial de causar perda de vidas imediata. A seguranca de sistemas
+    aeronauticos segue padroes ICAO e EUROCONTROL, com requisitos de
+    certificacao rigorosos.
+
+    **Agua: vetor de contaminacao fisica via ciberataque:**
+    O caso Oldsmar (Florida, 2021) demonstrou que um atacante pode tentar
+    alterar o nivel de cloro em sistemas de tratamento de agua remotamente.
+    A seguranca do setor de agua e especialmente sensivel por ter impacto
+    imediato na saude publica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de protecao por setor:**
+      Telecomunicacoes:
+      1. RPKI (Resource Public Key Infrastructure) obrigatorio para todos os
+         provedores de internet brasileiros, prevenindo BGP hijacking.
+      2. DNS Security Extensions (DNSSEC) habilitado em todos os dominios
+         .gov.br e incentivado para operadores privados criticos.
+      3. Redundancia de roteamento em PTTs com failover automatico para evitar
+         single point of failure no backbone internet brasileiro.
+
+      Transportes:
+      4. Redes dedicadas e isoladas para sistemas de controle de trafego aereo
+         (DECEA), sem conectividade com internet publica.
+      5. Autenticacao forte com biometria ou token fisico para acesso a sistemas
+         de controle de trafego aereo e gestao portuaria.
+
+      Agua:
+      6. Limites fisicos de seguranca para alteracoes em parametros quimicos:
+         bloqueio de comandos que excedam limites seguros, independente de
+         autorizacao logica (safety instrumented systems).
+    tools:
+      - rpki-implementation
+      - dnssec-tools
+      - atc-network-isolation
+      - safety-instrumented-systems
+      - water-scada-security
+  devsecops:
+    prose: |
+      **Pipeline de desenvolvimento por setor:**
+      1. Certificacao de seguranca obrigatoria para software embarcado em
+         sistemas de controle de trafego aereo: DO-326A (aeronautica) como
+         padrao de desenvolvimento seguro.
+      2. Testes de seguranca especificos para protocolos de telecomunicacoes:
+         SS7, Diameter, SIP com ferramentas especializadas.
+      3. Validacao de integridade de firmware para equipamentos de rede de
+         backbone (roteadores, switches de nucleo) antes de atualizacoes.
+      4. Ambiente de teste isolado para sistemas de gestao de agua com
+         simulacao de sensores e atuadores antes de qualquer atualizacao.
+      5. Analise de cadeia de suprimentos (supply chain security) para
+         equipamentos criticos de telecomunicacoes e transportes.
+    tools:
+      - do-326a-compliance-tools
+      - telecom-protocol-security-scanner
+      - firmware-integrity-verification
+      - water-ics-test-environment
+      - supply-chain-analysis
+  secops:
+    prose: |
+      **Operacao de seguranca nos tres setores:**
+      1. CERT Telecom integrado ao CTIR Gov para resposta a incidentes em
+         backbone e infraestrutura critica de internet.
+      2. Monitoramento de BGP em tempo real com alertas automaticos para
+         desvios de rota suspeitos (BGP hijacking attempts).
+      3. Protocolo de comunicacao de emergencia entre DECEA e GSI/PR para
+         incidentes ciberneticos que afetam o controle de trafego aereo.
+      4. Exercicio anual de seguranca de agua: simulacao de ataque a estacao
+         de tratamento com participacao de SABESP, CAESB e outros operadores.
+      5. Integracao com WaterISAC e Aviation ISAC para compartilhamento de
+         inteligencia de ameacas especifica para agua e aviacao.
+    tools:
+      - bgp-monitoring
+      - atc-incident-protocol
+      - water-isac-integration
+      - aviation-isac-integration
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-2", "art-3"]
+    relationship: complements
+  - framework_id: nist-csf-v2
+    articles: ["PR.IR-04", "DE.AE-06"]
+    relationship: mapped
+  - framework_id: pnsi
+    articles: ["art-5"]
+    relationship: complements

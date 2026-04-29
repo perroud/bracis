@@ -1,0 +1,91 @@
+id: a8.1
+family: a8
+title: "User endpoint devices"
+class: ISO27001
+
+statement:
+  prose: >-
+    Information stored on, processed by or accessible via user endpoint
+    devices shall be protected.
+
+guidance:
+  prose: >-
+    The organization should establish a topic-specific policy on secure
+    configuration and handling of user endpoint devices. The topic-specific
+    policy should consider the following: the type of information and
+    the classification level that the endpoint device can handle, store
+    and process; registration of endpoint devices; requirements for
+    physical protection; restriction of software installation;
+    requirements for endpoint device software versions and for applying
+    patches; the rules for connection to information services, public
+    networks, or any other network outside the premises; access controls;
+    storage media encryption; protection against malware; remote disable,
+    delete, or lockout; backups; use of web services and web applications;
+    end-user behavior analytics; and the use of removable devices such
+    as USB devices and the use of removable storage media.
+    The topic-specific policy should consider allowing the use of
+    personal devices (BYOD) and whether to apply specific controls.
+
+references:
+  - citation: "ISO/IEC 27002:2022, 8.1"
+    url: "https://www.iso.org/standard/75652.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement device trust verification as part of the zero-trust
+      access model. Integrate device posture checks (OS version, disk
+      encryption, firewall status, EDR agent running) into the access
+      decision chain before granting access to platform services. Deploy
+      mobile device management (MDM) or unified endpoint management (UEM)
+      solutions that enforce baseline configurations. Implement conditional
+      access policies that restrict access to the internal developer
+      platform based on device compliance status. Automate device
+      inventory management integrated with the identity provider.
+    tools:
+      - intune
+      - jamf
+      - tailscale
+      - cloudflare-access
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Enforce that developer endpoints meet minimum security requirements
+      before they can clone repositories or push code. Require full
+      disk encryption and screen lock on devices that access source
+      code. Implement pre-commit hooks that verify the local
+      environment meets security baselines (e.g., secrets not committed,
+      branch protection honored). Ensure that CI/CD pipeline credentials
+      are never stored on developer endpoints; use short-lived tokens
+      and vault integrations instead.
+    tools:
+      - git-secrets
+      - gitleaks
+      - vault
+      - pre-commit
+
+  secops:
+    prose: >-
+      Deploy endpoint detection and response (EDR) agents on all user
+      endpoints and feed telemetry into the SIEM. Monitor for indicators
+      of compromise on endpoints: suspicious process execution,
+      unauthorized software installation, and data exfiltration
+      attempts. Implement automated response playbooks for compromised
+      endpoints: network isolation, credential rotation, and forensic
+      artifact collection. Track endpoint compliance posture
+      continuously and alert when devices fall out of compliance.
+    tools:
+      - crowdstrike
+      - sentinel-one
+      - wazuh
+      - splunk
+      - cortex-xsoar
+
+legal_references:
+  - framework_id: nist-800-53
+    articles: ["AC-19", "SC-28", "MP-7"]
+    relationship: equivalent-to
+  - framework_id: gdpr
+    articles: ["art-32"]
+    relationship: supports

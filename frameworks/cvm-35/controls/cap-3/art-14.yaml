@@ -1,0 +1,179 @@
+id: art-14
+family: cap-3
+title: "Testes Periodicos de Seguranca Cibernetica"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 14. A entidade deve realizar testes periódicos de segurança
+    cibernética, que contemplem, no mínimo:
+    I - testes de vulnerabilidade em sistemas e aplicações relevantes;
+    II - testes de intrusão (penetration testing) conduzidos por equipe
+    independente;
+    III - simulações de cenários de incidentes cibernéticos, incluindo
+    os procedimentos de resposta.
+
+    Parágrafo único. A periodicidade dos testes de que trata o caput deve
+    ser definida de acordo com a relevância dos sistemas e o perfil de risco
+    da entidade, não podendo ser superior a:
+    I - trimestral para testes de vulnerabilidade;
+    II - anual para testes de intrusão;
+    III - semestral para simulações de incidentes.
+guidance:
+  prose: |
+    O art. 14 define as tres categorias de testes obrigatorios e suas
+    periodicidades maximas. Sao requisitos auditaveis e a CVM verifica
+    cumprimento em fiscalizacoes.
+
+    **I — Testes de vulnerabilidade:**
+    Vulnerability scanning automatizado e manual de sistemas e aplicacoes.
+    Periodicidade maxima trimestral. Entidades de grande porte devem
+    considerar scanning continuo (semanal ou diario) para sistemas criticos.
+    Escopo: sistemas de negociacao, portais de investidores, APIs, bancos
+    de dados, infraestrutura de rede.
+
+    **II — Testes de intrusao (pentest):**
+    Pentest conduzido por equipe independente (interna separada do time de
+    operacoes, ou preferencialmente empresa externa). Periodicidade maxima
+    anual. Metodologia reconhecida (OWASP, PTES, NIST SP 800-115).
+    Escopo deve cobrir sistemas criticos e vetores de ataque relevantes
+    (externo, interno, social engineering, wireless).
+
+    **III — Simulacoes de incidentes:**
+    Exercicios que testam o plano de resposta a incidentes (art. 11).
+    Periodicidade maxima semestral. Incluem:
+    - Tabletop exercises: cenarios discutidos em reuniao.
+    - Functional exercises: simulacao pratica parcial.
+    - Full-scale exercises: simulacao completa anual.
+
+    **Paragrafo unico — Periodicidade proporcional:**
+    A resolucao define periodicidade MAXIMA. Entidades de maior porte e
+    risco devem considerar frequencia maior. A proporcionalidade (art. 3)
+    se aplica — para cima, nunca para baixo dos minimos.
+
+    **Documentacao obrigatoria:**
+    Todos os testes devem gerar relatorios detalhados com escopo,
+    metodologia, achados, severidade, recomendacoes e plano de remediacao.
+    Esses relatorios alimentam o relatorio anual (art. 13, II) e devem
+    estar disponiveis para a CVM (art. 8).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Testes de vulnerabilidade (I):**
+      1. Vulnerability scanning automatizado semanal para sistemas criticos.
+      2. Scanning trimestral completo de toda a infraestrutura (minimo CVM).
+      3. Ferramentas: Nessus, Qualys, OpenVAS para infraestrutura;
+         OWASP ZAP, Burp Suite para aplicacoes web.
+      4. Integracao com CMDB para garantir cobertura de 100% dos ativos.
+      5. SLAs de remediacao por severidade, rastreados automaticamente.
+
+      **Testes de intrusao (II):**
+      6. Pentest externo anual por empresa independente certificada
+         (CREST, OSCP, CEH).
+      7. Escopo: perimetro externo, aplicacoes web, APIs, mobile,
+         infraestrutura interna, social engineering.
+      8. Retesting de findings criticos e altos apos remediacao.
+      9. Pentest de aplicacoes a cada release major de sistemas criticos.
+
+      **Simulacoes de incidentes (III):**
+      10. Tabletop exercise trimestral com rotacao de cenarios:
+          ransomware, DDoS, data breach, insider threat, supply chain attack.
+      11. Simulacao tecnica semestral com ativacao real de playbooks.
+      12. Full-scale exercise anual envolvendo todas as areas da entidade.
+
+      **Infraestrutura de testes:**
+      13. Ambiente de staging isolado para testes de intrusao sem impacto
+          em producao.
+      14. Chaos engineering para testar resiliencia de sistemas.
+      15. Red team/blue team exercises para entidades de grande porte.
+    tools:
+      - vulnerability-scanner
+      - pentest-tools
+      - chaos-engineering
+      - siem
+      - soar
+  devsecops:
+    prose: |
+      **Testes automatizados no pipeline (I):**
+      1. SAST em cada merge request (cobertura continua, supera o minimo
+         trimestral da CVM).
+      2. DAST em ambiente staging a cada deploy (cobertura continua).
+      3. Dependency scanning continuo com alertas para novas CVEs.
+      4. Container scanning em cada build de imagem.
+      5. Infrastructure-as-Code scanning (Checkov, tfsec) em cada alteracao.
+
+      **Pentest integrado ao desenvolvimento (II):**
+      6. Pentest de aplicacao a cada release major via pipeline.
+      7. Fuzzing automatizado para descoberta de vulnerabilidades nao
+         cobertas por SAST.
+      8. API security testing automatizado (OWASP API Top 10).
+
+      **Simulacoes (III):**
+      9. Chaos engineering no pipeline: falhas simuladas em dependencias
+         para testar resiliencia.
+      10. Game days de seguranca com equipes de desenvolvimento.
+
+      **Rastreabilidade de remediacao:**
+      11. Findings de pentest importados como issues no GitLab com SLA.
+      12. Dashboard de remediacao de findings por equipe.
+      13. Bloqueio de deploy se finding critico nao remediado apos SLA.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-fuzz-testing
+      - checkov
+      - owasp-zap
+      - burp-suite
+  secops:
+    prose: |
+      **Gestao do programa de testes:**
+      1. Calendario anual de testes alinhado as periodicidades do art. 14:
+         - Vulnerability assessment: janeiro, abril, julho, outubro.
+         - Pentest externo: marco (ou conforme contrato com fornecedor).
+         - Simulacao de incidentes: junho e dezembro.
+      2. Escopo de testes revisado anualmente baseado em risk assessment.
+      3. Fornecedores de pentest pre-qualificados e rotacionados.
+
+      **Execucao de testes de vulnerabilidade (I):**
+      4. Coordenacao entre equipes para minimizar impacto operacional.
+      5. Triagem e priorizacao de findings por contexto de negocio.
+      6. Tracking de remediacao com SLA compliance report.
+
+      **Execucao de pentests (II):**
+      7. Regras de engajamento (RoE) documentadas e aprovadas.
+      8. Supervisao do pentest para garantir seguranca da entidade.
+      9. Debriefing pos-pentest com equipes tecnicas.
+      10. Retesting de findings criticos e altos em 30 dias.
+
+      **Simulacoes de incidentes (III):**
+      11. Cenarios variados e realistas baseados em ameacas ao setor.
+      12. Avaliacao de participantes (tempo de resposta, decisoes, comunicacao).
+      13. Relatorio pos-exercicio com gaps identificados e plano de melhoria.
+      14. Atualizacao de playbooks baseada nos resultados.
+
+      **Documentacao para CVM (art. 8):**
+      15. Relatorios de todos os testes retidos por minimo 5 anos.
+      16. Relatorio resumido para diretoria e CVM (art. 13, II).
+      17. Evidencias de remediacao de findings criticos.
+    tools:
+      - vulnerability-scanner
+      - pentest-management
+      - soar
+      - grc-platform
+      - siem
+      - ticketing-system
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-7", "art-8"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-2", "CA-8", "RA-5", "SI-2", "CP-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.8", "A.5.36", "A.8.34"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,114 @@
+id: art-21
+family: cap-5
+title: "Seguranca de Protocolos de Sinalizacao e Interconexao"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 21. As prestadoras devem implementar controles de segurança
+    específicos para protocolos de sinalização e interfaces de
+    interconexão de redes de telecomunicações, incluindo:
+
+    I - filtragem e monitoramento de mensagens nos protocolos de
+    sinalização SS7, Diameter e GTP, para detecção e bloqueio de
+    tentativas de exploração de vulnerabilidades conhecidas;
+
+    II - controles de segurança em pontos de interconexão com outras
+    prestadoras nacionais e internacionais, incluindo roaming;
+
+    III - proteção de interfaces de usuário contra ataques de
+    falsificação de identidade (spoofing), interceptação e manipulação
+    de tráfego;
+
+    IV - implementação de RPKI (Resource Public Key Infrastructure)
+    e filtragem de prefixos BGP para proteção contra hijacking de
+    rotas de internet;
+
+    V - monitoramento de anomalias de tráfego e sinalização para
+    detecção de fraudes e ataques em tempo real.
+guidance:
+  prose: |
+    O art. 21 aborda vulnerabilidades especificas de redes de
+    telecomunicacoes que nao existem em ambientes corporativos comuns.
+
+    **Vulnerabilidades SS7:**
+    O protocolo SS7 (Signaling System 7), criado nos anos 1970, possui
+    vulnerabilidades severas que permitem: rastreamento de localizacao
+    de usuarios, interceptacao de ligacoes e SMS, desvio de chamadas.
+    Operadores devem implementar Firewall SS7 (GSMA FS.11) para bloquear
+    mensagens maliciosas.
+
+    **Diameter e 4G/5G:**
+    O protocolo Diameter (substituto do SS7 em redes 4G/5G) possui
+    vulnerabilidades similares. Requer Diameter Edge Agent (DEA) com
+    politicas de filtragem baseadas em GSMA FS.19.
+
+    **GTP e usuario falso:**
+    O GPRS Tunneling Protocol (GTP) permite criacao de usuarios falsos
+    e bypass de controles de seguranca. Requer GTP Firewall baseado em
+    GSMA FS.20.
+
+    **RPKI e BGP (inciso IV):**
+    Ataques de BGP hijacking podem desviar trafego de internet de
+    usuarios de telecomunicacoes. RPKI com Route Origin Validation (ROV)
+    e pratica recomendada pelo MANRS (Mutually Agreed Norms for Routing
+    Security) e exigida pelo R-Ciber.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de controles de sinalizacao:**
+      1. Implantar Signaling Firewall (SS7 e Diameter) com politicas
+         de filtragem baseadas em GSMA FS.11 e FS.19, com atualizacao
+         continua de assinaturas de ataques.
+      2. Implementar GTP Firewall em pontos de interface Gi/SGi
+         e S5/S8 para protecao contra ataques de gerenciamento de
+         sessao e criacao de usuarios falsos.
+      3. Configurar RPKI com Route Origin Validation em todos os
+         roteadores de borda de internet (ASBR) da prestadora.
+      4. Implementar strict prefix filtering em sessoes BGP com peers
+         e upstream providers, usando IRRDB e filtros automatizados.
+    tools:
+      - signaling-firewall
+      - gtp-firewall
+      - rpki-validator
+      - bgp-filtering
+  devsecops:
+    prose: |
+      **Monitoramento e testes de sinalizacao:**
+      1. Implementar probes de monitoramento de sinalizacao SS7 e
+         Diameter em pontos de interconexao para deteccao de anomalias.
+      2. Realizar testes de penetracao especificos em interfaces de
+         sinalizacao (SS7, Diameter, GTP) anualmente por especialistas
+         certificados.
+      3. Automatizar verificacao de configuracao de RPKI e BGP
+         filtering em mudancas de configuracao de roteadores.
+    tools:
+      - signaling-monitoring
+      - penetration-testing
+      - rpki-monitoring
+      - bgp-analysis
+  secops:
+    prose: |
+      **Operacao de seguranca de sinalizacao:**
+      1. Operar monitoramento 24x7 de anomalias de sinalizacao SS7,
+         Diameter e GTP com alertas em tempo real para tentativas
+         de exploracao de vulnerabilidades.
+      2. Subscrever a feeds de threat intelligence especificos de
+         telecomunicacoes (GSMA, i3Forum, ETIS) para atualizacao
+         de assinaturas de ataques de sinalizacao.
+      3. Implementar mecanismo de bloqueio automatizado de mensagens
+         de sinalizacao maliciosas identificadas em tempo real.
+      4. Relatar tentativas de ataques de sinalizacao a ANATEL e
+         ao CERT.br quando de relevancia para o setor.
+    tools:
+      - signaling-security
+      - threat-intelligence
+      - automated-blocking
+      - incident-reporting
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-8-20", "A-8-21", "A-8-22"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-15", "art-16", "art-17", "art-18"]
+    relationship: mapped

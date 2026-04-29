@@ -1,0 +1,99 @@
+id: v6.2.1
+family: v6
+title: "Approved Cryptographic Algorithms"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that all cryptographic modules fail securely, and errors are handled in a
+    way that does not enable Padding Oracle attacks. Verify that industry-proven or
+    government-approved cryptographic algorithms, modes, and libraries are used, instead
+    of custom-coded cryptography. All cryptographic operations must use approved algorithms:
+    AES-256 for symmetric encryption, RSA-2048+ or ECC P-256+ for asymmetric operations,
+    SHA-256+ for hashing, and HMAC-SHA256+ for message authentication.
+
+guidance:
+  prose: >-
+    Cryptographic algorithm selection is a critical security decision that must not be left
+    to individual developers. Custom cryptography is almost always broken; even experienced
+    cryptographers submit algorithms to years of peer review before deployment. Applications
+    must use well-vetted libraries (libsodium, OpenSSL, BouncyCastle) with approved algorithm
+    configurations. Deprecated algorithms (DES, 3DES, RC4, MD5, SHA-1) must be explicitly
+    prohibited. Padding Oracle attacks exploit error message differences between valid and
+    invalid padding in block cipher decryption; using authenticated encryption modes
+    (AES-GCM, ChaCha20-Poly1305) eliminates this attack class entirely. Key sizes must
+    meet current NIST recommendations for the projected lifetime of the protected data.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V6.2.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "NIST SP 800-57 Part 1 Rev 5"
+    url: "https://doi.org/10.6028/NIST.SP.800-57pt1r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Standardize on a cryptographic library across the organization (libsodium/NaCl for
+      modern applications, or AWS Encryption SDK/Google Tink for cloud-native). Provide a
+      platform-level encryption service that handles key management, algorithm selection,
+      and key rotation, removing cryptographic decisions from application developers. Use
+      authenticated encryption modes exclusively (AES-256-GCM or ChaCha20-Poly1305).
+      Integrate with a KMS (Vault, AWS KMS, GCP Cloud KMS) for key storage and rotation.
+      Implement crypto-agility by abstracting algorithm selection behind a configuration
+      layer to enable rapid migration when algorithms are deprecated. Ban ECB mode, CBC
+      without HMAC, and all unauthenticated encryption modes via policy.
+    tools:
+      - vault
+      - aws-kms
+      - gcp-cloud-kms
+      - libsodium
+      - google-tink
+      - aws-encryption-sdk
+      - openssl
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect use of deprecated algorithms (DES, 3DES, RC4, MD5
+      for integrity, SHA-1 for integrity, ECB mode). Scan for hardcoded cryptographic keys
+      and initialization vectors. Validate that all encryption operations use authenticated
+      encryption modes. Test for Padding Oracle vulnerabilities by manipulating ciphertext
+      and analyzing error responses. Include cryptographic configuration checks in IaC
+      scanning (TLS versions, cipher suites). Enforce approved crypto libraries via
+      dependency allow-lists in the build pipeline.
+    tools:
+      - semgrep
+      - sonarqube
+      - checkov
+      - trivy
+      - gitlab-ci
+      - gitleaks
+      - trufflehog
+
+  secops:
+    prose: >-
+      Monitor for use of deprecated TLS cipher suites in network traffic. Alert on
+      certificate management events: expiring certificates, weak key lengths, or SHA-1
+      signed certificates. Audit KMS access logs for anomalous key usage patterns. Track
+      cryptographic inventory: which algorithms and key sizes are in use across the
+      organization. Scan externally-facing services for weak cryptographic configurations.
+      Monitor for crypto-mining activity that may indicate compromised infrastructure.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+      - sslyze
+      - vault-audit-logs
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["4.2.1", "4.2.2"]
+    relationship: implements

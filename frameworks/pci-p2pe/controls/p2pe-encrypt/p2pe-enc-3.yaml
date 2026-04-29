@@ -1,0 +1,110 @@
+id: p2pe-enc-3
+family: p2pe-encrypt
+title: "Encrypted Data Handling in the Merchant Environment"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    Account data encrypted by the POI device shall not be decrypted,
+    re-encrypted, or otherwise transformed at any point within the merchant
+    environment. The merchant environment shall have no access to cleartext
+    account data, decryption keys, or key management operations. Encrypted
+    data traversing the merchant environment shall be transmitted to the
+    decryption environment without modification. The solution provider
+    shall ensure that no merchant system component has the ability or the
+    cryptographic material to decrypt the P2PE-encrypted payload.
+  parts:
+    - id: p2pe-enc-3.a
+      label: "Domain 1, 1E"
+      prose: >-
+        No system within the merchant environment decrypts, re-encrypts,
+        or derives cleartext account data from the P2PE-encrypted payload.
+    - id: p2pe-enc-3.b
+      label: "Domain 1, 1F"
+      prose: >-
+        Decryption keys and key management functions are absent from the
+        merchant environment, and encrypted data is forwarded unmodified
+        to the secure decryption environment.
+
+guidance:
+  prose: >-
+    The primary value proposition of P2PE for merchants is PCI DSS scope
+    reduction. This is only achievable if the merchant environment never has
+    access to cleartext account data or the means to decrypt it. The
+    encrypted payload must pass through the merchant POS system, network,
+    and any intermediate systems as an opaque blob. Solution providers must
+    design the data flow so that no merchant-side component requires
+    decryption capability. If re-encryption is needed (e.g., for format
+    conversion), it must occur within the secure decryption environment, not
+    at the merchant. Merchants using a validated P2PE solution can use the
+    PCI P2PE SAQ (SAQ P2PE) which significantly reduces PCI DSS assessment
+    requirements.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 1 — Encryption Device and Application Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI DSS v4.0.1 — Applicability of PCI DSS to P2PE Merchants"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design merchant-side software to treat the encrypted payload as an
+      opaque binary blob with no parsing, transformation, or storage beyond
+      transient forwarding. Implement strict API contracts where the
+      merchant POS sends the encrypted payload to the acquirer/processor
+      endpoint via TLS without any intermediate buffering to disk. Ensure
+      no cryptographic libraries or HSM client software are deployed in the
+      merchant environment. Use network segmentation and firewall rules to
+      ensure merchant systems cannot reach the decryption environment
+      directly.
+    tools:
+      - terraform
+      - kubernetes-network-policies
+      - calico
+      - cilium
+      - api-gateway
+
+  devsecops:
+    prose: >-
+      Scan merchant-side POS application code for any cryptographic
+      operations on payment data (decrypt, re-encrypt, key derivation).
+      SAST rules should flag imports of cryptographic libraries in
+      merchant-side components. Enforce that merchant-side code does not
+      log, parse, or store any portion of the encrypted payload beyond
+      transient memory. Include integration tests that verify the encrypted
+      payload arriving at the acquirer matches byte-for-byte what the POI
+      device produced.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - checkmarx
+      - integration-test-framework
+
+  secops:
+    prose: >-
+      Monitor merchant network traffic for any cleartext PAN patterns
+      (Luhn-valid 13-19 digit sequences) that would indicate a P2PE
+      failure. Deploy DLP sensors on merchant network egress points. Alert
+      on any merchant system attempting to connect to the decryption
+      environment or key management infrastructure. Conduct periodic
+      merchant environment reviews to confirm no unauthorized cryptographic
+      software or key material is present.
+    tools:
+      - splunk
+      - elastic-siem
+      - symantec-dlp
+      - forcepoint-dlp
+      - network-traffic-analysis
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1", "req-3.5", "req-4.1"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-28", "MP-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.10"]
+    relationship: supports

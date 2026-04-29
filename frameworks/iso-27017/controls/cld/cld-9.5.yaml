@@ -1,0 +1,96 @@
+id: cld-9.5
+family: cld
+title: "Access control to cloud service customer data in shared virtual environments"
+class: ISO27017
+
+statement:
+  prose: >-
+    The cloud service provider shall enforce access controls that ensure
+    cloud service customer data cannot be accessed by other cloud service
+    customers or by unauthorized cloud service provider personnel. In
+    shared virtual environments, the cloud service provider shall
+    implement logical isolation mechanisms to prevent any cloud service
+    customer from accessing, modifying, or deleting another cloud service
+    customer's data. The cloud service provider shall implement
+    administrative access controls that restrict and log access to
+    cloud service customer data by the cloud service provider's own
+    personnel, limiting such access to what is necessary for service
+    operation and maintenance.
+
+guidance:
+  prose: >-
+    Multi-tenancy is a core characteristic of cloud services, and
+    ensuring proper isolation between tenants is critical for
+    information security. The cloud service provider should implement
+    multiple layers of isolation including compute isolation (separate
+    virtual machines, containers, or processes), storage isolation
+    (separate storage volumes, encryption with per-tenant keys, or
+    logical partitioning), network isolation (virtual networks, network
+    security groups), and identity isolation (separate identity
+    namespaces, tenant-scoped credentials). Cloud service customers
+    should verify the isolation mechanisms used and assess whether
+    they are adequate for the sensitivity of their data.
+
+references:
+  - citation: "ISO/IEC 27017:2015, CLD.9.5.1"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement multi-layered tenant isolation using namespace
+      separation, network policies, RBAC, and per-tenant encryption
+      keys. Use Kubernetes namespaces with strict network policies
+      and resource quotas for workload isolation. Deploy cloud-native
+      tenant isolation features such as AWS Organizations, Azure
+      management groups, or GCP resource hierarchy. Implement data
+      access controls that enforce tenant boundaries at the
+      application, database, and storage layers. Use policy-as-code
+      to prevent cross-tenant resource access.
+    tools:
+      - kubernetes
+      - open-policy-agent
+      - calico
+      - vault
+      - terraform
+
+  devsecops:
+    prose: >-
+      Include tenant isolation testing in CI/CD pipelines with
+      automated tests that verify data cannot be accessed across
+      tenant boundaries. Implement security testing that specifically
+      targets multi-tenancy isolation, including IDOR (Insecure
+      Direct Object Reference) testing for APIs. Scan application
+      code for patterns that could lead to tenant data leakage,
+      such as missing tenant context filters in database queries.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - zap
+      - burp-suite
+
+  secops:
+    prose: >-
+      Monitor for cross-tenant access attempts and data leakage
+      between cloud service customer environments. Deploy anomaly
+      detection that identifies unusual data access patterns
+      suggesting tenant isolation failures. Conduct periodic
+      penetration testing specifically targeting multi-tenancy
+      isolation controls. Alert on administrative access to customer
+      data and verify it is authorized and justified.
+    tools:
+      - splunk
+      - elastic-siem
+      - falco
+      - aws-guardduty
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.3", "a8.31"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["ivs-03", "dsp-05"]
+    relationship: complements
+  - framework_id: nist-800-53
+    articles: ["AC-4", "SC-4"]
+    relationship: mapped

@@ -1,0 +1,103 @@
+id: ctrl-20
+family: fam-5
+title: "Avaliacao de Vulnerabilidades e Testes de Seguranca no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve realizar avaliações periódicas de vulnerabilidades
+    cibernéticas nos sistemas do ARCiber para identificar fragilidades técnicas
+    que possam ser exploradas por atores maliciosos. As avaliações devem ser
+    conduzidas por pessoal tecnicamente qualificado, usando metodologias e
+    ferramentas apropriadas para ambientes OT/ICS que não causem interrupção
+    dos sistemas de controle. Os resultados devem ser documentados, priorizados
+    por risco e alimentar o processo de gestão de patches e o registro de riscos
+    do ARCiber. Testes de penetração em sistemas do ARCiber devem ser realizados
+    com aprovação formal e janela de manutenção planejada.
+
+guidance:
+  prose: >-
+    Avaliacoes de vulnerabilidades em OT/ICS requerem abordagem diferente do
+    IT convencional: (i) scans ativos tradicionais (Nessus, OpenVAS) podem causar
+    falhas em PLCs, RTUs e sistemas de tempo real — usar preferencialmente
+    descoberta passiva ou scans ativos apenas em janelas de manutencao planejada
+    com aprovacao do responsavel operacional; (ii) avaliacao de vulnerabilidades
+    deve incluir: analise de configuracao (hardening assessment), revisao de
+    arquitetura de segmentacao de rede, analise de versoes de firmware/software
+    vs CVEs conhecidos, e verificacao de credenciais padrao; (iii) para testes
+    de penetracao: devem ser planejados com antecedencia minima de 30 dias,
+    aprovados pelo RSCA e responsavel operacional, executados em janela de
+    manutencao com possibilidade de rollback imediato, e documentados com
+    metodologia, escopo, descobertas e recomendacoes; (iv) periodicidade minima:
+    avaliacao de vulnerabilidades anual, com atualizacao continua via monitoramento
+    passivo.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar Tenable.OT ou Nozomi Networks em modo de monitoramento
+      passivo continuo para identificacao de vulnerabilidades conhecidas nos
+      ativos do ARCiber sem scan ativo invasivo. Configurar feeds automaticos
+      de CVEs relevantes para sistemas OT (ICS-CERT advisories, NVD) integrados
+      ao inventario de ativos do ARCiber para matching automatico de vulnerabilidades.
+      Para avaliacoes mais profundas em janelas de manutencao, usar Tenable
+      Nessus com plugins especificos para SCADA/ICS em modo controlado.
+      Manter ambiente de testes OT espelhando a producao para validacao de
+      correcoes antes da aplicacao no ARCiber operacional.
+    tools:
+      - tenable-ot
+      - nozomi-networks
+      - nessus
+      - claroty
+      - gitlab
+  devsecops:
+    prose: >-
+      Automatizar a correlacao entre o inventario de ativos do ARCiber (versoes
+      de firmware/software) e bancos de dados de vulnerabilidades (NVD, ICS-CERT)
+      para identificacao continua de novos CVEs aplicaveis. Implementar dashboard
+      de vulnerabilidades do ARCiber com priorizacao automatica por CVSS e
+      impacto potencial no SIN. Gerar relatorios automatizados de status de
+      vulnerabilidades para o RSCA e para submissao ao ONS quando solicitado.
+      Rastrear o ciclo de vida de vulnerabilidades identificadas (abertura,
+      avaliacao de risco, remediacao, verificacao, fechamento) via GitLab
+      Issues com SLAs automaticamente monitorados.
+    tools:
+      - gitlab-ci
+      - tenable-ot
+      - dependency-track
+      - servicenow
+  secops:
+    prose: >-
+      Realizar avaliacao de vulnerabilidades abrangente do ARCiber ao menos
+      anualmente, usando metodologia documentada e por equipe qualificada em
+      seguranca OT/ICS. Conduzir testes de penetracao limitados em componentes
+      do ARCiber ao menos a cada dois anos, com escopo definido, aprovacao
+      formal e equipe especializada em OT. Monitorar continuamente publicacoes
+      de vulnerabilidades de sistemas OT instalados no ARCiber (Siemens, Schneider,
+      GE, ABB, Rockwell, outros). Priorizar remedicao de vulnerabilidades com
+      exploracao conhecida publica (known exploited vulnerabilities) em sistemas
+      do ARCiber com prazo maximo de 30 dias ou controles compensatorios imediatos.
+    tools:
+      - tenable-ot
+      - nozomi-networks
+      - servicenow
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 10", "art. 11"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-1 cl.4.2.3.9", "62443-3-3 SR7.2"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-010-R2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.8"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5", "CA-8", "CA-2"]
+    relationship: mapped

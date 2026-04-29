@@ -1,0 +1,100 @@
+id: art-24
+family: cap-4
+title: "Registro de Operacoes com Valores Mobiliarios"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 24. Os participantes devem manter registros específicos para as
+    seguintes operações com valores mobiliários:
+
+    I - operações de compra e venda de ações, debêntures, cotas de fundos
+    e demais valores mobiliários;
+    II - operações com derivativos financeiros, incluindo opções, futuros
+    e swaps;
+    III - emissões de valores mobiliários (IPO, follow-on, emissões privadas);
+    IV - operações de empréstimo de valores mobiliários;
+    V - transferências de ativos financeiros entre participantes;
+    VI - resgates e aplicações em fundos de investimento; e
+    VII - ordens de clientes não executadas por suspeita de PLD/FT.
+
+    Parágrafo único. Os registros devem identificar o cliente final da
+    operação, mesmo em operações realizadas por intermediários ou gestores
+    de carteira.
+guidance:
+  prose: |
+    O art. 24 especifica os tipos de operacoes que devem ser registradas
+    no mercado de capitais — complementando o art. 21 com detalhes sobre
+    o universo operacional do mercado de valores mobiliarios.
+
+    **Por que o mercado de capitais tem vulnerabilidades especificas:**
+    - Acoes: compra de acao super-valorizada de empresa controlada por
+      criminosos cria aparencia de renda legitima
+    - Derivativos: options podem ser usados para transferir valor entre
+      contrapartes disfarçando a natureza da transacao
+    - Fundos de investimento: layering atraves de multiplos fundos
+      obscurece a origem dos recursos
+    - Emprestimo de titulos: pode ser usado para criacao de posicoes artificiais
+
+    **Inciso VII — ordens nao executadas por suspeita:**
+    Este inciso e critico: o participante deve registrar quando RECUSOU uma
+    ordem por suspeita de PLD/FT. Isso cria evidencia de que o sistema de
+    monitoramento funcionou e o participante agiu corretamente.
+
+    **Paragrafo unico — cliente final:**
+    Em gestao de carteiras e fundos, o gestor opera em nome do cliente.
+    O registro deve identificar o cliente final — nao apenas o gestor —
+    para permitir investigacao do beneficiario economico das operacoes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Registro granular por tipo de operacao:**
+      1. Schema de dados especifico para cada tipo de operacao (acao, derivativo,
+         fundo, emprestimo) com campos adicionais relevantes por tipo.
+      2. Para derivativos: registro de todas as pernas da operacao, nocional,
+         vigencia, contraparte.
+      3. Para fundos: registro de cada aplicacao/resgate com CNPJ do fundo,
+         classe, cotista final (mesmo em gestao terceirizada).
+      4. Para ordens recusadas: registro do motivo da recusa e evidencia de
+         suspeita que motivou a decisao.
+
+      **Rastreamento de cliente final:**
+      5. Para operacoes via intermediarios: campo obrigatorio de cliente final
+         com validacao de que nao pode ser preenchido como "nao identificado".
+      6. API de passagem de cliente final: intermediarios devem transmitir
+         o identificador do cliente final ao registrar operacoes.
+    tools:
+      - transaction-database
+      - event-sourcing
+      - clearing-integration
+      - data-lake
+  devsecops:
+    prose: |
+      **Qualidade dos registros especificos:**
+      1. Testes por tipo de operacao: garantir que cada tipo tem seus campos
+         especificos preenchidos corretamente.
+      2. Testes de cliente final: operacoes via intermediario devem rejeitar
+         registros sem cliente final identificado.
+      3. Reconciliacao com sistemas de clearing/custódia.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - reconciliation
+  secops:
+    prose: |
+      **Monitoramento de qualidade:**
+      1. KPI por tipo de operacao: completude de dados especificos.
+      2. Auditoria de operacoes registradas sem cliente final identificado.
+      3. Reconciliacao periodica com sistemas de custódia e clearing para
+         garantir que todos os registros foram capturados.
+    tools:
+      - data-quality
+      - audit-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18"]
+    relationship: equivalent-to
+  - framework_id: marco-civil
+    articles: ["art-13"]
+    relationship: complements

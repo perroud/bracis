@@ -1,0 +1,136 @@
+id: art-3b
+family: cap-1
+title: "Receipt Confirmation and Protocol for Remote Operations"
+class: CNSP-408
+baselines: [seguradoras-digitais]
+statement:
+  prose: |
+    Art. 3º. A utilização de meios remotos nas operações de seguro, previdência
+    complementar aberta e capitalização deverá garantir:
+
+    II — a confirmação do recebimento de documentos e mensagens enviadas pelo ente
+    supervisionado ao cliente ou, quando couber, ao intermediário, quando o respectivo
+    envio se der em decorrência de exigência regulatória; e
+
+    III — o fornecimento de protocolo ao cliente ou, quando couber, ao intermediário,
+    para as solicitações e procedimentos relativos ao produto contratado.
+
+    Parágrafo único. O simples acesso ou consulta a documentos e informações
+    disponibilizados pelo ente supervisionado dispensam a necessidade de fornecimento
+    de protocolo.
+guidance:
+  prose: |
+    Article 3, incisos II and III, along with the sole paragraph, establish requirements
+    for receipt confirmation and protocol generation in digital insurance operations.
+
+    **Receipt confirmation (inciso II):**
+    When the supervised entity sends documents or messages to the client (or intermediary)
+    as required by regulation, it must obtain confirmation that the recipient received
+    the communication. This applies specifically to regulatory-mandated communications
+    (e.g., policy documents, renewal notices, claim status updates, mandatory disclosures).
+
+    The requirement is for "confirmation of receipt," not "confirmation of reading."
+    Technical delivery confirmation (read receipt, delivery status notification) satisfies
+    this requirement. The supervised entity must retain proof of delivery.
+
+    **Protocol for requests (inciso III):**
+    Every request or procedure related to a contracted product must generate a unique
+    protocol number for the client (or intermediary). This ensures traceability of all
+    interactions and provides the client with a reference for follow-up.
+
+    **Exception (parágrafo único):**
+    Simple access to or consultation of documents and information made available by the
+    supervised entity does not require protocol generation. This distinguishes between
+    active requests (which need protocols) and passive browsing (which does not).
+
+    Examples requiring protocol: claim filing, cancellation request, endorsement request,
+    benefit redemption, address change, beneficiary update.
+    Examples NOT requiring protocol: viewing policy terms, checking account balance,
+    downloading general conditions, reading FAQ.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Receipt confirmation infrastructure:**
+      1. Implement delivery status tracking for all regulatory-mandated communications
+         sent through digital channels (email delivery receipts, push notification
+         delivery confirmation, SMS delivery reports, in-app read tracking).
+      2. Multi-channel delivery system with fallback: if primary channel delivery
+         fails, attempt delivery through secondary channels.
+      3. Delivery evidence store: immutable log of all delivery attempts and
+         confirmations with timestamps and channel details.
+      4. Retry mechanism for undelivered regulatory communications with configurable
+         policies per communication type.
+
+      **Protocol generation system:**
+      5. Centralized protocol generator producing unique, sequential, human-readable
+         protocol numbers for all client requests and procedures.
+      6. Protocol format: include date, operation type, and sequential number
+         (e.g., PROT-2024-SINISTRO-000123).
+      7. Protocol tracking API enabling clients and intermediaries to query the
+         status of any protocol in real time.
+      8. Protocol lifecycle management: creation, status updates, resolution, closure.
+
+      **Exception handling:**
+      9. Classification engine distinguishing between active requests (protocol required)
+         and passive consultations (protocol exempt per parágrafo único).
+      10. Access logging for consultation operations (no protocol, but audit trail retained).
+    tools:
+      - message-broker
+      - notification-service
+      - protocol-management
+      - event-sourcing
+      - api-gateway
+  devsecops:
+    prose: |
+      **Automated validation:**
+      1. Integration tests verifying that all regulatory-mandated communication
+         flows generate delivery confirmation records.
+      2. End-to-end tests validating protocol generation for every client
+         request type (claim, cancellation, endorsement, etc.).
+      3. Automated checks ensuring protocol numbers are unique, sequential,
+         and properly formatted.
+      4. Regression tests verifying the parágrafo único exception: consultation
+         flows must NOT generate protocols.
+
+      **Pipeline controls:**
+      5. Code review checklist item: any new client-facing feature must be
+         classified as "request" (needs protocol) or "consultation" (exempt).
+      6. API contract validation ensuring all request endpoints return protocol
+         numbers in the response.
+      7. Delivery confirmation integration tests for each supported channel
+         (email, push, SMS, in-app).
+    tools:
+      - gitlab-ci
+      - postman
+      - selenium
+      - integration-testing
+  secops:
+    prose: |
+      **Monitoring and compliance:**
+      1. Monitor delivery failure rates across all channels — high failure rates
+         indicate non-compliance with inciso II.
+      2. Track protocol generation completeness: every request must have a protocol.
+         Alert on requests processed without protocol assignment.
+      3. Periodic audit of delivery evidence store to verify integrity and
+         completeness of receipt confirmations.
+      4. SLA monitoring for protocol resolution times.
+
+      **Reporting:**
+      5. Monthly report on delivery confirmation rates per channel and
+         communication type.
+      6. Protocol statistics: volume, resolution time, open/closed ratio.
+      7. Exception report: requests processed without protocol (should be zero).
+      8. Client complaint analysis related to non-receipt of communications
+         or missing protocols.
+    tools:
+      - monitoring-alerting
+      - grc-platform
+      - reporting-platform
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-9", "art-18"]
+    relationship: complements
+  - framework_id: cnsp-416
+    articles: ["art-6"]
+    relationship: complements

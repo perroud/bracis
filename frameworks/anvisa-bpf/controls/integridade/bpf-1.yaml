@@ -1,0 +1,118 @@
+id: bpf-1
+family: integridade
+title: "ALCOA+ Principles for Manufacturing Data"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    Todos os dados gerados, processados, reportados e armazenados como parte
+    das atividades de Boas Práticas de Fabricação devem atender aos princípios
+    de integridade de dados ALCOA+: Atribuível (identificação inequívoca de
+    quem realizou a ação), Legível (dados permanentemente legíveis durante todo
+    o período de retenção), Contemporâneo (registrado no momento da atividade),
+    Original (registro primário ou cópia certificada verificável), Preciso (livre
+    de erros e edições não documentadas), Completo (incluindo todas as repetições
+    e resultados fora de especificação), Consistente (sequência cronológica
+    verificável entre sistemas), Durável (preservado durante todo o período de
+    retenção) e Disponível (acessível para revisão e inspeção regulatória).
+
+    O fabricante deve implementar controles técnicos e procedimentais que
+    garantam o cumprimento simultâneo de todos os princípios ALCOA+ em cada
+    sistema computadorizado utilizado nas operações de fabricação, controle
+    de qualidade, armazenamento e distribuição de medicamentos.
+guidance:
+  prose: |
+    This control establishes the ALCOA+ data integrity framework as the
+    foundational requirement for all GMP manufacturing data. ALCOA+ extends
+    the original FDA ALCOA principles with three additional attributes
+    (Complete, Consistent, Enduring/Available) aligned with WHO, PIC/S, and
+    MHRA guidance on data integrity.
+
+    Each ALCOA+ principle must be verifiable through technical controls:
+    - Attributable: unique user IDs, audit trail linking actions to persons
+    - Legible: standardized formats, migration plans, periodic readability checks
+    - Contemporaneous: automated timestamps, NTP synchronization
+    - Original: version control, certified copies with checksums
+    - Accurate: input validation, calibration, verification workflows
+    - Complete: protection against deletion, inclusion of all test results
+    - Consistent: synchronized timestamps across systems, reconciliation
+    - Enduring: backup strategies, media migration, integrity verification
+    - Available: open formats, regulatory access, system migration planning
+
+    Non-compliance with ALCOA+ principles can result in regulatory action
+    including warning letters, import alerts, and manufacturing license
+    suspension.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Deploy immutable storage (WORM/append-only) for GMP-critical data
+         to prevent unauthorized modification or deletion of manufacturing
+         records, batch records, and quality control results.
+      2. Configure centralized NTP synchronization with drift monitoring
+         across all GMP systems to ensure contemporaneous and consistent
+         timestamps. Maximum acceptable drift: 1 second.
+      3. Implement automated SHA-256 checksums for all stored data with
+         periodic integrity verification (minimum weekly) to detect
+         unauthorized changes or media degradation.
+      4. Configure automated retention policies ensuring data durability
+         and availability for the regulatory retention period (minimum
+         5 years for batch records, 1 year after expiry date for released
+         products).
+      5. Deploy storage integrity monitoring with alerts for media
+         degradation, tampering detection, and capacity planning.
+    tools:
+      - worm-storage
+      - ntp-management
+      - checksum-verification
+      - retention-management
+      - storage-integrity-monitoring
+  devsecops:
+    prose: |
+      1. Implement automated test suites verifying each ALCOA+ principle
+         in GMP systems: attributability (user recorded), contemporaneity
+         (system-generated timestamps), completeness (no missing data),
+         accuracy (validation rules enforced).
+      2. Add pipeline checks that verify deletion functions are controlled
+         and all deletions are recorded in audit trail with justification.
+      3. Test that record timestamps are system-generated (not user-editable)
+         and synchronized via NTP with verifiable accuracy.
+      4. Validate that data copies and transfers maintain integrity through
+         automated checksum comparison at source and destination.
+      5. Include ALCOA+ compliance verification in acceptance testing for
+         every system release or configuration change.
+    tools:
+      - gitlab-ci
+      - alcoa-test-framework
+      - timestamp-verification
+      - data-integrity-testing
+  secops:
+    prose: |
+      1. Establish a pharmaceutical data integrity policy defining ALCOA+
+         requirements for each system category (ERP, LIMS, MES, SCADA,
+         chromatography data systems, electronic batch records).
+      2. Conduct periodic data integrity assessments on GMP-critical
+         systems (minimum annually) using ALCOA+ checklists aligned with
+         PIC/S PI 041-1 guidance.
+      3. Monitor data integrity indicators: correction rates, incomplete
+         records, audit trail violations, timestamp anomalies, and
+         unauthorized access attempts.
+      4. Investigate and document all data integrity breaches as quality
+         deviations with CAPA (Corrective and Preventive Action) per
+         pharmaceutical quality system requirements.
+      5. Train all GMP system users on ALCOA+ principles and their
+         individual responsibilities for data integrity.
+    tools:
+      - grc-platform
+      - data-integrity-assessment
+      - quality-management-system
+      - training-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-11", "controle-A-5-33"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-c-1"]
+    relationship: mapped

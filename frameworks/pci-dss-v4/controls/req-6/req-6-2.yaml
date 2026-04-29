@@ -1,0 +1,131 @@
+id: req-6.2
+family: req-6
+title: "Bespoke and Custom Software Security"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Bespoke and custom software are developed securely. Software development personnel
+    working on bespoke and custom software are trained at least once every 12 months
+    on software security relevant to their job function, including secure software
+    design and secure coding techniques. Bespoke and custom software is developed in
+    accordance with PCI DSS and based on industry standards and/or best practices for
+    secure development. Software engineering techniques or other methods are defined and
+    in use to prevent or mitigate common software attacks and related vulnerabilities,
+    including but not limited to injection attacks, data and memory leakage, insecure
+    cryptographic usage, and cross-site attacks.
+  parts:
+    - id: req-6.2.a
+      label: "6.2.1"
+      prose: >-
+        Bespoke and custom software are developed securely, including software
+        development personnel training on software security.
+    - id: req-6.2.b
+      label: "6.2.2"
+      prose: >-
+        Software development personnel working on bespoke and custom software are
+        trained at least once every 12 months on secure coding, OWASP Top 10, and
+        the threat landscape relevant to the CDE.
+    - id: req-6.2.c
+      label: "6.2.3"
+      prose: >-
+        Bespoke and custom software is reviewed prior to being released into
+        production to identify and correct potential coding vulnerabilities through
+        manual or automated code review, or application security testing.
+    - id: req-6.2.d
+      label: "6.2.4"
+      prose: >-
+        Software engineering techniques or other methods prevent or mitigate
+        common software attacks including injection, buffer overflow, insecure
+        cryptographic storage, insecure communications, improper error handling,
+        XSS, improper access control, and CSRF.
+
+guidance:
+  prose: >-
+    Bespoke and custom software introduces unique risk because it lacks the broad
+    security testing that commercial off-the-shelf software receives. Organizations
+    must establish a secure software development lifecycle (SSDLC) that integrates
+    security at every phase: design, coding, testing, and deployment. Developers must
+    be trained annually on current threats and secure coding practices relevant to the
+    technologies they use. Code reviews (manual or automated) must occur before
+    production release to identify vulnerabilities. The OWASP Top 10 provides a
+    minimum baseline for the categories of vulnerabilities that must be addressed.
+    PCI DSS v4.0.1 emphasizes a risk-based approach where threat modeling during
+    design helps identify the most critical security requirements for each application.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 6.2"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "OWASP Application Security Verification Standard (ASVS)"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Software Assurance Maturity Model (SAMM)"
+    url: "https://owaspsamm.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide developers with secure coding libraries and frameworks as part of the
+      platform's golden path. Offer pre-built, security-hardened templates for common
+      patterns (API endpoints, database access, authentication flows) that prevent
+      common vulnerabilities by design. Integrate SAST and SCA scanning as mandatory
+      pipeline stages in all project templates. Provide a security champions program
+      with training resources accessible through the internal developer platform.
+      Implement parameterized query libraries, output encoding helpers, and CSRF
+      protection middleware as platform-provided packages. Use language-specific
+      security linters (eslint-plugin-security, bandit, gosec) in shared CI
+      configurations.
+    tools:
+      - backstage
+      - gitlab-project-templates
+      - semgrep
+      - eslint-security
+      - bandit
+      - gosec
+      - sonarqube
+
+  devsecops:
+    prose: >-
+      Enforce mandatory SAST scanning on every merge request. Configure security
+      scanning rules to block merge when critical vulnerabilities are detected in
+      bespoke code. Implement OWASP ZAP or similar DAST tools as automated stages
+      that test deployed review environments. Require security-focused code review
+      approval for all changes to authentication, authorization, cryptographic, and
+      payment processing code paths. Track developer secure coding training
+      completion and block production deployment privileges for developers with
+      expired training. Generate SBOM for all custom applications and track
+      third-party component vulnerabilities.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - owasp-zap
+      - semgrep
+      - snyk-code
+      - sonarqube
+      - codeql
+      - syft
+
+  secops:
+    prose: >-
+      Monitor application security testing results and track vulnerability
+      remediation timelines across all custom applications. Maintain metrics on
+      developer training completion rates and security review coverage. Conduct
+      periodic application penetration testing by qualified personnel. Monitor
+      production applications for exploitation attempts targeting OWASP Top 10
+      vulnerabilities. Correlate WAF logs with application logs to identify
+      successful attacks that bypassed preventive controls. Track security debt
+      across custom applications and report trends to management.
+    tools:
+      - splunk
+      - elastic-siem
+      - defectdojo
+      - threadfix
+      - burpsuite
+      - portswigger
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-15", "SA-16", "SA-17"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.26", "A8.28", "A8.31"]
+    relationship: supports

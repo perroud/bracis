@@ -1,0 +1,121 @@
+id: owasp-a07
+family: a07
+title: "A07:2021 — Identification and Authentication Failures"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Previously known as Broken Authentication, this category addresses confirmation of the user's
+    identity, authentication, and session management which is critical to protect against
+    authentication-related attacks. An application may be vulnerable if it permits automated
+    attacks such as credential stuffing (where the attacker has a list of valid usernames and
+    passwords), permits brute force or other automated attacks, permits default, weak, or
+    well-known passwords (such as "Password1" or "admin/admin"), uses weak or ineffective
+    credential recovery and forgot-password processes (such as "knowledge-based answers"),
+    uses plain text, encrypted, or weakly hashed passwords, has missing or ineffective
+    multi-factor authentication, exposes session identifiers in the URL, reuses session identifiers
+    after successful login, does not correctly invalidate session IDs during logout or a period
+    of inactivity, or has session tokens that do not expire after an appropriate period.
+
+guidance:
+  prose: >-
+    Identification and Authentication Failures slipped from the top position in 2017 to seventh
+    in 2021, with increased availability of standardized frameworks reducing occurrence, but the
+    category remains highly impactful. Authentication is the foundation of all application
+    security — a broken authentication mechanism allows complete bypass of all other security
+    controls. Key mitigations include implementing multi-factor authentication where possible,
+    not deploying with default credentials, implementing weak password checks against known
+    compromised password lists (e.g., using the Have I Been Pwned API), aligning password length,
+    complexity, and rotation policies with NIST 800-63b guidelines (which discourages forced
+    periodic rotation but mandates breach-driven rotation), using a server-side secure session
+    manager that generates a new random high-entropy session ID after login, and not including
+    session identifiers in URLs.
+
+references:
+  - citation: "OWASP Top 10:2021 A07 Identification and Authentication Failures"
+    url: "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
+  - citation: "OWASP Authentication Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+  - citation: "OWASP Session Management Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+  - citation: "NIST SP 800-63B Digital Identity Guidelines"
+    url: "https://pages.nist.gov/800-63-3/sp800-63b.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized identity provider (Keycloak, Okta, Auth0, Azure AD) and federate all
+      application authentication through it using OIDC/OAuth2 — never implement custom authentication
+      logic in individual applications. Enable MFA at the identity provider level, requiring TOTP,
+      hardware security keys (FIDO2/WebAuthn), or push-based MFA for all users, with step-up
+      authentication for sensitive operations. Implement account lockout and rate limiting at the
+      identity provider for failed authentication attempts (align with NIST 800-63b — temporary
+      lockout, not permanent). Configure session token parameters at the IdP: HTTPOnly, Secure,
+      SameSite=Strict cookies; short-lived access tokens (15-60 minutes); refresh token rotation.
+      Implement a bot detection and CAPTCHA mechanism for login, registration, and password reset
+      endpoints. Enforce password complexity against NIST 800-63b guidelines and check new
+      passwords against HaveIBeenPwned's compromised password database.
+    tools:
+      - keycloak
+      - okta
+      - auth0
+      - vault
+      - cloudflare
+      - kong
+      - nginx
+
+  devsecops:
+    prose: >-
+      Implement automated testing for authentication controls: test that login rate limiting activates
+      after the configured number of failures, that session tokens are invalidated on logout (reusing
+      the token returns 401), that session tokens are not present in URLs or logs, and that MFA
+      bypass is not possible through alternative flows. Run DAST authentication tests: credential
+      stuffing simulation (using known test credentials), common password attempts, and session
+      fixation tests. Review all authentication code in security-focused code review, checking
+      for custom crypto, hardcoded test credentials, and authentication bypass conditions. Scan
+      for hardcoded credentials in source code using secret detection tools. Include authentication
+      failure handling in test coverage: verify correct error messages (generic, not revealing
+      whether username or password was wrong).
+    tools:
+      - burp-suite
+      - owasp-zap
+      - gitlab-secret-detection
+      - semgrep
+      - nuclei
+      - trufflehog
+
+  secops:
+    prose: >-
+      Implement detection for credential stuffing and brute force attacks: high-volume authentication
+      failure rates from single IPs, authentication failures using a known-compromised credential
+      list, successful authentications from impossible travel (login from two geographically distant
+      locations within a short time). Monitor for anomalous session activity: sessions active for
+      unusually long durations, concurrent sessions from different locations, or session token
+      reuse after logout. Integrate with threat intelligence feeds for compromised credential
+      databases to proactively identify and force-reset compromised accounts. Enable MFA bypass
+      alerting: alert when MFA is disabled for any account, when MFA recovery codes are used,
+      or when MFA exceptions are granted. Conduct regular access reviews to disable inactive
+      accounts and revoke excessive privileges.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - okta-identity-engine
+      - cloudflare
+      - datadog-security
+
+legal_references:
+  - framework_id: owasp-asvs
+    articles: ["V2.1", "V2.2", "V2.3", "V3.1", "V3.2", "V3.3"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-3", "IA-5", "AC-7", "AC-12"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["8.1", "8.2", "8.3", "8.4", "8.5"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["5.2", "6.3", "6.4", "6.5"]
+    relationship: mapped

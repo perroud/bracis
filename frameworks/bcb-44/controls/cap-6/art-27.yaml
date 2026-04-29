@@ -1,0 +1,98 @@
+id: art-27
+family: cap-6
+title: "Comunicacoes Automaticas ao COAF por Limiar"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 27. Independentemente de análise de suspeita, as instituições de pagamento
+    devem comunicar ao COAF:
+
+    I - operações de depósito ou de qualquer outra forma de carga em conta de
+    pagamento realizadas em espécie com valor igual ou superior a R$ 50.000,00
+    (cinquenta mil reais);
+
+    II - transferências internacionais com valor igual ou superior a R$ 100.000,00
+    (cem mil reais), por cliente, em um período de trinta dias;
+
+    III - outras operações que o COAF ou o Banco Central do Brasil determinarem
+    por ato normativo específico.
+
+    Parágrafo único. As comunicações de que trata este artigo devem ser realizadas
+    até o último dia útil do mês subsequente ao mês de realização da operação.
+guidance:
+  prose: |
+    O art. 27 estabelece as "comunicacoes automaticas" ou "comunicacoes sem suspeita"
+    -- tambem chamadas de CTR (Currency Transaction Report) na nomenclatura americana.
+
+    **Diferenca entre art. 25 e art. 27:**
+    - Art. 25: baseado em SUSPEITA -- a IP analisa e conclui que e suspeito.
+    - Art. 27: baseado em LIMIAR -- automatico, independente de suspeita.
+    Uma mesma operacao pode gerar comunicacao por ambos os artigos.
+
+    **Limiares para IPs:**
+    - R$ 50.000 em especie (unica operacao)
+    - R$ 100.000 em transferencias internacionais acumuladas em 30 dias
+
+    **Periodicidade de envio (paragrafo unico):**
+    Ate o ultimo dia util do mes seguinte ao mes da operacao. Para operacoes
+    de julho, comunicar ate o ultimo dia util de agosto.
+
+    **Implicacao pratica:**
+    A IP deve ter processo automatico de consolidacao mensal e envio batch
+    das comunicacoes do art. 27, separado do processo individual de SAR do art. 25.
+
+    **Operacoes futuras (inciso III):**
+    O COAF pode publicar novas categorias de comunicacao automatica. A IP deve
+    monitorar as publicacoes do COAF e implementar novas obrigacoes no prazo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de comunicacoes automaticas:**
+      1. Job diario que identifica operacoes do dia acima dos limiares do art. 27.
+      2. Consolidacao mensal: acumular transferencias internacionais por cliente
+         nos ultimos 30 dias (janela deslizante) para identificar ultrapasse do
+         limiar de R$ 100.000.
+      3. Geracao automatica do relatorio mensal no formato SISCOAF, consolidando
+         todas as comunicacoes do mes.
+      4. Workflow de revisao e envio: compliance officer revisa o relatorio
+         consolidado antes do envio automatico ao COAF.
+      5. Calendario de prazos: alerta 5 dias antes do ultimo dia util de cada mes
+         para garantir que o relatorio sera enviado no prazo.
+      6. Confirmar recebimento: verificar que o SISCOAF registrou o recebimento
+         e arquivar o numero de protocolo.
+    tools:
+      - transaction-monitoring
+      - regulatory-reporting
+      - job-scheduler
+      - aml-platform
+  devsecops:
+    prose: |
+      **Automacao e testes das comunicacoes automaticas:**
+      1. Testes de limiar: operacao exatamente em R$ 50.000, acima e abaixo.
+      2. Testes de acumulacao de 30 dias para transferencias internacionais.
+      3. Testes de geracao do relatorio: formato correto conforme especificacao SISCOAF.
+      4. Testes de calendario: calcular corretamente o ultimo dia util do mes
+         seguinte em todos os meses do ano (incluindo fevereiro).
+      5. Alertas de monitoramento: verificar que o job diario executou com sucesso.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - job-monitoring
+  secops:
+    prose: |
+      **Conformidade das comunicacoes automaticas:**
+      1. Relatorio de status: comunicacoes do mes enviadas, protocolo COAF,
+         numero de operacoes reportadas.
+      2. Reconciliacao: operacoes acima do limiar no banco de dados vs.
+         operacoes efetivamente comunicadas ao COAF.
+      3. Historico de envios: arquivo de todos os relatorios mensais enviados.
+      4. Verificacao do prazo: nunca enviar apos o ultimo dia util do mes seguinte.
+    tools:
+      - aml-platform
+      - regulatory-reporting
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-26", "art-27"]
+    relationship: equivalent-to

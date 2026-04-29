@@ -1,0 +1,94 @@
+id: cls10.2
+family: cls10
+title: "Key management for cloud services"
+class: ISO27017
+
+statement:
+  prose: >-
+    A policy on the use, protection and lifetime of cryptographic keys
+    shall be developed and implemented through their whole lifecycle.
+    For cloud services, the cloud service provider shall provide
+    information to the cloud service customer about the key management
+    practices it uses, including backup, archiving, and destruction of
+    keys. The cloud service customer shall manage its own cryptographic
+    keys or verify that the key management practices of the cloud
+    service provider meet the cloud service customer's requirements.
+    The cloud service provider shall enable the cloud service customer
+    to manage its own keys where the cloud service customer requires
+    this capability.
+
+guidance:
+  prose: >-
+    Key management in cloud environments requires careful consideration
+    of key ownership, custody, and access. Customer-managed keys provide
+    the highest level of control but require the customer to manage key
+    lifecycle operations including generation, distribution, storage,
+    rotation, revocation, and destruction. Cloud provider-managed keys
+    offer convenience but mean the provider has access to key material.
+    Bring-your-own-key (BYOK) and hold-your-own-key (HYOK) models
+    offer intermediate approaches. The key management policy should
+    specify which model is required for each data classification level
+    and cloud service.
+
+references:
+  - citation: "ISO/IEC 27017:2015, Section 10.1.2"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized key management using cloud KMS services or
+      external HSM-backed solutions. Define key hierarchies with separate
+      key encryption keys and data encryption keys. Automate key rotation
+      schedules with zero-downtime rotation procedures. Implement
+      customer-managed encryption keys for sensitive data classes using
+      BYOK or HYOK models. Configure key access policies that enforce
+      least-privilege access and require multi-party authorization for
+      key deletion operations.
+    tools:
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - gcp-cloud-kms
+      - thales-luna
+
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code for encryption key configurations that
+      do not meet organizational requirements, such as missing key
+      rotation policies, overly permissive key access grants, or use of
+      provider-managed keys where customer-managed keys are required.
+      Implement pipeline checks that verify key management configurations
+      before deployment. Prevent hardcoding of key material or key
+      identifiers in source code.
+    tools:
+      - checkov
+      - tfsec
+      - gitleaks
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor key usage patterns for anomalies including unusual
+      decryption volumes, access from unexpected sources, and attempts
+      to export or delete keys. Track key rotation compliance and alert
+      when keys exceed their maximum lifetime. Audit key access logs
+      to verify that only authorized services and users are accessing
+      encryption keys. Monitor for key compromise indicators and
+      implement automated key revocation procedures.
+    tools:
+      - splunk
+      - aws-cloudtrail
+      - azure-monitor
+      - chronicle
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.24"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["cek-04", "cek-05", "cek-06", "cek-07"]
+    relationship: complements
+  - framework_id: nist-800-53
+    articles: ["SC-12"]
+    relationship: mapped

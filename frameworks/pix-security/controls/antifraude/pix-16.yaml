@@ -1,0 +1,96 @@
+id: pix-16
+family: antifraude
+title: "Bloqueio Cautelar"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP recebedor pode efetuar o bloqueio cautelar de recursos creditados em conta
+    transacional quando houver fundada suspeita de fraude. O bloqueio cautelar permite
+    ao PSP recebedor reter os valores por até 72 horas para análise, durante as quais
+    deve notificar o titular da conta e, se confirmada a fraude, iniciar o procedimento
+    de devolução via MED. O bloqueio cautelar é uma prerrogativa do PSP recebedor, não
+    do pagador.
+guidance:
+  prose: |
+    **Conceito de bloqueio cautelar:**
+    Mecanismo que permite ao PSP recebedor reter valores Pix creditados quando identifica
+    indicios de fraude, mesmo sem solicitacao do pagador. E uma medida preventiva para
+    preservar os recursos enquanto a analise de fraude e realizada.
+
+    **Regras do bloqueio cautelar:**
+    1. **Quem pode bloquear:** Apenas o PSP recebedor (onde os recursos foram creditados).
+    2. **Prazo:** Ate 72 horas a partir do credito.
+    3. **Notificacao:** O titular da conta bloqueada deve ser notificado imediatamente.
+    4. **Analise:** O PSP deve analisar o caso dentro do prazo de 72 horas.
+    5. **Desfecho:**
+       - Se fraude confirmada: inicia MED para devolver os valores.
+       - Se nao confirmada: desbloqueia os valores.
+       - Se prazo excede sem conclusao: desbloqueia automaticamente.
+
+    **Quando aplicar bloqueio cautelar:**
+    - Credito de valor incomum para o perfil da conta recebedora
+    - Conta recem-aberta recebendo volumes elevados
+    - Multiplos creditos de origens diversas em curto periodo (padrao de mula)
+    - Chave Pix marcada como suspeita no DICT
+    - Notificacao de fraude recebida do PSP pagador
+
+    **Protecao ao titular:**
+    O bloqueio cautelar pode afetar um usuario inocente. Por isso, a notificacao imediata
+    e o prazo maximo de 72 horas sao garantias essenciais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de bloqueio cautelar:**
+      1. API de bloqueio que registra o motivo, valor, horario e prazo de expiracao.
+      2. Tabela de bloqueios com controle de estado (ativo, liberado, devolvido, expirado).
+      3. Scheduler para liberacao automatica apos 72 horas se nao houver resolucao.
+      4. Integracao com MED para iniciar devolucao quando fraude confirmada.
+
+      **Notificacao:**
+      5. Push notification imediata ao titular da conta bloqueada.
+      6. Canal de atendimento para contestacao do bloqueio.
+      7. Notificacao de liberacao ou devolucao ao final do processo.
+
+      **Controles:**
+      8. Audit trail completo de cada bloqueio (quem, quando, por que, resolucao).
+      9. Prevencao de bloqueio duplicado no mesmo credito.
+      10. Rate limiting para prevenir uso abusivo de bloqueio cautelar.
+    tools:
+      - database
+      - scheduler
+      - notification-service
+      - audit-log
+      - workflow-engine
+  devsecops:
+    prose: |
+      **Testes de bloqueio cautelar:**
+      1. Testes de fluxo completo: bloqueio, analise, liberacao ou devolucao.
+      2. Testes de expiracao: bloqueio expira apos 72 horas automaticamente.
+      3. Testes de notificacao: usuario recebe todas as notificacoes esperadas.
+      4. Testes de concorrencia: bloqueio e transacao simultaneos na mesma conta.
+      5. Testes de integracao com MED: bloqueio cautelar seguido de devolucao.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - event-testing
+  secops:
+    prose: |
+      **Operacao de bloqueio cautelar:**
+      1. Fila de casos de bloqueio cautelar para analise pela equipe antifraude.
+      2. SLA de analise: resolucao em ate 48 horas (antes do prazo de 72h).
+      3. Metricas: taxa de bloqueios confirmados como fraude vs falsos positivos.
+      4. Relatorio mensal de bloqueios cautelares ao BCB.
+      5. Revisao de criterios de bloqueio com base em metricas de efetividade.
+    tools:
+      - case-management
+      - fraud-detection-platform
+      - analytics-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3"]
+    relationship: complements
+  - framework_id: bcb-3978
+    articles: ["art-1", "art-2"]
+    relationship: complements

@@ -1,0 +1,139 @@
+id: art-13
+family: cap-4
+title: "Comunicacao Previa ao BCB para Contratacao de Nuvem"
+class: BACEN-4893
+statement:
+  prose: |
+    Art. 13. As instituições referidas no art. 1 devem comunicar ao Banco Central do
+    Brasil a contratação de serviços relevantes de processamento e armazenamento de
+    dados e de computação em nuvem.
+
+    § 1º A comunicação referida no caput deve conter:
+    I - a denominação da empresa contratada;
+    II - os serviços contratados;
+    III - a indicação dos países e das regiões em cada país onde os serviços poderão
+    ser prestados e os dados poderão ser armazenados, processados e gerenciados.
+
+    § 2º A comunicação de que trata este artigo deve ser realizada até dez dias após
+    a contratação dos serviços.
+
+    § 3º As alterações contratuais que impliquem modificação das informações de que
+    trata o § 1º devem ser comunicadas ao Banco Central do Brasil até dez dias após a
+    alteração contratual.
+guidance:
+  prose: |
+    O art. 13 exige comunicacao ao BCB sobre contratacao de servicos relevantes de
+    cloud computing. Nao e uma autorizacao previa, mas uma notificacao obrigatoria.
+
+    **Prazo:** 10 dias apos a contratacao (ss 2) ou alteracao contratual (ss 3).
+
+    **Conteudo obrigatorio da comunicacao (ss 1):**
+    1. Nome do provedor contratado (ex: AWS, Azure, GCP, Oracle Cloud)
+    2. Servicos contratados (ex: IaaS, PaaS, SaaS, servicos especificos)
+    3. Localizacao geografica: paises e regioes onde dados serao armazenados
+       e processados
+
+    **"Servicos relevantes":**
+    A resolucao usa o termo "relevantes", o que implica que nem toda contratacao
+    de cloud precisa ser comunicada. A instituicao deve definir criterios de
+    relevancia com base em:
+    - Volume de dados processados
+    - Sensibilidade dos dados
+    - Criticidade do servico para operacoes
+    - Impacto em caso de indisponibilidade
+
+    **Alteracoes contratuais (ss 3):**
+    Qualquer alteracao que mude provedor, servicos ou localizacao geografica deve
+    ser comunicada em 10 dias. Na pratica, mudancas de regiao em cloud providers
+    devem ser rastreadas e comunicadas.
+
+    **Risco operacional:**
+    O nao cumprimento do prazo de 10 dias e infração regulatoria. O processo
+    de comunicacao deve ser automatizado e integrado ao processo de contratacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Inventario de servicos cloud:**
+      1. Asset inventory automatizado de todos os servicos cloud contratados.
+      2. Tagging obrigatorio de recursos com provedor, servico, regiao e data
+         de contratacao.
+      3. Deteccao automatica de novos servicos provisionados em cloud.
+      4. Dashboard de servicos cloud com mapeamento geografico.
+
+      **Controle de regioes:**
+      5. Policy-as-code que restringe provisionamento a regioes autorizadas.
+      6. Alerta automatico quando recurso e provisionado em regiao nao autorizada.
+      7. Registro de todas as regioes em uso por provedor e servico.
+
+      **Automacao da comunicacao:**
+      8. Workflow automatizado: novo servico cloud -> checklist de comunicacao ->
+         notificacao ao compliance -> comunicacao ao BCB.
+      9. Integracao com sistema de procurement para capturar contratacoes.
+      10. Rastreamento de alteracoes contratuais com alerta de prazo de 10 dias.
+
+      **Multi-cloud governance:**
+      11. Cloud broker ou management layer centralizado.
+      12. Inventario consolidado multi-cloud.
+      13. Compliance check antes de provisionar em novo provedor/regiao.
+    tools:
+      - cspm
+      - asset-inventory
+      - cloud-governance
+      - opa-gatekeeper
+      - tagging-enforcement
+  devsecops:
+    prose: |
+      **Controle no pipeline:**
+      1. IaC validation que verifica se regioes de deploy estao na lista autorizada.
+      2. Pre-deploy check: novo provedor/regiao exige aprovacao de compliance.
+      3. GitOps enforcement: toda mudanca de infraestrutura cloud via merge request
+         com aprovacao obrigatoria.
+
+      **Rastreabilidade de mudancas:**
+      4. Change log automatizado de provisioning de cloud resources.
+      5. Drift detection para identificar recursos criados fora do pipeline.
+      6. Notificacao automatica ao compliance quando nova regiao e usada.
+
+      **Documentacao:**
+      7. README de infraestrutura com mapeamento de provedores, servicos e regioes.
+      8. Architecture Decision Records para decisoes de cloud.
+    tools:
+      - checkov
+      - tfsec
+      - terraform
+      - pulumi
+      - gitlab-ci
+      - opa-gatekeeper
+  secops:
+    prose: |
+      **Processo de comunicacao:**
+      1. Processo formal de comunicacao ao BCB com responsavel designado.
+      2. Template de comunicacao com campos mapeados para ss 1.
+      3. Tracking de prazo de 10 dias com alertas automaticos.
+      4. Registro historico de todas as comunicacoes ao BCB.
+
+      **Monitoramento de conformidade:**
+      5. Inventario de servicos cloud reconciliado com comunicacoes ao BCB.
+      6. Gap analysis: servicos contratados vs. comunicados.
+      7. Auditoria periodica de aderencia ao processo de comunicacao.
+
+      **Gestao de terceiros cloud:**
+      8. Due diligence de seguranca para novos provedores cloud.
+      9. Revisao anual de provedores existentes.
+      10. Monitoramento de incidentes reportados pelos provedores.
+      11. Verificacao de certificacoes (SOC 2, ISO 27001).
+    tools:
+      - grc-platform
+      - asset-inventory
+      - vendor-risk-management
+      - compliance-scanner
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SA-4", "PM-14"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-34"]
+    relationship: complements

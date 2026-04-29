@@ -1,0 +1,121 @@
+id: art-19
+family: cap-4
+title: "Trilha de Auditoria"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 19. Os sistemas computadorizados que processam dados GMP-relevantes
+    devem manter trilha de auditoria automática que registre, de forma
+    inalterável e cronológica, todas as ações que criem, modifiquem ou
+    excluam dados regulatórios.
+
+    Parágrafo 1. A trilha de auditoria deve registrar, no mínimo:
+    I - identificação única do usuário que realizou a ação;
+    II - data e hora exatas da ação com resolução mínima de segundo;
+    III - tipo de ação realizada (criação, modificação, exclusão);
+    IV - valor anterior e valor posterior dos dados modificados;
+    V - motivo da alteração, quando aplicável;
+    VI - identificação do terminal ou estação de trabalho utilizada.
+
+    Parágrafo 2. A trilha de auditoria não pode ser desativada, alterada
+    ou excluída por nenhum usuário, incluindo administradores do sistema.
+
+    Parágrafo 3. A trilha de auditoria deve estar disponível para revisão
+    por inspetores da ANVISA durante todo o período de retenção de dados.
+guidance:
+  prose: |
+    O art. 19 e um dos requisitos mais criticos da IN 134, alinhado com
+    21 CFR Part 11 e EU GMP Annex 11 no tema de trilhas de auditoria.
+
+    **Caracteristicas obrigatorias da trilha de auditoria:**
+    - Automatica: gerada pelo sistema, nao pelo usuario
+    - Inalteravel: protegida contra modificacao ou exclusao
+    - Cronologica: com timestamp sincronizado e preciso
+    - Completa: todas as acoes GMP-relevantes registradas
+    - Acessivel: disponivel para revisao regulatoria
+    - Duravel: retida pelo periodo regulatorio exigido
+
+    **Acoes que devem ser registradas:**
+    - CRUD de dados GMP (resultados, parametros, lotes)
+    - Login/logout de usuarios
+    - Tentativas de acesso malsucedidas
+    - Mudancas de configuracao do sistema
+    - Mudancas de niveis de acesso
+    - Assinaturas eletronicas
+    - Acoes de backup e restauracao
+    - Eventos de sistema (erros, alarmes, falhas)
+
+    **Imutabilidade:**
+    A trilha de auditoria deve ser protegida contra qualquer tipo de
+    adulteracao, inclusive por administradores de sistema. Isso pode ser
+    implementado via write-once storage, assinatura digital, blockchain
+    ou segregacao de acesso ao armazenamento de audit trail.
+
+    **Sincronizacao de tempo:**
+    Todos os sistemas devem ser sincronizados via NTP com fonte de tempo
+    confiavel para garantir consistencia cronologica da trilha.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de trilha de auditoria:**
+      1. Implementar sistema centralizado de coleta de audit trail com
+         armazenamento imutavel (WORM storage, append-only databases,
+         ou blockchain para registros criticos).
+      2. Configurar sincronizacao NTP em todos os sistemas GMP com fonte
+         de tempo confiavel e monitoramento de drift.
+      3. Implementar segregacao de acesso ao armazenamento de audit trail:
+         administradores de sistema GMP nao devem ter acesso de escrita
+         ou exclusao ao repositorio de trilhas.
+      4. Configurar retencao automatica de trilhas de auditoria pelo
+         periodo regulatorio (minimo periodo de validade do medicamento
+         + 1 ano, ou 5 anos, o que for maior).
+      5. Implementar monitoramento de integridade do repositorio de
+         audit trail com alertas para tentativas de adulteracao.
+    tools:
+      - elasticsearch
+      - worm-storage
+      - ntp-monitoring
+      - integrity-monitoring
+  devsecops:
+    prose: |
+      **Trilha de auditoria no pipeline:**
+      1. Verificar automaticamente no pipeline que sistemas GMP
+         implementam trilha de auditoria conforme requisitos do art. 19.
+      2. Testar imutabilidade da trilha de auditoria como parte da OQ:
+         tentar modificar registros e confirmar que operacao e rejeitada.
+      3. Validar que todos os campos obrigatorios (usuario, timestamp,
+         acao, valores anterior/posterior) sao registrados corretamente.
+      4. Implementar testes de integridade de trilha de auditoria como
+         parte do pipeline de compliance.
+    tools:
+      - gitlab-ci
+      - audit-trail-testing
+      - integrity-verification
+      - compliance-testing
+  secops:
+    prose: |
+      **Governanca de trilhas de auditoria:**
+      1. Definir procedimento de revisao periodica de trilhas de auditoria
+         para sistemas GMP criticos (minimo mensal para producao).
+      2. Implementar alertas automaticos para eventos anomalos detectados
+         em trilhas de auditoria (acessos fora de horario, tentativas
+         de modificacao, volume anomalo de alteracoes).
+      3. Garantir que trilhas estejam acessiveis e legiveis para
+         inspetores da ANVISA durante inspecoes.
+      4. Conduzir verificacao periodica de integridade das trilhas de
+         auditoria armazenadas.
+      5. Capacitar inspetores internos e equipe de QA na revisao e
+         interpretacao de trilhas de auditoria.
+    tools:
+      - siem
+      - audit-trail-review
+      - alerting
+      - training-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-15"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-b"]
+    relationship: mapped

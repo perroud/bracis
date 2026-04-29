@@ -1,0 +1,116 @@
+id: cscf-1.2
+family: obj-1
+title: "Segregation of SWIFT Environment"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure the segregation of the SWIFT secure zone from the general IT
+    environment, back-office systems, and any other untrusted networks.
+    The secure zone must operate as an isolated enclave with strictly
+    controlled data flows. General-purpose operator workstations must not
+    reside in the secure zone unless they are exclusively dedicated to
+    SWIFT operations.
+  parts:
+    - id: cscf-1.2.a
+      label: "1.2.a"
+      prose: >-
+        The SWIFT secure zone is separated from the general IT environment
+        through network segmentation controls (firewalls, ACLs, or equivalent).
+    - id: cscf-1.2.b
+      label: "1.2.b"
+      prose: >-
+        Operator PCs used for SWIFT operations are dedicated and hardened,
+        residing within or being tightly controlled to access only the
+        secure zone.
+    - id: cscf-1.2.c
+      label: "1.2.c"
+      prose: >-
+        Data flows between the secure zone and back-office applications
+        traverse controlled interfaces with explicit allow-listing of
+        protocols, ports, and endpoints.
+
+guidance:
+  prose: >-
+    Network segmentation is the primary defense preventing lateral movement
+    from compromised general IT systems into the SWIFT environment. The
+    secure zone should be treated as a high-security enclave comparable to
+    a cardholder data environment in PCI DSS. Organizations with architecture
+    types A1 and A2 must ensure messaging interfaces and communication
+    interfaces are within this zone. Jump servers or bastion hosts should
+    mediate administrative access. Back-office integration should use
+    middleware in a controlled DMZ rather than direct connectivity. Virtual
+    desktop infrastructure (VDI) may be used for operator PCs provided the
+    VDI infrastructure itself is within or dedicated to the secure zone.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 1.2"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-125B — Secure Virtual Network Configuration for Virtual Machine (VM) Protection"
+    url: "https://doi.org/10.6028/NIST.SP.800-125B"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy the SWIFT secure zone in a dedicated VPC/VNet with no peering
+      to general-purpose networks. Use private subnets with no internet
+      gateway attachment. Implement micro-segmentation via network policies
+      (Calico, Cilium) if containerized components exist. Provision dedicated
+      bastion hosts in a management subnet for administrative access, enforcing
+      SSH certificate authentication and session recording. Define all
+      segmentation rules in IaC with mandatory code review for changes.
+      Use network flow telemetry to continuously validate that only approved
+      traffic patterns exist.
+    tools:
+      - terraform
+      - pulumi
+      - calico
+      - cilium
+      - aws-transit-gateway
+      - azure-firewall
+      - gcp-vpc-service-controls
+
+  devsecops:
+    prose: >-
+      Enforce segmentation policies through automated tests in CI/CD. Deploy
+      canary pods or test VMs that attempt cross-zone communication and
+      assert failures. Use Conftest or OPA to validate IaC changes maintain
+      segmentation boundaries. Block any pull request that adds network
+      routes between the secure zone and general IT without explicit security
+      team approval.
+    tools:
+      - conftest
+      - opa
+      - checkov
+      - tfsec
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor east-west traffic between the secure zone and general IT
+      environment. Create SIEM detection rules for any unauthorized
+      communication crossing the segmentation boundary. Perform quarterly
+      segmentation validation tests simulating lateral movement attacks.
+      Maintain a network topology diagram updated automatically from IaC
+      state.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - firemon
+      - tufin
+      - aws-vpc-flow-logs
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-7(21)", "AC-4"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.22", "A8.20"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-1.2", "req-1.3"]
+    relationship: complements

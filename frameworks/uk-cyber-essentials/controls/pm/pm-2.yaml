@@ -1,0 +1,101 @@
+id: pm-2
+family: pm
+title: "Timely Patching of Applications and Third-Party Software"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    All applications installed on in-scope devices must be licensed and supported
+    by the vendor, receiving regular security updates. Security patches for applications
+    must be applied within 14 days of release where the patch fixes a vulnerability
+    with a severity rated as critical or high. This includes web browsers, browser
+    plugins, email clients, office productivity suites, PDF readers, and any other
+    software accessible to users or exposed to untrusted content. Applications that
+    are no longer supported by the vendor must be removed.
+
+guidance:
+  prose: >-
+    Third-party applications are frequently targeted by attackers because they often
+    have a large installed base and may not be covered by the organisation's primary
+    patch management process. Web browsers, Java, Adobe products, and office suites
+    are particularly high-risk due to their exposure to untrusted content from the
+    internet. Organisations must maintain an inventory of all installed applications,
+    monitor vendor advisories for security patches, and deploy updates within the
+    14-day window. Automated update mechanisms built into applications should be
+    enabled where available and where they do not conflict with the organisation's
+    change management process.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Security Update Management"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy application packaging and deployment solutions (SCCM/MECM, Intune,
+      Munki, Jamf) that can distribute application updates across the estate. Use
+      third-party patch management tools (Patch My PC, Ninite Pro, ManageEngine)
+      that specialise in non-Microsoft application patching. Implement Software
+      Composition Analysis (SCA) to identify vulnerable third-party components in
+      internally developed applications. Configure automatic update policies for
+      web browsers (Chrome, Edge, Firefox enterprise policies) and enable auto-update
+      for productivity applications. Maintain a software inventory linked to CVE
+      feeds to identify affected applications when new vulnerabilities are disclosed.
+    tools:
+      - sccm
+      - intune
+      - jamf
+      - munki
+      - renovate
+      - dependabot
+      - trivy
+
+  devsecops:
+    prose: >-
+      Integrate dependency scanning into CI/CD pipelines to detect vulnerable
+      third-party libraries before deployment. Configure pipeline gates that block
+      deployments containing dependencies with critical or high-severity CVEs older
+      than 14 days. Automate dependency updates via merge request bots (Renovate,
+      Dependabot) with automated test execution. Track application version currency
+      across all environments as a DevSecOps KPI. Scan container images for vulnerable
+      application packages and block deployment of images with unpatched critical
+      vulnerabilities.
+    tools:
+      - gitlab-dependency-scanning
+      - renovate
+      - dependabot
+      - grype
+      - trivy
+      - snyk
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Run application vulnerability scans regularly to identify systems with outdated
+      software. Correlate vulnerability scan results with internet exposure and data
+      sensitivity to prioritize remediation. Track patch compliance metrics including
+      mean time to patch (MTTP) and percentage of applications patched within the
+      14-day SLA. Generate compliance reports showing applications past their patching
+      deadline. Monitor for newly disclosed zero-day vulnerabilities and activate
+      emergency patching procedures when necessary.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - splunk
+      - servicenow-vuln-response
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.19"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "RA-5"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-patch-apps"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 7.1", "CIS 7.2", "CIS 7.3", "CIS 7.4"]
+    relationship: mapped

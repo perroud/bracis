@@ -1,0 +1,119 @@
+id: basel-gov-stress
+family: governance
+title: "Stress Testing Framework"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain a comprehensive, forward-looking stress testing programme as a key
+    risk management and capital planning tool. Stress testing must be used to complement
+    risk-based capital models and to inform the board and senior management about the
+    potential impact of adverse economic and financial conditions on the bank's capital
+    adequacy, liquidity, profitability, and business model viability. Stress tests must
+    cover all material risk types, including credit risk, market risk, liquidity risk,
+    operational risk, interest rate risk in the banking book (IRRBB), and concentration
+    risk. The programme must include: (1) sensitivity analysis — testing the impact of a
+    change in a single risk factor; (2) scenario analysis — testing the impact of multiple
+    risk factor changes simultaneously under coherent macroeconomic scenarios (baseline,
+    adverse, severely adverse); and (3) reverse stress testing — identifying the scenarios
+    under which the bank would fail to meet its minimum capital or liquidity requirements.
+    Stress test results must be reviewed by the board, integrated into the ICAAP and capital
+    planning process, and used to calibrate the bank's risk appetite limits and contingency
+    plans. Banks subject to supervisory stress tests (e.g., ECB SREP stress tests, Fed
+    DFAST/CCAR, Bank of England ACS) must also comply with the applicable supervisory
+    frameworks and methodologies.
+
+guidance:
+  prose: >-
+    Stress testing has become one of the most important post-crisis supervisory tools.
+    Well-designed scenarios should be severe but plausible — the 2008-2009 global financial
+    crisis and the 2020 COVID-19 shock are now de facto benchmarks. Scenarios should be
+    updated at least annually to reflect current macroeconomic risks, structural changes in
+    the bank's portfolio, and emerging risks such as climate transition risk and cyber risk.
+    Banks must ensure that stress test scenarios capture non-linear effects (e.g., credit
+    risk migration, collateral value deterioration, liquidity-solvency spirals) and that
+    model outputs are subject to expert judgment overlays where models are known to have
+    limitations. Reverse stress tests are particularly valuable for identifying business
+    model vulnerabilities: the question is not "what is our loss in a severe scenario?" but
+    rather "what scenario would cause us to fail, and how plausible is it?" Stress test
+    results should drive active management responses: capital contingency plans, dividend
+    restrictions, balance sheet de-risking, or business model adjustments.
+
+references:
+  - citation: "BCBS, Principles for sound stress testing practices and supervision, May 2009"
+    url: "https://www.bis.org/publ/bcbs155.htm"
+  - citation: "BCBS, Stress testing principles, October 2018"
+    url: "https://www.bis.org/bcbs/publ/d450.htm"
+  - citation: "BCBS, Climate-related risk drivers and their transmission channels, April 2021"
+    url: "https://www.bis.org/bcbs/publ/d517.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a scenario management and stress testing platform that: (a) centralises all
+      macroeconomic scenario definitions (GDP growth, unemployment, interest rates, credit
+      spreads, property price indices, equity indices) across base, adverse, and severely
+      adverse scenarios; (b) propagates scenario assumptions through satellite models
+      (PD migration matrices, LGD projection models, market price shock models, liquidity
+      outflow models) to generate stressed P&L and capital projections; (c) aggregates
+      stress test results from all risk types and business lines into a consolidated capital
+      impact report; and (d) supports management action modelling — simulating the capital
+      impact of proposed management actions (dividend suspension, asset disposals, capital
+      issuance) in the stress scenario. Integrate with the ICAAP platform to embed stress
+      test results directly into capital adequacy assessments.
+    tools:
+      - apache-spark
+      - dbt
+      - postgresql
+      - grafana
+      - apache-airflow
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain all stress test models (PD migration, LGD, market shocks, funding cost),
+      scenario parameters, and results processing code in version-controlled repositories.
+      Implement automated regression tests that run each model against a reference historical
+      period and validate that outputs are within expected ranges. Build a CI/CD pipeline
+      for model updates that includes independent validation testing before production
+      deployment. Automate the extraction of stress test results into ICAAP report templates
+      and supervisory submission formats (ECB stress test templates, DFAST XML schemas).
+    tools:
+      - gitlab-ci
+      - mlflow
+      - dvc
+      - pytest
+      - sonarqube
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Stress test scenarios and results are highly sensitive pre-publication information;
+      if leaked, they could trigger adverse market reactions. Apply document classification
+      (Strictly Confidential) to all stress test scenario workbooks and results packages,
+      restrict access to the stress testing team, CRO office, and senior management, and
+      audit all access. Implement DLP controls to prevent stress test data from being
+      transferred outside approved channels. After supervisory publication of stress test
+      results, archive all supporting documentation — model inputs, scenario specifications,
+      results — in a tamper-evident archive for at least 10 years.
+    tools:
+      - sharepoint-dlm
+      - cyberark
+      - splunk
+      - hashicorp-vault
+      - microsoft-purview
+
+legal_references:
+  - framework_id: iso-22301
+    articles: ["cl-8.2", "cl-8.3", "cl-8.6"]
+    relationship: complements
+  - framework_id: dora
+    articles: ["art-24", "art-25", "art-26"]
+    relationship: complements
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12", "BAI08"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-2", "PM-9", "RA-3", "SI-14"]
+    relationship: mapped

@@ -1,0 +1,124 @@
+id: glba-limits
+family: privacy-rule
+title: "Limits on Disclosure of Nonpublic Personal Information"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall limit the disclosure of nonpublic personal information
+    (NPI) to non-affiliated third parties in accordance with the customer's opt-out
+    election and applicable regulatory exceptions. Institutions shall not disclose account
+    numbers or access codes for marketing purposes. Institutions shall implement controls
+    to ensure that NPI is disclosed only to the extent permitted by law and only for the
+    purposes described in the privacy notice.
+  parts:
+    - id: glba-limits.1
+      label: "(1)"
+      prose: >-
+        The institution shall not disclose customer account numbers, credit card numbers,
+        access numbers, or access codes for use in telemarketing, direct mail marketing,
+        or other marketing through electronic mail to non-affiliated third parties.
+    - id: glba-limits.2
+      label: "(2)"
+      prose: >-
+        The institution shall not disclose NPI to non-affiliated third parties beyond
+        the scope described in the privacy notice provided to the customer, unless an
+        updated notice is provided and the customer is given a new opportunity to opt out.
+    - id: glba-limits.3
+      label: "(3)"
+      prose: >-
+        Disclosures to service providers and joint marketing partners shall be governed
+        by contractual provisions requiring the recipient to maintain the confidentiality
+        of NPI and to use it only for the purposes for which it was disclosed.
+    - id: glba-limits.4
+      label: "(4)"
+      prose: >-
+        The institution shall maintain an inventory of all NPI data flows to non-affiliated
+        third parties and shall be able to demonstrate that each disclosure falls within
+        a permitted exception or is consistent with the customer's opt-out election.
+
+guidance:
+  prose: >-
+    Regulators examine whether institutions have effective controls over outbound NPI
+    flows. The account number prohibition is absolute — there is no opt-out override for
+    marketing use of account numbers. Common examination findings include: account numbers
+    or access codes included in marketing data files sent to third parties, NPI disclosed
+    for purposes not described in the privacy notice, service provider agreements lacking
+    required confidentiality provisions, and inability to produce a complete inventory of
+    NPI data flows. Institutions should maintain a data-sharing register that documents
+    every NPI disclosure pathway, the legal basis for each disclosure, the contractual
+    protections in place, and the review cadence. The distinction between affiliates and
+    non-affiliated third parties is critical — affiliate sharing has different rules under
+    the Fair Credit Reporting Act.
+
+references:
+  - citation: "Gramm-Leach-Bliley Act, Section 502(d) — Limitations on Disclosure of Account Numbers"
+    url: "https://www.ftc.gov/legal-library/browse/statutes/gramm-leach-bliley-act"
+  - citation: "Regulation P, Subpart A — Limits on Disclosures (12 CFR § 1016.11-12)"
+    url: "https://www.consumerfinance.gov/rules-policy/regulations/1016/"
+  - citation: "FTC Privacy Rule — Limits on Disclosure (16 CFR § 313.11-12)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-313"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a data classification engine that tags all NPI fields at the schema level
+      (account numbers, SSNs, credit card numbers, access codes) with sensitivity labels
+      and disclosure restrictions. Build a data egress gateway that intercepts all outbound
+      data transmissions and enforces disclosure rules based on: data classification, recipient
+      classification (affiliate vs. non-affiliated), purpose classification, and customer
+      opt-out status. Implement automated account number redaction in all marketing data
+      pipelines — no exception path. Deploy data loss prevention (DLP) policies at the
+      platform level that block NPI from exiting through unauthorized channels. Maintain a
+      machine-readable data-sharing register as code that documents every authorized NPI
+      disclosure pathway with its legal basis, recipient, purpose, and review date.
+      Implement contract management integration that links third-party data-sharing
+      agreements to the data-sharing register and alerts when contracts approach expiration.
+    tools:
+      - kubernetes
+      - kafka
+      - open-policy-agent
+      - vault
+      - terraform
+      - postgresql
+  devsecops:
+    prose: >-
+      Implement pipeline stages that scan data export code for NPI field references and
+      verify that appropriate disclosure checks are in place. Create automated tests that
+      attempt to include account numbers in marketing data exports and verify that the
+      export is blocked. Implement data flow analysis tools in the CI/CD pipeline that
+      detect new NPI egress pathways and require security review before deployment.
+      Use policy-as-code to enforce data classification labels on all new database columns
+      and API response fields. Implement automated contract compliance checks that verify
+      third-party integration code only accesses NPI fields permitted by the corresponding
+      data-sharing agreement.
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - checkov
+      - gitleaks
+      - tfsec
+  secops:
+    prose: >-
+      Monitor data egress patterns and alert on anomalies (unexpected NPI volumes,
+      new recipient endpoints, account number patterns in outbound data). Conduct
+      quarterly data flow audits that reconcile actual NPI disclosures against the
+      data-sharing register. Generate compliance reports showing: NPI disclosure volumes
+      by recipient and purpose, blocked disclosure attempts, contract expiration timelines,
+      and audit findings. Implement automated scanning of outbound data files for account
+      number patterns. Maintain evidence packages for examinations including the data-sharing
+      register, sample data-sharing agreements, DLP reports, and audit results.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - servicenow
+      - dlp-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-4", "PT-2", "PT-3", "PT-6", "PM-25"]
+    relationship: supports
+  - framework_id: ccpa-cpra
+    articles: ["1798.100", "1798.140"]
+    relationship: complements

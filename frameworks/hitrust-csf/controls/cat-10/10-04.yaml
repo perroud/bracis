@@ -1,0 +1,81 @@
+id: 10-04
+family: cat-10
+title: "Security of System Files"
+class: HITRUST-CSF
+baselines: [i1, r2]
+statement:
+  prose: >-
+    The organization shall ensure the security of system files including the control of
+    operational software, the protection of system test data, and the control of access to
+    program source code. Procedures shall be implemented to control the installation of software
+    on operational systems. Test data shall be selected carefully, protected, and controlled.
+    Access to program source code shall be restricted. The installation of software on operational
+    systems shall be controlled to minimize the risk of corruption. Where test data includes
+    personally identifiable information or protected health information, it shall be de-identified
+    or synthetic data shall be used. Change control procedures shall be applied to changes to
+    information systems through formal change management processes.
+guidance:
+  prose: >-
+    Security of system files requires protecting the integrity and confidentiality of software
+    code, configuration files, and test data throughout the development and operational lifecycle.
+    Organizations must control what software is installed on production systems, protect source
+    code from unauthorized access and modification, and ensure that test environments do not
+    contain unprotected sensitive data. At i1, documented procedures for software installation
+    control, source code access restrictions, and test data management are required. At r2,
+    automated software deployment controls, code signing, immutable infrastructure, synthetic
+    test data generation, and comprehensive change management with full audit trails are expected.
+    Organizations handling PHI must ensure that test environments never contain unmasked production
+    PHI data.
+references:
+  - citation: "NIST SP 800-53 Rev 5: CM-5, CM-11, SA-10, SA-15"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+  - citation: "ISO/IEC 27001:2022 A.8.19, A.8.31, A.8.33"
+    url: "https://www.iso.org/standard/27001"
+  - citation: "HIPAA Security Rule 45 CFR 164.312(c)(1)"
+    url: "https://www.hhs.gov/hipaa/for-professionals/security/index.html"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement immutable infrastructure where production systems are never modified in place
+      but replaced with new verified images. Use container image signing (cosign/sigstore) to
+      ensure only verified images are deployed. Enforce admission policies that require image
+      signatures and approved registries. Implement GitOps where the Git repository is the
+      single source of truth for all production configurations. Use read-only container
+      filesystems with tmpfs for runtime data. Implement supply chain security with SLSA
+      framework compliance.
+    tools:
+      - "Cosign / Sigstore (image signing)"
+      - "Kyverno / OPA (admission policies)"
+      - "ArgoCD / Flux (GitOps)"
+      - "Kubernetes SecurityContext (read-only root)"
+      - "Container Registries (Harbor, GHCR) with signing"
+      - "SLSA framework tools"
+  devsecops:
+    prose: >-
+      Implement branch protection rules preventing direct commits to production branches.
+      Require code review and automated testing before merge. Use CI/CD pipelines to build,
+      test, sign, and deploy artifacts with no manual intervention on production systems.
+      Implement secret scanning to prevent credentials in source code. Use synthetic data
+      generation tools for test environments to avoid PHI exposure. Automate test data
+      provisioning through CI/CD pipelines.
+    tools:
+      - "GitLab Protected Branches"
+      - "GitLab CI/CD (build, test, sign, deploy)"
+      - "GitLab Secret Detection"
+      - "Synthetic Data Tools (Synthea, Faker)"
+      - "CODEOWNERS"
+      - "Artifact signing in pipelines"
+  secops:
+    prose: >-
+      Monitor for unauthorized software installation on production systems through file
+      integrity monitoring and endpoint detection. Track all changes to production systems
+      through change management workflows. Conduct periodic audits verifying that test
+      environments do not contain unmasked sensitive data. Monitor source code repositories
+      for unauthorized access and suspicious activities. Verify artifact integrity through
+      signature validation before deployment.
+    tools:
+      - "File Integrity Monitoring (OSSEC, Tripwire, Wazuh)"
+      - "EDR (CrowdStrike, Microsoft Defender)"
+      - "Change Management (ServiceNow, Jira)"
+      - "Data Loss Prevention (DLP)"
+      - "Source Code Access Monitoring"

@@ -1,0 +1,118 @@
+id: bpf-14
+family: acesso
+title: "User Authentication and Password Policy"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    A autenticação de usuários em sistemas computadorizados de BPF deve
+    garantir a verificação inequívoca da identidade do indivíduo antes
+    de conceder acesso ao sistema ou permitir a execução de operações.
+
+    A política de senhas deve definir requisitos mínimos de complexidade,
+    comprimento, histórico de reutilização, período de validade e
+    bloqueio após tentativas falhas consecutivas. Senhas devem ser
+    armazenadas utilizando algoritmos de hash criptográficos seguros
+    e nunca em texto claro.
+
+    Para sistemas de alta criticidade e operações sensíveis (liberação
+    de lote, aprovação de desvios, assinatura eletrônica), deve ser
+    implementada autenticação multifator (MFA) combinando pelo menos
+    dois fatores independentes: conhecimento (senha), posse (token,
+    certificado digital) ou inerência (biometria).
+guidance:
+  prose: |
+    User authentication is the first line of defense for ensuring
+    that actions in GMP systems are attributable to specific individuals.
+    Weak authentication undermines the entire ALCOA+ framework.
+
+    Authentication requirements by system criticality:
+    - High-risk systems (MES, LIMS, CDS): MFA mandatory, session
+      timeout ≤15 minutes, account lockout after 3-5 failed attempts
+    - Medium-risk systems (DMS, TMS): strong password policy, session
+      timeout ≤30 minutes, account lockout after 5 failed attempts
+    - Low-risk systems: standard password policy with periodic rotation
+
+    Password policy minimums for GMP systems:
+    - Minimum length: 12 characters
+    - Complexity: uppercase, lowercase, numbers, special characters
+    - History: prevent reuse of last 12 passwords
+    - Maximum age: 90 days (or longer with MFA)
+    - Lockout: after 3-5 consecutive failures
+    - Unlock: by authorized administrator only (not self-service for
+      high-risk systems)
+
+    Additional authentication controls:
+    - Unique user IDs that are never reassigned
+    - Automatic session timeout after inactivity
+    - Concurrent session restrictions
+    - Login history visible to user at login
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Deploy centralized authentication service (LDAP/Active
+         Directory/OIDC) with enforced password policies meeting GMP
+         requirements: minimum 12 characters, complexity rules, and
+         90-day maximum age.
+      2. Implement multi-factor authentication (MFA) for all high-risk
+         GMP systems using hardware tokens, TOTP authenticator apps,
+         or certificate-based authentication as the second factor.
+      3. Configure automated account lockout after 3-5 failed
+         authentication attempts with alerting to security operations
+         and administrative unlock required for high-risk systems.
+      4. Implement session management controls: automatic timeout after
+         15 minutes inactivity for high-risk systems, concurrent session
+         prevention, and secure session handling.
+    tools:
+      - active-directory
+      - mfa-platform
+      - session-management
+      - authentication-monitoring
+  devsecops:
+    prose: |
+      1. Test authentication enforcement: verify that all system
+         endpoints require authentication, session tokens expire
+         correctly, and password policies are enforced at creation
+         and change.
+      2. Implement automated security testing for authentication
+         bypass vulnerabilities, credential stuffing resistance, and
+         brute force protection in CI pipelines.
+      3. Test MFA enforcement: verify that high-risk operations
+         require multi-factor authentication and that single-factor
+         authentication is rejected for protected functions.
+      4. Validate password storage security: verify that credentials
+         are hashed with current algorithms (bcrypt, scrypt, Argon2)
+         and never stored or transmitted in plaintext.
+    tools:
+      - gitlab-ci
+      - authentication-testing
+      - security-scanning
+      - credential-testing
+  secops:
+    prose: |
+      1. Define authentication and password policy for GMP systems
+         specifying requirements by system criticality level, aligned
+         with pharmaceutical regulatory expectations and industry
+         standards.
+      2. Monitor authentication events across all GMP systems: failed
+         login attempts, account lockouts, MFA failures, unusual login
+         patterns, and concurrent session violations.
+      3. Conduct periodic authentication security assessments including
+         password strength auditing, MFA coverage verification, and
+         credential storage security review.
+      4. Investigate and document all authentication anomalies
+         (brute force attempts, credential sharing indicators, MFA
+         bypass attempts) as security incidents with appropriate
+         escalation.
+    tools:
+      - siem
+      - iam-platform
+      - security-assessment
+      - incident-management
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-21"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-17", "controle-A-8-5"]
+    relationship: mapped

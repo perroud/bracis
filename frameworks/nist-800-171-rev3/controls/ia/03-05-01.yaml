@@ -1,0 +1,82 @@
+id: 03.05.01
+family: ia
+title: "Identification"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [ia-2, ia-4]
+  - cmmc-v2: [ia.l2-3.5.1]
+statement:
+  prose: >-
+    a. Uniquely identify and authenticate organizational users, processes acting on
+       behalf of organizational users, and devices.
+    b. Manage system identifiers by receiving authorization from designated personnel
+       or roles to assign an individual, group, role, service, or device identifier.
+    c. Select and assign identifiers that identify an individual, group, role, service,
+       or device.
+    d. Prevent reuse of identifiers for a defined time period.
+    e. Disable identifiers after a defined time period of inactivity.
+guidance:
+  prose: >-
+    Common device identifiers include Media Access Control (MAC) addresses, Internet
+    Protocol (IP) addresses, or device-unique token identifiers. Management of individual
+    identifiers is not applicable to shared system accounts. Typically, individual
+    identifiers are the usernames of the system accounts assigned to those individuals.
+    Organizations may require unique identification of individuals in group accounts or
+    for detailed accountability of individual activity. Identifier management includes
+    establishing initial identifiers, maintaining identifiers over time, and revoking
+    identifiers when no longer needed. Preventing identifier reuse ensures that an
+    identifier cannot be reassigned to a different individual for a defined period.
+    Disabling identifiers after periods of inactivity helps to reduce the attack surface
+    by removing dormant accounts.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management with unique identifiers for all entities
+      (users, services, devices). Use an IdP (Okta, Azure Entra ID) as the single source
+      of truth for identity. Assign unique UUIDs to all service accounts and machine
+      identities. Implement SPIFFE/SPIRE for cryptographic workload identity in
+      Kubernetes and service mesh environments. Configure automatic disabling of user
+      accounts after 90 days of inactivity. Prevent identifier reuse through IdP
+      policies that retain deactivated identifiers for a minimum of 2 years. Deploy
+      device identity through certificate-based authentication (802.1X, mTLS).
+    tools:
+      - "Okta / Azure Entra ID (centralized identity)"
+      - "SPIFFE/SPIRE (workload identity)"
+      - "Kubernetes ServiceAccounts"
+      - "Certificate management (cert-manager, Venafi)"
+      - "Device identity (802.1X, NAC)"
+      - "HashiCorp Vault (machine identity)"
+  devsecops:
+    prose: >-
+      Enforce that all CI/CD pipelines use uniquely identified service accounts with
+      short-lived tokens rather than shared credentials. Implement identity validation
+      in deployment pipelines to ensure only authorized identities can deploy to
+      production. Scan for hardcoded credentials and shared account usage in code
+      repositories. Maintain an inventory of all service identities used in CI/CD
+      with documented ownership and purpose.
+    tools:
+      - "CI/CD service account management"
+      - "OIDC federation for pipelines"
+      - "Secret scanning (GitLeaks, TruffleHog)"
+      - "Service identity inventory"
+      - "Short-lived token providers"
+  secops:
+    prose: >-
+      Monitor for shared account usage, identifier reuse attempts, and dormant account
+      activity. Implement automated detection of inactive accounts exceeding the
+      defined threshold. Conduct periodic identity inventories reconciling active
+      identifiers against authorized user/service/device lists. Alert on attempts to
+      authenticate with disabled or expired identifiers. Generate compliance reports
+      on identifier lifecycle management.
+    tools:
+      - "Identity Governance and Administration (IGA)"
+      - "SIEM (identity event correlation)"
+      - "Dormant account detection"
+      - "Identity inventory reconciliation"
+      - "Compliance reporting"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — IA-2, IA-4"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-63-3"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"

@@ -1,0 +1,113 @@
+id: bpf-16
+family: acesso
+title: "Segregation of Duties for Critical Operations"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    A segregação de funções deve ser implementada em sistemas
+    computadorizados de BPF para garantir que nenhum indivíduo possa
+    executar e aprovar a mesma operação crítica, eliminar ou criar
+    registros sem supervisão independente, ou acumular permissões que
+    permitam contornar controles de qualidade.
+
+    As operações que obrigatoriamente exigem segregação de funções
+    incluem: fabricação e liberação de lote, análise e aprovação de
+    resultados, criação e aprovação de documentos, execução e aprovação
+    de calibrações, investigação e fechamento de desvios, e solicitação
+    e aprovação de mudanças.
+
+    A matriz de segregação de funções deve ser implementada tecnicamente
+    no sistema de controle de acesso, impedindo a atribuição de funções
+    conflitantes ao mesmo usuário. Exceções temporárias devem ser
+    documentadas com justificativa, aprovação da Garantia da Qualidade,
+    e prazo máximo definido.
+guidance:
+  prose: |
+    Segregation of duties (SoD) is a fundamental internal control that
+    prevents fraud, errors, and data integrity violations by requiring
+    independent verification of critical activities.
+
+    Critical SoD pairs in pharmaceutical manufacturing:
+    - Production execution / Batch release (operator ≠ QA approver)
+    - Sample analysis / Result approval (analyst ≠ QC approver)
+    - Document creation / Document approval (author ≠ approver)
+    - System administration / Quality oversight (IT admin ≠ QA)
+    - Change request / Change approval (requestor ≠ approver)
+    - Deviation investigation / CAPA closure (investigator ≠ closer)
+    - Calibration execution / Calibration approval
+
+    Implementation approaches:
+    - Preventive: system technically blocks conflicting role assignment
+    - Detective: system allows but flags and reports SoD conflicts
+    - Compensating: where preventive control is not feasible, implement
+      enhanced monitoring and secondary review
+
+    SoD must be maintained even in small organizations where the same
+    person might traditionally perform multiple roles. Technical
+    enforcement in the system is preferred over procedural controls.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement SoD conflict detection in the IAM platform that
+         automatically identifies and blocks conflicting role
+         assignments based on the defined SoD matrix.
+      2. Configure workflow engines in GMP systems to technically
+         enforce SoD: block self-approval, require different users
+         for execution and verification steps, and prevent the same
+         person from completing both sides of a dual-control operation.
+      3. Deploy SoD monitoring dashboards showing current SoD
+         compliance status, active exceptions, and upcoming exception
+         expirations.
+      4. Implement automated SoD exception management with time-bound
+         approvals, mandatory justification, compensating controls,
+         and automatic expiration.
+    tools:
+      - iam-platform
+      - sod-engine
+      - workflow-management
+      - exception-management
+  devsecops:
+    prose: |
+      1. Test SoD enforcement in GMP systems: verify that conflicting
+         operations cannot be completed by the same user and that
+         self-approval is technically blocked.
+      2. Implement automated SoD matrix validation testing verifying
+         that role definitions in the system match the approved SoD
+         matrix without conflicts.
+      3. Test exception workflows: verify that SoD exceptions require
+         proper authorization, have defined expiration, and are logged
+         in the audit trail.
+      4. Include SoD enforcement verification in regression testing
+         for every system release or role configuration change.
+    tools:
+      - gitlab-ci
+      - sod-testing
+      - role-validation
+      - access-control-testing
+  secops:
+    prose: |
+      1. Define SoD policy and matrix for all GMP operations,
+         identifying conflicting function pairs and specifying required
+         controls (preventive, detective, or compensating).
+      2. Conduct periodic SoD compliance reviews verifying that no
+         active user holds conflicting roles and that all exceptions
+         are authorized, time-bound, and compensated.
+      3. Monitor for SoD violations in real-time: alert when a user
+         attempts to perform both sides of a segregated function or
+         when conflicting roles are assigned.
+      4. Report SoD compliance status to quality management review,
+         including violation trends, exception utilization, and
+         remediation status.
+    tools:
+      - grc-platform
+      - sod-monitoring
+      - access-review
+      - quality-management-system
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-18"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-3", "controle-A-5-15"]
+    relationship: mapped

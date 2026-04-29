@@ -1,0 +1,83 @@
+id: 03.04.01
+family: cm
+title: "Baseline Configuration"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [cm-2]
+  - cmmc-v2: [cm.l2-3.4.1]
+statement:
+  prose: >-
+    a. Establish and maintain baseline configurations and inventories of organizational
+       systems (including hardware, software, firmware, and documentation) throughout the
+       respective system development life cycles.
+    b. Establish and enforce security configuration settings for information technology
+       products employed in organizational systems.
+guidance:
+  prose: >-
+    Baseline configurations are documented, formally reviewed, and agreed-upon
+    specifications for systems or configuration items within those systems. Baseline
+    configurations serve as a basis for future builds, releases, or changes to systems.
+    Baseline configurations include hardware, software, firmware, and documentation
+    items. Maintaining baselines requires creating new baselines as systems change
+    over time. Baseline configuration information is maintained about system components
+    including standard software packages installed on workstations, notebook computers,
+    servers, network components, or mobile devices; current version numbers and update
+    levels of operating systems and applications; configuration settings of system
+    components; and network topology and logical placement of components within the
+    system architecture. Organizations can implement automated mechanisms (configuration
+    management tools) to maintain up-to-date, complete, accurate, and readily available
+    baseline configurations.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define all system configurations as Infrastructure-as-Code (IaC) stored in Git
+      repositories. Use Terraform for cloud infrastructure, Kubernetes manifests or Helm
+      charts for workloads, and Ansible/Chef for OS-level configurations. Implement
+      GitOps using ArgoCD or Flux to ensure the live system state matches the declared
+      baseline in Git. Deploy configuration drift detection using tools that compare
+      actual system state against the IaC baseline and alert on deviations. Maintain a
+      CMDB (Configuration Management Database) synchronized with infrastructure discovery
+      tools. Use immutable infrastructure patterns (container images, AMIs) to prevent
+      configuration drift. Tag all resources with version, owner, and environment metadata.
+    tools:
+      - "Terraform / OpenTofu (infrastructure baseline)"
+      - "ArgoCD / Flux (GitOps drift detection)"
+      - "Helm (application configuration baseline)"
+      - "Ansible (OS-level baseline)"
+      - "CMDB (ServiceNow, Backstage)"
+      - "AWS Config / Azure Policy / GCP Asset Inventory"
+  devsecops:
+    prose: >-
+      Version-control all configuration baselines in Git with required merge request
+      reviews for changes. Implement CI pipeline stages that validate configuration
+      changes against security benchmarks (CIS Benchmarks) before deployment. Enforce
+      that all infrastructure changes flow through the IaC pipeline — no manual changes
+      to production. Implement automated configuration scanning using Checkov, tfsec,
+      or Trivy to detect deviations from security baselines. Maintain an inventory of
+      all software components using SBOM generation in build pipelines.
+    tools:
+      - "Git (version-controlled baselines)"
+      - "Checkov / tfsec (configuration validation)"
+      - "CIS Benchmark scanning"
+      - "SBOM generation (Syft, CycloneDX)"
+      - "Merge request approval workflows"
+  secops:
+    prose: >-
+      Monitor for configuration drift from established baselines using continuous
+      compliance scanning. Alert on unauthorized configuration changes detected outside
+      the approved change management process. Conduct periodic baseline reviews to ensure
+      configurations reflect current security requirements. Generate compliance reports
+      showing baseline adherence across all systems. Maintain evidence of baseline
+      establishment, updates, and deviation remediation for audit purposes.
+    tools:
+      - "Cloud Security Posture Management (CSPM)"
+      - "AWS Config Rules / Azure Policy"
+      - "Configuration drift detection"
+      - "Compliance reporting dashboards"
+      - "Change management tracking"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — CM-2"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-128"
+    url: "https://doi.org/10.6028/NIST.SP.800-128"

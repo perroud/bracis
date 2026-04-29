@@ -1,0 +1,118 @@
+id: rec-4
+family: prescricao
+title: "Prescription Validity, Renewal, and Cancellation"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 7.º A prescrição eletrônica possui prazo de validade definido
+    conforme a classificação do medicamento:
+
+    I — medicamentos de venda livre e sob prescrição comum: validade de
+    até 6 (seis) meses a partir da data de emissão;
+
+    II — medicamentos sujeitos a controle especial, listas C1 a C5 da
+    Portaria SVS/MS n.º 344/1998: validade de até 30 (trinta) dias;
+
+    III — medicamentos das listas A e B da Portaria SVS/MS n.º 344/1998:
+    validade de até 30 (trinta) dias;
+
+    IV — antimicrobianos: validade de até 10 (dez) dias conforme RDC
+    n.º 471/2021.
+
+    Art. 8.º O prescritor pode cancelar a prescrição eletrônica a qualquer
+    momento antes da dispensação, registrando o motivo do cancelamento no
+    sistema.
+
+    Parágrafo único. Após a dispensação, a prescrição não pode ser cancelada,
+    sendo necessário emitir nova prescrição ou comunicação ao farmacêutico
+    responsável para as providências cabíveis.
+guidance:
+  prose: |
+    Articles 7 and 8 establish the validity periods for electronic
+    prescriptions based on drug classification, as well as the rules
+    for prescription cancellation.
+
+    **Validity periods by drug category:**
+    - Over-the-counter and common prescription drugs: up to 6 months
+    - Controlled substances (Lists C1-C5): up to 30 days
+    - Narcotics and psychotropics (Lists A, B): up to 30 days
+    - Antimicrobials (RDC 471/2021): up to 10 days
+
+    **Cancellation rules:**
+    - Pre-dispensation: prescriber may cancel at any time with
+      documented reason
+    - Post-dispensation: cancellation is not allowed; a new
+      prescription or pharmacist notification is required
+
+    **System enforcement:**
+    Systems must automatically enforce validity periods, preventing
+    dispensation of expired prescriptions. The expiration check must
+    occur at dispensation time, not just at prescription creation.
+
+    **Audit trail:**
+    All cancellations must be recorded with timestamp, prescriber
+    identification, and reason, creating an immutable audit trail.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Prescription lifecycle management:**
+      1. Implement a prescription state machine with states: DRAFT,
+         ISSUED, PARTIALLY_DISPENSED, FULLY_DISPENSED, CANCELLED,
+         EXPIRED, with enforced transitions and validity checks.
+      2. Deploy a scheduled job that scans active prescriptions and
+         transitions expired ones to EXPIRED status based on drug
+         classification validity rules.
+      3. Implement a cancellation API that validates pre-dispensation
+         status before allowing cancellation, requiring a mandatory
+         reason field.
+      4. Store all state transitions in an immutable event log with
+         cryptographic chaining for tamper evidence.
+      5. Deploy real-time notification to pharmacies when a
+         prescription is cancelled before dispensation.
+    tools:
+      - state-machine
+      - event-sourcing
+      - kafka
+      - postgresql
+      - cron-scheduler
+      - notification-service
+  devsecops:
+    prose: |
+      **Prescription lifecycle testing:**
+      1. Create exhaustive state transition tests covering all valid
+         and invalid prescription state changes.
+      2. Implement time-based tests verifying correct expiration
+         behavior for each drug classification category.
+      3. Add security tests ensuring cancellation is blocked after
+         dispensation and that reason field cannot be empty.
+      4. Deploy integration tests for the full prescription lifecycle
+         from issuance through dispensation or cancellation.
+    tools:
+      - gitlab-ci
+      - time-based-testing
+      - state-machine-testing
+      - integration-tests
+  secops:
+    prose: |
+      **Prescription lifecycle monitoring:**
+      1. Monitor cancellation rates by prescriber and flag unusual
+         patterns (high cancellation rates, last-minute cancellations).
+      2. Audit expired prescription dispensation attempts and alert
+         on any successful dispensation of expired prescriptions.
+      3. Generate weekly reports on prescription lifecycle metrics
+         (issuance, dispensation, cancellation, expiration rates).
+      4. Review cancellation reasons monthly for patterns that may
+         indicate system or workflow issues.
+    tools:
+      - siem
+      - compliance-dashboard
+      - audit-logging
+      - analytics-platform
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23", "art-25"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

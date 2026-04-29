@@ -1,0 +1,98 @@
+id: tds-monitor-1
+family: tds-monitor
+title: "Security Monitoring and Audit Logging for 3DS Environment"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Audit logging must be enabled on all 3DS system components to record
+    security-relevant events. Logged events must include, at minimum:
+    all individual user access to 3DS data, all actions taken by accounts
+    with administrative privileges, access to audit trails, invalid logical
+    access attempts, use of and changes to identification and authentication
+    mechanisms, initialization and stopping of audit logs, and creation
+    and deletion of system-level objects. Each audit log entry must include
+    user identification, type of event, date and time, success or failure
+    indication, origination of event, and identity or name of affected
+    data, system component, or resource.
+
+guidance:
+  prose: >-
+    Comprehensive audit logging provides the visibility needed to detect
+    security incidents, investigate breaches, and demonstrate compliance.
+    Without adequate logging, security events go undetected and forensic
+    investigation becomes impossible. The 3DS environment handles sensitive
+    authentication data, making it essential to track who accessed what,
+    when, and from where. Log entries must contain sufficient detail to
+    reconstruct the sequence of events during an incident. Logs themselves
+    must be protected from tampering, as an attacker who gains access to
+    the 3DS environment may attempt to erase or modify audit trails.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 5 — Monitor and Test"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 5.1 — Audit Logging"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure centralized log collection from all 3DS system components
+      to a SIEM or log management platform. Enable cloud-native audit
+      logging (AWS CloudTrail, Azure Monitor, GCP Cloud Audit Logs) for
+      all 3DS resources. Configure application-level logging in 3DS
+      Server, ACS, and DS components to capture all required event types.
+      Implement log integrity verification using cryptographic checksums
+      or write-once storage. Configure log retention for at least 12
+      months with immediate availability of the most recent 3 months.
+    tools:
+      - splunk
+      - elastic-stack
+      - aws-cloudtrail
+      - azure-monitor
+      - gcp-cloud-logging
+      - fluentd
+      - vector
+
+  devsecops:
+    prose: >-
+      Implement logging standards in application code through shared
+      logging libraries that enforce required fields. Include log coverage
+      verification in CI/CD pipelines using automated tests that trigger
+      security events and verify log output. Scan application code for
+      missing audit logging on security-relevant operations. Automate
+      log format validation to ensure all entries include required fields.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - semgrep
+      - fluentd
+      - logstash
+
+  secops:
+    prose: >-
+      Configure SIEM correlation rules to detect security-relevant event
+      patterns including brute force attempts, privilege escalation,
+      unauthorized data access, and audit log tampering. Establish daily
+      log review procedures for critical events. Implement automated
+      alerting for high-priority events with defined escalation paths.
+      Conduct quarterly reviews of logging coverage to verify all 3DS
+      components are generating required logs. Protect log integrity
+      through write-once storage or cryptographic verification.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - palo-alto-cortex
+      - sumo-logic
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-10"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.17"]
+    relationship: mapped

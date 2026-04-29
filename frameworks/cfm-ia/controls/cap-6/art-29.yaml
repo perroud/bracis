@@ -1,0 +1,120 @@
+id: art-29
+family: cap-6
+title: "Conformidade com a LGPD para Dados de Saude em IA"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 29. O tratamento de dados pessoais de saúde por sistemas de
+    inteligência artificial médica deve observar integralmente a Lei Geral
+    de Proteção de Dados Pessoais (Lei 13.709/2018):
+
+    I - o tratamento de dados pessoais sensíveis de saúde para treinamento,
+    validação ou operação de sistemas de IA médica deve estar amparado em
+    base legal adequada, nos termos do art. 11 da LGPD;
+
+    II - a finalidade do tratamento deve ser específica, explícita e
+    informada ao titular, sendo vedado o uso de dados coletados para
+    assistência médica em finalidades não autorizadas, como comercialização
+    ou perfilamento não clínico;
+
+    III - devem ser implementados mecanismos de minimização de dados:
+    somente dados estritamente necessários para a finalidade do sistema
+    de IA devem ser processados;
+
+    IV - o titular dos dados deve poder exercer seus direitos previstos
+    na LGPD, incluindo acesso, correção, exclusão e portabilidade,
+    respeitadas as obrigações legais de retenção de prontuário;
+
+    V - o encarregado de proteção de dados (DPO) da instituição deve
+    participar da avaliação de impacto à proteção de dados pessoais
+    (RIPD/DPIA) antes da implantação de sistema de IA médica.
+guidance:
+  prose: |
+    O art. 29 faz a ponte entre o CFM IA e a LGPD, reconhecendo que
+    dados de saude sao dados pessoais sensiveis com protecao reforccada.
+
+    **Base legal para IA medica (inciso I):**
+    O art. 11 da LGPD lista bases legais para dados sensiveis. Para
+    IA medica, as mais relevantes sao:
+    - Consentimento especifico e destacado do titular (art. 11, I)
+    - Tutela da saude, em procedimento realizado por profissionais
+      da saude (art. 11, II, f)
+    - Pesquisa, garantida a anonimizacao (art. 11, II, c)
+
+    **Finalidade e minimizacao (incisos II e III):**
+    Se o sistema de IA precisa apenas da imagem do exame, nao deve
+    receber nome, CPF ou endereco do paciente. Pseudonimizacao e
+    anonimizacao devem ser aplicadas sempre que possivel.
+
+    **Direitos do titular (inciso IV):**
+    Complexidade especifica: paciente pede exclusao de seus dados,
+    mas prontuario deve ser retido por 20 anos. Solucao: excluir
+    dados de datasets de treinamento, manter dados de prontuario
+    conforme obrigacao legal.
+
+    **RIPD/DPIA (inciso V):**
+    Obrigatoria antes da implantacao. Deve avaliar: volume de dados,
+    categorias de dados sensiveis, riscos ao titular, medidas de
+    mitigacao, necessidade e proporcionalidade do tratamento.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de protecao de dados para IA:**
+      1. Implementar data de-identification pipeline: anonimizacao
+         e pseudonimizacao automatica de dados clinicos antes do
+         uso em treinamento de IA.
+      2. Configurar controle de acesso granular a dados de saude
+         com segregacao por finalidade: dados de atendimento vs
+         dados de treinamento vs dados de validacao.
+      3. Implementar mecanismo de minimizacao de dados: filtrar
+         campos desnecessarios antes de enviar dados ao modelo.
+      4. Criar infraestrutura de exercicio de direitos do titular:
+         API para busca, correcao e exclusao de dados pessoais
+         em datasets de treinamento.
+    tools:
+      - de-identification
+      - access-control
+      - data-minimization
+      - rights-management
+  devsecops:
+    prose: |
+      **Protecao de dados integrada ao pipeline:**
+      1. Implementar privacy-by-design no pipeline de ML: verificacao
+         automatica de que dados pessoais nao identificados estao
+         sendo usados no treinamento sem autorizacao.
+      2. Automatizar PIA (Privacy Impact Assessment) como artefato
+         obrigatorio do pipeline para sistemas de IA medica.
+      3. Implementar deteccao de PII (Personally Identifiable
+         Information) em datasets de treinamento: bloquear pipeline
+         se dados pessoais nao anonimizados forem detectados.
+      4. Validar que dados de treinamento possuem base legal
+         documentada conforme LGPD antes de inicio do treinamento.
+    tools:
+      - gitlab-ci
+      - pii-detection
+      - privacy-impact
+      - data-governance
+  secops:
+    prose: |
+      **Governanca de protecao de dados:**
+      1. Coordenar com DPO a realizacao de RIPD/DPIA para todo
+         sistema de IA medica antes da implantacao.
+      2. Manter registro de atividades de tratamento (ROPA) que
+         inclua todos os sistemas de IA medica e seus fluxos de dados.
+      3. Implementar processo de resposta a solicitacoes de titulares
+         especifico para dados utilizados em IA.
+      4. Auditar conformidade com LGPD periodicamente: base legal,
+         consentimento, minimizacao, retencao, direitos do titular.
+    tools:
+      - dpia-management
+      - ropa-registry
+      - rights-management
+      - lgpd-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-18", "art-37", "art-38"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-10", "art-29"]
+    relationship: mapped

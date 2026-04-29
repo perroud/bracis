@@ -1,0 +1,109 @@
+id: art-9
+family: administracao-gestao
+title: "Deveres do Gestor"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 9. O gestor da carteira do fundo de investimento é responsável pelas
+    decisões de investimento e desinvestimento do fundo, de acordo com a política
+    de investimento prevista no regulamento.
+
+    Parágrafo 1. São deveres do gestor: I - operar de acordo com a política de
+    investimento e os limites de risco estabelecidos no regulamento; II - atuar
+    com diligência, lealdade e boa-fé no exercício de suas funções; III - executar
+    as ordens de compra e venda de ativos, buscando sempre as melhores condições
+    para o fundo; IV - monitorar os riscos inerentes às posições mantidas pelo
+    fundo; V - comunicar imediatamente ao administrador qualquer situação de
+    desenquadramento da carteira.
+
+    Parágrafo 2. O gestor responde solidariamente com o administrador pelos
+    prejuízos causados por descumprimento de seus deveres.
+guidance:
+  prose: |
+    O art. 9 define o papel do gestor como responsavel pela gestao da carteira.
+    E a separacao funcional entre administracao (art. 7) e gestao (art. 9) que
+    constitui a base da governanca de fundos.
+
+    **Segregacao administrador vs gestor:**
+    A CVM 175 consolidou a separacao de funcoes: o administrador cuida da
+    operacao e conformidade do fundo; o gestor cuida das decisoes de investimento.
+    Podem ser a mesma instituicao, mas as funcoes devem ser segregadas internamente.
+
+    **Best execution:**
+    O inciso III exige que o gestor busque as "melhores condicoes" para o fundo.
+    Isso implica obrigacao de best execution: melhores precos, menores custos
+    de transacao, maior velocidade de execucao.
+
+    **Responsabilidade solidaria:**
+    O paragrafo 2 e critico: o gestor responde SOLIDARIAMENTE com o administrador.
+    Isso significa que cotistas podem cobrar de qualquer um dos dois a reparacao
+    integral do prejuizo.
+
+    **Comunicacao de desenquadramento:**
+    O gestor deve comunicar IMEDIATAMENTE ao administrador qualquer situacao de
+    desenquadramento. Nao ha prazo de tolerancia para esta comunicacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de investimentos:**
+      1. Sistema de Order Management (OMS) integrado com validacoes pre-trade
+         que impedem ordens que violem a politica de investimento.
+      2. Limites de concentracao, exposicao e risco implementados como regras
+         automaticas (Policy-as-Code) no OMS.
+      3. Monitoramento em tempo real de enquadramento da carteira versus
+         regulamento e politica de investimento.
+
+      **Best execution:**
+      4. Registro automatico de todas as ordens executadas: preco, volume,
+         contraparte, hora, venue.
+      5. Analise automatizada de best execution: comparacao com benchmarks
+         de mercado.
+      6. Relatorio de best execution periodico para o administrador.
+    tools:
+      - opa-gatekeeper
+      - vault
+      - terraform
+      - git
+  devsecops:
+    prose: |
+      **Auditoria de decisoes de investimento:**
+      1. Logs imutaveis de todas as decisoes de investimento: ativo, quantidade,
+         preco, justificativa, responsavel.
+      2. Pipeline de validacao pre-trade integrado ao OMS: cada ordem passa
+         por validacao automatica de limites antes da execucao.
+      3. Testes automatizados para regras de enquadramento e limites.
+
+      **Segregacao de acesso:**
+      4. Controle de acesso granular: gestores so acessam funcoes de gestao,
+         administradores so acessam funcoes administrativas.
+      5. Revisao de acesso periodica via pipeline automatizado.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - vault
+  secops:
+    prose: |
+      **Monitoramento de conformidade da gestao:**
+      1. Alertas em tempo real para ordens que se aproximam de limites de
+         concentracao ou exposicao.
+      2. Dashboard de enquadramento: posicao atual versus limites do regulamento.
+      3. Metricas de best execution: custo medio de transacao, slippage,
+         qualidade de execucao.
+
+      **Investigacao de desenquadramento:**
+      4. Workflow automatizado para tratamento de desenquadramentos: deteccao,
+         comunicacao ao administrador, plano de reenquadramento, evidencia.
+      5. Historico de desenquadramentos e tempo medio de reenquadramento.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-20"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-4"]
+    relationship: complements

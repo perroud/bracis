@@ -1,0 +1,100 @@
+id: ctrl-09
+family: fam-3
+title: "Controle de Acesso Logico ao ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles de acesso lógico baseados no
+    princípio do privilégio mínimo para todos os sistemas do ARCiber. Cada
+    usuário, serviço ou sistema deve receber apenas os acessos estritamente
+    necessários para o desempenho de suas funções. Deve existir processo formal
+    de concessão, revisão e revogação de acessos lógicos ao ARCiber, com
+    aprovação do RSCA ou responsável designado. Contas de usuário devem ser
+    individuais e nominais — o compartilhamento de credenciais é vedado nos
+    sistemas do ARCiber.
+
+guidance:
+  prose: >-
+    Em ambientes OT/ICS, o controle de acesso logico apresenta desafios
+    especificos: sistemas legados frequentemente nao suportam autenticacao
+    forte, contas de servico genericas sao comuns, e a segregacao de funcoes
+    e dificil em equipes pequenas. A implementacao deve abordar:
+    (i) inventario completo de contas (usuarios, servicos, administrativas)
+    em todos os sistemas do ARCiber; (ii) eliminacao ou controle de contas
+    genericas e compartilhadas (ex: "admin", "operator"); (iii) segregacao de
+    funcoes entre operacao, engenharia e administracao de sistemas;
+    (iv) processo formal de offboarding — revogacao de acesso em no maximo 24h
+    apos desligamento ou mudanca de funcao; (v) revisao periodica (trimestral)
+    de todos os acessos logicos ao ARCiber com aprovacao dos responsaveis;
+    (vi) controle de contas privilegiadas (administradores de sistemas OT) com
+    gerenciamento de senhas em cofre digital.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de Privileged Access Management (PAM) (CyberArk,
+      BeyondTrust) para gerenciamento de contas privilegiadas nos sistemas
+      do ARCiber, com cofre de senhas, rotacao automatica de credenciais
+      e gravacao de sessao. Integrar sistemas do ARCiber que suportam
+      autenticacao centralizada ao Active Directory/LDAP corporativo para
+      gerenciamento unificado de identidades. Para sistemas legados sem suporte
+      a autenticacao centralizada, implementar gestao de contas locais via
+      ferramenta de automacao (Ansible) com senhas gerenciadas no cofre PAM.
+      Implementar provisionamento e desprovisionamento automatizado de acessos
+      via IGA (Identity Governance and Administration) integrado ao RH.
+    tools:
+      - cyberark
+      - beyondtrust
+      - active-directory
+      - saviynt
+      - ansible
+  devsecops:
+    prose: >-
+      Implementar processo automatizado de revisao de acessos (access review)
+      como pipeline recorrente no GitLab, gerando relatorio de todos os acessos
+      ativos no ARCiber para aprovacao dos responsaveis. Integrar o processo de
+      offboarding ao pipeline de desprovisionamento automatico: quando usuario
+      e desativado no AD, acesso aos sistemas do ARCiber e revogado automaticamente
+      em menos de 4 horas. Implementar alertas para contas inativas (sem login
+      por mais de 30 dias) no ARCiber para revisao e possivel desativacao.
+      Auditar periodicamente o uso de contas de servico nos sistemas do ARCiber.
+    tools:
+      - gitlab-ci
+      - cyberark
+      - active-directory
+      - saviynt
+  secops:
+    prose: >-
+      Realizar revisao formal de acessos logicos ao ARCiber trimestralmente,
+      com certificacao pelos gestores diretos e pelo RSCA. Monitorar e alertar
+      para acessos privilegiados fora de horario comercial ou fora de janelas
+      de manutencao aprovadas. Investigar toda conta com acesso ao ARCiber
+      que apresente padrao de acesso anomalo (horario, volume, sistemas acessados).
+      Manter registro completo de concessoes, alteracoes e revogacoes de acesso
+      ao ARCiber como evidencia de conformidade. Eliminar contas de teste ou
+      temporarias nao utilizadas nos sistemas do ARCiber.
+    tools:
+      - cyberark
+      - splunk
+      - servicenow
+      - saviynt
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-3-3 SR1.1", "62443-3-3 SR2.1"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-004-R4", "CIP-007-R5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.2", "a8.3", "a8.4", "a8.5"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6", "PS-4"]
+    relationship: mapped

@@ -1,0 +1,88 @@
+id: pix-03
+family: disp-gerais
+title: "Participantes do Arranjo e Requisitos de Adesao"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Podem participar do arranjo Pix as instituições financeiras e as instituições de
+    pagamento autorizadas a funcionar pelo Banco Central do Brasil que atendam aos
+    requisitos técnicos, operacionais e de segurança estabelecidos no regulamento.
+    A participação é obrigatória para instituições financeiras e instituições de pagamento
+    que oferecem conta transacional (conta de depósito à vista ou conta de pagamento
+    pré-paga) com mais de 500.000 contas ativas. Para as demais, a adesão é facultativa.
+guidance:
+  prose: |
+    **Obrigatoriedade de adesao:**
+    Instituicoes com mais de 500.000 contas transacionais ativas sao obrigadas a aderir ao
+    Pix. Este criterio garante que a maioria dos brasileiros tenha acesso ao Pix independente
+    do PSP escolhido.
+
+    **Tipos de participacao:**
+    - Participante direto: conecta-se ao SPI diretamente via RSFN, opera conta PI
+      (Pagamentos Instantaneos) no BCB, assume responsabilidade integral pela liquidacao.
+    - Participante indireto: conecta-se ao SPI por meio de um participante direto,
+      pode ou nao operar conta PI propria no BCB.
+    - Liquidante especial: funcao limitada a liquidacao em nome de participantes indiretos.
+
+    **Requisitos de adesao:**
+    1. Autorizacao de funcionamento pelo BCB
+    2. Homologacao tecnica no ambiente de homologacao do SPI
+    3. Certificado digital ICP-Brasil valido para conexao a RSFN
+    4. Infraestrutura que atenda aos SLAs de disponibilidade e tempo de resposta
+    5. Motor antifraude operacional
+    6. Capacidade de operar 24x7x365
+    7. Adesao formal ao regulamento do arranjo
+
+    **Implicacao de seguranca:**
+    Todo participante -- direto ou indireto -- e responsavel pela seguranca de ponta
+    a ponta no trecho sob seu controle, incluindo autenticacao do usuario, protecao de
+    dados e prevencao de fraudes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Homologacao tecnica:**
+      1. Ambiente de homologacao espelhando producao para testes no SPI-HML.
+      2. Simulador de transacoes Pix para validacao de fluxos ponta-a-ponta.
+      3. Testes de conectividade RSFN com failover automatico.
+      4. Validacao de certificados ICP-Brasil em cadeia completa.
+
+      **Infraestrutura de participante direto:**
+      5. Conexao RSFN redundante (minimo dois enlaces independentes).
+      6. Balanceamento de carga para mensageria SPI.
+      7. Monitoramento de latencia de cada enlace RSFN.
+      8. Conta PI no BCB com gestao automatizada de liquidez.
+    tools:
+      - rsfn-connector
+      - load-balancer
+      - certificate-manager
+      - monitoring-stack
+  devsecops:
+    prose: |
+      **Pipeline de homologacao:**
+      1. Suite de testes de aceitacao alinhada aos cenarios de homologacao do BCB.
+      2. Testes automatizados de regressao apos cada atualizacao do SPI.
+      3. Validacao de conformidade de mensagens em cada build.
+      4. Ambiente de staging com simulador SPI integrado ao pipeline.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - api-simulator
+  secops:
+    prose: |
+      **Conformidade de participacao:**
+      1. Verificacao periodica do cumprimento de todos os requisitos de adesao.
+      2. Acompanhamento de comunicados e atualizacoes do BCB sobre o arranjo.
+      3. Relatorios de conformidade para o gestor do arranjo.
+      4. Plano de contingencia documentado para indisponibilidade do canal Pix.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - documentation-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-5", "art-6", "art-7"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-1", "art-2"]
+    relationship: complements

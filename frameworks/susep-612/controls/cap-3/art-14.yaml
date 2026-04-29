@@ -1,0 +1,125 @@
+id: art-14
+family: cap-3
+title: "Verificacao de Beneficiarios de Seguros e Previdencia"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 14. As supervisionadas devem identificar e verificar a identidade dos
+    beneficiários de seguros de vida, de previdência complementar aberta e de
+    capitalização, previamente ao pagamento de qualquer indenização, benefício
+    ou resgate, aplicando, no que couber, os procedimentos previstos nos arts.
+    12 e 13.
+guidance:
+  prose: |
+    O art. 14 estabelece obrigacao especifica do mercado securitario: a
+    verificacao de identidade dos beneficiarios no momento do pagamento, nao
+    apenas na contratacao.
+
+    **Diferencial do mercado securitario:**
+    Diferentemente do setor bancario, onde o titular da conta e conhecido desde
+    a abertura, no mercado de seguros o beneficiario pode ser:
+    - Designado na contratacao mas nunca verificado ate o sinistro
+    - Alterado durante a vigencia da apolice
+    - Determinado por lei (herdeiros legais) sem cadastro previo
+    - Cessionario de apolice por transferencia
+
+    **Situacoes de risco elevado:**
+    1. Seguro de vida:
+       - Beneficiario sem parentesco ou vinculo economico com segurado
+       - Alteracao recente de beneficiario seguida de sinistro
+       - Beneficiario residente no exterior, especialmente em jurisdicao de risco
+       - Multiplos seguros com diferentes beneficiarios
+    2. Previdencia (VGBL/PGBL):
+       - Resgate total pouco tempo apos aporte significativo
+       - Portabilidade para outra instituicao seguida de resgate
+       - Beneficiario de peculio diferente do titular sem justificativa
+    3. Capitalizacao:
+       - Resgate por terceiro com procuracao
+       - Transferencia de titulo seguida de resgate rapido
+       - Ganhador de sorteio com perfil incompativel
+
+    **Momento da verificacao:**
+    A verificacao deve ocorrer ANTES do pagamento. Na pratica:
+    - Regulacao de sinistro: identificar beneficiario durante analise do sinistro
+    - Resgate de VGBL/PGBL: verificar identidade do solicitante
+    - Resgate de capitalizacao: verificar titular ou portador
+    - Peculio: verificar herdeiros com documentacao comprobatoria
+
+    **Implicacao pratica:**
+    A supervisionada deve ter processo de KYC especifico para o momento do
+    pagamento, que pode ser anos apos a contratacao. Beneficiarios que nunca
+    foram verificados devem passar por processo completo de identificacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de verificacao de beneficiarios:**
+      1. Modulo de KYC de beneficiarios integrado ao sistema de sinistros e
+         resgates, com checklist de verificacao obrigatoria antes do pagamento.
+      2. Workflow de regulacao de sinistro com etapa obrigatoria de verificacao
+         de identidade do beneficiario.
+      3. Validacao automatica de CPF/CNPJ do beneficiario antes de liberacao
+         de pagamento.
+      4. Screening automatico do beneficiario contra listas de PEP, sancoes
+         e restritivos no momento do pagamento.
+
+      **Controles de pagamento:**
+      5. Bloqueio automatico de pagamento quando:
+         - Beneficiario nao identificado
+         - Beneficiario em lista de sancoes
+         - Beneficiario PEP sem aprovacao de nivel superior
+         - Valor incompativel com perfil do beneficiario
+         - Alteracao recente de beneficiario (< 6 meses antes do sinistro)
+      6. Pagamento apenas em conta bancaria do beneficiario (nao em conta de
+         terceiros).
+      7. Registro de dados do beneficiario com mesmo nivel de detalhe do
+         segurado (campos do art. 12/13).
+    tools:
+      - claims-management-system
+      - kyc-platform
+      - payment-gateway
+      - sanctions-screening
+  devsecops:
+    prose: |
+      **Testes de fluxo de pagamento:**
+      1. Testes end-to-end do fluxo sinistro-verificacao-pagamento para cada
+         tipo de produto (vida, previdencia, capitalizacao).
+      2. Testes de bloqueio: pagamento a beneficiario nao verificado, em lista
+         de sancoes, PEP sem aprovacao.
+      3. Testes de cenarios de risco: alteracao recente de beneficiario,
+         beneficiario estrangeiro, resgate antecipado.
+
+      **Integridade do processo:**
+      4. Audit trail completo do fluxo de verificacao de beneficiarios.
+      5. Testes de segregacao de funcoes: quem verifica nao autoriza pagamento.
+      6. Testes de integracao entre sistema de sinistros e modulo de KYC.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - audit-trail-tests
+      - integration-tests
+  secops:
+    prose: |
+      **Monitoramento de pagamentos:**
+      1. Dashboard de pagamentos pendentes de verificacao de beneficiario.
+      2. Alertas para pagamentos de alto valor com beneficiarios nao verificados.
+      3. Monitoramento de alteracoes de beneficiarios proximas a sinistros.
+
+      **Analise de risco de beneficiarios:**
+      4. Analise retrospectiva de beneficiarios de sinistros pagos para
+         identificar padroes suspeitos.
+      5. Cross-reference entre beneficiarios de diferentes apolices para
+         detectar coincidencias suspeitas.
+      6. Relatorio de pagamentos a PEPs e beneficiarios de alto risco.
+      7. Retencao de documentacao de verificacao de beneficiarios por 10 anos.
+    tools:
+      - claims-analytics
+      - fraud-detection
+      - compliance-monitoring
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-14"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

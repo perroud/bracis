@@ -1,0 +1,115 @@
+id: art-17
+family: cap-4
+title: "Medico como Decisor Final"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 17. O médico é o responsável final por toda decisão clínica, ainda
+    que assistida por sistema de inteligência artificial:
+
+    I - nenhum sistema de IA pode substituir o julgamento clínico do médico
+    ou impor decisão diagnóstica ou terapêutica;
+
+    II - o médico deve avaliar criticamente toda inferência, recomendação
+    ou resultado produzido por sistema de IA antes de adotá-lo na
+    condução clínica do paciente;
+
+    III - a decisão de seguir ou não a recomendação do sistema de IA
+    cabe exclusivamente ao médico, que deve documentar sua decisão e
+    justificativa no prontuário;
+
+    IV - o médico não pode delegar a sistema de IA a responsabilidade
+    por atos médicos, incluindo prescrição, diagnóstico final e
+    indicação de procedimento.
+guidance:
+  prose: |
+    O art. 17 reafirma principio fundamental da etica medica: a
+    responsabilidade e intransferivel e pessoal do medico.
+
+    **Implicacoes praticas:**
+
+    - O medico nao pode se escudar em "a IA recomendou" para justificar
+      decisao clinica inadequada. Se a IA sugere diagnostico errado e
+      o medico aceita sem critica, a responsabilidade e do medico.
+
+    - Inversamente, se o medico discorda da IA com base em julgamento
+      clinico fundamentado, essa discordancia e valida e deve ser
+      documentada. O medico nao e obrigado a seguir a recomendacao da IA.
+
+    - "Avaliar criticamente" (inciso II) nao e mera formalidade. O medico
+      deve compreender a explicacao fornecida pelo sistema, considerar
+      o contexto clinico completo do paciente (que pode conter informacoes
+      nao disponiveis para a IA) e aplicar seu conhecimento profissional.
+
+    - A proibicao de delegacao (inciso IV) impede modelos de operacao
+      em que a IA prescreve e o medico apenas "homologa" sem avaliacao
+      critica. O ato medico exige exercicio ativo de julgamento.
+
+    **Responsabilidade civil e etica:**
+    A responsabilidade etico-disciplinar e sempre do medico. A
+    responsabilidade civil pode ser compartilhada com fabricante
+    (Codigo de Defesa do Consumidor) e instituicao, mas a
+    responsabilidade profissional perante o CRM e individual.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura human-in-the-loop:**
+      1. Implementar arquitetura obrigatoria de human-in-the-loop para
+         todos os sistemas de IA medica: nenhuma saida de modelo pode
+         chegar ao paciente sem validacao medica registrada.
+      2. Configurar UI/UX que apresente resultado da IA como sugestao,
+         nao como determinacao: linguagem de interface deve usar
+         "sugestao", "possibilidade", nunca "diagnostico" ou "prescricao".
+      3. Implementar fluxo de validacao que exija acao positiva do
+         medico (aceitar/rejeitar/modificar) — nao aceitar silencio
+         como concordancia (no auto-accept).
+      4. Registrar automaticamente a decisao do medico (concordou,
+         discordou, modificou) com timestamp e justificativa.
+    tools:
+      - workflow-engine
+      - emr-integration
+      - audit-log
+      - ui-framework
+  devsecops:
+    prose: |
+      **Validacao de human-in-the-loop no pipeline:**
+      1. Implementar testes de arquitetura que verifiquem que toda
+         saida de modelo de IA medica passa por camada de validacao
+         humana antes de afetar conducao clinica.
+      2. Automatizar verificacao de que nenhum endpoint de modelo
+         esta configurado como auto-accept ou auto-apply.
+      3. Testar que fluxo de discordancia funciona: medico deve
+         conseguir rejeitar recomendacao de IA sem impedimentos
+         tecnicos ou workflow bloqueante.
+      4. Validar que registro de decisao medica e obrigatorio e
+         nao pode ser pulado na interface.
+    tools:
+      - gitlab-ci
+      - architecture-tests
+      - integration-tests
+      - ui-tests
+  secops:
+    prose: |
+      **Monitoramento de supervisao humana:**
+      1. Monitorar taxa de concordancia medico-IA: taxas muito altas
+         (>95%) podem indicar rubber-stamping (medico nao avaliando
+         criticamente). Investigar.
+      2. Auditar amostra de decisoes em que medico discordou da IA
+         para verificar que discordancia foi fundamentada.
+      3. Verificar que medicos estao registrando justificativas de
+         decisao conforme exigido, nao apenas clicando "aceitar".
+      4. Reportar ao comite de governanca metricas de supervisao
+         humana: concordancia, discordancia, tempo de revisao.
+    tools:
+      - analytics-platform
+      - audit-tools
+      - grc-platform
+      - reporting
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-14"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["govern-6", "manage-4"]
+    relationship: mapped

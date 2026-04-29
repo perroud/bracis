@@ -1,0 +1,120 @@
+id: art-19
+family: cap-6
+title: "Documentos Medicos Eletronicos -- Atestados, Receitas e Laudos"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 19. Os documentos médicos eletrônicos, incluindo atestados,
+    receitas, laudos, relatórios e encaminhamentos, podem ser emitidos
+    em formato exclusivamente eletrônico quando assinados digitalmente
+    com certificado ICP-Brasil, conforme Resolução CFM 2.299/2021.
+
+    I - A receita médica eletrônica deve conter todos os elementos
+    obrigatórios da prescrição (identificação do médico, CRM,
+    identificação do paciente, medicamento, posologia, data) e ser
+    assinada digitalmente pelo médico prescritor;
+
+    II - O atestado médico eletrônico deve conter os mesmos elementos
+    do atestado em papel, com assinatura digital do médico e carimbo
+    de tempo;
+
+    III - Os laudos e relatórios médicos eletrônicos devem ser gerados
+    a partir dos dados registrados no PEP, assinados digitalmente
+    pelo médico responsável;
+
+    IV - Todos os documentos médicos eletrônicos devem ser verificáveis
+    por terceiros (empregadores, farmácias, operadoras de saúde)
+    por meio de serviço de validação disponibilizado pela instituição
+    ou pelo sistema emissor.
+guidance:
+  prose: |
+    O art. 19, incorporando a Resolucao CFM 2.299/2021, autoriza a
+    emissao de documentos medicos em formato exclusivamente eletronico.
+    Isso inclui:
+
+    **Receita eletronica (inciso I):**
+    A receita medica eletronica com assinatura digital ICP-Brasil tem
+    validade em todo o territorio nacional, em qualquer farmacia. A
+    Resolucao 2.299/2021 consolidou esta pratica que ganhou impulso
+    durante a pandemia de COVID-19.
+
+    **Atestado eletronico (inciso II):**
+    O atestado medico eletronico pode ser apresentado ao empregador
+    em formato digital. O empregador deve ter meios de verificar a
+    autenticidade (assinatura digital e carimbo de tempo).
+
+    **Verificabilidade por terceiros (inciso IV):**
+    Este e um requisito frequentemente negligenciado. O documento
+    eletronico deve poder ser verificado por quem o recebe. Solucoes:
+    - QR Code com link para servico de verificacao
+    - Portal web de validacao de documento (inserir codigo)
+    - Validacao da assinatura digital ICP-Brasil via software padrao
+
+    **Integracao com PEP:**
+    Documentos emitidos devem ser gerados a partir dos dados do PEP
+    e armazenados como parte do prontuario do paciente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de documentos medicos eletronicos:**
+      1. Implementar modulo de emissao de documentos eletronicos
+         integrado ao PEP: receita, atestado, laudo, relatorio,
+         encaminhamento, solicitacao de exames.
+      2. Gerar documentos em formato PDF/A com assinatura digital
+         PAdES (assinatura visivel no PDF) e carimbo de tempo.
+      3. Incluir QR Code em cada documento emitido com link para
+         servico de verificacao de autenticidade.
+      4. Disponibilizar portal/API de verificacao de documentos
+         acessivel a terceiros (farmacias, empregadores, operadoras)
+         sem necessidade de autenticacao.
+      5. Armazenar copia de todo documento emitido no PEP do
+         paciente, vinculado ao atendimento de origem.
+    tools:
+      - pdf-a-generator
+      - pades-signer
+      - qr-code-generator
+      - verification-portal
+      - document-storage
+  devsecops:
+    prose: |
+      **Validacao de documentos eletronicos:**
+      1. Testar que todos os documentos emitidos contem os
+         elementos obrigatorios (medico, CRM, paciente, data,
+         conteudo especifico por tipo de documento).
+      2. Validar assinatura digital e carimbo de tempo em cada
+         documento gerado via pipeline automatizado.
+      3. Testar servico de verificacao: QR Code deve levar a
+         pagina de validacao que confirma autenticidade.
+      4. Testar que documentos emitidos sao armazenados no
+         PEP do paciente automaticamente.
+    tools:
+      - gitlab-ci
+      - document-content-tests
+      - signature-validation-tests
+      - verification-service-tests
+  secops:
+    prose: |
+      **Governanca de documentos eletronicos:**
+      1. Definir catalogo de documentos medicos eletronicos
+         autorizados pela instituicao, com template padronizado
+         para cada tipo.
+      2. Monitorar emissao de documentos para detectar anomalias
+         (volume atipico de atestados, receitas em horarios
+         suspeitos, documentos para pacientes nao atendidos).
+      3. Manter canal de denuncias para documentos falsificados
+         e processo de invalidacao de documentos comprometidos.
+      4. Capacitar profissionais sobre emissao correta de
+         documentos eletronicos e responsabilidade legal.
+    tools:
+      - document-catalog
+      - emission-monitoring
+      - fraud-detection
+      - awareness-training
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-22", "art-23"]
+    relationship: complements

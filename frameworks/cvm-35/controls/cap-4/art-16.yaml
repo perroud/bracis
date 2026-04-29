@@ -1,0 +1,162 @@
+id: art-16
+family: cap-4
+title: "Gestao de Terceiros e Monitoramento de Prestadores de Servicos em Nuvem"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 16. A entidade deve adotar procedimentos de gestão que assegurem
+    o monitoramento contínuo dos serviços de computação em nuvem contratados,
+    incluindo:
+    I - monitoramento contínuo da prestação de serviços, com verificação
+    periódica do cumprimento dos níveis de serviço e dos requisitos de
+    segurança contratados;
+    II - previsão contratual de possibilidade de realização de auditorias
+    pela entidade contratante ou por terceiro por ela designado;
+    III - obrigação contratual de notificação pelo prestador de serviços
+    de incidentes relevantes que possam afetar os dados ou a continuidade
+    dos serviços;
+    IV - avaliação periódica dos riscos associados à prestação de serviços
+    contratados.
+guidance:
+  prose: |
+    O art. 16 complementa o art. 15, focando na gestao continua (pos-
+    contratacao) dos servicos em nuvem. Nao basta contratar bem — e
+    necessario monitorar continuamente.
+
+    **I — Monitoramento continuo:**
+    Verificacao ativa de que o prestador cumpre os SLAs e requisitos de
+    seguranca estabelecidos em contrato. Nao se limita a monitoramento de
+    disponibilidade — inclui seguranca, conformidade, performance.
+    Periodicidade recomendada: mensal para metricas operacionais, trimestral
+    para avaliacao de conformidade.
+
+    **II — Direito de auditoria:**
+    Clausula contratual que garante o direito da entidade (ou auditor
+    independente por ela contratado) de auditar o prestador. Isso inclui:
+    acesso a relatorios de auditoria do prestador (SOC 2, ISO 27001),
+    inspecoes in loco (se aplicavel), questionarios de seguranca.
+    Na pratica, para hyperscalers (AWS, Azure, GCP), o direito de auditoria
+    e exercido via relatorios SOC 2 e certificacoes.
+
+    **III — Notificacao de incidentes pelo prestador:**
+    O prestador e obrigado contratualmente a notificar a entidade sobre
+    incidentes relevantes que possam afetar dados ou servicos. Prazo de
+    notificacao deve ser definido em contrato (recomendado: ate 24 horas
+    para incidentes criticos, 72 horas para outros).
+
+    **IV — Avaliacao periodica de riscos:**
+    Risk assessment regular dos servicos contratados, considerando:
+    mudancas no prestador, evolucao de ameacas, dependencia da entidade,
+    concentracao de servicos em um unico prestador.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Monitoramento continuo (I):**
+      1. Dashboard de monitoramento de saude dos servicos de nuvem:
+         disponibilidade, latencia, erros, throughput.
+      2. Alertas automaticos para degradacao de servico.
+      3. Coleta automatizada de metricas de seguranca do provider (CloudTrail,
+         Azure Monitor, GCP Cloud Audit Logs).
+      4. Comparacao automatica de configuracao real vs. baseline de seguranca.
+
+      **Auditoria (II):**
+      5. Coleta automatizada de relatorios de conformidade do provider
+         (SOC 2, ISO 27001, PCI DSS reports).
+      6. Cloud Security Posture Management (CSPM) para auditoria continua.
+      7. Infrastructure-as-Code drift detection para verificar que
+         configuracao real corresponde ao declarado.
+
+      **Notificacao de incidentes (III):**
+      8. Integracao com canais de notificacao do provider (AWS Health,
+         Azure Service Health, GCP Incident Dashboard).
+      9. Webhook automatico para SIEM quando provider notifica incidente.
+      10. Processo de triagem de incidentes do provider.
+
+      **Avaliacao de riscos (IV):**
+      11. Risk scoring automatizado baseado em metricas coletadas.
+      12. Alerta quando risco do provider ultrapassa threshold definido.
+      13. Dashboard de concentracao de servicos por provider.
+    tools:
+      - cloud-monitoring
+      - cspm
+      - siem
+      - terraform
+      - cloud-custodian
+  devsecops:
+    prose: |
+      **Compliance continua no pipeline (I):**
+      1. IaC scanning em cada merge request para validar conformidade
+         de configuracao de nuvem.
+      2. Policy-as-Code para enforcar requisitos de seguranca do contrato.
+      3. Alertas quando deploy cria recursos fora de conformidade.
+
+      **Auditoria automatizada (II):**
+      4. Inventario automatico de todos os recursos de nuvem via IaC.
+      5. Compliance reports gerados por pipeline (Checkov, Regula).
+      6. Drift detection automatizado entre IaC e estado real.
+
+      **Rastreabilidade (III):**
+      7. Correlacao de incidentes do provider com deployments recentes.
+      8. Timeline automatica de mudancas em infraestrutura de nuvem.
+
+      **Seguranca de configuracao (IV):**
+      9. Benchmarks de seguranca (CIS Benchmarks para AWS/Azure/GCP)
+         validados automaticamente.
+      10. Security score por projeto/ambiente de nuvem.
+    tools:
+      - checkov
+      - tfsec
+      - cloud-custodian
+      - gitlab-ci
+      - terraform
+  secops:
+    prose: |
+      **Gestao operacional de terceiros:**
+      1. Inventario centralizado de todos os prestadores de nuvem com
+         dados contratuais, certificacoes e datas de revisao.
+      2. Calendario de avaliacoes periodicas (trimestral para metricas,
+         anual para risk assessment completo).
+      3. Ponto focal designado para relacionamento com cada prestador.
+
+      **Monitoramento de SLAs e seguranca (I):**
+      4. Relatorio mensal de conformidade com SLAs.
+      5. Reuniao trimestral de service review com prestador.
+      6. Escalacao formal quando SLAs sao violados repetidamente.
+
+      **Auditoria (II):**
+      7. Coleta anual de relatorios SOC 2 Type II de cada prestador.
+      8. Revisao de relatorios com foco em exceptions e remediation.
+      9. Auditoria complementar quando relatorio SOC 2 indicar gaps.
+
+      **Notificacao de incidentes (III):**
+      10. Processo documentado de tratamento de notificacoes do prestador.
+      11. Avaliacao de impacto na entidade para cada incidente notificado.
+      12. Comunicacao a CVM se incidente do prestador afetar a entidade
+          conforme criterios do art. 12.
+
+      **Risk assessment (IV):**
+      13. Avaliacao anual de riscos por prestador, incluindo: risco
+          operacional, risco de concentracao, risco jurisdicional.
+      14. Plano de mitigacao para riscos identificados.
+      15. Reavaliacao imediata se prestador sofrer incidente grave ou
+          mudanca significativa (aquisicao, falencia, sancoes).
+    tools:
+      - grc-platform
+      - cloud-monitoring
+      - contract-management
+      - risk-management-platform
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-15", "art-16", "art-17"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-4", "SA-9", "SA-11", "RA-3", "CA-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-39", "art-46"]
+    relationship: complements

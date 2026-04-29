@@ -1,0 +1,154 @@
+id: itgc-sdlc
+family: itgc
+title: "IT General Control: System Development Lifecycle"
+class: SOX
+
+statement:
+  prose: >-
+    The organization shall establish and maintain a formal system development lifecycle
+    (SDLC) methodology for the acquisition, development, implementation, and maintenance
+    of IT systems that support financial reporting. The SDLC shall include requirements
+    definition, design, development, testing, approval, and post-implementation review.
+    Security and internal control requirements shall be identified and addressed during
+    the development process. Data conversion and migration activities shall be controlled
+    to ensure completeness and accuracy of migrated data.
+  parts:
+    - id: itgc-sdlc.1
+      label: "(1)"
+      prose: >-
+        A formal SDLC methodology shall be defined and followed for new system
+        development, significant modifications, and system acquisitions affecting
+        financial reporting processes.
+    - id: itgc-sdlc.2
+      label: "(2)"
+      prose: >-
+        Business and technical requirements shall be documented and approved by
+        appropriate stakeholders before development begins.
+    - id: itgc-sdlc.3
+      label: "(3)"
+      prose: >-
+        Internal control and security requirements shall be identified and
+        incorporated into system design for all systems that process, store,
+        or transmit financial data.
+    - id: itgc-sdlc.4
+      label: "(4)"
+      prose: >-
+        Systems shall undergo user acceptance testing (UAT) to validate that
+        they meet business requirements and process financial data accurately
+        before being deployed to production.
+    - id: itgc-sdlc.5
+      label: "(5)"
+      prose: >-
+        Data conversion and migration activities shall be controlled to ensure
+        the completeness, accuracy, and validity of migrated financial data.
+        Reconciliation procedures shall verify data integrity post-migration.
+    - id: itgc-sdlc.6
+      label: "(6)"
+      prose: >-
+        Post-implementation reviews shall be conducted to confirm that new or
+        modified systems operate as intended and that internal controls function
+        effectively in the production environment.
+
+guidance:
+  prose: >-
+    SDLC controls ensure that new systems and significant system changes are developed
+    and implemented with appropriate rigor, particularly regarding internal controls
+    over financial data. While change management (ITGC-Change) covers the deployment
+    of individual changes, SDLC covers the broader lifecycle of system projects:
+    new ERP implementations, financial system upgrades, data warehouse builds,
+    reporting platform migrations, and other significant initiatives. Auditors focus
+    on whether the organization has a defined methodology, whether projects follow it,
+    and whether security and control requirements are addressed during development
+    rather than retrofitted afterward. Common audit findings include: missing or
+    incomplete requirements documentation, insufficient UAT for financial processes,
+    data migration without reconciliation, lack of security requirements in design
+    specifications, and missing post-implementation reviews. Data conversions during
+    system migrations are a particularly high-risk area because errors can directly
+    affect financial statement balances.
+
+references:
+  - citation: "COSO Internal Control — Integrated Framework, Principle 11: Select and Develop General Controls Over Technology"
+    url: "https://www.coso.org/guidance-on-ic"
+  - citation: "COBIT 2019 — BAI03: Manage Solutions Identification and Build"
+    url: "https://www.isaca.org/resources/cobit"
+  - citation: "NIST SP 800-64: Security Considerations in the System Development Life Cycle"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-64/rev-2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Establish a platform-level SDLC framework implemented through project templates,
+      CI/CD pipeline templates, and documentation scaffolds that guide teams through
+      the required lifecycle phases. Implement mandatory project artifacts as code:
+      requirements documents, design documents, security assessments, test plans, and
+      post-implementation reviews stored in version-controlled repositories linked to
+      the system they describe. Deploy automated compliance gates that verify the
+      existence and approval of required SDLC artifacts before permitting production
+      deployment of new systems. Implement data migration tooling with built-in
+      reconciliation capabilities that automatically compare source and target record
+      counts, checksums, and key financial balances. Establish internal developer
+      portal (Backstage) templates that embed security and compliance requirements
+      into the default project structure, making it harder to skip required steps
+      than to follow them.
+    tools:
+      - backstage
+      - gitlab-project-templates
+      - terraform
+      - open-policy-agent
+      - data-migration-tools
+      - kubernetes
+  devsecops:
+    prose: >-
+      Implement CI/CD pipeline templates that encode the SDLC methodology, including
+      mandatory stages for security scanning (SAST, DAST, SCA), automated testing,
+      compliance verification, and approval gates. Deploy threat modeling tools
+      integrated into the development workflow that guide teams through security
+      requirement identification for financial systems. Enforce security-by-default
+      configurations through policy-as-code that prevents insecure patterns
+      (unencrypted data storage, missing authentication, overly permissive access)
+      in new systems. Implement automated UAT frameworks that allow business users
+      to define and execute acceptance criteria for financial processes. Configure
+      pipeline controls that verify data migration reconciliation has been performed
+      and approved before a migration is marked as complete. Establish code quality
+      gates that enforce documentation standards for financial data processing logic.
+    tools:
+      - gitlab-ci
+      - gitlab-project-templates
+      - sonarqube
+      - semgrep
+      - checkov
+      - owasp-zap
+      - selenium
+      - conftest
+  secops:
+    prose: >-
+      Review and approve security requirements for all new system development projects
+      and significant modifications to existing financial systems. Conduct security
+      assessments at defined SDLC milestones (design review, pre-deployment, post-
+      implementation) to verify that security and internal control requirements have
+      been addressed. Maintain an inventory of all SDLC projects affecting financial
+      systems with tracking of phase completion and required artifact status. Validate
+      data migration and conversion controls by reviewing reconciliation reports and
+      verifying that financial data integrity is maintained post-migration. Conduct
+      post-implementation security reviews to confirm that security controls are
+      operational in the production environment. Track SDLC compliance metrics:
+      percentage of projects following the methodology, security assessment completion
+      rates, UAT sign-off rates, and post-implementation review completion rates.
+    tools:
+      - grc-platform
+      - servicenow
+      - jira
+      - archer
+      - burp-suite
+      - qualys
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-3", "SA-4", "SA-8", "SA-10", "SA-11", "SA-15"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.8", "a8.25", "a8.26", "a8.27", "a8.28", "a8.29", "a8.31"]
+    relationship: supports
+  - framework_id: soc2
+    articles: ["cc3.1", "cc3.2", "cc5.2", "cc8.1"]
+    relationship: supports

@@ -1,0 +1,100 @@
+id: art-5
+family: cap-2
+title: "Restricted Execution Data Sharing Category"
+class: DADOS-GOV
+baselines: [administracao-publica-federal]
+statement:
+  prose: |
+    Art. 5º. São categorizados como de execução de políticas públicas os dados protegidos
+    por sigilo que sejam necessários para a execução de políticas públicas, cujo
+    compartilhamento é considerado legítimo para a consecução das finalidades públicas
+    buscadas.
+
+    § 1º. O compartilhamento de dados de que trata este artigo dispensa o consentimento do
+    titular dos dados, nos termos do disposto no inciso III do caput do art. 11 da Lei
+    nº 13.709, de 14 de agosto de 2018 — Lei Geral de Proteção de Dados Pessoais.
+    § 2º. O acesso aos dados de que trata este artigo requer autenticação do solicitante
+    e é condicionado à comprovação da necessidade para execução de políticas públicas.
+    § 3º. O compartilhamento de dados de que trata este artigo será realizado preferencialmente
+    por meio de interface de programação de aplicações — API, disponibilizada pelo órgão
+    custodiante.
+guidance:
+  prose: |
+    Article 5 defines the second category — data protected by secrecy but necessary for
+    public policy execution. This is the most operationally important category for
+    inter-agency data sharing.
+
+    **Key characteristics:**
+    - Data is protected by some form of secrecy (personal data, fiscal, etc.)
+    - Sharing is justified by public policy execution needs
+    - Considered legitimate under LGPD Art. 11, III (public administration treatment)
+
+    **Consent waiver:**
+    Art. 5 §1 explicitly dispenses with data subject consent when data sharing serves
+    public policy execution, relying on LGPD's public administration legal basis.
+    This is NOT a blanket exemption — the requesting agency must demonstrate the
+    specific policy need.
+
+    **Access controls:**
+    - Authentication of the requesting party is mandatory
+    - Demonstration of necessity for public policy execution required
+    - Preferably via API provided by the custodian agency
+
+    **Critical safeguard:**
+    While consent is waived, the purpose limitation principle still applies —
+    the receiving agency may only use the data for the stated policy purpose.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Authenticated data sharing infrastructure:**
+      1. Implement mutual TLS (mTLS) authentication for agency-to-agency API
+         communication for restricted data sharing.
+      2. Deploy an authorization server enforcing purpose-based access control —
+         each API call must include the policy justification claim.
+      3. Implement a consent management bypass mechanism that validates the
+         LGPD Art. 11 III legal basis before granting access.
+      4. API rate limiting and quota management per requesting agency.
+      5. Data minimization enforcement — API responses filtered to return
+         only the specific attributes needed for the stated policy purpose.
+    tools:
+      - api-gateway
+      - identity-provider
+      - service-mesh
+      - rate-limiter
+      - data-masking
+  devsecops:
+    prose: |
+      **Purpose-bound data sharing validation:**
+      1. Policy-as-code rules validating that every restricted data API call
+         includes a valid policy purpose identifier.
+      2. Automated tests verifying mTLS certificate validation in data sharing
+         endpoints.
+      3. Integration tests confirming data minimization filters work correctly
+         for each policy use case.
+      4. Security scanning of API endpoints handling restricted data.
+    tools:
+      - gitlab-ci
+      - opa-gatekeeper
+      - api-testing
+      - sast
+  secops:
+    prose: |
+      **Restricted data access monitoring:**
+      1. Real-time monitoring of all restricted data API access with alerting
+         on anomalous patterns (volume spikes, unusual agencies, off-hours access).
+      2. Audit trail of all data sharing requests with purpose justifications.
+      3. Quarterly review of active restricted data sharing agreements
+         validating continued policy necessity.
+      4. Data breach response plan specific to restricted data categories.
+    tools:
+      - siem
+      - audit-logging
+      - grc-platform
+      - monitoring-alerting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-26"]
+    relationship: complements
+  - framework_id: gov-digital
+    articles: ["art-1"]
+    relationship: complements

@@ -1,0 +1,117 @@
+id: art-37
+family: titulo-4
+title: "Retencao de Documentos e Informacoes"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 37. As instituições mencionadas no art. 1 devem manter à disposição do
+    Banco Central do Brasil e do COAF, pelo período mínimo de dez anos, contados
+    a partir do término da relação de negócio ou da conclusão da operação:
+    I - os cadastros e as informações de identificação e qualificação de clientes;
+    II - os registros das operações;
+    III - as análises de operações e situações suspeitas;
+    IV - as comunicações ao COAF;
+    V - os documentos relativos à avaliação interna de risco; e
+    VI - os demais documentos e informações previstos nesta Circular.
+guidance:
+  prose: |
+    O art. 37 consolida a obrigacao de retencao de TODOS os documentos e
+    informacoes de PLD/FT por um periodo minimo de 10 anos.
+
+    **Inicio da contagem:**
+    O prazo de 10 anos conta a partir de:
+    - Termino da relacao de negocio (para dados cadastrais), ou
+    - Conclusao da operacao (para registros transacionais)
+    Na pratica, dados de um cliente que encerrou conta em 2024 devem ser
+    mantidos ate 2034.
+
+    **Escopo abrangente:**
+    Seis categorias de documentos, cobrindo todo o ciclo de PLD/FT:
+    1. Cadastros/KYC: dados de identificacao, qualificacao, UBO, PEP
+    2. Registros de operacoes: todas as transacoes (art. 18-19)
+    3. Analises: documentacao de analises de alertas (art. 23)
+    4. Comunicacoes ao COAF: copias e comprovantes de comunicacoes
+    5. Avaliacao de risco: relatorios de avaliacao interna
+    6. Demais: politica, treinamentos, due diligence de correspondentes
+
+    **Disponibilidade:**
+    Os documentos devem estar "a disposicao" do BCB e COAF, ou seja,
+    recuperaveis em prazo razoavel quando solicitados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Politica de retencao unificada:**
+      1. Politica de lifecycle de dados com regras por tipo de documento:
+         - Cadastros: retencao de 10 anos apos encerramento da relacao
+         - Operacoes: retencao de 10 anos apos exercicio da operacao
+         - Analises/comunicacoes: retencao de 10 anos apos conclusao
+         - Avaliacao de risco: retencao de 10 anos apos revisao
+      2. Implementacao de lifecycle policies em todas as camadas de
+         armazenamento (hot, warm, cold).
+      3. Legal hold para documentos sujeitos a investigacao (suspensao
+         de descarte).
+      4. Descarte automatico seguro apos periodo de retencao (com registro).
+
+      **Armazenamento de longo prazo:**
+      5. Object storage com WORM (Write Once Read Many) para imutabilidade.
+      6. Formato de arquivo de longo prazo (PDF/A para documentos, Parquet
+         para dados estruturados).
+      7. Metadados de retencao associados a cada documento/registro.
+      8. Backup geograficamente distribuido com teste periodico de restore.
+
+      **Recuperacao:**
+      9. API unificada de consulta que abstrai camadas de armazenamento.
+      10. Indice de busca por cliente, data, tipo de documento.
+      11. SLA de recuperacao definido (hot: segundos, cold: horas).
+      12. Portal para entrega de documentos ao BCB/COAF.
+    tools:
+      - data-lake
+      - object-storage
+      - data-governance
+      - document-management
+  devsecops:
+    prose: |
+      **Testes de retencao:**
+      1. Testes de que documentos nao sao excluidos antes do prazo.
+      2. Testes de descarte automatico apos periodo de retencao.
+      3. Testes de legal hold (suspensao de descarte).
+      4. Testes de recuperacao de documentos de cada camada.
+
+      **Integridade:**
+      5. Testes de imutabilidade (WORM) de documentos retidos.
+      6. Verificacao periodica de checksum de documentos.
+      7. Testes de formato de longo prazo (legibilidade apos anos).
+      8. Testes de backup e restore.
+    tools:
+      - gitlab-ci
+      - backup-validation
+      - data-integrity
+      - monitoring
+  secops:
+    prose: |
+      **Governanca de retencao:**
+      1. Inventario de todos os repositorios de documentos de PLD/FT.
+      2. Auditoria anual de conformidade de retencao por tipo de documento.
+      3. Processo de descarte com aprovacao e registro.
+      4. Teste anual de recuperacao simulando solicitacao regulatoria.
+
+      **Conformidade:**
+      5. Relatorio de status de retencao por tipo de documento.
+      6. Identificacao de gaps (documentos nao retidos adequadamente).
+      7. Plano de remediacao para gaps identificados.
+      8. Acompanhamento de mudancas regulatorias em prazos de retencao.
+    tools:
+      - data-governance
+      - grc-platform
+      - audit-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-4", "AU-9", "AU-11", "SI-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.33", "A.8.10"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-16"]
+    relationship: complements

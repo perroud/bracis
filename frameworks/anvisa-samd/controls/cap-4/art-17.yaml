@@ -1,0 +1,123 @@
+id: art-17
+family: cap-4
+title: "Medidas de Controle e Mitigacao de Riscos"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 17. O fabricante deve implementar medidas de controle de riscos
+    para cada risco não aceitável identificado, seguindo a hierarquia
+    de controle:
+
+    I - eliminação do perigo por design: alteração do projeto do SaMD
+    para remover o perigo ou reduzir a probabilidade de ocorrência;
+    II - medidas de proteção no software: implementação de mecanismos
+    de segurança, alertas, limites operacionais e validações que
+    reduzam o risco sem eliminar o perigo;
+    III - informação para segurança: comunicação ao usuário sobre
+    riscos residuais, limitações do SaMD, condições de uso seguro
+    e ações a tomar em caso de mau funcionamento.
+
+    Parágrafo 1. Para cada medida de controle implementada, o fabricante
+    deve verificar sua efetividade e documentar a verificação.
+
+    Parágrafo 2. O fabricante deve avaliar se medidas de controle
+    introduzem novos riscos e, em caso positivo, tratar esses riscos
+    adicionais.
+guidance:
+  prose: |
+    O art. 17 implementa a hierarquia de controle de riscos da ISO 14971,
+    que prioriza eliminacao por design sobre medidas de protecao e
+    informacao.
+
+    **Hierarquia na pratica para SaMD:**
+    1. Design: evitar que o perigo exista
+       Ex: limitar intervalo de valores aceitos pelo algoritmo
+    2. Protecao: detectar e tratar o perigo automaticamente
+       Ex: alerta automatico quando resultado esta fora do esperado
+    3. Informacao: informar o usuario sobre o perigo residual
+       Ex: disclaimer sobre limitacoes do SaMD na tela de resultado
+
+    **Exemplos de medidas de controle para SaMD:**
+    - Falso negativo: implementar segundo algoritmo de confirmacao,
+      recomendar confirmacao clinica para resultados negativos em
+      populacao de alto risco
+    - Indisponibilidade: implementar cache local de dados criticos,
+      modo offline degradado, failover automatico
+    - Corrupcao de dados: checksums em dados de entrada, validacao de
+      integridade em cada etapa do processamento
+    - Vies algoritmico: calibracao por subpopulacao, aviso quando
+      paciente esta fora da populacao de validacao
+
+    **Riscos introduzidos por controles:**
+    Exemplo: um alerta de seguranca pode causar "alert fatigue" se
+    disparar com frequencia excessiva, levando o usuario a ignorar
+    alertas genuinos. Cada controle deve ser avaliado por potencial
+    de introducao de novos riscos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de controles de risco:**
+      1. Implementar framework de validacao de dados de entrada com
+         regras configuravois por SaMD: tipo de dado, intervalo valido,
+         formato, completude, consistencia.
+      2. Configurar circuit breaker clinico com niveis de resposta:
+         warning (alerta ao usuario), degraded (funcionalidade reduzida),
+         disabled (funcionalidade desabilitada), rollback (versao anterior).
+      3. Implementar sistema de alertas clinicos com prioridade,
+         deduplicacao e confirmacao de leitura para evitar alert fatigue.
+      4. Provisionar infraestrutura de failover e modo offline para
+         SaMD criticos (Classe III/IV), com sincronizacao de dados
+         quando conectividade e restaurada.
+    tools:
+      - input-validation
+      - circuit-breaker
+      - alerting-system
+      - failover-infrastructure
+  devsecops:
+    prose: |
+      **Pipeline de verificacao de controles:**
+      1. Implementar testes automatizados para cada medida de controle
+         de risco: testes que verificam que o controle funciona conforme
+         especificado (ex: alerta dispara quando condicao e atingida).
+      2. Criar testes de cenarios adversos (negative testing) que
+         verificam comportamento do SaMD quando perigos se materializam
+         (dados corrompidos, timeout, valores fora do intervalo).
+      3. Automatizar verificacao de rastreabilidade risco -> controle ->
+         teste de verificacao no pipeline, bloqueando release se houver
+         controles sem verificacao.
+      4. Implementar analise automatica de riscos introduzidos por
+         novos controles: verificar se novos componentes de seguranca
+         (alertas, validacoes) nao degradam usabilidade ou performance.
+    tools:
+      - gitlab-ci
+      - negative-testing
+      - risk-traceability
+      - performance-testing
+  secops:
+    prose: |
+      **Governanca de controles de risco:**
+      1. Manter registro de todas as medidas de controle implementadas,
+         com vinculacao ao risco mitigado, resultado de verificacao e
+         status de efetividade.
+      2. Monitorar efetividade de controles em producao: taxa de
+         disparo de alertas, taxa de falsos alarmes, feedback de
+         usuarios sobre utilidade das informacoes de seguranca.
+      3. Revisar hierarquia de controles anualmente, avaliando se
+         controles de informacao podem ser substituidos por controles
+         de design ou protecao mais efetivos.
+      4. Documentar analise de riscos introduzidos por controles e
+         manter ciclo de avaliacao iterativo ate que todos os riscos
+         residuais sejam aceitaveis.
+    tools:
+      - risk-register
+      - control-monitoring
+      - effectiveness-review
+      - grc-platform
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-1-1", "SR-5-1"]
+    relationship: mapped
+  - framework_id: eu-ai-act
+    articles: ["art-9-4"]
+    relationship: mapped

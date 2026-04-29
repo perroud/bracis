@@ -1,0 +1,126 @@
+id: rec-9
+family: sncr
+title: "SNCR Integration and Prescription Registration"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 16. Todo sistema de prescrição eletrônica deve estar integrado ao
+    Sistema Nacional de Controle de Receituários (SNCR), mantido pela
+    ANVISA, para registro obrigatório de prescrições eletrônicas.
+
+    § 1.º O registro da prescrição no SNCR deve ocorrer em tempo real no
+    momento da assinatura digital, contendo, no mínimo:
+    I — identificador único da prescrição;
+    II — dados do prescritor (nome, CPF, registro profissional);
+    III — dados do paciente (nome, CPF ou documento de identificação);
+    IV — medicamentos prescritos com classificação conforme Portaria
+    SVS/MS n.º 344/1998, quando aplicável;
+    V — data e hora da prescrição com carimbo de tempo;
+    VI — hash criptográfico do documento assinado.
+
+    § 2.º O SNCR deve retornar um código de autenticação único que será
+    incorporado à prescrição eletrônica como prova de registro.
+
+    § 3.º O credenciamento do sistema de prescrição eletrônica junto ao
+    SNCR é condição obrigatória para sua operação.
+guidance:
+  prose: |
+    Article 16 establishes the SNCR as the central national registry
+    for all electronic prescriptions, creating a single source of truth
+    for prescription tracking across Brazil.
+
+    **Real-time registration:**
+    Prescriptions must be registered in the SNCR at the moment of
+    digital signing, not in batch or with delay. This enables real-time
+    fraud detection and dispensation control.
+
+    **Mandatory registration data:**
+    - Unique prescription identifier
+    - Prescriber data (name, CPF, professional registry)
+    - Patient data (name, CPF or ID document)
+    - Prescribed medications with Portaria 344 classification
+    - Timestamp with ICP-Brasil time authority
+    - Cryptographic hash of the signed document
+
+    **Authentication code:**
+    The SNCR returns a unique authentication code that must be embedded
+    in the prescription. This code serves as proof of registration and
+    enables pharmacies to query the prescription status.
+
+    **System credentialing:**
+    Prescription systems must be formally credentialed with ANVISA
+    before they can issue electronic prescriptions. This involves
+    technical certification, security audits, and compliance assessment.
+
+    **Implications for system developers:**
+    All prescription software vendors must implement the SNCR API,
+    complete ANVISA credentialing, and maintain ongoing compliance
+    to operate legally.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **SNCR integration architecture:**
+      1. Implement a SNCR integration service as a dedicated
+         microservice with synchronous real-time registration during
+         the prescription signing workflow.
+      2. Deploy message queuing with guaranteed delivery for SNCR
+         registration in case of transient API failures, with
+         automatic retry and dead-letter queue monitoring.
+      3. Implement the cryptographic hash computation (SHA-256 minimum)
+         of the signed prescription document for SNCR registration.
+      4. Store the SNCR authentication code as an immutable field in
+         the prescription record, embedded in the final document.
+      5. Complete ANVISA system credentialing process, including
+         technical documentation, security assessment, and API
+         conformance testing.
+      6. Deploy health checks and circuit breakers for SNCR API
+         connectivity with real-time monitoring.
+    tools:
+      - sncr-api-client
+      - kafka
+      - rabbitmq
+      - circuit-breaker
+      - resilience4j
+      - sha256
+  devsecops:
+    prose: |
+      **SNCR integration testing:**
+      1. Create integration tests against the SNCR sandbox environment
+         covering all registration scenarios (regular prescriptions,
+         controlled substances, cancellations).
+      2. Implement failure simulation tests for SNCR API unavailability,
+         verifying queue-based retry and eventual consistency.
+      3. Add contract tests for the SNCR API to detect breaking changes
+         before they impact production.
+      4. Deploy end-to-end tests for the complete prescription-to-SNCR
+         registration flow, including authentication code embedding.
+    tools:
+      - gitlab-ci
+      - contract-testing
+      - wiremock
+      - integration-tests
+      - e2e-tests
+  secops:
+    prose: |
+      **SNCR integration operations:**
+      1. Monitor SNCR API response times and availability with SLA
+         tracking and alerting on degradation.
+      2. Audit the dead-letter queue daily for failed SNCR registrations
+         and ensure resolution within 24 hours.
+      3. Track SNCR authentication code issuance rates and reconcile
+         with prescription volumes to detect registration gaps.
+      4. Maintain ANVISA system credentialing compliance, including
+         annual recertification and change notification procedures.
+    tools:
+      - siem
+      - api-monitoring
+      - dead-letter-queue-dashboard
+      - compliance-tracking
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23", "art-24"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7", "art-26"]
+    relationship: complements

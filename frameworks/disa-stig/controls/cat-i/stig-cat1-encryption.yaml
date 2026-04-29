@@ -1,0 +1,130 @@
+id: stig-cat1-encryption
+family: cat-i
+title: "Unencrypted Data Transmission and Storage"
+class: DISA-STIG
+
+baselines: [cat-i]
+
+statement:
+  prose: >-
+    The system must protect the confidentiality of CUI and other sensitive data
+    using FIPS 140-2 (or FIPS 140-3) validated encryption for all data in transit
+    and data at rest. Unencrypted protocols (HTTP, FTP, Telnet, SMTP without TLS,
+    SNMPv1/v2, rsh) are prohibited for any data transmission involving sensitive
+    information. Encryption algorithms must be NSA-approved or NIST-approved;
+    deprecated algorithms (DES, 3DES, RC4, MD5, SHA-1 for digital signatures)
+    must not be used. TLS 1.0 and TLS 1.1 must be disabled; systems must use
+    TLS 1.2 at minimum and TLS 1.3 where technically feasible. Data at rest on
+    system storage must be encrypted using AES-256 or an equivalent FIPS-approved
+    algorithm, with keys managed separately from the data they protect.
+
+guidance:
+  prose: >-
+    Unencrypted transmission of sensitive data is a CAT I finding because it
+    directly enables data exfiltration through network interception — a technique
+    routinely used by sophisticated adversaries targeting DoD networks. The
+    requirement for FIPS 140-2/140-3 validated cryptography ensures that
+    algorithms and implementations have been tested against known weaknesses,
+    rather than relying on vendor claims.
+
+    STIG reviewers must verify encryption not only on external communications
+    but also on internal east-west traffic between system components, including
+    microservice communication, database connections, and management interfaces.
+    The ubiquitous assumption that internal networks are trusted is a critical
+    attack surface — many significant DoD incidents involved lateral movement
+    over unencrypted internal channels.
+
+    Key management is equally critical: encryption provides no protection if
+    keys are stored alongside the encrypted data, embedded in source code, or
+    protected by weak access controls. The system security plan must document
+    the key management lifecycle, including key generation, distribution, rotation,
+    and destruction procedures.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SC-8, SC-28, SC-13"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "FIPS PUB 140-2 — Security Requirements for Cryptographic Modules"
+    url: "https://csrc.nist.gov/publications/detail/fips/140/2/final"
+  - citation: "NSA Commercial National Security Algorithm (CNSA) Suite 2.0"
+    url: "https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF"
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222575"
+    url: "https://public.cyber.mil/stigs/downloads/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce mTLS for all service-to-service communication using a service mesh
+      (Istio or Linkerd) configured with FIPS-compliant cipher suites. Disable
+      TLS 1.0 and 1.1 at the ingress controller, API gateway, and all TLS
+      termination points. Configure cipher suite allowlists specifying only
+      FIPS-approved algorithms (AES-GCM, ChaCha20-Poly1305 with TLS 1.3;
+      ECDHE-based suites with AES-256-GCM for TLS 1.2). Implement encryption
+      at rest for all persistent volumes using cloud KMS (AWS KMS, Azure Key Vault,
+      GCP Cloud KMS) or on-premises HSM, with keys managed separately from the
+      data. Use Vault's transit secrets engine for application-level encryption
+      of sensitive fields. Validate FIPS compliance of cryptographic libraries
+      in container base images using OpenSSL FIPS module or Go's BoringCrypto.
+    tools:
+      - istio
+      - linkerd
+      - hashicorp-vault
+      - cert-manager
+      - openssl-fips
+      - aws-kms
+      - azure-key-vault
+
+  devsecops:
+    prose: >-
+      Integrate SAST rules that detect use of deprecated cryptographic algorithms
+      (MD5, SHA-1, DES, RC4, hardcoded keys) in application source code. Use
+      dependency scanning to identify libraries with known cryptographic
+      weaknesses or CVEs affecting TLS implementations. Scan container images
+      for TLS configuration files that enable weak protocols or cipher suites.
+      Implement pipeline policies that reject deployments where services expose
+      unencrypted endpoints (HTTP on port 80 without redirect, FTP servers,
+      Telnet). Add TLS configuration tests to the integration test suite that
+      verify minimum TLS version, cipher suite compliance, and certificate
+      validity before release. Store all secrets and certificates in Vault or
+      cloud secret managers — never in source control, environment files, or
+      container image layers.
+    tools:
+      - gitlab-sast
+      - semgrep
+      - trivy
+      - checkov
+      - testssl-sh
+      - conftest
+
+  secops:
+    prose: >-
+      Conduct regular TLS configuration assessments using testssl.sh or Qualys
+      SSL Labs equivalents against all external and internal-facing services.
+      Monitor for cleartext protocol usage (HTTP, FTP, Telnet, LDAP) using
+      network traffic analysis tools and alert on any instances within the
+      system boundary. Validate encryption-at-rest configuration during ATO
+      assessment by inspecting storage configuration and key management policies.
+      Track FIPS 140-2/140-3 module certification status for all cryptographic
+      components and monitor for certificate expiration across the system.
+      Include cryptographic configuration in vulnerability scanning scope using
+      SCAP content that tests for deprecated algorithms and weak TLS configurations.
+    tools:
+      - splunk
+      - zeek
+      - qualys
+      - tenable
+      - openscap-fips
+      - hashicorp-vault
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-8(1)", "SC-28", "SC-28(1)", "SC-13"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SC.L2-3.13.8", "SC.L2-3.13.10", "SC.L2-3.13.16"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["sc-8", "sc-28", "sc-13"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-01", "PR.DS-02", "PR.DS-10"]
+    relationship: supports

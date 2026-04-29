@@ -1,0 +1,103 @@
+id: sec-16
+family: xborder
+title: "Transfer of personal data outside India"
+class: DPDP-INDIA
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    (1) The Data Fiduciary may transfer personal data of a Data Principal for processing to such
+    country or territory outside India as the Central Government may, by notification, allow.
+    (2) The Central Government may restrict the transfer of personal data by a Data Fiduciary for
+    processing to such country or territory outside India as the Central Government may, by
+    notification, restrict. (3) The provisions of this section shall be in addition to any
+    requirements for transfer of personal data outside India under any other law for the time
+    being in force.
+
+guidance:
+  prose: >-
+    Section 16 adopts a government-controlled "blacklist" approach to cross-border data transfers,
+    which is fundamentally different from GDPR's "adequacy" model. Under the DPDP Act, transfers
+    are generally allowed UNLESS the Central Government specifically restricts transfers to certain
+    countries. This is a more permissive default than GDPR (which restricts by default) or PIPL
+    (which requires security assessment). The government can both (a) explicitly allow transfers
+    to specific countries and (b) explicitly restrict transfers to specific countries. The
+    restriction power is significant — it could be used to block transfers to adversarial nations
+    or countries with inadequate protections. Organizations must monitor government notifications
+    closely and implement dynamic transfer controls that can be updated as the notification list
+    evolves. Section 16(3) clarifies that other laws (e.g., RBI data localization, CERT-In rules)
+    may impose additional transfer restrictions that operate independently.
+
+references:
+  - citation: "DPDP Act 2023, Section 16"
+    url: "https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Build a cross-border transfer control engine that maintains a dynamic registry of
+      allowed and restricted countries, updated from government notifications.
+      2. Implement data flow mapping that identifies all cross-border transfers — destination
+      country, Data Processor location, cloud infrastructure region, and sub-processor chains.
+      3. Deploy geo-fencing controls at infrastructure level — ensure data processing occurs
+      only in permitted jurisdictions.
+      4. Build automated transfer blocking for restricted countries — prevent data from being
+      routed to or processed in restricted territories.
+      5. Implement multi-law compliance checks — verify transfers comply with DPDP Act AND
+      sector-specific laws (RBI data localization, IRDAI, CERT-In).
+      6. Create data residency dashboards showing where personal data is stored and processed,
+      with alerts for configuration drift.
+    tools:
+      - data-flow-mapping
+      - geo-fencing
+      - cloud-security-posture-management
+      - terraform
+      - kubernetes-network-policies
+      - data-residency-monitoring
+
+  devsecops:
+    prose: >-
+      1. Infrastructure-as-code templates must enforce data residency constraints — prevent
+      deployment of personal data services to restricted regions.
+      2. CI/CD pipeline checks must verify that new services or data stores do not route
+      personal data to restricted countries.
+      3. Automated tests must verify geo-fencing controls block data transfers to restricted
+      territories.
+      4. Configuration scanning must detect cloud resources deployed in restricted regions.
+      5. Dependency analysis must verify third-party services and sub-processors do not
+      transfer data to restricted countries.
+    tools:
+      - terraform
+      - checkov
+      - tfsec
+      - gitlab-ci
+      - cloud-security-scanner
+      - supply-chain-security
+
+  secops:
+    prose: >-
+      1. Monitor data flows for unauthorized cross-border transfers to restricted countries.
+      2. Track government notifications for changes to allowed/restricted country lists and
+      trigger immediate compliance assessments.
+      3. Audit cloud infrastructure configurations to verify data residency compliance.
+      4. Monitor third-party processor locations and sub-processor chains for restricted
+      country exposure.
+      5. Maintain sector-specific transfer compliance (RBI, IRDAI, CERT-In) alongside
+      DPDP Act requirements.
+    tools:
+      - siem
+      - data-flow-monitoring
+      - cloud-security-posture-management
+      - compliance-dashboard
+      - vendor-risk-management
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44", "art-45", "art-46"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35"]
+    relationship: mapped
+  - framework_id: pipl
+    articles: ["art-38", "art-39", "art-40"]
+    relationship: mapped

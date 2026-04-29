@@ -1,0 +1,107 @@
+id: slsa-dep-complete
+family: dependencies
+title: "Dependencies: Complete Provenance Chain"
+class: SLSA
+
+baselines: [build-l3]
+
+statement:
+  prose: >-
+    Every dependency consumed by the build must itself have SLSA provenance,
+    establishing a complete, verifiable chain of provenance from source to final
+    artifact through all intermediate dependencies. The provenance chain must be
+    recursive — each dependency's provenance must reference its own dependencies'
+    provenance, all the way down to the original source. This creates a full supply-
+    chain graph that can be audited end-to-end.
+
+guidance:
+  prose: >-
+    Complete provenance chains represent the aspirational goal of SLSA for the
+    entire software ecosystem. In practice, achieving this fully is a long-term
+    objective because it requires every upstream dependency to also adopt SLSA. In
+    the interim, organizations should track provenance coverage (what percentage of
+    dependencies have verifiable provenance) and prioritize critical dependencies.
+    SBOM (Software Bill of Materials) generation using SPDX or CycloneDX formats
+    provides the structural foundation for provenance chains. Organizations should
+    generate SBOMs at build time, include them in artifact attestations, and
+    progressively require SLSA provenance from upstream suppliers and open-source
+    projects they depend on.
+
+references:
+  - citation: "SLSA v1.0 — Dependencies"
+    url: "https://slsa.dev/spec/v1.0/requirements"
+  - citation: "in-toto — Supply Chain Layout"
+    url: "https://in-toto.io/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Generate SBOMs (CycloneDX or SPDX) as a mandatory build output for every
+      artifact. Use syft, cdxgen, or trivy to produce accurate SBOMs that capture
+      all direct and transitive dependencies with their versions and hashes. Store
+      SBOMs as attestations alongside artifacts in OCI registries. Implement
+      dependency provenance verification that checks SLSA provenance for each
+      dependency where available. Deploy a dependency graph service that tracks
+      provenance coverage across the organization's dependency portfolio. Prioritize
+      provenance requirements for critical dependencies (cryptography libraries,
+      authentication frameworks, base images).
+    tools:
+      - syft
+      - cdxgen
+      - trivy
+      - cosign
+      - in-toto
+      - oras
+      - harbor
+      - dependency-track
+      - guac
+
+  devsecops:
+    prose: >-
+      Add SBOM generation as a mandatory CI/CD pipeline stage. Configure pipelines
+      to produce CycloneDX or SPDX SBOMs and attach them as in-toto attestations
+      to build artifacts. Implement progressive enforcement — log warnings for
+      dependencies without provenance today, block them after a defined adoption
+      timeline. Use GUAC (Graph for Understanding Artifact Composition) to visualize
+      and query the dependency provenance graph. Include SBOM completeness metrics
+      in pipeline reports. Verify dependency provenance signatures where available
+      using slsa-verifier as part of the build pipeline.
+    tools:
+      - syft
+      - cdxgen
+      - trivy
+      - cosign
+      - slsa-verifier
+      - guac
+      - github-actions
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Track provenance coverage metrics — what percentage of dependencies in each
+      project have verifiable SLSA provenance. Generate reports showing provenance
+      gaps and prioritize remediation for critical dependencies. Use Dependency-Track
+      or GUAC to monitor the dependency provenance graph for changes and anomalies.
+      Alert on newly introduced dependencies that lack provenance. Include SBOM
+      and provenance chain analysis in vendor risk assessments for third-party
+      software. Integrate SBOM data with vulnerability intelligence for comprehensive
+      supply-chain risk visibility.
+    tools:
+      - dependency-track
+      - guac
+      - splunk
+      - elastic-siem
+      - grafana
+      - trivy
+      - slsa-verifier
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-3", "SR-4", "SR-4(1)", "SR-4(3)", "SA-12"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PW.4.1", "PW.4.4", "PS.1.1", "PS.2.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["2.5", "16.4", "16.5"]
+    relationship: supports

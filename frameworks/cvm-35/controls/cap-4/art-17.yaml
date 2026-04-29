@@ -1,0 +1,174 @@
+id: art-17
+family: cap-4
+title: "Armazenamento de Dados no Exterior"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 17. A contratação de serviços de processamento, armazenamento de
+    dados e computação em nuvem no exterior deve ser precedida de:
+    I - comunicação prévia à CVM, informando os países e regiões onde os
+    dados serão processados ou armazenados;
+    II - análise dos riscos associados ao ambiente regulatório e jurídico
+    do país ou região de destino dos dados;
+    III - garantia de que a CVM terá acesso aos dados e informações
+    processados ou armazenados no exterior.
+
+    Parágrafo único. A entidade permanece integralmente responsável pelo
+    cumprimento da legislação e regulamentação aplicáveis, independentemente
+    da localização dos dados e informações.
+guidance:
+  prose: |
+    O art. 17 trata do cenario especifico de dados armazenados fora do
+    Brasil, impondo requisitos adicionais aos previstos nos arts. 15 e 16.
+
+    **I — Comunicacao previa a CVM:**
+    ANTES de armazenar ou processar dados no exterior, a entidade deve
+    comunicar formalmente a CVM, indicando:
+    - Paises e regioes especificos (nao basta dizer "nuvem global").
+    - Tipos de dados que serao processados/armazenados no exterior.
+    - Justificativa tecnica e de negocio para a escolha.
+    Esta e uma comunicacao, nao uma autorizacao. A CVM pode questionar
+    mas nao precisa aprovar previamente.
+
+    **II — Analise de riscos jurisdicionais:**
+    Avaliacao formal dos riscos associados ao pais de destino:
+    - Legislacao de protecao de dados (equivalencia com LGPD).
+    - Estabilidade juridica e politica do pais.
+    - Riscos de acesso governamental nao autorizado (leis de vigilancia).
+    - Protecao de propriedade intelectual.
+    - Risco de sancoes ou restricoes comerciais.
+    - Capacidade de enforcement de clausulas contratuais.
+
+    **III — Acesso da CVM:**
+    A CVM deve poder acessar os dados no exterior como se estivessem no
+    Brasil. Clausulas contratuais devem garantir que o prestador nao pode
+    negar acesso com base em legislacao local. Se a legislacao do pais
+    impedir acesso, a entidade nao deve armazenar dados la.
+
+    **Paragrafo unico — Responsabilidade integral:**
+    A entidade nao pode transferir responsabilidade para o prestador de
+    nuvem. Se houver incidente com dados no exterior, a entidade e
+    responsavel perante a CVM, investidores e reguladores. O prestador
+    pode ser responsabilizado contratualmente, mas a obrigacao regulatoria
+    e da entidade.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de localizacao de dados (I):**
+      1. Data residency policies implementadas na nuvem: restricao de
+         regioes permitidas para deploy de recursos.
+      2. Policy-as-Code (OPA, Kyverno, SCP AWS) para bloquear criacao
+         de recursos fora de regioes autorizadas.
+      3. Inventario automatico de localizacao de todos os dados, atualizado
+         continuamente.
+      4. Alertas quando dados sao movidos ou replicados para regioes
+         nao autorizadas.
+
+      **Analise de riscos (II):**
+      5. Risk assessment documentado para cada pais/regiao de armazenamento.
+      6. Mapeamento de legislacao de protecao de dados do pais de destino.
+      7. Avaliacao de adequacao (LGPD art. 33-36) para transferencia
+         internacional de dados.
+
+      **Acesso da CVM (III):**
+      8. Garantia tecnica de acesso: dados exportaveis a qualquer momento,
+         independente do pais de armazenamento.
+      9. Criptografia com chaves sob gestao da entidade (BYOK) para
+         garantir que nenhum governo estrangeiro acesse dados sem
+         autorizacao.
+      10. Clausulas contratuais que proibem prestador de divulgar dados
+          a governos estrangeiros sem notificacao a entidade.
+
+      **Multi-region com controle:**
+      11. Replicacao entre regioes com mapeamento claro de onde cada
+          copia esta.
+      12. Data sovereignty tags em todos os recursos de nuvem.
+      13. Logging de movimentacao de dados entre regioes.
+    tools:
+      - terraform
+      - opa-gatekeeper
+      - kyverno
+      - cloud-custodian
+      - vault
+      - dlp-solution
+  devsecops:
+    prose: |
+      **Compliance no pipeline (I, III):**
+      1. IaC scanning para validar que recursos sao criados apenas em
+         regioes autorizadas.
+      2. Policy-as-Code no pipeline para bloquear deploy em regioes
+         nao comunicadas a CVM.
+      3. Testes automatizados de data residency em pipeline de CI/CD.
+
+      **Seguranca de dados no exterior (II):**
+      4. Criptografia obrigatoria para dados armazenados no exterior,
+         validada por IaC scanning.
+      5. Validacao de configuracao de criptografia (algoritmo, tamanho
+         de chave, gestao de chaves) em cada deploy.
+      6. Secret scanning para evitar exposicao de chaves de acesso a
+         dados no exterior.
+
+      **Rastreabilidade:**
+      7. Tag de localizacao em todos os recursos de nuvem gerenciados
+         por IaC.
+      8. Dashboard de distribuicao geografica de recursos e dados.
+      9. Alertas quando IaC tenta criar recursos em regiao nao autorizada.
+    tools:
+      - checkov
+      - tfsec
+      - terraform
+      - gitlab-ci
+      - cloud-custodian
+  secops:
+    prose: |
+      **Comunicacao previa a CVM (I):**
+      1. Processo formal de comunicacao previa: template padronizado,
+         aprovacao da diretoria, protocolo junto a CVM.
+      2. Registro centralizado de todas as comunicacoes de dados no
+         exterior, com datas e localizacoes autorizadas.
+      3. Atualizacao da comunicacao quando houver mudanca de regiao ou
+         tipo de dado.
+
+      **Analise de riscos jurisdicionais (II):**
+      4. Risk assessment especifico por pais, cobrindo:
+         - Adequacao de protecao de dados (equivalencia LGPD).
+         - Estabilidade politica e juridica.
+         - Riscos de acesso governamental (CLOUD Act, leis de vigilancia).
+         - Sancoes e restricoes comerciais.
+      5. Revisao anual dos risk assessments jurisdicionais.
+      6. Reavaliacao imediata se houver mudanca politica ou regulatoria
+         relevante no pais de destino.
+
+      **Monitoramento continuo:**
+      7. Monitoramento de legislacao e regulamentacao dos paises de destino.
+      8. Alertas para mudancas regulatorias que possam impactar a
+         conformidade.
+      9. Monitoramento de sancoes internacionais que possam afetar
+         prestadores de nuvem.
+
+      **Acesso da CVM (III):**
+      10. Procedimento documentado para atender demandas da CVM de acesso
+          a dados no exterior.
+      11. Teste anual de capacidade de exportacao de dados para entrega
+          a CVM.
+      12. Clausulas contratuais revisadas anualmente para garantir acesso.
+    tools:
+      - grc-platform
+      - risk-management-platform
+      - cloud-monitoring
+      - legal-monitoring
+      - contract-management
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-18", "art-19", "art-20"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "SC-28", "PT-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.23", "A.5.34"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35", "art-36"]
+    relationship: complements

@@ -1,0 +1,100 @@
+id: cek-01
+family: cek
+title: "Encryption and Key Management Entitlement"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Establish, document, approve, communicate, apply, evaluate, and maintain
+    policies and procedures for cryptography, encryption, and key management.
+    The cryptography, encryption, and key management policy shall be
+    consistent with applicable legal and regulatory requirements, and
+    define data-at-rest and data-in-transit encryption requirements,
+    key lifecycle management procedures, and the roles and responsibilities
+    for key management.
+
+guidance:
+  prose: >-
+    The cryptographic policy should specify approved algorithms and
+    minimum key lengths for each use case (TLS 1.2+, AES-256,
+    RSA-2048+, ECC P-256+). Key management procedures should cover
+    the complete key lifecycle: generation, distribution, storage,
+    rotation, revocation, and destruction. The policy should mandate
+    encryption for all data at rest and in transit, define key escrow
+    and recovery procedures, and specify hardware security module (HSM)
+    requirements for high-sensitivity keys. Customer-managed encryption
+    keys (CMEK/BYOK) options should be documented for cloud services.
+    Key compromise procedures must be defined and tested.
+
+references:
+  - citation: "CSA CCM v4.0 CEK-01"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy centralized secrets and key management infrastructure using
+      dedicated KMS or HSM-backed solutions. Enforce TLS 1.2+ for all
+      service-to-service communication via service mesh mTLS policies.
+      Implement automated certificate management with auto-renewal.
+      Configure default encryption at rest for all storage services
+      including databases, object stores, and persistent volumes.
+      Provide platform-level encryption primitives that developers can
+      use without managing keys directly. Implement key rotation
+      automation with zero-downtime re-encryption capabilities.
+    tools:
+      - vault
+      - aws-kms
+      - azure-key-vault
+      - gcp-cloud-kms
+      - cert-manager
+      - istio
+
+  devsecops:
+    prose: >-
+      Scan code repositories for hardcoded secrets and cryptographic
+      anti-patterns. Enforce minimum TLS versions and cipher suites
+      in infrastructure-as-code configurations. Include cryptographic
+      library version checks in dependency scanning. Validate that
+      encryption configurations meet policy requirements as part of
+      CI/CD pipeline checks. Implement pre-commit hooks to prevent
+      secrets from being committed. Automate certificate and secret
+      rotation in deployment pipelines.
+    tools:
+      - gitleaks
+      - trufflehog
+      - checkov
+      - tfsec
+      - trivy
+      - detect-secrets
+
+  secops:
+    prose: >-
+      Monitor for certificate expiration and cryptographic configuration
+      weaknesses. Alert on use of deprecated cryptographic algorithms
+      or protocols (SSLv3, TLS 1.0/1.1, MD5, SHA-1, DES, 3DES).
+      Implement key usage auditing to detect anomalous access patterns.
+      Monitor for unauthorized key export or access attempts. Maintain
+      a cryptographic inventory of all keys, certificates, and their
+      expiration dates. Integrate certificate transparency logs into
+      monitoring for unauthorized certificate issuance.
+    tools:
+      - venafi
+      - keyfactor
+      - splunk
+      - qualys-ssl-labs
+      - nessus
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8-24"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC6.1", "CC6.7"]
+    relationship: mapped
+  - framework_id: gdpr
+    articles: ["art-32"]
+    relationship: supports

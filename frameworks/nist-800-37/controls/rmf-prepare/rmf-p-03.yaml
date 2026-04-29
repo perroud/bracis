@@ -1,0 +1,90 @@
+id: rmf-p-03
+family: rmf-prepare
+title: "Common Control Identification and Provision"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Identify, document, and publish organization-wide common controls that are available
+    for inheritance by organizational information systems. Common controls are security
+    and privacy controls that can be inherited by multiple information systems, reducing
+    the overall cost of security and privacy and enabling consistent implementation across
+    the organization. Organizations identify common controls during the Prepare step and
+    make them available through a common control catalog or provider listing.
+
+guidance:
+  prose: >-
+    Common controls are provided by an entity other than the system owner — typically the
+    organization, a shared service provider, or a platform team. Examples include physical
+    security controls provided by a facility, identity management controls provided by a
+    centralized IAM service, or audit logging controls provided by a platform engineering
+    team. Each common control must have a designated common control provider who is
+    responsible for its implementation, assessment, and continuous monitoring. The
+    identification of common controls is critical for avoiding redundant implementations
+    and ensuring consistent security posture. System owners inherit common controls and
+    document the inheritance relationship in their system security plans.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Prepare Step — Task P-5, Common Control Identification"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "NIST SP 800-53 Rev 5, Section 2.3, Common Controls"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define and publish a common control catalog that documents every security and
+      privacy control provided by the platform. For each common control, specify the
+      control implementation description, the responsible platform team, assessment
+      evidence location, and the continuous monitoring mechanism. Implement common
+      controls as infrastructure services (e.g., centralized logging via ELK/Splunk,
+      secrets management via HashiCorp Vault, network segmentation via service mesh
+      policies). Expose common control inheritance metadata through the service catalog
+      so system owners can easily reference which controls they inherit from the platform.
+      Version-control the common control catalog and notify inheriting systems when
+      control implementations change.
+    tools:
+      - backstage
+      - hashicorp-vault
+      - elastic-stack
+      - istio
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Implement common controls as shared CI/CD pipeline components (templates, includes)
+      that are automatically applied to inheriting systems. For example, provide a shared
+      SAST/DAST scanning template that all projects inherit, a common secrets detection
+      job, and a standardized container image scanning stage. Document each shared pipeline
+      component as a common control with its control ID, implementation description, and
+      assessment methodology. Use GitLab compliance pipelines to enforce that common
+      controls cannot be bypassed by individual project owners. Track common control
+      inheritance in pipeline metadata.
+    tools:
+      - gitlab-ci-includes
+      - gitlab-compliance-pipelines
+      - gitlab-security-scanners
+
+  secops:
+    prose: >-
+      Maintain the organizational common control catalog in the GRC platform with
+      detailed implementation descriptions, responsible providers, and assessment
+      schedules. Track the assessment status of each common control and propagate
+      assessment results to all inheriting systems. When a common control is found
+      deficient, identify all affected systems and initiate risk response actions.
+      Conduct periodic reviews of the common control catalog to ensure it remains
+      current and that all providers are fulfilling their responsibilities. Generate
+      reports showing which systems inherit which common controls and the overall
+      health of the common control program.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-6", "SA-8", "CA-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.8", "A8.27"]
+    relationship: mapped

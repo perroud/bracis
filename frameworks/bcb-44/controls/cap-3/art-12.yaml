@@ -1,0 +1,111 @@
+id: art-12
+family: cap-3
+title: "Beneficiario Final de Pessoas Juridicas"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 12. Para fins de identificação do beneficiário final de pessoas jurídicas,
+    as instituições de pagamento devem:
+
+    I - identificar a cadeia de controle societário até alcançar a pessoa natural
+    que, em última instância, detiver participação societária igual ou superior a
+    25% do capital social ou que exercer o controle da pessoa jurídica;
+
+    II - verificar se a pessoa jurídica é controlada por outra pessoa jurídica e,
+    caso positivo, aprofundar as investigações para identificar o beneficiário final
+    pessoa natural;
+
+    III - obter declaração do cliente informando quem são os beneficiários finais,
+    complementada com documentação comprobatória;
+
+    IV - adotar procedimentos adicionais quando não for possível identificar o
+    beneficiário final, incluindo a consideração de aumentar o nível de risco do
+    cliente.
+
+    Parágrafo único. A identificação do beneficiário final deve ser atualizada
+    sempre que ocorrer alteração societária relevante.
+guidance:
+  prose: |
+    O art. 12 aborda o desafio central de pessoas juridicas: quem e, de fato,
+    o dono por tras da empresa?
+
+    **Logica do calculo de 25%:**
+    - Participacao direta: Joao tem 30% da empresa X → beneficiario final.
+    - Participacao indireta: Holding Y tem 40% da empresa X, Joao tem 70% da
+      Holding Y → participacao de Joao na empresa X = 40% × 70% = 28% → beneficiario final.
+    - Multiplas holdings: calcular a participacao acumulada em toda a cadeia.
+
+    **Controle de fato (sem participacao de 25%):**
+    Mesmo sem atingir 25%, uma pessoa pode ser beneficiario final se:
+    - Exerce poder de veto sobre decisoes relevantes
+    - Tem direito contratual de nomear/demitir a maioria dos diretores
+    - Controla a empresa por acordo de acionistas ou instrumento similar
+
+    **Quando nao e possivel identificar:**
+    Se a empresa tem estrutura deliberadamente opaca (offshores aninhadas sem
+    transparencia), a IP deve:
+    1. Solicitar declaracao formal do representante legal
+    2. Aumentar o nivel de risco do cliente
+    3. Aplicar diligencia reforcada
+    4. Em caso extremo, recusar o onboarding
+
+    **Estruturas comuns de risco:**
+    - Empresas com acoes ao portador (proibidas no Brasil, mas comuns no exterior)
+    - Trusts com beneficiarios desconhecidos
+    - Empresas registradas em jurisdicoes sem registro de beneficiario final
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de mapeamento societario:**
+      1. Implementar grafo de estrutura societaria com calculo recursivo de
+         participacao indireta (arvore N-niveis de profundidade).
+      2. Algoritmo de identificacao de beneficiario final: percorre o grafo e
+         identifica todos os nos (pessoas naturais) com participacao >= 25%.
+      3. Integracao com API da Receita Federal para obter quadro societario
+         automaticamente pelo CNPJ (QSA - Quadro de Socios e Administradores).
+      4. Formulario de declaracao de beneficiario final com upload de documentos
+         comprobatorios (contrato social, acordos de acionistas, procuracoes).
+      5. Flag automatico para estruturas suspeitas: mais de 3 niveis de holdings,
+         presenca de offshores, acoes ao portador.
+    tools:
+      - kyc-platform
+      - graph-database
+      - document-management
+      - data-enrichment-api
+  devsecops:
+    prose: |
+      **Testes de calculo de beneficiario final:**
+      1. Testes unitarios para o algoritmo de calculo de participacao indireta
+         com casos de multiplos niveis de holding.
+      2. Testes de edge case: participacao exatamente 25%, ciclos no grafo
+         societario, offshore sem dados disponiveis.
+      3. Testes de integracao com API da Receita Federal (mock em ambiente de
+         teste, real em staging).
+      4. Performance test: tempo de calculo para estruturas societarias complexas
+         (ex: grupo economico com 20 entidades).
+    tools:
+      - gitlab-ci
+      - test-automation
+      - api-testing
+  secops:
+    prose: |
+      **Auditoria de beneficiario final:**
+      1. Relatorio de clientes PJ com beneficiario final nao identificado ou
+         em status "pendente de documentacao".
+      2. Verificacao periodica de alteracoes societarias: monitorar publicacoes
+         no Diario Oficial e no CNPJ para mudancas relevantes.
+      3. Auditoria de PJs com estrutura societaria com mais de 3 niveis de
+         holding (risco elevado de opacidade).
+      4. Revisao de beneficiarios finais identificados como PEP.
+    tools:
+      - aml-platform
+      - grc-platform
+      - regulatory-intelligence
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-10", "art-11"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

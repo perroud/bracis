@@ -1,0 +1,89 @@
+id: art-9
+family: cap-2
+title: "Responsabilidade pela Qualidade e Disponibilidade dos Dados"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 9. A instituição transmissora de dados é responsável por:
+
+    I - garantir a qualidade, integridade e acurácia dos dados compartilhados;
+
+    II - manter a disponibilidade das interfaces dedicadas conforme os níveis
+    de serviço (SLAs) estabelecidos nas especificações técnicas;
+
+    III - notificar a instituição receptora e o diretório em caso de
+    indisponibilidade planejada ou não-planejada;
+
+    IV - implementar mecanismos de tratamento de erros e retentativas conforme
+    padrões definidos nas especificações técnicas.
+
+    Parágrafo único. A instituição receptora é responsável pelo uso adequado
+    dos dados recebidos, conforme a finalidade declarada no consentimento.
+guidance:
+  prose: |
+    O art. 9 distribui responsabilidades entre transmissor e receptor:
+
+    **Transmissor de dados (obrigacoes):**
+    - Qualidade: dados completos, corretos e atualizados
+    - Disponibilidade: SLA minimo de 95% mensal (especificacao tecnica)
+    - Notificacao: alertar sobre indisponibilidades via diretorio
+    - Tratamento de erros: codigos HTTP padronizados e mensagens claras
+
+    **SLAs do ecossistema (especificacoes tecnicas):**
+    - Disponibilidade: >= 95% mensal por endpoint
+    - Latencia P95: <= 1000ms para dados cadastrais
+    - Latencia P95: <= 2000ms para dados transacionais
+    - Timeout maximo: 30 segundos
+
+    **Receptor de dados (obrigacoes):**
+    - Usar dados apenas para finalidade declarada no consentimento
+    - Nao reter dados alem do prazo do consentimento
+    - Nao compartilhar dados com terceiros sem autorizacao
+
+    **Mecanismos de tratamento de erros:**
+    - Codigos HTTP padronizados (400, 401, 403, 404, 429, 500, 503)
+    - Retry-After header para rate limiting e indisponibilidade
+    - Correlation ID (x-fapi-interaction-id) para rastreabilidade
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de alta disponibilidade:**
+      1. Implementar redundancia de APIs com load balancing ativo-ativo.
+      2. Configurar circuit breaker para degradacao graciosa.
+      3. Implementar health checks e auto-recovery.
+      4. Configurar rate limiting por participante e por consentimento.
+      5. Implementar mecanismo de notificacao de indisponibilidade
+         integrado ao diretorio.
+    tools:
+      - load-balancer
+      - circuit-breaker
+      - health-checks
+      - rate-limiting
+  devsecops:
+    prose: |
+      **Monitoramento de SLA e qualidade:**
+      1. Implementar metricas de disponibilidade por endpoint (uptime).
+      2. Medir latencia P50, P95 e P99 em pipeline de metricas.
+      3. Automatizar testes de qualidade de dados em pipeline.
+      4. Configurar alertas para degradacao de SLA.
+    tools:
+      - prometheus
+      - grafana
+      - alertmanager
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de qualidade e disponibilidade:**
+      1. Publicar relatorio mensal de SLA por endpoint.
+      2. Investigar causas-raiz de indisponibilidades nao-planejadas.
+      3. Auditar uso de dados pelo receptor conforme consentimento.
+      4. Monitorar metricas de qualidade de dados compartilhados.
+    tools:
+      - sla-monitoring
+      - incident-management
+      - grc-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

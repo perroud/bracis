@@ -1,0 +1,88 @@
+id: soc1-ca-segregation
+family: control-activities
+title: "Segregation of Duties"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization maintains segregation of duties in its financial processing
+    operations and IT environment to reduce the risk of error or fraud going undetected.
+    Incompatible duties — including initiating transactions, authorizing transactions, recording
+    transactions, and custody of assets — are assigned to different individuals or automated
+    controls. In the IT environment, duties are segregated among individuals responsible for
+    application development, testing, IT operations, and security administration. The
+    organization has identified where segregation of duties is not practicable due to resource
+    constraints and has implemented compensating controls such as supervisory review,
+    management oversight, or enhanced logging to mitigate the associated risk. Segregation
+    of duties configurations are reviewed at least annually to confirm continued effectiveness.
+guidance:
+  prose: >-
+    Segregation of duties (SoD) is one of the most fundamental ICFR controls because it
+    creates a system of checks where no single individual can perpetrate and conceal an
+    error or fraud without the collusion of others. Auditors test SoD by reviewing role
+    assignments and system access configurations to confirm that incompatible functions
+    are truly separated and not assigned to the same individual. Common SoD conflicts
+    in service organizations include: developers with production access, IT operations
+    staff with the ability to modify financial data, and individuals who can both initiate
+    and approve financial transactions. Where perfect SoD cannot be achieved, compensating
+    controls must be robust enough to provide equivalent assurance. Auditors will evaluate
+    whether compensating controls are operating effectively.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement technical SoD through fine-grained RBAC that prevents incompatible role
+      combinations from being assigned to the same user. Use automated SoD conflict detection
+      tools that flag when access requests would create prohibited role combinations.
+      Enforce environment-level SoD by ensuring developers cannot access production financial
+      systems directly — production access must go through a formal privileged access
+      management (PAM) process with approval and monitoring. Implement separate administrative
+      accounts for platform operations roles, preventing individuals from using the same
+      account for both development and operations functions. Automate deployment so that
+      no single person can both approve and execute a production deployment.
+    tools:
+      - cyberark
+      - sailpoint
+      - saviynt
+      - vault
+      - aws-iam
+  devsecops:
+    prose: >-
+      Enforce SoD in the CI/CD process by configuring GitLab to prevent merge request
+      authors from approving their own merge requests (enable the "Prevent approval by
+      author" setting). Ensure that the pipeline automation — not individual developers —
+      performs production deployments, and that production deployments require approval
+      from a designated release manager who is not the developer who wrote the code.
+      Implement GitLab's protected environments feature to control who can trigger deployments
+      to production. Use separate service accounts for CI/CD operations that have narrow,
+      scoped permissions rather than broad developer access. Maintain audit logs of all
+      approval and deployment actions for SoD evidence.
+    tools:
+      - gitlab-approval-rules
+      - gitlab-protected-environments
+      - gitlab-audit-events
+      - vault-approle
+      - oidc-federation
+  secops:
+    prose: >-
+      Develop and maintain a SoD matrix that defines incompatible duty combinations for
+      all roles with ICFR responsibilities. Conduct quarterly SoD access reviews comparing
+      current role assignments against the SoD matrix and remediating conflicts. Document
+      and formally approve all cases where SoD exceptions have been granted, along with
+      the compensating controls in place. Review compensating controls periodically to
+      confirm they are operating effectively. Retain SoD review documentation, conflict
+      reports, and exception approvals for audit examination.
+    tools:
+      - sailpoint-iga
+      - saviynt
+      - servicenow-grc
+      - archer-grc
+related_controls:
+  - control_id: soc1-ca-access-controls
+    relationship: implements
+    description: "Logical access controls provide the technical enforcement of SoD."
+  - control_id: soc1-ra-fraud-risk
+    relationship: supports
+    description: "SoD directly addresses the fraud risk of unauthorized transaction manipulation."
+  - control_id: soc1-mon-continuous
+    relationship: supports
+    description: "Continuous monitoring compensates where perfect SoD is not achievable."

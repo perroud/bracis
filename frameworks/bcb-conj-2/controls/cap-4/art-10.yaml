@@ -1,0 +1,173 @@
+id: art-10
+family: cap-4
+title: "Classificacao de Severidade de Incidentes"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 10. As instituições referidas no art. 1 devem definir critérios de
+    classificação de severidade de incidentes de segurança, considerando, no mínimo:
+    I - a criticidade dos sistemas e das infraestruturas afetados;
+    II - o tipo e a sensibilidade dos dados comprometidos;
+    III - o impacto na prestação de serviços aos clientes e usuários;
+    IV - a extensão do incidente, incluindo o número de clientes, usuários e
+    instituições afetados;
+    V - a possibilidade de impacto no sistema financeiro nacional.
+guidance:
+  prose: |
+    O art. 10 obriga a instituicao a ter uma metodologia formal e documentada de
+    classificacao de severidade. A classificacao e a base para as decisoes de
+    notificacao (art. 3) e de resposta (art. 9).
+
+    **I - Criticidade dos sistemas:**
+    Criterios para avaliar a criticidade dos sistemas afetados:
+    - Sistemas Tier 1 (criticos para o SFN): SPB, STR, PIX, compensacao
+    - Sistemas Tier 2 (criticos para o negocio): core banking, internet banking,
+      app mobile, gateway de pagamentos
+    - Sistemas Tier 3 (suporte): e-mail, intranet, sistemas administrativos
+    A classificacao de criticidade deve estar registrada no CMDB e revisada
+    periodicamente.
+
+    **II - Tipo e sensibilidade dos dados:**
+    Classificacao dos dados comprometidos:
+    - Dados pessoais sensiveis (biometria, saude financeira): severidade mais alta
+    - Dados pessoais cadastrais (nome, CPF, endereco): severidade alta
+    - Dados de transacoes financeiras (saldos, movimentacoes): severidade alta
+    - Dados operacionais (logs, configs): severidade media
+    - Dados publicos: severidade baixa
+    Volume de registros afetados e fator multiplicador da severidade.
+
+    **III - Impacto na prestacao de servicos:**
+    Criterios quantitativos:
+    - Indisponibilidade total de servicos criticos: severidade maxima
+    - Degradacao severa (> 50% de impacto em performance): severidade alta
+    - Degradacao moderada (> 20% de impacto): severidade media
+    - Impacto minimo (< 20%): severidade baixa
+    Duracao da interrupcao e fator agravante.
+
+    **IV - Extensao do incidente:**
+    Quantificacao de afetados:
+    - > 1.000.000 de clientes: severidade maxima
+    - > 100.000 de clientes: severidade critica
+    - > 10.000 de clientes: severidade alta
+    - > 1.000 de clientes: severidade media
+    - < 1.000 de clientes: severidade baixa
+    Considerar tambem instituicoes financeiras parceiras afetadas.
+
+    **V - Impacto no SFN:**
+    Avaliacao de risco sistemico:
+    - Incidente com potencial de afetar a estabilidade do SFN: severidade maxima
+    - Incidente que afeta participantes do SPB: severidade critica
+    - Incidente que afeta infraestrutura compartilhada: severidade critica
+    - Incidente isolado a uma instituicao: avaliacao pelos demais criterios
+
+    **Composicao da severidade:**
+    A severidade final deve considerar todos os cinco criterios. A instituicao
+    pode adotar modelo de scoring (ex: ponderacao dos criterios) ou modelo de
+    maximo (ex: o criterio mais grave define a severidade).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de scoring de severidade:**
+      1. Scoring engine automatizado que calcula severidade com base nos cinco
+         criterios do art. 10:
+         - Criticidade do sistema: lookup no CMDB (Tier 1=5, Tier 2=3, Tier 3=1)
+         - Sensibilidade de dados: lookup no data catalog (sensivel=5, pessoal=3,
+           operacional=1)
+         - Impacto em servicos: calculado via SLO violations (total=5, severo=3,
+           moderado=2, minimo=1)
+         - Extensao: calculado via metricas de uso (formula baseada em clientes
+           afetados)
+         - Impacto SFN: flag binario baseado no tipo de sistema (SFN=sim/nao)
+      2. Score composto: MAX(criterios individuais) ou soma ponderada, conforme
+         metodologia aprovada.
+      3. Classificacao automatica: score -> severidade (critico/alto/medio/baixo).
+      4. Override manual com justificativa obrigatoria registrada.
+
+      **Integracao com CMDB e Data Catalog:**
+      5. CMDB com campo obrigatorio de classificacao de criticidade (Tier 1/2/3)
+         para todo sistema.
+      6. Data catalog com classificacao de sensibilidade para todo repositorio
+         de dados.
+      7. Atualizacao automatica do score quando classificacao de sistema ou dados
+         muda.
+
+      **Dashboard de severidade:**
+      8. Visualizacao em tempo real de incidentes por severidade.
+      9. Drill-down nos cinco criterios para cada incidente.
+      10. Historico de reclassificacoes com justificativas.
+    tools:
+      - siem
+      - soar
+      - cmdb
+      - data-catalog
+      - incident-management
+      - monitoring-alerting
+  devsecops:
+    prose: |
+      **Classificacao de criticidade no repositorio:**
+      1. Cada repositorio deve ter metadata de classificacao de criticidade
+         (ex: label ci-tier-1, ci-tier-2, ci-tier-3).
+      2. Pipeline rules diferenciados por classificacao de criticidade.
+      3. Vulnerability severity mapping: vulnerabilidades em sistemas Tier 1
+         sao automaticamente elevadas em prioridade.
+
+      **Dados para avaliacao de extensao:**
+      4. Metricas de uso por feature/endpoint para estimar clientes afetados.
+      5. APM tracing para identificar servicos e dependencias afetados.
+      6. Error rate monitoring para quantificar impacto em tempo real.
+
+      **Automacao de reclassificacao:**
+      7. Atualizacao automatica de severidade quando metricas de impacto mudam
+         (ex: numero de afetados aumenta, novo sistema comprometido).
+      8. Notificacao automatica ao SOC quando severidade sobe.
+    tools:
+      - gitlab-ci
+      - monitoring-alerting
+      - apm
+      - incident-management
+  secops:
+    prose: |
+      **Metodologia de classificacao documentada:**
+      1. Documento formal de classificacao de severidade aprovado pela diretoria,
+         contendo criterios quantitativos para cada inciso do art. 10.
+      2. Matriz de severidade com exemplos concretos para cada nivel.
+      3. Decision tree para triagem rapida (< 15 minutos por incidente).
+      4. Treinamento obrigatorio da equipe de triagem nos criterios.
+
+      **Processo de classificacao:**
+      5. Classificacao inicial pelo analista de triagem (T+0 a T+15min).
+      6. Validacao pelo Incident Commander (T+30min).
+      7. Reclassificacao conforme investigacao avanca (registro obrigatorio).
+      8. Classificacao final no relatorio de encerramento.
+
+      **Mapeamento com criterios de relevancia (art. 3):**
+      9. Tabela de correspondencia entre severidade e obrigacao de notificacao:
+         - Critico: notificacao obrigatoria e imediata ao BCB
+         - Alto: notificacao obrigatoria em ate 24h
+         - Medio: avaliacao caso a caso de relevancia
+         - Baixo: registro interno, sem notificacao ao BCB
+      10. Registro da justificativa quando incidente medio/baixo nao e notificado.
+
+      **Revisao periodica da metodologia:**
+      11. Revisao semestral da metodologia com base em:
+          - Incidentes ocorridos e classificacoes atribuidas
+          - Feedback do BCB sobre notificacoes enviadas
+          - Evolucao do cenario de ameacas
+          - Mudancas no porte e perfil de risco da instituicao
+      12. Benchmarking com pares do setor.
+    tools:
+      - incident-management
+      - grc-platform
+      - soar
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-9"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-5", "RA-3", "RA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.25", "A.8.8"]
+    relationship: supports

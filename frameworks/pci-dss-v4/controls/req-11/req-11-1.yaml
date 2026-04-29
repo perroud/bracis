@@ -1,0 +1,114 @@
+id: req-11.1
+family: req-11
+title: "Test Security of Systems and Networks Regularly"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for regularly testing security of systems and networks are
+    defined and understood. Wireless access points are identified and monitored, and
+    unauthorized wireless access points are addressed. External and internal vulnerabilities
+    are regularly identified, prioritized, and addressed. External and internal penetration
+    testing is regularly performed, and exploitable vulnerabilities and security weaknesses
+    are corrected. Network intrusions and unexpected file changes are detected and responded to.
+    Changes to payment pages are detected and responded to.
+  parts:
+    - id: req-11.1.a
+      label: "11.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 11
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-11.1.b
+      label: "11.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 11 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Regular testing is essential because vulnerabilities are continually being discovered
+    by researchers and attackers. Internal and external vulnerability scans must be
+    conducted at least quarterly. Internal scans must use a qualified resource and external
+    scans must be performed by a PCI SSC Approved Scanning Vendor (ASV). Penetration
+    testing must be conducted at least annually and after any significant infrastructure
+    or application change. The penetration test methodology must cover the entire CDE
+    perimeter and critical internal systems, test both network-layer and application-layer
+    vulnerabilities, and include segmentation validation. PCI DSS v4.0.1 adds requirements
+    for change and tamper detection on payment pages to address web skimming (Magecart)
+    attacks, and for intrusion detection/prevention systems on all traffic into and within
+    the CDE.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 11"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "PCI SSC Penetration Testing Guidance"
+    url: "https://www.pcisecuritystandards.org/document_library/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate vulnerability scanning into the platform lifecycle. Deploy automated
+      vulnerability scanners (Trivy Operator, Starboard) that continuously scan running
+      workloads in Kubernetes. Implement network intrusion detection using Suricata or
+      Snort at CDE network boundaries. Deploy file integrity monitoring (FIM) using
+      AIDE, OSSEC, or Wazuh on all CDE system components. For payment page tamper
+      detection, implement Subresource Integrity (SRI) checks and Content Security
+      Policy (CSP) headers. Use automated infrastructure scanning that runs quarterly
+      and on every change to CDE infrastructure.
+    tools:
+      - trivy-operator
+      - suricata
+      - snort
+      - wazuh
+      - aide
+      - falco
+      - nuclei
+      - content-security-policy
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning as a mandatory CI/CD pipeline stage. Run
+      internal vulnerability scans automatically on infrastructure changes and
+      schedule quarterly full scans. Implement DAST scanning against deployed
+      environments as part of the release pipeline. Automate payment page integrity
+      checks using CI/CD jobs that compare page content hashes against known-good
+      baselines. Include penetration testing scope in sprint planning for CDE
+      changes. Generate machine-readable vulnerability reports that integrate with
+      the vulnerability management workflow.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - owasp-zap
+      - nuclei
+      - trivy
+      - nmap
+      - nikto
+
+  secops:
+    prose: >-
+      Manage the quarterly vulnerability scanning program including ASV scans for
+      external-facing systems. Track vulnerability remediation timelines and
+      ensure rescans confirm remediation. Coordinate annual penetration testing
+      with qualified testers and track finding remediation. Monitor IDS/IPS alerts
+      in real time and investigate network intrusion detections. Review file
+      integrity monitoring alerts and investigate unauthorized changes. Monitor
+      payment page integrity and alert on unauthorized script injections or DOM
+      modifications. Maintain a risk register of all identified vulnerabilities
+      with remediation plans and timelines.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - burpsuite
+      - cobalt-strike
+      - snort
+      - suricata
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5", "SI-4", "SI-7", "CA-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.16", "A8.34"]
+    relationship: supports

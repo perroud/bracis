@@ -1,0 +1,116 @@
+id: a-7.2.5
+family: annex-a
+title: "Privacy impact assessment"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall assess the need for, and where necessary carry out, a privacy
+    impact assessment whenever new processing of PII or changes to existing processing
+    of PII is planned. The privacy impact assessment shall identify and evaluate the
+    risks to PII principals arising from the processing, evaluate the necessity and
+    proportionality of the processing in relation to its purposes, and identify measures
+    to mitigate identified risks to PII principals. The organization shall use the
+    results of the privacy impact assessment to determine the appropriate controls and
+    the privacy risk treatment plan. The privacy impact assessment shall be documented
+    and reviewed by appropriate stakeholders, including the data protection officer
+    where one is designated.
+
+guidance:
+  prose: >-
+    Privacy Impact Assessment (PIA), also known as Data Protection Impact Assessment
+    (DPIA) under GDPR, is a structured process for evaluating the privacy risks of
+    a processing activity before it begins. PIAs are mandatory in many jurisdictions
+    for high-risk processing: large-scale processing of sensitive data, systematic
+    monitoring of public areas, automated decision-making with legal effects, new
+    technologies, and large-scale profiling. Even when not legally required, PIAs
+    are a best practice that demonstrates proactive privacy risk management. A
+    comprehensive PIA should include: a systematic description of the processing
+    (purpose, data flows, technologies used), assessment of necessity and
+    proportionality, identification and assessment of risks to PII principals,
+    proposed measures to mitigate risks (controls, safeguards, mechanisms),
+    and consultation with stakeholders. PIAs should be living documents, updated
+    when processing changes materially. The organization should maintain a
+    threshold assessment process to determine when a full PIA is required versus
+    a lightweight privacy review.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.2.5"
+    url: "https://www.iso.org/standard/71670.html"
+  - citation: "ISO/IEC 29134:2017, Guidelines for privacy impact assessment"
+    url: "https://www.iso.org/standard/62289.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a PIA workflow engine as a platform service. Implement automated
+      threshold assessment that evaluates new or changed PII processing against
+      PIA trigger criteria (high-risk data categories, volume thresholds, new
+      technologies, automated decision-making). Provide PIA templates as
+      structured forms in the developer portal, pre-populated with data from
+      the PII processing registry (data categories, data flows, third parties,
+      jurisdictions). Integrate PIA workflow with the change management process
+      so that infrastructure changes affecting PII processing automatically
+      trigger PIA threshold assessment. Build PIA result integration that
+      feeds identified risks into the risk registry and control requirements
+      into the Statement of Applicability. Maintain PIA records with version
+      history, enabling traceability of privacy risk decisions over time.
+    tools:
+      - pia-workflow-engine
+      - backstage-catalog
+      - pii-processing-registry
+      - risk-registry-integration
+      - change-management-system
+      - document-management
+
+  devsecops:
+    prose: >-
+      Integrate PIA triggers into the development lifecycle. Implement automated
+      PIA threshold detection in CI pipelines: scan for new PII data models,
+      new automated decision-making logic, new third-party PII sharing, changes
+      to data retention, and new cross-border data flows. Build pipeline gates
+      that block deployment when PIA thresholds are met but no PIA has been
+      completed. Provide lightweight privacy review templates for changes below
+      the PIA threshold, integrated into the merge request workflow. Implement
+      PIA tracking as a required artifact for feature branches introducing
+      high-risk PII processing. Build automated PIA report generation that
+      pulls data flow diagrams, architecture decisions, and risk assessments
+      from existing pipeline artifacts.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - pia-threshold-scanner
+      - merge-request-templates
+      - automated-pia-generation
+      - compliance-evidence-store
+
+  secops:
+    prose: >-
+      Monitor compliance with PIA requirements. Alert when new PII processing
+      activities are detected in production that do not have associated PIAs.
+      Build dashboards tracking PIA coverage: percentage of processing
+      activities with completed PIAs, PIA review freshness, overdue PIA
+      updates for changed processing. Monitor the effectiveness of PIA-
+      recommended mitigations by tracking associated risk indicators. Alert
+      when processing activities exceed the scope evaluated in their PIAs.
+      Generate audit reports showing PIA completion history, stakeholder
+      review records, and mitigation implementation status.
+    tools:
+      - splunk
+      - elastic-siem
+      - pia-compliance-dashboards
+      - audit-trail-monitoring
+      - compliance-reporting
+      - grc-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-35", "art-36"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-5.XVII", "art-38"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.185"]
+    relationship: supports

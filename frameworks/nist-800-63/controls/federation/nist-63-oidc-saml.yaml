@@ -1,0 +1,134 @@
+id: nist-63-oidc-saml
+family: federation
+title: "OpenID Connect and SAML Implementation"
+class: SP800-63C
+
+baselines: [fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    When OpenID Connect (OIDC) is used as the federation protocol, the
+    implementation SHALL comply with the OpenID Connect Core 1.0 specification,
+    the OpenID Connect Discovery specification, and applicable security profiles.
+    The Authorization Code flow SHALL be used in preference to the Implicit flow,
+    which is deprecated. PKCE (Proof Key for Code Exchange) SHALL be used for
+    all public clients. When SAML 2.0 is used as the federation protocol, the
+    implementation SHALL comply with the SAML 2.0 specification and the appropriate
+    SAML profile for the deployment context. The SAML HTTP POST binding SHALL
+    be used in preference to the HTTP Redirect binding for bearer assertions to
+    prevent assertion size limitations. SAML assertions SHALL use XML Digital
+    Signatures and, at FAL2 and above, XML Encryption. Both OIDC and SAML
+    implementations SHALL validate all required claims and attributes as specified
+    in the applicable FAL requirements. Discovery metadata for both protocols
+    SHALL be published at well-known endpoints and protected with TLS.
+
+guidance:
+  prose: >-
+    OIDC and SAML are the two dominant federation protocols in enterprise and
+    government deployments. The choice between them depends on the ecosystem:
+    OIDC is preferred for modern web applications and API-based architectures;
+    SAML is still prevalent in enterprise SSO (Salesforce, AWS Console, government
+    portals). Both protocols can satisfy FAL1, FAL2, and FAL3 requirements when
+    correctly implemented. The OIDC FAPI (Financial-grade API) security profile
+    provides a ready-made configuration for high-assurance OIDC deployments
+    aligned with FAL2/FAL3 requirements. For SAML deployments, the eGov SAML
+    profile provides government-sector guidance. Key security considerations for
+    OIDC: use PKCE for all clients (not just public clients), use form_post
+    response mode instead of fragment to prevent token leakage in browser history,
+    validate the nonce parameter to prevent CSRF, and implement back-channel logout
+    to ensure session termination propagates across all RPs. Key security
+    considerations for SAML: validate the InResponseTo element to prevent
+    unsolicited responses, enforce strict audience checking, and implement
+    one-time-use assertion caching to prevent replay.
+
+references:
+  - citation: "OpenID Connect Core 1.0"
+    url: "https://openid.net/specs/openid-connect-core-1_0.html"
+  - citation: "RFC 7636 — PKCE for OAuth 2.0 Public Clients"
+    url: "https://datatracker.ietf.org/doc/html/rfc7636"
+  - citation: "OASIS SAML 2.0 Specification"
+    url: "http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf"
+  - citation: "OpenID FAPI 2.0 Security Profile"
+    url: "https://openid.net/specs/fapi-2_0-security-profile.html"
+  - citation: "NIST SP 800-63C Section 6.2 — Token Artifacts"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+
+related_controls:
+  - id: nist-63-fal1
+    relationship: implements
+    description: "OIDC Authorization Code flow and SAML POST binding implement FAL1."
+  - id: nist-63-fal2
+    relationship: implements
+    description: "OIDC JWE and SAML XML Encryption implement the FAL2 encryption requirement."
+  - id: nist-63-fal3
+    relationship: implements
+    description: "OIDC DPoP and SAML HoK implement the FAL3 holder-of-key binding."
+  - id: nist-63-assertions
+    relationship: implements
+    description: "OIDC ID tokens and SAML assertions are the concrete assertion formats."
+  - id: nist-63-verifier-requirements
+    relationship: complements
+    description: "Verifier impersonation resistance is achieved through OIDC rpId binding and SAML audience restriction."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      For OIDC deployments: configure the authorization server to support
+      the Authorization Code + PKCE flow exclusively for all new clients.
+      Deprecate the Implicit flow and Client Credentials flow without
+      scoped claims. Publish OIDC discovery metadata at
+      /.well-known/openid-configuration including all supported scopes,
+      response types, and algorithm capabilities. Configure the server-side
+      allowed algorithms list to include only RS256, RS384, RS512, ES256,
+      ES384, or ES512 for signing, and RSA-OAEP or ECDH-ES for encryption.
+      For SAML deployments: configure the IdP to sign all SAML responses
+      and assertions (both levels), validate InResponseTo, enforce
+      NotBefore/NotOnOrAfter, and implement one-time-use caching using
+      an assertion ID store. Publish IdP metadata at a stable URL with
+      a long cache TTL. Implement backchannel SAML SLO (Single Log Out)
+      so all SP sessions are terminated when the IdP session ends.
+    tools:
+      - keycloak
+      - okta
+      - dex
+      - shibboleth
+      - vault
+
+  devsecops:
+    prose: >-
+      Include protocol compliance tests in CI/CD: validate that the
+      authorization code flow correctly requires PKCE, that the code
+      challenge is verified before the code is exchanged, and that the
+      state parameter prevents CSRF. Test the SAML flow with an invalid
+      signature and validate rejection. Test for SAML Signature Wrapping
+      attacks by manipulating the assertion XML structure and confirming
+      the SP correctly validates the signature over the entire assertion.
+      Validate OIDC back-channel logout propagation: trigger an IdP logout
+      and verify that all associated RP sessions are invalidated within the
+      defined time window. Include library version pinning for OIDC and SAML
+      client libraries in dependency management.
+    tools:
+      - gitlab-ci
+      - playwright
+      - burp-suite
+      - semgrep
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor OIDC and SAML federation events for attack indicators:
+      unsolicited SAML responses (InResponseTo mismatch), SAML assertion
+      replay (duplicate AssertionID), OIDC state parameter mismatch (CSRF
+      indicator), and OIDC PKCE bypass attempts. Alert on federation
+      metadata changes (IdP public key rotation, endpoint URL changes) and
+      require change management review before propagating updates to RPs.
+      Implement SAML and OIDC assertion logging with structured fields for
+      SIEM correlation. Monitor for federation protocol downgrade attempts
+      (forcing an OIDC flow to use the Implicit flow). Conduct quarterly
+      protocol security reviews against current OIDC security BCP guidance
+      (RFC 9700).
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - azure-sentinel

@@ -1,0 +1,173 @@
+id: art-9
+family: cap-3
+title: "Plano de Ação e Resposta a Incidentes"
+class: CNSP-381
+baselines: [all]
+statement:
+  prose: |
+    Art. 9. As supervisionadas devem estabelecer plano de ação e de resposta a
+    incidentes que contemple:
+
+    I - as ações a serem desenvolvidas pela supervisionada para adequar suas
+    estruturas organizacional e operacional aos princípios e às diretrizes da
+    política de segurança cibernética;
+
+    II - as rotinas, os procedimentos, os controles e as tecnologias a serem
+    utilizados na prevenção e na resposta a incidentes, em conformidade com
+    as diretrizes da política de segurança cibernética;
+
+    III - a designação da área responsável pelo registro e controle dos efeitos
+    de incidentes relevantes para as atividades da supervisionada.
+guidance:
+  prose: |
+    O art. 9 detalha o plano de ação e de resposta a incidentes, que é o
+    instrumento operacional para implementar a política de segurança cibernética.
+
+    **Distinção entre plano de ação e plano de resposta:**
+    O artigo combina dois objetivos em um único plano:
+    1. Plano de ação: roadmap de adequação da entidade à CNSP 381 (inciso I)
+    2. Plano de resposta: procedimentos para prevenir e responder a incidentes (inciso II)
+
+    **Inciso I — Adequação organizacional e operacional:**
+    O plano deve conter ações concretas para adaptar a entidade:
+    - Estrutura organizacional: criação/reestruturação de áreas de segurança,
+      contratação de pessoal especializado, definição de papéis
+    - Estrutura operacional: implementação de controles técnicos, aquisição
+      de ferramentas, mudanças em processos
+
+    Cada ação deve ter: responsável, prazo, recursos necessários, indicador de
+    conclusão.
+
+    **Inciso II — Rotinas, procedimentos, controles e tecnologias:**
+    Quatro camadas de operação:
+    - Rotinas: atividades periódicas (monitoramento diário, revisão semanal de logs)
+    - Procedimentos: passos documentados para cada situação (playbooks)
+    - Controles: mecanismos de prevenção e detecção (firewall, IDS, SIEM)
+    - Tecnologias: ferramentas e plataformas utilizadas (SOAR, EDR, sandbox)
+
+    **Inciso III — Área responsável:**
+    A SUSEP exige designação formal de uma área (não apenas pessoa individual)
+    responsável por:
+    - Registro de incidentes: documentação formal de cada incidente
+    - Controle dos efeitos: monitoramento das consequências e ações de contenção
+
+    Na prática, essa área é tipicamente o SOC (Security Operations Center) ou
+    CSIRT (Computer Security Incident Response Team). Pode ser interno ou
+    contratado, desde que formalmente designado.
+
+    **Relação com outros artigos:**
+    - Art. 3-4: o plano operacionaliza a política
+    - Art. 10: define a comunicação à SUSEP (decorrente da resposta)
+    - Art. 11: define o relatório anual sobre o plano
+    - Art. 17: o conselho/diretoria aprova e supervisiona o plano
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de detecção e resposta:**
+      1. SIEM (Security Information and Event Management):
+         - Coleta centralizada de logs de todos os sistemas críticos
+         - Regras de correlação para detecção de incidentes
+         - Dashboards de monitoramento em tempo real
+         - Retenção de logs por mínimo 5 anos
+      2. SOAR (Security Orchestration, Automation and Response):
+         - Playbooks automatizados para incidentes comuns
+         - Integração com SIEM, EDR, firewall, WAF
+         - Métricas automáticas (MTTD, MTTR)
+      3. EDR (Endpoint Detection and Response):
+         - Monitoramento contínuo de endpoints
+         - Resposta automatizada (isolamento, quarentena)
+         - Coleta forense automatizada
+      4. NDR (Network Detection and Response):
+         - Monitoramento de tráfego de rede
+         - Detecção de movimentação lateral
+         - Análise de tráfego criptografado (TLS inspection)
+
+      **Infraestrutura de backup e recuperação:**
+      5. Backup automatizado com testes periódicos de restauração.
+      6. Plano de disaster recovery com RTO/RPO definidos por sistema.
+      7. Ambientes de failover para sistemas críticos.
+    tools:
+      - siem
+      - soar
+      - edr
+      - ndr
+      - backup-automation
+      - disaster-recovery
+  devsecops:
+    prose: |
+      **Prevenção no pipeline (inciso II — rotinas e controles):**
+      1. Pipeline de segurança com etapas obrigatórias:
+         - SAST: análise estática de código em cada merge request
+         - DAST: testes dinâmicos em ambientes de staging
+         - Dependency scanning: verificação de vulnerabilidades em dependências
+         - Container scanning: verificação de imagens Docker
+         - Secret detection: prevenção de vazamento de credenciais
+      2. Quality gates de segurança:
+         - Zero vulnerabilidades críticas não resolvidas para deploy em produção
+         - Aprovação obrigatória de security champion para sistemas sensíveis
+
+      **Resposta a incidentes no pipeline:**
+      3. Runbooks codificados para resposta em aplicações:
+         - Rollback automatizado de deploys com vulnerabilidades
+         - Feature flags para desabilitar funcionalidades comprometidas
+         - Circuit breakers para isolar serviços afetados
+      4. Integração com sistema de incidentes:
+         - Alertas automáticos ao SOC quando anomalia detectada
+         - Geração de ticket de incidente para vulnerabilidades críticas
+         - Logs de deploy retidos para investigação forense
+    tools:
+      - gitlab-ci
+      - sast-scanner
+      - dast-scanner
+      - dependency-scanning
+      - container-scanning
+      - secret-detection
+      - feature-flags
+  secops:
+    prose: |
+      **Gestão do plano de ação (inciso I):**
+      1. Roadmap de adequação à CNSP 381:
+         - Inventário de gaps versus requisitos da resolução
+         - Priorização por criticidade e esforço
+         - Cronograma com marcos e responsáveis
+         - Status tracking com relatórios periódicos ao diretor responsável
+      2. Revisão trimestral do progresso do plano de ação.
+
+      **Gestão de incidentes (incisos II e III):**
+      3. Playbooks detalhados por tipo de incidente:
+         - Ransomware: isolamento, preservação, comunicação, recuperação
+         - Vazamento de dados: contenção, avaliação LGPD, notificação SUSEP
+         - DDoS: mitigação, failover, comunicação
+         - Comprometimento de credenciais: revogação, reset, investigação
+         - Fraude digital: coleta de evidências, comunicação ao jurídico
+      4. Processo formal de registro de incidentes:
+         - Classificação: severidade, tipo, sistemas afetados
+         - Timeline: detecção, triagem, contenção, erradicação, recuperação
+         - Impacto: dados afetados, clientes impactados, valor financeiro
+         - Causa raiz: análise formal com metodologia (5 Whys, Fishbone)
+         - Ações corretivas: melhorias implementadas
+
+      **Área responsável (inciso III):**
+      5. Designação formal do SOC/CSIRT como área responsável.
+      6. Definição de papéis: coordenador de incidentes, analistas, comunicação.
+      7. Escala de plantão 24/7 ou definição de cobertura mínima.
+      8. Processo de escalação por severidade.
+    tools:
+      - incident-management
+      - soar
+      - siem
+      - grc-platform
+      - project-management
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-6", "art-7"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-46", "art-48", "art-50"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26", "A.5.27", "A.5.28", "A.5.29", "A.5.30"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-2", "IR-3", "IR-4", "IR-5", "IR-6", "IR-7", "IR-8", "CP-1", "CP-2"]
+    relationship: supports

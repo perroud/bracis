@@ -1,0 +1,112 @@
+id: pip-2
+family: principles
+title: "Principle 2 — Identifying Purposes"
+class: PIPEDA
+statement:
+  prose: >-
+    The purposes for which personal information is collected shall be identified by the organization
+    at or before the time the information is collected.
+  parts:
+    - id: pip-2.4.2.1
+      label: "4.2.1"
+      prose: >-
+        The organization shall document the purposes for which personal information is collected
+        in order to comply with the Openness principle (Clause 4.8) and the Individual Access
+        principle (Clause 4.9).
+    - id: pip-2.4.2.2
+      label: "4.2.2"
+      prose: >-
+        The identified purposes should be specified at or before the time of collection to the
+        individual from whom the personal information is collected. Depending upon the way in
+        which the information is collected, this can be done orally or in writing.
+    - id: pip-2.4.2.3
+      label: "4.2.3"
+      prose: >-
+        When personal information that has been collected is to be used for a purpose not
+        previously identified, the new purpose shall be identified prior to use. Unless the
+        new purpose is required by law, the consent of the individual is required before
+        information can be used for that purpose.
+    - id: pip-2.4.2.4
+      label: "4.2.4"
+      prose: >-
+        Persons collecting personal information should be able to explain to individuals the
+        purposes for which the information is being collected.
+    - id: pip-2.4.2.5
+      label: "4.2.5"
+      prose: >-
+        The purposes for which personal information is collected should be specified to be no
+        broader than reasonably required to carry out the identified objectives.
+guidance:
+  prose: >-
+    This principle requires purpose specification before or at the point of collection — not after
+    the fact. The OPC has found violations where organizations collected data first and determined
+    purposes later. Key requirements: (1) purposes must be documented, not just understood
+    informally; (2) purposes must be communicated to the individual at collection time; (3) any
+    new use requires fresh consent unless legally mandated; (4) front-line staff must be able to
+    articulate why they are collecting each piece of information; (5) purposes must be specific
+    and narrowly scoped — "business purposes" or "to improve our services" is too vague. In
+    digital contexts, this translates to: every data collection form, API endpoint, and SDK must
+    declare its purposes clearly and link to the privacy policy section describing those purposes.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      PURPOSE TAGGING: Implement a purpose taxonomy as a platform service. Every data collection
+      endpoint must declare its processing purposes using standardized metadata labels (e.g.,
+      Kubernetes annotations, API gateway metadata). PURPOSE REGISTRY: Build a centralized purpose
+      registry that maps data collection points to documented purposes. All services must register
+      their data collection activities before deployment. PURPOSE ENFORCEMENT: Deploy policy engines
+      that reject data collection requests without valid purpose declarations. Implement purpose-bound
+      access controls — services can only access data for their declared purposes. NEW PURPOSE
+      DETECTION: Build automated change detection that flags when a service begins accessing data
+      categories or using data in ways not covered by its declared purposes. PURPOSE DOCUMENTATION:
+      Auto-generate purpose documentation from service metadata for inclusion in privacy policies.
+    tools:
+      - "Kubernetes labels and annotations for purpose declaration"
+      - "Open Policy Agent (OPA) for purpose-bound access enforcement"
+      - "Service mesh (Istio/Linkerd) for purpose-tagged data flow tracking"
+      - "Centralized purpose registry with API-driven registration"
+      - "Automated purpose drift detection"
+  devsecops:
+    prose: >-
+      PURPOSE DECLARATION: CI/CD pipeline gates must verify that every new API endpoint collecting
+      personal information has a declared purpose in the purpose registry. Merge requests introducing
+      new data collection must include purpose documentation. PURPOSE VALIDATION: Automated linting
+      rules must detect data collection code without purpose annotations. Code review checklists
+      must include purpose identification verification. NEW PURPOSE REVIEW: Pipelines must flag
+      when existing data is accessed for purposes not in the original declaration. Require privacy
+      team review for purpose changes. DOCUMENTATION SYNC: Automated checks to ensure privacy
+      policy documentation matches actual data collection purposes in code.
+    tools:
+      - "Custom CI/CD checks for purpose declaration validation"
+      - "Semgrep rules for data collection without purpose annotation"
+      - "Merge request templates with mandatory purpose fields"
+      - "Privacy policy sync verification tools"
+      - "Purpose drift detection in code review automation"
+  secops:
+    prose: >-
+      PURPOSE MONITORING: Monitor data access patterns and alert when services access personal
+      information outside their declared purposes. Correlate data flows with purpose registry
+      to detect unauthorized purpose expansion. PURPOSE DRIFT DETECTION: Continuous monitoring
+      for new data collection activities not registered in the purpose registry. Alert on API
+      endpoints collecting personal information without purpose declarations. AUDIT SUPPORT:
+      Maintain audit trails linking every personal information collection event to its declared
+      purpose. Generate compliance reports showing purpose adherence metrics.
+    tools:
+      - "SIEM rules for purpose-violation detection"
+      - "Data flow monitoring with purpose correlation"
+      - "API gateway analytics for undeclared data collection"
+      - "Purpose compliance dashboards and reporting"
+      - "Automated purpose audit trail generation"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.b", "art-13", "art-14"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["7.2.1"]
+    relationship: supports

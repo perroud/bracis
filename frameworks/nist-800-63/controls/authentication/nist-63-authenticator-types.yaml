@@ -1,0 +1,127 @@
+id: nist-63-authenticator-types
+family: authentication
+title: "Authenticator Types — TOTP, FIDO2, PKI"
+class: SP800-63B
+
+baselines: [aal1, aal2, aal3]
+
+statement:
+  prose: >-
+    NIST SP 800-63B defines the following authenticator types and their
+    permitted use across assurance levels: (1) Memorized Secrets — permitted
+    at all levels as one factor; (2) Look-up Secrets — permitted at AAL1,
+    AAL2 as one factor; (3) Out-of-Band Authenticators — push notifications
+    permitted at AAL2, PSTN/SMS restricted; (4) Single-Factor OTP Devices —
+    hardware or software TOTP, permitted at AAL1, and as one factor at AAL2;
+    (5) Multi-Factor OTP Devices — hardware TOTP with PIN/biometric, permitted
+    at AAL2 and AAL3; (6) Single-Factor Cryptographic Software — permitted at
+    AAL1; (7) Single-Factor Cryptographic Hardware — FIDO2 keys without user
+    verification, permitted at AAL2 as one factor; (8) Multi-Factor Cryptographic
+    Software — TOTP apps with device PIN, permitted at AAL2; (9) Multi-Factor
+    Cryptographic Hardware — FIDO2 keys with user verification, PIV/CAC cards,
+    permitted at AAL2 and AAL3. Verifier impersonation resistance is only
+    provided by authenticator types 7-9 (cryptographic hardware/software).
+
+guidance:
+  prose: >-
+    Organizations must select authenticators that match the required AAL and
+    provide the best security properties available. The hierarchy of preferred
+    authenticators from strongest to weakest is: Multi-Factor Cryptographic
+    Hardware (FIDO2 with user verification, PIV) > Multi-Factor Cryptographic
+    Software > Multi-Factor OTP Hardware > Single-Factor Cryptographic Hardware
+    > Multi-Factor OTP Software (TOTP apps) > Out-of-Band Push > Look-up Secrets
+    > Memorized Secrets. Organizations should phase out SMS OTP (PSTN out-of-band)
+    completely due to SIM swapping attacks and SS7 protocol vulnerabilities.
+    TOTP (time-based one-time passwords per RFC 6238) is widely deployed but
+    is vulnerable to phishing (codes can be intercepted in real time). FIDO2/WebAuthn
+    and PKCS#11 (PIV/CAC) provide phishing resistance through origin binding.
+    Organizations deploying FIDO2 must decide between discoverable credentials
+    (passkeys, stored on the device) and non-discoverable credentials (traditional
+    security keys requiring a username first).
+
+references:
+  - citation: "NIST SP 800-63B Section 5 — Authenticator and Verifier Requirements"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "FIDO Alliance — FIDO2/WebAuthn Specification"
+    url: "https://fidoalliance.org/fido2/"
+  - citation: "RFC 6238 — TOTP: Time-Based One-Time Password Algorithm"
+    url: "https://datatracker.ietf.org/doc/html/rfc6238"
+  - citation: "FIPS 201-3 — Personal Identity Verification"
+    url: "https://doi.org/10.6028/NIST.FIPS.201-3"
+
+related_controls:
+  - id: nist-63-aal1
+    relationship: supports
+    description: "Authenticator types permitted at AAL1 are defined in this control."
+  - id: nist-63-aal2
+    relationship: supports
+    description: "Authenticator types permitted at AAL2 are defined in this control."
+  - id: nist-63-aal3
+    relationship: supports
+    description: "Only multi-factor cryptographic hardware authenticators are permitted at AAL3."
+  - id: nist-63-memorized-secrets
+    relationship: complements
+    description: "Memorized secrets are the most common single-factor authenticator type."
+  - id: nist-63-verifier-requirements
+    relationship: implements
+    description: "Authenticator type selection determines whether verifier impersonation resistance is achieved."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a graduated authenticator enrollment system in the platform IdP:
+      allow users to register FIDO2 keys as the primary authenticator, TOTP apps
+      as a fallback, and recovery codes as a last resort. Block SMS OTP by
+      removing it from the list of permitted out-of-band authenticators in the
+      IdP configuration. For FIDO2/WebAuthn deployment, configure the relying
+      party with a strict rpId bound to the exact origin domain (no wildcard
+      subdomain matching) to maintain phishing resistance. For PIV/CAC environments,
+      deploy a certificate validation service that checks the PIV certificate
+      against the Federal PKI bridge CA and the PIV Interoperability (PIV-I)
+      trust chain. Implement authenticator lifecycle management: track key
+      registration dates, enforce rotation policies for TOTP secrets, and
+      provide a self-service authenticator management portal where users can
+      register multiple authenticators for redundancy.
+    tools:
+      - keycloak
+      - okta
+      - yubico-yubikey
+      - dex
+      - vault
+      - backstage
+
+  devsecops:
+    prose: >-
+      Include authenticator type validation in security tests: assert that
+      the authentication flow rejects weak authenticator types for endpoints
+      that require AAL2 or AAL3. Test that FIDO2 attestation verification
+      correctly rejects non-approved hardware (authenticators not on the
+      AAGUID allowlist). Validate TOTP implementation against RFC 6238:
+      correct window, 30-second intervals, 6-digit codes, and handling of
+      clock drift. Build pipeline integration tests that simulate both
+      successful and failed authentication for each authenticator type,
+      verifying error messages do not leak credential information.
+    tools:
+      - gitlab-ci
+      - playwright
+      - open-policy-agent
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor authenticator usage across the user population and generate
+      weekly reports showing the distribution of authenticator types: what
+      percentage of users authenticate with FIDO2 vs TOTP vs password-only.
+      Set organizational targets for phishing-resistant authenticator adoption
+      and track progress. Alert on first-time FIDO2 key registrations from
+      unusual locations, which may indicate account takeover followed by
+      authenticator replacement. Monitor for authenticator type downgrade
+      events in the IdP — if a user's FIDO2 key is suddenly replaced with
+      TOTP or a memorized secret, this should trigger a security review.
+      Implement automatic account lockout after repeated authenticator
+      verification failures.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - microsoft-entra-id

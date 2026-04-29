@@ -1,0 +1,99 @@
+id: sc-2
+family: sc
+title: "Changing Default Passwords and Secure Authentication Configuration"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Default passwords for all user and administrative accounts must be changed before
+    deployment or upon first use. Where devices or software are supplied with default
+    passwords, these must be changed to unique, strong passwords before the device is
+    connected to the network. Passwords must have a minimum length of eight characters,
+    with no maximum length artificially imposed. Where multi-factor authentication is
+    available, it should be enabled, particularly for administrator accounts, cloud
+    services, and internet-facing services. Accounts must be protected against brute-force
+    attacks through account lockout or throttling mechanisms.
+
+guidance:
+  prose: >-
+    Default credentials are one of the most commonly exploited vulnerabilities. Attackers
+    routinely scan for devices and services using factory-default usernames and passwords.
+    The Cyber Essentials scheme requires that all default credentials are changed before
+    systems go into production. Password policies must balance security with usability —
+    long passwords (passphrases) are preferred over complex short passwords. Brute-force
+    protection (account lockout after a reasonable number of failed attempts, or rate
+    limiting) is mandatory for all authentication endpoints. Multi-factor authentication
+    adds critical defence-in-depth, especially for privileged and internet-facing access.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Secure Configuration"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Password Guidance"
+    url: "https://www.ncsc.gov.uk/collection/passwords"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate secrets management tools (HashiCorp Vault, AWS Secrets Manager, Azure Key
+      Vault) into provisioning workflows to generate unique credentials at deployment time.
+      Use Infrastructure-as-Code to enforce that no resource is deployed with default
+      credentials. Implement automated credential rotation for service accounts and machine
+      identities. Configure identity providers (Azure AD, Okta, Google Workspace) with MFA
+      enforcement for all user accounts. Deploy conditional access policies that require
+      MFA for administrative actions and access from untrusted locations.
+    tools:
+      - hashicorp-vault
+      - aws-secrets-manager
+      - azure-key-vault
+      - okta
+      - azure-ad
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement secret scanning in CI/CD pipelines to detect default or hardcoded
+      credentials in source code, configuration files, and container images. Use
+      pre-commit hooks to prevent secrets from entering version control. Configure
+      pipeline checks that fail if infrastructure definitions reference default
+      credentials or weak password policies. Scan Docker images for common default
+      credentials using container security tools. Enforce password policy compliance
+      through automated testing of authentication endpoints.
+    tools:
+      - gitlab-secret-detection
+      - trufflehog
+      - gitleaks
+      - trivy
+      - gitlab-ci
+      - checkov
+
+  secops:
+    prose: >-
+      Conduct periodic credential audits to identify accounts still using default
+      passwords. Use vulnerability scanning tools that check for default credentials
+      on network devices, printers, IoT devices, and management interfaces. Monitor
+      authentication logs for brute-force attempts and ensure lockout/throttling is
+      functioning. Review MFA enrollment metrics and follow up on accounts that have
+      not completed MFA setup. Generate compliance dashboards showing MFA adoption
+      rates and accounts with weak authentication configurations.
+    tools:
+      - qualys
+      - tenable-nessus
+      - splunk
+      - elastic-siem
+      - crowdstrike-falcon
+      - microsoft-entra-id
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "IA-2", "AC-7"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-mfa"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS 4.7", "CIS 5.2", "CIS 6.3", "CIS 6.5"]
+    relationship: mapped

@@ -1,0 +1,100 @@
+id: art-2
+family: cap-1
+title: "Definicoes -- GED e Digitalizacao de Documentos"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 2. Estabelecer a utilização de sistemas de Gerenciamento
+    Eletrônico de Documentos (GED) para o armazenamento, organização
+    e recuperação de documentos médicos digitalizados.
+
+    Parágrafo 1. O GED deve garantir a integridade, a autenticidade
+    e a acessibilidade dos documentos digitalizados ao longo de todo
+    o período de guarda exigido por lei.
+
+    Parágrafo 2. A digitalização de documentos deve preservar a
+    legibilidade e a fidedignidade do documento original, utilizando
+    resolução mínima e padrões técnicos adequados.
+guidance:
+  prose: |
+    O art. 2 trata do GED como componente complementar ao PEP. O GED
+    nao substitui o PEP, mas e o sistema responsavel por armazenar
+    documentos que originalmente existiam em papel e foram digitalizados.
+
+    **Distincao PEP vs. GED:**
+    - PEP: dados nativamente eletronicos (prescricoes, evolucoes,
+      resultados de exames gerados em sistemas)
+    - GED: documentos originalmente em papel que foram digitalizados
+      (termos de consentimento assinados, exames antigos, prontuarios
+      historicos)
+
+    **Requisitos de digitalizacao:**
+    A digitalizacao deve seguir padroes que garantam legibilidade a
+    longo prazo. Recomenda-se resolucao minima de 300 DPI para
+    documentos textuais e 600 DPI para imagens diagnosticas.
+
+    **Integridade ao longo do tempo:**
+    O GED deve garantir que documentos digitalizados permanecam
+    integros por no minimo 20 anos, exigindo estrategia de migracao
+    de formatos e midias.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de GED para documentos de saude:**
+      1. Implementar sistema GED com armazenamento imutavel
+         (object storage com WORM ou S3 Object Lock) para garantir
+         que documentos digitalizados nao possam ser alterados.
+      2. Adotar formatos abertos de longa duracao (PDF/A-3 para
+         documentos textuais, DICOM para imagens medicas) evitando
+         dependencia de formatos proprietarios.
+      3. Implementar indexacao automatica de documentos digitalizados
+         com metadados padronizados (paciente, tipo de documento,
+         data, profissional responsavel).
+      4. Integrar GED ao PEP via API, permitindo acesso unificado
+         aos documentos digitalizados a partir do prontuario.
+    tools:
+      - object-storage-worm
+      - pdf-a-converter
+      - dicom-server
+      - metadata-indexer
+  devsecops:
+    prose: |
+      **Pipeline de validacao de documentos digitalizados:**
+      1. Implementar validacao automatica de qualidade da
+         digitalizacao (resolucao, legibilidade, formato correto).
+      2. Criar verificacao automatica de integridade de documentos
+         armazenados (checksum SHA-256) em pipeline periodico.
+      3. Validar conformidade de metadados obrigatorios antes
+         de aceitar documento no GED.
+      4. Implementar testes de recuperacao de documentos
+         digitalizados para validar acessibilidade ao longo do tempo.
+    tools:
+      - gitlab-ci
+      - image-quality-check
+      - checksum-validation
+      - metadata-validator
+  secops:
+    prose: |
+      **Governanca de digitalizacao:**
+      1. Definir procedimento operacional padrao (POP) para
+         digitalizacao de documentos medicos, incluindo resolucao
+         minima, formato, nomenclatura e responsavel.
+      2. Criar processo de conferencia de qualidade pos-digitalizacao
+         por amostragem antes de autorizar eliminacao do papel.
+      3. Manter registro de cadeia de custodia dos documentos
+         digitalizados (quem digitalizou, quando, equipamento usado).
+      4. Auditar periodicamente a integridade dos documentos
+         armazenados no GED versus checksums originais.
+    tools:
+      - grc-platform
+      - document-management
+      - chain-of-custody
+      - audit-scheduler
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312"]
+    relationship: mapped

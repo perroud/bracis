@@ -1,0 +1,127 @@
+id: art-5
+family: cap-1
+title: "Definições Técnicas e Conceitos para Interpretação da Lei"
+class: marco-civil
+statement:
+  prose: |
+    Art. 5º Para os efeitos desta Lei, considera-se:
+
+    I - internet: o sistema constituído do conjunto de protocolos lógicos, estruturado
+    em escala mundial para uso público e irrestrito, com a finalidade de possibilitar
+    a comunicação de dados entre terminais por meio de diferentes redes;
+
+    II - terminal: o computador ou qualquer dispositivo que se conecte à internet;
+
+    III - endereço de protocolo de internet (endereço IP): o código atribuído a um
+    terminal de uma rede para permitir sua identificação, definido segundo parâmetros
+    internacionais;
+
+    IV - administrador de sistema autônomo: a pessoa física ou jurídica que administra
+    blocos de endereço IP específicos e o respectivo sistema autônomo de roteamento,
+    devidamente cadastrada no ente nacional responsável pelo registro e distribuição de
+    endereços IP geograficamente referentes ao País;
+
+    V - conexão à internet: a habilitação de um terminal para envio e recebimento de
+    pacotes de dados pela internet, mediante a atribuição ou autenticação de um
+    endereço IP;
+
+    VI - registro de conexão: o conjunto de informações referentes à data e hora de
+    início e término de uma conexão à internet, sua duração e o endereço IP utilizado
+    pelo terminal para o envio e recebimento de pacotes de dados;
+
+    VII - aplicações de internet: o conjunto de funcionalidades que podem ser acessadas
+    por meio de um terminal conectado à internet; e
+
+    VIII - registros de acesso a aplicações de internet: o conjunto de informações
+    referentes à data e hora de uso de uma determinada aplicação de internet a partir
+    de um determinado endereço IP.
+guidance:
+  prose: |
+    O art. 5º é o glossário normativo do Marco Civil. Essas definições são vinculantes
+    para toda a interpretação da lei e devem ser observadas em contratos, políticas
+    internas e documentação técnica.
+
+    **Inciso I — Internet:**
+    Definição funcional baseada em protocolos (TCP/IP). Abrange apenas redes públicas
+    e irrestritas. Redes privadas (intranets) não estão abrangidas pelo Marco Civil.
+
+    **Inciso III — Endereço IP:**
+    Elemento central para rastreabilidade. Os art. 13 e 15 impõem obrigações de
+    guarda baseadas neste conceito. Abrange IPv4 e IPv6. A atribuição de IPs no
+    Brasil é feita pelo NIC.br.
+
+    **Inciso VI — Registro de conexão:**
+    Definição estrita: data/hora de início, término, duração e IP. NÃO inclui
+    conteúdo das comunicações, URLs acessadas ou dados de aplicação. Prazo de
+    guarda: 1 ano (art. 13).
+
+    **Inciso VIII — Registros de acesso a aplicações:**
+    Definição estrita: data/hora de uso + IP de origem. NÃO inclui conteúdo.
+    Prazo de guarda: 6 meses (art. 15).
+
+    A distinção entre incisos VI e VIII é fundamental: provedores de conexão
+    guardam registros de conexão (art. 13); provedores de aplicação guardam
+    registros de acesso a aplicações (art. 15).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificação de dados conforme definições legais:**
+      1. Mapear quais sistemas geram registros de conexão (inciso VI) vs
+         registros de acesso a aplicações (inciso VIII).
+      2. Garantir que registros de conexão contenham exatamente: data/hora
+         de início, término, duração e endereço IP.
+      3. Garantir que registros de acesso a aplicações contenham exatamente:
+         data/hora de uso e endereço IP de origem.
+      4. Separar logicamente registros de conexão de registros de acesso a
+         aplicações em sistemas de armazenamento distintos.
+
+      **Endereçamento IP (inciso III):**
+      5. Suporte completo a IPv4 e IPv6 em toda a infraestrutura.
+      6. Registro preciso de endereços IP atribuídos com timestamp NTP.
+      7. Gestão de blocos de endereços junto ao NIC.br para ASNs brasileiros.
+
+      **Definição de terminal (inciso II):**
+      8. Inventário de dispositivos que acessam a plataforma (user-agent,
+         device fingerprint) para fins de segurança, não de rastreamento.
+    tools:
+      - centralized-logging
+      - ntp-sync
+      - ipam
+      - asset-inventory
+      - log-classification
+  devsecops:
+    prose: |
+      **Conformidade com definições:**
+      1. Validação automatizada de que logs contêm os campos obrigatórios
+         definidos nos incisos VI e VIII.
+      2. Testes de que registros de conexão não contêm dados de aplicação
+         (separação de responsabilidades entre art. 13 e art. 15).
+      3. Verificação de sincronização NTP em todos os servidores de log.
+
+      **Endereçamento IP:**
+      4. Testes de compatibilidade IPv6 em toda a stack.
+      5. Validação de formato de endereços IP em logs.
+    tools:
+      - log-schema-validator
+      - ntp-compliance-check
+      - ipv6-compatibility-tests
+      - log-field-auditor
+  secops:
+    prose: |
+      **Monitoramento de conformidade:**
+      1. Alertas para logs que não contenham campos obrigatórios (IP,
+         data/hora).
+      2. Auditoria periódica de separação entre registros de conexão
+         e registros de acesso a aplicações.
+      3. Verificação de sincronização de relógios (NTP drift).
+
+      **Rastreabilidade:**
+      4. Capacidade de correlacionar registros de conexão com registros
+         de acesso para atender ordens judiciais.
+      5. Processo documentado para identificação de terminal a partir
+         de endereço IP e timestamp.
+    tools:
+      - siem
+      - ntp-monitoring
+      - log-audit
+      - forensic-correlation

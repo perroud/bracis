@@ -1,0 +1,123 @@
+id: stig-cat2-network
+family: cat-ii
+title: "Network Segmentation and Boundary Protection"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must implement network segmentation that separates different
+    security domains (e.g., public-facing, internal application tier, database
+    tier, management network) and restricts traffic flow between segments to
+    only what is explicitly required for system operation. Firewalls, access
+    control lists (ACLs), and host-based firewalls must be configured to deny
+    traffic by default and permit only documented, approved flows. The system
+    must implement a DMZ architecture for any services exposed to the internet.
+    Unnecessary ports and protocols must be disabled at both network and host
+    levels. Wireless networks, if present, must be logically separated from
+    wired networks hosting DoD systems. Remote administration must be performed
+    exclusively through encrypted, authenticated channels (SSH, TLS-protected
+    administrative interfaces) from approved jump servers or bastion hosts.
+
+guidance:
+  prose: >-
+    Network segmentation limits lateral movement opportunities for attackers who
+    have gained initial access to one component of the system. Without segmentation,
+    a compromised web application can directly reach the database, directory
+    services, and management interfaces — dramatically increasing the attacker's
+    ability to escalate access and exfiltrate data.
+
+    STIG reviewers validate network segmentation through network diagrams,
+    firewall rule reviews, and empirical testing (attempting connections between
+    segments that should be blocked). Many systems document segmentation in their
+    architecture diagrams but fail to enforce it technically — a segmentation
+    violation discovered through testing is typically a CAT II or CAT I finding
+    depending on what sensitive resources are accessible.
+
+    In cloud and containerized environments, network segmentation is implemented
+    through security groups, VPC/VNET configurations, Kubernetes Network Policies,
+    and service mesh policies. These must be validated with the same rigor as
+    traditional firewall rules.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, SC-7, AC-4, CA-3"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA Network Infrastructure SRG, V8R12"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "DoD Zero Trust Reference Architecture v2.0"
+    url: "https://dodcio.defense.gov/Portals/0/Documents/Library/(U)ZT_RA_v2.0(U)_Sep22.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement zero-trust network architecture using a service mesh (Istio or
+      Linkerd) for east-west traffic control between workloads, with mTLS
+      enforced for all service communication. Deploy Kubernetes Network Policies
+      (or Cilium NetworkPolicies for L7 control) that default to deny-all within
+      namespaces and explicitly permit only documented inter-service flows.
+      Use cloud provider security groups and VPC/VNET subnet isolation to
+      separate external-facing, application, and data tiers. Implement dedicated
+      management network segments for administrative access to cluster nodes
+      and cloud management APIs. Operate a bastion host or privileged access
+      workstation (PAW) architecture for all administrative sessions. Monitor
+      network flow logs (VPC Flow Logs, Kubernetes network audit logs) for
+      policy violations.
+    tools:
+      - istio
+      - cilium
+      - linkerd
+      - calico
+      - terraform
+      - aws-security-groups
+      - azure-nsg
+
+  devsecops:
+    prose: >-
+      Validate Kubernetes Network Policies and Istio AuthorizationPolicies
+      in CI/CD pipelines using policy testing frameworks (kube-netpol-test,
+      Conftest). Scan Terraform and CloudFormation templates for overly permissive
+      security group rules (0.0.0.0/0 ingress, unnecessary port exposure).
+      Enforce that all new services declare explicit Network Policies as a
+      deployment prerequisite — reject services deployed without a deny-all
+      default policy. Generate network topology documentation as pipeline
+      artifacts by parsing deployed Network Policies and service mesh
+      configurations. Include network segmentation regression tests in the
+      integration test suite.
+    tools:
+      - conftest
+      - checkov
+      - kube-bench
+      - tfsec
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor network flow data in the SIEM for communication patterns that
+      violate documented segmentation (e.g., database tier initiating connections
+      to external IPs, management network receiving connections from application
+      tier). Conduct quarterly firewall rule reviews to remove stale rules and
+      verify that all permitted flows remain authorized. Include network
+      segmentation validation in penetration testing scopes. Maintain network
+      architecture diagrams as living documents updated with each system change
+      and include them in the ATO package and system security plan.
+    tools:
+      - splunk
+      - zeek
+      - darktrace
+      - firemon
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-7(3)", "AC-4", "CA-3"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["SC.L2-3.13.1", "SC.L2-3.13.2", "SC.L2-3.13.5"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["sc-7", "ac-4"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.IR-01", "PR.IR-02", "DE.CM-01"]
+    relationship: supports

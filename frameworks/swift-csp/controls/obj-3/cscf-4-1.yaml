@@ -1,0 +1,108 @@
+id: cscf-4.1
+family: obj-3
+title: "Password Policy"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Enforce password policies that meet or exceed industry best practices
+    for all accounts accessing SWIFT-related systems and applications.
+    Passwords must be sufficiently complex, regularly rotated for
+    privileged accounts, and protected against common attack vectors
+    including brute force, credential stuffing, and dictionary attacks.
+  parts:
+    - id: cscf-4.1.a
+      label: "4.1.a"
+      prose: >-
+        Password policies enforce minimum length of 12 characters with
+        complexity requirements (uppercase, lowercase, numbers, special
+        characters) for all SWIFT-related accounts.
+    - id: cscf-4.1.b
+      label: "4.1.b"
+      prose: >-
+        Account lockout policies are configured to lock accounts after
+        a maximum of 5 failed authentication attempts, with lockout
+        duration of at least 30 minutes or until administrative unlock.
+    - id: cscf-4.1.c
+      label: "4.1.c"
+      prose: >-
+        Service accounts and privileged accounts use unique, complex
+        passwords that are stored in a secrets management solution and
+        rotated at least every 90 days.
+
+guidance:
+  prose: >-
+    Weak passwords remain a primary vector for unauthorized access to
+    financial systems. SWIFT-related accounts are high-value targets;
+    credential compromise could enable unauthorized transaction submission.
+    Organizations should implement password managers for operator accounts
+    and secrets management for service accounts. Passwords should be
+    checked against known breached password databases (e.g., HIBP) at
+    creation and rotation. Where possible, passwordless authentication
+    (FIDO2, certificate-based) should replace passwords entirely, with
+    MFA as an additional layer (see Control 4.2).
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 4.1"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-63B — Digital Identity Guidelines: Authentication and Lifecycle Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity management (Active Directory, LDAP,
+      Okta, Azure AD) for all SWIFT-related accounts. Deploy a secrets
+      management solution (HashiCorp Vault, CyberArk, AWS Secrets Manager)
+      for service account credentials with automated rotation. Configure
+      password policies via Group Policy or identity provider settings.
+      Integrate Have I Been Pwned API or equivalent to reject compromised
+      passwords at creation time. Implement FIDO2/WebAuthn for operator
+      authentication where application support exists.
+    tools:
+      - hashicorp-vault
+      - cyberark
+      - aws-secrets-manager
+      - azure-key-vault
+      - active-directory
+      - okta
+      - fido2
+
+  devsecops:
+    prose: >-
+      Scan infrastructure-as-code for hardcoded credentials. Use secret
+      detection tools (GitLeaks, TruffleHog) in CI/CD pipelines. Validate
+      password policy configurations in IaC templates. Automate service
+      account credential rotation via pipeline orchestration.
+    tools:
+      - gitleaks
+      - trufflehog
+      - checkov
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor authentication logs for brute-force attacks, credential
+      stuffing patterns, and account lockout events. Alert on password
+      changes for privileged accounts outside approved change windows.
+      Conduct quarterly password audits to identify weak or non-compliant
+      passwords. Track service account password rotation compliance.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - crowdstrike-falcon
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "IA-5(1)", "AC-7"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-8.3"]
+    relationship: complements

@@ -1,0 +1,136 @@
+id: coppa-third-party
+family: obligations
+title: "Third-Party Operator Obligations"
+class: COPPA
+
+statement:
+  prose: |
+    A third party that operates a plug-in, advertising network, or other technology on a
+    child-directed website or online service is subject to COPPA if it collects personal
+    information from children (16 CFR § 312.2 definition of "operator").
+
+    When an operator discloses children's personal information to third parties
+    (16 CFR § 312.8, § 312.4(b)(4)):
+
+    (1) The operator must take reasonable steps to release children's personal information
+        only to third parties who are capable of maintaining the confidentiality, security,
+        and integrity of such information, and who provide assurances that they will maintain
+        the information in such a manner.
+
+    (2) Third parties who receive children's PI are independently responsible for COPPA
+        compliance if they have actual knowledge that they are collecting or receiving PI
+        from a child-directed service.
+
+    (3) The disclosing operator must disclose in its privacy policy the types of third
+        parties to whom PI is disclosed, the general purposes, and whether the third parties
+        have agreed to maintain confidentiality.
+
+guidance:
+  prose: |
+    Third-party obligations under COPPA create a web of responsibility that operators must
+    manage carefully. Key principles:
+
+    1. **Operator liability for third parties:** The primary operator is responsible for
+       the actions of third parties operating on its service. If an ad network collects
+       children's PI on a child-directed site, the site operator is liable even if the
+       ad network acted independently.
+
+    2. **Due diligence requirement:** Before disclosing children's PI to any third party,
+       the operator must assess the third party's ability to maintain confidentiality,
+       security, and integrity. This is not a checkbox — it requires substantive evaluation.
+
+    3. **Contractual obligations:** Third-party agreements must include COPPA-specific
+       provisions: data use restrictions, security requirements, deletion obligations,
+       audit rights, and breach notification requirements.
+
+    4. **Ad tech implications:** Many standard advertising technologies (RTB, behavioral
+       targeting, cross-device tracking) are incompatible with COPPA. Child-directed
+       services must use COPPA-compliant ad configurations or contextual-only advertising.
+
+    5. **SDK responsibility:** Including a third-party SDK that collects children's PI
+       makes the operator responsible for that SDK's data practices. Operators must audit
+       SDKs and configure them for COPPA compliance.
+
+    6. **Independent operator status:** A third party may itself be an "operator" under
+       COPPA if it has actual knowledge that it is collecting children's PI. Both the
+       site operator and the third party can be held independently liable.
+
+    The FTC has brought enforcement actions against both site operators (for failing to
+    control third-party data collection) and third parties (for independently collecting
+    children's PI without consent).
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a third-party vendor registry that catalogs all third parties with
+         access to children's PI, including: data shared, purposes, contractual status,
+         security assessment date, and COPPA compliance status.
+      2. Build a third-party data sharing gateway that enforces access controls, logs all
+         PI transmissions, and blocks sharing with non-approved vendors.
+      3. Implement SDK management for child-directed services — maintain an approved SDK
+         list, configure SDKs for COPPA-compliant mode, and block unapproved SDKs at
+         build time.
+      4. Deploy Content Security Policy (CSP) headers and Subresource Integrity (SRI) on
+         child-directed pages to control third-party script loading and prevent unauthorized
+         data collection.
+      5. Implement child-directed ad configuration that restricts advertising to contextual
+         placement only — block behavioral targeting, RTB, and cross-device tracking for
+         child sessions.
+      6. Build automated vendor assessment workflows — onboarding questionnaire, security
+         review, contract review, and periodic reassessment.
+    tools:
+      - vendor-management
+      - api-gateway
+      - csp-manager
+      - ad-server
+      - sdk-management
+      - contract-management
+
+  devsecops:
+    prose: |
+      1. Scan build artifacts for unapproved third-party SDKs — fail builds that include
+         SDKs not in the approved vendor registry.
+      2. Monitor network traffic from child-directed services to identify unauthorized
+         third-party data collection endpoints.
+      3. Validate CSP headers and SRI hashes in CI/CD — verify child-directed pages block
+         unauthorized third-party scripts.
+      4. Test ad SDK configurations to verify behavioral targeting and cross-device tracking
+         are disabled for child-directed content.
+      5. Implement automated testing that verifies third-party data sharing conforms to
+         contracted purposes and data categories.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - network-analyzer
+      - csp-validator
+      - sdk-audit
+
+  secops:
+    prose: |
+      1. Monitor third-party data transmissions from child-directed services — alert on
+         unexpected data flows to unapproved endpoints.
+      2. Conduct quarterly vendor security assessments for all third parties with access
+         to children's PI.
+      3. Track third-party breach notifications — assess impact on children's PI and
+         initiate response procedures.
+      4. Audit ad network configurations on child-directed services — verify COPPA-compliant
+         settings remain in effect.
+      5. Monitor for new third-party scripts or tags appearing on child-directed pages
+         without approval.
+    tools:
+      - network-monitoring
+      - third-party-risk-management
+      - compliance-dashboard
+      - web-monitoring
+      - siem
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 28"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 39"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-140"]
+    relationship: complements

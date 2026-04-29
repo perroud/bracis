@@ -1,0 +1,99 @@
+id: art-12
+family: cap-3
+title: "Backup e Recuperacao de Dados"
+class: GSI-IN5
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 12. Os órgãos e entidades devem garantir a realização de cópias de segurança
+    (backup) dos dados armazenados em soluções de computação em nuvem, observando:
+    I - periodicidade de backup compatível com a criticidade dos dados;
+    II - armazenamento das cópias de segurança em localização geográfica distinta
+    do ambiente de produção;
+    III - criptografia das cópias de segurança;
+    IV - testes periódicos de restauração para validar a integridade e a
+    disponibilidade dos dados;
+    V - retenção das cópias de segurança conforme política do órgão ou entidade.
+
+    Parágrafo único. O órgão ou entidade deve manter cópia de segurança dos dados
+    críticos em infraestrutura própria ou em provedor distinto do provedor principal
+    de nuvem, de forma a garantir a continuidade do negócio em caso de indisponibilidade
+    do provedor.
+guidance:
+  prose: |
+    O art. 12 estabelece requisitos de backup e disaster recovery para dados em nuvem,
+    incluindo a regra critica de backup em provedor distinto.
+
+    **Cinco requisitos de backup:**
+    1. Periodicidade: diario para dados criticos, semanal para demais
+    2. Georredundancia: backup em regiao/datacenter diferente
+    3. Criptografia: backups DEVEM ser criptografados
+    4. Testes de restore: validacao periodica de que backups funcionam
+    5. Retencao: conforme politica do orgao
+
+    **Regra critica (paragrafo unico):**
+    Dados criticos DEVEM ter backup FORA do provedor principal.
+    Isso previne single point of failure caso o provedor tenha indisponibilidade
+    total (ex: AWS us-east-1 outage).
+
+    **Mapeamento CSA CCM v4:**
+    - BCR-01: Business Continuity Planning
+    - BCR-06: Backup
+    - BCR-09: Backup Testing
+
+    **Mapeamento NIST SP 800-53:**
+    - CP-9: Information System Backup
+    - CP-10: Information System Recovery and Reconstitution
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Estrategia de backup multi-provedor:**
+      1. Regra 3-2-1: tres copias, em dois tipos de midia, uma offsite.
+      2. Backup automatizado: AWS Backup, Azure Backup, GCP Backup and DR.
+      3. Cross-region replication para georredundancia dentro do provedor.
+      4. Backup cross-provider: copiar dados criticos para provedor secundario
+         (ex: AWS → Azure ou AWS → storage on-premises).
+      5. Criptografia de backups com chaves BYOK gerenciadas pelo orgao.
+      6. RTO/RPO definidos por classificacao de dados: critico (RTO 4h, RPO 1h),
+         alto (RTO 24h, RPO 4h), medio (RTO 72h, RPO 24h).
+    tools:
+      - backup-solution
+      - cross-region-replication
+      - cross-provider-sync
+      - kms
+      - disaster-recovery
+  devsecops:
+    prose: |
+      **Backup no pipeline:**
+      1. Validacao de que todos os recursos de armazenamento possuem politica
+         de backup configurada via IaC.
+      2. Testes automatizados de restore em ambiente de staging.
+      3. Pipeline de DR drill que simula perda do provedor principal e valida
+         recuperacao a partir do backup secundario.
+      4. Verificacao de criptografia em todos os backups provisionados.
+    tools:
+      - gitlab-ci
+      - terraform
+      - dr-testing
+      - backup-validator
+  secops:
+    prose: |
+      **Operacao de backup:**
+      1. Monitoramento diario de status de backup (sucesso/falha).
+      2. Testes de restore trimestrais com documentacao de resultados.
+      3. Auditoria semestral de politicas de retencao vs. dados armazenados.
+      4. Relatorio mensal de RPO/RTO atingidos vs. targets definidos.
+      5. Simulacao anual de disaster recovery com failover para provedor
+         secundario.
+    tools:
+      - backup-monitoring
+      - dr-orchestration
+      - grc-platform
+      - audit-trail
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["BCR-01", "BCR-06", "BCR-09"]
+    relationship: mapped

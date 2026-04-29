@@ -1,0 +1,111 @@
+id: basel-cap-cet1
+family: capital
+title: "Common Equity Tier 1 (CET1) Capital Requirement"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain a minimum Common Equity Tier 1 (CET1) capital ratio of 4.5% of
+    risk-weighted assets (RWA) at all times. CET1 capital consists of the highest quality
+    capital instruments — primarily ordinary shares and retained earnings — that absorb
+    losses on a going-concern basis. Supervisors may additionally require banks to hold a
+    capital conservation buffer of 2.5% CET1, bringing the effective minimum to 7%, and
+    a countercyclical capital buffer (CCyB) of 0-2.5% when credit growth is judged to be
+    excessive. Global Systemically Important Banks (G-SIBs) and Domestic SIBs (D-SIBs)
+    are subject to higher CET1 surcharges. Instruments that do not qualify as CET1 must
+    be deducted from the capital base, including goodwill, deferred tax assets that rely
+    on future profitability, and significant investments in financial institutions.
+
+guidance:
+  prose: >-
+    CET1 is the cornerstone of the Basel III capital framework. Regulators view it as the
+    most loss-absorbing form of capital because it has no maturity, bears unlimited losses,
+    and has discretionary dividends. The quality criteria for CET1 instruments are strict:
+    they must be perpetual, rank subordinate to all other claims in liquidation, have
+    distributions paid only after all tax and regulatory obligations are met, and carry no
+    expectation of repayment. Banks should maintain CET1 well above regulatory minimums to
+    avoid restrictions on dividends and discretionary bonuses imposed by the capital
+    conservation buffer framework. Internal capital planning processes (ICAAP) must model
+    CET1 depletion under stress scenarios and demonstrate adequate buffers. Deductions from
+    CET1 include items such as intangible assets, deferred tax assets, securitisation
+    exposures below the threshold treatment, and pension fund deficits net of tax.
+
+references:
+  - citation: "BCBS, Basel III: A global regulatory framework for more resilient banks and banking systems, December 2010 (revised June 2011)"
+    url: "https://www.bis.org/publ/bcbs189.htm"
+  - citation: "BCBS, Minimum capital requirements for market risk (FRTB), January 2019 (revised February 2019)"
+    url: "https://www.bis.org/bcbs/publ/d457.htm"
+  - citation: "BCBS, Basel III Monitoring Report"
+    url: "https://www.bis.org/bcbs/qis/index.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build an automated capital monitoring platform that ingests positions from all trading
+      systems, loan systems, and off-balance-sheet facilities in real time and computes
+      RWA under both standardised and internal model approaches. Expose CET1 ratio dashboards
+      as a first-class platform service consumed by Finance, Risk, and Treasury teams.
+      Implement threshold alerting so that capital ratios approaching buffer triggers (e.g.,
+      7.0% CET1 or 8.5% Tier 1) generate automated escalation tickets. Store all capital
+      calculation inputs and outputs with immutable audit trails in an append-only data store
+      (e.g., event-sourced ledger or a write-once S3-compatible object store). Version all
+      RWA models and parameter sets using GitOps so that every calculation is reproducible
+      and auditable by regulators. Automate the generation of COREP (Common Reporting) and
+      local supervisory capital reports.
+    tools:
+      - apache-kafka
+      - apache-flink
+      - postgresql
+      - terraform
+      - grafana
+      - prometheus
+      - vault
+
+  devsecops:
+    prose: >-
+      Treat capital calculation models as code: store RWA model logic and parameter files
+      in version-controlled repositories, require peer review via merge requests, and deploy
+      model updates through CI/CD pipelines with automated unit and regression tests comparing
+      new outputs against approved baselines. Enforce four-eyes approval (two approvers from
+      different teams — Risk and Finance — before any capital model change is merged to main).
+      Generate an immutable software bill of materials (SBOM) for every model release so that
+      regulators can trace exactly which version of which model produced a given capital report.
+      Integrate regulatory change notifications (e.g., BCBS consultative papers, EBA Q&A) into
+      the backlog as tracked issues with clear ownership and deadlines.
+    tools:
+      - gitlab-ci
+      - opa-conftest
+      - syft
+      - cyclonedx
+      - sonarqube
+      - dependency-track
+
+  secops:
+    prose: >-
+      Protect the integrity of capital data with strict access controls: segregate duties so
+      that individuals who input position data cannot also approve capital reports. Enable
+      comprehensive audit logging for all access to capital calculation systems, including
+      read access, and forward logs to a SIEM for anomaly detection. Implement data lineage
+      controls so that any change to a source position that affects RWA triggers an automated
+      recalculation and difference report. Run quarterly penetration tests against capital
+      reporting systems and remediate findings before the next regulatory reporting date.
+      Monitor for insider threat patterns such as unusual access to capital model parameters
+      outside business hours.
+    tools:
+      - splunk
+      - sentinel
+      - hashicorp-vault
+      - cyberark
+      - qualys
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-9", "SI-7", "AC-5"]
+    relationship: mapped

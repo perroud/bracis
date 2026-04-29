@@ -1,0 +1,107 @@
+id: samm-ops-environment-mgmt
+family: operations
+title: "Environment Management"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Establish and maintain security controls for all software deployment environments —
+    development, testing, staging, and production. Implement configuration management,
+    patch management, and continuous compliance monitoring to ensure environments remain
+    hardened against known attack patterns and compliant with security baselines throughout
+    the software operational lifecycle.
+  parts:
+    - id: samm-ops-environment-mgmt_smt.a
+      label: "Stream A — Configuration Hardening"
+      prose: >-
+        Define security configuration baselines for all environment types (operating
+        systems, container runtimes, cloud services, databases, web servers) aligned to
+        industry benchmarks such as CIS Benchmarks or DISA STIGs. Implement automated
+        configuration management to enforce baselines and detect configuration drift.
+        Conduct regular compliance scans to measure adherence to security baselines and
+        remediate deviations within defined SLAs. Separate development, testing, staging,
+        and production environments with appropriate access controls and security controls
+        calibrated to the sensitivity of each environment's data.
+    - id: samm-ops-environment-mgmt_smt.b
+      label: "Stream B — Patching and Updates"
+      prose: >-
+        Implement a patch management process that tracks vulnerability disclosures for
+        all operating system, runtime, and middleware components used in software
+        environments. Define patching SLAs by vulnerability severity and enforce them
+        through automated patching workflows where feasible. Prioritize patching of
+        components with active exploitation evidence. Maintain an inventory of all
+        software versions deployed across environments to enable rapid impact assessment
+        when new vulnerabilities are disclosed. Test patches in non-production environments
+        before applying to production to detect application compatibility issues.
+
+guidance:
+  prose: >-
+    A secure application running in an insecure environment is not secure. Environment
+    management is the operational foundation that determines whether the security
+    controls implemented in code and architecture can be effective at runtime. At
+    maturity level 1, the organization applies basic hardening to production environments
+    and has a patching process, however informal. At level 2, configuration baselines
+    are formally defined, compliance scanning is automated, and patch SLAs are defined
+    and tracked. At level 3, environments are fully managed as code, configuration drift
+    is impossible by design (immutable infrastructure), patching is automated and continuous
+    for low-risk updates, and compliance status is reported continuously.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Operations: Environment Management"
+    url: "https://owaspsamm.org/model/operations/environment-management/"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"
+  - citation: "DISA Security Technical Implementation Guides (STIGs)"
+    url: "https://public.cyber.mil/stigs/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement immutable infrastructure patterns where production environments are
+      built from version-controlled, signed images and replaced rather than patched
+      in place. Use Terraform or Crossplane to define all environment configurations
+      as code, making it impossible to introduce configuration that has not passed
+      security review. Enforce CIS Benchmark compliance for base images through the
+      platform image pipeline (hardened base images built and tested before distribution).
+      Implement node auto-upgrade policies in Kubernetes that automatically apply
+      security patches to node pools within defined maintenance windows. Maintain
+      environment parity between staging and production through the same IaC definitions.
+    tools:
+      - "Terraform / Crossplane (IaC)"
+      - "Ansible (configuration management)"
+      - "Kube-bench (CIS Kubernetes benchmark)"
+      - "Packer (hardened image building)"
+      - "Renovate Bot (automated dependency updates)"
+  devsecops:
+    prose: >-
+      Integrate environment security scanning into deployment pipelines as pre-deployment
+      validation stages. Run Trivy against Kubernetes manifests and Helm charts to detect
+      configuration vulnerabilities before deployment. Implement Checkov or tfsec to
+      scan Terraform plans for cloud misconfigurations before apply. Use automated
+      drift detection tools that compare running configurations against IaC definitions
+      and alert when unauthorized changes are detected. Integrate CVE feeds into the
+      pipeline to block deployments of base images with unpatched critical vulnerabilities.
+    tools:
+      - "Trivy (Kubernetes / container scanning)"
+      - "Checkov / tfsec / KICS (IaC scanning)"
+      - "Drifted (Terraform drift detection)"
+      - "Snyk Container"
+      - "GitLab Container Scanning"
+  secops:
+    prose: >-
+      Operate a cloud security posture management (CSPM) platform to continuously monitor
+      production environments for security baseline deviations, misconfigured cloud
+      resources, and excessive permissions. Generate daily compliance reports against
+      CIS Benchmarks and organizational security baselines. Implement a vulnerability
+      management workflow for environment-layer vulnerabilities separate from application
+      vulnerabilities, with environment-specific SLAs and remediation procedures.
+      Coordinate with platform teams on emergency patching procedures for critical
+      vulnerabilities (e.g., Log4Shell-class) with defined playbooks for rapid environment
+      remediation.
+    tools:
+      - "Wiz / Prisma Cloud (CSPM)"
+      - "AWS Security Hub / Azure Defender"
+      - "Qualys / Tenable (vulnerability scanning)"
+      - "Chef InSpec (compliance scanning)"
+      - "Trivy (continuous vulnerability scanning)"

@@ -1,0 +1,109 @@
+id: samm-imp-secure-build
+family: implementation
+title: "Secure Build"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Implement a secure, repeatable, and auditable build process that integrates automated
+    security analysis into every build. Enforce dependency management controls to prevent
+    introduction of vulnerable or malicious third-party components. Generate and maintain
+    software bills of materials (SBOMs) for all software artifacts, and ensure builds are
+    reproducible and tamper-evident through signing and provenance attestation.
+  parts:
+    - id: samm-imp-secure-build_smt.a
+      label: "Stream A — Build Process Security"
+      prose: >-
+        Standardize and document the build process, ensuring builds are performed from
+        version-controlled source code through a defined, automated pipeline. Integrate
+        static application security testing (SAST) into the build process to detect
+        security vulnerabilities in first-party code before artifacts are produced.
+        Generate SBOMs for all build artifacts. Sign build artifacts cryptographically
+        to establish provenance and enable tamper detection downstream. Enforce that
+        production deployments use only artifacts produced by the authorized build system.
+    - id: samm-imp-secure-build_smt.b
+      label: "Stream B — Software Dependency Management"
+      prose: >-
+        Maintain an inventory of all third-party dependencies used in software products,
+        including transitive dependencies. Implement automated software composition
+        analysis (SCA) to detect known vulnerabilities in dependencies at each build.
+        Enforce dependency version pinning to prevent supply chain attacks via dependency
+        confusion or version substitution. Define and enforce policies for acceptable
+        dependency vulnerability severity thresholds, with SLA-driven remediation
+        requirements. Prohibit use of dependencies from untrusted or unmaintained sources.
+
+guidance:
+  prose: >-
+    The build pipeline is the last programmatic opportunity to prevent vulnerable code
+    from reaching production. At maturity level 1, the organization runs SAST and
+    dependency scanning in CI/CD and reviews findings manually. At level 2, pipeline
+    security gates block builds that exceed defined severity thresholds; SBOM generation
+    is automated; builds are signed. At level 3, builds are fully reproducible and
+    verifiable (SLSA level 3+); SBOM provenance is attested and published; dependency
+    pinning is enforced at the platform level; supply chain integrity checks verify
+    the authenticity of all upstream build tools and base images.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Implementation: Secure Build"
+    url: "https://owaspsamm.org/model/implementation/secure-build/"
+  - citation: "SLSA (Supply-chain Levels for Software Artifacts)"
+    url: "https://slsa.dev/"
+  - citation: "OWASP CycloneDX SBOM Standard"
+    url: "https://cyclonedx.org/"
+  - citation: "NIST SP 800-218 — PW.4, PW.5"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide centralized, hardened build infrastructure managed by the platform team,
+      preventing teams from using ad-hoc build environments that bypass security controls.
+      Implement SLSA-compliant build systems (Tekton Chains, GitHub Actions with SLSA
+      builder) that produce provenance attestations automatically. Integrate Syft for SBOM
+      generation and Grype for vulnerability scanning as shared pipeline components
+      available to all teams. Maintain a central artifact registry (Harbor, Artifactory)
+      that enforces artifact signing verification before images can be deployed. Implement
+      an approved base image catalog, automatically scanning and updating base images on
+      a regular schedule.
+    tools:
+      - "Tekton / Tekton Chains (SLSA provenance)"
+      - "Syft (SBOM generation)"
+      - "Grype (vulnerability scanning)"
+      - "Harbor / Artifactory (artifact registry)"
+      - "Cosign (artifact signing)"
+      - "OWASP Dependency-Check"
+  devsecops:
+    prose: >-
+      Integrate SAST, SCA, and container scanning as mandatory pipeline stages that
+      execute on every commit. Configure severity-based pipeline gates: critical and
+      high vulnerabilities block the pipeline; medium and low generate warnings with
+      SLA-tracked tickets. Use Semgrep or GitLab SAST with custom rule sets tailored
+      to the organization's technology stack. Implement dependency pinning enforcement
+      through Renovate Bot or Dependabot configured to require review of all dependency
+      updates. Generate CycloneDX SBOMs at build time and publish them to Dependency-Track
+      for continuous monitoring.
+    tools:
+      - "Semgrep (SAST)"
+      - "GitLab SAST / GitHub CodeQL"
+      - "Trivy (container + dependency scanning)"
+      - "Snyk (SCA)"
+      - "CycloneDX / Syft (SBOM)"
+      - "Dependency-Track (continuous SBOM monitoring)"
+      - "Renovate Bot / Dependabot"
+  secops:
+    prose: >-
+      Monitor the artifact registry and SBOM inventory for newly disclosed vulnerabilities
+      (CVEs) against deployed software components, enabling rapid response when new
+      vulnerabilities affect production systems. Maintain a software asset inventory
+      derived from SBOMs that maps deployed software components to the systems and
+      environments where they run. Operate a vulnerability management workflow that
+      ingests findings from build-time scanners into a centralized tracker, assigns
+      ownership, and tracks remediation against SLA commitments. Conduct periodic
+      supply chain security reviews to assess build infrastructure integrity.
+    tools:
+      - "Dependency-Track (SBOM vulnerability monitoring)"
+      - "DefectDojo (vulnerability management)"
+      - "Splunk / Elastic (SBOM inventory)"
+      - "Sonatype Nexus Lifecycle"
+      - "NVD / VulnDB (vulnerability intelligence)"

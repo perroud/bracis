@@ -1,0 +1,109 @@
+id: art-23
+family: sensitive
+title: "Restriction on Provision to Third Parties"
+class: APPI
+baselines:
+  - privacy-baseline
+
+statement:
+  prose: |
+    (1) A business operator handling personal information shall not provide personal
+    data to a third party without obtaining the prior consent of the data subject,
+    except in the following cases:
+    (i) Cases based on laws and regulations;
+    (ii) Cases in which it is necessary for the protection of the life, body, or
+    property of an individual and it is difficult to obtain the consent of the data
+    subject;
+    (iii) Cases in which it is especially necessary for improving public health or
+    promoting the sound growth of children and it is difficult to obtain the consent
+    of the data subject;
+    (iv) Cases in which it is necessary to cooperate with a national organ or a local
+    government, or a person entrusted thereby, in executing affairs prescribed by laws
+    and regulations, and obtaining the consent of the data subject would impede the
+    execution of said affairs.
+
+    (2) Notwithstanding the provisions of the preceding paragraph, in the following
+    cases, the person to whom the personal data is provided shall not be deemed a third
+    party:
+    (i) Cases in which the business operator handling personal information entrusts the
+    handling of personal data, in whole or in part, to another person within the scope
+    necessary for the achievement of the purpose of utilization;
+    (ii) Cases in which personal data is provided as a result of the succession of
+    business due to a merger or other reasons;
+    (iii) Cases in which personal data is used jointly with a specific person and the
+    business operator has notified the data subject in advance or placed in a state
+    easily accessible to the data subject, the items of personal data to be jointly
+    used, the scope of joint users, the purpose of use by those users, and the name
+    of the person responsible for the management of such personal data.
+
+    (3) A business operator handling personal information may, if the following
+    conditions are met and unless the data subject has requested cessation of
+    provision, provide personal data to a third party without consent (opt-out):
+    The business operator must notify the data subject or place in a state easily
+    accessible to the data subject: the categories of personal data, the method of
+    provision, and the fact that the data subject may request cessation. The business
+    operator must also notify the Personal Information Protection Commission in advance.
+
+guidance:
+  prose: |
+    Article 23 establishes the consent-based framework for third-party data sharing.
+    Prior consent is the default requirement, with narrow exceptions for legal
+    obligations, protection of life, and public interest. Three categories of
+    recipients are excluded from the "third party" definition: entrusted processors,
+    business successors, and joint users. The opt-out mechanism (paragraph 3) allows
+    sharing without individual consent, but requires prior notification to both the
+    data subject and the PPC. The 2022 amendment significantly tightened the opt-out
+    mechanism by requiring PPC notification and restricting its use for special
+    care-required personal information and illicitly obtained data.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Build a third-party data sharing governance platform. Implement consent
+      verification checks at all data egress points. Create a registry of
+      authorized data recipients with their legal basis (consent, entrustment
+      contract, joint use agreement). Enforce automated policy checks before
+      any API or data pipeline transfers personal data to external parties.
+      Implement the opt-out mechanism with PPC notification capabilities.
+    tools:
+      - open-policy-agent
+      - backstage
+      - datahub
+      - kong
+      - onetrust
+
+  devsecops:
+    prose: |
+      Enforce that all third-party data sharing integrations include consent
+      verification in code reviews. Scan API contracts and webhook
+      configurations for unauthorized data sharing endpoints. Validate that
+      data processing agreements are referenced in service configurations
+      before enabling third-party integrations. Block deployments that
+      introduce new third-party data flows without governance review.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - spectral
+      - trivy
+
+  secops:
+    prose: |
+      Monitor all data egress to detect unauthorized third-party data
+      sharing. Alert on personal data transfers to unregistered recipients.
+      Audit entrustment contracts and joint use agreements for compliance
+      with Article 23 requirements. Track opt-out requests and verify
+      timely cessation of data sharing. Monitor PPC notifications for
+      opt-out mechanism compliance.
+    tools:
+      - splunk
+      - elastic-siem
+      - prisma-cloud
+      - onetrust
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-28"]
+    relationship: equivalent-to
+  - framework_id: pipl
+    articles: ["art-23", "art-24"]
+    relationship: mapped

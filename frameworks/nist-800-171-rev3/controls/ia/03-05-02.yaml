@@ -1,0 +1,86 @@
+id: 03.05.02
+family: ia
+title: "Authentication"
+class: SP800-171r3
+baselines: [basic]
+related_controls:
+  - nist-800-53-rev5: [ia-2, ia-5]
+  - cmmc-v2: [ia.l2-3.5.2]
+statement:
+  prose: >-
+    a. Authenticate (or verify) the identities of users, processes, or devices as a
+       prerequisite to allowing access to organizational systems.
+    b. Use multifactor authentication for local and network access to privileged accounts
+       and for network access to non-privileged accounts.
+    c. Employ replay-resistant authentication mechanisms for network access to privileged
+       and non-privileged accounts.
+    d. Implement mechanisms for authentication to a cryptographic module that meet
+       applicable requirements.
+guidance:
+  prose: >-
+    Individual authenticators include passwords, key cards, cryptographic devices, and
+    one-time password devices. Multifactor authentication requires the use of two or more
+    different factors: something you know (password, PIN), something you have (token,
+    smart card), or something you are (biometric). Replay-resistant authentication
+    mechanisms include protocols that use nonces or challenges such as Transport Layer
+    Security (TLS) and Kerberos. Replay-resistant authentication is needed to protect
+    against replay attacks where an adversary captures authentication credentials and
+    replays them to gain access. The strength of the authentication mechanism is
+    determined by the sensitivity of the CUI being protected. FIPS-validated
+    cryptographic modules are required for authentication to meet federal standards.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce MFA for all user accounts through the centralized IdP with phishing-resistant
+      methods (WebAuthn/FIDO2 security keys, passkeys) as the primary factor. Implement
+      SSO across all platform services to reduce authentication fatigue and ensure
+      consistent enforcement. Deploy mutual TLS (mTLS) for all service-to-service
+      authentication within the platform. Use OIDC tokens with short expiration (15 min)
+      for API authentication. Implement certificate-based authentication for device
+      identity. Configure FIPS 140-2/3 validated cryptographic modules for all
+      authentication operations in CUI environments. Deploy adaptive authentication
+      that increases assurance requirements based on risk signals.
+    tools:
+      - "Okta / Azure Entra ID (MFA, SSO)"
+      - "WebAuthn/FIDO2 security keys"
+      - "Service mesh mTLS (Istio, Linkerd)"
+      - "OIDC / OAuth 2.0"
+      - "FIPS 140-3 validated modules"
+      - "cert-manager (certificate lifecycle)"
+  devsecops:
+    prose: >-
+      Enforce MFA for all access to code repositories, CI/CD systems, and artifact
+      registries. Implement OIDC federation for CI/CD pipelines to eliminate long-lived
+      credentials (e.g., GitHub OIDC for AWS, GitLab CI OIDC). Scan for weak
+      authentication configurations in IaC (e.g., APIs without authentication, services
+      without mTLS). Validate that all deployed services require authentication through
+      automated integration tests. Enforce that all secrets used for authentication are
+      stored in vault systems, never in code or environment variables.
+    tools:
+      - "OIDC federation (CI/CD to cloud)"
+      - "HashiCorp Vault (secret management)"
+      - "Checkov (authentication config validation)"
+      - "Integration tests (auth enforcement)"
+      - "Secret scanning in pipelines"
+  secops:
+    prose: >-
+      Monitor for authentication failures, brute force attempts, credential stuffing,
+      and MFA bypass attempts. Implement alerts for authentication from unusual locations,
+      devices, or times. Track MFA enrollment rates and enforce compliance. Monitor for
+      token theft and session hijacking indicators. Conduct periodic assessments of
+      authentication mechanism effectiveness. Report on authentication incidents and
+      trends to security leadership.
+    tools:
+      - "SIEM (authentication event correlation)"
+      - "Identity threat detection (ITDR)"
+      - "MFA enrollment reporting"
+      - "Brute force detection"
+      - "Impossible travel detection"
+      - "Dark web credential monitoring"
+references:
+  - citation: "NIST SP 800-53 Rev. 5 — IA-2, IA-5"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "NIST SP 800-63B"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "FIPS 140-3"
+    url: "https://csrc.nist.gov/publications/detail/fips/140/3/final"

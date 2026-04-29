@@ -1,0 +1,97 @@
+id: med2-13
+family: ressarcimento
+title: "Full and Partial Fund Return Procedures"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Concluída a análise de mérito com decisão favorável à devolução, o PSP recebedor deve
+    efetuar a devolução dos recursos ao PSP pagador por meio do SPI no prazo máximo de 96 horas.
+    A devolução pode ser total, quando o valor integral da transação fraudulenta está disponível
+    na conta bloqueada, ou parcial, quando apenas parte dos recursos permanece disponível.
+    No caso de bloqueio em cascata, a devolução deve considerar os valores bloqueados em todas
+    as contas da cadeia, consolidando os montantes recuperados para crédito ao usuário pagador.
+    O PSP pagador deve creditar os valores devolvidos na conta do usuário pagador tão logo
+    recebidos, sem cobrar taxas ou encargos pela operação de devolução. O registro da devolução
+    deve ser efetuado no DICT para atualização do status da notificação de infração.
+guidance:
+  prose: |
+    **Return Procedures:**
+
+    **Total return:**
+    When the full transaction amount is available in the blocked account(s), the receiver
+    PSP returns the entire amount via SPI. This is the ideal scenario but occurs in a
+    minority of cases, as fraudsters typically move funds quickly.
+
+    **Partial return:**
+    When only part of the funds remain, the receiver PSP returns the available balance.
+    In cascade scenarios, partial returns from multiple accounts in the chain are
+    consolidated.
+
+    **Cascade return consolidation:**
+    When funds are blocked across multiple accounts (e.g., R$3,000 at Account A, R$4,000
+    at Account B, R$2,000 at Account C for a R$10,000 fraud), each receiver PSP returns
+    its blocked portion. The payer PSP consolidates all returns and credits the victim.
+
+    **Key rules:**
+    - No fees may be charged to the victim for the return.
+    - Return must be via SPI (Pix rails) for speed and traceability.
+    - DICT must be updated with return status.
+    - The payer PSP must credit the victim immediately upon receiving the return.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build an automated return settlement service that generates SPI return
+         transactions upon favorable merit analysis decisions. Support both total and
+         partial returns.
+      2. Implement a cascade return aggregation engine: collect return confirmations
+         from all PSPs in the cascade chain, calculate the total recovered amount, and
+         initiate a single credit to the victim's account.
+      3. Build reconciliation logic: match returned amounts against blocked amounts for
+         each account in the cascade, identify discrepancies, and flag for review.
+      4. Implement a zero-fee enforcement rule: return transactions must never generate
+         fees or deductions for the victim.
+      5. Build DICT status update integration: upon return settlement confirmation,
+         automatically update the infraction notification status to reflect the return.
+    tools:
+      - spi-client
+      - settlement-engine
+      - reconciliation-service
+      - dict-api-client
+      - workflow-engine
+  devsecops:
+    prose: |
+      1. Test total return: block R$10,000, decision favorable, verify R$10,000 returned
+         via SPI and credited to victim.
+      2. Test partial return: block R$3,000 (of R$10,000 fraud), verify R$3,000 returned.
+      3. Test cascade return aggregation: multiple partial returns from different PSPs,
+         verify consolidation and victim credit.
+      4. Test zero-fee enforcement: verify no deductions in the return chain.
+      5. Test DICT status updates: verify infraction status reflects return (total/partial).
+      6. Test reconciliation: inject discrepancies and verify they are flagged.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - financial-testing
+      - reconciliation-testing
+  secops:
+    prose: |
+      1. Monitor return settlement latency: time from favorable decision to victim credit.
+      2. Track recovery rates: total recovered vs. total fraud value, per case and
+         aggregate.
+      3. Monitor reconciliation exceptions: discrepancies between blocked and returned
+         amounts.
+      4. Audit return transactions for zero-fee compliance.
+      5. Monthly recovery performance report for management and BCB.
+    tools:
+      - monitoring-platform
+      - analytics-dashboard
+      - reconciliation-dashboard
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-21", "pix-22"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-22"]
+    relationship: implements

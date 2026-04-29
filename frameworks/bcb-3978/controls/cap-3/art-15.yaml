@@ -1,0 +1,110 @@
+id: art-15
+family: cap-3
+title: "Atualizacao Cadastral de Clientes"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 15. As instituições mencionadas no art. 1 devem manter as informações cadastrais
+    de seus clientes permanentemente atualizadas, de acordo com a classificação de risco
+    e a natureza da relação de negócio.
+
+    Parágrafo único. A periodicidade da atualização deve ser compatível com o risco
+    atribuído ao cliente, observando-se que clientes de maior risco devem ter seus
+    cadastros atualizados com maior frequência.
+guidance:
+  prose: |
+    O art. 15 estabelece a obrigacao de manutencao continua dos dados cadastrais,
+    nao como evento unico, mas como processo permanente.
+
+    **Obrigacao de atualizacao permanente:**
+    "Permanentemente atualizadas" significa que a instituicao nao pode se limitar
+    a coletar dados no onboarding e nunca mais revisita-los. Ha duas dimensoes:
+    1. Atualizacao proativa: a instituicao busca ativamente informacoes atualizadas
+       em intervalos regulares
+    2. Atualizacao reativa: quando o cliente informa mudancas ou a instituicao
+       detecta alteracoes em fontes externas
+
+    **Proporcionalidade ao risco (paragrafo unico):**
+    Frequencia de atualizacao diferenciada por nivel de risco:
+    - Risco alto: atualizacao anual (ou mais frequente)
+    - Risco medio: atualizacao a cada 2 anos
+    - Risco baixo: atualizacao a cada 5 anos (maximo)
+    Estes prazos sao referencia de mercado; a circular nao prescreve prazos
+    especificos, cabendo a instituicao definir na politica.
+
+    **Implicacao pratica:**
+    Clientes com cadastro desatualizado alem do prazo devem ter suas operacoes
+    restringidas ate que a atualizacao seja realizada. A instituicao deve ter
+    controles para identificar e tratar cadastros desatualizados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de atualizacao cadastral:**
+      1. Scheduler que identifica clientes com atualizacao cadastral pendente
+         baseado na classificacao de risco e data da ultima atualizacao.
+      2. Notificacao multicanal ao cliente (e-mail, SMS, push, in-app) quando
+         atualizacao e necessaria.
+      3. Portal de auto-atendimento para atualizacao cadastral pelo cliente
+         com verificacao de documentos.
+      4. Bloqueio progressivo de operacoes para clientes com cadastro
+         desatualizado: alerta -> restricao parcial -> bloqueio total.
+
+      **Atualizacao automatica:**
+      5. Consulta periodica a fontes externas (Receita Federal, bureaus)
+         para detectar mudancas cadastrais.
+      6. Trigger automatico de atualizacao quando mudanca e detectada.
+      7. Reclassificacao automatica de risco apos atualizacao cadastral.
+      8. Dashboard de completude cadastral com aging por categoria de risco.
+    tools:
+      - kyc-system
+      - notification-service
+      - data-enrichment-api
+      - scheduling-engine
+  devsecops:
+    prose: |
+      **Testes de atualizacao:**
+      1. Testes do scheduler de atualizacao (frequencias por categoria de risco).
+      2. Testes de bloqueio progressivo (correto escalonamento de restricoes).
+      3. Testes de atualizacao automatica via fontes externas.
+      4. Testes de reclassificacao de risco apos atualizacao.
+
+      **Pipeline de qualidade de dados:**
+      5. Metricas de completude cadastral calculadas em cada build.
+      6. Alertas de degradacao de qualidade cadastral.
+      7. Testes de regressao quando logica de atualizacao e alterada.
+      8. Data profiling automatizado da base de clientes.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - data-quality
+      - monitoring
+  secops:
+    prose: |
+      **Gestao de cadastros desatualizados:**
+      1. Relatorio semanal de clientes com cadastro desatualizado por
+         categoria de risco (priorizar alto risco).
+      2. Processo de cobranca de atualizacao com registro de tentativas.
+      3. Escalonamento para gerente quando cliente nao responde.
+      4. Decisao de encerramento de relacao para cadastros persistentemente
+         desatualizados.
+
+      **Indicadores de qualidade:**
+      5. Percentual de base atualizada dentro do prazo por categoria de risco.
+      6. Tempo medio de atualizacao apos notificacao.
+      7. Taxa de atualizacao espontanea vs. cobrada.
+      8. Relatorio ao comite de PLD/FT sobre status de atualizacao cadastral.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+      - crm
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-4", "IA-5", "IA-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-16", "art-18"]
+    relationship: complements

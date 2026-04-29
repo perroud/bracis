@@ -1,0 +1,107 @@
+id: art-6
+family: cap-2
+title: "Sistemas de Negociacao e Formacao de Precos"
+class: CVM-135
+baselines: [infraestruturas-mercado]
+statement:
+  prose: |
+    Art. 6. A bolsa de valores deve manter sistema eletrônico de negociação que
+    assegure:
+    I - mecanismo competitivo de formação de preços, com prioridade de preço
+    e tempo para as ofertas de compra e venda;
+    II - igualdade de acesso ao sistema de negociação por todos os participantes
+    autorizados;
+    III - capacidade adequada para processar o volume de ordens e negócios,
+    inclusive em situações de estresse;
+    IV - latência equitativa entre participantes, vedados mecanismos que confiram
+    vantagem de velocidade desproporcional;
+    V - mecanismos de controle de volatilidade, incluindo circuit breakers e
+    leilões de abertura e fechamento; e
+    VI - integridade das informações de ofertas e negócios, com registros
+    completos e inalteráveis.
+
+    § 1. A bolsa deve implementar mecanismos de prevenção e detecção de
+    manipulação de mercado, incluindo spoofing, layering e wash trading.
+    § 2. Os parâmetros dos mecanismos de controle de volatilidade devem ser
+    públicos e revisados periodicamente.
+guidance:
+  prose: |
+    O art. 6 trata do nucleo funcional de uma bolsa de valores: o sistema de
+    negociacao eletronico (matching engine) e os mecanismos que garantem a
+    integridade da formacao de precos.
+
+    **Mecanismo competitivo de formacao de precos:**
+    O modelo price-time priority e o padrao global para bolsas, garantindo que
+    a melhor oferta de preco tem prioridade, e entre ofertas de mesmo preco,
+    a que chegou primeiro e executada antes.
+
+    **Latencia equitativa:**
+    Este e um dos pontos mais relevantes para tecnologia. A CVM exige que nao
+    haja vantagem desproporcional de velocidade, o que impacta diretamente
+    a arquitetura de co-location, acesso ao data center e infraestrutura
+    de rede. Nao proibe HFT, mas exige que o acesso seja justo.
+
+    **Controles de volatilidade:**
+    Circuit breakers e leiloes sao mecanismos de protecao sistemica que
+    interrompem ou desaceleram negociacoes em caso de movimentos bruscos
+    de preco, prevenindo crash relampago (flash crash).
+
+    **Prevencao de manipulacao:**
+    Spoofing (ordens falsas para mover preco), layering (multiplas camadas
+    de ordens fictcias) e wash trading (operacoes consigo mesmo) sao praticas
+    vedadas que os sistemas devem detectar em tempo real.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de matching engine:**
+      1. Implementar motor de negociacao com algoritmo price-time priority
+         com logs inalteraveis de todas as ordens e execucoes.
+      2. Dimensionar capacidade para pelo menos 3x o pico historico de
+         mensagens/segundo, com testes de carga periodicos.
+      3. Garantir latencia equitativa com arquitetura de rede simetrica
+         no data center, monitoramento de jitter e latencia por participante.
+
+      **Mecanismos de controle:**
+      4. Implementar circuit breakers configuravies com parametros publicos
+         e leiloes automaticos de abertura/fechamento.
+      5. Sistema de deteccao em tempo real para spoofing, layering e wash
+         trading usando modelos de comportamento e anomalia.
+    tools:
+      - matching-engine
+      - market-surveillance
+      - network-monitoring
+      - load-testing
+  devsecops:
+    prose: |
+      **Integridade de sistemas de negociacao:**
+      1. Pipeline de CI/CD com testes de regressao que validem algoritmo de
+         prioridade preco-tempo apos cada alteracao de codigo.
+      2. Testes de performance automatizados que medem latencia e capacidade
+         antes de cada release em producao.
+      3. Imutabilidade de logs de negociacao com assinatura criptografica
+         e armazenamento append-only.
+    tools:
+      - gitlab-ci
+      - performance-testing
+      - cryptographic-signing
+      - immutable-logging
+  secops:
+    prose: |
+      **Supervisao de integridade de mercado:**
+      1. Monitoramento 24/7 do sistema de negociacao com alertas para
+         degradacao de performance ou comportamento anomalo.
+      2. Revisao diaria de alertas de manipulacao de mercado gerados pelo
+         sistema de surveillance.
+      3. Relatorio mensal de parametros de circuit breaker e incidentes
+         de volatilidade para a CVM.
+    tools:
+      - market-surveillance
+      - siem
+      - incident-management
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-4", "art-9"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-26"]
+    relationship: complements

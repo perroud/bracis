@@ -1,0 +1,125 @@
+id: nist-63-assertions
+family: federation
+title: "Assertion Content and Binding"
+class: SP800-63C
+
+baselines: [fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    Assertions SHALL contain the following attributes: an assertion identifier
+    unique within the assertion's valid time window; the issuer (IdP) identifier;
+    the subject identifier for the subscriber; the audience (intended RP); the
+    issuance timestamp; and the expiration timestamp. Assertions SHALL NOT be
+    valid for more than the maximum time period defined by the applicable FAL.
+    For FAL1, assertions SHALL be valid for no longer than 5 minutes; for FAL2
+    and FAL3, no longer than 5 minutes unless additional replay protection
+    mechanisms are used. Assertions SHALL be bound to a secure channel (TLS)
+    for transmission. The IdP SHALL NOT include more than the minimum necessary
+    identity attributes in the assertion — additional attribute release requires
+    subscriber consent. The assertion SHALL be structured in a format that
+    allows the RP to verify all required claims. The assertion SHALL specify
+    the AAL of the authentication event and the IAL of the subscriber's identity
+    as structured claims.
+
+guidance:
+  prose: >-
+    Assertion design is a critical element of federation security. Over-scoped
+    assertions (containing more attributes than the RP needs) violate the data
+    minimization principle required by 800-63C and applicable privacy regulations.
+    CSPs must implement attribute release policies that are consent-driven: the
+    subscriber must have agreed to share each attribute class with the specific RP.
+    The acr (Authentication Context Class Reference) claim is the mechanism for
+    conveying AAL in OIDC assertions — CSPs must populate this correctly based
+    on the actual authentication performed. The vot (Vectors of Trust) framework
+    (RFC 8485) is an alternative representation that can carry both IAL and AAL
+    in a structured form. Assertion expiration is a hard security boundary: the
+    verifier must reject expired assertions even if the signature is valid.
+    A 5-minute default assertion lifetime for federated ID tokens is intentionally
+    short — the authorization code flow exchanges the code for a token over a
+    server-to-server channel, so the token lifetime does not need to accommodate
+    network round-trip delays from the user's browser.
+
+references:
+  - citation: "NIST SP 800-63C Section 6 — Assertions"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "NIST SP 800-63C Section 6.1 — Assertion Binding"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "RFC 8485 — Vectors of Trust"
+    url: "https://datatracker.ietf.org/doc/html/rfc8485"
+  - citation: "OpenID Connect Core 1.0 — Standard Claims"
+    url: "https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims"
+
+related_controls:
+  - id: nist-63-fal1
+    relationship: supports
+    description: "FAL1 defines the minimum assertion signing and validation requirements."
+  - id: nist-63-fal2
+    relationship: supports
+    description: "FAL2 adds encryption requirements to the assertion model."
+  - id: nist-63-fal3
+    relationship: supports
+    description: "FAL3 adds holder-of-key binding claims to the assertion."
+  - id: nist-63-oidc-saml
+    relationship: implements
+    description: "OIDC and SAML provide the concrete assertion formats implementing these requirements."
+  - id: nist-63-data-minimization
+    relationship: implements
+    description: "Assertion content must adhere to data minimization — release only needed attributes."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design the IdP's claim mapping configuration to release only the minimum
+      necessary attributes per RP. Implement a per-RP claim release policy in
+      the authorization server (Keycloak's client-level mappers, Okta's
+      attribute statements, or a custom policy engine). The standard minimum
+      claim set for most RPs is: sub (subject identifier), iss (issuer),
+      aud (audience), exp (expiration), iat (issued at), and jti (JWT ID).
+      Add acr (Authentication Context Class Reference) reflecting the actual
+      AAL, and amr (Authentication Methods References) listing the authenticator
+      types used. For identity claims (email, name, address), require explicit
+      scope request by the RP and subscriber consent. Implement a consent
+      management UI where subscribers can review and revoke attribute release
+      consents per RP. Set assertion lifetimes at the IdP: ID token expiry at
+      5 minutes, access token expiry at 15-60 minutes (shorter for higher AAL).
+    tools:
+      - keycloak
+      - okta
+      - dex
+      - vault
+      - postgres
+
+  devsecops:
+    prose: >-
+      Build tests that validate assertion content compliance: assert that the
+      IdP includes the jti claim in all tokens, that exp is within the allowed
+      window, that the acr claim matches the expected AAL for the authenticated
+      session, and that no additional attributes are present beyond what the RP
+      requested. Implement a CI test that calls the token endpoint with a minimal
+      scope and validates the returned assertion contains only the expected claims.
+      Include a test for consent enforcement: request a scope the user has not
+      consented to and validate the request is denied. Validate that the pairwise
+      subject identifier (ppid) mode works correctly when configured — different
+      RPs receive different sub values for the same subscriber.
+    tools:
+      - gitlab-ci
+      - pytest
+      - playwright
+      - semgrep
+      - open-policy-agent
+
+  secops:
+    prose: >-
+      Monitor assertion content for over-scoping incidents: alert when RPs
+      receive attribute claims beyond their registered scope. Audit the claim
+      release policy configuration regularly to verify that only intended
+      attributes are released to each RP. Monitor assertion jti values to
+      detect replay attacks. Alert on unusual patterns in assertion issuance
+      volume — a sudden spike in assertions may indicate an automated attack
+      on the federation endpoint. Review acr claim values in issued assertions
+      to verify that AAL is being correctly reflected and not downgraded.
+    tools:
+      - splunk
+      - elastic-siem
+      - azure-sentinel

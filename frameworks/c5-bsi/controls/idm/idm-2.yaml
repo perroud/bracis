@@ -1,0 +1,90 @@
+id: idm-2
+family: idm
+title: "Multi-Factor Authentication"
+class: C5BSI
+baselines: [c5-basic, c5-additional]
+
+statement:
+  prose: >-
+    The cloud provider shall implement multi-factor authentication for
+    remote access to the cloud provider's systems and for all access
+    to the management plane of the cloud services. Multi-factor
+    authentication shall combine at least two of the following factors:
+    something the user knows (knowledge), something the user possesses
+    (possession), and something the user is (inherence). The cloud
+    provider shall also offer multi-factor authentication capabilities
+    to cloud customers for access to the cloud services.
+
+guidance:
+  prose: >-
+    Multi-factor authentication (MFA) significantly reduces the risk
+    of unauthorized access through compromised credentials. For cloud
+    providers, MFA is mandatory for all administrative and management
+    plane access, as compromise of these interfaces could affect all
+    tenants. The MFA implementation should support industry-standard
+    protocols (TOTP, FIDO2/WebAuthn) and resist common bypass
+    techniques (phishing-resistant MFA is preferred). Cloud customers
+    should be provided with MFA capabilities for their end-user access
+    to cloud services.
+
+references:
+  - citation: "C5:2020, IDM-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce MFA at the identity provider level for all platform
+      administrators and operators. Implement phishing-resistant MFA
+      (FIDO2/WebAuthn) for high-privilege accounts. Configure
+      conditional access policies that require MFA for all management
+      plane access regardless of network location. Integrate MFA
+      enforcement into infrastructure provisioning so that all new
+      IAM roles with administrative privileges automatically require
+      MFA. Offer MFA as a configurable option for customer-facing
+      authentication flows.
+    tools:
+      - okta
+      - azure-ad
+      - yubikey
+      - duo
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Require MFA for all developer access to source code repositories,
+      CI/CD pipelines, and deployment tools. Enforce MFA for Git
+      operations (push, merge) to production branches. Scan IAM
+      configurations in IaC templates to verify that MFA requirements
+      are enforced for all administrative roles. Block pipeline
+      execution from accounts that do not have MFA enabled.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - vault
+
+  secops:
+    prose: >-
+      Monitor MFA enrollment and usage rates across the organization.
+      Alert on successful authentications that bypass MFA (e.g., legacy
+      protocols, exception accounts). Track MFA adoption metrics and
+      report non-compliant accounts for remediation. Investigate
+      failed MFA attempts as potential indicators of credential
+      compromise and account takeover attacks.
+    tools:
+      - splunk
+      - elastic-siem
+      - okta-syslog
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.5"]
+    relationship: mapped
+  - framework_id: nist-800-53
+    articles: ["IA-2"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["IAM-02", "IAM-04"]
+    relationship: equivalent-to

@@ -1,0 +1,98 @@
+id: dev-2
+family: dev
+title: "Security Testing"
+class: C5BSI
+baselines: [c5-basic, c5-additional]
+
+statement:
+  prose: >-
+    The cloud provider shall perform security testing during
+    development and prior to deployment, including static application
+    security testing, dynamic application security testing, and
+    penetration testing. The scope and frequency of security testing
+    shall be based on the criticality and risk profile of the cloud
+    service components. Identified vulnerabilities shall be assessed,
+    prioritised, and remediated before deployment to the production
+    environment or within a defined remediation timeline.
+
+guidance:
+  prose: >-
+    Security testing must be comprehensive and continuous, not a
+    one-time gate before release. Static analysis (SAST) should run
+    on every code change to catch vulnerabilities early when they
+    are cheapest to fix. Dynamic analysis (DAST) should run against
+    deployed test environments to find runtime vulnerabilities that
+    static analysis cannot detect. Penetration testing should be
+    conducted at least annually by qualified testers (internal or
+    external) to validate the overall security posture. Vulnerability
+    remediation must follow a defined process with SLAs based on
+    severity — critical vulnerabilities should block deployment.
+
+references:
+  - citation: "C5:2020, DEV-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide centralized security testing infrastructure (SAST/DAST
+      scanners, container registries with integrated scanning, fuzzing
+      platforms) as shared platform services. Implement automated
+      vulnerability management workflows that create tracking tickets
+      for identified vulnerabilities and enforce remediation SLAs.
+      Deploy pre-production environments that mirror production for
+      realistic security testing. Maintain a vulnerability database
+      with full lifecycle tracking.
+    tools:
+      - gitlab
+      - defectdojo
+      - trivy
+      - sonarqube
+      - zap
+      - backstage
+
+  devsecops:
+    prose: >-
+      Configure SAST scanning as a mandatory pipeline stage for all
+      code changes. Run DAST scans against staging environments as
+      part of the release pipeline. Implement dependency scanning to
+      identify known vulnerabilities in third-party libraries. Block
+      pipeline progression when critical or high-severity vulnerabilities
+      are found. Generate vulnerability reports as pipeline artifacts
+      and integrate with defect tracking systems for remediation
+      management.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - trivy
+      - grype
+      - zap
+      - nuclei
+
+  secops:
+    prose: >-
+      Track security testing coverage and vulnerability remediation
+      metrics across all cloud service components. Correlate penetration
+      test findings with production monitoring data. Monitor for
+      exploitation of known vulnerabilities in production environments.
+      Generate compliance reports demonstrating security testing
+      frequency, coverage, and remediation effectiveness for audit
+      purposes.
+    tools:
+      - splunk
+      - defectdojo
+      - elastic-siem
+      - qualys
+      - rapid7
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.29", "a8.34"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["SA-11", "CA-8"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["AIS-02", "AIS-04"]
+    relationship: mapped

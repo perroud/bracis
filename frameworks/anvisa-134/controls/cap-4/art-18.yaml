@@ -1,0 +1,110 @@
+id: art-18
+family: cap-4
+title: "Niveis de Acesso e Segregacao de Funcoes"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 18. Os sistemas computadorizados devem implementar níveis de acesso
+    diferenciados que restrinjam as funcionalidades disponíveis a cada
+    usuário conforme suas funções e responsabilidades na organização.
+
+    Parágrafo 1. A segregação de funções deve garantir, no mínimo:
+    I - separação entre funções de desenvolvimento e operação;
+    II - separação entre funções de produção e controle de qualidade;
+    III - separação entre funções de administração do sistema e uso;
+    IV - restrição de acesso a funcionalidades de configuração crítica;
+    V - controle sobre funções de criar, alterar e excluir dados.
+
+    Parágrafo 2. A matriz de acesso deve ser documentada, aprovada pela
+    unidade da qualidade e revisada periodicamente para garantir adequação
+    dos níveis de acesso atribuídos.
+guidance:
+  prose: |
+    O art. 18 implementa o principio de minimo privilegio e segregacao de
+    funcoes (Segregation of Duties - SoD) em contexto GMP.
+
+    **Principio do minimo privilegio:**
+    Cada usuario deve ter acesso apenas as funcionalidades estritamente
+    necessarias para executar suas atividades. Acessos devem ser concedidos
+    com base na funcao, nao na pessoa.
+
+    **Segregacoes criticas em ambiente GMP:**
+    - Quem desenvolve nao opera em producao (dev vs. ops)
+    - Quem produz nao libera (producao vs. QC)
+    - Quem administra o sistema nao e usuario final (admin vs. user)
+    - Quem cria dados nao pode apagar sem autorizacao adicional
+    - Quem aprova nao pode ser quem executou a atividade
+
+    **Modelo RBAC (Role-Based Access Control):**
+    Implementar niveis de acesso baseados em funcoes pre-definidas:
+    - Administrador de sistema: configuracao, backup, manutencao
+    - Operador de producao: entrada de dados, execucao de processos
+    - Supervisor: aprovacao, revisao, liberacao
+    - Analista de QC: analise, revisao de resultados
+    - Auditor: visualizacao somente-leitura de trilhas
+    - CSV owner: gestao de validacao e configuracao
+
+    **Matriz de acesso:**
+    Documento formal que mapeia funcoes organizacionais a niveis de acesso
+    no sistema, aprovado pela QA e revisado no minimo semestralmente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de RBAC em infraestrutura:**
+      1. Implementar RBAC centralizado com roles pre-definidas para cada
+         funcao GMP, propagadas automaticamente para todos os sistemas.
+      2. Configurar segregacao de ambientes (dev, staging, producao GMP)
+         com controles de acesso distintos e politicas que impedem acesso
+         de desenvolvedores a producao.
+      3. Implementar just-in-time access para acesso privilegiado a
+         sistemas GMP criticos, com aprovacao e tempo limitado.
+      4. Configurar politicas de admissao que verifiquem segregacao de
+         funcoes: impedir que mesmo usuario tenha roles conflitantes.
+    tools:
+      - rbac-management
+      - vault
+      - opa-gatekeeper
+      - just-in-time-access
+  devsecops:
+    prose: |
+      **Segregacao de funcoes no pipeline:**
+      1. Configurar CODEOWNERS que impecam desenvolvedores de aprovar
+         suas proprias mudancas em sistemas GMP.
+      2. Implementar gates de aprovacao com roles distintas: developer,
+         reviewer, QA approver, production deployer.
+      3. Verificar automaticamente no pipeline que deploys em producao
+         GMP sao executados por equipe diferente da que desenvolveu.
+      4. Auditar periodicamente matriz de acesso de repositorios e
+         pipelines contra funcoes organizacionais.
+    tools:
+      - gitlab-ci
+      - codeowners
+      - approval-rules
+      - access-audit
+  secops:
+    prose: |
+      **Governanca de niveis de acesso:**
+      1. Elaborar e manter matriz de acesso formal para cada sistema
+         GMP com aprovacao da unidade da qualidade.
+      2. Revisar matriz de acesso semestralmente e sempre que houver
+         mudancas organizacionais significativas.
+      3. Implementar processo de certificacao de acessos onde gestores
+         confirmam periodicamente que acessos de seus subordinados
+         estao adequados.
+      4. Monitorar e investigar violacoes de segregacao de funcoes
+         detectadas por controles automatizados.
+      5. Documentar e justificar excecoes a segregacao de funcoes com
+         aprovacao da alta direcao e controles compensatorios.
+    tools:
+      - identity-governance
+      - access-certification
+      - sod-monitoring
+      - quality-management-system
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-15", "controle-A-5-3"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-a-1"]
+    relationship: mapped

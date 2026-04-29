@@ -1,0 +1,117 @@
+id: art-20
+family: cap-6
+title: "Certificacao e Validade de Documentos Medicos Eletronicos"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 20. Os documentos médicos eletrônicos assinados digitalmente
+    com certificado ICP-Brasil e carimbo de tempo têm a mesma validade
+    jurídica dos documentos em papel assinados manualmente pelo médico.
+
+    Parágrafo 1. A validade do documento médico eletrônico independe
+    do sistema utilizado para sua emissão, desde que a assinatura
+    digital e o carimbo de tempo sejam verificáveis e válidos.
+
+    Parágrafo 2. Farmácias, empregadores, operadoras de saúde e
+    demais destinatários devem aceitar documentos médicos eletrônicos
+    que atendam aos requisitos desta resolução.
+
+    Parágrafo 3. A instituição emissora deve manter disponível o
+    serviço de verificação de autenticidade dos documentos médicos
+    eletrônicos emitidos, durante o prazo de validade do documento
+    e, no mínimo, por 5 (cinco) anos após a emissão.
+guidance:
+  prose: |
+    O art. 20 consolida a validade juridica plena dos documentos
+    medicos eletronicos e estabelece obrigacoes tanto para emissores
+    quanto para destinatarios.
+
+    **Independencia de sistema (paragrafo 1):**
+    O documento eletronico nao depende do software que o gerou. A
+    validade vem da assinatura digital ICP-Brasil e do carimbo de
+    tempo, que sao padroes abertos verificaveis por qualquer
+    software compativel.
+
+    **Obrigacao dos destinatarios (paragrafo 2):**
+    Farmacias nao podem recusar receita eletronica valida. Empresas
+    nao podem recusar atestado eletronico valido. A recusa
+    injustificada pode caracterizar infracoes legais.
+
+    **Servico de verificacao por 5 anos (paragrafo 3):**
+    A instituicao emissora deve manter servico online de verificacao
+    de documentos por pelo menos 5 anos. Na pratica, como receitas
+    tem validade curta (30-60 dias), os 5 anos cobrem atestados e
+    laudos que podem ser contestados posteriormente.
+
+    **Implicacao tecnica:**
+    O servico de verificacao deve estar disponivel 24/7 com alta
+    disponibilidade, pois farmacias podem precisar validar receitas
+    a qualquer momento. Indisponibilidade do servico de verificacao
+    impede a dispensacao de medicamentos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Servico de verificacao de autenticidade:**
+      1. Implementar servico web de verificacao de documentos
+         medicos eletronicos com alta disponibilidade (99.9%+),
+         acessivel sem autenticacao para permitir validacao
+         por terceiros.
+      2. Expor API REST e pagina web de verificacao. O input
+         deve aceitar: codigo do documento (presente no QR Code),
+         upload do arquivo PDF para validacao da assinatura.
+      3. O servico deve retornar: status de autenticidade,
+         dados do documento (tipo, data, medico, instituicao),
+         status da assinatura digital e carimbo de tempo.
+      4. Implementar cache e CDN para garantir performance
+         mesmo sob alta demanda (ex.: farmacias validando
+         receitas em periodo de pico).
+      5. Manter servico ativo por minimo de 5 anos apos emissao
+         do ultimo documento, com politica de retencao de dados
+         de verificacao alinhada.
+    tools:
+      - verification-api
+      - high-availability-cluster
+      - cdn
+      - document-registry
+  devsecops:
+    prose: |
+      **Testes do servico de verificacao:**
+      1. Testar validacao de documentos autenticos: servico deve
+         confirmar autenticidade e retornar dados corretos.
+      2. Testar rejeicao de documentos adulterados: qualquer
+         alteracao no conteudo deve resultar em "invalido".
+      3. Testar disponibilidade do servico com testes de carga
+         simulando picos de validacao por farmacias.
+      4. Testar verificacao de documentos antigos (dentro dos
+         5 anos de obrigacao de manutencao do servico).
+    tools:
+      - gitlab-ci
+      - verification-tests
+      - tamper-detection-tests
+      - load-tests
+      - long-term-verification-tests
+  secops:
+    prose: |
+      **Governanca de verificacao:**
+      1. Monitorar disponibilidade do servico de verificacao com
+         SLA de 99.9% e alerta imediato para indisponibilidade.
+      2. Manter metricas de uso do servico de verificacao (volume
+         de validacoes, tipos de documento, origens das consultas).
+      3. Criar processo de comunicacao para farmacias e
+         empregadores sobre o servico de verificacao disponivel.
+      4. Definir plano de contingencia para indisponibilidade
+         do servico (ex.: farmacia pode aceitar receita com
+         validacao offline da assinatura ICP-Brasil).
+    tools:
+      - uptime-monitoring
+      - analytics-dashboard
+      - communication-management
+      - contingency-plan
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-24"]
+    relationship: complements

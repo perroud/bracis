@@ -1,0 +1,94 @@
+id: art-10
+family: cap-2
+title: "Security Clearance Renewal and Revocation"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 10. A credencial de segurança será renovada periodicamente,
+    conforme regulamentação do Gabinete de Segurança Institucional da
+    Presidência da República.
+
+    § 1º A credencial de segurança poderá ser suspensa ou cancelada a
+    qualquer tempo, por decisão fundamentada da autoridade competente
+    ou do Núcleo de Segurança e Credenciamento.
+
+    § 2º A suspensão ou o cancelamento da credencial de segurança
+    implicará a imediata restrição de acesso à informação classificada,
+    sem prejuízo de outras medidas cabíveis.
+
+    § 3º O portador da credencial de segurança suspensa ou cancelada
+    deverá devolver toda informação classificada em seu poder.
+guidance:
+  prose: |
+    Article 10 establishes the clearance lifecycle management rules:
+
+    **Periodic renewal:**
+    - Clearances are not permanent — they require periodic renewal
+    - Renewal frequency is defined by GSI/PR regulations
+    - Renewal involves re-investigation to verify continued eligibility
+
+    **Suspension and cancellation:**
+    - Can occur at any time with a justified decision
+    - Authority: the competent authority or NSC
+    - Immediate effect: access must be cut immediately upon suspension
+    - Information return: the person must return all classified materials
+
+    **Critical automation requirement:**
+    The immediate access restriction upon suspension/cancellation requires
+    real-time integration between the clearance management system and
+    all access control systems. Any delay creates a compliance gap.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automated clearance lifecycle:**
+      1. Implement clearance expiration tracking with automated renewal
+         reminders (90, 60, 30 days before expiration).
+      2. Deploy real-time clearance revocation: when a clearance is
+         suspended or cancelled, all access tokens and sessions must be
+         invalidated within minutes (not hours or days).
+      3. Implement clearance status synchronization between the NSC
+         registry and all downstream access control systems.
+      4. Create automated information recall workflow: upon revocation,
+         generate a list of all classified materials accessed and trigger
+         return/destruction verification.
+    tools:
+      - iam-platform
+      - session-management
+      - clearance-sync
+      - recall-workflow
+  devsecops:
+    prose: |
+      **Clearance revocation in CI/CD:**
+      1. Implement webhook-triggered access revocation: when clearance
+         status changes, immediately revoke repository access.
+      2. Remove cached credentials and local clones when clearance is
+         revoked — implement device management policies.
+      3. Audit all actions performed by the person between the revocation
+         event and effective access termination.
+    tools:
+      - webhook-integration
+      - device-management
+      - audit-logging
+  secops:
+    prose: |
+      **Clearance lifecycle governance:**
+      1. Track all clearance statuses: active, pending-renewal, suspended,
+         cancelled, expired.
+      2. Implement SLA for revocation execution: target < 1 hour from
+         suspension decision to effective access termination.
+      3. Verify classified material return upon clearance cancellation:
+         conduct physical and digital inventory check.
+      4. Report clearance lifecycle metrics to GSI/PR as required.
+    tools:
+      - clearance-database
+      - sla-monitoring
+      - inventory-management
+      - grc-platform
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-5", "art-7"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PS-4", "PS-5"]
+    relationship: mapped

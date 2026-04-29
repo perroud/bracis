@@ -1,0 +1,91 @@
+id: soc1-ca-processing-integrity
+family: control-activities
+title: "Transaction Processing Integrity and Completeness"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization implements controls to ensure that transactions are processed
+    completely, accurately, in a timely manner, and only with proper authorization. Input
+    controls validate transactions before processing; processing controls ensure that
+    calculations, postings, and transformations are performed correctly; and output controls
+    confirm that processed data is complete and accurately reported to user entities.
+    The service organization implements edit and validation checks to reject invalid transactions,
+    reconciliation procedures to confirm that all transactions entered for processing are
+    processed and reported, and exception reporting to identify transactions that require
+    manual investigation. Reconciliations are performed on a defined schedule, documented,
+    and reviewed by an appropriate level of management.
+guidance:
+  prose: >-
+    Processing integrity is the core control objective of SOC 1 — it addresses whether the
+    service provided to user entities ensures that their financial data is processed accurately
+    and completely. Auditors test processing integrity controls by examining reconciliation
+    procedures, reviewing exception reports and their resolution, testing edit checks for
+    representative transaction types, and confirming that output reports to user entities
+    are accurate and complete. The specific controls tested will depend on the nature of the
+    service organization's processing (payroll, payment processing, general ledger outsourcing,
+    etc.), but the common thread is that every transaction that enters the system must be
+    accounted for, and the output must reconcile to the input. Service organizations should
+    document their processing integrity controls at the transaction type level and maintain
+    evidence of reconciliation performance for the audit examination period.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement application-level controls that enforce processing integrity automatically.
+      Use database transactions with ACID properties for all financial data writes to
+      ensure atomicity and prevent partial updates. Implement input validation at all
+      entry points using schema validation and business rule enforcement. Deploy message
+      queuing with guaranteed delivery and idempotent processing to ensure no transactions
+      are lost or duplicated. Implement automated reconciliation jobs that run on defined
+      schedules and produce exception reports when discrepancies are detected. Store
+      reconciliation results and exception reports in an audit log. Use cryptographic
+      checksums on financial data packages transferred between systems to detect corruption.
+    tools:
+      - kafka
+      - postgresql
+      - redis
+      - apache-flink
+      - aws-step-functions
+  devsecops:
+    prose: >-
+      Enforce processing integrity in the software development process. Implement comprehensive
+      automated testing for all financial calculation logic including unit tests, integration
+      tests, and regression tests. Define and enforce data quality rules through automated
+      testing in the CI/CD pipeline. Use contract testing (e.g., Pact) to ensure that
+      interfaces between financial processing services maintain data integrity. Require
+      that all changes to financial processing logic include updated tests that cover
+      edge cases such as zero values, negative numbers, rounding, and currency conversion.
+      Implement mutation testing to verify test coverage quality for financial calculation
+      code. Scan for common financial calculation vulnerabilities in static analysis.
+    tools:
+      - pytest
+      - junit
+      - pact
+      - pitest
+      - sonarqube
+  secops:
+    prose: >-
+      Implement and document reconciliation procedures for all key transaction types,
+      specifying frequency, responsible role, review requirements, and exception handling.
+      Maintain a reconciliation log that records each reconciliation performed, the result,
+      and how exceptions were resolved. Implement an exception management process that
+      routes unresolved reconciliation exceptions to management for review and resolution
+      within defined timeframes. Review exception trends periodically to identify systemic
+      processing integrity issues. Retain reconciliation documentation for the full audit
+      examination period.
+    tools:
+      - tableau
+      - power-bi
+      - splunk
+      - servicenow
+      - oracle-account-reconciliation
+related_controls:
+  - control_id: soc1-ca-itgc-program
+    relationship: implements
+    description: "ITGC controls support the reliability of financial transaction processing."
+  - control_id: soc1-ca-backup-recovery
+    relationship: supports
+    description: "Backup and recovery ensures transaction data is not lost, supporting processing completeness."
+  - control_id: soc1-avail-uptime
+    relationship: supports
+    description: "System availability ensures financial transactions can be processed as committed."

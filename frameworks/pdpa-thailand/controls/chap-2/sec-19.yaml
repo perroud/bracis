@@ -1,0 +1,104 @@
+id: sec-19
+family: chap-2
+title: "Collection of Personal Data"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 19. A data controller shall not collect, use, or disclose personal data unless
+    the data subject has given consent prior to or at the time of collection, use, or
+    disclosure, except where this Act or other laws permit without consent.
+
+    The collection of personal data shall be carried out to the extent necessary for lawful
+    purposes of the data controller, and the data controller shall inform the data subject
+    of the purposes of collection before or at the time of collection.
+  parts:
+    - id: sec-19-1
+      label: "Paragraph 1"
+      prose: |
+        No collection, use, or disclosure without prior consent or legal basis.
+    - id: sec-19-2
+      label: "Paragraph 2"
+      prose: |
+        Collection shall be limited to what is necessary for the lawful purposes
+        of the data controller. The data controller must inform the data subject
+        of the purposes before or at the time of collection.
+    - id: sec-19-3
+      label: "Paragraph 3"
+      prose: |
+        Lawful bases for processing without consent include: (1) research or
+        statistical purposes; (2) prevention or suppression of danger to life, body,
+        or health; (3) performance of a contract; (4) public interest or exercise
+        of official authority; (5) legitimate interests; (6) compliance with law.
+guidance:
+  prose: |
+    Section 19 establishes the fundamental requirement for lawful processing of personal
+    data under the PDPA. Similar to GDPR Article 6 and LGPD Article 7, it requires
+    a lawful basis before any collection, use, or disclosure can occur.
+
+    Key implementation considerations for engineering teams:
+
+    - **Lawful Basis Documentation:** Every data processing activity must have a
+      documented lawful basis. Create a Register of Processing Activities (ROPA)
+      mapping each data element to its corresponding legal basis.
+
+    - **Consent as Default:** When no other lawful basis applies, obtain consent
+      before collection. This means consent flows must be implemented before any
+      data-collecting feature goes live.
+
+    - **Purpose Specification:** The purpose must be communicated before or at the
+      time of collection. This translates to privacy notices on forms, API
+      documentation, and consent dialogs.
+
+    - **Necessity Principle:** Collect only what is strictly necessary. Review every
+      database column, API field, and form input to verify necessity.
+
+    - **Alternative Lawful Bases:** Understand when consent is not required (contract
+      performance, legal obligation, vital interests, public interest, legitimate
+      interests). Misidentifying the lawful basis creates compliance risk.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a centralized consent management service that records lawful basis
+         per data element and purpose.
+      2. Build a ROPA (Register of Processing Activities) as a structured data store,
+         not a spreadsheet. Link it to data catalog metadata.
+      3. Enforce purpose-binding at the API gateway level: requests must declare the
+         processing purpose, validated against the ROPA.
+      4. Implement privacy notices as configurable content served before data collection
+         points (forms, SDKs, API onboarding).
+      5. Design data models with lawful basis metadata: each personal data field should
+         reference its legal justification.
+    tools:
+      - consent-management-platform
+      - data-catalog
+      - api-gateway
+      - privacy-notice-service
+  devsecops:
+    prose: |
+      1. Add CI/CD checks that flag new database columns or API fields collecting personal
+         data without a corresponding ROPA entry.
+      2. Implement privacy linting rules to detect data collection without consent or
+         purpose declaration in code.
+      3. Run automated tests validating that consent is obtained before data persistence.
+      4. Scan for hardcoded purposes or missing purpose parameters in API calls.
+    tools:
+      - privacy-linter
+      - schema-diff-validator
+      - consent-test-suite
+  secops:
+    prose: |
+      1. Monitor for data collection events that lack a corresponding consent record.
+      2. Alert on data access patterns that do not match declared purposes in the ROPA.
+      3. Maintain audit logs of all consent grants and revocations.
+      4. Conduct periodic reviews of lawful basis assignments.
+    tools:
+      - siem
+      - consent-audit-trail
+      - data-access-monitor
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 6"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 7"]
+    relationship: equivalent-to

@@ -1,0 +1,113 @@
+id: art-2
+family: cap-1
+title: "Definicoes Tecnicas e Terminologia"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 2. Para fins desta Resolução Normativa, considera-se:
+
+    I - segurança cibernética: conjunto de ações, procedimentos e mecanismos destinados
+    a proteger os ativos de informação e os sistemas cibernéticos dos agentes do setor
+    elétrico contra ameaças, ataques e acessos não autorizados;
+
+    II - ativo cibernético: hardware, software, dados, redes, sistemas de controle
+    industrial e demais recursos digitais essenciais à operação dos sistemas elétricos;
+
+    III - incidente cibernético: evento ou série de eventos adversos que comprometem ou
+    têm potencial de comprometer a confidencialidade, integridade ou disponibilidade de
+    ativos cibernéticos do setor elétrico;
+
+    IV - sistemas de controle industrial (ICS/SCADA): sistemas utilizados para monitorar
+    e controlar processos industriais, incluindo sistemas de supervisão e aquisição de
+    dados (SCADA), sistemas de controle distribuído (DCS), controladores lógicos
+    programáveis (PLC) e unidades terminais remotas (RTU).
+guidance:
+  prose: |
+    As definicoes do art. 2 sao fundamentais para determinar o que deve ser protegido
+    e o que constitui um evento reportavel.
+
+    **Ativo cibernetico no setor eletrico:**
+    No contexto do setor eletrico, os ativos ciberneticos incluem tanto componentes IT
+    tradicionais quanto sistemas OT especializados:
+    - Sistemas SCADA que monitoram subestacoes, linhas de transmissao e usinas
+    - RTUs (Remote Terminal Units) que coletam dados de campo e executam comandos
+    - IEDs (Intelligent Electronic Devices) que protegem equipamentos de alta tensao
+    - Sistemas de gerenciamento de energia (EMS/SCADA corporativo)
+    - Redes de comunicacao industrial (DNP3, IEC 61850, Modbus)
+    - Sistemas de medicao de energia e faturamento
+
+    **Incidente cibernetico vs. falha operacional:**
+    E essencial distinguir incidentes ciberneticos de falhas operacionais normais.
+    Um incidente cibernetico implica acao intencional ou exploracao de vulnerabilidade.
+    A investigacao de causa raiz deve sempre verificar a hipotese cibernetica.
+
+    **Triade CID no setor eletrico:**
+    - Confidencialidade: protecao de dados operacionais, topologia da rede, planos de carga
+    - Integridade: garantia de que comandos SCADA sao autenticos e nao manipulados
+    - Disponibilidade: prioridade maxima — interrupcao de energia tem impacto imediato
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar taxonomia padronizada de ativos ciberneticos alinhada as definicoes
+      da ANEEL 964 no CMDB corporativo:
+
+      1. Criar categorias de ativos: IT, OT-SCADA, OT-DCS, OT-PLC, OT-RTU, OT-IED,
+         Rede-Industrial, Fronteira-IT/OT, Medicao
+      2. Mapear cada ativo a sua criticidade para o SIN (critico, importante, corporativo)
+      3. Registrar protocolos de comunicacao utilizados por cada ativo OT
+         (DNP3, IEC 61850, Modbus TCP, IEC 60870-5-104, etc.)
+      4. Documentar interfaces entre sistemas IT e OT (historians, gateways)
+
+      Manter inventario atualizado com scans automaticos da rede corporativa IT.
+      Para redes OT, usar ferramentas passivas de descoberta (Claroty, Nozomi, Dragos)
+      que nao interferem com sistemas de controle em operacao.
+    tools:
+      - claroty
+      - nozomi-networks
+      - dragos
+      - servicenow-cmdb
+      - netbox
+  devsecops:
+    prose: |
+      Padronizar o modelo de dados de ativos ciberneticos como codigo:
+
+      1. Definir schema YAML para inventario de ativos OT/IT
+      2. Validar automaticamente que novos ativos incluem todos os campos obrigatorios
+         (tipo, criticidade para SIN, protocolo, localizacao, responsavel)
+      3. Bloquear deploys de sistemas que nao tenham classificacao de ativo registrada
+      4. Gerar alertas quando o inventario de ativos nao e atualizado por mais de 30 dias
+
+      Integrar o dicionario de termos ANEEL 964 ao processo de documentacao:
+      garantir que toda a documentacao tecnica use terminologia consistente.
+    tools:
+      - gitlab-ci
+      - conftest
+      - json-schema
+      - mkdocs
+  secops:
+    prose: |
+      Adotar as definicoes da ANEEL 964 como base do programa de gestao de incidentes:
+
+      1. Configurar regras de deteccao no SIEM alinhadas a definicao de incidente cibernetico
+      2. Treinar analistas de SOC na diferenciacao entre incidente cibernetico e falha operacional
+      3. Definir procedimentos de investigacao de causa raiz que incluam hipotese cibernetica
+      4. Criar playbooks especificos para cada tipo de ativo (SCADA, RTU, PLC, IED)
+
+      Estabelecer glossario interno alinhado com ANEEL 964, NERC CIP e IEC 62443
+      para garantir comunicacao clara entre equipes IT, OT e regulatoria.
+    tools:
+      - splunk
+      - elastic-siem
+      - ibm-qradar
+      - servicenow-itsm
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-002"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["1-1", "2-1-3.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.9", "A.5.12"]
+    relationship: supports

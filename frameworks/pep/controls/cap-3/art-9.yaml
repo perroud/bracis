@@ -1,0 +1,112 @@
+id: art-9
+family: cap-3
+title: "Processo de Assinatura Digital de Registros Clinicos"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 9. Todo registro clínico no prontuário eletrônico do paciente
+    deve ser assinado digitalmente pelo profissional de saúde
+    responsável, no momento da realização do registro.
+
+    Parágrafo 1. A assinatura digital deve abranger a totalidade do
+    conteúdo do registro, incluindo texto, dados estruturados,
+    imagens e anexos.
+
+    Parágrafo 2. É vedada a assinatura digital em lote ou retroativa
+    de registros clínicos, exceto em situações de contingência
+    documentadas e justificadas pela instituição.
+
+    Parágrafo 3. O sistema PEP deve garantir que o registro não
+    possa ser salvo como definitivo sem a assinatura digital do
+    profissional responsável, quando em nível NGS2.
+guidance:
+  prose: |
+    O art. 9 estabelece a assinatura digital como ato indissociavel
+    do registro clinico. O profissional assina NO momento em que
+    registra, nao depois.
+
+    **Vedacao de assinatura em lote (paragrafo 2):**
+    Pratica comum mas irregular: profissional registra varios
+    atendimentos e assina todos ao final do plantao. Isso compromete
+    a tempestividade e pode ser questionado juridicamente.
+
+    **Situacao de contingencia (paragrafo 2, excecao):**
+    Em caso de indisponibilidade do sistema de assinatura digital
+    (ex.: falha no servidor de timestamp, token defeituoso), a
+    instituicao deve ter procedimento documentado de contingencia
+    que permita registro temporario sem assinatura, com assinatura
+    retroativa em prazo definido (recomendado: 24 horas).
+
+    **Abrangencia da assinatura (paragrafo 1):**
+    A assinatura deve cobrir todo o conteudo. Se o registro incluir
+    imagem (ex.: foto de lesao), a assinatura deve englobar a imagem
+    tambem, nao apenas o texto.
+
+    **Imutabilidade pos-assinatura:**
+    Apos assinatura, o registro e selado criptograficamente. Qualquer
+    alteracao invalida a assinatura. Correcoes devem ser feitas como
+    adendo vinculado ao registro original.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de assinatura digital no PEP:**
+      1. Implementar fluxo de assinatura inline: ao clicar
+         "salvar" no registro clinico, o sistema solicita
+         automaticamente a assinatura digital (PIN do token ou
+         senha do certificado A1).
+      2. Gerar hash SHA-256 do conteudo completo do registro
+         (incluindo metadados, imagens e anexos) e assinar o hash
+         com o certificado do profissional.
+      3. Solicitar carimbo de tempo da ACT imediatamente apos
+         a assinatura e vincular ao registro.
+      4. Armazenar registro assinado em formato CAdES (binario)
+         ou PAdES (PDF) conforme tipo de documento, em storage
+         imutavel (WORM).
+      5. Implementar modo de contingencia: permitir registro
+         temporario sem assinatura, com fila de pendencias e
+         assinatura retroativa em ate 24h.
+    tools:
+      - digital-signature-sdk
+      - timestamp-authority
+      - worm-storage
+      - contingency-queue
+  devsecops:
+    prose: |
+      **Testes de assinatura digital:**
+      1. Testar que registro nao pode ser salvo como definitivo
+         sem assinatura digital em modo NGS2.
+      2. Validar que assinatura cobre conteudo completo (alterar
+         1 byte do registro deve invalidar assinatura).
+      3. Testar fluxo de contingencia: registro sem assinatura,
+         fila de pendencias, assinatura retroativa.
+      4. Verificar que registros assinados sao imutaveis: rejeitar
+         tentativas de UPDATE em registros ja assinados.
+    tools:
+      - gitlab-ci
+      - signature-integrity-tests
+      - immutability-tests
+      - contingency-flow-tests
+  secops:
+    prose: |
+      **Monitoramento de assinaturas:**
+      1. Monitorar taxa de registros assinados vs. pendentes,
+         alertando quando pendencias excedem 24 horas.
+      2. Auditar mensalmente amostra de assinaturas verificando
+         validade, cadeia de confianca e presenca de timestamp.
+      3. Investigar imediatamente registros salvos sem assinatura
+         fora de situacao de contingencia documentada.
+      4. Manter registro de todas as situacoes de contingencia
+         com justificativa e prazo de regularizacao.
+    tools:
+      - signature-monitoring
+      - compliance-dashboard
+      - audit-scheduler
+      - contingency-log
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-c", "164.312-e"]
+    relationship: mapped

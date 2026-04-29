@@ -1,0 +1,102 @@
+id: ctrl-13
+family: fam-4
+title: "Gestao de Configuracao e Hardening de Sistemas do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar processo formal de gestão de configuração
+    para todos os ativos do ARCiber, incluindo o estabelecimento de baselines
+    de configuração segura (hardening) para os sistemas operacionais, aplicações
+    e dispositivos de rede que integram o Ambiente Regulado Cibernético. As
+    configurações baseline devem ser documentadas, versionadas e aplicadas de
+    forma consistente. Qualquer desvio da configuração baseline deve ser
+    detectado, avaliado e corrigido por meio do processo formal de gestão
+    de mudanças. Configurações padrões inseguras de fabricante devem ser
+    removidas antes da entrada em operação de qualquer ativo no ARCiber.
+
+guidance:
+  prose: >-
+    O hardening de sistemas OT/ICS deve equilibrar seguranca com disponibilidade
+    operacional — modificacoes imprudentes podem causar falhas em sistemas
+    criticos do SIN. Os controles devem abranger: (i) baselines de configuracao
+    segura por tipo de ativo: servidores SCADA (Windows Server hardened, servicos
+    desnecessarios desabilitados, portas fechadas), workstations de engenharia
+    (application whitelisting, USB desabilitado), PLCs/RTUs (portas de comunicacao
+    desnecessarias desabilitadas, firmware atualizado), switches industriais
+    (VLANs configuradas, portas nao utilizadas desabilitadas); (ii) processo
+    formal de gestao de mudancas com aprovacao dupla (engenheiro OT + RSCA)
+    para qualquer alteracao de configuracao em sistema do ARCiber;
+    (iii) monitoramento de integridade de configuracao com alerta para desvios;
+    (iv) documentacao e versionamento de todas as configuracoes de sistemas
+    criticos do ARCiber (PLC programs, SCADA configs, firewall rules).
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar gerenciamento de configuracao como codigo (CaC) para sistemas
+      do ARCiber que suportam automacao — usar Ansible para servidores e
+      workstations Windows/Linux, com playbooks versionados no GitLab.
+      Implementar solucao de monitoramento de integridade de configuracao
+      (Tripwire, OSSEC, ou funcionalidade equivalente do Nozomi/Claroty) para
+      detectar mudancas nao autorizadas em arquivos de configuracao criticos
+      dos sistemas SCADA. Manter repositorio GitLab com todas as configuracoes
+      baseline documentadas e versionadas por tipo de ativo do ARCiber.
+      Implementar pipeline CI/CD para aplicacao controlada de configuracoes
+      com aprovacao obrigatoria.
+    tools:
+      - ansible
+      - gitlab
+      - tripwire
+      - nozomi-networks
+      - claroty
+  devsecops:
+    prose: >-
+      Implementar pipeline de validacao de configuracao que compare a configuracao
+      atual dos sistemas do ARCiber com a baseline aprovada, gerando relatorio
+      de desvios. Usar ferramentas de Infrastructure as Code (Ansible, Puppet,
+      Chef) para aplicar configuracoes baseline de forma repetivel e auditavel.
+      Implementar testes automatizados de hardening (CIS Benchmarks adaptados
+      para OT) como parte do processo de comissionamento de novos sistemas.
+      Bloquear no pipeline qualquer deploy de configuracao que desative controles
+      de seguranca criticos sem aprovacao do RSCA.
+    tools:
+      - ansible
+      - gitlab-ci
+      - inspec
+      - cis-cat
+      - opa
+  secops:
+    prose: >-
+      Realizar auditoria trimestral de conformidade de configuracao dos sistemas
+      criticos do ARCiber em relacao as baselines aprovadas. Investigar e
+      documentar cada desvio de configuracao identificado, determinando causa
+      raiz (mudanca autorizada nao documentada, mudanca nao autorizada, desvio
+      tecnico). Manter processo de gestao de mudancas integrado ao registro de
+      ativos do ARCiber — toda mudanca de configuracao deve ter um ticket de
+      mudanca associado. Verificar que configuracoes de sistemas substituidos
+      ou descomissionados sao sanitizadas antes do descarte.
+    tools:
+      - servicenow
+      - tripwire
+      - nozomi-networks
+      - splunk
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-1 cl.4.3.4.3", "62443-3-3 SR7.6"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-010-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a8.8", "a8.9"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-6", "CM-7", "SI-7"]
+    relationship: mapped

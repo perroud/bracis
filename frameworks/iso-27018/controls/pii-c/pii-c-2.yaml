@@ -1,0 +1,97 @@
+id: pii-c.2
+family: pii-c
+title: "Secure erasure of temporary PII"
+class: ISO27018
+
+statement:
+  prose: >-
+    Temporary files and documents that might contain PII shall be erased or made
+    unrecoverable within a specified, documented period. The public cloud PII
+    processor shall have a policy and implement measures providing for the timely
+    erasure of temporary PII, including that which exists in log files, debug
+    outputs, database transaction logs, staging areas, and intermediate processing
+    results. The cloud service customer shall be informed of the temporary PII
+    erasure policy and any associated retention periods.
+
+guidance:
+  prose: >-
+    This control specifically addresses the lifecycle of incidental PII copies
+    that arise during normal cloud service operations. Every processing operation
+    potentially creates PII traces across multiple system layers: application logs,
+    web server access logs, database query logs, message queue buffers, CDN caches,
+    debugging outputs, crash dumps, and temporary computation files. Each of these
+    represents a potential data leak point and a compliance obligation. The
+    processor must systematically identify all locations where incidental PII may
+    reside, define and document retention periods for each, implement automated
+    cleanup mechanisms, and verify that erasure is effective (i.e., the PII
+    cannot be recovered through forensic techniques). Cryptographic erasure, where
+    encryption keys are destroyed rather than data being overwritten, is an
+    acceptable approach for storage systems where granular deletion is impractical.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.3.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a temporary PII inventory that catalogs all system components where
+      incidental PII may reside. Implement automated lifecycle management for each
+      component: log rotation with PII-aware retention policies, database
+      transaction log purging, message queue TTLs, cache expiration, staging area
+      cleanup cron jobs, and crash dump sanitization. Deploy PII scanning agents
+      that continuously scan temporary storage locations and alert on PII persisting
+      beyond the defined retention period. Implement per-tenant encryption keys for
+      temporary storage to enable cryptographic erasure. Build erasure verification
+      jobs that attempt to recover data after deletion and confirm irrecoverability.
+    tools:
+      - log-rotation-manager
+      - pii-lifecycle-automation
+      - cryptographic-erasure-service
+      - pii-scanning-agents
+      - erasure-verification-jobs
+      - temp-storage-inventory
+
+  devsecops:
+    prose: >-
+      Enforce temporary PII management in the development lifecycle. Require that
+      all code creating temporary files or log entries containing PII includes
+      corresponding cleanup logic. CI pipeline rules should reject deployments
+      that introduce new temporary PII storage without documented retention and
+      cleanup mechanisms. Build static analysis rules that detect PII being
+      written to log files without redaction. Integration tests must verify that
+      temporary PII is cleaned up within the documented period. Include temporary
+      PII review in the security review checklist for all pull requests.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - pii-in-logs-detector
+      - cleanup-verification-tests
+      - temp-file-lifecycle-linter
+      - security-review-checklist
+
+  secops:
+    prose: >-
+      Monitor temporary PII erasure compliance across all system components.
+      Build dashboards tracking retention period adherence for each temporary
+      storage location. Alert on cleanup job failures or delays. Perform periodic
+      forensic sampling to verify that erased PII is truly unrecoverable.
+      Investigate any temporary PII that persists beyond its documented retention
+      period. Track metrics: erasure timeliness (percent within SLA), cleanup
+      coverage (percent of temporary locations with automated cleanup), and
+      residual PII (volume of PII past retention period).
+    tools:
+      - splunk
+      - elastic-siem
+      - erasure-compliance-dashboard
+      - forensic-recovery-tests
+      - cleanup-job-monitor
+      - retention-metrics
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.e", "art-17"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.4.5"]
+    relationship: complements

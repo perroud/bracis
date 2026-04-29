@@ -1,0 +1,85 @@
+id: pin-12
+family: pin-device
+title: "PIN Entry Device Physical Security"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    PIN entry devices (PEDs) used at attended and unattended points of interaction must be
+    evaluated and approved under the PCI PTS Device Testing and Approval Program. PEDs must
+    incorporate physical tamper-detection and tamper-response mechanisms that zeroize all
+    secret data (including PIN encryption keys) upon detection of physical intrusion. The
+    device must be designed to resist attacks including probing, environmental manipulation
+    (voltage glitching, temperature extremes, electromagnetic emanation), and component
+    removal or substitution. Approved PEDs must be listed on the PCI SSC list of approved
+    PTS devices and must not be deployed beyond their PCI PTS approval expiry date.
+
+guidance:
+  prose: >-
+    Physical security of PIN entry devices is the first line of defense in PIN protection
+    because the PED is the only point where the cleartext PIN exists outside of an HSM —
+    the brief moment between the cardholder pressing keys and the PED encrypting the PIN.
+    Tamper-detection mechanisms typically include mesh circuits that detect drill attempts,
+    tamper-evident seals that reveal case opening, and environmental sensors that detect
+    voltage or temperature manipulation designed to extract secrets. Organizations must
+    maintain an inventory of all deployed PEDs, track their PCI PTS approval status, and
+    have a decommissioning plan for devices approaching or exceeding their approval
+    expiry. PEDs deployed in unattended environments (ATMs, self-service kiosks) require
+    additional anti-skimming protections.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 4"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI PTS Device Testing and Approval Program"
+    url: "https://www.pcisecuritystandards.org/assessors_and_solutions/pin_transaction_devices"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Maintain a centralized asset management database of all deployed PEDs with model
+      number, serial number, firmware version, PCI PTS approval number, and approval
+      expiry date. Implement automated alerts for PEDs approaching PCI PTS approval
+      expiry (180, 90, 30 days). Deploy remote device management platforms that can
+      query PED health status, firmware versions, and tamper detection status. Implement
+      network-level controls that restrict PED communications to authorized transaction
+      processing endpoints only.
+    tools:
+      - device-management-platform
+      - asset-inventory-system
+      - network-access-control
+      - pci-pts-device-registry
+  devsecops:
+    prose: >-
+      Implement firmware integrity verification in deployment pipelines for PED firmware
+      updates. Validate firmware signatures before approving deployment to production
+      devices. Scan PED management system configurations for secure communication
+      settings. Test PED integration endpoints for input validation and error handling
+      to prevent protocol-level attacks.
+    tools:
+      - gitlab-sast
+      - firmware-signing-tools
+      - integration-test-framework
+  secops:
+    prose: >-
+      Conduct periodic physical inspections of deployed PEDs for evidence of tampering,
+      overlay devices (skimmers), or unauthorized modifications. Monitor PED tamper
+      alerts from the device management platform and respond immediately to any tamper
+      event. Review PED deployment locations for physical security adequacy. Audit PED
+      firmware versions against the approved firmware list and flag devices running
+      unapproved versions.
+    tools:
+      - physical-inspection-checklists
+      - device-management-platform
+      - splunk
+      - service-now
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-9.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-3", "PE-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.7.8", "A.7.9"]
+    relationship: mapped

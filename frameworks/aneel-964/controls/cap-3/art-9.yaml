@@ -1,0 +1,133 @@
+id: art-9
+family: cap-3
+title: "Gestao de Vulnerabilidades em Sistemas OT e IT"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 9. Os agentes do setor elétrico devem manter processo estruturado de gestão
+    de vulnerabilidades que abranja todos os sistemas críticos, observando:
+
+    I - monitoramento contínuo de vulnerabilidades divulgadas que afetem os sistemas,
+    equipamentos e softwares utilizados, incluindo publicações do CERT.br, ICS-CERT
+    e fabricantes de equipamentos industriais;
+
+    II - avaliação do impacto potencial de cada vulnerabilidade sobre a operação
+    dos sistemas elétricos e sobre a integridade do SIN;
+
+    III - adoção de processo formal de gestão de patches, com prazos de remediação
+    proporcionais ao nível de criticidade e ao impacto operacional de cada sistema;
+
+    IV - quando a aplicação de patches não for imediatamente viável em sistemas de
+    controle industrial, adoção de controles compensatórios documentados e aprovados
+    pela área de segurança cibernética.
+guidance:
+  prose: |
+    O art. 9 e um dos mais desafiadores para agentes do setor eletrico porque o
+    gerenciamento de patches em ambientes OT e fundamentalmente diferente de IT.
+
+    **O desafio do patch management em OT:**
+    - Muitos fornecedores de ICS nao lancam patches frequentemente
+    - Aplicacao de patches pode requerer parada do sistema (impacto na geracao/transmissao)
+    - Patches precisam ser testados exaustivamente — um patch mal aplicado pode
+      paralisar uma usina ou subestacao
+    - Sistemas legados muitas vezes nao recebem mais atualizacoes do fabricante
+    - SLAs de disponibilidade do SIN restringem janelas de manutencao
+
+    **Controles compensatorios (inciso IV):**
+    Quando o patch nao pode ser aplicado imediatamente, o agente deve documentar
+    e implementar controles compensatorios, como:
+    - Segmentacao de rede adicional (isolar o sistema vulneravel)
+    - Regras de firewall especificas para bloquear exploracao da vulnerabilidade
+    - Monitoramento intensificado do sistema afetado
+    - Restricao adicional de acesso ao sistema
+    - Desativacao de funcionalidades nao essenciais que contenham a vulnerabilidade
+
+    **Fontes de inteligencia de vulnerabilidades para OT:**
+    - ICS-CERT (CISA): alertas especificos para sistemas industriais
+    - Vendor security bulletins: Siemens ProductCERT, Schneider Electric, ABB, GE, Rockwell
+    - CERT.br: alertas relevantes para o contexto brasileiro
+    - ISACs de energia: E-ISAC (Electricity ISAC), ISAC BR
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Arquitetar solucao de vulnerability management dedicada para ambientes OT:
+
+      1. Scanner passivo de vulnerabilidades OT (Claroty, Nozomi, Dragos):
+         identifica ativos e versoes de firmware sem enviar trafego que possa
+         impactar sistemas industriais em operacao
+      2. Integracao com CMDB: cada vulnerabilidade identificada e linkada ao
+         ativo afetado com metadados de criticidade para o SIN
+      3. Pipeline de patch management diferenciado:
+         - IT: ciclo mensal automatizado com aprovacao minima
+         - OT critico: ciclo trimestral com testes em ambiente de homologacao,
+           aprovacao do gestor OT e janela de manutencao pre-agendada
+         - OT critico-SIN sem patch: controles compensatorios documentados
+           e aprovados com prazo de reavaliacao
+      4. Ambiente de homologacao OT: laboratorio que replica o ambiente industrial
+         para testes de patches antes de aplicacao em producao
+    tools:
+      - claroty
+      - nozomi-networks
+      - dragos-platform
+      - tenable-ot
+      - ansible
+  devsecops:
+    prose: |
+      Automatizar gestao de vulnerabilidades com foco em sistemas criticos:
+
+      1. Feed de ICS-CERT automaticamente importado no sistema de vulnerability
+         management, linkado ao inventario de ativos OT
+      2. Alertas automaticos quando nova vulnerabilidade afeta um ativo do inventario,
+         com severidade ajustada pela criticidade do ativo para o SIN
+      3. Pipeline de avaliacao de patches OT:
+         - Receber patch de fornecedor
+         - Executar testes automatizados em ambiente de homologacao
+         - Gerar relatorio de impacto operacional
+         - Criar MR no repositorio de configuracao com proposta de mudanca
+         - Fluxo de aprovacao (gestor OT + CISO) antes do deploy
+      4. Rastreamento de compensating controls como codigo: documentar no Git
+         cada controle compensatorio com prazo, aprovacao e status de remediacao
+    tools:
+      - gitlab-ci
+      - tenable-ot
+      - dependency-track
+      - grype
+      - ansible
+  secops:
+    prose: |
+      Operar o programa de vulnerability management para OT/IT:
+
+      1. Monitoramento diario de feeds de vulnerabilidades:
+         - ICS-CERT (CISA) advisories
+         - CERT.br alertas
+         - Vendor security bulletins (Siemens, Schneider, ABB, GE, Rockwell, SEL)
+      2. Triagem de vulnerabilidades OT: avaliar impacto para cada ativo afetado,
+         considerando criticidade para o SIN e viabilidade de patch
+      3. SLA de remediacao diferenciado:
+         - CVSS >= 9.0 em sistema critico-SIN: mitigacao em 72h (patch ou compensating control)
+         - CVSS >= 7.0 em sistema critico-SIN: remediacao em 30 dias
+         - CVSS >= 7.0 em sistema corporativo: remediacao em 90 dias
+      4. Documentacao formal de compensating controls: aprovacao do CISO +
+         gestor de operacoes OT, revisao mensal de cada controle pendente
+      5. Relatorio mensal de status do programa de vulnerability management
+         para a lideranca de seguranca e gestao de operacoes
+    tools:
+      - tenable-ot
+      - claroty
+      - nozomi-networks
+      - grc-platform
+      - jira
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-007-R2", "CIP-010-R2"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.3", "3-3-SR-7.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.8"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5", "SI-2", "SI-3"]
+    relationship: supports

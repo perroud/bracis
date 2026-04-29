@@ -1,0 +1,105 @@
+id: sec-2
+family: gen
+title: "Interpretation and Definitions"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    In this Act, unless the context otherwise requires —
+
+    "personal data" means data, whether true or not, about an individual who can be
+    identified — (a) from that data; or (b) from that data and other information to
+    which the organisation has or is likely to have access;
+
+    "organisation" includes any individual, company, association or body of persons,
+    corporate or unincorporate, whether or not — (a) formed or recognised under the
+    law of Singapore; or (b) resident, or having an office or a place of business,
+    in Singapore;
+
+    "data intermediary", in relation to another organisation, means an organisation
+    which processes personal data on behalf of the other organisation pursuant to a
+    contract which is evidenced or made in writing but does not include an employee
+    of that other organisation.
+
+guidance:
+  prose: |
+    Section 2 defines core terms that underpin the entire PDPA. The definition of
+    "personal data" is deliberately broad — it includes any data about an identifiable
+    individual, whether true or not. This means even inaccurate data about a person
+    qualifies as personal data.
+
+    The definition of "organisation" captures any entity regardless of incorporation
+    status, including sole proprietors, partnerships, companies, and associations.
+    Public agencies are expressly excluded from the PDPA's data protection provisions
+    under Section 4.
+
+    "Data intermediary" is Singapore's equivalent of a data processor under the GDPR.
+    Data intermediaries process personal data on behalf of another organisation under
+    a written contract. They are subject to protection and retention obligations under
+    the Ninth Schedule but are exempt from most other obligations.
+
+references:
+  - citation: "PDPA 2012, Section 2"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Maintain a data dictionary that classifies all data fields as personal data,
+         sensitive personal data, or non-personal data per PDPA definitions.
+      2. Implement data tagging and classification in data catalogs to mark fields that
+         constitute personal data under the PDPA's broad definition.
+      3. Create a registry of all data intermediaries (processors) with their written
+         contracts, processing scope, and compliance status.
+      4. Build automated data discovery pipelines that detect new personal data fields
+         across databases, object storage, caches, and logs.
+      5. Implement metadata management to track data lineage from collection through
+         processing and disclosure.
+    tools:
+      - datahub
+      - openmetadata
+      - apache-atlas
+      - backstage
+      - data-classification-engine
+
+  devsecops:
+    prose: |
+      1. Integrate data classification checks into CI/CD pipelines to flag new personal
+         data fields in schema migrations and code changes.
+      2. Implement linting rules that require data classification annotations on all
+         database columns and API response fields.
+      3. Scan code for direct personal data handling and ensure it routes through
+         approved data access layers.
+      4. Validate that data intermediary integrations use approved SDKs and authorized
+         endpoints defined in processing contracts.
+    tools:
+      - semgrep
+      - gitlab-ci
+      - sonarqube
+      - custom-data-classification-linters
+
+  secops:
+    prose: |
+      1. Audit data classification completeness quarterly — verify all systems
+         containing personal data are cataloged.
+      2. Monitor for unauthorized data intermediary access patterns.
+      3. Review data intermediary contracts annually to ensure they reflect actual
+         processing activities.
+      4. Track changes to the data dictionary and flag unclassified data fields.
+    tools:
+      - siem
+      - data-discovery
+      - compliance-dashboard
+      - contract-management
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-4"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-140"]
+    relationship: mapped

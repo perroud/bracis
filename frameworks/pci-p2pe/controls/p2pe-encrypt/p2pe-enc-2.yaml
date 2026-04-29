@@ -1,0 +1,110 @@
+id: p2pe-enc-2
+family: p2pe-encrypt
+title: "Encryption Method and Cipher Suite Requirements"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The P2PE solution shall employ encryption methods that ensure account
+    data confidentiality from the POI device through to the decryption
+    environment. Encryption keys used at the POI device shall be unique
+    per transaction or derived using an approved key derivation method
+    such as DUKPT (Derived Unique Key Per Transaction). The encrypted
+    payload format shall prevent partial decryption or selective extraction
+    of account data fields. The solution provider shall document all
+    cryptographic algorithms, key lengths, modes of operation, and padding
+    schemes used in the encryption process.
+  parts:
+    - id: p2pe-enc-2.a
+      label: "Domain 1, 1C"
+      prose: >-
+        Encryption keys are unique per transaction or derived using an
+        approved mechanism such as DUKPT, ensuring that compromise of a
+        single transaction key does not expose other transactions.
+    - id: p2pe-enc-2.b
+      label: "Domain 1, 1D"
+      prose: >-
+        The encrypted data format prevents selective field extraction
+        and the solution provider maintains comprehensive documentation
+        of all cryptographic parameters.
+
+guidance:
+  prose: >-
+    DUKPT is the predominant key derivation scheme for P2PE because it
+    generates a unique key for each transaction from a base derivation key
+    (BDK), limiting the exposure from any single key compromise. AES-DUKPT
+    (as defined in ANSI X9.24-3) is preferred over TDEA-DUKPT due to
+    stronger security margins. The encrypted payload should include the
+    entire track data or equivalent, encrypted as a single blob, so that
+    individual fields (PAN, expiration date, service code) cannot be
+    selectively extracted. Solution providers must document the complete
+    cryptographic specification, including algorithm (AES-128, AES-256,
+    TDEA), mode of operation (CBC, CTR, GCM), initialization vector
+    handling, and any padding applied.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 1 — Encryption Device and Application Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "ANSI X9.24-3 — AES-DUKPT"
+    url: "https://webstore.ansi.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure POI devices to use AES-DUKPT with 128-bit or 256-bit keys
+      where supported. Implement a DUKPT key management server that tracks
+      Key Serial Numbers (KSNs) and BDK identifiers for all deployed
+      devices. Store BDKs exclusively within FIPS 140-2 Level 3 (or higher)
+      HSMs. Build automated validation that verifies encrypted payloads
+      from POI devices conform to the documented cryptographic specification
+      (correct algorithm, key length, IV handling). Provision separate BDKs
+      per merchant or merchant group to limit blast radius of a BDK
+      compromise.
+    tools:
+      - thales-payshield
+      - futurex-vectera
+      - hashicorp-vault
+      - aws-cloudhsm
+      - azure-dedicated-hsm
+
+  devsecops:
+    prose: >-
+      Include cryptographic specification validation tests in CI/CD
+      pipelines for any component that parses or forwards encrypted payloads.
+      Scan code for hardcoded cryptographic keys, deprecated algorithms, or
+      incorrect mode-of-operation usage. Enforce that no component in the
+      merchant path attempts to decrypt, re-encrypt, or transform the
+      encrypted payload. Use SAST rules to detect patterns indicating
+      cleartext PAN handling in application code.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - checkov
+      - bandit
+
+  secops:
+    prose: >-
+      Monitor DUKPT counter progression for anomalies (counter resets,
+      large gaps, or reuse indicating device cloning). Alert on any
+      encrypted payload that does not match the expected format or length.
+      Track BDK usage metrics and generate alerts if a BDK approaches its
+      maximum derivation count. Conduct quarterly cryptographic compliance
+      reviews comparing deployed configurations against the documented
+      specification.
+    tools:
+      - splunk
+      - elastic-siem
+      - hsm-audit-logs
+      - custom-kms-monitoring
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.5", "req-3.6"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: supports

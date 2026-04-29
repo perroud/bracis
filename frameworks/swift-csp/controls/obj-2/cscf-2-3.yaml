@@ -1,0 +1,114 @@
+id: cscf-2.3
+family: obj-2
+title: "System Hardening"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Reduce the cyber attack surface of SWIFT-related components by hardening
+    all systems within the secure zone. Unnecessary services, protocols,
+    ports, and accounts must be removed or disabled. System configurations
+    must follow industry-recognized hardening standards.
+  parts:
+    - id: cscf-2.3.a
+      label: "2.3.a"
+      prose: >-
+        All operating systems within the secure zone are hardened according
+        to CIS benchmarks or equivalent industry standards. Default accounts
+        are disabled or renamed, and default passwords are changed.
+    - id: cscf-2.3.b
+      label: "2.3.b"
+      prose: >-
+        Only services, protocols, and ports required for SWIFT operations
+        are enabled. All unnecessary services are disabled and documented.
+    - id: cscf-2.3.c
+      label: "2.3.c"
+      prose: >-
+        Application whitelisting is implemented on operator PCs and
+        critical servers within the secure zone, allowing only approved
+        executables to run.
+
+guidance:
+  prose: >-
+    System hardening removes unnecessary functionality that attackers could
+    exploit. Every running service, open port, and installed application
+    represents potential attack surface. Organizations should establish
+    hardened baseline images for each system role within the secure zone
+    (messaging server, operator PC, connector server). These baselines
+    should be reviewed and updated at least annually. Application whitelisting
+    is particularly critical for operator PCs, as it prevents execution of
+    unauthorized code even if an attacker delivers malware through social
+    engineering or supply chain compromise. Group Policy Objects (GPO) or
+    endpoint management tools should enforce hardening configurations
+    centrally.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.3"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build hardened golden images using Packer with CIS benchmark
+      automation (CIS-CAT, Ansible CIS roles). Implement application
+      whitelisting using AppLocker (Windows) or fapolicyd (Linux).
+      Disable unnecessary services via Ansible playbooks applied during
+      provisioning. Use immutable infrastructure patterns: replace
+      rather than reconfigure. Enforce USB device restrictions and
+      removable media policies via Group Policy or endpoint management.
+      Define and maintain a port/protocol matrix documenting all
+      allowed communications within the secure zone.
+    tools:
+      - packer
+      - ansible
+      - cis-cat
+      - applocker
+      - fapolicyd
+      - terraform
+      - chef-inspec
+
+  devsecops:
+    prose: >-
+      Scan golden images against CIS benchmarks in CI/CD pipelines before
+      promotion to production. Use InSpec or Lynis for automated compliance
+      validation. Block deployment of images failing hardening checks.
+      Automate drift detection by comparing running system configurations
+      against declared baselines. Maintain hardening exceptions in a
+      risk register tracked as code.
+    tools:
+      - inspec
+      - lynis
+      - checkov
+      - ansible-lint
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Conduct monthly configuration compliance scans across all secure
+      zone systems. Alert on configuration drift from hardened baselines.
+      Monitor for unauthorized service activation or port opening.
+      Review application whitelist violations to detect potential malware
+      execution attempts. Track hardening compliance metrics and report
+      to CISO quarterly.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - crowdstrike-falcon
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "CM-7", "CM-7(5)", "CM-11"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.19"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-2.1", "req-2.2"]
+    relationship: complements

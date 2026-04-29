@@ -1,0 +1,118 @@
+id: gsr-2
+family: gsr
+title: "Design and Manufacturing Principles"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    Manufacturers shall reduce risks related to the use of the device as
+    far as possible by means of solutions inherent to the design and
+    manufacturing process. In the case of devices incorporating electronic
+    programmable systems, including software, or software that are devices
+    in themselves, such systems or software shall be designed to ensure
+    repeatability, reliability and performance in line with their intended
+    use. In the event of a single fault condition, appropriate means shall
+    be adopted to eliminate or reduce as far as possible consequent risks
+    or impairment of performance.
+
+    Devices shall be designed and manufactured in such a way as to reduce
+    as far as possible the risks posed by substances or particles,
+    including wear debris, degradation products and processing residues,
+    that may be released from the device. Devices, or those parts thereof
+    or those materials used therein that are invasive and come into direct
+    contact with the human body, shall be designed and manufactured in
+    such a way as to be compatible, where relevant, with the tissues,
+    cells, body fluids and other biological material, taking account of
+    the intended purpose of the device.
+guidance:
+  prose: |
+    Annex I, Chapter II establishes the design and manufacturing
+    requirements that apply throughout the development process. For
+    software-based medical devices, the key focus areas are:
+
+    - Repeatability: the software must produce consistent results given
+      the same inputs and operating conditions.
+    - Reliability: the software must perform its intended function under
+      stated conditions for a specified period without failure.
+    - Performance: the software must meet quantitative performance
+      targets defined during design input.
+    - Single fault tolerance: the design must handle individual component
+      failures gracefully, either through redundancy, fail-safe modes,
+      or graceful degradation.
+
+    For platform engineering teams, this translates to infrastructure
+    reliability (high availability, disaster recovery), while for
+    development teams it means defensive programming, input validation,
+    and comprehensive error handling.
+references:
+  - citation: "EU MDR 2017/745, Annex I, Chapter II, Sections 5–15"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Design infrastructure with high availability patterns (active-active
+         or active-passive) to ensure single fault tolerance for medical
+         device software, with documented recovery time objectives (RTO)
+         and recovery point objectives (RPO).
+      2. Implement infrastructure-as-code with repeatable deployment
+         pipelines that guarantee consistent environment provisioning
+         across development, staging, and production.
+      3. Deploy chaos engineering practices (controlled fault injection)
+         to validate system resilience under single fault conditions and
+         document results in the design history file.
+      4. Maintain environment parity controls ensuring manufacturing
+         (build) and production environments are reproducible and
+         traceable to specific configuration baselines.
+    tools:
+      - kubernetes
+      - terraform
+      - helm
+      - chaos-mesh
+      - litmus
+  devsecops:
+    prose: |
+      1. Enforce defensive programming standards in code review
+         checklists: null checks, input validation, boundary conditions,
+         exception handling, and timeout management for all safety-critical
+         functions.
+      2. Implement automated regression testing with documented test
+         coverage metrics for repeatability verification, ensuring
+         identical inputs always produce identical outputs.
+      3. Configure mutation testing to validate the effectiveness of
+         the test suite in detecting faults, maintaining a minimum
+         mutation score for safety-critical modules.
+      4. Establish a design control pipeline that links design inputs
+         to design outputs, verification tests, and validation evidence
+         in an auditable trace matrix.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - mutation-testing
+      - design-control-tooling
+      - test-coverage
+  secops:
+    prose: |
+      1. Document and maintain a design history file (DHF) for each
+         device that captures all design decisions, trade-off analyses,
+         and rationale for residual risks accepted during development.
+      2. Establish a formal design review process with documented
+         entry/exit criteria at each design phase gate (concept, design
+         input, design output, verification, validation, transfer).
+      3. Conduct periodic reliability assessments using field data,
+         complaint analysis, and post-market surveillance information
+         to validate that design assumptions remain valid.
+      4. Maintain a manufacturing (build) process validation record
+         that demonstrates the CI/CD pipeline consistently produces
+         compliant software builds.
+    tools:
+      - document-management
+      - design-history-file
+      - quality-review
+      - audit-trail
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-10"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["8.1"]
+    relationship: complements

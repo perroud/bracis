@@ -1,0 +1,126 @@
+id: rec-10
+family: sncr
+title: "Prescription Traceability and Chain of Custody"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 18. O SNCR deve garantir a rastreabilidade completa da cadeia de
+    prescrição e dispensação, registrando:
+
+    I — o momento e o local da prescrição, incluindo a identificação do
+    estabelecimento de saúde ou consultório;
+
+    II — o momento e o local da dispensação, incluindo a identificação da
+    farmácia ou drogaria e do farmacêutico responsável;
+
+    III — a dispensação parcial, quando aplicável, com registro da
+    quantidade dispensada e do saldo remanescente;
+
+    IV — eventuais cancelamentos, devoluções ou alertas de fraude
+    associados à prescrição;
+
+    V — a relação entre prescrição original e prescrições complementares
+    ou de continuidade de tratamento.
+
+    Parágrafo único. Os registros de rastreabilidade devem ser mantidos
+    por prazo mínimo de 5 (cinco) anos para medicamentos comuns e de 20
+    (vinte) anos para medicamentos sujeitos a controle especial.
+guidance:
+  prose: |
+    Article 18 establishes full chain-of-custody traceability for
+    electronic prescriptions, from the moment of prescribing through
+    dispensation to the patient.
+
+    **Traceability events:**
+    - Prescription issuance (where, when, by whom)
+    - Dispensation (where, when, by whom, how much)
+    - Partial dispensation (quantity dispensed vs. remaining)
+    - Cancellations (when, by whom, reason)
+    - Returns (when, by whom, reason)
+    - Fraud alerts (trigger, investigation status, resolution)
+    - Continuation prescriptions (link to original)
+
+    **Retention periods:**
+    - Common medications: minimum 5 years
+    - Controlled substances: minimum 20 years (aligns with PEP
+      retention requirements)
+
+    **Partial dispensation tracking:**
+    For prescriptions allowing multiple dispensations (e.g., chronic
+    treatment), the system must track each partial dispensation with
+    the quantity dispensed and remaining balance, preventing
+    over-dispensation.
+
+    **Prescription linking:**
+    Continuation or follow-up prescriptions must be linked to the
+    original prescription, enabling healthcare authorities to view
+    the complete treatment timeline for a patient.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Traceability event sourcing architecture:**
+      1. Implement an event-sourced traceability ledger that records
+         all prescription lifecycle events as immutable, ordered
+         entries with cryptographic linking.
+      2. Deploy dispensation tracking with real-time balance
+         calculation for partial dispensation scenarios, using
+         optimistic locking to prevent race conditions.
+      3. Implement prescription linking through parent-child
+         relationships, enabling full treatment timeline queries.
+      4. Deploy tiered storage with automatic archival: active
+         storage for recent prescriptions, warm storage for
+         1-5 years, cold archival for 5-20 years.
+      5. Implement data retention policies with automated lifecycle
+         management: 5-year minimum for common medications,
+         20-year minimum for controlled substances.
+    tools:
+      - event-sourcing
+      - kafka
+      - postgresql
+      - elasticsearch
+      - s3-glacier
+      - retention-policy-engine
+  devsecops:
+    prose: |
+      **Traceability testing:**
+      1. Create end-to-end tests for the complete traceability chain:
+         prescription, partial dispensation, balance tracking,
+         cancellation, and continuation linking.
+      2. Implement concurrency tests for partial dispensation to
+         verify that race conditions cannot cause over-dispensation.
+      3. Add data retention tests verifying that records are
+         preserved for the correct minimum periods based on
+         medication classification.
+      4. Deploy immutability tests confirming that traceability
+         records cannot be modified or deleted through any API.
+    tools:
+      - gitlab-ci
+      - concurrency-testing
+      - data-retention-tests
+      - immutability-tests
+      - e2e-tests
+  secops:
+    prose: |
+      **Traceability monitoring and audit:**
+      1. Monitor the traceability ledger for gaps (prescriptions
+         without dispensation records, dispensations without
+         prescription records) and investigate discrepancies.
+      2. Generate monthly traceability completeness reports by
+         pharmacy and prescriber, flagging incomplete chains.
+      3. Audit partial dispensation records quarterly for balance
+         accuracy and over-dispensation incidents.
+      4. Verify data retention compliance annually, ensuring no
+         premature deletion of traceability records.
+    tools:
+      - audit-platform
+      - compliance-dashboard
+      - data-integrity-monitoring
+      - retention-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: complements
+  - framework_id: anvisa-134
+    articles: ["art-25", "art-26"]
+    relationship: mapped

@@ -1,0 +1,97 @@
+id: iot-2
+family: auth
+title: "Mandatory Password Change on First Use"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve forçar a alteração da senha na primeira utilização
+    pelo usuário. O equipamento não deve permitir a definição de senhas
+    em branco ou consideradas fracas conforme critérios técnicos definidos
+    pelo fabricante.
+
+    O equipamento deve implementar verificações contra dicionários de
+    senhas comumente utilizadas ou metodologia equivalente para coibir
+    a definição de senhas fracas pelo usuário. Os manuais do equipamento
+    devem especificar as quantidades mínima e máxima de caracteres
+    aceitas e as regras de formação de senhas.
+
+    (Ato 77/2021 §5.1.4, incisos III e IV; Ato 2436/2023 §5)
+guidance:
+  prose: |
+    This control ensures that factory-provisioned credentials are
+    ephemeral — the device must compel the user to set a strong,
+    personalized password before normal operation begins.
+
+    **Key requirements:**
+    - The device must enforce a mandatory password change flow during
+      initial setup — the user cannot skip this step.
+    - Blank passwords and passwords that fail complexity checks must be
+      rejected.
+    - The device must validate proposed passwords against a dictionary of
+      commonly used passwords (e.g., "123456", "admin", "password") or
+      use an equivalent strength-checking methodology.
+    - The user manual must document minimum and maximum password lengths
+      and the formation rules.
+
+    **Implementation considerations:**
+    - Dictionary-based checks can use an embedded list (e.g., top 10,000
+      leaked passwords) or a bloom filter for memory-constrained devices.
+    - For CPE devices managed via TR-069, the ACS can enforce the password
+      change remotely on first provisioning.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a first-boot setup wizard that blocks access to device
+         functionality until the user completes password change.
+      2. Embed a password strength validator in the firmware that enforces:
+         minimum 8 characters, mixed case, digit, special character.
+      3. Include a compressed bloom filter or hash list of the top 10,000
+         most common passwords in the firmware image for dictionary checks.
+      4. For TR-069/USP managed devices, implement a provisioning parameter
+         that flags whether the factory password has been changed, enabling
+         the ACS to force the change remotely if needed.
+      5. Store the new user-defined password using bcrypt or argon2 hashing
+         with per-device salt.
+    tools:
+      - firmware-build-pipeline
+      - tr-069-acs
+      - embedded-crypto-library
+  devsecops:
+    prose: |
+      1. Write unit tests that verify the first-boot password change flow
+         cannot be bypassed (e.g., by directly accessing API endpoints or
+         resetting device state).
+      2. Add SAST rules that flag any code path allowing device operation
+         with the factory password still active.
+      3. Maintain the weak-password dictionary as a versioned artifact in
+         the CI pipeline, updated quarterly from public breach databases.
+      4. Test password rejection edge cases: blank, single-character,
+         all-numeric, common dictionary entries.
+    tools:
+      - gitlab-ci
+      - sast-scanner
+      - unit-testing-framework
+      - password-dictionary-artifact
+  secops:
+    prose: |
+      1. During homologation testing, verify that the device blocks access
+         until password change is completed — attempt to use the device
+         with factory credentials after first boot.
+      2. Audit user-facing documentation to confirm password rules are
+         clearly stated in the manual.
+      3. Monitor field returns and support tickets for password-related
+         issues that may indicate the enforcement mechanism is failing.
+      4. Maintain compliance evidence (test reports, screenshots of the
+         setup flow) for ANATEL audits.
+    tools:
+      - penetration-testing-tools
+      - grc-platform
+      - compliance-documentation
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-12"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

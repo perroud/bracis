@@ -1,0 +1,117 @@
+id: sec-6
+family: obligations
+title: "Consent requirements and lawful processing"
+class: DPDP-INDIA
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    (1) A person may process the personal data of a Data Principal only in accordance with the
+    provisions of this Act and for a lawful purpose— (a) for which the Data Principal has given
+    her consent; or (b) for certain legitimate uses. (2) For the purposes of sub-section (1), the
+    expression "legitimate uses" shall mean— (a) the specified purpose for which the Data Principal
+    has voluntarily provided her personal data to the Data Fiduciary, and has not indicated to the
+    Data Fiduciary that she does not consent to the use of her personal data; (b) the purpose
+    related to employment or those related to safeguarding the employer from loss or liability, such
+    as prevention of corporate espionage, maintenance of confidentiality of trade secrets, intellectual
+    property, classified information, or provision of any service or benefit sought by a Data
+    Principal who is an employee; (c) any purpose related to a merger, demerger, amalgamation,
+    rehabilitation, or any scheme of arrangement; (d) any purpose for which it is necessary to
+    process the personal data by a State or any instrumentality of the State for— (i) providing any
+    subsidy, benefit, service, certificate, licence, or permit for any purpose for which such
+    personal data is voluntarily shared by the Data Principal; (ii) performing any function under
+    any law or any order or judgement of any court or tribunal in India; (e) any purpose related to
+    ensuring the safety of or providing assistance or services to any individual during any disaster
+    or any breakdown of public order; (f) any fair and reasonable purpose as may be prescribed.
+    (3) The consent given by the Data Principal shall be free, specific, informed, unconditional,
+    and unambiguous with a clear affirmative action signifying an agreement to the processing of
+    her personal data for the specified purpose. (4) Every Data Principal shall have the right to
+    withdraw her consent at any time.
+
+guidance:
+  prose: >-
+    Section 6 establishes the dual legal basis for processing: consent and legitimate uses. Unlike
+    GDPR's six legal bases, the DPDP Act simplifies to two broad categories. The "legitimate uses"
+    concept under Section 6(2) is broader than GDPR's legitimate interest — it includes voluntary
+    provision of data (deemed consent), employment relationships, corporate transactions, state
+    functions, disaster management, and a catch-all "fair and reasonable purpose" to be prescribed
+    by rules. The consent standard mirrors GDPR Article 7: free, specific, informed, unconditional,
+    unambiguous, and requiring clear affirmative action. The right to withdraw consent is absolute
+    and unconditional. Organizations must map each processing activity to either an explicit consent
+    record or a documented legitimate use justification. The absence of other GDPR bases (contractual
+    necessity, vital interest, public interest, legal obligation as separate categories) means more
+    processing may need to rely on consent or the broad "legitimate uses" provision.
+
+references:
+  - citation: "DPDP Act 2023, Section 6"
+    url: "https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Build a lawful basis registry that maps each processing activity to either explicit consent
+      or a documented legitimate use category (employment, state function, disaster, voluntary
+      provision, corporate transaction, or prescribed fair/reasonable purpose).
+      2. Implement consent enforcement middleware that checks consent status before every personal
+      data processing operation — processing must be blocked if consent is not valid.
+      3. Build legitimate use documentation APIs that allow teams to register and justify processing
+      under Section 6(2) categories with appropriate evidence.
+      4. Implement consent withdrawal enforcement — when consent is withdrawn, all processing
+      dependent on that consent must cease immediately across all systems.
+      5. Create purpose limitation controls that restrict processing strictly to the purpose for
+      which consent was obtained or the legitimate use was documented.
+      6. Build a processing activity register with real-time lawful basis status.
+    tools:
+      - consent-management-platform
+      - open-policy-agent
+      - api-gateway
+      - kafka
+      - processing-activity-register
+      - postgresql
+
+  devsecops:
+    prose: >-
+      1. CI/CD pipeline gates must verify that every new processing activity has a documented
+      lawful basis (consent or legitimate use) before deployment.
+      2. Automated tests must verify consent enforcement — data processing must fail gracefully
+      when consent is absent or withdrawn.
+      3. Linting rules must flag personal data processing code that bypasses consent checks.
+      4. Code review automation must detect new processing purposes and require lawful basis
+      documentation before merge approval.
+      5. Integration tests must verify legitimate use justification is properly recorded for
+      all non-consent-based processing.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - open-policy-agent
+      - api-testing
+      - custom-compliance-checks
+
+  secops:
+    prose: >-
+      1. Monitor for personal data processing without a valid lawful basis — alert immediately
+      on any processing that lacks consent or legitimate use documentation.
+      2. Audit consent records quarterly for validity — check for expired, withdrawn, or
+      improperly collected consent.
+      3. Monitor consent withdrawal events and verify downstream processing cessation within
+      defined SLAs.
+      4. Track legitimate use justifications and flag any that appear over-broad or insufficiently
+      documented.
+      5. Implement anomaly detection for processing patterns that deviate from declared purposes.
+    tools:
+      - siem
+      - compliance-dashboard
+      - data-governance-platform
+      - consent-analytics
+      - audit-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-10"]
+    relationship: equivalent-to
+  - framework_id: pipl
+    articles: ["art-13"]
+    relationship: equivalent-to

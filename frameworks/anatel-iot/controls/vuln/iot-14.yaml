@@ -1,0 +1,113 @@
+id: iot-14
+family: vuln
+title: "Vulnerability Reporting Channel"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O fornecedor deve disponibilizar canal exclusivo e seguro para a
+    notificação de vulnerabilidades identificadas em seus equipamentos,
+    acessível a pesquisadores de segurança, consumidores e demais
+    partes interessadas. O canal de notificação deve utilizar mecanismos
+    de comunicação segura, como HTTPS e criptografia PGP/GPG, para
+    proteger as informações reportadas.
+
+    O fornecedor deve implementar processos de Divulgação Coordenada
+    de Vulnerabilidades (Coordinated Vulnerability Disclosure — CVD)
+    baseados em boas práticas internacionalmente reconhecidas.
+
+    (Ato 77/2021 §6.1.5 e §6.1.6; Ato 2436/2023 §7)
+guidance:
+  prose: |
+    This control requires manufacturers to establish a formal
+    vulnerability reporting mechanism that enables responsible
+    disclosure by security researchers and other stakeholders.
+
+    **Channel requirements:**
+    - A dedicated, publicly accessible vulnerability reporting endpoint
+      (e.g., security@manufacturer.com, HTTPS web form, or
+      security.txt as per RFC 9116).
+    - Secure communication: HTTPS for web forms, PGP/GPG public key
+      available for encrypted email communication.
+    - The channel must be monitored continuously — response SLA should
+      be defined (e.g., acknowledgment within 72 hours).
+
+    **Coordinated Vulnerability Disclosure (CVD) process:**
+    - Follow ISO/IEC 29147:2018 (Vulnerability disclosure) and
+      ISO/IEC 30111:2019 (Vulnerability handling processes).
+    - Define and publish a disclosure timeline (e.g., 90-day
+      coordinated disclosure window).
+    - Establish clear communication with the reporter throughout the
+      process: acknowledgment, triage, fix timeline, coordinated
+      publication.
+    - Credit the vulnerability discoverer in the public advisory
+      (with their consent).
+
+    **Best practice references:**
+    - CERT/CC vulnerability disclosure guidelines.
+    - Google Project Zero 90-day disclosure policy.
+    - FIRST PSIRT Services Framework.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a security.txt file (RFC 9116) at
+         /.well-known/security.txt on the manufacturer's website,
+         containing: contact email, PGP key URL, disclosure policy
+         URL, preferred language, and canonical URL.
+      2. Deploy a secure vulnerability submission web form (HTTPS)
+         with fields: product, firmware version, vulnerability
+         description, reproduction steps, severity assessment, and
+         reporter contact information.
+      3. Integrate the vulnerability intake form with an internal
+         ticket tracking system (e.g., Jira, GitLab Issues) with
+         restricted access to the PSIRT team.
+      4. Publish the manufacturer's PGP/GPG public key for encrypted
+         email communication on the security page.
+      5. Automate acknowledgment: send confirmation receipt within
+         24 hours of submission with a tracking identifier.
+    tools:
+      - security-txt-generator
+      - secure-web-form
+      - pgp-key-management
+      - ticketing-system
+      - email-automation
+  devsecops:
+    prose: |
+      1. Maintain the security.txt file as a versioned artifact in the
+         corporate website repository — update it as part of the
+         release process.
+      2. Implement CI checks that verify security.txt is present,
+         correctly formatted (RFC 9116), and the PGP key is not
+         expired.
+      3. Create internal PSIRT workflow automation: vulnerability
+         report → triage → assign to engineering team → track fix →
+         coordinate disclosure → publish advisory.
+      4. Test the vulnerability reporting flow end-to-end quarterly:
+         submit a test report and verify it flows correctly through
+         the entire process.
+    tools:
+      - gitlab-ci
+      - psirt-workflow
+      - security-txt-validator
+      - integration-testing
+  secops:
+    prose: |
+      1. Staff the PSIRT team with defined roles: intake coordinator,
+         triage analyst, engineering liaison, communications lead.
+      2. Define and publish SLAs: acknowledgment within 72 hours,
+         triage within 7 days, fix timeline based on CVSS severity
+         (critical: 30 days, high: 60 days, medium: 90 days).
+      3. Monitor the vulnerability reporting channel continuously —
+         ensure no reports are lost or ignored.
+      4. Maintain records of all vulnerability reports, triage
+         decisions, and remediation timelines for ANATEL audit
+         evidence.
+    tools:
+      - psirt-management-platform
+      - sla-monitoring
+      - grc-platform
+      - audit-log-management
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-14", "art-15"]
+    relationship: complements

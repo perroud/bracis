@@ -1,0 +1,75 @@
+id: oi-cd-02
+family: cd
+title: "Compartilhamento de Dados Cadastrais de Clientes"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O compartilhamento de dados cadastrais dos clientes entre participantes do Open
+    Insurance deve ocorrer exclusivamente mediante consentimento prévio, expresso,
+    informado e inequívoco do titular dos dados.
+
+    Os dados cadastrais compartilháveis incluem:
+    I - Dados de identificação pessoal (nome, CPF/CNPJ, data de nascimento);
+    II - Dados de contato (endereço, telefone, e-mail);
+    III - Dados de qualificação (profissão, renda, estado civil);
+    IV - Dados de representantes e procuradores.
+
+    A transmissora de dados deve garantir que os dados compartilhados estejam
+    atualizados e sejam transmitidos de forma segura, íntegra e confidencial.
+guidance:
+  prose: |
+    Dados cadastrais sao a base para que a receptora possa oferecer produtos
+    personalizados ao cliente. O compartilhamento permite que o cliente "porte"
+    seus dados entre seguradoras, facilitando cotacoes e contratacoes.
+
+    O consentimento deve ser granular -- o cliente pode autorizar compartilhamento
+    de dados cadastrais sem autorizar dados de apolices, por exemplo. A LGPD
+    art. 8 exige que o consentimento seja fornecido por escrito ou por meio que
+    demonstre a manifestacao de vontade do titular.
+
+    A transmissora e responsavel pela qualidade e atualizacao dos dados. Dados
+    desatualizados ou incorretos podem gerar responsabilidade civil.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar APIs de dados cadastrais conforme especificacao do Open Insurance,
+         protegidas por OAuth 2.0 + FAPI.
+      2. Garantir que dados sao transmitidos via canal cifrado (TLS 1.2+) com mTLS.
+      3. Implementar mecanismo de filtragem de campos baseado no escopo do consentimento.
+      4. Manter logs de auditoria de todos os compartilhamentos realizados.
+      5. Implementar mecanismo de atualizacao de dados com notificacao as receptoras.
+    tools:
+      - api-gateway
+      - oauth2-server
+      - mtls
+      - audit-logging
+  devsecops:
+    prose: |
+      1. Validar no pipeline que APIs de dados cadastrais exigem token de acesso valido.
+      2. Testar que a filtragem de campos funciona corretamente conforme escopo do
+         consentimento (nao retornar dados nao autorizados).
+      3. SAST para detectar vazamento de dados pessoais em logs ou respostas de erro.
+      4. Testes de integracao end-to-end do fluxo de consentimento.
+    tools:
+      - sast
+      - dast
+      - integration-testing
+      - secret-detection
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar padroes anomalos de acesso a dados cadastrais (volume, horario,
+         origem).
+      2. Implementar alertas para tentativas de acesso a dados sem consentimento
+         valido.
+      3. Auditar periodicamente que dados compartilhados estao dentro do escopo
+         autorizado pelo cliente.
+    tools:
+      - siem
+      - dlp
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5", "art-7", "art-8", "art-9"]
+    relationship: complements

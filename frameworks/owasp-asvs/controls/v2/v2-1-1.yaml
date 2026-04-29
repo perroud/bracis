@@ -1,0 +1,94 @@
+id: v2.1.1
+family: v2
+title: "Password Length Requirements"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that user set passwords are at least 12 characters in length after combining
+    spaces. Longer passwords and passphrases should be encouraged. There is no maximum
+    length restriction, but an upper bound of at least 128 characters must be supported.
+
+guidance:
+  prose: >-
+    Password length is the single most important factor in password strength. Short passwords
+    are trivially crackable regardless of complexity requirements. The 12-character minimum
+    reflects current understanding of brute-force attack capabilities and aligns with NIST
+    SP 800-63B guidance. Eliminating maximum length restrictions (within reason) enables
+    passphrases, which are both more secure and more memorable. Complexity rules (requiring
+    special characters, mixed case) are deliberately absent from this requirement because
+    they reduce usability without proportional security gains. Applications must normalize
+    whitespace handling so that spaces within passwords are preserved, enabling natural
+    passphrase usage.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V2.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "NIST SP 800-63B Section 5.1.1"
+    url: "https://pages.nist.gov/800-63-3/sp800-63b.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement password policy enforcement at the identity provider level, not at the
+      application level. Configure the centralized authentication service (Keycloak, Auth0,
+      Okta, AWS Cognito) to enforce a minimum of 12 characters and support at least 128
+      characters. Remove all composition rules (uppercase, special character requirements).
+      Implement real-time password strength meters using zxcvbn or equivalent entropy-based
+      scoring. Integrate breached password checks against the HaveIBeenPwned API via k-anonymity
+      during registration and password change flows. Store passwords using Argon2id with
+      appropriate memory, iteration, and parallelism parameters.
+    tools:
+      - keycloak
+      - auth0
+      - okta
+      - aws-cognito
+      - zxcvbn
+      - haveibeenpwned-api
+      - vault
+
+  devsecops:
+    prose: >-
+      Include password policy validation in automated security tests. Write integration tests
+      that verify the authentication service rejects passwords shorter than 12 characters
+      and accepts passwords up to 128 characters. Add SAST rules to detect hardcoded password
+      length checks in application code that contradict the centralized policy. Scan for
+      deprecated hashing algorithms (MD5, SHA-1, bcrypt with low cost factor) in credential
+      storage code. Implement pipeline checks that verify password policy configuration in
+      IaC templates matches the organizational standard.
+    tools:
+      - semgrep
+      - sonarqube
+      - owasp-zap
+      - nuclei
+      - gitlab-ci
+      - selenium
+
+  secops:
+    prose: >-
+      Monitor authentication logs for patterns indicating password spraying or credential
+      stuffing attacks. Alert on high volumes of failed authentication attempts with short
+      passwords, which may indicate attackers testing weak credentials. Periodically audit
+      the identity provider configuration to confirm password policy enforcement remains
+      active. Run offline hash audits (with appropriate authorization) to identify accounts
+      with passwords that predate the 12-character minimum policy. Track and report on
+      password reset compliance rates.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - hashcat
+      - datadog-security
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["8.3.6"]
+    relationship: implements

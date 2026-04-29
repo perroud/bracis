@@ -1,0 +1,122 @@
+id: art-20
+family: cap-4
+title: "Disponibilidade dos Registros"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 20. Os registros de que tratam os arts. 18 e 19 devem ficar à disposição do
+    Banco Central do Brasil e do Conselho de Controle de Atividades Financeiras pelo
+    período mínimo de dez anos.
+
+    Parágrafo único. As instituições devem assegurar que os registros possam ser
+    recuperados de forma tempestiva e em formato legível, independentemente do meio
+    de armazenamento utilizado.
+guidance:
+  prose: |
+    O art. 20 complementa os arts. 18 e 19 estabelecendo que os registros devem
+    estar disponiveis para os reguladores e ser recuperaveis de forma tempestiva.
+
+    **Destinatarios dos registros:**
+    Os registros devem estar a disposicao de:
+    - Banco Central do Brasil (BCB): supervisor bancario
+    - COAF: unidade de inteligencia financeira do Brasil
+    - Implicito: Ministerio Publico e Policia Federal (mediante ordem judicial)
+
+    **Periodo de retencao:**
+    Minimo de 10 anos. A contagem se inicia no termino do exercicio em que a
+    operacao foi realizada (art. 18, ss 2). Na pratica, isso pode significar
+    ate 11 anos de retencao.
+
+    **Requisitos de recuperacao (paragrafo unico):**
+    Dois requisitos criticos:
+    1. Tempestividade: capacidade de recuperar registros em prazo razoavel.
+       Na pratica, o BCB pode solicitar registros com prazo de 48 a 72 horas.
+    2. Legibilidade: independentemente do meio de armazenamento (fita, disco,
+       nuvem, microfilme), os dados devem ser legiveis. Isso implica:
+       - Formatos de arquivo que permanecam legiveis ao longo de 10 anos
+       - Capacidade de converter formatos legados quando necessario
+       - Documentacao de schemas e formatos utilizados
+
+    **Implicacao pratica:**
+    Dados em cold storage devem poder ser restaurados e consultados em prazo
+    razoavel. A instituicao deve testar periodicamente a recuperabilidade
+    de dados antigos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao:**
+      1. Armazenamento em camadas com politica de lifecycle automatizada:
+         - Hot (0-2 anos): banco de dados operacional com acesso direto
+         - Warm (2-5 anos): data warehouse com acesso via query engine
+         - Cold (5-10 anos): object storage (S3, GCS) com restore on-demand
+      2. Formato de armazenamento de longo prazo: Parquet ou ORC com schema
+         evolution, garantindo legibilidade futura.
+      3. Metadados de schema versionados junto com os dados.
+      4. Compressao eficiente para reducao de custo em cold storage.
+
+      **Recuperacao tempestiva:**
+      5. API de consulta unificada que abstrai a camada de armazenamento.
+      6. SLA de recuperacao definido por camada: hot (segundos), warm
+         (minutos), cold (horas, maximo 24h).
+      7. Indice de busca para localizacao rapida de registros por cliente,
+         data, tipo de operacao.
+      8. Processo de restore testado e documentado para cold storage.
+
+      **Disponibilidade para reguladores:**
+      9. Portal ou API segura para entrega de dados ao BCB/COAF.
+      10. Formato de exportacao padronizado (CSV, XML, JSON).
+      11. Criptografia de dados em transito para entrega ao regulador.
+      12. Log de todas as entregas de dados a reguladores.
+    tools:
+      - data-lake
+      - object-storage
+      - query-engine
+      - data-export
+  devsecops:
+    prose: |
+      **Testes de recuperacao:**
+      1. Testes periodicos de restore de dados de cada camada de armazenamento.
+      2. Testes de legibilidade de formatos antigos (simulacao de 10 anos).
+      3. Testes de performance de consulta em cada camada.
+      4. Testes de exportacao em formatos padronizados.
+
+      **Monitoramento de integridade:**
+      5. Verificacao periodica de checksum de dados em cold storage.
+      6. Alertas de corrupcao de dados ou perda de integridade.
+      7. Testes de disaster recovery para dados de retencao legal.
+      8. Validacao de que lifecycle policies nao excluem dados antes do prazo.
+    tools:
+      - gitlab-ci
+      - backup-validation
+      - data-integrity
+      - monitoring
+  secops:
+    prose: |
+      **Governanca de retencao:**
+      1. Politica de retencao documentada com prazos por tipo de registro.
+      2. Inventario de todos os repositorios de registros e seus prazos.
+      3. Auditoria anual de conformidade de retencao.
+      4. Teste anual de recuperacao de dados com simulacao de solicitacao
+         regulatoria.
+
+      **Resposta a solicitacoes regulatorias:**
+      5. Processo formal de atendimento a solicitacoes do BCB e COAF.
+      6. SLA interno de atendimento (48 horas para dados hot, 72 horas
+         para dados cold).
+      7. Registro de todas as solicitacoes e entregas ao regulador.
+      8. Revisao de dados antes de entrega para garantir completude.
+    tools:
+      - data-governance
+      - grc-platform
+      - data-lake
+      - audit-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-4", "AU-9", "AU-11", "CP-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.33", "A.8.10", "A.8.13", "A.8.14"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-16"]
+    relationship: complements

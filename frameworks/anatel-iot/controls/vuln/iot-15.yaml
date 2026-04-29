@@ -1,0 +1,109 @@
+id: iot-15
+family: vuln
+title: "Public Vulnerability Disclosure Portal"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O fornecedor deve manter página pública, em língua portuguesa,
+    contendo o histórico de vulnerabilidades identificadas em seus
+    equipamentos, as respectivas mitigações aplicáveis e as correções
+    disponibilizadas. O portal deve conter, para cada vulnerabilidade
+    publicada: identificador único, título, descrição, produtos
+    afetados, avaliação de impacto utilizando o Common Vulnerability
+    Scoring System (CVSS), soluções ou mitigações recomendadas, e
+    créditos ao descobridor da vulnerabilidade (quando autorizado).
+
+    (Ato 77/2021 §6.1.7; Ato 2436/2023 §7)
+guidance:
+  prose: |
+    This control mandates that manufacturers maintain a publicly
+    accessible, Portuguese-language security advisory portal. This
+    enables consumers, operators, and regulators to track the security
+    posture of deployed equipment.
+
+    **Required portal content per vulnerability:**
+    - Unique identifier (CVE-YYYY-NNNNN or manufacturer-specific ID).
+    - Advisory title and human-readable description.
+    - Affected products and firmware versions.
+    - CVSS v3.1 score and vector string.
+    - Recommended mitigations (workarounds for unpatched devices).
+    - Available fix (firmware version that resolves the issue).
+    - Discovery credit (with the researcher's consent).
+    - Publication and last-updated dates.
+
+    **Portal requirements:**
+    - Must be in Portuguese (pt-BR) — the working language for
+      Brazilian consumers and regulators.
+    - Must be publicly accessible without authentication.
+    - Should support RSS/Atom feed for automated monitoring.
+    - Historical advisories must remain available (not deleted after
+      a period).
+
+    **ANATEL enforcement context:**
+    ANATEL monitors published vulnerabilities and may set remediation
+    deadlines based on CVSS severity. Non-compliance with remediation
+    timelines can result in suspension or cancellation of the product's
+    homologation certificate.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Deploy a security advisory portal on the manufacturer's
+         website (e.g., /security/advisories) with structured data
+         (HTML + machine-readable JSON/CSAF).
+      2. Implement advisory pages with all required fields: CVE ID,
+         title, description, affected products, CVSS score/vector,
+         mitigations, fix version, credits, dates.
+      3. Add RSS/Atom feed for automated monitoring by operators,
+         CERTs, and security tools.
+      4. Implement CSAF (Common Security Advisory Framework) format
+         for machine-readable advisories, enabling automated
+         consumption by vulnerability management tools.
+      5. Ensure the portal is in Portuguese with proper accentuation
+         and serves as the canonical source for ANATEL communications.
+    tools:
+      - cms-platform
+      - csaf-generator
+      - rss-feed-generator
+      - cdn
+  devsecops:
+    prose: |
+      1. Integrate advisory publication into the vulnerability
+         remediation workflow: when a fix is released, the advisory
+         is automatically generated from the PSIRT ticket metadata
+         and published.
+      2. Implement CI checks for advisory quality: required fields
+         present, CVSS vector valid, affected product versions match
+         known product catalog, links to fix firmware are valid.
+      3. Maintain advisory content in a version-controlled repository
+         (e.g., CSAF documents in Git) with review workflow before
+         publication.
+      4. Test advisory publication flow quarterly to ensure the
+         end-to-end process works correctly.
+    tools:
+      - gitlab-ci
+      - csaf-toolchain
+      - advisory-review-workflow
+      - link-checker
+  secops:
+    prose: |
+      1. Monitor the portal for completeness: verify all known
+         vulnerabilities (including third-party CVEs affecting device
+         components) have corresponding advisories.
+      2. Track ANATEL notifications and verify remediation timelines
+         are being met — ANATEL sets deadlines based on CVSS severity.
+      3. Subscribe to CVE feeds for all third-party components used
+         in device firmware (Linux kernel, OpenSSL, busybox, etc.)
+         and ensure advisories are published when these affect your
+         devices.
+      4. Maintain portal access logs and publication records for
+         ANATEL audit evidence.
+    tools:
+      - cve-monitoring
+      - vulnerability-tracking
+      - grc-platform
+      - anatel-notification-tracker
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-14", "art-15"]
+    relationship: complements

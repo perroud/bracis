@@ -1,0 +1,95 @@
+id: cls6.2
+family: cls6
+title: "Segregation of duties in cloud environments"
+class: ISO27017
+
+statement:
+  prose: >-
+    Conflicting duties and areas of responsibility shall be segregated to
+    reduce opportunities for unauthorized or unintentional modification
+    or misuse of the organization's assets. For cloud services, the cloud
+    service provider shall implement segregation of duties within the
+    cloud service to prevent unauthorized access to cloud service customer
+    data and resources. The cloud service customer shall consider the
+    segregation of duties implemented by the cloud service provider when
+    defining its own information security controls and assess whether
+    additional controls are necessary.
+
+guidance:
+  prose: >-
+    In cloud environments, segregation of duties must address both
+    traditional organizational concerns and cloud-specific risks. The
+    cloud service provider should ensure that administrative access to
+    cloud infrastructure is separated from access to customer data, and
+    that operational staff cannot unilaterally make changes to security
+    controls. Cloud service customers should verify that their own
+    segregation of duties extends to cloud administration activities,
+    ensuring that the same person cannot provision cloud resources and
+    approve their security configuration. Role-based access control
+    in cloud management consoles should enforce these separations.
+
+references:
+  - citation: "ISO/IEC 27017:2015, Section 6.1.2"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) across all cloud management
+      planes with clear separation between infrastructure provisioning,
+      security configuration, and data access roles. Use infrastructure-as-code
+      with mandatory review and approval workflows that enforce separation
+      between the author and approver of changes. Configure cloud IAM policies
+      to prevent any single identity from having both administrative and
+      operational access. Implement break-glass procedures for emergency
+      access that require multi-party authorization and are fully audited.
+    tools:
+      - terraform
+      - open-policy-agent
+      - vault
+      - aws-iam
+      - azure-rbac
+
+  devsecops:
+    prose: >-
+      Enforce merge request approval workflows that require different
+      individuals for code authoring and approval, especially for
+      infrastructure and security configuration changes. Implement
+      pipeline controls that prevent developers from deploying directly
+      to production without separate approval. Use code ownership files
+      to ensure that security-sensitive configurations require review
+      by the security team. Enforce branch protection rules that require
+      approval from designated reviewers for changes to cloud
+      infrastructure definitions.
+    tools:
+      - gitlab-ci
+      - codeowners
+      - git
+      - snyk
+
+  secops:
+    prose: >-
+      Monitor for violations of segregation of duties in cloud
+      environments by detecting when single identities accumulate
+      excessive privileges. Alert on attempts to bypass approval
+      workflows or when emergency access procedures are invoked.
+      Review cloud audit logs for patterns indicating that segregation
+      controls are being circumvented. Conduct periodic access reviews
+      to verify that role assignments maintain appropriate separation
+      of duties.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-cloudtrail
+      - azure-monitor
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.3"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["iam-05"]
+    relationship: complements
+  - framework_id: nist-800-53
+    articles: ["AC-5"]
+    relationship: mapped

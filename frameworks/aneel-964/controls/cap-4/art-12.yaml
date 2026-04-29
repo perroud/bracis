@@ -1,0 +1,136 @@
+id: art-12
+family: cap-4
+title: "Plano de Resposta a Incidentes Ciberneticos"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 12. Os agentes do setor elétrico devem elaborar e manter plano de resposta
+    a incidentes cibernéticos que contemple, no mínimo:
+
+    I - procedimentos claros para detecção, análise, contenção, erradicação e
+    recuperação de incidentes cibernéticos, com responsabilidades definidas para
+    cada fase;
+
+    II - critérios objetivos para classificação da severidade dos incidentes
+    cibernéticos, considerando o impacto potencial sobre a operação dos sistemas
+    elétricos e sobre o SIN;
+
+    III - cadeia de comunicação interna e externa, incluindo notificação à ANEEL,
+    ao ONS, ao CTIR.gov e a outras partes relevantes conforme a severidade do incidente;
+
+    IV - procedimentos específicos para incidentes que afetam sistemas de controle
+    industrial, reconhecendo as particularidades operacionais e de segurança dos
+    ambientes OT;
+
+    V - atualização periódica do plano com base nas lições aprendidas de incidentes
+    ocorridos e de exercícios de simulação.
+guidance:
+  prose: |
+    O art. 12 estabelece os requisitos para o plano de resposta a incidentes (PRI)
+    especifico para o setor eletrico. Um bom PRI e a diferenca entre um incidente
+    que dura horas e um que dura dias ou semanas.
+
+    **Particularidades do IRP para ambientes OT:**
+    1. Contencao OT: diferente de IT, desligar um sistema OT para contencao pode
+       ter impacto direto no fornecimento de energia. A decisao de isolamento deve
+       balancear o risco cibernetico com o impacto operacional
+    2. Forense OT: coleta de evidencias em sistemas industriais exige conhecimento
+       especializado e ferramentas que nao impactem a operacao
+    3. Coordenacao com ONS: incidentes que afetam a transmissao ou geracao devem
+       ser coordenados com o Operador Nacional do Sistema para gestao do despacho
+    4. Tempo de resposta: no setor eletrico, a velocidade de resposta e critica —
+       uma subestacao sem controle SCADA por horas pode resultar em apagoes
+
+    **Criterios de severidade:**
+    - Critico: impacto confirmado ou iminente na operacao do SIN
+    - Alto: comprometimento de sistemas SCADA sem impacto operacional imediato
+    - Medio: comprometimento de sistemas IT com potencial de lateralizacao para OT
+    - Baixo: incidente confinado a sistemas corporativos sem acesso a OT
+
+    **Notificacao ao CTIR.gov:**
+    O Centro de Tratamento de Incidentes de Redes do Governo (CTIR.gov) deve ser
+    notificado em incidentes que afetam infraestrutura critica de informacao (ICI),
+    categorias que incluem o setor eletrico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Construir plataforma tecnica de suporte ao plano de resposta a incidentes:
+
+      1. SIEM com correlacao OT/IT: integrar alertas de sistemas OT (Claroty/Nozomi)
+         com alertas IT em plataforma unificada (Splunk, Microsoft Sentinel)
+      2. SOAR (Security Orchestration, Automation and Response):
+         - Playbooks automatizados para triagem inicial de incidentes
+         - Orquestracao de acoes de contencao (block IP, disable account, isolate VLAN)
+         - Notificacao automatica baseada em severidade classificada
+      3. Plataforma de gestao de incidentes: ServiceNow ou Jira com workflows
+         customizados para incidentes OT vs. IT
+      4. Sistema de comunicacao seguro para gestao de crise:
+         - Canal de comunicacao fora-de-banda (nao dependente dos sistemas comprometidos)
+         - Lista de contatos atualizada (ANEEL, ONS, CTIR.gov, fornecedores chave)
+      5. Ambientes forenses: estacoes de trabalho dedicadas para analise forense
+         de sistemas OT e IT sem contaminar evidencias
+    tools:
+      - splunk
+      - microsoft-sentinel
+      - palo-alto-xsoar
+      - servicenow-itsm
+      - elastic-siem
+  devsecops:
+    prose: |
+      Implementar planos de resposta a incidentes como codigo gerenciado:
+
+      1. Playbooks de incidentes em formato Markdown versionado no Git:
+         - Playbook para ransomware em rede IT com potencial OT
+         - Playbook para comprometimento de sistema SCADA
+         - Playbook para acesso nao autorizado via VPN de fornecedor
+         - Playbook para anomalias em RTU/PLC detectadas via Claroty/Nozomi
+      2. Pipeline de revisao de playbooks: revisao obrigatoria apos cada incidente
+         ou exercicio de simulacao (within 5 dias uteis)
+      3. Automacao de notificacoes: integrar SOAR com sistema de notificacao
+         para gerar rascunhos de comunicacao para ANEEL, ONS e CTIR.gov
+         automaticamente quando incidente e classificado como Alto ou Critico
+      4. Rastreamento de metricas de resposta: MTTD, MTTR, por categoria de incidente
+         e por sistema (OT vs. IT)
+    tools:
+      - gitlab
+      - palo-alto-xsoar
+      - servicenow-itsm
+      - pagerduty
+      - mkdocs
+  secops:
+    prose: |
+      Executar e manter o programa de resposta a incidentes:
+
+      1. SOC com capacidade OT 24/7: turnos com pelo menos um analista treinado
+         em seguranca industrial e familiarizado com protocolos OT
+      2. Exercicios de simulacao semestrais: tabletop exercises e full-scale
+         drills simulando incidentes ciberneticos com componente OT
+         (ex.: ransomware que atinge o historian, acesso nao autorizado ao HMI)
+      3. Pos-incidente obrigatorio: PIR (Post-Incident Review) documentado
+         para todo incidente classificado como Medio ou acima, com licoes
+         aprendidas e acoes de melhoria com prazos definidos
+      4. Teste anual do plano de comunicacao de crise: verificar que todos os
+         contatos (ANEEL, ONS, CTIR.gov) estao validos e que a cadeia de
+         notificacao funciona corretamente
+      5. Metricas de programa: MTTD < 4h para incidentes em sistemas OT criticos,
+         MTTR < 8h para contencao de incidentes criticos
+    tools:
+      - splunk
+      - claroty
+      - nozomi-networks
+      - servicenow-itsm
+      - pagerduty
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-008-R1", "CIP-008-R2", "CIP-008-R3"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26", "A.5.27"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-2", "IR-3", "IR-4", "IR-5", "IR-8"]
+    relationship: supports

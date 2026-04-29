@@ -1,0 +1,130 @@
+id: art-13
+family: title-2-cap-3
+title: "Carteira de Negociacao e Carteira Bancaria"
+class: CMN-4557
+statement:
+  prose: |
+    Art. 13. A estrutura de gerenciamento do risco de mercado deve contemplar a separação
+    entre a carteira de negociação (trading book) e a carteira bancária (banking book),
+    incluindo:
+    I - critérios claros para a classificação de instrumentos financeiros em cada carteira;
+    II - procedimentos para transferências entre as carteiras;
+    III - tratamento do risco de taxa de juros da carteira bancária (IRRBB).
+guidance:
+  prose: |
+    O art. 13 trata da distincao fundamental entre trading book e banking book, que e a
+    base para o tratamento regulatorio de risco de mercado.
+
+    **Trading book vs. Banking book:**
+
+    **Carteira de negociacao (trading book):**
+    - Posicoes mantidas para negociacao de curto prazo
+    - Intencao de revenda ou beneficio de movimentos de precos
+    - Valoracao a mercado (mark-to-market) diaria
+    - Sujeita a requerimento de capital para risco de mercado
+    - Exemplos: posicoes proprietarias, market-making, derivativos para hedge de trading
+
+    **Carteira bancaria (banking book):**
+    - Posicoes mantidas ate o vencimento ou estruturais
+    - Credito, depositos, titulos mantidos ate o vencimento
+    - Pode ser valorada pelo custo amortizado
+    - Sujeita a requerimento de capital para risco de credito
+    - Risco de taxa de juros da carteira bancaria (IRRBB) tratado separadamente
+
+    **Criterios de classificacao (inciso I):**
+    - Intencao de negociacao: posicao comprada para revenda = trading
+    - Liquidez do instrumento: instrumento iliquido = mais provavel banking
+    - Hedge: hedge de posicao de trading = trading; hedge de posicao bancaria = banking
+    - Frequencia de negociacao: turnover alto = trading
+
+    **Transferencias (inciso II):**
+    Transferencias entre carteiras devem ser:
+    - Raras e excepcionais (nao rotineiras)
+    - Justificadas por mudanca de estrategia documentada
+    - Aprovadas pelo comite de riscos
+    - Reportadas ao BCB
+    - Sem resultado de P&L artificial (anti-arbitragem regulatoria)
+
+    **IRRBB (inciso III):**
+    Risco de que mudancas nas taxas de juros afetem o valor economico ou a margem
+    financeira da carteira bancaria. O BCB exige:
+    - Calculo de EVE (Economic Value of Equity) sensitivities
+    - Calculo de NII (Net Interest Income) sensitivities
+    - Cenarios padronizados de choque de juros (6 cenarios do Basileia)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de classificacao:**
+      1. System of record para classificacao de instrumentos em trading ou banking book.
+      2. Regras automatizadas de classificacao baseadas em criterios objetivos.
+      3. Workflow de aprovacao para transferencias entre carteiras.
+      4. Audit trail de classificacao e transferencias.
+
+      **IRRBB engine (inciso III):**
+      5. IRRBB calculation engine para EVE e NII sensitivities.
+      6. Cash flow repricing gap analysis para carteira bancaria.
+      7. Behavioral model para depositos sem vencimento definido (NMDs).
+      8. Prepayment model para credito (antecipacao de amortizacao).
+
+      **Monitoramento:**
+      9. Dashboard separado para risco de mercado de trading book e IRRBB do banking book.
+      10. Cenarios de choque de juros (6 cenarios padronizados do BCBS).
+      11. EVE outlier test: alerta quando queda de EVE supera 15% do Tier 1 capital.
+      12. NII impact analysis para planejamento financeiro.
+    tools:
+      - risk-engine
+      - alm-system
+      - data-lake
+      - bi-platform
+  devsecops:
+    prose: |
+      **Classificacao no pipeline:**
+      1. Regras de classificacao trading/banking codificadas e testadas automaticamente.
+      2. Validacao automatica de que novas operacoes sao classificadas antes de booking.
+      3. Alertas quando operacao e classificada de forma inconsistente com criterios.
+      4. Testes de regressao para regras de classificacao.
+
+      **IRRBB no pipeline:**
+      5. CI/CD para modelos comportamentais (NMDs, prepayment).
+      6. Backtesting de modelos comportamentais contra dados realizados.
+      7. Data quality checks para dados de fluxo de caixa da carteira bancaria.
+      8. Reconciliacao entre sistemas contabeis e ALM.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - data-quality-platform
+      - reconciliation-engine
+  secops:
+    prose: |
+      **Governanca de classificacao:**
+      1. Politica de classificacao trading/banking aprovada pelo comite de riscos.
+      2. Revisao periodica da classificacao de instrumentos existentes.
+      3. Processo de aprovacao de transferencias entre carteiras com justificativa.
+      4. Reporte de transferencias ao BCB conforme regulacao.
+
+      **IRRBB governance:**
+      5. Limites de EVE e NII sensitivity aprovados pelo conselho.
+      6. Relatorio mensal de IRRBB para comite de riscos.
+      7. Stress testing de IRRBB com cenarios padronizados e customizados.
+      8. Estrategias de hedge da carteira bancaria revisadas trimestralmente.
+
+      **Reporting:**
+      9. Reporte regulatorio de risco de mercado (DRM) ao BCB.
+      10. Reporte de IRRBB conforme requisitos do Pilar 3.
+      11. Relatorio consolidado de risco de mercado para conselho.
+      12. Validacao independente dos modelos de IRRBB.
+    tools:
+      - risk-management-platform
+      - alm-system
+      - grc-platform
+      - reporting-platform
+legal_references:
+  - framework_id: basel-iii
+    articles: ["pillar-1", "pillar-2"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-5", "AU-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.3", "A.5.10"]
+    relationship: supports

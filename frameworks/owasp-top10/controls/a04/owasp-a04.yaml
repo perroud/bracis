@@ -1,0 +1,119 @@
+id: owasp-a04
+family: a04
+title: "A04:2021 — Insecure Design"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Insecure design is a new category for 2021, representing failures related to design and
+    architectural flaws, with a call for more use of threat modeling, secure design patterns,
+    and reference architectures. Insecure design is not the source for all other Top 10 risk
+    categories — there is a difference between insecure design and insecure implementation. A
+    secure design can still have implementation defects leading to vulnerabilities that may be
+    exploited. An insecure design cannot be fixed by a perfect implementation as by definition,
+    needed security controls were never created to defend against specific attacks. Factors
+    contributing to insecure design include missing or ineffective threat modeling during
+    requirements and design, insufficient or absent security requirements, lack of secure design
+    patterns and principles (defense-in-depth, fail-secure, least privilege), missing security
+    controls in business logic, and no validation of security design before development begins.
+
+guidance:
+  prose: >-
+    Insecure design represents a fundamental shift in how organizations must think about security —
+    moving from reactive patching to proactive security by design. The distinction from other OWASP
+    categories is that insecure design vulnerabilities cannot be remediated after the fact without
+    significant rework; they require architectural changes. Examples include a credential recovery
+    flow that uses "security questions" (an inherently insecure design), a cinema booking system
+    with no rate limiting that allows bulk seat reservation abuse, an e-commerce system that stores
+    full credit card numbers by design, or an API that returns more data than necessary because
+    filtering was not designed in. Prevention requires integrating security into the software
+    development lifecycle from requirements through deployment: threat modeling to identify security
+    requirements, secure design pattern libraries, reference architectures, security champions in
+    development teams, and paved-road infrastructure that makes the secure path the default path.
+
+references:
+  - citation: "OWASP Top 10:2021 A04 Insecure Design"
+    url: "https://owasp.org/Top10/A04_2021-Insecure_Design/"
+  - citation: "OWASP Threat Modeling"
+    url: "https://owasp.org/www-community/Threat_Modeling"
+  - citation: "OWASP Secure Design Principles"
+    url: "https://owasp.org/www-project-developer-guide/draft/design/web_app_checklist/"
+  - citation: "NIST SSDF PW.1 — Perform Security Design Review"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-218/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a "paved road" platform that makes secure design the default and easiest path for
+      development teams. Provide pre-approved reference architectures for common patterns
+      (authentication, API design, data storage, inter-service communication) that have security
+      controls built in. Implement platform-level controls that enforce security requirements
+      regardless of application design choices: automatic mTLS via service mesh, mandatory
+      authentication at the API gateway, centralized secret injection, and deny-by-default network
+      policies. Offer self-service security tools integrated into the internal developer platform
+      (Backstage): threat modeling templates, secure design checklists, architecture review request
+      workflows. Build policy guardrails (OPA, Kyverno) that prevent deployment of architectures
+      that violate baseline security requirements. Make insecure design choices fail at deployment,
+      not in production.
+    tools:
+      - backstage
+      - opa
+      - kyverno
+      - istio
+      - vault
+      - keycloak
+      - terraform
+
+  devsecops:
+    prose: >-
+      Mandate threat modeling as a required artifact for any new feature, system, or significant
+      architectural change — gate the transition from design to implementation on threat model
+      completion and review. Use structured threat modeling methodologies: STRIDE (Spoofing,
+      Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
+      for identifying threats, or PASTA for a more risk-centric approach. Integrate threat modeling
+      tooling (OWASP Threat Dragon, Microsoft Threat Modeling Tool, IriusRisk) into the design
+      workflow. Establish a security requirements checklist that must be satisfied before a design
+      is approved. Conduct design-phase security reviews for high-risk features (authentication,
+      payment processing, data sharing, admin functions). Train developers in secure design patterns
+      and anti-patterns through hands-on workshops and security champions programs.
+    tools:
+      - owasp-threat-dragon
+      - iriusrisk
+      - miro
+      - gitlab-issues
+      - checkov
+      - semgrep
+
+  secops:
+    prose: >-
+      Identify insecure design patterns through application security assessments and penetration
+      tests that specifically probe business logic and architectural assumptions (not just
+      implementation vulnerabilities). Review application designs for absence of rate limiting
+      on sensitive operations (login, password reset, account creation, API calls), missing
+      account lockout mechanisms, lack of data minimization (collecting and storing more data
+      than necessary), insufficient separation of privileges (all users have admin-like access),
+      and missing fraud detection capabilities. Maintain a secure design pattern library of
+      known insecure designs encountered in the organization and their approved replacements.
+      Include architectural risk assessment in the annual risk management process.
+    tools:
+      - burp-suite
+      - owasp-zap
+      - jira
+      - confluence
+      - splunk
+
+legal_references:
+  - framework_id: nist-ssdf
+    articles: ["PW.1.1", "PW.1.2", "PW.1.3"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-8", "SA-11", "SA-15", "SA-17"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.1", "6.2.2"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["16.7", "16.8", "16.9"]
+    relationship: mapped

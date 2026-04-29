@@ -1,0 +1,92 @@
+id: art-9
+family: cap-3
+title: "Segregacao de Ativos dos Clientes"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 9. As prestadoras de serviços de ativos virtuais devem manter os ativos
+    virtuais e os recursos financeiros dos clientes segregados do seu patrimônio próprio.
+
+    Parágrafo 1. Os ativos virtuais dos clientes devem ser mantidos em carteiras
+    específicas, distintas das carteiras utilizadas para recursos próprios da
+    prestadora.
+
+    Parágrafo 2. Os recursos financeiros em moeda nacional ou estrangeira dos clientes
+    devem ser mantidos em contas específicas em instituições financeiras autorizadas
+    pelo Banco Central do Brasil.
+
+    Parágrafo 3. Os ativos virtuais e recursos financeiros segregados não respondem
+    por dívidas da prestadora, não podem ser objeto de penhora, arresto ou sequestro
+    por obrigações da prestadora, e não integram a massa falida da prestadora.
+guidance:
+  prose: |
+    O art. 9 e um dos pilares mais criticos da regulacao: a segregacao patrimonial.
+    Protege clientes contra insolvencia da VASP (prevencao de cenarios tipo FTX).
+
+    **Dupla segregacao:**
+    1. Ativos virtuais: carteiras de clientes SEPARADAS das carteiras da VASP
+    2. Recursos fiat: contas bancarias especificas para clientes, em bancos autorizados
+
+    **Blindagem patrimonial (par. 3):**
+    Os ativos segregados:
+    - Nao respondem por dividas da VASP
+    - Nao podem ser penhorados por credores da VASP
+    - Nao integram massa falida
+    Isso cria protecao juridica similar a contas de pagamento de IPs (Lei 12.865/2013).
+
+    **Licoes do colapso da FTX:**
+    A FTX misturou ativos de clientes com recursos proprios e da Alameda Research.
+    Este artigo visa prevenir exatamente esse cenario no Brasil.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de segregacao:**
+      1. Wallets segregadas: carteiras hot e cold separadas para assets de clientes
+         vs. assets da empresa, com enderecos distintos e rastreavel on-chain.
+      2. Ledger interno com double-entry bookkeeping que registra saldo de cada
+         cliente individualmente e reconcilia com saldo on-chain.
+      3. Proof of reserves automatizado: script que gera Merkle tree dos saldos
+         de clientes e compara com saldo on-chain das carteiras de custodia.
+      4. Contas bancarias segregadas via API bancaria com reconciliacao automatica.
+      5. Alertas em caso de divergencia entre ledger interno e saldo on-chain.
+    tools:
+      - wallet-management
+      - internal-ledger
+      - proof-of-reserves
+      - banking-api
+      - reconciliation-engine
+  devsecops:
+    prose: |
+      **Validacao da segregacao:**
+      1. Testes automatizados que verificam impossibilidade de transferir ativos
+         de clientes para carteiras da empresa sem autorizacao multi-sig.
+      2. Testes de reconciliacao que comparam ledger interno vs. blockchain.
+      3. Pipeline que valida integridade das proof of reserves periodicamente.
+      4. Scan de codigo que detecta logica que possa misturar fundos.
+    tools:
+      - gitlab-ci
+      - reconciliation-tests
+      - merkle-tree-validator
+      - code-review
+  secops:
+    prose: |
+      **Auditoria de segregacao:**
+      1. Reconciliacao diaria entre saldo on-chain e ledger interno.
+      2. Auditoria externa semestral de proof of reserves.
+      3. Relatorio mensal ao compliance officer sobre status da segregacao.
+      4. Procedimento de resposta a divergencias (gap analysis e correcao).
+      5. Documentacao de trilha de auditoria para todas as movimentacoes
+         entre carteiras segregadas.
+    tools:
+      - proof-of-reserves
+      - external-auditor
+      - grc-platform
+      - audit-trail
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-19"]
+    relationship: implements
+  - framework_id: bcb-44
+    articles: ["art-15"]
+    relationship: complements

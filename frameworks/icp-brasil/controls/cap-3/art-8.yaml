@@ -1,0 +1,115 @@
+id: art-8
+family: cap-3
+title: "Root Certification Authority (AC Raiz) and ITI Governance"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 3º da MP 2.200-2/2001. A função de autoridade gestora de políticas
+    será exercida pelo Comitê Gestor da ICP-Brasil, vinculado à Casa Civil
+    da Presidência da República e composto por cinco representantes da
+    sociedade civil, integrantes de setores interessados, designados pelo
+    Presidente da República, e um representante de cada um dos seguintes
+    órgãos, indicados por seus titulares.
+
+    Art. 4º da MP 2.200-2/2001. Compete ao Comitê Gestor da ICP-Brasil:
+    I - adotar as medidas necessárias e coordenar a implantação e o
+    funcionamento da ICP-Brasil;
+    II - estabelecer a política, os critérios e as normas técnicas para o
+    credenciamento das AC, das AR e dos demais prestadores de serviço de
+    suporte à ICP-Brasil, em todos os níveis da cadeia de certificação;
+    III - estabelecer a política de certificação e as regras operacionais
+    da AC Raiz.
+
+    Art. 5º da MP 2.200-2/2001. À AC Raiz, primeira autoridade da cadeia
+    de certificação, executora das políticas de certificados e normas técnicas
+    e operacionais aprovadas pelo Comitê Gestor da ICP-Brasil, compete emitir,
+    expedir, distribuir, revogar e gerênciar os certificados das AC de nível
+    imediatamente subsequente ao seu.
+guidance:
+  prose: |
+    Articles 3-5 of MP 2.200-2/2001 establish the governance structure and
+    root of trust for ICP-Brasil.
+
+    **CG-ICP-Brasil (Comite Gestor):**
+    The policy management authority with mixed composition (government + civil
+    society). Responsible for:
+    - Overall ICP-Brasil policy and technical standards
+    - CA, RA, and service provider accreditation criteria
+    - AC Raiz certificate policy and operational rules
+
+    **AC Raiz (Root CA):**
+    Operated by ITI (Instituto Nacional de Tecnologia da Informacao), the
+    AC Raiz is the trust anchor for the entire ICP-Brasil hierarchy.
+    - Issues certificates ONLY to first-level CAs
+    - Does NOT issue end-entity certificates directly
+    - Self-signed root certificate with extended validity period
+    - Key ceremony conducted with strict physical and procedural controls
+
+    **ITI (Instituto Nacional de Tecnologia da Informacao):**
+    Federal autarchy linked to Casa Civil that operates AC Raiz and provides
+    technical support to CG-ICP-Brasil. Responsible for:
+    - AC Raiz key management and operations
+    - CA audit and accreditation oversight
+    - Technical standards publication (DOC-ICP series)
+    - Homologation of hardware and software for ICP-Brasil
+
+    **Trust model implications:**
+    All qualified signatures depend on this hierarchy. A compromise at any
+    level (AC Raiz, first-level CA, or subordinate CA) could undermine the
+    entire trust model for affected certificate chains.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implement trust hierarchy awareness in platform:**
+      1. Maintain authoritative copy of AC Raiz certificate and all
+         active first-level CA certificates from ITI distribution points.
+      2. Implement automated trust store refresh mechanism that checks
+         ITI LCR (Lista de Certificados Revogados) distribution points.
+      3. Configure certificate validation to enforce full chain validation
+         from end-entity to AC Raiz — reject partial chains.
+      4. Implement CA certificate pinning for critical integrations to
+         prevent unauthorized CA substitution attacks.
+      5. Monitor ITI announcements for new CA accreditations or
+         revocations and update trust stores accordingly.
+    tools:
+      - trust-store-automation
+      - certificate-pinning
+      - crl-monitoring
+      - pki-service
+  devsecops:
+    prose: |
+      **CA hierarchy validation in development:**
+      1. Include ICP-Brasil CA hierarchy tests in integration testing
+         suite, validating chain construction and verification.
+      2. Maintain test certificates from ITI homologation environment
+         for development and staging testing.
+      3. Implement pipeline checks that verify trust store currency
+         (last update date, number of active CAs, CRL freshness).
+      4. Add static analysis rules to detect hardcoded CA certificates
+         or trust store bypass patterns in code.
+    tools:
+      - gitlab-ci
+      - pki-testing
+      - static-analysis
+      - trust-store-validation
+  secops:
+    prose: |
+      **AC Raiz and CA hierarchy operational security:**
+      1. Monitor Certificate Transparency logs for any certificates
+         issued under the organization's domains by ICP-Brasil CAs.
+      2. Subscribe to ITI security notifications and CG-ICP-Brasil
+         resolutions for policy changes affecting the trust hierarchy.
+      3. Maintain documented procedure for emergency trust store update
+         in case of CA compromise or revocation by CG-ICP-Brasil.
+      4. Conduct annual review of ICP-Brasil CAs used by the organization,
+         verifying their accreditation status with ITI.
+    tools:
+      - ct-log-monitoring
+      - threat-intelligence
+      - incident-response
+      - regulatory-tracking
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-5", "art-6"]
+    relationship: complements

@@ -1,0 +1,95 @@
+id: fw-3
+family: fw
+title: "Host-Based Firewalls on End-User Devices"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Where end-user devices connect to untrusted networks (including the internet)
+    directly, rather than through an organisation-controlled network boundary, a
+    software firewall must be installed and enabled on each device. The host-based
+    firewall must be configured to block inbound network connections by default.
+    Users must not be able to disable or modify the firewall configuration. Only
+    approved network connections necessary for the device to function in its role
+    should be permitted.
+
+guidance:
+  prose: >-
+    With remote and hybrid working now standard practice, devices frequently connect
+    to networks outside the organisation's direct control — home broadband, public
+    Wi-Fi, mobile hotspots. In these scenarios the corporate boundary firewall
+    provides no protection, and the host-based firewall becomes the primary network
+    perimeter. All major operating systems ship with built-in firewalls (Windows
+    Defender Firewall, macOS Application Firewall, iptables/nftables on Linux) that
+    must be enabled and centrally managed. Mobile devices (iOS, Android) should have
+    equivalent protections enforced through mobile device management (MDM) profiles.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Firewalls"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC End User Device Security Guidance"
+    url: "https://www.ncsc.gov.uk/collection/device-security-guidance"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy endpoint management solutions (Intune, Jamf, SCCM) to centrally configure
+      and enforce host-based firewall policies across all managed devices. Use Group Policy
+      Objects (GPO) or MDM configuration profiles to prevent users from disabling the
+      firewall. Define baseline firewall profiles per device role (developer workstation,
+      corporate laptop, kiosk) with only the minimum required inbound exceptions. Monitor
+      firewall status as part of endpoint compliance checks and quarantine non-compliant
+      devices from network access using Network Access Control (NAC).
+    tools:
+      - intune
+      - jamf
+      - sccm
+      - group-policy
+      - ansible
+      - osquery
+
+  devsecops:
+    prose: >-
+      Include host-based firewall configuration as part of golden image build pipelines.
+      Use automated testing to verify that built images have the firewall enabled with the
+      correct rule set before publishing. Implement compliance-as-code checks that validate
+      endpoint firewall status via APIs from the endpoint management platform. Integrate
+      endpoint compliance data into deployment pipelines to ensure only compliant devices
+      can access production infrastructure.
+    tools:
+      - packer
+      - ansible
+      - inspec
+      - osquery
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor endpoint firewall status across the fleet using the endpoint management
+      console and SIEM integration. Generate alerts when any managed device reports
+      firewall disabled or a policy violation. Conduct periodic audits of firewall
+      configurations on a sample of devices to verify compliance. Include host-based
+      firewall status in vulnerability assessment reports. For Cyber Essentials Plus,
+      ensure the Certification Body can verify host firewall configuration during the
+      hands-on technical assessment.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-for-endpoint
+      - sentinelone
+      - splunk
+      - osquery
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.1"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-7(12)"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-user-app-hardening"]
+    relationship: complements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 4.4", "CIS 4.5"]
+    relationship: mapped

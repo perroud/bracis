@@ -1,0 +1,112 @@
+id: art-14
+family: cap-4
+title: "Plano de Resposta a Incidentes de Seguranca Cibernetica"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 14. As prestadoras devem elaborar e manter Plano de Resposta a
+    Incidentes de Segurança Cibernética (PRISC) que contemple:
+
+    I - critérios e procedimentos de classificação e priorização de
+    incidentes de segurança cibernética por nível de severidade;
+
+    II - fluxos de escalonamento internos e procedimentos de ativação
+    da equipe de resposta a incidentes;
+
+    III - procedimentos técnicos de contenção, erradicação e recuperação
+    para tipos de incidentes relevantes ao setor de telecomunicações;
+
+    IV - procedimentos de preservação de evidências para fins de
+    investigação e cumprimento de obrigações legais;
+
+    V - critérios, fluxos e procedimentos de comunicação interna e
+    externa, incluindo notificação à ANATEL, usuários afetados e
+    outros órgãos competentes;
+
+    VI - critérios e procedimentos para declaração de encerramento
+    do incidente e realização de análise pós-incidente (RCA).
+guidance:
+  prose: |
+    O art. 14 exige um plano de resposta a incidentes (IRP) estruturado
+    e especifico para o contexto de telecomunicacoes.
+
+    **Tipos de incidentes relevantes para telecom:**
+    - Ransomware em OSS/BSS com impacto na operacao de rede
+    - DDoS contra infraestrutura de rede ou plataformas de servico
+    - Comprometimento de conta privilegiada de administrador de rede
+    - Vazamento de dados de usuarios (CDRs, dados de localizacao)
+    - Ataque a protocolo SS7/Diameter com impacto em comunicacoes
+    - Indisponibilidade de elementos criticos de rede
+
+    **Preservacao de evidencias (inciso IV):**
+    Logs de equipamentos de rede tem formatos especificos (IPFIX,
+    NetFlow, Syslog) e alta volatilidade. O PRISC deve prever
+    coleta forense adequada para evidencias de telecomunicacoes.
+
+    **Comunicacao com usuarios (inciso V):**
+    A LGPD (art. 48) exige notificacao de titulares em incidentes
+    com dados pessoais. O R-Ciber acrescenta a notificacao
+    especifica a ANATEL para incidentes com impacto nos servicos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de resposta a incidentes:**
+      1. Implementar plataforma SOAR (Security Orchestration, Automation
+         and Response) com playbooks automatizados para tipos de
+         incidentes comuns em telecomunicacoes.
+      2. Automatizar contencao de incidentes de rede (bloqueio de IPs,
+         isolamento de segmentos, ativacao de ACLs de emergencia) via
+         APIs de equipamentos de rede.
+      3. Implementar capacidade de captura forense de trafego de rede
+         em elementos criticos para uso em investigacoes de incidentes.
+      4. Criar ambientes de recuperacao (DR sites, cold standby) para
+         sistemas criticos OSS/BSS com RTO/RPO documentados.
+    tools:
+      - soar
+      - network-automation
+      - forensic-capture
+      - dr-environment
+  devsecops:
+    prose: |
+      **Resposta a incidentes em sistemas desenvolvidos internamente:**
+      1. Implementar capacidade de rollback rapido para versoes anteriores
+         em sistemas OSS/BSS criticos em caso de comprometimento.
+      2. Manter imagens de containers e artefatos de deploy imutaveis e
+         assinados para garantir integridade na recuperacao.
+      3. Implementar feature flags para desabilitar funcionalidades
+         comprometidas rapidamente sem necessidade de novo deploy.
+      4. Documentar procedimentos de recovery especificos por sistema
+         como parte da documentacao de cada repositorio.
+    tools:
+      - rollback-automation
+      - artifact-signing
+      - feature-flags
+      - runbooks
+  secops:
+    prose: |
+      **Operacao do CSIRT de telecomunicacoes:**
+      1. Constituir CSIRT (Computer Security Incident Response Team)
+         com capacidade de atendimento 24x7 e escalacao clara.
+      2. Treinar equipe de CSIRT especificamente em incidentes de
+         telecomunicacoes: SS7, diameter, GTP, redes moveis.
+      3. Testar PRISC via simulacoes semestrais (tabletop e exercicios
+         praticos) com participacao de areas operacionais de rede.
+      4. Manter contato pre-estabelecido com CERT.br, ANATEL e outros
+         operadores para resposta coordenada a incidentes de impacto
+         nacional.
+    tools:
+      - soar
+      - incident-management
+      - csirt-platform
+      - external-coordination
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-5-24", "A-5-25", "A-5-26", "A-5-27", "A-5-28"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-4"]
+    relationship: mapped

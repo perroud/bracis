@@ -1,0 +1,91 @@
+id: art-20
+family: cap-5
+title: "Prazo de Validade e Renovacao do Consentimento"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 20. O consentimento para compartilhamento de dados tem prazo de
+    validade definido pelo cliente, observadas as seguintes regras:
+
+    I - o prazo máximo de validade do consentimento é de 12 (doze) meses,
+    contados a partir da data de concessão;
+
+    II - o cliente pode definir prazo inferior ao máximo;
+
+    III - ao final do prazo de validade, o compartilhamento cessa
+    automaticamente, devendo a instituição receptora interromper o
+    acesso aos dados;
+
+    IV - a renovação do consentimento exige nova manifestação explícita
+    do cliente, não sendo permitida renovação automática ou tácita;
+
+    V - a instituição receptora deve notificar o cliente sobre a
+    proximidade do vencimento do consentimento com antecedência mínima
+    definida nas especificações técnicas.
+guidance:
+  prose: |
+    O art. 20 define o ciclo de vida temporal do consentimento:
+
+    **Prazo maximo: 12 meses**
+    - Cliente pode escolher: 1, 3, 6 ou 12 meses (ou personalizado)
+    - Apos o prazo, acesso cessa automaticamente (hard stop)
+    - Dados ja recebidos podem ser retidos conforme LGPD (base legal)
+
+    **Renovacao (NAO automatica):**
+    - Exige nova jornada de consentimento completa
+    - Nao e permitido "auto-renovar" sem acao do cliente
+    - Nao e permitido pre-selecionar opcao de renovacao
+    - Receptor pode solicitar renovacao proativamente antes do vencimento
+
+    **Notificacao de vencimento:**
+    - Receptor deve avisar o cliente antes do vencimento
+    - Prazo minimo de antecedencia definido nas especificacoes
+    - Canal de notificacao: app, e-mail, SMS (conforme preferencia)
+
+    **Implicacoes tecnicas:**
+    - Tokens de acesso vinculados ao consentimento devem expirar junto
+    - Scheduler deve verificar e encerrar consentimentos vencidos
+    - Log de encerramento automatico para auditoria
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de ciclo de vida de consentimentos:**
+      1. Implementar scheduler que verifique consentimentos proximos do
+         vencimento e vencidos (job periodico).
+      2. Revogar tokens de acesso vinculados a consentimentos expirados.
+      3. Implementar notificacao proativa ao cliente antes do vencimento.
+      4. Registrar log de encerramento automatico com motivo e timestamp.
+      5. Implementar endpoint de renovacao que exija nova autorizacao.
+    tools:
+      - job-scheduler
+      - notification-service
+      - consent-management
+      - token-management
+  devsecops:
+    prose: |
+      **Testes de ciclo de vida:**
+      1. Testar encerramento automatico ao atingir prazo de validade.
+      2. Verificar que tokens vinculados sao revogados junto com consentimento.
+      3. Testar que renovacao exige nova jornada completa de autorizacao.
+      4. Validar envio de notificacao de vencimento no prazo correto.
+    tools:
+      - integration-tests
+      - time-based-tests
+      - notification-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de validade de consentimentos:**
+      1. Dashboard de consentimentos ativos, proximos do vencimento e expirados.
+      2. Alertar sobre consentimentos que nao foram encerrados apos vencimento.
+      3. Auditar que tokens vinculados foram efetivamente revogados.
+      4. Verificar que nenhum acesso a dados ocorre apos expiracao.
+    tools:
+      - consent-dashboard
+      - token-audit
+      - siem
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-8", "art-15"]
+    relationship: complements

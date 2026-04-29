@@ -1,0 +1,123 @@
+id: art-10
+family: cap-3
+title: "Identificacao e Qualificacao de Clientes"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 10. As instituições mencionadas no art. 1 devem adotar procedimentos que
+    permitam identificar, qualificar e classificar seus clientes.
+
+    § 1. Os procedimentos mencionados no caput devem incluir a coleta, a verificação
+    e a validação de informações de seus clientes, de acordo com o perfil de risco
+    e a natureza da relação de negócio.
+
+    § 2. Os procedimentos de que trata o caput devem ser realizados no início da
+    relação de negócio ou quando houver alteração relevante nos dados cadastrais
+    do cliente.
+guidance:
+  prose: |
+    O art. 10 estabelece a obrigacao fundamental de KYC (Know Your Customer),
+    que e a base de todo o programa de PLD/FT.
+
+    **Tripla obrigacao:**
+    1. Identificar: saber quem e o cliente (documentos, dados pessoais)
+    2. Qualificar: entender o que o cliente faz (atividade economica, renda)
+    3. Classificar: atribuir nivel de risco ao cliente
+
+    **Abordagem baseada em risco (ss 1):**
+    A intensidade dos procedimentos de KYC deve ser proporcional ao risco:
+    - Risco baixo: coleta simplificada (dados minimos + verificacao basica)
+    - Risco medio: coleta padrao (dados completos + verificacao documental)
+    - Risco alto: coleta reforcada (dados detalhados + verificacao presencial
+      ou biometrica + documentacao complementar)
+
+    **Timing dos procedimentos (ss 2):**
+    - Inicio da relacao: onboarding completo antes de ativar a conta/servico
+    - Alteracao cadastral relevante: nova verificacao quando dados significativos
+      mudam (ex: mudanca de endereco para outro pais, alteracao societaria)
+
+    **Implicacao pratica:**
+    Nenhuma relacao de negocio pode ser estabelecida sem procedimentos de KYC
+    completos e proporcionais ao risco. A instituicao deve recusar o cliente
+    se nao for possivel cumprir os procedimentos minimos de identificacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de KYC automatizado:**
+      1. Formulario digital de onboarding com campos obrigatorios por tipo de
+         pessoa (PF: CPF, nome, data nascimento, filiacao, endereco, renda;
+         PJ: CNPJ, razao social, quadro societario, faturamento).
+      2. OCR de documentos (RG, CNH, passaporte, CNPJ, contrato social) com
+         validacao automatica de autenticidade.
+      3. Verificacao biometrica (facial, liveness detection) integrada ao
+         processo de onboarding.
+      4. Consulta automatica a fontes externas: Receita Federal, Detran,
+         Tribunal de Justica, bureaus de credito.
+
+      **Classificacao automatica:**
+      5. Motor de scoring de risco executado ao final do processo de coleta.
+      6. Regras de bloqueio automatico quando risco excede threshold ou dados
+         sao inconsistentes.
+      7. Workflow de aprovacao para clientes de alto risco (escalacao para
+         compliance officer).
+
+      **Atualizacao cadastral:**
+      8. Trigger de recadastramento quando dados relevantes mudam em fontes
+         externas (ex: mudanca de endereco na Receita Federal).
+      9. Scheduler de atualizacao periodica baseado na categoria de risco.
+      10. Portal de auto-atendimento para atualizacao cadastral pelo cliente.
+    tools:
+      - kyc-system
+      - ocr-engine
+      - biometric-verification
+      - data-enrichment-api
+  devsecops:
+    prose: |
+      **Testes de fluxo de KYC:**
+      1. Testes end-to-end do fluxo de onboarding para cada tipo de cliente
+         (PF, PJ, MEI, estrangeiro).
+      2. Testes de validacao de documentos (formatos validos, invalidos,
+         expirados, falsificados).
+      3. Testes de integracao com cada fonte de dados externa.
+      4. Testes de performance para garantir SLA de onboarding.
+
+      **Seguranca dos dados de KYC:**
+      5. Criptografia de dados sensiveis (documentos, biometria) em transito
+         e repouso.
+      6. Mascaramento de dados de KYC em ambientes nao produtivos.
+      7. Audit trail de acesso a dados de clientes.
+      8. Secret scanning para credenciais de APIs de consulta.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Qualidade do processo de KYC:**
+      1. Auditoria periodica de completude cadastral por amostragem.
+      2. Revisao de clientes onboarded sem procedimentos completos.
+      3. Monitoramento de taxa de rejeicao no onboarding por motivo.
+      4. Controle de atualizacoes cadastrais pendentes (aging).
+
+      **Conformidade regulatoria:**
+      5. Verificacao de que todos os campos obrigatorios estao preenchidos.
+      6. Validacao de que classificacao de risco esta atribuida a todos os
+         clientes.
+      7. Relatorio de clientes sem atualizacao cadastral dentro do prazo.
+      8. Assessment de conformidade do processo de KYC com a circular.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+      - audit-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-1", "IA-2", "IA-4", "IA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-18"]
+    relationship: complements

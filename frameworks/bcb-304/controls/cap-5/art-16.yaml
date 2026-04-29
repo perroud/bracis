@@ -1,0 +1,101 @@
+id: art-16
+family: cap-5
+title: "Travel Rule para Ativos Virtuais"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 16. A prestadora de serviços de ativos virtuais deve, nas transferências de
+    ativos virtuais, obter e transmitir as seguintes informações:
+    I - do originador: nome completo, número de inscrição no CPF ou CNPJ ou
+    documento de identificação equivalente, e endereço da carteira de origem;
+    II - do beneficiário: nome completo, número de inscrição no CPF ou CNPJ ou
+    documento de identificação equivalente, e endereço da carteira de destino.
+
+    Parágrafo 1. As informações do originador e do beneficiário devem ser transmitidas
+    de forma segura à prestadora de serviços de ativos virtuais destinatária,
+    simultaneamente ou anteriormente à transferência do ativo virtual.
+
+    Parágrafo 2. A prestadora destinatária deve verificar a completude e a
+    consistência das informações recebidas antes de disponibilizar os ativos
+    virtuais ao beneficiário.
+
+    Parágrafo 3. Para transferências envolvendo carteiras não custodiadas
+    (self-hosted wallets), a prestadora deve adotar procedimentos de due diligence
+    proporcionais ao risco da operação.
+guidance:
+  prose: |
+    O art. 16 implementa a travel rule do GAFI/FATF (Recomendacao 16) para
+    ativos virtuais no Brasil.
+
+    **Travel rule para cripto:**
+    Analogia com a travel rule bancaria (wire transfers), onde banco remetente
+    envia dados do originador para banco destinatario. No cripto, VASP remetente
+    envia dados para VASP destinataria.
+
+    **Dados obrigatorios:**
+    - Originador: nome, CPF/CNPJ, endereco da carteira de origem
+    - Beneficiario: nome, CPF/CNPJ, endereco da carteira de destino
+
+    **Self-hosted wallets (par. 3):**
+    Transferencias de/para carteiras nao custodiadas (MetaMask, Ledger) exigem
+    due diligence proporcional. A VASP nao consegue verificar a identidade do
+    titular da carteira self-hosted diretamente, entao deve usar mecanismos
+    alternativos (proof of ownership, declaracao do cliente).
+
+    **Protocolos de travel rule:**
+    TRISA, OpenVASP, TRP, Sygna Bridge sao protocolos para troca de informacoes
+    entre VASPs em conformidade com a travel rule.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao da travel rule:**
+      1. Integracao com protocolo de travel rule (TRISA, OpenVASP ou TRP) para
+         troca de informacoes entre VASPs.
+      2. Motor de validacao que verifica completude dos dados de originador e
+         beneficiario antes de executar a transferencia.
+      3. Sistema de proof of ownership para self-hosted wallets: cliente assina
+         mensagem com chave privada da carteira para comprovar titularidade.
+      4. Base de dados de VASPs registradas para lookup automatico da VASP
+         destinataria/remetente.
+      5. Queue de transferencias pendentes de validacao de travel rule data.
+    tools:
+      - travel-rule-protocol
+      - proof-of-ownership
+      - vasp-directory
+      - transfer-queue
+      - validation-engine
+  devsecops:
+    prose: |
+      **Validacao de travel rule:**
+      1. Testes de integracao com protocolo de travel rule (envio e recebimento).
+      2. Testes de validacao de completude de dados (campos obrigatorios).
+      3. Testes de cenarios de self-hosted wallet (proof of ownership).
+      4. Testes de rejeicao quando dados sao incompletos ou inconsistentes.
+      5. Testes de encriptacao de dados em transito (travel rule data).
+    tools:
+      - gitlab-ci
+      - travel-rule-testing
+      - encryption-validation
+      - integration-tests
+  secops:
+    prose: |
+      **Operacao de travel rule:**
+      1. Monitoramento de taxas de compliance de travel rule (% de transferencias
+         com dados completos).
+      2. Processo de escalacao para transferencias com dados incompletos.
+      3. Due diligence manual para self-hosted wallets de alto risco.
+      4. Relatorio ao BCB sobre compliance com travel rule.
+      5. Acompanhamento de evolucao dos protocolos de travel rule globais.
+    tools:
+      - travel-rule-dashboard
+      - escalation-workflow
+      - regulatory-reporting
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-31", "art-32", "art-33"]
+    relationship: implements
+  - framework_id: bcb-44
+    articles: ["art-15", "art-16"]
+    relationship: complements

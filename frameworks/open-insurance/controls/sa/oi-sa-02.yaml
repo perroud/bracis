@@ -1,0 +1,88 @@
+id: oi-sa-02
+family: sa
+title: "Certificados Digitais ICP-Brasil e mTLS"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Todos os participantes do Open Insurance devem utilizar certificados digitais
+    emitidos por Autoridade Certificadora vinculada à ICP-Brasil para autenticação
+    mútua (mTLS) nas comunicações entre participantes.
+
+    Os requisitos de certificação incluem:
+    I - Certificados de transporte (mTLS): utilizados para autenticação mútua nas
+    conexões TLS entre participantes, garantindo identidade de ambas as partes;
+    II - Certificados de assinatura: utilizados para assinar mensagens, tokens e
+    payloads conforme exigido pelo perfil FAPI;
+    III - Registro dos certificados no Diretório de Participantes do Open Insurance;
+    IV - Validação de cadeia de certificação e verificação de revogação (OCSP/CRL)
+    em tempo real;
+    V - Renovação de certificados antes do vencimento, sem interrupção de serviço.
+
+    Conexões sem mTLS válido devem ser rejeitadas. Certificados expirados ou
+    revogados devem ser recusados imediatamente.
+guidance:
+  prose: |
+    O uso de certificados ICP-Brasil e uma exigencia especifica do ecossistema
+    brasileiro (tanto Open Finance quanto Open Insurance), diferente de outros paises
+    que usam PKI privada. Isso garante identidade juridica verificavel dos
+    participantes.
+
+    O mTLS (mutual TLS) significa que tanto o cliente quanto o servidor apresentam
+    certificados durante o handshake TLS. No contexto do Open Insurance:
+    - A receptora apresenta seu certificado a transmissora
+    - A transmissora valida o certificado contra o Diretorio de Participantes
+    - A transmissora apresenta seu certificado a receptora
+    - A receptora valida igualmente
+
+    Os certificados devem ser obtidos via Diretorio de Participantes, que atua como
+    Autoridade de Registro. Cada participante registra seus software statements e
+    associa certificados a eles.
+
+    A validacao de revogacao em tempo real (OCSP stapling ou CRL) e critica para
+    impedir que certificados comprometidos sejam usados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Obter certificados ICP-Brasil para transporte e assinatura via AC habilitada.
+      2. Configurar mTLS no API Gateway / reverse proxy com validacao de cadeia
+         completa contra ICP-Brasil.
+      3. Implementar verificacao OCSP stapling ou CRL check para cada conexao.
+      4. Registrar certificados no Diretorio de Participantes do Open Insurance.
+      5. Implementar rotacao automatica de certificados antes do vencimento.
+      6. Configurar HSM (Hardware Security Module) para armazenamento seguro de
+         chaves privadas.
+    tools:
+      - pki-management
+      - hsm
+      - api-gateway
+      - certificate-manager
+  devsecops:
+    prose: |
+      1. Testes automatizados de mTLS: verificar que conexoes sem certificado valido
+         sao rejeitadas.
+      2. Testar validacao de cadeia de certificacao (certificados invalidos, expirados,
+         revogados devem ser rejeitados).
+      3. Monitorar validade de certificados no pipeline e alertar antes do vencimento.
+      4. Testes de regressao quando certificados sao rotacionados.
+    tools:
+      - certificate-testing
+      - security-testing
+      - certificate-monitoring
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar validade de todos os certificados em uso (alertar 30 dias antes
+         do vencimento).
+      2. Implementar alertas para tentativas de conexao com certificados invalidos.
+      3. Auditar que chaves privadas estao armazenadas em HSM e nao em filesystem.
+      4. Monitorar CRL/OCSP para detectar revogacoes de certificados de parceiros.
+    tools:
+      - certificate-monitoring
+      - hsm-monitoring
+      - siem
+      - pki-management
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4", "art-5"]
+    relationship: complements

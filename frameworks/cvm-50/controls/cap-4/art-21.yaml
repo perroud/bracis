@@ -1,0 +1,101 @@
+id: art-21
+family: cap-4
+title: "Obrigacao de Registro de Operacoes"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 21. Os participantes devem manter registros de todas as operações
+    realizadas, propostas, tentadas ou recusadas, que envolvam os clientes
+    ou seus beneficiários finais.
+
+    § 1. Os registros de que trata o caput devem conter, no mínimo:
+    I - a identificação das partes envolvidas na operação;
+    II - o tipo, o valor e a data da operação;
+    III - o instrumento ou produto financeiro utilizado;
+    IV - a conta ou carteira de investimento envolvida; e
+    V - quando aplicável, as contrapartes e intermediários da operação.
+
+    § 2. Os participantes devem registrar também as operações realizadas
+    em nome de terceiros, identificando o terceiro e sua relação com
+    o titular da conta.
+guidance:
+  prose: |
+    O registro de operacoes e a base sobre a qual o monitoramento, a investigacao
+    e as comunicacoes ao COAF sao construidos. Sem registros completos, nao
+    e possivel investigar retroativamente transacoes suspeitas.
+
+    **Escopo amplo — inclui operacoes recusadas:**
+    O art. 21 vai alem do usual: o participante deve registrar nao apenas as
+    operacoes efetivadas, mas tambem as tentadas e recusadas. Uma operacao
+    recusada por suspeita pode ser evidencia relevante para uma investigacao
+    de lavagem de dinheiro.
+
+    **Campos obrigatorios (ss 1):**
+    Os cinco campos sao o minimo — o participante pode (e deve) capturar mais
+    informacoes para facilitar a investigacao posterior. Especialmente relevantes:
+    canal pelo qual a operacao foi realizada, dispositivo (para operacoes digitais),
+    localizacao geografica, e hora exata (nao apenas data).
+
+    **Operacoes em nome de terceiros (ss 2):**
+    Este inciso e especialmente relevante para: gestores de carteira que operam
+    em nome de seus clientes, advogados que gerem recursos de clientes, e
+    qualquer forma de procuracao. O terceiro deve ser identificado e seu vinculo
+    com o titular documentado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Registro imutavel de transacoes:**
+      1. Banco de dados de transacoes com armazenamento append-only (imutavel):
+         nenhum registro pode ser deletado ou alterado apos a gravacao.
+      2. Captura automatica dos cinco campos obrigatorios do ss 1 para toda
+         operacao no mercado de capitais.
+      3. Metadados adicionais capturados automaticamente: canal (web, app, mesa),
+         IP, dispositivo, hora exata, localizacao geografica.
+      4. Registro de operacoes tentadas e recusadas: toda tentativa de operacao
+         que nao foi concluida deve gerar um registro com motivo.
+
+      **Modelo de dados:**
+      5. Schema de transacao com todos os campos do ss 1 + metadados adicionais,
+         com indice para busca rapida por cliente, data, produto.
+      6. Suporte a operacoes de terceiros: campo de "operado por" separado
+         de "titular da conta".
+    tools:
+      - transaction-database
+      - event-sourcing
+      - data-lake
+      - audit-trail
+  devsecops:
+    prose: |
+      **Integridade dos registros:**
+      1. Testes de imutabilidade: garantir que nenhuma operacao de UPDATE/DELETE
+         e possivel na tabela de transacoes.
+      2. Testes de completude: toda operacao executada no sistema deve gerar
+         exatamente um registro com todos os campos obrigatorios.
+      3. Testes de operacoes tentadas: simular operacao recusada e verificar
+         que o registro e criado.
+      4. Hash criptografico de cada registro para deteccao de manipulacao.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - integrity-checks
+  secops:
+    prose: |
+      **Qualidade dos registros:**
+      1. Auditoria de completude: percentual de transacoes com todos os campos
+         obrigatorios preenchidos.
+      2. Monitoramento de gaps: periodos sem transacoes registradas podem
+         indicar falha no sistema de registro.
+      3. Reconciliacao entre registros no sistema de PLD/FT e nos sistemas
+         transacionais de negocio (clearing, custódia).
+    tools:
+      - data-quality
+      - monitoring-platform
+      - reconciliation-tool
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18"]
+    relationship: equivalent-to
+  - framework_id: marco-civil
+    articles: ["art-13", "art-15"]
+    relationship: complements

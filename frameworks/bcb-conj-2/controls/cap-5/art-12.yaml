@@ -1,0 +1,177 @@
+id: art-12
+family: cap-5
+title: "Registro e Retencao de Informacoes"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 12. As instituições referidas no art. 1 devem manter registro de todos
+    os incidentes de segurança ocorridos, incluindo aqueles não notificados ao
+    Banco Central do Brasil, pelo prazo mínimo de 5 (cinco) anos.
+
+    Parágrafo único. O registro de que trata o caput deve conter, no mínimo:
+    I - a descrição do incidente e a classificação de severidade atribuída;
+    II - os sistemas e os dados afetados;
+    III - as medidas adotadas para o tratamento do incidente;
+    IV - os resultados das medidas adotadas;
+    V - a justificativa para a não notificação ao Banco Central do Brasil,
+    quando aplicável.
+guidance:
+  prose: |
+    O art. 12 institui a obrigacao de registro completo e retencao de longo prazo
+    de todos os incidentes, inclusive os que nao foram notificados ao BCB.
+
+    **Escopo do registro:**
+    TODOS os incidentes de seguranca devem ser registrados, nao apenas os
+    relevantes. Isso inclui:
+    - Incidentes criticos e altos (obrigatoriamente notificados ao BCB)
+    - Incidentes medios (avaliados caso a caso para notificacao)
+    - Incidentes baixos (nao notificados, mas registrados)
+    - Incidentes sob suspeita que foram investigados e descartados
+    - Incidentes originados em terceiros
+
+    **Prazo de retencao: 5 anos:**
+    O prazo de 5 anos e minimo. A instituicao pode adotar prazo maior. O prazo
+    conta a partir do encerramento do incidente, nao da deteccao.
+
+    **Conteudo minimo do registro (paragrafo unico):**
+
+    **I - Descricao e classificacao:**
+    - Timeline completa (deteccao, contencao, erradicacao, recuperacao, encerramento)
+    - Tipo de incidente conforme taxonomia da instituicao
+    - Classificacao de severidade com justificativa
+    - Reclassificacoes durante o tratamento
+
+    **II - Sistemas e dados afetados:**
+    - Lista de sistemas comprometidos
+    - Tipo e volume de dados afetados
+    - Classificacao dos dados (pessoais, financeiros, operacionais)
+    - Estimativa de clientes afetados
+
+    **III - Medidas adotadas:**
+    - Acoes de contencao executadas
+    - Acoes de erradicacao executadas
+    - Acoes de recuperacao executadas
+    - Comunicacoes realizadas (internas e externas)
+
+    **IV - Resultados:**
+    - Eficacia de cada medida adotada
+    - Impacto final quantificado
+    - Causa raiz determinada
+    - Licoes aprendidas
+
+    **V - Justificativa de nao notificacao:**
+    Para incidentes nao notificados ao BCB, a instituicao deve registrar
+    explicitamente por que o incidente nao foi considerado relevante conforme
+    criterios do art. 3. Este registro e critico para auditorias e inspeccoes
+    do BCB.
+
+    **Implicacao pratica:**
+    O BCB pode, a qualquer momento, solicitar acesso aos registros de incidentes
+    da instituicao, incluindo aqueles nao notificados. A qualidade e completude
+    dos registros sera avaliada em inspecoes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Repositorio centralizado de incidentes:**
+      1. Incident management platform com registro obrigatorio de todos os campos
+         do paragrafo unico para cada incidente.
+      2. Campos obrigatorios que impedem encerramento de incidente sem completude:
+         - Descricao e classificacao (inciso I)
+         - Sistemas e dados afetados (inciso II)
+         - Medidas adotadas (inciso III)
+         - Resultados (inciso IV)
+         - Justificativa de nao notificacao quando aplicavel (inciso V)
+      3. Timeline imutavel (append-only) para cada incidente.
+      4. Workflow de encerramento com checklist de campos obrigatorios.
+
+      **Retencao de 5 anos:**
+      5. Politica de retencao configurada no incident management para 5 anos
+         minimo (recomendado 7 anos para margem).
+      6. Armazenamento de evidencias associadas (logs, screenshots, dumps)
+         com mesma politica de retencao.
+      7. Backup dos registros de incidentes com teste de restore periodico.
+      8. Controle de acesso restrito aos registros de incidentes.
+
+      **Auditabilidade:**
+      9. Audit trail de todas as alteracoes nos registros de incidentes.
+      10. Export automatizado para atender solicitacoes do BCB em inspecoes.
+      11. Dashboards de metricas historicas (tendencias, recorrencias, evolucao).
+    tools:
+      - incident-management
+      - centralized-logging
+      - backup-recovery
+      - grc-platform
+      - data-retention
+  devsecops:
+    prose: |
+      **Vinculacao de incidentes ao codigo:**
+      1. Issues de incidentes vinculadas a merge requests de correcao para
+         rastreabilidade completa: incidente -> causa -> fix -> deploy.
+      2. Tags de incidente em commits de hotfix e correcao.
+      3. Post-mortem versionado no repositorio com referencia ao incidente.
+
+      **Retencao de evidencias tecnicas:**
+      4. Logs de aplicacao retidos por 5 anos em storage de longo prazo
+         (cold storage / archive tier).
+      5. Artifacts de build e deploy retidos por 5 anos para sistemas envolvidos
+         em incidentes.
+      6. SBOM da versao afetada preservado para analise futura.
+
+      **Automacao de coleta:**
+      7. Pipeline de coleta automatica de evidencias disparado ao abrir incidente:
+         - Snapshot de logs de aplicacao
+         - Metricas de performance do periodo
+         - Estado de configuracao
+         - Resultados de scans de seguranca recentes
+    tools:
+      - gitlab-ci
+      - centralized-logging
+      - artifact-registry
+      - sbom-generator
+      - incident-management
+  secops:
+    prose: |
+      **Processo de registro:**
+      1. Todo incidente, independente de severidade, deve ser registrado no
+         incident management dentro de 24 horas da deteccao.
+      2. Responsavel pelo registro: analista de incidentes que realiza a triagem.
+      3. Revisao de qualidade pelo Incident Commander antes do encerramento.
+      4. Auditoria trimestral de completude dos registros.
+
+      **Justificativa de nao notificacao (inciso V):**
+      5. Para cada incidente nao notificado ao BCB, registro obrigatorio contendo:
+         - Criterios do art. 3, ss 1 avaliados
+         - Justificativa para cada criterio nao atendido
+         - Aprovacao do CISO na decisao de nao notificar
+      6. Revisao retroativa: compliance verifica mensalmente se algum incidente
+         deveria ter sido notificado e nao foi.
+
+      **Retencao e acesso:**
+      7. Registros mantidos em plataforma de GRC com retencao minima de 5 anos.
+      8. Acesso restrito: somente equipe de seguranca, compliance e auditoria.
+      9. Processo formal para conceder acesso ao BCB durante inspecoes.
+      10. Teste anual de capacidade de recuperar registros antigos.
+
+      **Metricas e tendencias:**
+      11. Relatorio mensal de incidentes para CISO e diretoria.
+      12. Analise de tendencias: tipos recorrentes, severidades, tempo de resposta.
+      13. Benchmark com exercicios anteriores e com o setor (quando disponivel).
+    tools:
+      - incident-management
+      - grc-platform
+      - data-retention
+      - compliance-scanner
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-11"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-5", "AU-11", "SI-4"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-37", "art-50"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.27", "A.5.28", "A.5.33"]
+    relationship: supports

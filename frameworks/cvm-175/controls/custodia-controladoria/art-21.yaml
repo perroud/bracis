@@ -1,0 +1,108 @@
+id: art-21
+family: custodia-controladoria
+title: "Precificacao e Marcacao a Mercado"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 21. Os ativos financeiros e valores mobiliários integrantes da carteira
+    do fundo devem ser avaliados diariamente a valor de mercado (marcação a mercado),
+    de acordo com critérios e metodologias transparentes, consistentes e verificáveis.
+
+    Parágrafo 1. O administrador é responsável pela precificação dos ativos do
+    fundo, podendo contratar prestador de serviço especializado para esta função.
+
+    Parágrafo 2. A metodologia de precificação deve ser documentada em manual de
+    marcação a mercado, disponibilizado aos cotistas e à CVM.
+
+    Parágrafo 3. Em situações excepcionais de iliquidez, o administrador pode
+    adotar critérios alternativos de precificação, desde que: I - justifique a
+    adoção dos critérios alternativos; II - comunique à CVM e aos cotistas;
+    III - documente os critérios utilizados.
+guidance:
+  prose: |
+    O art. 21 estabelece a obrigacao de marcacao a mercado (MtM) diaria. E uma
+    das regras mais importantes para protecao do cotista, pois garante que o
+    valor da cota reflita o valor real dos ativos.
+
+    **Marcacao a mercado diaria:**
+    Todos os ativos devem ser precificados diariamente a valor de mercado, nao
+    a custo de aquisicao. Isso evita transferencia de riqueza entre cotistas
+    que entram e saem do fundo em momentos diferentes.
+
+    **Manual de marcacao a mercado:**
+    O manual deve documentar: fontes de preco, metodologias de precificacao
+    para cada classe de ativo, tratamento de ativos iliquidos, comite de
+    precificacao, escalacao de divergencias.
+
+    **Criterios alternativos (iliquidez):**
+    Em situacoes excepcionais (crise, ativos sem negociacao), criterios
+    alternativos podem ser adotados, mas com justificativa, comunicacao e
+    documentacao. Nao e uma carta branca para precificacao arbitraria.
+
+    **Impacto critico em TI:**
+    Sistemas de precificacao devem ser automatizados, com fontes de precos
+    confiaaveis (B3, Bloomberg, ANBIMA), conciliacao de precos e audit trail
+    completo de todos os precos utilizados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de precificacao automatizado:**
+      1. Pipeline de precificacao diaria automatizado: coleta de precos de
+         fontes oficiais (B3, Bloomberg, ANBIMA), aplicacao de metodologia,
+         calculo de NAV.
+      2. Fontes redundantes de precos: se fonte primaria falha, fallback
+         para fonte secundaria com alerta.
+      3. Reconciliacao automatica de precos entre fontes.
+
+      **Manual de marcacao como codigo:**
+      4. Manual de marcacao a mercado versionado em repositorio Git com
+         historico completo de alteracoes.
+      5. Regras de precificacao codificadas e testadas automaticamente.
+      6. Comite de precificacao com workflow de aprovacao para alteracoes.
+    tools:
+      - git
+      - terraform
+      - gitlab-ci
+      - vault
+  devsecops:
+    prose: |
+      **Integridade de precos:**
+      1. Validacao automatica de precos: detectar precos fora de faixa
+         (outliers), precos repetidos (stale prices) e precos inconsistentes.
+      2. Testes automatizados de precificacao: cenarios de mercado normal,
+         stress e iliquidez.
+      3. Audit trail imutavel de todos os precos utilizados: fonte, data,
+         hora, responsavel pela aprovacao.
+
+      **Seguranca do pipeline de precificacao:**
+      4. SAST para codigo de precificacao: erros de calculo podem causar
+         prejuizo aos cotistas.
+      5. Secret detection para credenciais de APIs de fontes de precos.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de precificacao:**
+      1. Alertas para precos fora de faixa ou ausencia de precos.
+      2. Dashboard de precificacao: status diario, ativos precificados,
+         divergencias, criterios alternativos utilizados.
+      3. Metricas de qualidade de precificacao: taxa de precos obtidos
+         automaticamente vs. manualmente.
+
+      **Auditoria de precificacao:**
+      4. Auditoria mensal de precificacao por amostragem: verificar se precos
+         utilizados correspondem as fontes oficiais.
+      5. Revisao de eventos de criterio alternativo: justificativa adequada,
+         comunicacao tempestiva, documentacao completa.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5"]
+    relationship: complements

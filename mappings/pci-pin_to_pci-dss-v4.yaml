@@ -1,0 +1,431 @@
+id: pci-pin_to_pci-dss-v4
+title: "PCI PIN v3.1 to PCI DSS v4.0 Control Mapping"
+source_framework: pci-pin
+target_framework: pci-dss-v4
+version: "1.0.0"
+last_updated: "2026-04-05"
+methodology: semantic
+description: >
+  Control-to-control mapping between PCI PIN Security Requirements v3.1 and PCI DSS
+  v4.0.1. PCI PIN focuses specifically on the protection of PIN data throughout its
+  lifecycle (entry, encryption, transmission, verification), while PCI DSS provides
+  the broader cardholder data protection framework. PCI PIN controls complement and
+  extend PCI DSS requirements with PIN-specific cryptographic, device, and operational
+  controls. Both standards are published by PCI SSC and are designed to be implemented
+  together for organizations that process PIN-based transactions.
+
+mappings:
+  - source_control: pin-1
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          PIN-1 requires PINs to be protected at all times and to exist in cleartext
+          only within a secure cryptographic device. Req-3.1 addresses stored account
+          data protection including the prohibition on storing PIN/PIN block after
+          authorization. PIN-1 extends req-3.1 with specific requirements for PIN
+          encryption at the point of interaction and SCD-only cleartext handling.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.82
+        rationale: >
+          PIN-1 mandates that the online PIN must be encrypted immediately upon entry
+          and remain encrypted during transit to the issuer. Req-4.1 requires strong
+          cryptography for cardholder data during transmission over open networks.
+          PIN-1 applies stricter PIN-specific encryption requirements beyond general
+          cardholder data transit protection.
+
+  - source_control: pin-2
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          PIN-2 requires PIN generation within a secure cryptographic device using
+          approved random number generation. Req-3.1 governs protection of stored
+          account data including cryptographic key management. PIN generation within
+          SCDs ensures the PIN value is protected from creation, aligning with req-3.1's
+          data protection principles while adding PIN-specific generation controls.
+      - id: req-8.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          PIN-2 addresses the creation of PIN credentials including ensuring statistical
+          unpredictability and rejection of trivial PINs. Req-8.1 covers user
+          identification and authentication management including password/credential
+          policies. Both address credential strength, but PIN-2 focuses on the
+          cardholder-facing PIN credential generated within HSM environments.
+
+  - source_control: pin-3
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.83
+        rationale: >
+          PIN-3 mandates approved ISO 9564 PIN block formats for encryption and
+          transmission. Req-3.1 requires that stored account data (including PIN blocks)
+          be protected using strong cryptography. PIN-3 extends req-3.1 by specifying
+          the exact approved formats (Format 0, 1, 3, 4) and recommending Format 4
+          (AES-based) for new implementations.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          PIN-3 defines how PINs are encoded and encrypted within PIN blocks for
+          transmission. Req-4.1 requires strong cryptography during data transmission.
+          PIN-3 provides PIN-specific technical details on block format construction
+          that complement the general transmission encryption requirements of req-4.1.
+
+  - source_control: pin-4
+    target_controls:
+      - id: req-8.1
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          PIN-4 governs PIN verification at the issuer's HSM, including the requirement
+          that only a boolean pass/fail result is returned, and that failed PIN attempts
+          trigger card blocking. Req-8.1 addresses authentication management including
+          account lockout after failed attempts. Both enforce failed-attempt lockout, but
+          PIN-4 adds PIN-specific requirements for HSM-based verification and prevention
+          of partial match information leakage.
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          PIN-4 requires that cleartext PINs never leave the SCD during verification.
+          Req-3.1 prohibits storage of PIN/PIN block after authorization. Together they
+          ensure PINs are protected both during and after the verification process.
+
+  - source_control: pin-5
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.88
+        rationale: >
+          PIN-5 requires cryptographic keys for PIN operations to be generated within
+          SCDs using approved RNGs with minimum 112-bit effective strength, dual control,
+          and split knowledge. Req-3.1 covers protection of stored data including key
+          management processes. PIN-5 provides detailed PIN-specific key generation
+          requirements that extend the general cryptographic key management expectations
+          of req-3.1.
+
+  - source_control: pin-6
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          PIN-6 mandates secure key distribution using approved methods (manual with
+          dual control, electronic via KEKs, or public-key cryptography). Req-3.1
+          addresses key management for stored data protection. PIN-6 provides specific
+          key distribution protocols (TR-34, DUKPT initial injection) that extend the
+          general key management lifecycle addressed in req-3.1.
+      - id: req-4.1
+        relationship: intersects-with
+        confidence: 0.73
+        rationale: >
+          PIN-6's requirement for encrypted and authenticated key distribution channels
+          supports req-4.1's mandate for strong cryptography during data transmission.
+          Secure key distribution is a prerequisite for establishing the encryption that
+          protects cardholder data in transit.
+
+  - source_control: pin-7
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.90
+        rationale: >
+          PIN-7 requires all PIN cryptographic keys to be stored within SCDs or encrypted
+          under KEKs with layered key hierarchies, dual control, and tamper-resistant
+          hardware. Req-3.1 requires strong cryptography for stored account data and key
+          management. Both directly address key storage protection; PIN-7 provides the
+          PIN-specific key hierarchy and HSM storage requirements that operationalize
+          req-3.1 for PIN encryption keys.
+      - id: req-9.1
+        relationship: intersects-with
+        confidence: 0.72
+        rationale: >
+          PIN-7 requires tamper-resistant, tamper-evident HSMs meeting FIPS 140-2 Level 3
+          for key storage, with backup components in physically separate secure locations.
+          Req-9.1 restricts physical access to cardholder data environments. PIN-7's
+          physical HSM protection requirements support req-9.1's broader physical security
+          objectives.
+
+  - source_control: pin-8
+    target_controls:
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.87
+        rationale: >
+          PIN-8 mandates a complete key lifecycle (generation through destruction) with
+          defined cryptoperiods, zero-downtime rotation, and witnessed destruction with
+          certificates. Req-3.1 addresses protection of stored account data including key
+          management. PIN-8 provides detailed PIN-specific key lifecycle and destruction
+          requirements that extend the general key management scope of req-3.1.
+
+  - source_control: pin-9
+    target_controls:
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.92
+        rationale: >
+          PIN-9 requires PINs to be transmitted only in encrypted form using approved
+          algorithms with minimum 112-bit strength, supporting both end-to-end and zone
+          encryption architectures. Req-4.1 mandates strong cryptography for cardholder
+          data during transmission. Both directly address encryption in transit; PIN-9
+          provides PIN-specific transmission encryption requirements including zone
+          encryption and DUKPT that extend the general transport encryption of req-4.1.
+      - id: req-1.1
+        relationship: intersects-with
+        confidence: 0.73
+        rationale: >
+          PIN-9 requires secure sessions and point-to-point encryption between
+          communicating endpoints for PIN transmission. Req-1.1 addresses network
+          security controls protecting the CDE. PIN-9's requirement for dedicated
+          encrypted channels supports the network segmentation and traffic control
+          objectives of req-1.1.
+
+  - source_control: pin-10
+    target_controls:
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.88
+        rationale: >
+          PIN-10 requires PIN translation (re-encryption between zones) to occur
+          exclusively within SCDs, with the cleartext PIN never existing outside the SCD
+          boundary. Req-4.1 requires strong cryptography during data transmission. PIN-10
+          adds PIN-specific translation controls that ensure cryptographic protection is
+          maintained at zone boundaries during multi-hop transmission.
+      - id: req-10.1
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          PIN-10 mandates comprehensive audit logging of all PIN translation operations
+          including timestamps, key identifiers, source/destination identifiers, and
+          transaction references. Req-10.1 requires logging and monitoring of all access
+          to system components. PIN-10's translation audit logging supports req-10.1's
+          accountability and forensic investigation objectives.
+
+  - source_control: pin-11
+    target_controls:
+      - id: req-1.1
+        relationship: complements
+        confidence: 0.90
+        rationale: >
+          PIN-11 requires authenticated encryption (TLS 1.2+, IPsec), mutual
+          authentication, and network segmentation for all links carrying PIN data.
+          Req-1.1 mandates network security controls to protect the CDE. Both address
+          network security; PIN-11 adds PIN-specific requirements for mutual
+          authentication, microsegmentation of PIN processing zones, and restrictions
+          on wireless PIN transmission.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          PIN-11 requires TLS 1.2+ with mutual authentication and restricts wireless
+          transmission of PIN data to WPA3-Enterprise with additional application-layer
+          encryption. Req-4.1 mandates strong cryptography for cardholder data in transit.
+          PIN-11 adds the PIN-specific mutual authentication requirement and wireless
+          restrictions that go beyond req-4.1's general transport encryption.
+      - id: req-2.1
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          PIN-11's requirements for secure protocol configurations (TLS 1.2+, WPA3) on
+          PIN network segments support req-2.1's mandate to apply secure configurations
+          and change vendor defaults on all system components.
+
+  - source_control: pin-12
+    target_controls:
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.92
+        rationale: >
+          PIN-12 requires PEDs to be PCI PTS-approved with tamper-detection and
+          tamper-response mechanisms that zeroize secrets upon physical intrusion.
+          Req-9.1 addresses physical access restrictions and POI device tamper protection.
+          Both directly address POI/PED physical security; PIN-12 adds specific PCI PTS
+          certification requirements, tamper-response zeroization, and approval expiry
+          tracking that extend req-9.1's general POI protection.
+
+  - source_control: pin-13
+    target_controls:
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.82
+        rationale: >
+          PIN-13 requires PED firmware to be digitally signed, verified at boot, and
+          protected against unauthorized code execution including application isolation
+          on multi-application terminals. Req-6.1 addresses secure development and
+          maintenance of systems including change management. PIN-13 extends req-6.1
+          with PED-specific firmware integrity, secure boot chain, and trusted execution
+          environment requirements.
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          PIN-13's logical security mechanisms for PEDs (secure boot, firmware signing,
+          application isolation) complement req-9.1's physical POI device protection.
+          Together they provide defense in depth for PIN entry devices against both
+          physical and software-based attacks.
+
+  - source_control: pin-14
+    target_controls:
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.88
+        rationale: >
+          PIN-14 mandates full PED lifecycle tracking from procurement through
+          decommissioning, including inventory management, integrity verification upon
+          receipt, key injection in approved facilities, regular physical inspections,
+          and secure erasure before disposal. Req-9.1 requires POI device protection
+          from tampering and substitution. PIN-14 extends req-9.1 with comprehensive
+          supply chain security, chain-of-custody tracking, and lifecycle management
+          controls for PIN entry devices.
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.73
+        rationale: >
+          PIN-14's requirements for PED procurement from trusted sources, formal
+          decommissioning procedures, and physical inspection programs support
+          req-12.1's organizational policies for asset management, risk assessment,
+          and third-party service provider management for PED suppliers.
+
+  - source_control: pin-15
+    target_controls:
+      - id: req-7.1
+        relationship: complements
+        confidence: 0.87
+        rationale: >
+          PIN-15 requires formal authorization, background verification, and security
+          training for personnel with access to PIN processing systems and cryptographic
+          keys, plus dual control and split knowledge for key management operations.
+          Req-7.1 restricts access based on business need to know with least privilege.
+          PIN-15 adds PIN-specific personnel controls including key custodian designation,
+          split knowledge enforcement, and written security acknowledgments.
+      - id: req-8.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          PIN-15's requirements for formal key custodian designation and multi-party
+          authentication for HSM administrative operations complement req-8.1's user
+          identification and authentication management. PIN-15 adds the dual control
+          requirement ensuring no single individual can complete sensitive PIN key
+          management operations.
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          PIN-15's background verification, security awareness training for PIN
+          operations personnel, and formal custodian role documentation support
+          req-12.1's organizational requirements for personnel screening, security
+          awareness education, and policy management.
+
+  - source_control: pin-16
+    target_controls:
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.92
+        rationale: >
+          PIN-16 requires multi-factor physical access controls, CCTV surveillance,
+          intrusion detection, environmental monitoring, and visitor escort procedures
+          for facilities housing PIN processing systems, HSMs, and key ceremony rooms.
+          Req-9.1 addresses physical access restrictions for the CDE. PIN-16 adds
+          PIN-specific facility requirements including dedicated HSM rooms with enhanced
+          protections and key ceremony rooms with no network connectivity.
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.70
+        rationale: >
+          PIN-16's facility security policies and physical access management procedures
+          for PIN processing environments support req-12.1's organizational policies
+          governing information security and risk management.
+
+  - source_control: pin-17
+    target_controls:
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.88
+        rationale: >
+          PIN-17 requires formal change management for all modifications to PIN
+          processing systems, HSM configurations, cryptographic parameters, and network
+          configurations, including testing, risk assessment, and approval before
+          production implementation. Req-6.1 addresses secure development and change
+          management for system components. PIN-17 extends req-6.1 with PIN-specific
+          change controls including HSM firmware validation against manufacturer
+          signatures and configuration baseline monitoring for PIN processing components.
+      - id: req-6.2
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          PIN-17's configuration control and baseline management for PIN processing
+          systems supports req-6.2's requirements for secure software development
+          practices, as PIN processing application changes must follow the same
+          rigorous change management and testing discipline.
+      - id: req-2.1
+        relationship: intersects-with
+        confidence: 0.73
+        rationale: >
+          PIN-17's requirement for documented configuration baselines and automated
+          drift detection on PIN processing components supports req-2.1's mandate
+          to apply and maintain secure configurations across all system components.
+
+  - source_control: pin-18
+    target_controls:
+      - id: req-10.1
+        relationship: complements
+        confidence: 0.93
+        rationale: >
+          PIN-18 mandates logging of all PIN security events (HSM operations, key
+          management events, PIN translations, authentication events, physical access,
+          configuration changes) with timestamps from authoritative sources, tamper-proof
+          storage, and defined retention periods. Req-10.1 requires logging and monitoring
+          of all access to system components. Both directly address comprehensive audit
+          logging; PIN-18 adds PIN-specific log requirements including HSM administrative
+          operations, key lifecycle events, and PIN translation audit trails.
+
+  - source_control: pin-19
+    target_controls:
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.87
+        rationale: >
+          PIN-19 requires periodic security assessments by qualified PIN assessors (QPAs)
+          covering all seven PCI PIN control objectives, with documented findings and
+          remediation plans. Req-11.1 mandates regular security testing including
+          vulnerability scans and penetration testing. Both address security validation;
+          PIN-19 adds the PIN-specific assessment program including QPA evaluation,
+          PIN Security Assessment Reports, and continuous compliance monitoring.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.82
+        rationale: >
+          PIN-19's assessment program, compliance validation, and remediation planning
+          requirements complement req-12.1's PCI DSS compliance program management,
+          risk assessment, and security policy requirements. Both require formal
+          compliance programs, but PIN-19 focuses specifically on PIN security
+          assessment scope and QPA qualifications.
+
+  - source_control: pin-20
+    target_controls:
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.90
+        rationale: >
+          PIN-20 requires a PIN-specific incident response plan addressing key
+          compromise, emergency key replacement, device quarantine, forensic
+          investigation, payment brand notification, and post-incident review.
+          Req-12.1 includes incident response requirements for cardholder data breaches.
+          Both mandate incident response plans; PIN-20 adds PIN-specific procedures
+          including rapid key revocation and replacement within hours, identification
+          of affected transactions for fraud monitoring, and coordination across payment
+          network entities.
+      - id: req-10.1
+        relationship: intersects-with
+        confidence: 0.75
+        rationale: >
+          PIN-20's requirement for forensic data collection that preserves evidence
+          integrity during PIN security incidents supports req-10.1's logging and
+          monitoring requirements that provide the audit trail necessary for incident
+          investigation.

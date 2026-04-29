@@ -1,0 +1,89 @@
+id: art-16
+family: cap-4
+title: "Assinatura Digital de Mensagens"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 16. As mensagens trocadas entre participantes do Open Finance que
+    contenham dados de clientes ou instruções de pagamento devem ser assinadas
+    digitalmente conforme as especificações técnicas do diretório.
+
+    Parágrafo 1. A assinatura digital deve utilizar:
+    I - o padrão JSON Web Signature (JWS) conforme RFC 7515;
+    II - algoritmos criptográficos aprovados nas especificações técnicas
+    (PS256 como mínimo obrigatório);
+    III - certificado de assinatura (BRCAC) emitido no âmbito da ICP-Brasil.
+
+    Parágrafo 2. As seguintes mensagens devem ser obrigatoriamente assinadas:
+    I - request objects enviados ao authorization endpoint;
+    II - payloads de criação e atualização de consentimentos;
+    III - payloads de iniciação de pagamento;
+    IV - respostas contendo dados financeiros do cliente.
+guidance:
+  prose: |
+    O art. 16 exige assinatura digital para integridade e nao-repudio:
+
+    **Padrao tecnico:**
+    - Formato: JWS (JSON Web Signature) - RFC 7515
+    - Algoritmo minimo: PS256 (RSASSA-PSS com SHA-256)
+    - Certificado: BRCAC (ICP-Brasil)
+    - Header: inclui x5c (cadeia de certificados) ou kid (referencia)
+
+    **Mensagens que DEVEM ser assinadas:**
+    - Authorization requests (JAR/request objects)
+    - Consentimentos (criacao, atualizacao, revogacao)
+    - Ordens de pagamento (criacao, confirmacao)
+    - Respostas com dados financeiros
+
+    **Mensagens que NAO precisam de assinatura:**
+    - Dados abertos (Fase 1 - sem dados pessoais)
+    - Respostas de erro genericas
+    - Health checks e status endpoints
+
+    **Proposito da assinatura:**
+    - Integridade: garante que a mensagem nao foi alterada
+    - Autenticidade: confirma a identidade do emissor
+    - Nao-repudio: emissor nao pode negar ter enviado a mensagem
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de assinatura digital:**
+      1. Implementar middleware de assinatura JWS que assine automaticamente
+         payloads de saida e valide assinaturas de entrada.
+      2. Configurar chave privada de assinatura em HSM (nunca em disco).
+      3. Publicar JWKS (JSON Web Key Set) endpoint com chaves publicas.
+      4. Implementar rotacao de chaves de assinatura sem downtime.
+      5. Validar cadeia de certificados do emissor contra truststore.
+    tools:
+      - hsm
+      - jwks-endpoint
+      - jose-library
+      - api-gateway
+  devsecops:
+    prose: |
+      **Validacao de assinaturas em pipeline:**
+      1. Testar que payloads obrigatorios sao assinados (nao e opcional).
+      2. Validar algoritmo usado (rejeitar RS256, aceitar apenas PS256+).
+      3. Testar rejeicao de assinaturas invalidas ou expiradas.
+      4. Verificar que chaves privadas NAO estao em repositorios.
+    tools:
+      - secret-detection
+      - security-testing
+      - jose-verification
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de integridade de mensagens:**
+      1. Monitorar taxa de rejeicao de assinaturas (pode indicar ataque).
+      2. Alertar sobre uso de algoritmos deprecados.
+      3. Auditar rotacao de chaves e publicacao no JWKS.
+      4. Investigar mensagens com assinaturas invalidas.
+    tools:
+      - siem
+      - api-monitoring
+      - key-management
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

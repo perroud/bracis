@@ -1,0 +1,117 @@
+id: art-2
+family: cap-1
+title: "Definicoes Aplicaveis"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 2. Para os efeitos desta Resolução, considera-se:
+
+    I - lavagem de dinheiro: os crimes previstos na Lei n. 9.613, de 3 de março
+    de 1998, e suas alterações;
+
+    II - financiamento do terrorismo: os crimes previstos na Lei n. 13.260, de
+    16 de março de 2016, e suas alterações;
+
+    III - beneficiário final: a pessoa natural que, em última instância, possui,
+    controla ou é beneficiada por uma pessoa jurídica, fundo de investimento ou
+    outra estrutura sem personalidade jurídica, ou em nome de quem uma transação
+    é realizada;
+
+    IV - pessoas politicamente expostas (PEP): os agentes públicos que desempenham
+    ou tenham desempenhado, nos últimos cinco anos, no Brasil ou em países estrangeiros,
+    cargos, empregos ou funções públicas relevantes, bem como seus representantes,
+    familiares e estreitos colaboradores;
+
+    V - abordagem baseada em risco: metodologia que orienta a alocação de recursos
+    de PLD/FT de forma proporcional ao nível de risco identificado;
+
+    VI - cliente: pessoa natural ou jurídica, nacional ou estrangeira, que mantenha
+    relação de negócio com o participante do mercado de capitais.
+guidance:
+  prose: |
+    O art. 2 estabelece as definicoes fundamentais que permeiam toda a CVM 50.
+
+    **Beneficiario final (inciso III):**
+    Esta e uma das definicoes mais operacionalmente relevantes. O beneficiario
+    final e a pessoa natural que esta "atras" de estruturas juridicas:
+    - Em pessoas juridicas: acionista/cotista que detenha, direta ou indiretamente,
+      mais de 25% do capital ou que exerca controle, mesmo com participacao menor
+    - Em fundos de investimento: o cotista pessoa natural que seja o beneficiario
+      economico ultimo
+    - Em trusts e estruturas offshore: o settlor, trustee ou beneficiario efetivo
+
+    **PEP (inciso IV):**
+    O conceito de PEP abrange:
+    - Cargos relevantes: presidente, ministros, governadores, parlamentares,
+      diretores de estatais, magistrados de tribunais superiores
+    - Escopo temporal: 5 anos apos deixar o cargo
+    - Extensao: familiares de primeiro grau, conjuges/companheiros, e "estreitos
+      colaboradores" (socio em negocios, pessoas com quem mantem relacoes
+      financeiras proximas)
+    - PEPs estrangeiros recebem tratamento equivalente a PEPs nacionais
+
+    **Abordagem baseada em risco (inciso V):**
+    A RBA (Risk-Based Approach) significa que a intensidade dos controles deve
+    ser proporcional ao risco. Clientes de baixo risco requerem Due Diligence
+    Simplificada (SDD); clientes de alto risco requerem Enhanced Due Diligence
+    (EDD) com medidas adicionais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Identificacao de beneficiario final:**
+      1. Formulario estruturado para captura de cadeia de controle societario com
+         suporte a arvores de propriedade multinivel (ate nivel necessario para
+         identificar pessoa natural).
+      2. Algoritmo de calculo de participacao indireta: dado estrutura societaria
+         em camadas, calcular percentual efetivo de participacao de cada pessoa
+         natural.
+      3. Integracao com base da Receita Federal e Junta Comercial para validacao
+         automatica de quadro societario de empresas brasileiras.
+      4. Banco de dados de PEPs integrado (fontes: Diario Oficial, IBGE, listas
+         internacionais como OFAC, EU, UN) com atualizacao periodica.
+
+      **Screening automatico de PEP:**
+      5. Matching fuzzy contra base de PEPs no momento do onboarding e em
+         atualizacoes cadastrais, com tolerancia configuravel para variantes
+         de nomes.
+      6. Alerta automatico quando cliente ou beneficiario final e identificado
+         como PEP, com escalacao para compliance.
+    tools:
+      - kyc-platform
+      - pep-screening
+      - entity-resolution
+      - sanctions-screening
+  devsecops:
+    prose: |
+      **Testes de definicoes:**
+      1. Testes unitarios para algoritmo de calculo de beneficiario final com
+         casos de uso: empresa direta, empresa com holding, fundo de fundo.
+      2. Testes de matching de PEP com variantes de nomes, apelidos, transliteracoes.
+      3. Testes de regressao quando base de PEPs e atualizada.
+      4. Validacao automatica de que campos obrigatorios para identificacao de
+         beneficiario final estao presentes no formulario de KYC.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - data-quality
+  secops:
+    prose: |
+      **Qualidade das definicoes:**
+      1. Revisao periodica das definicoes operacionais internas para garantir
+         alinhamento com atualizacoes regulatorias.
+      2. Treinamento sobre os conceitos de beneficiario final e PEP para equipes
+         de onboarding e compliance.
+      3. Procedimento formal para casos duvidosos de enquadramento como PEP ou
+         beneficiario final.
+    tools:
+      - training-platform
+      - grc-platform
+      - pep-database
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-2"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-5"]
+    relationship: complements

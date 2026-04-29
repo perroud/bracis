@@ -1,0 +1,145 @@
+id: art-3
+family: cap-2
+title: "Classificacao de Incidentes Ciberneticos por Severidade"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 3. Os incidentes de segurança cibernética devem ser classificados pela
+    instituição em níveis de severidade, considerando:
+
+    I - o impacto potencial ou efetivo na confidencialidade, integridade ou
+    disponibilidade dos sistemas e dados da instituição;
+    II - o volume de clientes, usuários e contrapartes afetados ou potencialmente
+    afetados;
+    III - o impacto financeiro real ou estimado, incluindo perdas operacionais,
+    reembolsos e custos de remediação;
+    IV - o comprometimento de infraestruturas críticas do Sistema Financeiro Nacional,
+    incluindo sistemas de pagamento, liquidação e compensação;
+    V - a repercussão pública e o impacto reputacional para a instituição e para
+    o sistema financeiro.
+
+    § 1. A classificação de severidade deve ser revisada ao longo da gestão do
+    incidente, podendo ser elevada ou reduzida conforme novas informações tornem-se
+    disponíveis.
+
+    § 2. A instituição deve manter documentados os critérios e a metodologia de
+    classificação de severidade, tornando-os disponíveis ao BCB quando solicitado.
+guidance:
+  prose: |
+    O art. 3 estabelece os cinco eixos de avaliacao de severidade e dois requisitos
+    processuais criticos: revisao dinamica e documentacao da metodologia.
+
+    **Eixo I - Impacto na CIA:**
+    Este e o eixo base. A avaliacao deve considerar:
+    - Confidencialidade: dados foram expostos? Quais dados? Para quem?
+    - Integridade: dados foram alterados? A alteracao e detectavel e reversivel?
+    - Disponibilidade: servicos estao indisponiveis? Por quanto tempo? Quais servicos?
+    O impacto "potencial" e relevante: mesmo sem dano confirmado, se o vetor de
+    ataque tinha potencial de causar dano significativo, o incidente deve ser
+    classificado na severidade correspondente.
+
+    **Eixo II - Volume de afetados:**
+    Escala logaritmica recomendada:
+    - Critico: > 1.000.000 de clientes ou instituicoes sistemicamente importantes
+    - Alto: > 100.000 de clientes
+    - Medio: > 10.000 de clientes
+    - Baixo: < 10.000 de clientes
+    (A instituicao deve definir seus proprios limiares baseados em seu porte)
+
+    **Eixo III - Impacto financeiro:**
+    Inclui perdas diretas (fraudes nao recuperaveis), custos de remediacao (forense,
+    consultoria, remediation tecnologica), multas regulatorias previstas e custo de
+    reembolsos a clientes. Estimativa inicial com refinamento progressivo.
+
+    **Eixo IV - Infraestrutura critica SFN:**
+    Qualquer impacto em SPB, STR, SILOC, LDL, SITRAF, CIP, PIX (DICT, SPI)
+    automaticamente eleva o incidente para Critico independente dos demais eixos.
+
+    **Eixo V - Repercussao publica:**
+    Monitoramento de midia e redes sociais durante o incidente. Noticia publicada
+    por veiculo de grande alcance eleva automaticamente a severidade.
+
+    **Revisao dinamica (ss 1):**
+    O incidente pode ser classificado inicialmente como Medio e ser elevado para
+    Alto ou Critico conforme a investigacao avanca. O BCB deve ser notificado de
+    qualquer mudanca de classificacao.
+
+    **Documentacao da metodologia (ss 2):**
+    A metodologia de classificacao deve existir como documento formal, aprovado
+    pela diretoria, e estar disponivel para auditoria pelo BCB. Nao basta ter o
+    processo; e preciso telo documentado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de scoring de severidade automatizado:**
+      1. Algoritmo de scoring com peso por eixo:
+         - Eixo I (CIA): peso 30% — score 0-10 calculado por tipo e extensao do impacto
+         - Eixo II (volume): peso 25% — escala logaritmica de clientes afetados
+         - Eixo III (financeiro): peso 20% — faixas de valor em R$
+         - Eixo IV (SFN): peso 15% — binario (sim/nao) com elevacao automatica a Critico
+         - Eixo V (reputacao): peso 10% — monitoramento de midia integrado
+      2. Score final mapeado para niveis: Critico (>= 8.5), Alto (>= 6.5), Medio (>= 4.0),
+         Baixo (< 4.0).
+      3. Override manual disponivel para analistas senior com justificativa obrigatoria
+         registrada no audit log.
+      4. Dashboard de severidade em tempo real com historico de revisoes documentado.
+      5. Alerta automatico ao BCB quando severidade e elevada (integracao com canal
+         oficial de comunicacao).
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - monitoring-alerting
+      - media-monitoring
+  devsecops:
+    prose: |
+      **Dados de severidade alimentados pelo pipeline:**
+      1. Tag de criticidade no repositorio (tier-1, tier-2, tier-3) alimenta
+         automaticamente o eixo I do scoring de severidade.
+      2. Mapeamento de sistemas para infraestruturas SFN no service catalog:
+         campo "sfn_critical: true/false" para deteccao automatica do eixo IV.
+      3. Metricas de uso expostas por cada servico (DAU, MAU, volume de transacoes)
+         para alimentar estimativa do eixo II.
+      4. SBOM de cada release para identificar escopo exato de sistemas e versoes
+         afetados em caso de incidente por vulnerabilidade.
+    tools:
+      - gitlab-ci
+      - service-catalog
+      - metrics-platform
+      - sbom-generator
+  secops:
+    prose: |
+      **Processo de classificacao e revisao:**
+      1. Documento formal de metodologia de classificacao aprovado pela diretoria,
+         incluindo:
+         - Definicao de cada nivel de severidade (Critico, Alto, Medio, Baixo)
+         - Criterios quantitativos para cada eixo
+         - Regras de elevacao automatica (eixo IV)
+         - Processo de revisao e quem pode alterar a classificacao
+      2. Revistas programadas de classificacao:
+         - T+6h: primeira revisao com dados da investigacao inicial
+         - T+24h: revisao apos relatorio inicial ao BCB
+         - A cada 48h: revisao continuada ate encerramento
+      3. Notificacao automatica ao BCB quando classificacao e revisada:
+         canal oficial com timestamp e justificativa da mudanca.
+      4. Exercicio trimestral de classificacao de cenarios hipoteticos para
+         calibrar os criterios internos.
+    tools:
+      - incident-management
+      - grc-platform
+      - soar
+      - communication-tools
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-3"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "IR-5", "IR-8"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.26"]
+    relationship: supports

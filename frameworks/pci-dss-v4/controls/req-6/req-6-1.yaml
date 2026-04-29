@@ -1,0 +1,107 @@
+id: req-6.1
+family: req-6
+title: "Develop and Maintain Secure Systems and Software"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for developing and maintaining secure systems and software
+    are defined and understood. Bespoke and custom software are developed securely.
+    Security vulnerabilities are identified and addressed. Public-facing web applications
+    are protected against attacks. Changes to all system components are managed securely.
+  parts:
+    - id: req-6.1.a
+      label: "6.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 6
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-6.1.b
+      label: "6.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 6 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Without proper security controls in the software development lifecycle, applications
+    can introduce vulnerabilities that expose cardholder data. Organizations must
+    establish a vulnerability management process that identifies, ranks, and addresses
+    security vulnerabilities in a timely manner. Critical and high-severity patches must
+    be applied within defined timeframes. All system components must have the latest
+    vendor-supplied security patches installed. For public-facing web applications,
+    additional protections are required including web application firewalls (WAFs) or
+    automated vulnerability assessment tools. Change management processes must ensure
+    all changes are authorized, tested, and documented.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 6"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "OWASP Top 10"
+    url: "https://owasp.org/www-project-top-ten/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated patch management across all system components using tools
+      like Renovate or Dependabot for application dependencies, and Kured or
+      system-reboot-operator for OS-level patches on Kubernetes nodes. Deploy a WAF
+      (ModSecurity, AWS WAF, Cloudflare) in front of all public-facing web applications
+      with OWASP Core Rule Set enabled. Use image rebuilds with patched base images
+      rather than in-place patching for containerized workloads. Implement vulnerability
+      scanning at the infrastructure level with automatic ticket creation for findings
+      above defined severity thresholds. Enforce change management through GitOps where
+      all system changes originate from version-controlled merge requests.
+    tools:
+      - renovate
+      - kured
+      - aws-waf
+      - cloudflare-waf
+      - modsecurity
+      - argocd
+      - fluxcd
+      - terraform
+
+  devsecops:
+    prose: >-
+      Embed SAST, DAST, and SCA scanning into every merge request pipeline. Enforce
+      that critical and high vulnerability findings block the merge request from being
+      approved. Use OWASP ZAP or Nuclei for automated DAST scanning of web applications.
+      Implement mandatory code review with security-focused reviewers for changes to
+      payment processing logic. Track vulnerability SLAs in the CI/CD pipeline: critical
+      vulnerabilities must be remediated within 30 days, high within 90 days. Maintain
+      a software bill of materials (SBOM) for all applications in the CDE.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - owasp-zap
+      - nuclei
+      - semgrep
+      - sonarqube
+      - snyk
+      - syft
+
+  secops:
+    prose: >-
+      Monitor vulnerability scanning results and track remediation timelines. Maintain
+      a centralized vulnerability database correlated with the asset inventory. Alert
+      on new critical vulnerabilities affecting system components in the CDE. Monitor
+      WAF logs for attack patterns and tune rules to reduce false positives while
+      maintaining protection. Track change management compliance ensuring all changes
+      follow the approved process. Conduct periodic penetration testing to validate
+      vulnerability management effectiveness.
+    tools:
+      - tenable-nessus
+      - qualys
+      - rapid7-insightvm
+      - splunk
+      - jira
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SA-11", "SA-15", "CM-3"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.9", "A8.25", "A8.28", "A8.31", "A8.32"]
+    relationship: supports

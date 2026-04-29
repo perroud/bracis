@@ -1,0 +1,94 @@
+id: ssf-data-1
+family: ssf-data
+title: "Sensitive Data Identification and Classification"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software vendor shall identify and document all sensitive data processed,
+    stored, or transmitted by the software, including but not limited to primary
+    account numbers (PANs), cardholder data, sensitive authentication data, and
+    cryptographic keys. Data shall be classified according to its sensitivity level,
+    and protection requirements shall be defined for each classification. The
+    software shall enforce data handling rules based on classification, preventing
+    sensitive data from being stored, logged, cached, or transmitted in violation
+    of its protection requirements.
+
+guidance:
+  prose: >-
+    Understanding what sensitive data the software handles and where it resides is
+    a prerequisite for protecting it. PCI SSF requires a comprehensive data inventory
+    that maps every location where sensitive data is processed, stored, or
+    transmitted. This includes obvious locations like databases and less obvious
+    ones like log files, error messages, temporary files, caches, and memory dumps.
+    The classification scheme must distinguish between data that can be stored
+    (e.g., masked PAN) and data that must never be retained after authorization
+    (e.g., full track data, CVV2).
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 7 — Sensitive Data Identification"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 7.1"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data classification labels in metadata catalogs and enforce
+      classification-based access controls at the storage layer. Deploy data loss
+      prevention (DLP) agents at network egress points to detect sensitive data
+      leaving the environment. Configure log aggregation pipelines with automatic
+      PAN detection and masking rules. Use database activity monitoring to track
+      access to tables containing classified data. Enforce encryption at rest for
+      all storage volumes containing sensitive data using platform-managed keys.
+    tools:
+      - vault
+      - aws-macie
+      - google-dlp
+      - elasticsearch
+      - terraform
+      - kubernetes-secrets
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect sensitive data being written to log files, error
+      messages, or debug output. Implement secret detection scanning to identify
+      PANs, API keys, and other sensitive data in source code and configuration
+      files. Write unit tests that validate sensitive data masking and
+      classification enforcement. Use code review checklists that include
+      verification of data handling for each classification level. Configure
+      dependency scanning to detect libraries with known data leakage
+      vulnerabilities.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - semgrep
+      - gitleaks
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor for sensitive data exposure in logs, error messages, and network
+      traffic. Conduct periodic data discovery scans to identify unclassified or
+      misclassified sensitive data in production. Alert on unauthorized access to
+      data stores containing sensitive payment data. Track and report on data
+      classification compliance metrics. Investigate and respond to data leakage
+      incidents with defined containment and notification procedures.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-macie
+      - google-dlp
+      - varonis
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1", "req-3.2", "req-3.3"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v8.1", "v8.2", "v8.3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.10", "A8.11"]
+    relationship: mapped

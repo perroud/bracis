@@ -1,0 +1,89 @@
+id: 164.312-d
+family: security-rule-technical
+title: "Person or Entity Authentication"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement procedures to verify that a person or entity seeking access to electronic
+    protected health information is the one claimed.
+
+guidance:
+  prose: >-
+    Person or entity authentication verifies the identity of users before granting access
+    to ePHI. Authentication can be achieved through something the user knows (password,
+    PIN), something the user has (token, smart card, mobile device), something the user is
+    (biometric), or a combination of these (multi-factor authentication). MFA is strongly
+    recommended for access to ePHI systems. For entity authentication (system-to-system),
+    mutual TLS, API keys with rotation, or OAuth 2.0 client credentials provide
+    verification. Authentication mechanisms must protect credentials during transmission
+    and storage. Accounts must be locked after repeated failed attempts. Authentication
+    events must be logged for audit purposes.
+
+references:
+  - citation: "45 CFR 164.312(d)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.312"
+  - citation: "NIST SP 800-63B - Digital Identity Guidelines"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy multi-factor authentication for all access to ePHI systems through the
+      centralized IdP. Support hardware security keys (FIDO2/WebAuthn) as the
+      strongest authentication method. Implement adaptive authentication that increases
+      authentication requirements based on risk signals (new device, unusual location,
+      sensitive data access). Use mutual TLS (mTLS) for service-to-service
+      authentication within the ePHI environment via service mesh. Implement
+      certificate-based authentication for automated processes and API integrations.
+      Deploy account lockout policies with progressive delays and CAPTCHA challenges.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - yubikey
+      - istio
+      - linkerd
+      - cert-manager
+      - dex
+
+  devsecops:
+    prose: >-
+      Enforce MFA for all access to CI/CD systems and source code repositories
+      containing ePHI-related code. Implement authentication testing in DAST scans
+      that verify proper authentication enforcement, session management, and
+      credential protection. Scan for authentication bypass vulnerabilities and
+      hardcoded credentials. Test that failed authentication attempts are properly
+      logged and that lockout mechanisms activate after the configured threshold.
+      Use signed commits to verify developer identity for all code changes.
+    tools:
+      - gitlab-ci
+      - gitlab-dast
+      - owasp-zap
+      - gitlab-secret-detection
+      - git-signed-commits
+
+  secops:
+    prose: >-
+      Monitor authentication events for anomalies including brute force attacks,
+      credential stuffing, impossible travel, and MFA bypass attempts. Enforce
+      MFA enrollment for all ePHI users and track compliance rates. Monitor for
+      and alert on authentication from compromised credentials using threat
+      intelligence feeds. Investigate shared credential usage and enforce unique
+      authentication. Track authentication failure rates by user and system and
+      investigate patterns indicating targeted attacks.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike-falcon
+      - microsoft-sentinel
+      - duo-security
+      - okta-threatinsight
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-1", "IA-2", "IA-3", "IA-5", "IA-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A5.17", "A8.5"]
+    relationship: supports

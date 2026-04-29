@@ -1,0 +1,122 @@
+id: stig-app-session-tokens
+family: app-sec
+title: "Session Token Generation and Secure Cookie Attributes"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    Applications must generate session tokens using a cryptographically secure
+    pseudo-random number generator (CSPRNG) with at least 128 bits of entropy.
+    Session tokens must not be derived from any user-predictable input such as
+    username, timestamp, or sequential identifiers. Session tokens transmitted
+    over HTTP must use the Secure cookie attribute to prevent transmission over
+    unencrypted connections. The HttpOnly cookie attribute must be set on session
+    cookies to prevent access by client-side scripts and mitigate XSS-based
+    session theft. The SameSite cookie attribute must be set to Strict or Lax
+    to prevent cross-site request forgery (CSRF) attacks. Session tokens must
+    be invalidated and regenerated upon authentication, privilege escalation,
+    and logout. CSRF tokens must be implemented for all state-changing requests
+    in browser-based applications. Session tokens must not be placed in URL
+    query parameters, which would expose them in server logs, browser history,
+    and HTTP Referer headers.
+
+guidance:
+  prose: >-
+    Session token vulnerabilities are a foundational web application security
+    concern. A session token that can be predicted, stolen, or forged allows
+    an attacker to impersonate any user without knowing their credentials —
+    effectively bypassing all authentication controls. The specific requirements
+    for cookie attributes (Secure, HttpOnly, SameSite) address the most common
+    token theft and CSRF attack vectors.
+
+    Session fixation is a particularly insidious vulnerability: the attacker
+    sets a known session token (before authentication) and waits for the victim
+    to authenticate with it, after which the attacker can use the now-
+    authenticated session. The requirement to regenerate session tokens upon
+    authentication prevents this attack class entirely.
+
+    STIG reviewers analyze session token entropy by observing token patterns
+    over multiple sessions, verify cookie attributes in browser developer tools
+    or proxy intercept, and test CSRF protection by replaying state-changing
+    requests without the CSRF token.
+
+references:
+  - citation: "DISA STIG — Application Security and Development SRG, V6R1, SV-222582 through SV-222600"
+    url: "https://public.cyber.mil/stigs/downloads/"
+  - citation: "NIST SP 800-53 Rev 5, SC-23, IA-11"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "OWASP Session Management Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure API gateways and reverse proxies to enforce secure cookie
+      attributes on session cookies passed through the platform layer.
+      Use OAuth 2.0 / OIDC tokens with short expiry (access tokens: 15 minutes,
+      refresh tokens: hours) managed by the IdP rather than application-managed
+      session cookies where architecturally feasible. Implement CSRF protection
+      at the API gateway level using the Double Submit Cookie or Synchronizer
+      Token Pattern. Configure the platform's authentication proxy (oauth2-proxy)
+      to set required cookie attributes. Enable security headers at the ingress
+      controller level: Content-Security-Policy with appropriate directives
+      that restrict script execution to further limit XSS impact on session tokens.
+    tools:
+      - keycloak
+      - oauth2-proxy
+      - nginx
+      - envoy
+      - kong-gateway
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect weak token generation (Math.random(),
+      timestamp-based tokens, UUID v1/v4 without CSPRNG), missing cookie
+      attributes, CSRF token absence, and tokens stored in URL parameters or
+      localStorage. Run DAST scans with configured session token analysis that
+      checks entropy and cookie attribute settings. Include automated tests
+      that verify session token regeneration on authentication and invalidation
+      on logout. Add HTTP response header validation tests that verify
+      Set-Cookie headers include Secure, HttpOnly, and SameSite attributes.
+      Require security-focused code review for all authentication and session
+      management changes.
+    tools:
+      - semgrep
+      - codeql
+      - gitlab-sast
+      - gitlab-dast
+      - owasp-zap
+      - burp-suite
+
+  secops:
+    prose: >-
+      Include session management testing in all application penetration tests,
+      covering session fixation, token entropy analysis, cookie attribute
+      verification, CSRF protection validation, and session invalidation on
+      logout. Monitor authentication logs for session anomalies: simultaneous
+      sessions from multiple geographic locations using the same session token,
+      rapid re-use of session tokens after logout (indicating token theft),
+      and authentication events that do not correspond to a new session token
+      issuance. Track session management findings in the POA&M and remediate
+      within the CAT II timeline.
+    tools:
+      - burp-suite-enterprise
+      - owasp-zap
+      - splunk
+      - rapid7-insightappsec
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-23", "IA-11", "AC-11"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["IA.L2-3.5.10", "IA.L2-3.5.11"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["sc-23", "ia-11"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-05", "PR.DS-10"]
+    relationship: supports

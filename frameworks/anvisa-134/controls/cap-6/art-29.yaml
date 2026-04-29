@@ -1,0 +1,132 @@
+id: art-29
+family: cap-6
+title: "Controle de Mudancas em Sistemas Computadorizados"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 29. Toda mudança em sistemas computadorizados validados deve ser
+    gerenciada através de processo formal de controle de mudanças que avalie
+    o impacto da mudança na validação, integridade de dados e qualidade
+    do produto antes de sua implementação.
+
+    Parágrafo 1. O processo de controle de mudanças deve incluir:
+    I - descrição detalhada da mudança proposta;
+    II - justificativa e avaliação de risco da mudança;
+    III - avaliação de impacto na validação do sistema;
+    IV - plano de teste para verificação da mudança;
+    V - plano de rollback em caso de falha;
+    VI - aprovação pela unidade da qualidade antes da implementação;
+    VII - documentação de execução e resultados.
+
+    Parágrafo 2. Mudanças de emergência devem ser documentadas e submetidas
+    ao processo de controle de mudanças retroativamente, dentro de prazo
+    definido e acordado com a unidade da qualidade.
+
+    Parágrafo 3. O histórico de todas as mudanças em sistemas computadorizados
+    deve ser mantido e estar disponível para revisão regulatória.
+guidance:
+  prose: |
+    O art. 29 e fundamental para manter o estado validado dos sistemas
+    ao longo do tempo. Mudancas nao controladas sao a principal causa
+    de perda do estado validado.
+
+    **Tipos de mudanca e nivel de controle:**
+
+    Mudanca maior (requer QA approval + requalificacao):
+    - Upgrade de versao de software
+    - Mudanca de hardware ou infraestrutura
+    - Alteracao de funcionalidades validadas
+    - Mudanca de interface com outros sistemas
+    - Migracao de dados ou plataforma
+
+    Mudanca menor (requer QA notification + teste focalizado):
+    - Patch de seguranca sem impacto funcional
+    - Alteracao de configuracao nao-critica
+    - Adicao de usuario ou role
+    - Atualizacao de documentacao
+
+    Mudanca de emergencia (implementacao imediata + retrospectiva):
+    - Correcao de defeito critico em producao
+    - Patch de seguranca critico (zero-day)
+    - Restauracao de sistema apos falha
+
+    **Avaliacao de impacto na validacao:**
+    Toda mudanca deve ser avaliada quanto ao impacto no estado validado.
+    A avaliacao deve considerar:
+    - Funcionalidades afetadas pela mudanca
+    - Interfaces afetadas
+    - Dados afetados
+    - Necessidade de requalificacao (IQ/OQ/PQ)
+    - Necessidade de atualizacao de documentacao
+
+    **Rollback:**
+    Toda mudanca deve ter plano de rollback testado que permita retornar
+    ao estado anterior caso a mudanca cause problemas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de mudancas em infraestrutura como codigo:**
+      1. Implementar todas as mudancas de infraestrutura via GitOps:
+         mudancas sao propostas como merge requests, revisadas, aprovadas
+         e aplicadas automaticamente, garantindo rastreabilidade completa.
+      2. Configurar gates de aprovacao diferenciados por tipo de mudanca:
+         mudancas maiores exigem aprovacao de QA + CSV owner, menores
+         exigem aprovacao de team lead.
+      3. Implementar rollback automatizado: toda mudanca de infraestrutura
+         pode ser revertida via git revert + pipeline de deploy.
+      4. Manter historico completo de mudancas no Git como registro
+         auditavel para revisao regulatoria.
+      5. Configurar drift detection que alerte quando configuracao
+         divergir do estado desejado (mudanca nao autorizada).
+    tools:
+      - gitops
+      - terraform
+      - merge-request-approvals
+      - drift-detection
+      - rollback-automation
+  devsecops:
+    prose: |
+      **Pipeline de controle de mudancas:**
+      1. Exigir merge request com descricao, justificativa e avaliacao
+         de impacto para toda mudanca em repositorios de sistemas GMP.
+      2. Implementar template de merge request com campos obrigatorios:
+         tipo de mudanca, avaliacao de risco, impacto na validacao,
+         plano de teste, plano de rollback.
+      3. Configurar testes automatizados que verifiquem se a mudanca
+         nao quebra funcionalidades validadas (testes de regressao).
+      4. Exigir aprovacao de QA como gate obrigatorio no pipeline antes
+         de deploy de mudancas em producao GMP.
+      5. Registrar automaticamente todas as mudancas com metadados
+         (quem, quando, o que, por que) vinculados ao change control.
+    tools:
+      - gitlab-ci
+      - merge-request-templates
+      - regression-testing
+      - approval-gates
+      - change-tracking
+  secops:
+    prose: |
+      **Programa de gestao de mudancas:**
+      1. Manter procedimento operacional padrao de controle de mudancas
+         especifico para sistemas computadorizados GMP.
+      2. Garantir que todas as mudancas passem por avaliacao de impacto
+         na validacao antes da implementacao.
+      3. Manter registro centralizado de todas as mudancas com status,
+         aprovacoes e resultados de teste.
+      4. Monitorar indicadores de gestao de mudancas: volume, tipo,
+         taxa de sucesso, mudancas de emergencia, tempo de processamento.
+      5. Auditar periodicamente conformidade do processo de controle
+         de mudancas com procedimento aprovado.
+    tools:
+      - change-management-system
+      - quality-management-system
+      - audit-management
+      - compliance-dashboard
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-32"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["patch-management"]
+    relationship: mapped

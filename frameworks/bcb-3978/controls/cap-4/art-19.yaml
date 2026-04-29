@@ -1,0 +1,110 @@
+id: art-19
+family: cap-4
+title: "Registro de Operacoes em Especie"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 19. As instituições mencionadas no art. 1 devem manter registros específicos
+    de operações em espécie, de depósito ou de saque, de valor igual ou superior a
+    R$ 50.000,00 (cinquenta mil reais), realizadas por cliente ou em seu benefício.
+
+    Parágrafo único. Os registros de que trata o caput devem conter, além das
+    informações previstas no art. 18, o nome e o número de inscrição no CPF do
+    portador dos recursos.
+guidance:
+  prose: |
+    O art. 19 trata especificamente de operacoes em especie (dinheiro fisico)
+    de alto valor, que sao um dos principais indicadores de lavagem de dinheiro.
+
+    **Threshold de R$ 50.000:**
+    Operacoes em especie (deposito ou saque) de valor igual ou superior a
+    R$ 50.000 exigem registro especifico adicional. Este valor e cumulativo
+    dentro de um mes calendario para o mesmo cliente.
+
+    **Dados adicionais do portador:**
+    Alem dos dados do art. 18, deve-se registrar nome e CPF do portador
+    dos recursos (quem efetivamente realiza o deposito/saque na agencia).
+    Isso porque o portador pode ser diferente do titular da conta.
+
+    **Relevancia para PLD/FT:**
+    Operacoes em especie de alto valor sao tipicas de:
+    - Smurfing (estruturacao para evitar deteccao)
+    - Lavagem de dinheiro em cash-intensive businesses
+    - Financiamento do terrorismo via dinheiro fisico
+    - Evasao fiscal com recursos nao declarados
+
+    **Comunicacao automatica ao COAF:**
+    Operacoes em especie acima de R$ 50.000 tambem devem ser comunicadas
+    ao COAF independentemente de suspeita (art. 25). O registro detalhado
+    e a base para essa comunicacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Deteccao automatica de operacoes em especie:**
+      1. Classificacao automatica de operacoes como "especie" no momento
+         do registro: deposito em dinheiro, saque em especie, cambio manual.
+      2. Regra de threshold: alerta automatico quando operacao em especie
+         >= R$ 50.000 ou acumulado mensal >= R$ 50.000.
+      3. Campo obrigatorio de identificacao do portador (nome + CPF)
+         em operacoes em especie acima do threshold.
+      4. Bloqueio de finalizacao da operacao sem dados do portador.
+
+      **Registro estruturado:**
+      5. Campos adicionais no registro: portador_nome, portador_cpf,
+         tipo_especie (deposito/saque), cumulativo_mensal.
+      6. Calculo automatico de acumulado mensal por cliente.
+      7. Dashboard de operacoes em especie com heatmap por agencia/regiao.
+      8. Integracao automatica com modulo de comunicacao ao COAF (art. 25).
+    tools:
+      - transaction-monitoring
+      - aml-platform
+      - coaf-reporting
+      - threshold-engine
+  devsecops:
+    prose: |
+      **Testes de deteccao:**
+      1. Testes de threshold com valores exatos (49.999, 50.000, 50.001).
+      2. Testes de acumulado mensal (multiplas operacoes que somam >= 50.000).
+      3. Testes de bloqueio sem dados do portador.
+      4. Testes de integracao com modulo de comunicacao ao COAF.
+
+      **Qualidade dos registros:**
+      5. Testes de completude dos campos adicionais.
+      6. Validacao de CPF do portador.
+      7. Testes de reconciliacao entre operacoes em especie e registros.
+      8. Testes de performance com alto volume de operacoes.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - data-quality
+      - monitoring
+  secops:
+    prose: |
+      **Monitoramento de operacoes em especie:**
+      1. Dashboard de operacoes em especie acima de R$ 50.000 por dia/semana.
+      2. Alertas de concentracao de operacoes em especie por agencia.
+      3. Analise de tendencias de operacoes em especie por cliente.
+      4. Deteccao de estruturacao (smurfing): multiplas operacoes abaixo
+         do threshold que somam acima.
+
+      **Comunicacao ao COAF:**
+      5. Verificacao de que todas as operacoes em especie >= R$ 50.000
+         foram comunicadas ao COAF.
+      6. Reconciliacao entre registros internos e comunicacoes enviadas.
+      7. Monitoramento de prazos de comunicacao.
+      8. Auditoria periodica de completude das comunicacoes automaticas.
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - coaf-reporting
+      - reporting-dashboard
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.33", "A.8.15"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

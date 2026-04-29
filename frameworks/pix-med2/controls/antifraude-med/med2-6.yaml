@@ -1,0 +1,100 @@
+id: med2-6
+family: antifraude-med
+title: "DICT Fraud Marker Management and Sharing"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Os PSPs devem utilizar o sistema de marcação de fraude do DICT como instrumento central
+    do MED 2.0. O PSP que identificar fundada suspeita de fraude deve registrar a marcação
+    correspondente no DICT vinculada à chave Pix e à conta do recebedor suspeito, conforme
+    os tipos de marcação definidos pelo BCB. As marcações devem ser atualizadas ao longo do
+    processo do MED, refletindo o resultado da análise (confirmação de fraude, absolvição,
+    ou inconclusivo). Os PSPs devem consultar as marcações do DICT antes de efetivar
+    transações Pix e utilizar essas informações como insumo para seus motores antifraude.
+    A alimentação tempestiva e precisa do DICT com marcações de fraude é obrigação de todos
+    os participantes do arranjo Pix.
+guidance:
+  prose: |
+    **DICT Fraud Markers:**
+    The DICT fraud marking system is the backbone of MED 2.0 intelligence sharing.
+    Every PSP is both a consumer and a producer of fraud markers.
+
+    **Producer obligations:**
+    1. **Timely marking:** Register fraud markers in DICT as soon as well-founded
+       suspicion is established — delays reduce effectiveness for other PSPs.
+    2. **Accurate classification:** Use the correct marker type as defined by BCB
+       (confirmed fraud, suspected fraud, mule account, etc.).
+    3. **Lifecycle management:** Update markers as the MED case progresses —
+       confirmed, dismissed, or inconclusive.
+    4. **Removal when appropriate:** Remove markers when an account is cleared of
+       suspicion to avoid unjust restrictions.
+
+    **Consumer obligations:**
+    5. **Pre-transaction check:** Query DICT markers before settling outgoing Pix
+       transactions.
+    6. **Integration with anti-fraud:** Feed DICT marker data into the fraud scoring
+       model as a high-weight signal.
+    7. **User notification:** When a user attempts to send Pix to a flagged key,
+       display an appropriate warning (without revealing confidential details).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a DICT marker management service responsible for creating, updating, and
+         querying fraud markers via the DICT API.
+      2. Implement automated marker creation triggered by MED activation decisions —
+         when well-founded suspicion is confirmed, the marker is registered without
+         manual intervention.
+      3. Build a marker lifecycle workflow: initial marking → analysis in progress →
+         confirmed/dismissed/inconclusive → marker update/removal.
+      4. Cache DICT marker data locally with a short TTL (e.g., 5 minutes) to enable
+         sub-millisecond pre-transaction checks without overloading the DICT API.
+      5. Integrate DICT markers as a feature in the fraud scoring model, with
+         configurable weights based on marker type and age.
+    tools:
+      - dict-api-client
+      - caching-layer
+      - workflow-engine
+      - fraud-scoring-engine
+      - event-streaming
+  devsecops:
+    prose: |
+      1. Test marker creation for each marker type defined by BCB and validate DICT API
+         compliance.
+      2. Test marker lifecycle transitions: creation → update → removal, and verify
+         each state is correctly reflected in DICT.
+      3. Test pre-transaction marker checks: verify that transactions to flagged keys
+         trigger appropriate warnings or blocks.
+      4. Test cache consistency: verify that marker cache refreshes within the TTL and
+         does not serve stale data beyond acceptable limits.
+      5. Test marker integration with fraud scoring: verify that flagged keys increase
+         risk scores as expected.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - contract-testing
+      - cache-testing
+  secops:
+    prose: |
+      1. Monitor marker registration timeliness: time between MED activation and DICT
+         marker creation.
+      2. Track marker accuracy: percentage of markers that are later confirmed vs.
+         dismissed.
+      3. Audit marker lifecycle: ensure all markers are properly updated when cases
+         are resolved — stale markers cause unjust restrictions.
+      4. Monitor DICT API availability and latency — degradation directly impacts
+         fraud prevention.
+      5. Report marker statistics to BCB: total markers registered, updated, removed,
+         and average resolution time.
+    tools:
+      - monitoring-platform
+      - analytics-dashboard
+      - audit-logging
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-19"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21"]
+    relationship: implements

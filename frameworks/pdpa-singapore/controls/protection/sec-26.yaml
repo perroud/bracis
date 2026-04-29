@@ -1,0 +1,126 @@
+id: sec-26
+family: protection
+title: "Transfer Limitation Obligation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) An organisation shall not transfer any personal data to a country or
+    territory outside Singapore except in accordance with requirements prescribed
+    under this Act to ensure that organisations provide a standard of protection
+    to personal data so transferred that is comparable to the protection under
+    this Act.
+
+    (2) The requirements referred to in subsection (1) include —
+    (a) the recipient of the personal data is subject to any law, binding corporate
+    rules, binding agreement, or other binding instrument that provides a standard
+    of protection that is at least comparable to the protection under this Act;
+    (b) the individual has given consent to the transfer after being informed of the
+    fact that the standard of protection may not be comparable;
+    (c) the transfer is necessary for the performance of a contract between the
+    individual and the organisation;
+    (d) the transfer is necessary for the conclusion or performance of a contract
+    between the organisation and a third party that is in the interest of the
+    individual;
+    (e) the transfer is necessary to protect the vital interests of the individual
+    or of another person, where consent for the transfer cannot be obtained in a
+    timely way and it would not be reasonably possible to use anonymised data;
+    (f) the personal data is publicly available in Singapore; or
+    (g) the transfer is necessary for any investigation or proceedings.
+
+guidance:
+  prose: |
+    Section 26 restricts cross-border transfers of personal data. Unlike the GDPR's
+    adequacy decision framework, the PDPA uses a recipient-focused approach:
+
+    1. **Comparable protection standard:** The primary mechanism is ensuring the
+       recipient is bound by laws, rules, or agreements providing comparable
+       protection to the PDPA.
+
+    2. **Binding corporate rules:** Multinational organizations can use binding
+       corporate rules to facilitate intra-group transfers.
+
+    3. **Contractual safeguards:** Data processing agreements with comparable
+       protection clauses satisfy this requirement.
+
+    4. **Consent-based transfer:** Individuals may consent to transfers to
+       jurisdictions without comparable protection, provided they are informed of
+       the reduced protection standard.
+
+    5. **Contractual necessity:** Transfers necessary to perform a contract with
+       the individual are permitted.
+
+    The PDPC has published a list of countries with comparable data protection
+    frameworks (not an exhaustive adequacy list). Organizations transferring data
+    to countries not on this list must rely on contractual safeguards or consent.
+
+references:
+  - citation: "PDPA 2012, Section 26"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement data residency controls that enforce geographic restrictions on
+         personal data storage and processing.
+      2. Build a cross-border transfer registry documenting all transfers, recipient
+         countries, legal bases, and safeguards.
+      3. Implement transfer impact assessments for new cross-border data flows,
+         evaluating the recipient jurisdiction's protection standard.
+      4. Deploy data flow monitoring to detect unauthorized cross-border transfers
+         (e.g., data replicated to foreign regions without authorization).
+      5. Implement contractual safeguard management — track data processing agreements
+         with cross-border data recipients and their expiry dates.
+      6. Build geo-fencing capabilities that prevent personal data from being stored
+         or processed in unauthorized regions.
+    tools:
+      - data-residency-engine
+      - backstage
+      - cloud-policy-engine
+      - opa
+      - data-flow-monitoring
+
+  devsecops:
+    prose: |
+      1. Implement CI/CD checks that flag infrastructure code deploying personal data
+         services to unauthorized regions.
+      2. Scan cloud configurations for cross-border replication settings that may
+         violate transfer restrictions.
+      3. Validate that data processing agreements are referenced in service
+         configurations for cross-border integrations.
+      4. Test geo-fencing controls to verify personal data cannot be accessed from
+         unauthorized jurisdictions.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - cloud-custodian
+      - custom-transfer-validators
+
+  secops:
+    prose: |
+      1. Monitor data flows for unauthorized cross-border transfers in real-time.
+      2. Audit cross-border transfer registry quarterly for completeness and
+         accuracy.
+      3. Track data processing agreement renewals and flag agreements approaching
+         expiry.
+      4. Investigate anomalous data flow patterns that may indicate unauthorized
+         transfers.
+      5. Report on transfer volumes by jurisdiction for regulatory inquiries.
+    tools:
+      - siem
+      - data-flow-monitoring
+      - compliance-dashboard
+      - network-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44", "art-45", "art-46"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-33"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.5.1"]
+    relationship: supports

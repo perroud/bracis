@@ -1,0 +1,92 @@
+id: pix-21
+family: med
+title: "Devolucao de Valores e Encerramento do MED"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Quando a análise do MED concluir pela procedência da notificação de fraude, o PSP
+    recebedor deve efetuar a devolução dos valores bloqueados ao PSP pagador, que por
+    sua vez deve creditar os valores na conta do pagador (vítima). A devolução deve
+    utilizar o canal SPI e ser rastreável pelo EndToEndId da transação original. O PSP
+    deve manter registro completo de todo o processo MED para fins de auditoria e
+    prestação de contas ao BCB.
+guidance:
+  prose: |
+    **Fluxo de devolucao:**
+    1. Analise conclui pela procedencia.
+    2. PSP recebedor debita os valores bloqueados da conta do recebedor.
+    3. PSP recebedor envia ordem de devolucao ao SPI (pacs.004).
+    4. SPI liquida a devolucao em tempo real.
+    5. PSP pagador recebe os valores.
+    6. PSP pagador credita na conta do pagador (vitima).
+    7. PSP pagador notifica o pagador sobre a devolucao.
+
+    **Devolucao parcial:**
+    Se o saldo bloqueado for inferior ao valor original da transacao, a devolucao
+    sera parcial. O PSP pagador deve informar ao usuario o valor efetivamente devolvido
+    e os motivos da devolucao parcial.
+
+    **Rastreabilidade:**
+    O EndToEndId da transacao original deve ser referenciado na devolucao para permitir
+    conciliacao e auditoria ponta-a-ponta.
+
+    **Registro e retencao:**
+    Todo o historico do MED (abertura, bloqueio, analise, decisao, devolucao) deve ser
+    retido por no minimo 5 anos para fins de auditoria, disputa judicial e prestacao
+    de contas ao BCB.
+
+    **Contestacao:**
+    O recebedor pode contestar a devolucao. Em caso de contestacao, o BCB pode ser
+    acionado como arbitro.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de devolucao:**
+      1. API de devolucao que gera mensagem pacs.004 no formato ISO 20022.
+      2. Vinculacao automatica da devolucao ao EndToEndId original.
+      3. Conciliacao automatica: valor devolvido vs valor bloqueado vs valor original.
+      4. Notificacao ao pagador (vitima) com detalhes da devolucao.
+
+      **Retencao de dados:**
+      5. Armazenamento de todo historico MED com retencao de 5+ anos.
+      6. Indexacao por EndToEndId, chave Pix, conta e data para buscas rapidas.
+      7. Exportacao de dados para auditoria e para o BCB em formato padronizado.
+    tools:
+      - spi-client
+      - database
+      - storage
+      - notification-service
+      - reporting-engine
+  devsecops:
+    prose: |
+      **Testes de devolucao:**
+      1. Testes de fluxo completo: devolucao total e parcial.
+      2. Testes de conciliacao: verificar consistencia entre bloqueio e devolucao.
+      3. Testes de rastreabilidade: EndToEndId correto na devolucao.
+      4. Testes de notificacao: vitima e recebedor recebem notificacoes adequadas.
+      5. Testes de retencao: dados acessiveis apos 5 anos.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - data-retention-testing
+  secops:
+    prose: |
+      **Gestao de devolucoes:**
+      1. Dashboard de devolucoes MED com status em tempo real.
+      2. Conciliacao diaria entre bloqueios e devolucoes.
+      3. Relatorio mensal de valores devolvidos ao BCB.
+      4. Processo de contestacao documentado com prazos.
+      5. Retencao de evidencias para suporte a demandas judiciais.
+    tools:
+      - reporting-dashboard
+      - reconciliation-engine
+      - grc-platform
+      - legal-case-management
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-22", "art-23"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,99 @@
+id: ssf-testing-2
+family: ssf-testing
+title: "Vulnerability and Patch Management"
+class: PCI-SSF
+baselines: [secure-software-standard, secure-slc-standard]
+
+statement:
+  prose: >-
+    The software vendor shall establish a vulnerability management process that
+    includes monitoring for newly disclosed vulnerabilities affecting the software
+    and its dependencies, risk assessment of identified vulnerabilities, and timely
+    distribution of patches or mitigations to customers. Security patches for
+    critical vulnerabilities shall be developed and made available within a defined
+    timeframe. The vendor shall provide clear security advisories to customers that
+    describe the vulnerability, its impact, affected versions, and remediation steps.
+    The vendor shall maintain a process for receiving and responding to vulnerability
+    reports from external researchers.
+
+guidance:
+  prose: >-
+    Vulnerability management extends beyond the development phase into the
+    operational life of the software. PCI SSF requires that vendors actively monitor
+    for vulnerabilities in their own code and in third-party components they
+    incorporate. When vulnerabilities are discovered, the vendor must assess the risk,
+    develop a fix, and communicate with affected customers in a timely manner. The
+    standard also requires a coordinated vulnerability disclosure program that allows
+    external security researchers to report vulnerabilities responsibly. This
+    end-to-end approach ensures that vulnerabilities are addressed throughout the
+    software's lifecycle.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 15 — Vulnerability Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Lifecycle Standard v1.2, Section 4.1-4.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy automated dependency monitoring that continuously scans for new CVEs
+      affecting project dependencies and triggers alerts. Implement automated patch
+      testing pipelines that can validate patches against regression test suites
+      before release. Configure container image rebuilds triggered by base image
+      vulnerability discoveries. Deploy a vulnerability disclosure endpoint
+      (security.txt, bug bounty platform) with automated triage workflows. Maintain
+      a release infrastructure that supports rapid emergency patch distribution
+      across all supported versions.
+    tools:
+      - renovate
+      - dependabot
+      - trivy
+      - gitlab-ci
+      - argocd
+      - terraform
+
+  devsecops:
+    prose: >-
+      Configure continuous dependency scanning that monitors for new vulnerabilities
+      between scheduled pipeline runs. Implement vulnerability SLA tracking with
+      automated escalation when remediation deadlines approach. Maintain supported
+      version branches with automated security backporting capabilities. Write
+      regression tests for each security patch to prevent vulnerability
+      reintroduction. Generate and publish security advisories as part of the
+      release pipeline using a standardized advisory format (CSAF, OSV).
+    tools:
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - snyk
+      - renovate
+      - syft
+      - grype
+
+  secops:
+    prose: >-
+      Monitor threat intelligence feeds for vulnerabilities affecting the software
+      technology stack. Track vulnerability disclosure timelines and escalate when
+      SLAs are at risk. Coordinate incident response for actively exploited
+      vulnerabilities requiring emergency patches. Monitor bug bounty and
+      vulnerability disclosure channels for incoming reports. Generate compliance
+      reports on patch management effectiveness including time-to-patch metrics
+      and customer notification timelines.
+    tools:
+      - splunk
+      - elastic-siem
+      - jira
+      - servicenow
+      - hackerone
+      - bugcrowd
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.3", "req-11.3"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v14.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.9"]
+    relationship: mapped

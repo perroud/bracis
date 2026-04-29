@@ -1,0 +1,122 @@
+id: crowd-3
+family: plataforma
+title: "Conflict of Interest Management"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 5º. A plataforma eletrônica de investimento participativo deve
+    identificar, prevenir e gerênciar conflitos de interesses que possam
+    surgir no exercício de suas atividades.
+
+    § 1º A plataforma não pode: I — participar do capital social das
+    sociedades empresárias que realizem oferta por seu intermédio, salvo
+    se investir em condições idênticas às dos demais investidores;
+    II — remunerar ou oferecer vantagens a terceiros para indicação de
+    investidores; III — emprestar recursos a sociedades empresárias que
+    realizem oferta por seu intermédio.
+
+    § 2º A plataforma deve divulgar aos investidores, de forma clara e
+    destacada, a existência de qualquer relação comercial, societária ou
+    de parentesco entre a plataforma, seus administradores e controladores,
+    e a sociedade empresária emissora ou seus administradores.
+
+    § 3º Os conflitos de interesses identificados e as medidas adotadas
+    para seu gerênciamento devem ser documentados e mantidos à disposição
+    da CVM.
+guidance:
+  prose: |
+    Article 5 addresses conflict of interest management, a critical
+    governance requirement for crowdfunding platforms that act as
+    intermediaries between issuers and investors.
+
+    **Prohibited activities:**
+    - Platforms cannot hold equity in issuers (except under identical
+      conditions as other investors)
+    - No referral fees or kickbacks for investor leads
+    - No lending to issuers using the platform
+
+    **Mandatory disclosure:**
+    Any commercial, corporate, or family relationship between the platform
+    (including its executives and controllers) and the issuer must be
+    clearly and prominently disclosed to investors. This is a pre-investment
+    disclosure requirement.
+
+    **Documentation obligation:**
+    All identified conflicts and mitigation measures must be documented and
+    available for CVM inspection. This requires a systematic conflict of
+    interest registry.
+
+    **Technology implications:**
+    Systems must enforce business rules that prevent prohibited transactions
+    (e.g., block platform from investing in its own offerings under
+    different terms, flag related-party transactions).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Conflict detection and prevention systems:**
+      1. Build a related-party database that maps relationships between
+         platform personnel, controllers, and issuers. Cross-reference
+         automatically on each new offering.
+      2. Implement business rule engine that blocks prohibited transactions
+         (platform equity in issuers, lending to issuers) at the API level.
+      3. Deploy automated disclosure system that flags related-party
+         relationships and requires explicit disclosure before offering
+         publication.
+
+      **Separation of concerns:**
+      4. Segregate platform investment accounts from operational accounts
+         at the infrastructure level (separate databases, access controls).
+      5. Implement chinese wall controls between teams managing offerings
+         and teams making platform investment decisions.
+    tools:
+      - rules-engine
+      - vault
+      - postgresql
+      - kubernetes
+  devsecops:
+    prose: |
+      **Automated conflict detection in development:**
+      1. Implement unit and integration tests for all business rules that
+         enforce conflict of interest prohibitions.
+      2. Code review for any changes to the related-party checking module
+         must require approval from compliance team (CODEOWNERS).
+      3. Maintain test coverage > 90% for conflict management modules.
+
+      **Pipeline enforcement:**
+      4. Block deployments that modify conflict-of-interest business rules
+         without compliance team approval.
+      5. Automated regression testing for related-party disclosure workflows
+         on every release.
+    tools:
+      - gitlab-ci
+      - sonarqube
+      - selenium
+      - jest
+  secops:
+    prose: |
+      **Monitoring and auditing conflicts:**
+      1. Audit all transactions flagged by the conflict detection engine;
+         maintain a conflict of interest register with timestamps and
+         resolution notes.
+      2. Monitor for attempts to circumvent conflict controls (e.g.,
+         creating accounts under different identities to invest in
+         related offerings).
+      3. Quarterly review of the related-party database for completeness
+         and accuracy.
+
+      **CVM reporting:**
+      4. Prepare conflict of interest reports for CVM inspection showing
+         all identified conflicts and mitigation measures.
+      5. Maintain a whistleblower channel for conflict reporting.
+    tools:
+      - grc-platform
+      - siem
+      - case-management
+legal_references:
+  - framework_id: cvm-175
+    articles: ["art-60"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-3"]
+    relationship: complements

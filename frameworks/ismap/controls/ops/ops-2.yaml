@@ -1,0 +1,85 @@
+id: ops-2
+family: ops
+title: "Logging, Monitoring, and Vulnerability Management"
+class: ISMAP
+baselines:
+  - ismap
+  - ismap-lcs
+
+statement:
+  prose: |
+    The cloud service provider shall produce, retain, and regularly review
+    event logs that record user activities, exceptions, faults, and information
+    security events. Logging facilities and log information shall be protected
+    against tampering and unauthorized access. Clocks of all relevant
+    information processing systems shall be synchronized to an approved time
+    source. Technical vulnerabilities of information systems shall be evaluated,
+    and appropriate measures taken to address the associated risk in a timely
+    manner.
+
+guidance:
+  prose: |
+    ISMAP requires comprehensive logging and monitoring that enables Japanese
+    government agencies to verify that their data is handled securely. Logs
+    must be retained for a minimum period defined in the ISMAP management
+    criteria and must be available for audit review. Log integrity is
+    critical; cloud service providers must demonstrate that logs cannot be
+    modified or deleted by the personnel whose activities they record.
+    Vulnerability management must include timely patching with defined SLAs
+    for critical vulnerabilities. The vulnerability management program must
+    cover all layers of the cloud service stack.
+
+references:
+  - citation: "ISMAP Management Criteria, OPS-02"
+    url: "https://www.ismap.go.jp/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement centralized log aggregation with immutable storage. Deploy
+      infrastructure-level logging for all cloud services including API
+      calls, authentication events, and resource modifications. Use NTP
+      synchronization across all systems. Automate vulnerability scanning
+      of infrastructure with integration into patch management workflows.
+    tools:
+      - elastic-stack
+      - fluentd
+      - prometheus
+      - trivy
+
+  devsecops:
+    prose: |
+      Integrate dependency scanning, SAST, DAST, and container scanning
+      into CI/CD pipelines. Automate vulnerability remediation through
+      automated merge requests for dependency updates. Enforce that
+      pipeline logs are retained and tamper-proof. Implement SLA-based
+      vulnerability remediation tracking.
+    tools:
+      - gitlab-ci
+      - trivy
+      - semgrep
+      - dependabot
+
+  secops:
+    prose: |
+      Operate a security operations center (SOC) with real-time log
+      analysis and alerting. Implement SIEM correlation rules for
+      detection of security incidents. Monitor vulnerability remediation
+      timelines and escalate overdue items. Generate log review and
+      vulnerability management reports for ISMAP auditors.
+    tools:
+      - splunk
+      - elastic-siem
+      - tenable
+      - qualys
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a-8.15", "annex-a-8.16", "annex-a-8.8"]
+    relationship: derived-from
+  - framework_id: nist-800-53
+    articles: ["AU-2", "AU-3", "AU-6", "SI-2", "SI-5"]
+    relationship: mapped
+  - framework_id: fedramp
+    articles: ["AU-2", "AU-6", "SI-2"]
+    relationship: mapped

@@ -1,0 +1,103 @@
+id: art-10
+family: cap-3
+title: "Diligencia Simplificada"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 10. As instituições de pagamento podem adotar procedimentos simplificados
+    de identificação e qualificação para clientes cujo risco de lavagem de dinheiro
+    e de financiamento do terrorismo seja considerado baixo, observadas as seguintes
+    condições:
+
+    I - o cliente deve ser pessoa natural com capacidade legal plena;
+
+    II - a relação de negócio deve ser limitada a serviços e produtos de baixo risco,
+    incluindo contas de pagamento pré-pagas, instrumentos de pagamento com limite
+    de valor reduzido e operações de crédito de pequeno valor;
+
+    III - os valores das operações realizadas com a conta devem ser limitados, em
+    especial as operações de carga e de saque;
+
+    IV - a instituição deve manter mecanismos de monitoramento para identificar
+    eventuais desvios do perfil de baixo risco.
+
+    Parágrafo único. Identificado risco superior ao esperado para a categoria simplificada,
+    a instituição deve imediatamente adotar procedimentos de diligência padrão ou reforçada.
+guidance:
+  prose: |
+    O art. 10 e a base regulatoria para o onboarding simplificado das fintechs --
+    o que permite abrir uma conta de pagamento pre-paga com apenas CPF e selfie.
+
+    **Limites tipicos para diligencia simplificada:**
+    De acordo com orientacoes BCB e pratica do mercado:
+    - Carga mensal: ate R$ 5.000,00
+    - Saldo maximo: ate R$ 5.000,00
+    - Transacoes individuais: ate R$ 1.000,00
+    - Nenhuma transferencia internacional
+
+    **Condicoes cumulativas (nao alternativas):**
+    Todos os 4 incisos devem ser satisfeitos simultaneamente. Se qualquer
+    condicao deixar de ser atendida, a IP deve migrar o cliente para diligencia
+    padrao imediatamente.
+
+    **Monitoramento contravencional (inciso IV):**
+    A diligencia simplificada nao significa "sem monitoramento". Ao contrario,
+    exige monitoramento especifico para detectar quando o cliente tenta usar a
+    conta simplificada para operacoes acima dos limites esperados (fragmentacao,
+    operacoes multiplas no mesmo dia).
+
+    **Regra pratica:**
+    A IP pode ter dois "produtos" de conta: conta simplificada (art. 10) e conta
+    completa. Cliente que atinge limite da simplificada e convidado a completar
+    o KYC completo para continuar operando.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de conta com diligencia simplificada:**
+      1. Configurar produto "conta simplificada" com limites tecnicos rigidos:
+         - Bloqueio automatico de operacoes que excedam limites configurados
+         - Contador mensal de operacoes e volumes com reset no dia 1
+         - Saldo maximo configuravel (hard limit no core de pagamentos)
+      2. Fluxo de onboarding simplificado: CPF + selfie + declaracao de PEP
+         (sem exigencia de comprovante de renda, residencia ou renda detalhada).
+      3. Motor de deteccao de fragmentacao: alertar quando cliente tenta burlar
+         limites com multiplas operacoes menores (ex: 5 cargas de R$ 900,00 no dia).
+      4. Gatilho automatico de upgrade para diligencia completa quando limites
+         sao atingidos: notificacao ao cliente e solicitacao de documentos.
+      5. Bloqueio da conta simplificada se upgrade de KYC nao for concluido em
+         prazo determinado.
+    tools:
+      - kyc-platform
+      - payment-core
+      - transaction-monitoring
+      - aml-platform
+  devsecops:
+    prose: |
+      **Testes de limites e controles:**
+      1. Testes de limite: operacao exatamente no limite, acima, abaixo.
+      2. Testes de fragmentacao: detectar padroes de split de operacoes.
+      3. Testes de upgrade automatico: verificar se fluxo de migracao para
+         diligencia completa funciona corretamente.
+      4. Testes de regressao para garantir que alteracoes de limite nao afetam
+         clientes existentes de forma inesperada.
+    tools:
+      - gitlab-ci
+      - test-automation
+  secops:
+    prose: |
+      **Monitoramento da diligencia simplificada:**
+      1. Dashboard de clientes em diligencia simplificada vs completa.
+      2. Alertas para clientes proximos dos limites (acionar proativamente
+         o upgrade de KYC).
+      3. Auditoria de clientes que excedem o perfil esperado da conta simplificada.
+      4. Relatorio mensal de clientes migrados de simplificada para completa
+         (indicador de efetividade dos controles).
+    tools:
+      - aml-platform
+      - transaction-monitoring
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-14"]
+    relationship: equivalent-to

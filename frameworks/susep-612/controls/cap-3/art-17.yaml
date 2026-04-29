@@ -1,0 +1,139 @@
+id: art-17
+family: cap-3
+title: "Recusa e Encerramento de Relacionamento"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 17. As supervisionadas devem recusar o início de relacionamento comercial
+    ou encerrar o relacionamento existente quando:
+    I - não for possível identificar o cliente ou o beneficiário final;
+    II - as informações prestadas pelo cliente ou as disponibilizadas por fontes
+    públicas não forem suficientes para a adequada classificação de risco;
+    III - houver suspeita de que as informações prestadas são falsas ou
+    substancialmente inexatas;
+    IV - houver suspeita fundada de utilização da relação de negócios para fins de
+    lavagem de dinheiro ou de financiamento do terrorismo.
+guidance:
+  prose: |
+    O art. 17 estabelece as hipoteses em que a supervisionada deve recusar ou
+    encerrar o relacionamento, situacao que exige equilibrio entre compliance
+    PLD/FT e obrigacoes contratuais de seguros.
+
+    **Hipoteses de recusa/encerramento:**
+
+    1. Impossibilidade de identificacao (I):
+       - Cliente se recusa a fornecer documentos
+       - Beneficiario final de PJ nao identificavel apos due diligence razoavel
+       - Documentos apresentados sao invalidos ou vencidos sem possibilidade
+         de atualizacao
+       No mercado securitario: segurado que nao fornece CPF, estipulante que
+       nao identifica beneficiarios de seguro coletivo.
+
+    2. Classificacao de risco impossivel (II):
+       - Informacoes insuficientes para scoring de risco
+       - Cliente se recusa a declarar renda ou origem de recursos
+       - Dados contraditorios sem esclarecimento
+       No mercado securitario: proponente de VGBL de alto valor que nao
+       comprova origem dos recursos para aporte.
+
+    3. Suspeita de falsidade (III):
+       - Documentos aparentemente falsificados
+       - Informacoes contraditorias verificadas via fontes externas
+       - Renda declarada muito superior ao verificado em bureau
+       - Endereco inexistente ou incompativel
+
+    4. Suspeita de LD/FT (IV):
+       - Padrao operacional compativel com tipologias de lavagem
+       - Cliente em lista de sancoes
+       - Vinculo com organizacoes criminosas conhecidas
+       - Operacoes sem justificativa economica reiteradas
+
+    **Particularidades do mercado securitario:**
+
+    Recusa de inicio de relacionamento:
+    - Negar emissao de apolice e mais simples que no bancario (nao ha obrigacao
+      de contratar como em conta salario)
+    - Comunicar ao COAF ANTES de recusar se houver suspeita de LD/FT
+    - Nao informar ao cliente o motivo especifico (tipping off)
+
+    Encerramento de relacionamento existente:
+    - Cancelamento de apolice em vigor pode gerar devolucao de premio
+    - Resgate de VGBL/PGBL pode liberar recursos suspeitos
+    - Bloqueio de pagamento de sinistro pode gerar responsabilidade civil
+    - Encerramento deve ser feito de forma a nao prejudicar investigacoes
+
+    **Obrigacao de comunicacao ao COAF:**
+    Nas hipoteses III e IV, a comunicacao ao COAF e obrigatoria ANTES do
+    encerramento. A supervisionada nao deve alertar o cliente sobre a
+    comunicacao (tipping off proibido).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Workflow de recusa/encerramento:**
+      1. Workflow automatizado com etapas: identificacao do motivo, coleta de
+         evidencias, aprovacao hierarquica, comunicacao ao COAF (quando aplicavel),
+         execucao da recusa/encerramento.
+      2. Checklist obrigatorio por motivo de recusa (incisos I a IV) com
+         campos de evidencia e justificativa.
+      3. Integracao com sistema de emissao para bloquear novas operacoes
+         durante analise.
+      4. Integracao com sistema de sinistros para suspender pagamentos
+         pendentes quando encerramento por suspeita de LD/FT.
+
+      **Controles de tipping off:**
+      5. Comunicacao ao COAF automatizada ANTES de notificacao ao cliente.
+      6. Logs de acesso ao caso restritos a equipe de compliance.
+      7. Motivo generico na comunicacao ao cliente (sem mencionar LD/FT).
+      8. Registro completo do processo de decisao com retencao de 10 anos.
+    tools:
+      - workflow-engine
+      - case-management
+      - siscoaf-integration
+      - access-control
+  devsecops:
+    prose: |
+      **Testes de recusa/encerramento:**
+      1. Testes para cada hipotese de recusa (incisos I a IV) com cenarios
+         especificos do mercado securitario.
+      2. Testes de bloqueio: novas operacoes devem ser impedidas apos decisao
+         de recusa.
+      3. Testes de sequenciamento: comunicacao ao COAF antes de encerramento.
+
+      **Seguranca do processo:**
+      4. Testes de controle de acesso: somente compliance pode ver casos de
+         suspeita de LD/FT.
+      5. Audit trail inviolavel de todo o processo de recusa/encerramento.
+      6. Testes de tipping off: comunicacao ao cliente nao menciona LD/FT.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - access-control-tests
+      - audit-trail-tests
+  secops:
+    prose: |
+      **Gestao de recusas e encerramentos:**
+      1. Registro centralizado de todas as recusas e encerramentos com motivo,
+         data, evidencias e decisao.
+      2. Analise de tendencias: aumento de recusas pode indicar problema no
+         canal de distribuicao.
+      3. Cross-reference entre clientes recusados e comunicacoes ao COAF.
+
+      **Monitoramento pos-encerramento:**
+      4. Verificacao de tentativa de retorno de cliente encerrado por motivo
+         de LD/FT (blocklist).
+      5. Compartilhamento de informacoes sobre clientes recusados entre
+         entidades do mesmo grupo (conforme LGPD).
+      6. Relatorio de recusas e encerramentos para diretoria e SUSEP.
+      7. Retencao de documentacao por 10 anos apos recusa/encerramento.
+    tools:
+      - case-management
+      - blocklist-management
+      - reporting-engine
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

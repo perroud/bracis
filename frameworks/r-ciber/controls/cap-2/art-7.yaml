@@ -1,0 +1,110 @@
+id: art-7
+family: cap-2
+title: "Monitoramento Continuo e Gestao de Logs"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 7. As prestadoras devem implementar capacidades de monitoramento
+    contínuo de segurança cibernética em suas redes e sistemas, incluindo:
+
+    I - coleta, armazenamento e análise de logs de segurança de
+    equipamentos de rede, sistemas OSS/BSS e plataformas de suporte,
+    com retenção mínima de 12 (doze) meses;
+
+    II - monitoramento de tráfego de rede para identificação de anomalias,
+    ataques e comportamentos suspeitos em tempo real;
+
+    III - correlação de eventos de segurança de múltiplas fontes para
+    identificação de incidentes complexos e ataques avançados;
+
+    IV - capacidade de detecção e alerta para incidentes de segurança
+    em tempo hábil para permitir resposta efetiva;
+
+    V - proteção da integridade dos logs contra modificação ou exclusão
+    não autorizada.
+guidance:
+  prose: |
+    O art. 7 estabelece os requisitos de monitoramento e logging que
+    formam a base da capacidade de deteccao e resposta do R-Ciber.
+
+    **Retencao de 12 meses (inciso I):**
+    O periodo de 12 meses de retencao e o minimo regulatorio. Algumas
+    investigacoes de incidentes ciberneticos requerem correlacao de
+    eventos de meses anteriores para identificar o vetor de ataque inicial.
+
+    **Monitoramento de trafego de rede (inciso II):**
+    Para prestadoras de telecomunicacoes, o monitoramento de trafego
+    deve equilibrar a seguranca com o sigilo das comunicacoes dos
+    usuarios (Art. 5, XII da Constituicao Federal e art. 7 da Lei 9.472/1997).
+    O foco deve ser em metadados e comportamentos anormais, nao no
+    conteudo das comunicacoes privadas.
+
+    **Correlacao de eventos (inciso III):**
+    Requer solucao SIEM capaz de ingerir e correlacionar logs de
+    fontes heterogeneas tipicas de redes de telecomunicacoes:
+    equipamentos de diferentes fabricantes, plataformas OSS/BSS,
+    CDN, DNS e sistemas de autenticacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de monitoramento para telecomunicacoes:**
+      1. Implementar SIEM centralizado que ingira logs de:
+         - Equipamentos de rede (syslog, SNMP traps)
+         - Sistemas OSS/BSS (logs de aplicacao e banco de dados)
+         - Plataformas de autenticacao (AAA, RADIUS, Diameter)
+         - Firewalls e sistemas de deteccao de intrusao
+         - DNS e servidores de e-mail
+      2. Implementar retencao de logs com armazenamento imutavel
+         (write-once) por no minimo 12 meses, com backup offsite.
+      3. Automatizar deteccao de anomalias de trafego de rede via
+         machine learning (baseline de trafego + deteccao de desvios).
+      4. Implementar monitoramento de integridade de logs (hash
+         criptografico) para detectar adulteracao.
+    tools:
+      - siem
+      - log-management
+      - network-traffic-analysis
+      - immutable-storage
+  devsecops:
+    prose: |
+      **Instrumentacao de sistemas de telecomunicacoes:**
+      1. Padronizar formato de logs de seguranca em todos os sistemas
+         desenvolvidos internamente (CEF, JSON estruturado) para
+         facilitar ingestao no SIEM.
+      2. Implementar logging de auditoria em todas as operacoes criticas
+         de sistemas OSS/BSS (provisioning, modificacao de configuracoes,
+         acesso a dados de usuarios).
+      3. Testar em pipeline CI/CD que novos sistemas possuem logging
+         adequado antes de ir para producao.
+      4. Manter schema de logs documentado e versionado para cada
+         sistema de telecomunicacoes.
+    tools:
+      - structured-logging
+      - log-schema
+      - gitlab-ci
+      - opentelemetry
+  secops:
+    prose: |
+      **SOC para telecomunicacoes:**
+      1. Operar SOC (Security Operations Center) com capacidade de
+         monitoramento 24x7 para redes e sistemas de telecomunicacoes.
+      2. Desenvolver regras de correlacao e alertas especificas para
+         ameacas ao setor de telecomunicacoes (SS7 attacks, diameter
+         fraud, SIM swapping, toll fraud).
+      3. Definir SLAs de resposta a alertas baseados em severidade
+         do incidente e criticidade do sistema afetado.
+      4. Realizar revisao mensal de regras de correlacao e alertas
+         para reduzir falsos positivos e adaptar a novas ameacas.
+    tools:
+      - soc-platform
+      - siem
+      - threat-intelligence
+      - alert-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-8-15", "A-8-16", "A-8-17"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-38", "art-39", "art-40", "art-41", "art-42"]
+    relationship: mapped

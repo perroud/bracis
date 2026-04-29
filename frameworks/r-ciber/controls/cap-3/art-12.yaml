@@ -1,0 +1,114 @@
+id: art-12
+family: cap-3
+title: "Criptografia e Protecao de Dados em Redes de Telecomunicacoes"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 12. As prestadoras devem adotar mecanismos de criptografia para
+    proteção de dados sensíveis e comunicações críticas, incluindo:
+
+    I - criptografia em repouso para bases de dados de usuários, registros
+    de chamadas (CDR) e dados de localização;
+
+    II - criptografia em trânsito para interfaces de gestão de rede (OAM),
+    plataformas OSS/BSS e dados de usuários em redes de telecomunicações;
+
+    III - gestão segura de chaves criptográficas, incluindo geração,
+    distribuição, armazenamento, rotação e revogação de chaves;
+
+    IV - uso de algoritmos e parâmetros criptográficos recomendados por
+    órgãos nacionais e internacionais competentes, vedado o uso de
+    algoritmos descontinuados ou com vulnerabilidades conhecidas;
+
+    V - proteção das interfaces de intercâmbio de informações com outras
+    prestadoras e com a internet mediante uso de protocolos seguros.
+guidance:
+  prose: |
+    O art. 12 estabelece requisitos de criptografia especificos para o
+    contexto de telecomunicacoes, que envolvem volumes massivos de dados
+    de usuarios e interfaces criticas de interconexao.
+
+    **Dados sensiveis em telecom (inciso I):**
+    - CDRs (Call Detail Records): registros de todas as chamadas com
+      origem, destino, duracao, horario e localizacao
+    - IPDR (IP Detail Records): registros de sessoes de internet com
+      IP de origem, destino, horario e volume
+    - Dados de localizacao (Cell-ID, GPS agregado)
+    - Dados cadastrais de usuarios
+
+    **Interfaces criticas (incisos II e V):**
+    - OAM/NMS: geralmente usa SSH, SNMPv3, NETCONF/RESTCONF
+    - SS7/Diameter/SIP: protocolos de sinalização de telecomunicacoes
+      com requisitos especificos de seguranca
+    - BGP (internet): protecao via RPKI, route filtering
+    - Roaming (GTP, Diameter): protecao especifica para roaming 4G/5G
+
+    **Algoritmos descontinuados (inciso IV):**
+    Vedados: MD5, SHA-1, DES, 3DES, RSA <2048 bits, TLS 1.0/1.1,
+    SSLv3, WEP
+    Permitidos: AES-256, SHA-256/384/512, RSA >=3072, ECDSA P-256/P-384,
+    TLS 1.2/1.3, WPA3
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Criptografia em infraestrutura de telecomunicacoes:**
+      1. Implementar criptografia em repouso (AES-256) para todos os
+         bancos de dados contendo CDRs, dados de localizacao e
+         informacoes de usuarios, com chaves gerenciadas em HSM.
+      2. Habilitar criptografia em transito (TLS 1.2+ ou TLS 1.3)
+         em todas as interfaces de gestao de rede e plataformas
+         OSS/BSS, com desativacao de versoes antigas.
+      3. Implementar PKI interna para gestao de certificados digitais
+         de equipamentos de rede e sistemas OSS/BSS.
+      4. Automatizar rotacao de chaves criptograficas e certificados
+         com alertas de vencimento e renovacao automatica (ACME protocol).
+    tools:
+      - hsm
+      - vault
+      - pki-management
+      - cert-manager
+  devsecops:
+    prose: |
+      **Criptografia no ciclo de desenvolvimento:**
+      1. Implementar analise estatica (SAST) especifica para detectar
+         uso de algoritmos criptograficos inseguros em codigo de
+         sistemas de telecomunicacoes.
+      2. Escanear certificados e chaves expostos em repositorios de
+         codigo (secrets scanning) em cada commit.
+      3. Testar configuracao de TLS em todos os endpoints de sistemas
+         de telecomunicacoes no pipeline CI/CD (SSL Labs equivalent).
+      4. Manter inventario atualizado de todos os certificados digitais
+         com alertas automaticos de vencimento proximo.
+    tools:
+      - sast-crypto-check
+      - secret-scanning
+      - tls-testing
+      - certificate-inventory
+  secops:
+    prose: |
+      **Governanca de criptografia:**
+      1. Publicar e manter politica interna de criptografia com lista
+         de algoritmos aprovados e proibidos, alinhada ao inciso IV.
+      2. Auditar periodicamente o uso de criptografia em todos os
+         sistemas criticos de telecomunicacoes (ao menos anualmente).
+      3. Monitorar noticias e publicacoes de vulnerabilidades
+         criptograficas para atualizacao proativa da politica.
+      4. Definir plano de transicao para algoritmos pos-quanticos
+         (NIST PQC standards) considerando o ciclo de vida de
+         equipamentos de rede (10-15 anos).
+    tools:
+      - crypto-policy
+      - vulnerability-monitoring
+      - audit-management
+      - pqc-planning
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-8-24", "A-8-25"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-21", "art-22", "art-23"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-49"]
+    relationship: complements

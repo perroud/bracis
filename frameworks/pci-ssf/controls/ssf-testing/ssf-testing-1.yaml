@@ -1,0 +1,101 @@
+id: ssf-testing-1
+family: ssf-testing
+title: "Vulnerability Detection and Security Testing"
+class: PCI-SSF
+baselines: [secure-software-standard, secure-slc-standard]
+
+statement:
+  prose: >-
+    The software vendor shall implement a comprehensive security testing program
+    that includes static application security testing (SAST), dynamic application
+    security testing (DAST), software composition analysis (SCA), and manual
+    security review. Security testing shall be performed during development and
+    before each release. Known vulnerability databases shall be consulted to
+    identify vulnerabilities in third-party components. Identified vulnerabilities
+    shall be risk-ranked and remediated within defined timelines based on severity.
+    Critical and high-severity vulnerabilities shall be resolved before release.
+
+guidance:
+  prose: >-
+    Security testing is a multi-layered activity that must combine automated tools
+    with human expertise. PCI SSF requires that vendors use a combination of testing
+    techniques because no single method catches all vulnerability types. SAST
+    identifies issues in source code such as injection flaws and insecure API usage.
+    DAST discovers runtime vulnerabilities such as authentication bypasses and
+    configuration weaknesses. SCA identifies known vulnerabilities in third-party
+    libraries. Manual review catches business logic flaws that automated tools miss.
+    The standard mandates that testing results feed into a risk-based remediation
+    process with defined timelines.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 14 — Security Testing"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 10.1-10.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy security scanning infrastructure as shared CI/CD services available to
+      all development teams. Configure container scanning in the build pipeline to
+      identify vulnerabilities in base images and packages. Implement infrastructure-
+      as-code scanning to detect security misconfigurations in deployment templates.
+      Deploy DAST scanning infrastructure that can test applications in staging
+      environments automatically. Maintain a centralized vulnerability database
+      that aggregates findings from all scanning tools and tracks remediation status.
+    tools:
+      - gitlab-ci
+      - trivy
+      - checkov
+      - owasp-zap
+      - nuclei
+      - defectdojo
+
+  devsecops:
+    prose: >-
+      Configure SAST, DAST, SCA, and container scanning as mandatory pipeline stages
+      that block merge requests when critical or high-severity findings are detected.
+      Implement custom SAST rules targeting payment-specific vulnerability patterns.
+      Generate SBOMs and continuously monitor third-party components against CVE
+      databases. Configure vulnerability SLA enforcement in the pipeline with
+      automated escalation for overdue findings. Conduct pre-release security
+      reviews combining automated tool results with manual code review for
+      security-critical components.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - semgrep
+      - snyk
+      - sonarqube
+      - syft
+
+  secops:
+    prose: >-
+      Monitor vulnerability remediation timelines and escalate overdue findings.
+      Correlate security testing results with runtime security monitoring to
+      identify exploitable vulnerabilities. Conduct periodic penetration testing
+      by qualified assessors to validate automated testing effectiveness. Track
+      and report on vulnerability metrics including density, mean time to
+      remediate, and recurrence rates. Maintain a vulnerability exception
+      process with management approval and compensating controls for accepted
+      risks.
+    tools:
+      - defectdojo
+      - splunk
+      - jira
+      - servicenow
+      - rapid7-insightvm
+      - tenable
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.2", "req-6.3", "req-11.3", "req-11.4"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v1.1", "v14.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.28", "A8.29"]
+    relationship: mapped

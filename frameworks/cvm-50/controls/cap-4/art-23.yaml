@@ -1,0 +1,98 @@
+id: art-23
+family: cap-4
+title: "Disponibilidade de Registros para Autoridades"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 23. Os registros mantidos nos termos desta Resolução devem ser
+    prontamente disponibilizados à CVM, ao COAF, ao Ministério Público e
+    a outras autoridades competentes quando solicitados.
+
+    § 1. A disponibilização dos registros deve ser realizada no prazo
+    determinado pela autoridade solicitante.
+
+    § 2. Os participantes devem garantir que os registros possam ser
+    disponibilizados de forma segura, preservando a confidencialidade das
+    informações de terceiros não relacionados à investigação.
+
+    § 3. Os participantes não podem informar ao cliente ou a terceiros
+    que informações ou documentos foram solicitados por autoridade competente,
+    exceto quando expressamente autorizado pela autoridade.
+guidance:
+  prose: |
+    O art. 23 endereça a obrigacao de cooperacao com autoridades — uma das
+    condicoes para que o sistema de PLD/FT funcione efetivamente.
+
+    **Prontidao:**
+    "Prontamente" no caput e diferente do ss 1 que menciona prazo determinado
+    pela autoridade. Na pratica, solicitacoes da CVM e COAF tipicamente tem
+    prazo de 3 a 15 dias uteis. O participante precisa ter capacidade tecnica
+    de localizar e exportar os dados nesse prazo.
+
+    **Confidencialidade (ss 2):**
+    A solicitacao de dados de um cliente nao significa que o participante deve
+    expor dados de outros clientes. O sistema deve permitir extracoes cirurgicas
+    de dados de um individuo especifico sem vazar dados de terceiros.
+
+    **Proibicao de tipping-off (ss 3):**
+    Esta e uma obrigacao critica: o participante NAO pode avisar ao cliente
+    que esta sendo investigado. O aviso ao cliente ("tipping-off") pode destruir
+    evidencias, facilitar fuga ou prejudicar a investigacao. Violacao desta
+    norma pode configurar cumplicidade em lavagem de dinheiro.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de atendimento de requisicoes regulatorias:**
+      1. Modulo de gestao de requisicoes regulatorias: registro de solicitacoes,
+         prazo, status, responsavel e resposta fornecida.
+      2. Ferramenta de extracao de dados por cliente: dado o CPF/CNPJ e periodo,
+         extrair todos os registros relacionados (transacoes, KYC, alertas,
+         comunicacoes ao COAF) sem expor dados de outros clientes.
+      3. Exportacao em formato aceito pelas autoridades (JSON, CSV, PDF
+         com sumario executivo).
+      4. Criptografia de transferencia: dados enviados a autoridades devem
+         ser transmitidos via canal seguro com log de entrega.
+
+      **Controle de tipping-off:**
+      5. Restricao tecnica: colaboradores que acessam dados de cliente sob
+         investigacao nao podem enviar comunicacoes ao cliente pelo sistema.
+      6. Log de acesso: qualquer acesso a dados de cliente sob investigacao
+         e registrado para deteccao de possivel tipping-off.
+    tools:
+      - regulatory-reporting
+      - data-export
+      - audit-trail
+      - access-control
+  devsecops:
+    prose: |
+      **Testes de privacidade e segregacao:**
+      1. Testes de que extracao por cliente nao retorna dados de outros clientes.
+      2. Testes de que dados de clientes sao exportados corretamente (completude
+         e formato).
+      3. Testes de confidencialidade: log de acesso registra quem acessou
+         dados de cliente especifico.
+    tools:
+      - test-automation
+      - privacy-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Procedimento de atendimento de requisicoes:**
+      1. Procedimento formal para atendimento de requisicoes: triagem, avaliacao
+         da autoridade solicitante, compilacao dos dados, revisao juridica, envio.
+      2. Pratica de simulacao: realizar exercicios periodicos de resposta a
+         requisicoes regulatorias para validar tempo de resposta.
+      3. Treinamento de equipe sobre proibicao de tipping-off — com exemplos
+         de como pode ocorrer inadvertidamente.
+    tools:
+      - case-management
+      - training-platform
+      - legal-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-20"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-23"]
+    relationship: complements

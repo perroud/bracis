@@ -1,0 +1,92 @@
+id: soc1-ca-vendor-mgmt
+family: control-activities
+title: "Third-Party and Subservice Organization Management"
+class: SSAE18-ICFR
+baselines: [type-i, type-ii]
+statement:
+  prose: >-
+    The service organization identifies, evaluates, and monitors the risks associated with
+    third-party vendors and subservice organizations that perform services relevant to user
+    entities' internal control over financial reporting. Where subservice organizations are
+    used, the service organization discloses this in its system description and either
+    presents the description of the subservice organization's controls (inclusive method)
+    or describes only its own controls and the complementary subservice organization controls
+    that are assumed to be in place (carve-out method). The service organization monitors
+    subservice organization controls through periodic review of their SOC 1 reports,
+    contractual obligations, and where applicable, direct assessments. Third-party software
+    and services used in financial processing are evaluated for security and operational
+    risk before adoption and on an ongoing basis.
+guidance:
+  prose: >-
+    Subservice organization management is a critical and often complex area of SOC 1
+    examination. Many service organizations rely on cloud providers (AWS, GCP, Azure) and
+    other technology vendors as subservice organizations — and auditors examine whether
+    the service organization adequately monitors these dependencies. The inclusive vs.
+    carve-out method choice has significant implications: under the carve-out method, the
+    service organization must clearly identify complementary subservice organization controls
+    (CSOCs) that user entities must evaluate, and these CSOCs must be realistic and obtainable.
+    Auditors will test whether the service organization actually obtains and reviews the
+    SOC 1 reports of its material subservice organizations, identifies relevant findings,
+    and assesses whether user entity controls (complementary user entity controls, CUECs)
+    must be updated as a result. Cloud provider SOC 2 reports are commonly used as the
+    primary assurance mechanism for IaaS/PaaS subservice organizations.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a third-party risk management program for all technology vendors integrated
+      into the financial processing platform. Maintain a vendor registry in the service
+      catalog (e.g., Backstage) that tracks each vendor's risk classification, the financial
+      processing components they support, the assurance reports obtained, and the monitoring
+      schedule. For cloud subservice organizations, regularly review the current AWS, GCP,
+      and Azure SOC 1/SOC 2 reports and map their controls to the service organization's
+      control objectives. Implement automated supply chain security scanning for all
+      third-party software components used in financial processing. Deploy SBOM generation
+      for all financial processing applications to maintain visibility into component provenance.
+    tools:
+      - backstage
+      - snyk
+      - dependabot
+      - syft
+      - grype
+  devsecops:
+    prose: >-
+      Enforce vendor and dependency risk management in the software supply chain. Enable
+      GitLab's dependency scanning and license compliance scanning for all repositories
+      containing financial processing code. Implement Software Composition Analysis (SCA)
+      to continuously monitor for newly disclosed vulnerabilities in third-party components.
+      Define approved dependency policies and configure pipeline gates that fail when
+      unapproved or high-risk dependencies are introduced. Maintain a software bill of
+      materials (SBOM) as a pipeline artifact for all financial processing applications.
+      Review and update the SBOM as part of release management.
+    tools:
+      - gitlab-dependency-scanning
+      - gitlab-license-compliance
+      - trivy-sbom
+      - syft
+      - grype
+  secops:
+    prose: >-
+      Establish and maintain a vendor risk management program covering all subservice
+      organizations and material third-party vendors. Require annual SOC 1 or SOC 2 Type II
+      reports from all subservice organizations, review them within 30 days of receipt,
+      and document findings and follow-up actions. Maintain vendor contracts that include
+      right-to-audit clauses, security requirements, and notification obligations for
+      incidents and material changes. Conduct annual vendor risk assessments for critical
+      subservice organizations. Include vendor risk management review in the ICFR self-assessment
+      cycle. Retain vendor assessment documentation, SOC reports, and contract evidence
+      for audit examination.
+    tools:
+      - onspring-vendor-management
+      - servicenow-grc
+      - archer-grc
+      - prevalent-vendor-risk
+related_controls:
+  - control_id: soc1-ra-financial-risk
+    relationship: supports
+    description: "Subservice organization risk is a component of the overall financial reporting risk assessment."
+  - control_id: soc1-ca-itgc-program
+    relationship: supports
+    description: "Subservice organization monitoring extends the ITGC program to third-party environments."
+  - control_id: soc1-ic-user-controls
+    relationship: supports
+    description: "Complementary user entity controls for subservice organizations are communicated through the system description."

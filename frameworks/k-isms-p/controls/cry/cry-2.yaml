@@ -1,0 +1,83 @@
+id: cry-2
+family: cry
+title: "Encryption of Personal Information"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    Personal information, including resident registration numbers, passport
+    numbers, driver's license numbers, financial account numbers, and
+    biometric data, shall be encrypted when stored in databases and when
+    transmitted over networks. Passwords shall be stored using one-way
+    encryption (hashing) with appropriate salting. The organization shall
+    implement encryption that meets or exceeds the standards prescribed by
+    the Korea Internet and Security Agency for personal information
+    protection.
+
+guidance:
+  prose: |
+    Korean regulations mandate encryption of specific categories of personal
+    information. Resident registration numbers (equivalent to social security
+    numbers) must always be encrypted at rest and in transit. KISA publishes
+    specific guidance on acceptable encryption algorithms and minimum key
+    lengths. Password storage must use approved hashing algorithms such as
+    bcrypt, scrypt, or PBKDF2 with sufficient iterations. Failure to encrypt
+    mandated personal information categories is a critical audit finding
+    that can result in certification denial.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 2.6 — Personal Information Encryption"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement column-level encryption for database fields containing
+      regulated personal information categories. Deploy application-level
+      encryption libraries that enforce the use of KISA-approved algorithms.
+      Configure database engines to enforce encryption at rest by default.
+      Implement field-level encryption for personal information in transit
+      between microservices, beyond transport-layer encryption.
+    tools:
+      - hashicorp-vault
+      - aws-kms
+      - postgresql-pgcrypto
+      - mongodb-csfle
+
+  devsecops:
+    prose: |
+      Implement automated detection of personal information fields that
+      lack encryption in database schemas. Scan application code to verify
+      that password storage uses approved hashing algorithms with proper
+      salting. Enforce encryption-at-rest policies for all data stores in
+      infrastructure-as-code definitions. Block deployments that create
+      unencrypted storage for personal information.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - checkov
+      - trivy
+
+  secops:
+    prose: |
+      Monitor for transmission of personal information over unencrypted
+      channels. Audit database configurations to verify encryption settings
+      remain active. Detect and alert on attempts to access personal
+      information through non-standard database interfaces that may bypass
+      encryption controls. Conduct periodic reviews of password hashing
+      implementations.
+    tools:
+      - splunk
+      - elastic-siem
+      - guardium
+      - wazuh
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a.8.24"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-28", "IA-5"]
+    relationship: mapped

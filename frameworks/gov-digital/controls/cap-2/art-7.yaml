@@ -1,0 +1,90 @@
+id: art-7
+family: cap-2
+title: "National Public Services Database"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 7º Os serviços públicos serão catalogados em base nacional de
+    serviços públicos, que conterá, no mínimo, as seguintes informações:
+    I — a descrição do serviço público;
+    II — os requisitos para a prestação e a utilização do serviço;
+    III — os documentos necessários para acessar o serviço;
+    IV — as etapas para processamento do serviço;
+    V — o prazo para a prestação do serviço;
+    VI — a forma de prestação do serviço, digital ou presencial;
+    VII — os canais de prestação do serviço;
+    VIII — a legislação que fundamenta a prestação do serviço.
+guidance:
+  prose: |
+    Article 7 mandates the creation and maintenance of a national public
+    services database. Every public service must be cataloged with eight
+    mandatory metadata fields.
+
+    **Mandatory catalog fields:**
+    1. Service description — clear, citizen-readable explanation
+    2. Requirements — eligibility criteria and prerequisites
+    3. Required documents — exhaustive list of needed documentation
+    4. Processing steps — step-by-step workflow visible to the citizen
+    5. Service deadline — maximum time to completion (SLA)
+    6. Delivery mode — digital, in-person, or hybrid
+    7. Service channels — all available channels listed
+    8. Legal basis — legislation authorizing the service
+
+    **Technical implications:**
+    - Requires a structured metadata schema covering all eight fields
+    - Must be machine-readable for integration with portals and apps
+    - Data must be kept current — stale catalog data violates the law
+    - The national database (currently servicos.gov.br) is the
+      authoritative source
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Service catalog infrastructure:**
+      1. Implement a service catalog API (REST/GraphQL) that exposes all
+         eight mandatory metadata fields for each public service.
+      2. Deploy a metadata validation layer that rejects service entries
+         missing any of the eight required fields.
+      3. Integrate the catalog with the gov.br portal to ensure
+         single-source-of-truth for service information.
+      4. Implement versioning for service catalog entries with change
+         history and audit trail.
+      5. Create webhook notifications for catalog changes to keep
+         downstream systems synchronized.
+    tools:
+      - service-catalog-api
+      - metadata-validator
+      - govbr-integration
+      - event-bus
+  devsecops:
+    prose: |
+      **Catalog completeness validation:**
+      1. Add automated tests that verify every new service deployment
+         has a corresponding catalog entry with all eight mandatory fields.
+      2. Implement schema validation for catalog entries as a CI/CD gate
+         — incomplete entries block deployment.
+      3. Generate catalog compliance reports as pipeline artifacts showing
+         field completeness and freshness.
+    tools:
+      - gitlab-ci
+      - schema-validator
+      - catalog-linter
+  secops:
+    prose: |
+      **Catalog governance and audit:**
+      1. Assign catalog ownership to each service team with mandatory
+         quarterly review of catalog accuracy.
+      2. Monitor catalog freshness — flag entries not updated within
+         the defined review cycle.
+      3. Audit catalog completeness monthly and report to the digital
+         transformation officer.
+      4. Cross-reference catalog entries against actual service
+         deployments to identify gaps.
+    tools:
+      - catalog-governance
+      - freshness-monitor
+      - compliance-reporting
+legal_references:
+  - framework_id: lai
+    articles: ["art-8"]
+    relationship: complements

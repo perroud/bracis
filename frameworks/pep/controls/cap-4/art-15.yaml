@@ -1,0 +1,112 @@
+id: art-15
+family: cap-4
+title: "Migracao de Midias e Preservacao Digital"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 15. A instituição de saúde deve manter programa de migração
+    de mídias e formatos que garanta a acessibilidade e a integridade
+    dos prontuários eletrônicos ao longo de todo o período de guarda.
+
+    Parágrafo 1. A migração de mídias deve ser realizada antes da
+    obsolescência do suporte físico (fitas, discos, mídias ópticas),
+    garantindo que os dados permaneçam acessíveis em mídias atuais.
+
+    Parágrafo 2. A migração de formatos deve ser realizada quando o
+    formato original se tornar obsoleto, convertendo para formatos
+    abertos e de longa duração, preservando a integridade e a
+    fidedignidade dos dados.
+
+    Parágrafo 3. Cada migração deve ser documentada, incluindo
+    formato/mídia de origem, formato/mídia de destino, data,
+    responsável e validação de integridade pós-migração.
+guidance:
+  prose: |
+    O art. 15 aborda o desafio mais critico do PEP: manter dados
+    acessiveis por 20+ anos em um cenario de evolucao tecnologica
+    constante.
+
+    **Exemplos de obsolescencia:**
+    - Fitas DAT/DLT dos anos 2000: leitoras ja nao sao fabricadas
+    - Disquetes: praticamente extintos
+    - CDs/DVDs: degradacao fisica (disc rot) apos 10-15 anos
+    - Formatos proprietarios de banco de dados: podem nao ser
+      lidos por versoes futuras do software
+
+    **Estrategia recomendada:**
+    - Formatos: adotar formatos abertos de longa duracao (PDF/A,
+      XML, JSON, DICOM, HL7 FHIR) que nao dependam de software
+      proprietario
+    - Midias: adotar cloud storage com replicacao geografica ou
+      storage enterprise com suporte de longo prazo
+    - Testar periodicamente a capacidade de leitura dos dados
+      mais antigos
+
+    **Verificacao de integridade pos-migracao:**
+    Apos cada migracao, comparar checksums (SHA-256) dos dados
+    originais e migrados. Para documentos assinados digitalmente,
+    verificar que a assinatura permanece valida apos migracao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Programa de preservacao digital:**
+      1. Adotar formatos abertos de longa duracao como padrao:
+         PDF/A-3 para documentos, DICOM para imagens medicas,
+         HL7 FHIR JSON/XML para dados clinicos estruturados.
+      2. Implementar verificacao periodica de integridade (checksum
+         SHA-256) automatizada para todo o acervo, com alerta
+         imediato para dados corrompidos.
+      3. Manter redundancia geografica: replicacao de dados em
+         pelo menos 2 datacenters ou regioes de cloud distintas.
+      4. Criar pipeline automatizado de migracao de formato:
+         deteccao de formato obsoleto -> conversao -> validacao
+         de integridade -> registro de migracao.
+      5. Testar semestralmente a capacidade de restauracao e
+         leitura dos dados mais antigos do acervo.
+    tools:
+      - digital-preservation
+      - checksum-validator
+      - geo-replication
+      - format-migration-pipeline
+  devsecops:
+    prose: |
+      **Validacao de migracao:**
+      1. Criar testes automatizados de migracao de formato que
+         comparem checksum antes e depois da conversao.
+      2. Validar que assinaturas digitais permanecem verificaveis
+         apos migracao de formato/midia.
+      3. Testar legibilidade de dados migrados: documentos devem
+         ser renderizados corretamente apos conversao de formato.
+      4. Implementar teste de regressao para pipeline de migracao
+         com amostras de formatos antigos.
+    tools:
+      - gitlab-ci
+      - checksum-comparison-tests
+      - signature-post-migration-tests
+      - format-rendering-tests
+  secops:
+    prose: |
+      **Governanca de preservacao digital:**
+      1. Criar politica de preservacao digital com ciclo de
+         revisao anual, definindo formatos aceitaveis, frequencia
+         de verificacao de integridade e criterios de migracao.
+      2. Manter inventario de formatos e midias em uso com datas
+         de obsolescencia projetadas e plano de migracao.
+      3. Documentar cada migracao realizada: origem, destino,
+         data, responsavel, resultado da validacao de integridade.
+      4. Designar responsavel pelo programa de preservacao digital
+         com reporte periodico a diretoria sobre riscos de
+         obsolescencia e estado do acervo.
+    tools:
+      - preservation-policy
+      - media-inventory
+      - migration-log
+      - risk-reporting
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.310-d"]
+    relationship: mapped

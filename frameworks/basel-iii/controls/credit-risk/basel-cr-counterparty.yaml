@@ -1,0 +1,106 @@
+id: basel-cr-counterparty
+family: credit-risk
+title: "Counterparty Credit Risk — Standardised Approach (SA-CCR)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must measure counterparty credit risk (CCR) exposures arising from over-the-counter
+    (OTC) derivatives, exchange-traded derivatives, and long-settlement transactions using
+    the Standardised Approach for Counterparty Credit Risk (SA-CCR). SA-CCR replaced the
+    Current Exposure Method (CEM) and the Standardised Method (SM) as the mandatory
+    non-internal model approach from January 2022 onwards. Under SA-CCR, the exposure at
+    default (EAD) for a netting set is calculated as alpha × (RC + PFE), where alpha = 1.4,
+    RC is the replacement cost (current mark-to-market value of the netting set, adjusted
+    for variation margin received or posted), and PFE is the potential future exposure
+    (calculated as an aggregated add-on for interest rate, FX, credit, equity, and
+    commodity derivatives within each netting set, applying maturity and supervisory
+    volatility factors). Banks using the Internal Model Method (IMM) for CCR must have
+    supervisory approval and are subject to a floor equal to 50% of the SA-CCR EAD.
+    Wrong-way risk — where credit quality of the counterparty is adversely correlated with
+    the exposure — must be identified and managed conservatively.
+
+guidance:
+  prose: >-
+    SA-CCR is significantly more risk-sensitive than its predecessor CEM, incorporating
+    the effects of netting, margining, and collateral more accurately. Banks with large
+    derivatives portfolios should invest in SA-CCR calculation infrastructure as an
+    operational capability, not merely a regulatory compliance exercise, since the EAD
+    measure directly affects credit line consumption, internal transfer pricing, and
+    capital planning. Key implementation challenges include: collecting accurate market
+    values and sensitivities for all OTC derivatives (including complex structured products);
+    correctly classifying derivatives into the five asset classes (IR, FX, credit, equity,
+    commodity); applying netting benefits consistent with the ISDA Master Agreement and
+    Credit Support Annex (CSA) terms; and computing effective notional amounts for amortising,
+    accreting, and variable-notional instruments. Banks operating under central clearing
+    obligations must also apply the SA-CCR-based trade exposure calculation to their
+    qualifying central counterparty (QCCP) cleared trades.
+
+references:
+  - citation: "BCBS, The standardised approach for measuring counterparty credit risk exposures, March 2014 (revised April 2014)"
+    url: "https://www.bis.org/publ/bcbs279.htm"
+  - citation: "BCBS, Calculation of RWA for counterparty credit risk (CRE50-CRE56), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/CRE/50.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a derivatives pricing and SA-CCR calculation engine integrated with front
+      office trading systems via real-time API feeds. The engine must support all five
+      SA-CCR asset classes, handle complex netting set structures (cross-product netting,
+      multi-CSA structures), and compute replacement cost using both cleared and non-cleared
+      derivatives valuations. Expose SA-CCR EAD at trade, netting set, counterparty, and
+      portfolio levels to Credit Risk Management, Treasury, and front office teams. Build
+      pre-deal credit line check functionality that computes the marginal SA-CCR impact of
+      a proposed new trade before execution. Archive daily SA-CCR snapshots for regulatory
+      reporting and back-testing.
+    tools:
+      - apache-kafka
+      - redis
+      - postgresql
+      - quantlib
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain SA-CCR calculation logic and supervisory factor tables (maturity buckets,
+      supervisory delta formulas, supervisory volatilities, supervisory correlation
+      parameters) as version-controlled code and configuration files. Implement automated
+      validation tests using the BCBS benchmark portfolios provided in the SA-CCR standard.
+      Build a regression test suite that compares SA-CCR EAD calculations against an
+      approved reference implementation for a representative derivatives portfolio after
+      every code change. Enforce four-eyes review for changes to supervisory factor tables
+      with mandatory sign-off from the Market Risk Quantitative team.
+    tools:
+      - gitlab-ci
+      - pytest
+      - sonarqube
+      - opa-conftest
+      - signed-commits
+
+  secops:
+    prose: >-
+      Protect derivatives pricing data and SA-CCR calculation parameters from unauthorised
+      modification. Implement controls to prevent individuals from adjusting counterparty
+      credit risk EAD calculations to appear within credit line limits. Enable alerting
+      when any counterparty exposure approaches or exceeds 10% of Tier 1 capital (the
+      large exposure limit under CRR Article 395). Log and monitor all access to netting
+      agreement and CSA documentation that underpins netting benefit claims.
+    tools:
+      - cyberark
+      - splunk
+      - hashicorp-vault
+      - sentinel
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AC-5"]
+    relationship: mapped
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12"]
+    relationship: supports

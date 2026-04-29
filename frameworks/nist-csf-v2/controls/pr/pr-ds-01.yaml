@@ -1,0 +1,87 @@
+id: pr.ds-01
+family: pr
+title: "Data Security - The confidentiality, integrity, and availability of data-at-rest are protected"
+class: CSF2
+
+statement:
+  prose: >-
+    The confidentiality, integrity, and availability of data-at-rest are protected.
+
+guidance:
+  prose: >-
+    Data at rest includes data stored in databases, file systems, object storage,
+    archives, backups, and removable media. Protection measures include encryption,
+    access controls, integrity verification, and secure deletion. Encryption must use
+    current, strong algorithms (AES-256 for symmetric, RSA-2048+ or ECDSA for asymmetric)
+    with proper key management. Access controls must enforce least privilege, ensuring
+    only authorized users and services can read, write, or delete data. Integrity
+    controls must detect unauthorized modifications. Data must be classified and
+    protection measures applied based on classification level. Backup and recovery
+    procedures must ensure data availability while maintaining confidentiality of
+    backup copies.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, PR.DS-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce encryption-at-rest for all storage services through platform policies.
+      Use cloud-provider managed encryption (AWS KMS, GCP KMS, Azure Key Vault) as
+      the default, with customer-managed keys (CMK) required for restricted data.
+      Implement Kubernetes encryption at rest for etcd secrets. Use sealed-secrets
+      or external-secrets-operator to manage Kubernetes secrets securely. Enforce
+      storage access policies through IAM roles and bucket/container policies with
+      least-privilege defaults. Implement data lifecycle policies that automatically
+      transition data to appropriate storage tiers and delete expired data. Use
+      immutable storage (S3 Object Lock, WORM) for audit logs and compliance data.
+    tools:
+      - aws-kms
+      - gcp-kms
+      - azure-key-vault
+      - hashicorp-vault
+      - sealed-secrets
+      - external-secrets-operator
+
+  devsecops:
+    prose: >-
+      Scan IaC code for storage resources created without encryption enabled. Use
+      Checkov and tfsec policies that fail pipelines creating unencrypted databases,
+      storage buckets, or EBS volumes. Implement secret detection to prevent data
+      leakage into source code. Enforce that database migration scripts do not store
+      sensitive data in plaintext columns. Scan test fixtures and seed data for
+      real PII that should be anonymized. Verify that backup configurations include
+      encryption settings.
+    tools:
+      - checkov
+      - tfsec
+      - gitlab-secret-detection
+      - trivy
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor for unencrypted data stores through cloud security posture management
+      (CSPM) tools. Alert on storage resources with public access or overly permissive
+      IAM policies. Implement DLP monitoring for data exfiltration attempts. Conduct
+      quarterly reviews of encryption key management practices. Verify backup
+      encryption and test restore procedures. Monitor access patterns to sensitive
+      data stores and alert on anomalous access volumes or timing.
+    tools:
+      - aws-securityhub
+      - gcp-security-command-center
+      - azure-defender
+      - prisma-cloud
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-28", "MP-4", "MP-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.10", "A8.24"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-3.1"]
+    relationship: equivalent-to

@@ -1,0 +1,89 @@
+id: cis-6.1
+family: cis-6
+title: "Establish an Access Granting Process"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and follow a process, preferably automated, for granting access to
+    enterprise assets upon new hire, rights grant, or role change of a user.
+
+guidance:
+  prose: >-
+    Access granting without a defined process leads to excessive permissions, privilege
+    creep, and inability to audit who approved what access. The process should implement
+    least privilege by default, granting only the minimum access necessary for a person
+    to perform their job function. Role-based access control (RBAC) models simplify
+    access granting by mapping job functions to predefined permission sets. All access
+    grants must be logged and attributable to an approver. Self-service access request
+    portals with approval workflows reduce friction while maintaining governance.
+    Time-limited access grants should be the default for elevated permissions.
+
+references:
+  - citation: "CIS Controls v8.1, Control 6, Safeguard 6.1"
+    url: "https://www.cisecurity.org/controls/v8"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement RBAC across all platform components using a centralized policy engine.
+      Define role templates that map to organizational functions (developer, SRE,
+      security engineer, auditor) with pre-approved permission sets. Use group-based
+      access control in the IdP and propagate group memberships to downstream systems
+      via SCIM. Implement Just-In-Time (JIT) access for privileged operations using
+      tools like HashiCorp Vault or Teleport, where elevated access is granted for
+      a limited duration and requires approval. Define access policies as code in Git
+      repositories, requiring pull request reviews from security or team leads before
+      changes to access policies are applied.
+    tools:
+      - okta
+      - keycloak
+      - hashicorp-vault
+      - teleport
+      - kubernetes-rbac
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement access-as-code where project and repository permissions are declared
+      in version-controlled configuration files. Use GitLab's CODEOWNERS files to
+      enforce approval requirements based on which files are modified. Automate
+      onboarding by provisioning repository access through merge requests to a
+      central access configuration repository. Implement branch protection rules
+      that enforce who can push to protected branches. Use pipeline-based approval
+      workflows for access changes, requiring security team review for any change
+      granting admin-level permissions.
+    tools:
+      - gitlab-groups
+      - gitlab-codeowners
+      - terraform-gitlab-provider
+      - atlantis
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor access granting events in the SIEM and alert on grants that bypass
+      the approved process. Implement continuous compliance monitoring that detects
+      access grants not matching approved RBAC models. Track all access request
+      tickets from submission through approval to provisioning, maintaining an
+      auditable chain. Generate monthly reports on access grants, highlighting
+      exceptions and emergency access events. Conduct quarterly access certification
+      campaigns requiring managers to review and recertify their team's access.
+    tools:
+      - sailpoint
+      - okta-governance
+      - splunk
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.18", "A8.2"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-01", "PR.AA-03", "PR.AA-05"]
+    relationship: implements

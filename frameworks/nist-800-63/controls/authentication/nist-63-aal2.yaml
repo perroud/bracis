@@ -1,0 +1,134 @@
+id: nist-63-aal2
+family: authentication
+title: "AAL2 — Authentication Assurance Level 2 (Multi-Factor)"
+class: SP800-63B
+
+baselines: [aal2, aal3, fal2, fal3]
+
+statement:
+  prose: >-
+    AAL2 provides high confidence that the claimant controls one or more
+    authenticators bound to the subscriber's account. Proof of possession and
+    control of two distinct authentication factors is required through secure
+    authentication protocol(s). Approved cryptographic techniques are required
+    at AAL2. At AAL2, the authentication shall be accomplished using any of the
+    following authenticator types: multi-factor OTP device, multi-factor
+    cryptographic software authenticator, multi-factor cryptographic hardware
+    authenticator, or a single-factor cryptographic hardware authenticator
+    combined with a memorized secret. For the combination approach, a single-factor
+    cryptographic software authenticator combined with a memorized secret is also
+    acceptable. Reauthentication shall occur at least once per 12 hours regardless
+    of user activity and at least once per 30 minutes of user inactivity.
+    Out-of-band authenticators (e.g., SMS OTP) are restricted at AAL2: PSTN
+    (SMS, PSTN voice) SHALL NOT be used, and the restricted authenticator
+    warning shall be communicated to users.
+
+guidance:
+  prose: >-
+    AAL2 is the most commonly required assurance level for federal agency
+    applications. Executive Order 14028 (May 2021) mandates that federal
+    agencies implement phishing-resistant MFA, which for most applications
+    means AAL2 with FIDO2/WebAuthn, PIV/CAC, or equivalent phishing-resistant
+    authenticators. NIST 800-63B explicitly deprecated SMS OTP as an AAL2
+    authenticator in favor of phishing-resistant methods. Organizations should
+    plan a migration path away from TOTP (time-based one-time passwords)
+    toward FIDO2 hardware keys or platform authenticators (Face ID, Windows
+    Hello, Touch ID). AAL2 session management is stricter than AAL1: the
+    12-hour absolute limit and 30-minute idle timeout must both be enforced.
+    Applications should use the combination of access token (15-minute lifetime)
+    and refresh token (12-hour lifetime) with mandatory reauthentication upon
+    refresh token expiry. The authentication context class reference (acr)
+    claim in OIDC tokens must reflect AAL2 to allow relying parties to enforce
+    the correct access policy.
+
+references:
+  - citation: "NIST SP 800-63B Section 4.2 — Authentication Assurance Level 2"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "NIST SP 800-63B Section 5.2.10 — Restricted Authenticators"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "Executive Order 14028 — Improving the Nation's Cybersecurity"
+    url: "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/"
+  - citation: "OMB Memorandum M-22-09 — Moving the U.S. Government Toward Zero Trust"
+    url: "https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf"
+
+related_controls:
+  - id: nist-63-aal1
+    relationship: extends
+    description: "AAL2 adds a second factor requirement to the AAL1 baseline."
+  - id: nist-63-authenticator-types
+    relationship: implements
+    description: "AAL2 restricts the permitted authenticator types compared to AAL1."
+  - id: nist-63-memorized-secrets
+    relationship: complements
+    description: "Memorized secrets may be used as one factor at AAL2 when combined with a cryptographic authenticator."
+  - id: nist-63-reauthentication
+    relationship: implements
+    description: "AAL2 requires more frequent reauthentication than AAL1 (12h absolute, 30m idle)."
+  - id: nist-63-verifier-requirements
+    relationship: complements
+    description: "AAL2 verifiers must implement phishing-resistant protocol requirements for cryptographic authenticators."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure the platform's identity provider (Keycloak, Okta, Azure AD,
+      Dex) to enforce MFA at enrollment and every subsequent authentication.
+      Implement the following authenticator priority order: FIDO2/WebAuthn
+      hardware security keys (highest preference), PIV/CAC smart cards for
+      government environments, platform authenticators (Touch ID, Face ID,
+      Windows Hello), TOTP apps (Authy, Google Authenticator) as a fallback,
+      and explicitly block SMS/PSTN OTP. Configure the IdP to set acr claims
+      to 'urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo' or the
+      platform's equivalent AAL2 acr value. Enforce the 12-hour absolute
+      session lifetime and 30-minute idle timeout at the IdP level, not just
+      the application level, to prevent token reuse. Implement MFA recovery
+      using pre-generated lookup secrets (recovery codes) stored securely by
+      the user. Deploy SSO for all platform services to reduce MFA friction
+      without reducing security — MFA once at SSO login covers all downstream
+      services within the session lifetime.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - dex
+      - vault
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce MFA checks in the GitLab group settings: require two-factor
+      authentication for all group members. Configure GitLab SAML/OIDC SSO
+      to require the AAL2 acr value before allowing access to the instance.
+      In CI/CD pipelines, use GitLab CI job tokens, deploy keys, or OIDC
+      federation (GitLab-to-cloud) instead of personal access tokens with
+      long lifetimes. Implement a pipeline gate that checks the authenticated
+      user's MFA enrollment status before allowing high-privilege operations
+      (e.g., production deployments, secrets rotation). Use GitLab approval
+      rules to require approval from MFA-enrolled users before merge.
+      Scan for service account tokens with unlimited lifetimes and flag them
+      as policy violations.
+    tools:
+      - gitlab-ci
+      - gitlab-saml-sso
+      - vault
+      - aws-iam
+      - gcp-workload-identity
+
+  secops:
+    prose: >-
+      Monitor MFA authentication events for bypass attempts: look for
+      authentication flows that complete without an MFA step, which may
+      indicate a configuration error or active attack. Alert on MFA fatigue
+      attacks (repeated push notification requests to exhaust the user into
+      approving). Implement MFA challenge rate limiting: after 5 failed MFA
+      attempts, lock the account and require administrator-assisted recovery.
+      Monitor for adversary-in-the-middle (AiTM) proxy attacks that steal
+      session cookies after MFA authentication — deploy conditional access
+      policies that bind sessions to device certificates or IP ranges to
+      mitigate. Track MFA adoption rates and generate weekly reports on
+      users who have not enrolled MFA, escalating to account managers.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - microsoft-defender-for-identity

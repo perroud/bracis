@@ -1,0 +1,83 @@
+id: oi-cc-03
+family: cc
+title: "Revogacao do Consentimento"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O cliente tem o direito de revogar o consentimento para compartilhamento de dados
+    a qualquer momento, de forma gratuita e facilitada.
+
+    A revogação deve poder ser realizada:
+    I - Na instituição transmissora, por meio de canal digital acessível;
+    II - Na instituição receptora, que deve propagar a revogação à transmissora;
+    III - De forma total (revogar todo o compartilhamento) ou parcial (revogar
+    categorias específicas de dados).
+
+    A revogação deve produzir efeitos imediatos:
+    I - Interromper o compartilhamento de dados em tempo real;
+    II - Invalidar tokens de acesso vinculados ao consentimento revogado;
+    III - Notificar a outra parte (transmissora ou receptora) sobre a revogação.
+
+    A facilitação da revogação é obrigatória: o processo de revogar não pode ser
+    mais complexo que o processo de consentir.
+guidance:
+  prose: |
+    O direito de revogacao e garantido pela LGPD (art. 8, par. 5) e pelo Codigo
+    de Defesa do Consumidor. O Open Insurance exige que esse direito seja
+    exercivel de forma digital, sem necessidade de contato telefonico ou presencial.
+
+    A propagacao de revogacao entre transmissora e receptora e um requisito tecnico
+    importante: se o cliente revoga na receptora, a transmissora deve ser notificada
+    para invalidar tokens; se revoga na transmissora, a receptora deve ser notificada
+    para cessar o uso dos dados.
+
+    A revogacao parcial permite granularidade -- por exemplo, o cliente pode manter
+    o compartilhamento de dados cadastrais mas revogar o compartilhamento de dados
+    de sinistros. Isso exige que o sistema de consentimentos suporte escopos
+    independentes.
+
+    O principio de simetria (revogar nao pode ser mais dificil que consentir) visa
+    prevenir "dark patterns" que dificultam a revogacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar API de revogacao de consentimento conforme especificacao do
+         Open Insurance.
+      2. Implementar propagacao assincrona de revogacao entre transmissora e receptora
+         (webhook ou polling).
+      3. Invalidar imediatamente todos os tokens de acesso vinculados ao consentimento
+         revogado (token revocation endpoint).
+      4. Suportar revogacao parcial com granularidade por categoria de dado.
+      5. Registrar evento de revogacao com timestamp, origem e escopo.
+    tools:
+      - consent-management
+      - oauth2-server
+      - webhook-service
+      - event-streaming
+  devsecops:
+    prose: |
+      1. Testes automatizados de revogacao: verificar que APIs param de retornar
+         dados imediatamente apos revogacao.
+      2. Testar propagacao entre transmissora e receptora.
+      3. Testar revogacao parcial -- verificar que dados nao revogados continuam
+         acessiveis.
+      4. Testar que tokens revogados sao rejeitados em todas as APIs.
+    tools:
+      - integration-testing
+      - e2e-testing
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar tempo de efetivacao de revogacoes (deve ser imediato).
+      2. Auditar que dados nao sao compartilhados apos revogacao.
+      3. Alertar se tokens revogados continuam sendo aceitos.
+    tools:
+      - consent-monitoring
+      - siem
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-8", "art-15", "art-18"]
+    relationship: complements

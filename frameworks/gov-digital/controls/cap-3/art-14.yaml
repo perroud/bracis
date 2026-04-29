@@ -1,0 +1,103 @@
+id: art-14
+family: cap-3
+title: "Single Sign-On for Government Services"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 14. A plataforma de governo digital deverá oferecer ao cidadão
+    a possibilidade de acesso a serviços públicos por meio de autenticação
+    única, com um único cadastro.
+
+    § 1º A autenticação única de que trata o caput permitirá ao cidadão
+    acessar serviços públicos digitais de diferentes órgãos e entidades
+    com as mesmas credenciais.
+
+    § 2º Os órgãos e as entidades da administração pública deverão
+    integrar seus sistemas de autenticação com a plataforma de governo
+    digital, de forma a possibilitar a autenticação única de que trata
+    o caput.
+guidance:
+  prose: |
+    Article 14 mandates a single sign-on (SSO) experience for citizens
+    accessing government digital services. One set of credentials must
+    provide access across all government agencies and entities.
+
+    **SSO requirements:**
+    - Citizens must be able to create a single account (gov.br) and use
+      it to access services from any government entity
+    - Government entities must integrate their systems with the gov.br
+      identity platform — maintaining separate authentication systems
+      is a legal violation
+    - The SSO must work across federal, state, and municipal levels
+      (though integration with subnational levels is still evolving)
+
+    **Technical implications:**
+    - Standardized identity protocol (OpenID Connect) must be used
+    - Session management must support cross-domain SSO
+    - Consent management must handle scope authorization per service
+    - Account linking must support migration from legacy systems
+
+    **Current implementation:**
+    The gov.br login (login.gov.br) implements this requirement using
+    OpenID Connect. Services integrate via OAuth 2.0 authorization
+    code flow with PKCE.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **SSO integration infrastructure:**
+      1. Implement OpenID Connect (OIDC) client integration with the
+         gov.br login service (login.gov.br) for all citizen-facing
+         government services.
+      2. Deploy centralized session management that supports cross-domain
+         SSO with secure token propagation between services.
+      3. Implement a consent management layer that allows citizens to
+         control which services can access which identity attributes.
+      4. Create an account migration toolkit for transitioning users
+         from legacy authentication systems to gov.br SSO.
+      5. Deploy monitoring for SSO health: login success rate, session
+         duration, cross-service navigation success.
+    tools:
+      - oidc-client
+      - session-management
+      - consent-manager
+      - account-migration
+  devsecops:
+    prose: |
+      **SSO compliance pipeline:**
+      1. Implement automated tests for gov.br OIDC integration including
+         authorization code flow, token refresh, and logout.
+      2. Validate that no citizen-facing service maintains its own
+         authentication system outside of gov.br SSO.
+      3. Test cross-service SSO flows to verify seamless navigation
+         between services without re-authentication.
+      4. Scan for hardcoded credentials or local authentication bypasses
+         that circumvent the SSO mandate.
+    tools:
+      - gitlab-ci
+      - oidc-testing
+      - sso-validator
+      - credential-scanner
+  secops:
+    prose: |
+      **SSO governance and monitoring:**
+      1. Inventory all government digital services and track their
+         gov.br SSO integration status (integrated, in progress, pending).
+      2. Monitor SSO authentication events for security anomalies:
+         brute force attempts, credential stuffing, session hijacking.
+      3. Audit consent grants to ensure citizens are informed about
+         data sharing between services.
+      4. Track SSO adoption metrics: percentage of services integrated,
+         citizen adoption rate, cross-service usage patterns.
+    tools:
+      - sso-inventory
+      - security-monitoring
+      - consent-audit
+      - adoption-analytics
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-18"]
+    relationship: complements
+  - framework_id: icp-brasil
+    articles: ["art-1"]
+    relationship: implements

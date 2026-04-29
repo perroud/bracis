@@ -1,0 +1,99 @@
+id: pix-27
+family: ux-qrcode
+title: "Padroes de QR Code e Pix Copia e Cola"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP deve implementar a geração e leitura de QR Codes conforme padrão definido
+    pelo BCB (baseado no EMVCo), incluindo QR Code estático, QR Code dinâmico e Pix
+    Copia e Cola. A geração deve seguir estritamente o payload definido na especificação
+    técnica, com validação de integridade (CRC16) e proteção contra adulteração. O PSP
+    deve garantir que o usuário visualize os dados do pagamento extraídos do QR Code
+    antes de confirmar a transação.
+guidance:
+  prose: |
+    **Tipos de QR Code no Pix:**
+
+    1. **QR Code estatico:**
+       - Gerado uma vez, reutilizavel para multiplas transacoes.
+       - Pode conter valor fixo ou permitir que o pagador informe o valor.
+       - Uso tipico: estabelecimentos comerciais, prestadores de servico.
+       - Payload inclui: chave Pix, nome do recebedor, cidade, valor (opcional).
+
+    2. **QR Code dinamico:**
+       - Gerado para cada transacao individual.
+       - Contem informacoes especificas: valor, identificador unico, data de vencimento.
+       - Dois subtipos:
+         a) Pagamento imediato: sem vencimento, para uso instantaneo.
+         b) Cobranca com vencimento: inclui data de vencimento, juros, multa, desconto.
+       - URL de payload: QR Code aponta para URL que retorna os dados da cobranca.
+
+    3. **Pix Copia e Cola:**
+       - Representacao textual (string) do payload do QR Code.
+       - Usado quando camera nao esta disponivel (ex: pagamento via desktop).
+       - Mesmo payload do QR Code em formato de texto copiavel.
+
+    **Seguranca do QR Code:**
+    - CRC16 no payload para detectar adulteracao.
+    - HTTPS obrigatorio para URL de payload de QR Code dinamico.
+    - Validacao de certificado TLS do servidor que hospeda o payload.
+    - Exibicao dos dados ao pagador antes da confirmacao (anti-phishing).
+
+    **Risco de QR Code falso:**
+    Atacante pode gerar QR Code com dados proprios e sobrepor em QR Code legitimo.
+    O PSP deve educar o usuario a conferir os dados antes de confirmar.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Geracao de QR Code:**
+      1. Biblioteca certificada para geracao de QR Code conforme padrao EMVCo/BCB.
+      2. Calculo de CRC16 integrado ao payload para deteccao de adulteracao.
+      3. Servidor HTTPS para hospedagem de payloads de QR Code dinamico.
+      4. Certificado TLS valido e monitorado para o servidor de payload.
+
+      **Leitura de QR Code:**
+      5. Parser de payload conforme especificacao BCB com validacao de CRC16.
+      6. Rejeicao de payloads com CRC invalido ou campos obrigatorios ausentes.
+      7. Resolucao de URL de QR Code dinamico com validacao de certificado TLS.
+      8. Cache de payload com TTL curto para evitar chamadas duplicadas.
+
+      **Pix Copia e Cola:**
+      9. Funcionalidade de colagem e parse do payload textual.
+      10. Mesma validacao aplicada a QR Code e a Pix Copia e Cola.
+    tools:
+      - qr-code-library
+      - web-server
+      - cert-manager
+      - api-gateway
+  devsecops:
+    prose: |
+      **Testes de QR Code:**
+      1. Testes com payloads validos e invalidos (CRC adulterado, campos faltantes).
+      2. Testes de QR Code estatico e dinamico com todas as combinacoes de campos.
+      3. Testes de Pix Copia e Cola: colagem de strings validas e invalidas.
+      4. Testes de seguranca: URL de payload com certificado invalido ou expirado.
+      5. Testes de acessibilidade: QR Code legivel em diferentes tamanhos e contrastes.
+    tools:
+      - gitlab-ci
+      - qr-code-testing
+      - security-testing
+      - accessibility-testing
+  secops:
+    prose: |
+      **Monitoramento de QR Code:**
+      1. Monitoramento de URLs de payload para detectar indisponibilidade ou comprometimento.
+      2. Alerta para volume anomalo de QR Codes dinamicos gerados.
+      3. Monitoramento de denuncias de QR Code falso.
+      4. Educacao do usuario sobre verificacao de dados antes de confirmar.
+    tools:
+      - url-monitoring
+      - siem
+      - customer-education
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-26", "art-27"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: complements

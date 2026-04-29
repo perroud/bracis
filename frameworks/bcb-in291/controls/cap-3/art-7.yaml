@@ -1,0 +1,144 @@
+id: art-7
+family: cap-3
+title: "Conteudo Obrigatorio da Notificacao Inicial"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 7. A notificação inicial ao BCB deve conter, no mínimo, as seguintes
+    informações:
+
+    I - identificação da instituição notificante, incluindo razão social, CNPJ,
+    tipo de instituição e dados do responsável pela notificação;
+    II - data e hora da detecção do incidente, com indicação do fuso horário;
+    III - descrição sucinta do tipo de incidente, conforme categorias do art. 2;
+    IV - classificação preliminar de severidade, conforme critérios do art. 3;
+    V - sistemas, infraestruturas e dados afetados ou potencialmente afetados;
+    VI - medidas imediatas de contenção já adotadas;
+    VII - estimativa preliminar do número de clientes e contrapartes afetados;
+    VIII - indicação se o incidente envolve prestadores de serviços terceirizados;
+    IX - indicação de outras autoridades já notificadas ou que serão notificadas,
+    incluindo ANPD, Polícia Federal e CVM, quando aplicável.
+guidance:
+  prose: |
+    O art. 7 especifica os nove elementos obrigatorios da notificacao inicial,
+    adaptando o art. 4 da Resolucao Conjunta 2/2020 com maior granularidade.
+
+    **Inciso I - Identificacao da instituicao:**
+    O responsavel pela notificacao deve ser o CISO ou diretor de compliance,
+    com poderes formais delegados pela diretoria. A delegacao deve estar
+    documentada e disponivel para o BCB. Nao e recomendado que analistas
+    operacionais assinem notificacoes ao BCB sem validacao de nivel superior.
+
+    **Inciso II - Timestamp preciso:**
+    Fuso horario de Brasilia (BRT/BRST) e o padrao. Para incidentes em sistemas
+    com logs em UTC, a conversao deve ser explicitamente documentada. Discrepancias
+    de timestamp entre sistemas diferentes devem ser anotadas.
+
+    **Inciso III - Tipo de incidente:**
+    Referenciar explicitamente os incisos do art. 2. Um incidente pode se enquadrar
+    em multiplas categorias: listar todas. Evitar terminologia tecnica que o BCB
+    possa nao reconhecer; traduzir para a taxonomia normativa.
+
+    **Inciso IV - Severidade preliminar:**
+    "Preliminar" e palavra-chave: o BCB entende que a classificacao pode mudar.
+    Mas a justificativa da classificacao preliminar deve ser fornecida com base
+    nos criterios do art. 3, nao por intuicao.
+
+    **Inciso V - Sistemas afetados:**
+    Nivel de detalhe esperado:
+    - Nome funcional do sistema (ex: "plataforma de internet banking")
+    - Tipo de dado hospedado (ex: "dados cadastrais de clientes PF")
+    - Localizacao (ex: "cloud AWS sa-east-1")
+    - Se integra infraestrutura critica SFN (ex: "integrado ao PIX via API BCB")
+
+    **Inciso VI - Medidas de contencao:**
+    O que JA foi feito (passado), nao o que sera feito. Ex: "isolamento de rede
+    do servidor comprometido executado as 14h30", "bloqueio de conta privilegiada
+    comprometida as 15h00". Evidenciar que a instituicao ja reagiu.
+
+    **Inciso VIII - Terceiros:**
+    Nome do prestador, tipo de servico afetado, se ja foi notificado do incidente,
+    e se ha SLA de comunicacao em vigor.
+
+    **Inciso IX - Outras autoridades:**
+    Notificacoes cumulativas comuns:
+    - ANPD: dados pessoais comprometidos (LGPD art. 48)
+    - Policia Federal: crimes ciberneticos
+    - CVM: impacto em mercado de valores
+    - SUSEP: seguradoras
+    - BC de outros paises: incidentes transnacionais
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Formulario estruturado de notificacao:**
+      1. Sistema de notificacao ao BCB com nove secoes correspondentes aos
+         nove incisos do art. 7, com validacao de completude:
+         - Campos obrigatorios para incisos I a VI
+         - Campo de justificativa obrigatoria quando inciso VII e "desconhecido"
+         - Toggle para indicar terceiros (inciso VIII) com sub-formulario
+         - Multi-select de outras autoridades (inciso IX)
+      2. Pre-preenchimento automatico de dados persistentes:
+         - Inciso I: dados da instituicao carregados do cadastro
+         - Inciso II: timestamp do alerta original do SIEM
+         - Inciso V: sistemas afetados extraidos do CMDB
+      3. Workflow de aprovacao integrado:
+         Analista cria rascunho -> CISO revisa -> Compliance aprova -> Diretoria
+         autoriza -> Sistema envia e registra numero de protocolo BCB.
+      4. Exportacao automatica do numero de protocolo e resposta do BCB para
+         registro no sistema de incidentes.
+    tools:
+      - incident-management
+      - grc-platform
+      - notification-system
+      - cmdb
+      - siem
+  devsecops:
+    prose: |
+      **Dados para o formulario gerados automaticamente:**
+      1. API que retorna dados do CMDB para um sistema afetado:
+         nome, tipo, classificacao de dados, integracao com SFN, localizacao.
+      2. Relatorio automatico de impacto de disponibilidade:
+         porcentagem de downtime, SLO violation, numero de requisicoes falhas.
+      3. Log de deploys recentes para correlacionar com o inicio do incidente
+         (dado relevante para inciso III - tipo de incidente).
+      4. Catalogo de dados atualizado por IaC para que inciso V possa ser
+         preenchido com precisao sobre tipos de dados afetados.
+    tools:
+      - cmdb
+      - service-catalog
+      - metrics-platform
+      - data-catalog
+      - gitlab-ci
+  secops:
+    prose: |
+      **Processo de preenchimento e qualidade:**
+      1. Analista de plantao treinado para preencher todos os nove incisos em
+         qualquer hora do dia, incluindo fins de semana e feriados.
+      2. Revisao de qualidade pelo CISO focada em:
+         - Consistencia entre incisos (ex: severidade declarada em IV deve ser
+           consistente com sistemas afetados em V)
+         - Linguagem regulatoria correta (usar termos da IN, nao jargao tecnico)
+         - Evitar especulacoes (separar fatos confirmados de suspeitas)
+      3. Arquivo imutavel de todas as notificacoes enviadas (PDF + metadados),
+         com numero de protocolo do BCB e timestamp de envio.
+      4. Procedimento para correcao de notificacao ja enviada:
+         protocolo de envio de aditamento ao BCB com explicacao da correcao.
+    tools:
+      - incident-management
+      - grc-platform
+      - document-management
+      - communication-tools
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-4"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26", "A.6.8"]
+    relationship: supports

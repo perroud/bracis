@@ -1,0 +1,76 @@
+id: art-14
+family: cap-3
+title: "Revisao Periodica de Acessos"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 14. Os órgãos e entidades devem realizar revisão periódica dos direitos
+    de acesso concedidos, observando:
+
+    I - periodicidade mínima semestral para acessos a sistemas críticos;
+    II - periodicidade mínima anual para demais sistemas;
+    III - revogação imediata de acessos de servidores desligados, cedidos ou
+    exonerados;
+    IV - documentação e registro das revisões realizadas.
+guidance:
+  prose: |
+    O art. 14 estabelece periodicidade obrigatoria de revisao de acessos:
+    semestral para criticos, anual para demais.
+
+    **Cronograma obrigatorio:**
+    - Sistemas criticos: revisao a cada 6 meses
+    - Demais sistemas: revisao anual
+    - Desligamento: revogacao imediata (SLA: 24h)
+    - Mudanca de funcao: revisao na data da mudanca
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.5.18 (Access rights - review)
+    - NIST 800-53 rev5: AC-2(3) (Disable Accounts)
+    - CIS Controls v8: 5.3 (Disable Dormant Accounts)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Recertificacao automatizada:**
+      1. Campanha de recertificacao automatica via IdP/IGA
+         (SailPoint, Saviynt, Okta Governance).
+      2. Integracao com SIAPE: ao detectar desligamento, trigger de revogacao.
+      3. Workflow: gestor recebe lista de acessos de sua equipe -> confirma/revoga.
+      4. Acessos nao confirmados sao revogados automaticamente apos 15 dias.
+    tools:
+      - iga-platform
+      - recertification-engine
+      - hr-integration
+      - auto-revocation
+  devsecops:
+    prose: |
+      **Revisao em repositorios:**
+      1. Script automatico que lista memberships de projetos inativos (90+ dias sem commit).
+      2. Alerta para access tokens proximos de expirar ou expirados.
+      3. Limpeza automatica de deploy keys nao utilizadas.
+      4. Relatorio mensal de acesso a protected branches/environments.
+    tools:
+      - membership-audit
+      - token-expiry-monitor
+      - deploy-key-cleanup
+  secops:
+    prose: |
+      **Processo de revisao:**
+      1. Calendario de recertificacao: jan/jul para criticos, jul para demais.
+      2. Dashboard de compliance: % de revisoes completadas no prazo.
+      3. Escalacao automatica para revisoes atrasadas.
+      4. Evidencias de revisao armazenadas para auditoria (screenshots, logs).
+    tools:
+      - recertification-calendar
+      - compliance-dashboard
+      - escalation-engine
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.18"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2(3)", "AC-2(4)"]
+    relationship: mapped

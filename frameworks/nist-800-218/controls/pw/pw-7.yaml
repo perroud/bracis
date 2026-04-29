@@ -1,0 +1,83 @@
+id: pw-7
+family: pw
+title: "Review and/or Analyze Human-Readable Code"
+class: SP800-218
+statement:
+  prose: >-
+    Help identify vulnerabilities so that they can be corrected before the software is released
+    to prevent exploitation. Review and/or analyze all human-readable code (source code,
+    scripts, infrastructure-as-code) using a combination of manual review and automated analysis.
+  parts:
+    - id: pw-7_smt.a
+      label: "a."
+      prose: >-
+        Perform peer code reviews for all changes, with enhanced security-focused review for
+        security-sensitive components including authentication, authorization, cryptography,
+        input handling, and data protection.
+    - id: pw-7_smt.b
+      label: "b."
+      prose: >-
+        Use automated static analysis tools (SAST) to analyze source code for security
+        vulnerabilities, and integrate these tools into the development workflow so that
+        findings are available to developers promptly.
+    - id: pw-7_smt.c
+      label: "c."
+      prose: >-
+        Analyze infrastructure-as-code, configuration files, and deployment scripts for security
+        misconfigurations using specialized scanning tools.
+guidance:
+  prose: >-
+    Code review and analysis combine human judgment with automated tooling to identify security
+    vulnerabilities. Manual code review catches logic flaws, design issues, and context-specific
+    vulnerabilities that automated tools may miss, while SAST tools consistently check for
+    known vulnerability patterns at scale. Both approaches are complementary and should be used
+    together. Security-focused review should be required for high-risk code paths, and reviewers
+    should have security training relevant to the technologies in use. Infrastructure-as-code
+    should be reviewed with the same rigor as application code, as misconfigurations can expose
+    critical infrastructure.
+references:
+  - citation: "NIST SP 800-218 Section 2.3"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "OWASP Code Review Guide"
+    url: "https://owasp.org/www-project-code-review-guide/"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure platform-wide SAST scanning that runs automatically on all repositories.
+      Provide standardized code review checklists that include security considerations. Enforce
+      minimum reviewer requirements through platform policies, with additional security reviewer
+      requirements for security-sensitive paths. Aggregate SAST findings across the platform
+      into a centralized dashboard for visibility and prioritization.
+    tools:
+      - "Semgrep (SAST)"
+      - "SonarQube / SonarCloud"
+      - "GitLab Code Quality"
+      - "Backstage Scorecards"
+      - "Checkov / tfsec (IaC)"
+  devsecops:
+    prose: >-
+      Integrate SAST scanning as a mandatory CI/CD pipeline stage for every merge request.
+      Configure CODEOWNERS to require security team review for changes to security-sensitive
+      files and directories. Implement IaC scanning (Checkov, tfsec, KICS) for Terraform,
+      Kubernetes manifests, and Dockerfiles. Enable inline SAST feedback in merge requests so
+      developers see findings in context. Configure severity-based pipeline gates that block
+      merges for critical and high findings.
+    tools:
+      - "Semgrep / CodeQL (SAST)"
+      - "GitLab SAST / GitHub CodeQL"
+      - "Checkov / tfsec / KICS (IaC)"
+      - "Hadolint (Dockerfile)"
+      - "GitLab Merge Request Approvals"
+      - "GitHub CODEOWNERS"
+  secops:
+    prose: >-
+      Monitor code review and SAST metrics across the organization, including review coverage,
+      finding rates, and remediation timelines. Identify projects that consistently produce
+      high volumes of security findings for targeted intervention. Conduct periodic sample
+      audits of code reviews to verify that security considerations are being addressed. Track
+      false positive rates to optimize SAST rule configurations.
+    tools:
+      - "DefectDojo"
+      - "GitLab Security Dashboard"
+      - "SonarQube (centralized)"
+      - "SIEM (Splunk, Elastic Security)"

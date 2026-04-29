@@ -1,0 +1,105 @@
+id: sec-18
+family: collection
+title: "Purpose Limitation Obligation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    An organisation shall not use or disclose personal data about an individual for
+    a purpose other than —
+    (a) the purpose for which the personal data was collected; or
+    (b) a purpose directly related to the purpose referred to in paragraph (a),
+
+    unless the individual has given consent, or is deemed to have given consent, for
+    the use or disclosure of the personal data for that other purpose.
+
+guidance:
+  prose: |
+    Section 18 establishes the purpose limitation obligation — personal data may only
+    be used or disclosed for the purpose it was collected for, or a directly related
+    purpose. Any other use requires fresh consent.
+
+    Key considerations:
+
+    1. **Directly related purpose:** The PDPC has clarified that a "directly related"
+       purpose must have a close and substantive connection to the original collection
+       purpose. A tenuous or tangential connection is insufficient.
+
+    2. **Secondary use:** If an organization wishes to use data for a purpose that is
+       neither the original purpose nor directly related, it must obtain new consent
+       (express or deemed under Section 15A notification).
+
+    3. **Practical impact:** Organizations must maintain clear records of the original
+       collection purpose for each dataset to assess whether new uses are permissible.
+
+    This obligation is similar to GDPR's purpose limitation principle (Article 5(1)(b))
+    but the PDPA's "directly related" test is arguably more flexible than the GDPR's
+    "compatible purpose" test.
+
+references:
+  - citation: "PDPA 2012, Section 18"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement purpose tagging on all data stores — each personal data record
+         or dataset carries metadata indicating its collection purpose.
+      2. Build purpose-based access controls that restrict data access to processing
+         activities aligned with the tagged purpose.
+      3. Create a purpose compatibility assessment workflow — when a new use case
+         arises, it must pass a "directly related" assessment before proceeding.
+      4. Implement data access request forms that require purpose justification,
+         validated against the data's original collection purpose.
+      5. Build purpose lineage tracking that shows how data flows between systems
+         and whether each use aligns with the original or a directly related purpose.
+    tools:
+      - opa
+      - open-policy-agent
+      - datahub
+      - data-lineage
+      - backstage
+      - consent-management-platform
+
+  devsecops:
+    prose: |
+      1. Implement static analysis rules that detect data access operations without
+         purpose verification.
+      2. Create automated tests that verify data is not used in contexts outside its
+         tagged purpose.
+      3. Scan for data copies or ETL pipelines that move personal data to new
+         systems without purpose alignment documentation.
+      4. Validate that analytics and ML pipelines using personal data have documented
+         purpose compatibility assessments.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - data-lineage-scanner
+      - custom-purpose-validators
+
+  secops:
+    prose: |
+      1. Monitor data access patterns for purpose drift — detect when data is
+         accessed by services or users outside the expected purpose.
+      2. Audit purpose compatibility assessments quarterly.
+      3. Investigate anomalous data access patterns that may indicate unauthorized
+         secondary use.
+      4. Generate reports on purpose limitation compliance across all data
+         processing activities.
+    tools:
+      - siem
+      - data-access-monitoring
+      - compliance-dashboard
+      - anomaly-detection
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.4.2"]
+    relationship: supports

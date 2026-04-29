@@ -1,0 +1,98 @@
+id: pix-05
+family: seg-spi
+title: "Criptografia de Mensagens no SPI"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Todas as mensagens trafegadas no SPI devem ser criptografadas utilizando protocolos
+    aprovados pelo Banco Central do Brasil. A comunicação entre participantes e o SPI
+    ocorre exclusivamente pela RSFN (Rede do Sistema Financeiro Nacional), com uso
+    obrigatório de TLS (Transport Layer Security) em versão igual ou superior a 1.2,
+    garantindo confidencialidade e integridade das mensagens de pagamento em trânsito.
+guidance:
+  prose: |
+    **Requisitos de criptografia:**
+    A comunicacao com o SPI exige dupla camada de protecao:
+    1. **Criptografia de transporte (TLS):** Canal seguro via RSFN com TLS 1.2+.
+       O BCB recomenda TLS 1.3 para novos participantes.
+    2. **Criptografia de mensagem (XML Encryption):** O conteudo das mensagens ISO 20022
+       e criptografado com chaves do participante e do BCB.
+
+    **Algoritmos aceitos:**
+    - Criptografia simetrica: AES-256
+    - Criptografia assimetrica: RSA-2048 ou superior, ECDSA
+    - Hash: SHA-256 ou superior
+    - Protocolo: TLS 1.2 com cipher suites aprovadas pelo BCB, preferencialmente TLS 1.3
+
+    **RSFN como unico canal:**
+    O SPI nao aceita conexoes via Internet publica. Toda comunicacao ocorre pela RSFN,
+    rede privada do Sistema Financeiro Nacional, com controle de acesso por certificado
+    digital ICP-Brasil.
+
+    **Implicacao pratica:**
+    Participantes devem configurar seus gateways de mensageria para suportar exclusivamente
+    os protocolos e algoritmos aprovados. Cipher suites fracas devem ser desabilitadas.
+    A rotacao de chaves criptograficas deve seguir o calendario definido pelo BCB.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **TLS e criptografia de transporte:**
+      1. Configurar TLS 1.3 como versao preferencial em todos os endpoints RSFN.
+      2. Desabilitar TLS 1.0, TLS 1.1 e cipher suites inseguras (RC4, 3DES, NULL).
+      3. Configurar Perfect Forward Secrecy (PFS) com ECDHE.
+      4. Monitorar expiracao de certificados TLS com alertas antecipados (30, 15, 7 dias).
+
+      **Criptografia de mensagens:**
+      5. Implementar XML Encryption conforme especificacao do BCB para mensagens ISO 20022.
+      6. Armazenar chaves privadas em HSM (Hardware Security Module) certificado.
+      7. Rotacao automatica de chaves criptograficas conforme politica do BCB.
+      8. Key escrow com backup seguro e processo de recuperacao documentado.
+
+      **Criptografia em repouso:**
+      9. AES-256 para todos os dados de transacao Pix armazenados.
+      10. Criptografia de banco de dados (TDE) para tabelas com dados de pagamento.
+      11. Criptografia de backups com chaves independentes das de producao.
+    tools:
+      - hsm
+      - vault
+      - cert-manager
+      - kms
+      - tls-termination
+  devsecops:
+    prose: |
+      **Validacao criptografica no pipeline:**
+      1. Testes automatizados de TLS: verificar versao, cipher suite e certificado.
+      2. Validacao de assinatura e criptografia de mensagens ISO 20022 em testes de integracao.
+      3. SAST rules para detectar uso de algoritmos criptograficos fracos no codigo.
+      4. Secret scanning para prevenir vazamento de chaves criptograficas no repositorio.
+      5. Linting de configuracao TLS em arquivos de infraestrutura (IaC).
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - testssl
+      - checkov
+      - semgrep
+  secops:
+    prose: |
+      **Monitoramento criptografico:**
+      1. Monitoramento de cipher suites em uso nos endpoints RSFN.
+      2. Alerta para tentativas de downgrade de TLS.
+      3. Auditoria periodica de configuracao criptografica (trimestral).
+      4. Inventario de chaves criptograficas com lifecycle management.
+      5. Scan de vulnerabilidades criptograficas (POODLE, BEAST, Heartbleed, ROBOT).
+    tools:
+      - ssl-scanner
+      - siem
+      - key-management
+      - vulnerability-scanner
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-9", "art-10"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-3", "art-7"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-3", "art-7"]
+    relationship: complements

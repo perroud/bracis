@@ -1,0 +1,126 @@
+id: rec-3
+family: prescricao
+title: "Prescriber Identity Verification and Professional Registry"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 5.º O sistema de prescrição eletrônica deve validar a identidade
+    e a habilitação do prescritor previamente à emissão de cada receita,
+    mediante:
+
+    I — verificação do registro profissional ativo junto ao respectivo
+    conselho (CRM, CRO, CRMV ou outro conselho com competência prescritiva),
+    por meio de consulta em tempo real ou atualização periódica não superior
+    a 24 horas;
+
+    II — confirmação de que o prescritor não possui impedimento, suspensão
+    ou cassação do exercício profissional;
+
+    III — validação do certificado digital ICP-Brasil do prescritor,
+    vinculado ao respectivo número de registro profissional;
+
+    IV — registro da especialidade médica ou habilitação profissional,
+    quando exigido para a prescrição de determinados medicamentos.
+
+    Parágrafo único. É vedada a emissão de prescrição eletrônica por
+    profissional cujo registro esteja inativo, suspenso ou cassado, cabendo
+    ao sistema bloquear automaticamente a tentativa.
+guidance:
+  prose: |
+    Article 5 mandates real-time or near-real-time verification of prescriber
+    credentials before any electronic prescription can be issued.
+
+    **Verification requirements:**
+    - Active professional registry with the corresponding council (CRM for
+      physicians, CRO for dentists, CRMV for veterinarians)
+    - No active suspensions, revocations, or impediments
+    - Valid ICP-Brasil digital certificate linked to the registry number
+    - Specialty or qualification verification for restricted medications
+
+    **Validation frequency:**
+    The regulation allows two approaches: real-time API consultation with the
+    professional council, or cached validation with maximum staleness of
+    24 hours. Real-time validation is preferred for controlled substances.
+
+    **Automatic blocking:**
+    Systems must automatically prevent prescription issuance when the
+    prescriber's status is inactive, suspended, or revoked. This is not
+    an advisory — it is a hard block.
+
+    **Professional councils covered:**
+    - CRM (Conselho Regional de Medicina) — physicians
+    - CRO (Conselho Regional de Odontologia) — dentists
+    - CRMV (Conselho Regional de Medicina Veterinaria) — veterinarians
+    - CRF (Conselho Regional de Farmacia) — pharmacists (limited scope)
+    - COREN (Conselho Regional de Enfermagem) — nurses (limited scope)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Prescriber validation infrastructure:**
+      1. Implement a prescriber registry cache service that synchronizes
+         with CRM, CRO, CRMV APIs at least every 24 hours, storing
+         registration status, specialty, and impediment flags.
+      2. Deploy a prescriber validation middleware that intercepts all
+         prescription creation requests and verifies registry status
+         before allowing the transaction to proceed.
+      3. Implement circuit breaker patterns for professional council
+         API integrations to ensure graceful degradation when external
+         services are unavailable (fall back to cached data within
+         the 24-hour window).
+      4. Maintain an ICP-Brasil certificate validation service that
+         cross-references the certificate subject CN with the
+         prescriber's professional registry number.
+      5. Deploy a prescriber block list with real-time propagation
+         to all prescription endpoints when a suspension or revocation
+         is detected.
+    tools:
+      - redis
+      - api-gateway
+      - circuit-breaker
+      - resilience4j
+      - icp-brasil-sdk
+      - certificate-validation
+  devsecops:
+    prose: |
+      **Prescriber validation testing:**
+      1. Create integration tests simulating all prescriber status
+         scenarios (active, inactive, suspended, revoked) and verify
+         correct blocking behavior for each.
+      2. Implement chaos engineering tests that simulate professional
+         council API failures and verify fallback to cached data.
+      3. Add security tests verifying that prescriber validation
+         cannot be bypassed through API manipulation or direct
+         database access.
+      4. Deploy contract tests for each professional council API
+         integration to detect breaking changes early.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - litmus
+      - contract-testing
+      - security-testing
+  secops:
+    prose: |
+      **Prescriber credential monitoring:**
+      1. Monitor prescriber validation failure rates and alert on
+         spikes that may indicate integration issues or credential
+         problems.
+      2. Audit prescriber registry cache freshness daily, ensuring
+         no cached records exceed the 24-hour staleness threshold.
+      3. Generate monthly reports on blocked prescription attempts
+         due to prescriber credential issues, categorized by reason.
+      4. Coordinate with professional councils on bulk status change
+         notifications for proactive cache updates.
+    tools:
+      - siem
+      - monitoring-dashboard
+      - alerting
+      - audit-logging
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-1", "art-6"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-5"]
+    relationship: complements

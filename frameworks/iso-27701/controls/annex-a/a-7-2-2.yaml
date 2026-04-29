@@ -1,0 +1,113 @@
+id: a-7.2.2
+family: annex-a
+title: "Identify lawful basis"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall determine, for each identified processing purpose, the
+    applicable lawful basis for the processing of PII as required by applicable
+    legislation and/or regulation. The organization shall document the lawful basis
+    for each processing activity and ensure that the chosen lawful basis is appropriate
+    for the specific processing purpose, the categories of PII processed, and the
+    categories of PII principals involved. Where consent is relied upon as the lawful
+    basis, the organization shall implement mechanisms to obtain, record, and manage
+    consent in compliance with applicable requirements. The organization shall ensure
+    it can demonstrate the lawful basis for each processing activity.
+
+guidance:
+  prose: >-
+    Lawful basis identification is jurisdiction-dependent and must be mapped per
+    applicable regulation. Under GDPR, six lawful bases exist: consent, contract
+    performance, legal obligation, vital interests, public task, and legitimate
+    interests. Under LGPD, ten bases exist including public policy execution, studies
+    by research entities, credit protection, and health protection. The choice of
+    lawful basis has significant operational implications: consent can be withdrawn
+    (requiring the ability to stop processing), legitimate interests requires a
+    balancing test (requiring documentation), contract performance limits processing
+    to what is necessary for the contract. The organization must avoid defaulting to
+    consent when another basis is more appropriate, as consent places the highest
+    operational burden (withdrawal management, granularity requirements, freely given
+    standard). Lawful basis documentation should be part of the Records of Processing
+    Activities and should be reviewed when processing activities change or new
+    regulations apply.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.2.2"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Extend the purpose registry to include lawful basis per processing purpose
+      per jurisdiction. Build a consent management platform as a core service for
+      processing activities relying on consent: capture consent with granular
+      purpose specification, record consent evidence (timestamp, version of
+      privacy notice, method of consent), provide consent withdrawal APIs, and
+      propagate consent status changes across all dependent systems in real time.
+      Implement policy engine rules that enforce lawful basis requirements at
+      runtime: services processing PII under consent must check consent status
+      before each processing operation. Build a legitimate interests assessment
+      template and workflow for processing activities relying on that basis.
+      Implement jurisdiction-aware lawful basis validation that verifies the
+      chosen basis is valid under all applicable regulations for the PII
+      principals involved.
+    tools:
+      - consent-management-platform
+      - purpose-registry-with-legal-basis
+      - open-policy-agent
+      - event-driven-consent-propagation
+      - jurisdiction-mapping-service
+
+  devsecops:
+    prose: >-
+      Require lawful basis declaration in PII processing manifests alongside
+      purpose declarations. CI pipeline gates must validate that the declared
+      lawful basis is a valid option for the identified jurisdiction(s) and
+      processing purpose. Implement static analysis rules that detect consent
+      collection points and verify they meet requirements (granularity, freely
+      given, specific, informed, unambiguous). Code review automation should flag
+      PII processing code paths that do not check consent status when consent is
+      the declared lawful basis. Build integration tests that verify consent
+      withdrawal properly stops processing across all affected services.
+      Implement pipeline stages that validate legitimate interests assessments
+      exist for processing activities relying on that basis.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - semgrep
+      - consent-flow-validators
+      - legal-basis-manifest-schema
+      - integration-test-suites
+
+  secops:
+    prose: >-
+      Monitor for PII processing without a valid lawful basis. Build SIEM
+      correlation rules that detect: processing after consent withdrawal,
+      processing without consent record for consent-based activities, new
+      processing activities without lawful basis registration. Alert on consent
+      withdrawal events and verify that processing cessation occurs within
+      defined SLAs. Monitor consent metrics: consent rates, withdrawal rates,
+      consent freshness (time since last consent renewal). Track lawful basis
+      coverage across all processing activities and alert when gaps are detected.
+      Generate regulatory compliance reports mapping processing activities to
+      lawful bases per jurisdiction.
+    tools:
+      - splunk
+      - elastic-siem
+      - consent-monitoring-dashboards
+      - compliance-gap-detection
+      - regulatory-reporting
+      - soar-consent-workflows
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7", "art-8", "art-9"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.120"]
+    relationship: supports

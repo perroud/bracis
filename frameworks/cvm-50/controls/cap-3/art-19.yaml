@@ -1,0 +1,91 @@
+id: art-19
+family: cap-3
+title: "Impossibilidade de Cumprimento dos Procedimentos de KYC"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 19. Quando o participante não conseguir cumprir os procedimentos de
+    identificação e qualificação previstos nesta Resolução, deve:
+
+    I - não iniciar a relação de negócios;
+    II - não executar a transação; ou
+    III - encerrar a relação de negócios existente.
+
+    § 1. O encerramento da relação de negócios previsto no inciso III do
+    caput deve ser comunicado ao COAF quando houver fundada suspeita de lavagem
+    de dinheiro ou de financiamento do terrorismo.
+
+    § 2. Os participantes devem documentar os motivos pelos quais não foi
+    possível cumprir os procedimentos de identificação e qualificação.
+guidance:
+  prose: |
+    O art. 19 estabelece o protocolo para o caso de impossibilidade de KYC —
+    uma situacao que pode ocorrer por varios motivos: cliente nao fornece
+    documentos, documentos nao podem ser autenticados, beneficiario final nao
+    pode ser identificado.
+
+    **A regra e clara: nao operar:**
+    O participante nao pode "fazer vista grossa" para lacunas de KYC em nome
+    do interesse comercial. A lei e explicita: sem KYC completo, nao opera.
+    Qualquer pressao comercial para aprovar um cliente sem KYC adequado deve
+    ser recusada pelo compliance.
+
+    **Documentacao (ss 2):**
+    Documentar o motivo serve dois propositos:
+    1. Demonstrar que o participante agiu de boa-fe ao tentar cumprir os
+       procedimentos e foi impedido por circunstancias externas.
+    2. Criar registro para posterior analise: se o mesmo cliente tenta abrir
+       conta em outra instituicao, o historico de impossibilidade de KYC
+       pode ser relevante.
+
+    **Comunicacao ao COAF (ss 1):**
+    O encerramento de relacao por impossibilidade de KYC, quando acompanhado
+    de suspeita de lavagem, deve ser comunicado ao COAF. Isso evita que o
+    participante proteja inadvertidamente o lavador ao simplesmente encerrar
+    a conta sem alertar as autoridades.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de casos de impossibilidade:**
+      1. Workflow especifico para "KYC incompleto": registra motivo, evidencias
+         das tentativas realizadas e decisao final (recusar/encerrar).
+      2. Bloqueio automatico de onboarding quando KYC obrigatorio nao e concluido
+         dentro do prazo (ex: 7 dias corridos).
+      3. Trigger automatico para analise de suspeita quando relacao e encerrada
+         por impossibilidade de KYC.
+      4. Arquivo de casos de impossibilidade com busca para verificar se o
+         mesmo cliente ja tentou abrir conta anteriormente.
+    tools:
+      - kyc-platform
+      - workflow-engine
+      - case-management
+      - aml-platform
+  devsecops:
+    prose: |
+      **Controles de impossibilidade:**
+      1. Testes de que sistema bloqueia transacoes quando KYC nao esta completo.
+      2. Testes de que workflow de encerramento por KYC insuficiente dispara
+         analise de suspeita automaticamente.
+      3. Audit trail completo de todas as tentativas de coleta de KYC.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - audit-log
+  secops:
+    prose: |
+      **Analise de padroes:**
+      1. Relatorio mensal de casos de impossibilidade de KYC com analise de
+         motivos mais frequentes.
+      2. Revisao de encerramento por KYC: garantir que comunicacao ao COAF
+         foi realizada quando necessaria.
+      3. Identificacao de padroes suspeitos em casos de impossibilidade
+         (ex: multiplos clientes de mesma origem nao fornecem documentos).
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - coaf-reporting
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-10"]
+    relationship: equivalent-to

@@ -1,0 +1,92 @@
+id: slsa-source-retained
+family: source
+title: "Source: Retained Indefinitely"
+class: SLSA
+
+baselines: [build-l2, build-l3]
+
+statement:
+  prose: >-
+    The source code and its complete revision history must be retained indefinitely,
+    or at least for the useful lifetime of the software artifact. Any revision
+    referenced by a build's provenance must remain available for retrieval and
+    verification. Deletion of source revisions referenced by deployed artifacts is
+    prohibited. This ensures that security researchers, auditors, and consumers can
+    always inspect the exact source that produced a given artifact.
+
+guidance:
+  prose: >-
+    Source retention is essential for incident response, forensic analysis, and
+    long-term auditability. If an artifact is found to contain a vulnerability or
+    malicious code, investigators must be able to retrieve the exact source revision
+    that produced it. Organizations should implement retention policies that prevent
+    deletion of repositories or branches referenced by production artifacts. Git
+    hosting platforms should be configured to disable repository deletion by non-
+    administrators, and deletion requests should require multi-party approval. Backup
+    and disaster recovery procedures must include source repositories with their
+    complete history.
+
+references:
+  - citation: "SLSA v1.0 — Source Requirements"
+    url: "https://slsa.dev/spec/v1.0/requirements#source-requirements"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement repository retention policies that prevent deletion of repositories
+      and branches referenced by production artifacts. Configure Git platform
+      administrative controls to require multi-party approval for repository or branch
+      deletion. Deploy repository mirroring or backup solutions that maintain complete
+      copies of all source repositories including full history. Use Git LFS for large
+      files to ensure storage scalability does not become a reason for history pruning.
+      Implement archival workflows that move inactive repositories to cold storage
+      while maintaining accessibility. Tag all revisions referenced in production
+      provenance with protected tags that cannot be deleted.
+    tools:
+      - github
+      - gitlab
+      - git-lfs
+      - aws-codecommit
+      - gcp-source-repositories
+      - terraform
+
+  devsecops:
+    prose: >-
+      Add pipeline checks that verify the source commit referenced in build provenance
+      is resolvable and retrievable. Implement pre-deployment validation that confirms
+      the source revision is available before promoting artifacts. Configure CI/CD
+      pipelines to create protected tags for every revision used in a release build.
+      Reject artifact promotions if the source revision has been garbage-collected or
+      is otherwise unavailable. Include source retention verification in release
+      checklists and automation.
+    tools:
+      - github-actions
+      - gitlab-ci
+      - slsa-verifier
+      - git-hooks
+
+  secops:
+    prose: >-
+      Monitor for repository deletion events and branch force-pushes that could result
+      in loss of referenced revisions. Alert on any operation that removes source
+      history. Periodically audit that all source revisions referenced in production
+      artifact provenance are still retrievable. Include source availability
+      verification in incident response procedures. Generate compliance reports on
+      source retention policy adherence across all repositories.
+    tools:
+      - splunk
+      - elastic-siem
+      - github-audit-log
+      - gitlab-audit-events
+      - grafana
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-2", "CM-3", "AU-11", "SR-4"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PO.1.1", "PS.1.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.1", "16.3"]
+    relationship: supports

@@ -1,0 +1,133 @@
+id: glba-sfg-change-mgmt
+family: safeguards
+title: "Change Management Procedures"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall implement change management procedures that ensure
+    changes to information systems containing customer information are authorized,
+    tested, documented, and reviewed before implementation. Change management controls
+    shall prevent unauthorized modifications to systems, applications, and configurations
+    that could compromise the security, confidentiality, or integrity of customer
+    information.
+  parts:
+    - id: glba-sfg-change-mgmt.1
+      label: "(1)"
+      prose: >-
+        All changes to information systems that store, process, or transmit customer
+        information shall be formally requested, documented, and authorized by
+        appropriate management before implementation.
+    - id: glba-sfg-change-mgmt.2
+      label: "(2)"
+      prose: >-
+        Changes shall be tested in a non-production environment to verify that the
+        change functions as intended and does not introduce security vulnerabilities
+        or compromise existing safeguards before deployment to production.
+    - id: glba-sfg-change-mgmt.3
+      label: "(3)"
+      prose: >-
+        Segregation of duties shall be maintained in the change management process
+        to ensure that the individual who develops or requests a change is not the
+        same individual who approves or deploys the change to production.
+    - id: glba-sfg-change-mgmt.4
+      label: "(4)"
+      prose: >-
+        Emergency changes that bypass normal change management procedures shall be
+        documented retrospectively, reviewed, and approved within a defined timeframe
+        after implementation. The institution shall track emergency change frequency
+        as a risk indicator.
+    - id: glba-sfg-change-mgmt.5
+      label: "(5)"
+      prose: >-
+        The institution shall maintain a complete audit trail of all changes to
+        NPI-handling systems, including the change request, authorization, testing
+        results, deployment records, and post-implementation review.
+
+guidance:
+  prose: >-
+    Change management controls protect the integrity of systems containing customer
+    information by ensuring that modifications are authorized, tested, and traceable.
+    While the Safeguards Rule does not prescribe specific change management procedures,
+    examiners evaluate whether the institution has controls that prevent unauthorized or
+    untested changes to NPI systems. Common findings include: changes deployed to
+    production without authorization, changes deployed without testing, developers
+    deploying their own code to production (lack of segregation of duties), emergency
+    changes that are never retrospectively reviewed, and incomplete change logs that
+    prevent audit reconstruction. The change management program should cover all layers:
+    application code, infrastructure configuration, database schema, network
+    configuration, and security policy changes. Automated CI/CD pipelines can serve
+    as effective change management controls when properly configured with approval
+    gates, testing stages, and audit logging.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(8)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "FFIEC IT Examination Handbook — Development and Acquisition"
+    url: "https://ithandbook.ffiec.gov/it-booklets/development-and-acquisition.aspx"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps-based change management where all infrastructure and application
+      changes are version-controlled in Git with immutable audit trails. Deploy CI/CD
+      pipelines with mandatory approval gates that enforce segregation of duties —
+      the author of a change cannot approve or deploy it. Implement environment
+      promotion pipelines that require changes to pass through development, staging,
+      and production environments with automated testing at each stage. Configure
+      protected branches that prevent direct pushes to production branches. Deploy
+      policy-as-code that enforces change management requirements (approval counts,
+      reviewer qualifications, test coverage thresholds) as automated pipeline checks.
+      Implement automated rollback capabilities that can revert changes quickly when
+      post-deployment issues are detected. Maintain immutable deployment logs that
+      record who deployed what, when, with what approvals, and with what test results.
+    tools:
+      - gitlab-ci
+      - argocd
+      - terraform
+      - kubernetes
+      - open-policy-agent
+      - backstage
+  devsecops:
+    prose: >-
+      Configure CI/CD pipelines as the enforced change management mechanism — no
+      changes reach production except through the pipeline. Implement merge request
+      approval rules that require at least two reviewers with appropriate authority.
+      Prevent merge request authors and committers from approving their own changes.
+      Deploy automated security scanning (SAST, DAST, dependency scanning, container
+      scanning) as mandatory pipeline stages that block deployment when critical
+      findings are detected. Implement code owner rules that require domain-specific
+      review for changes to NPI-handling components. Configure pipeline audit logging
+      that captures the full change lifecycle from commit to deployment.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - checkov
+      - tfsec
+      - trivy
+      - gitleaks
+      - open-policy-agent
+  secops:
+    prose: >-
+      Monitor change management compliance metrics including: changes deployed without
+      required approvals, emergency change frequency and retrospective review completion,
+      average change lead time, change failure rate, and mean time to restore. Generate
+      weekly change management reports for NPI systems. Implement alerting for changes
+      that bypass the normal change management process. Conduct periodic audits that
+      sample recent changes and verify complete documentation (request, authorization,
+      testing, deployment, review). Track change-related incidents as a risk indicator
+      for change management process effectiveness.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - servicenow
+      - gitlab-audit-events
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-1", "CM-2", "CM-3", "CM-4", "CM-5", "CM-9", "SA-10"]
+    relationship: supports
+  - framework_id: sox
+    articles: ["itgc-change"]
+    relationship: complements

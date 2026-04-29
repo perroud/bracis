@@ -1,0 +1,376 @@
+id: pci-ssf_to_pci-dss-v4
+title: "PCI SSF v1.2 to PCI DSS v4.0 Control Mapping"
+source_framework: pci-ssf
+target_framework: pci-dss-v4
+version: "1.0.0"
+last_updated: "2026-04-05"
+methodology: semantic
+
+mappings:
+  # ─── SSF-DESIGN FAMILY ───────────────────────────────────────────────
+
+  - source_control: ssf-design-1
+    target_controls:
+      - id: req-6.1
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          SSF-design-1 requires threat modeling during software design to identify attack
+          vectors and trust boundaries. PCI DSS req-6.1 broadly mandates secure development
+          processes including vulnerability identification, which encompasses threat modeling
+          as a design-phase activity.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          SSF-design-1 threat modeling outputs inform the secure coding practices required
+          by req-6.2, ensuring developers address identified threats in bespoke software.
+
+  - source_control: ssf-design-2
+    target_controls:
+      - id: req-2.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          Both controls address attack surface minimization. SSF-design-2 requires disabling
+          unnecessary features and services at the software level, while req-2.1 requires
+          changing vendor defaults and applying secure configurations to system components.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.79
+        rationale: >
+          SSF-design-2 mandates least privilege, defense in depth, and input validation at
+          trust boundaries — principles that directly complement req-6.2's requirement for
+          secure software engineering techniques that prevent common attacks.
+      - id: req-1.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          SSF-design-2's requirement to disable unnecessary protocols and ports at the
+          software level supports req-1.1's network security controls that restrict
+          traffic to and from the CDE.
+
+  - source_control: ssf-design-3
+    target_controls:
+      - id: req-2.1
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          Both controls directly address secure default configurations. SSF-design-3 requires
+          software to ship without default credentials and with security features enabled.
+          Req-2.1 requires changing vendor defaults before deployment. They target the same
+          risk from different angles (vendor vs. operator).
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          SSF-design-3's configuration management process for security-relevant settings
+          supports req-6.1's broader change management requirements for system components.
+
+  # ─── SSF-AUTH FAMILY ─────────────────────────────────────────────────
+
+  - source_control: ssf-auth-1
+    target_controls:
+      - id: req-8.1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          Both controls address the same core requirement: unique identification of users,
+          MFA enforcement, account lockout after failed attempts, and prohibiting
+          default/shared credentials. SSF-auth-1 applies these at the software level while
+          req-8.1 applies them at the system component level, but the security objectives
+          are functionally equivalent.
+      - id: req-2.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSF-auth-1's prohibition of default credentials in production supports req-2.1's
+          broader requirement to change vendor-supplied defaults on all system components.
+
+  - source_control: ssf-auth-2
+    target_controls:
+      - id: req-7.1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          Both controls mandate least-privilege access control based on business need to
+          know, require a structured access control model (RBAC/ABAC), enforce server-side
+          authorization, and mandate periodic access reviews. The security objectives are
+          functionally equivalent across software and infrastructure layers.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          SSF-auth-2's requirement for server-side authorization enforcement complements
+          req-6.2's mandate that bespoke software prevents improper access control, one of
+          the OWASP Top 10 vulnerability categories.
+
+  - source_control: ssf-auth-3
+    target_controls:
+      - id: req-8.1
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          SSF-auth-3 covers session management and credential lifecycle, which are
+          subcomponents of req-8.1's broader authentication management scope covering
+          account lifecycle, password policies, and MFA. Session tokens and credential
+          rotation are directly relevant.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          Secure session management (preventing fixation, hijacking, replay attacks)
+          complements req-6.2's requirement that bespoke software address common attack
+          categories including authentication failures.
+
+  # ─── SSF-DATA FAMILY ─────────────────────────────────────────────────
+
+  - source_control: ssf-data-1
+    target_controls:
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          Both controls address identification and classification of sensitive data,
+          particularly PAN and cardholder data. SSF-data-1 requires a comprehensive data
+          inventory with classification and protection rules. Req-3.1 requires data
+          minimization, retention policies, and prohibits SAD storage after authorization.
+          They share the same data protection foundation.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSF-data-1's data classification and handling requirements support req-12.1's
+          broader information security policy that governs protection of information assets
+          including CDE scope documentation.
+
+  - source_control: ssf-data-2
+    target_controls:
+      - id: req-3.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          Both controls have near-identical requirements: PAN must be rendered unreadable
+          using hashing, truncation, tokenization, or encryption; SAD must never be stored
+          after authorization; and key management must follow separation of key-encrypting
+          keys and data-encrypting keys. SSF-data-2 additionally covers memory protection,
+          but the core data-at-rest requirements are equivalent.
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSF-data-2's data-at-rest protection requirements support req-9.1's physical media
+          security controls, as both aim to prevent unauthorized access to stored cardholder
+          data through different layers (logical vs. physical).
+
+  - source_control: ssf-data-3
+    target_controls:
+      - id: req-4.1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          Both controls mandate TLS 1.2+ for transmitting sensitive data, require certificate
+          validation, prohibit deprecated protocols (SSL, TLS 1.0, TLS 1.1), and require
+          encryption even within internal networks. The security objectives are functionally
+          equivalent for protecting cardholder data in transit.
+      - id: req-1.1
+        relationship: complements
+        confidence: 0.71
+        rationale: >
+          SSF-data-3's encryption requirements for all communication channels support
+          req-1.1's network security controls by ensuring that even if network boundaries
+          are compromised, data remains protected through cryptographic means.
+
+  # ─── SSF-CRYPTO FAMILY ───────────────────────────────────────────────
+
+  - source_control: ssf-crypto-1
+    target_controls:
+      - id: req-4.1
+        relationship: intersects-with
+        confidence: 0.84
+        rationale: >
+          SSF-crypto-1 specifies approved algorithms and cipher suites (AES-128+, RSA-2048+,
+          no DES/3DES/RC4/MD5/SHA-1) that directly apply to req-4.1's requirement for strong
+          cryptography during PAN transmission. Both mandate current, industry-approved
+          cryptographic standards.
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          SSF-crypto-1's algorithm requirements apply to req-3.1's stored data protection,
+          particularly the requirement for strong cryptography to render PAN unreadable and
+          bcrypt/scrypt/Argon2 for password storage.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          SSF-crypto-1's prohibition of insecure cryptographic usage and requirement for
+          cryptographic agility complement req-6.2's mandate that bespoke software prevent
+          insecure cryptographic storage vulnerabilities.
+
+  - source_control: ssf-crypto-2
+    target_controls:
+      - id: req-3.1
+        relationship: intersects-with
+        confidence: 0.87
+        rationale: >
+          SSF-crypto-2 covers the full key lifecycle (generation, distribution, storage,
+          rotation, revocation, destruction) that req-3.1 requires for protecting stored
+          account data. Both require dual control, split knowledge, and keys stored
+          separately from encrypted data.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          SSF-crypto-2's key management capabilities support req-4.1's requirement for
+          managed trusted keys and certificates used to protect cardholder data during
+          transmission.
+
+  # ─── SSF-LOGGING FAMILY ──────────────────────────────────────────────
+
+  - source_control: ssf-logging-1
+    target_controls:
+      - id: req-10.1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          Both controls mandate comprehensive audit logging of security-relevant events
+          (authentication, authorization, data access, configuration changes, admin actions)
+          with sufficient detail (timestamp, source identity, event type, affected resource,
+          outcome), time synchronization, log protection from unauthorized modification, and
+          export to centralized systems. The requirements are functionally equivalent.
+
+  - source_control: ssf-logging-2
+    target_controls:
+      - id: req-10.1
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          SSF-logging-2 covers log integrity (append-only storage, tamper detection),
+          real-time monitoring, and retention — all of which are specific sub-requirements
+          within req-10.1's broader logging mandate. Req-10.1 requires 12-month retention,
+          log protection from destruction, and review for anomalies, directly aligning with
+          SSF-logging-2.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.71
+        rationale: >
+          SSF-logging-2's real-time monitoring and alerting capabilities support req-11.1's
+          requirement for intrusion detection and response to unexpected changes, as log
+          monitoring is a primary detection mechanism.
+
+  # ─── SSF-LIFECYCLE FAMILY ────────────────────────────────────────────
+
+  - source_control: ssf-lifecycle-1
+    target_controls:
+      - id: req-12.1
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          SSF-lifecycle-1 requires documented security governance with policies, roles,
+          accountability, and management review. Req-12.1 requires a comprehensive
+          information security policy with defined roles, risk management, and compliance
+          program. Both address organizational governance for security.
+      - id: req-6.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          SSF-lifecycle-1's requirement for security governance across the SDLC with
+          defined security requirements at each phase directly maps to req-6.1's mandate
+          for defined processes and mechanisms for developing and maintaining secure
+          systems and software.
+
+  - source_control: ssf-lifecycle-2
+    target_controls:
+      - id: req-6.2
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          Both controls require annual security training for developers on secure coding
+          practices, enforcement of secure coding standards addressing common vulnerabilities
+          (injection, authentication failures, data exposure), and security-focused code
+          review. The requirements are functionally equivalent for bespoke software security.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          SSF-lifecycle-2's developer security training requirements support req-12.1's
+          broader mandate for security awareness education as an ongoing organizational
+          activity.
+
+  - source_control: ssf-lifecycle-3
+    target_controls:
+      - id: req-6.1
+        relationship: intersects-with
+        confidence: 0.86
+        rationale: >
+          SSF-lifecycle-3's change management process (authorization, documentation, testing,
+          review, rollback, separation of duties) directly maps to req-6.1's requirement
+          that changes to all system components are managed securely with defined processes.
+      - id: req-6.2
+        relationship: complements
+        confidence: 0.77
+        rationale: >
+          SSF-lifecycle-3's version control and build integrity requirements complement
+          req-6.2's secure software development lifecycle by ensuring that code changes are
+          traceable, reviewed, and authorized before production deployment.
+
+  # ─── SSF-TESTING FAMILY ──────────────────────────────────────────────
+
+  - source_control: ssf-testing-1
+    target_controls:
+      - id: req-6.1
+        relationship: intersects-with
+        confidence: 0.87
+        rationale: >
+          SSF-testing-1 requires SAST, DAST, SCA, and manual security review during
+          development and before release. Req-6.1 mandates that security vulnerabilities are
+          identified and addressed, public-facing web apps are protected, and changes are
+          managed securely — objectives that rely on the testing activities SSF-testing-1
+          prescribes.
+      - id: req-6.2
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          SSF-testing-1's multi-layered security testing program directly maps to req-6.2's
+          requirement that bespoke software is reviewed prior to production release using
+          manual or automated code review or application security testing.
+      - id: req-11.1
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          SSF-testing-1's vulnerability detection program aligns with req-11.1's requirement
+          for regular external and internal vulnerability identification, prioritization,
+          and remediation with defined timelines based on severity.
+      - id: req-5.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSF-testing-1's SCA scanning for known malicious packages in third-party
+          components supports req-5.1's broader malware protection requirements by
+          detecting supply chain attacks at the build stage.
+
+  - source_control: ssf-testing-2
+    target_controls:
+      - id: req-6.1
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          SSF-testing-2's vulnerability management process (monitoring, risk assessment,
+          timely patching) maps to req-6.1's requirement that security vulnerabilities are
+          identified and addressed across all system components with vendor-supplied patches
+          applied promptly.
+      - id: req-11.1
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          SSF-testing-2's continuous vulnerability monitoring and patch management aligns
+          with req-11.1's requirement for regular vulnerability identification, prioritization,
+          and correction of exploitable weaknesses.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          SSF-testing-2's vulnerability disclosure program and customer notification
+          process supports req-12.1's incident response and third-party service provider
+          management requirements.

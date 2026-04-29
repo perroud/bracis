@@ -1,0 +1,113 @@
+id: pld-9
+family: cap-5
+title: "Transaction Recording and Data Retention"
+class: PLD-BASE
+baselines: [pessoas-obrigadas]
+statement:
+  prose: |
+    Art. 10 (continuação). As pessoas referidas no art. 9º:
+
+    II - manterão registro de toda transação em moeda nacional ou estrangeira,
+    títulos e valores mobiliários, títulos de crédito, metais, ativos virtuais, ou
+    qualquer ativo passível de ser convertido em dinheiro, que ultrapassar limite
+    fixado pela autoridade competente e nos termos de instruções por esta expedidas;
+
+    § 2º Os cadastros e registros referidos nos incisos I e II deste artigo deverão
+    ser conservados durante o período mínimo de cinco anos a partir do encerramento
+    da conta ou da conclusão da transação, prazo este que poderá ser ampliado pela
+    autoridade competente.
+
+    § 3º O registro referido no inciso II deste artigo será efetuado também quando
+    a pessoa física ou jurídica, seus entes ligados, houver realizado, em um mesmo
+    mês-calendário, operações com uma mesma pessoa, conglomerado ou grupo que, em
+    seu conjunto, ultrapassem o limite fixado pela autoridade competente.
+guidance:
+  prose: |
+    Article 10, incisos II, §§ 2-3 establish the transaction recording and data
+    retention obligations.
+
+    **Recording obligation (inciso II):**
+    All transactions above the threshold set by the competent authority must be
+    recorded. The 2022 amendment (Lei 14.478) explicitly added "ativos virtuais"
+    (virtual assets) to the list of recordable asset types.
+
+    **Data retention (§ 2):**
+    Minimum 5-year retention from account closure or transaction completion. The
+    competent authority may extend this period. In practice, BCB and CVM typically
+    require 5–10 years depending on the type of record.
+
+    **Aggregation rule (§ 3):**
+    Transactions must also be recorded when cumulative operations with the same
+    person, conglomerate, or group within a single calendar month exceed the
+    threshold. This prevents structuring (smurfing) to avoid individual
+    transaction recording requirements.
+
+    **Practical thresholds:**
+    The BCB typically sets the threshold at R$ 2,000 for cash transactions and
+    R$ 10,000 for electronic transfers, but these are defined by specific
+    regulations (Circular BCB 3.978/2020 and subsequent updates).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement automated transaction recording that captures all transactions
+         above regulatory thresholds, including metadata: parties, amounts,
+         currencies, asset types, timestamps, channels.
+      2. Build aggregation engines that calculate cumulative transaction volumes
+         per counterparty per calendar month to detect threshold breaches (§ 3).
+      3. Implement data retention policies as infrastructure-as-code with
+         automated enforcement:
+         - Minimum 5-year retention from account closure or transaction completion
+         - Extended retention for flagged or investigated transactions
+         - Immutable storage for regulatory records
+      4. Create data lifecycle management pipelines that handle archival,
+         retrieval, and eventual destruction of expired records.
+      5. Support multi-asset recording including virtual assets with blockchain
+         transaction references (txid, wallet addresses, block numbers).
+    tools:
+      - transaction-recording-system
+      - aggregation-engine
+      - data-lifecycle-management
+      - immutable-storage
+      - blockchain-recording
+  devsecops:
+    prose: |
+      1. Implement automated tests validating threshold detection accuracy across
+         all asset types (fiat currency, securities, metals, virtual assets).
+      2. Build integration tests for aggregation rules covering edge cases:
+         conglomerate structures, related parties, calendar month boundaries.
+      3. CI/CD pipeline must include data retention policy validation ensuring
+         no records are deleted before the minimum retention period.
+      4. Implement infrastructure-as-code for storage policies with GitOps-based
+         deployment to prevent unauthorized modification.
+      5. Dependency scanning for data storage libraries to prevent vulnerabilities
+         that could lead to data loss or corruption.
+    tools:
+      - threshold-testing
+      - retention-policy-as-code
+      - gitlab-ci
+      - dependency-scanning
+      - infrastructure-as-code
+  secops:
+    prose: |
+      1. Monitor transaction recording completeness: percentage of above-threshold
+         transactions captured, data quality scores, missing field rates.
+      2. Conduct periodic audits of data retention compliance, verifying that
+         records are retained for the minimum period and not prematurely destroyed.
+      3. Test data retrieval procedures quarterly to ensure archived records
+         can be produced within regulatory response deadlines.
+      4. Monitor storage infrastructure for integrity (checksums, replication
+         status) and availability.
+      5. Report retention metrics to the compliance committee: volume of records,
+         storage utilization, retrieval response times, approaching expiration.
+    tools:
+      - data-quality-monitoring
+      - retention-audit
+      - storage-monitoring
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-18", "art-19", "art-20"]
+    relationship: derived-from
+  - framework_id: cvm-50
+    articles: ["art-14", "art-15"]
+    relationship: derived-from

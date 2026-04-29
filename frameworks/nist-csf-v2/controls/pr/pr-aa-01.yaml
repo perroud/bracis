@@ -1,0 +1,91 @@
+id: pr.aa-01
+family: pr
+title: "Identity Management, Authentication, and Access Control"
+class: CSF2
+
+statement:
+  prose: >-
+    Identities and credentials for authorized users, services, and hardware are managed
+    by the organization.
+
+guidance:
+  prose: >-
+    Identity management is the foundation of access control. The organization must
+    manage the full lifecycle of identities: provisioning, authentication, authorization,
+    monitoring, and deprovisioning. Credentials must be strong, unique, and protected.
+    Multi-factor authentication must be required for privileged access and recommended
+    for all users. Service identities (machine-to-machine) must be managed with the
+    same rigor as human identities, using short-lived tokens, certificates, or federated
+    identity where possible. Identity stores must be centralized and authoritative.
+    Orphaned accounts (identities without corresponding active users or services) must
+    be detected and remediated promptly.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, PR.AA-01"
+    url: "https://www.nist.gov/cyberframework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Centralize identity management through an enterprise IdP (Okta, Azure AD,
+      Keycloak). Implement OIDC/SAML federation for all platform services, eliminating
+      local authentication. Use SCIM for automated account provisioning and
+      deprovisioning synchronized with HR systems. Deploy HashiCorp Vault for machine
+      identity management, issuing short-lived certificates and tokens. Implement
+      workload identity federation (GCP Workload Identity, AWS IAM Roles for Service
+      Accounts) so Kubernetes pods authenticate to cloud services without static
+      credentials. Enforce MFA for all human access to platform management interfaces.
+      Use certificate-based authentication for service-to-service communication via
+      service mesh mTLS.
+    tools:
+      - okta
+      - azure-ad
+      - keycloak
+      - hashicorp-vault
+      - cert-manager
+      - istio
+      - spiffe-spire
+
+  devsecops:
+    prose: >-
+      Use GitLab's OIDC/JWT token integration for CI/CD pipeline authentication to
+      cloud providers and external services, eliminating static service account keys
+      in pipeline configurations. Enforce that all project access is managed through
+      group memberships rather than direct user assignments. Implement branch protection
+      requiring authentication for push access to protected branches. Scan repositories
+      for hardcoded credentials and API keys. Use Vault or GitLab CI/CD variables
+      (protected, masked) for secret management in pipelines. Review and rotate
+      CI/CD tokens on a defined schedule.
+    tools:
+      - gitlab-oidc-jwt
+      - hashicorp-vault
+      - gitlab-secret-detection
+      - gitleaks
+      - gitlab-ci-variables
+
+  secops:
+    prose: >-
+      Monitor authentication events for anomalies: impossible travel, credential
+      stuffing, brute force, and MFA bypass attempts. Implement UEBA to detect
+      compromised identities based on behavioral deviations. Conduct quarterly access
+      reviews ensuring all active accounts have valid business justification. Monitor
+      for credential exposure on dark web and paste sites. Alert on service account
+      usage anomalies (unusual hours, unusual source IPs, unusual API calls). Enforce
+      credential rotation policies and track compliance.
+    tools:
+      - azure-ad-identity-protection
+      - crowdstrike-identity
+      - splunk-ueba
+      - sailpoint
+      - have-i-been-pwned-api
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "IA-2", "IA-4", "IA-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A5.17", "A8.2", "A8.5"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-5.1", "CIS-6.1"]
+    relationship: equivalent-to

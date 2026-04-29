@@ -1,0 +1,101 @@
+id: art-9
+family: cap-3
+title: "Classificacao de Risco de Clientes"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 9. As instituições de pagamento devem classificar seus clientes de acordo
+    com o risco de lavagem de dinheiro e de financiamento do terrorismo, levando
+    em consideração, no mínimo:
+
+    I - a natureza, a atividade econômica e o porte do cliente;
+
+    II - os países e as regiões de origem e de destino dos recursos do cliente;
+
+    III - os produtos, serviços e canais de distribuição utilizados pelo cliente;
+
+    IV - a situação do cliente em relação a listas de sanções, de pessoas
+    impedidas ou de pessoas politicamente expostas;
+
+    V - o comportamento e o perfil de operações do cliente ao longo do
+    relacionamento com a instituição.
+
+    Parágrafo único. A classificação de risco deve ser revisada periodicamente
+    e sempre que houver alteração relevante no perfil de risco do cliente.
+guidance:
+  prose: |
+    O art. 9 transforma a abordagem baseada em risco em acao concreta: cada cliente
+    deve ter uma classificacao de risco documentada e revisada.
+
+    **Modelo tipico de classificacao:**
+    - Baixo risco: PF empregado formal, renda declarada, endereco nacional, produtos
+      simples (conta corrente, transferencias domesticas), sem flags de risco.
+    - Medio risco: PJ de pequeno porte, atividade comum, sem PEP, sem sancoes.
+    - Alto risco: PEP, clientes com residencia no exterior, PJ com estrutura complexa,
+      clientes em setores de alto risco (joias, criptoativos, imoveis), comportamento
+      atipico identificado no monitoramento.
+
+    **Risco dinamico (paragrafo unico):**
+    O risco nao e estatico. Um cliente de baixo risco pode se tornar de alto risco
+    ao longo do relacionamento. Gatilhos de revisao: novo PEP identificado na
+    rede do cliente, mudanca de atividade economica, comportamento transacional
+    atipico, aparecimento em lista de sancoes.
+
+    **Consequencias da classificacao:**
+    - Baixo risco → diligencia simplificada (art. 10)
+    - Alto risco → diligencia reforcada (art. 11)
+    - Qualquer risco → monitoramento proporcional ao nivel classificado
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de classificacao de risco:**
+      1. Implementar engine de scoring com variaveis ponderadas baseadas nos 5
+         criterios do art. 9 (cada variavel com peso configuravel).
+      2. Calcular score de risco no onboarding e recalcular periodicamente com
+         base em comportamento transacional real.
+      3. Integrar listas de sancoes em tempo real: OFAC SDN, ONU, UE, listas
+         domesticas (COAF, Policia Federal).
+      4. Integrar lista de PEP com cobertura global (WorldCheck, Dow Jones RMS
+         ou equivalente) e listas nacionais.
+      5. Recalculo automatico de risco quando: novo produto e contratado, novo
+         pais de operacao, mudanca de perfil transacional, aparecimento em lista.
+      6. Workflow de revisao manual para clientes cujo score muda de faixa
+         (baixo para medio, medio para alto).
+    tools:
+      - aml-screening
+      - sanctions-screening
+      - kyc-platform
+      - risk-scoring-engine
+  devsecops:
+    prose: |
+      **Qualidade e rastreabilidade do scoring:**
+      1. Versionamento do modelo de scoring: cada alteracao de pesos ou variaveis
+         e registrada com justificativa e aprovacao de compliance.
+      2. Testes de regressao do motor de risco: garantir que alteracoes nao mudam
+         a classificacao de clientes existentes sem intencionalidade.
+      3. Auditoria do modelo: registro de cada calculo com inputs, outputs e versao
+         do modelo utilizada.
+      4. Testes de integracao com listas de sancoes: simular match, near-match e
+         false positive para cada provedor de lista.
+    tools:
+      - gitlab-ci
+      - model-versioning
+      - audit-logging
+  secops:
+    prose: |
+      **Monitoramento da distribuicao de risco:**
+      1. Dashboard de distribuicao de clientes por categoria de risco (baixo/medio/alto).
+      2. Alertas quando percentual de clientes de alto risco muda significativamente
+         (pode indicar problema no modelo ou mudanca real no portfolio).
+      3. Auditoria periodica: amostragem de clientes de cada categoria para verificar
+         se classificacao esta correta.
+      4. Relatorio de clientes com revisao de risco em atraso (prazo do paragrafo unico).
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - grc-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-12", "art-13"]
+    relationship: equivalent-to

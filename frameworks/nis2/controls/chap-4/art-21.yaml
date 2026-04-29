@@ -1,0 +1,148 @@
+id: art-21
+family: chap-4
+title: "Cybersecurity Risk-Management Measures"
+class: NIS2
+
+statement:
+  prose: >-
+    Member States shall ensure that essential and important entities take appropriate
+    and proportionate technical, operational and organisational measures to manage the
+    risks posed to the security of network and information systems which those entities
+    use for their operations or for the provision of their services, and to prevent
+    or minimise the impact of incidents on recipients of their services and on other
+    services. The measures referred to in paragraph 1 shall be based on an all-hazards
+    approach that aims to protect network and information systems and the physical
+    environment of those systems from incidents, and shall include at least the
+    following: (a) policies on risk analysis and information system security;
+    (b) incident handling; (c) business continuity, such as backup management and
+    disaster recovery, and crisis management; (d) supply chain security, including
+    security-related aspects concerning the relationships between each entity and its
+    direct suppliers or service providers; (e) security in network and information
+    systems acquisition, development and maintenance, including vulnerability handling
+    and disclosure; (f) policies and procedures to assess the effectiveness of
+    cybersecurity risk-management measures; (g) basic cyber hygiene practices and
+    cybersecurity training; (h) policies and procedures regarding the use of
+    cryptography and, where appropriate, encryption; (i) human resources security,
+    access control policies and asset management; (j) the use of multi-factor
+    authentication or continuous authentication solutions, secured voice, video and
+    text communications and secured emergency communication systems within the entity,
+    where appropriate.
+
+guidance:
+  prose: >-
+    Article 21 is the core operational requirement of NIS 2. It mandates a comprehensive
+    set of cybersecurity risk-management measures covering ten specific domains. The
+    "all-hazards approach" means measures must address not only cyber threats but also
+    physical threats, natural disasters, and human errors. The principle of
+    proportionality allows measures to be scaled based on the entity's size, the
+    likelihood and severity of incidents, and the societal and economic impact of
+    potential incidents. However, the ten listed domains (a) through (j) represent
+    minimum requirements that all essential and important entities must address.
+    Organizations should map these requirements to established frameworks (ISO 27001,
+    NIST CSF, CIS Controls) to ensure comprehensive coverage. Compliance with ISO
+    27001 can demonstrate substantial alignment with Article 21, but is not
+    automatically sufficient.
+
+references:
+  - citation: "Directive (EU) 2022/2555, Article 21"
+    url: "https://eur-lex.europa.eu/eli/dir/2022/2555"
+  - citation: "ENISA NIS 2 Implementation Guidance"
+    url: "https://www.enisa.europa.eu/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Map each Article 21 requirement to specific platform engineering controls:
+      (a) Risk analysis: implement threat modeling for platform architecture, maintain
+      platform risk register. (b) Incident handling: deploy automated detection
+      (Falco, SIEM), alerting (PagerDuty), and containment capabilities.
+      (c) Business continuity: implement multi-region deployments, automated failover,
+      backup/restore pipelines (Velero), and disaster recovery testing.
+      (d) Supply chain: scan all dependencies (Trivy, Grype), enforce SBOM generation,
+      verify image signatures (Cosign), use trusted registries.
+      (e) Vulnerability handling: integrate vulnerability scanning at every layer,
+      implement coordinated vulnerability disclosure program.
+      (f) Effectiveness assessment: deploy compliance dashboards, run automated
+      compliance checks, conduct penetration testing.
+      (g) Cyber hygiene: enforce secure defaults in platform templates, implement
+      admission controllers for security baselines.
+      (h) Cryptography: enforce TLS everywhere (service mesh mTLS), manage certificates
+      (cert-manager), use KMS for encryption at rest.
+      (i) Access control: centralize identity (IdP), enforce RBAC, implement JIT access.
+      (j) MFA: enforce MFA at IdP level for all human access.
+    tools:
+      - falco
+      - velero
+      - trivy
+      - cosign
+      - cert-manager
+      - istio
+      - hashicorp-vault
+      - kyverno
+      - pagerduty
+      - defectdojo
+
+  devsecops:
+    prose: >-
+      Implement a comprehensive DevSecOps pipeline aligned with Article 21 domains:
+      (a) Include security scanning (SAST, DAST, SCA) in all pipelines as risk
+      analysis measures. (b) Maintain incident handling runbooks as code with automated
+      rollback capabilities. (c) Implement automated backup validation and disaster
+      recovery testing in CI/CD. (d) Enforce supply chain security through dependency
+      scanning, license compliance, and SBOM generation. (e) Implement vulnerability
+      handling workflows directly in GitLab with security policies defining
+      remediation SLAs. (f) Generate compliance reports as pipeline artifacts
+      measuring effectiveness. (g) Enforce secure coding standards through linting
+      and SAST rules. (h) Scan for insecure cryptography usage in code (weak
+      algorithms, hardcoded keys). (i) Implement access-as-code for repository
+      and environment permissions. (j) Require 2FA for all GitLab accounts with
+      push access.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - gitlab-dependency-scanning
+      - gitlab-container-scanning
+      - gitlab-secret-detection
+      - gitlab-license-compliance
+      - gitlab-security-policies
+      - gitlab-compliance-framework
+      - semgrep
+      - trivy
+
+  secops:
+    prose: >-
+      Establish a comprehensive security operations program addressing all ten
+      Article 21 domains. (a) Conduct annual risk assessments and maintain a risk
+      register with treatment plans. (b) Maintain and test incident response plans
+      with defined severity levels and escalation paths. (c) Test business continuity
+      and disaster recovery plans annually. (d) Conduct supply chain risk assessments
+      for critical suppliers and maintain vendor security requirements. (e) Run
+      continuous vulnerability management with defined remediation SLAs. (f) Conduct
+      annual security assessments (penetration testing, red team exercises) and track
+      control effectiveness metrics. (g) Deliver cybersecurity awareness training to
+      all employees annually. (h) Review cryptographic implementations against current
+      standards (minimum TLS 1.2, AES-256). (i) Conduct quarterly access reviews and
+      enforce least privilege. (j) Verify MFA coverage across all critical systems.
+      Document all activities for evidence during supervisory inspections.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys
+      - tenable
+      - knowbe4
+      - sailpoint
+      - archer-grc
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["GV.RM-01", "ID.RA-01", "PR.AA-01", "PR.DS-01", "PR.PS-01", "DE.CM-01", "RS.MA-01", "RC.RP-01"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.1", "A5.10", "A5.15", "A5.24", "A5.29", "A8.8", "A8.9", "A8.24", "A8.25"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-1.1", "CIS-2.1", "CIS-3.1", "CIS-4.1", "CIS-5.1", "CIS-6.1", "CIS-7.1", "CIS-8.1", "CIS-16.1"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AU-2", "CM-2", "CP-2", "IA-2", "IR-4", "RA-3", "SA-11", "SC-28", "SR-1"]
+    relationship: supports

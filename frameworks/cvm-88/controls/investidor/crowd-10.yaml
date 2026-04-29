@@ -1,0 +1,129 @@
+id: crowd-10
+family: investidor
+title: "Individual Investment Limits"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 23. O investimento realizado por investidor que não seja
+    qualificado em ofertas realizadas por meio de plataformas eletrônicas
+    de investimento participativo fica limitado a: I — R$ 20.000,00
+    (vinte mil reais) por ano-calendário, caso o investidor possua renda
+    bruta anual ou investimentos financeiros de valor inferior a
+    R$ 200.000,00 (duzentos mil reais); II — 10% (dez por cento) da
+    renda bruta anual ou dos investimentos financeiros do investidor,
+    o que for maior, caso o investidor possua renda bruta anual ou
+    investimentos financeiros de valor igual ou superior a R$ 200.000,00
+    (duzentos mil reais).
+
+    § 1º Os limites de investimento previstos neste artigo abrangem todos
+    os investimentos realizados pelo investidor em ofertas de plataformas
+    eletrônicas de investimento participativo no ano-calendário,
+    independentemente da plataforma utilizada.
+
+    § 2º Investidores qualificados nos termos da regulamentação da CVM
+    não estão sujeitos aos limites previstos neste artigo.
+
+    § 3º A plataforma deve obter declaração do investidor sobre o
+    cumprimento dos limites de investimento antes da confirmação de cada
+    investimento.
+guidance:
+  prose: |
+    Article 23 establishes annual investment limits for retail (non-qualified)
+    investors in crowdfunding offerings. This is a core investor protection
+    mechanism designed to limit exposure to the inherently risky startup and
+    SME asset class.
+
+    **Two-tier limit structure:**
+    - Tier 1 (income/assets < R$200K): Maximum R$20K per calendar year
+      across ALL crowdfunding platforms
+    - Tier 2 (income/assets >= R$200K): Maximum 10% of annual income or
+      financial assets (whichever is higher) per calendar year
+
+    **Cross-platform aggregate:**
+    The limits apply across all platforms, not per platform. This requires
+    either self-declaration by investors or a centralized tracking mechanism.
+
+    **Qualified investor exemption:**
+    Qualified investors (per CVM definition: generally R$1M+ in financial
+    assets or certified professionals) are exempt from these limits.
+
+    **Platform obligation:**
+    Platforms must obtain an investor declaration confirming limit compliance
+    before each investment. This creates both a compliance and UX design
+    challenge.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Investment limit enforcement system:**
+      1. Build investor profiling module that categorizes investors by
+         income/asset tier and qualified investor status, with annual
+         re-verification.
+      2. Implement real-time investment limit tracker that calculates
+         remaining annual capacity for each investor across all platform
+         offerings.
+      3. Deploy pre-investment limit check API that blocks investments
+         exceeding the applicable limit, with clear error messaging.
+
+      **Investor declaration workflow:**
+      4. Build digital declaration workflow requiring explicit investor
+         confirmation of limit compliance with e-signature before each
+         investment.
+      5. Implement investor onboarding KYC that collects income and
+         asset declarations for tier classification.
+      6. Store all declarations with immutable timestamps for regulatory
+         evidence.
+    tools:
+      - postgresql
+      - redis
+      - api-gateway
+      - digital-signature
+      - kubernetes
+  devsecops:
+    prose: |
+      **Limit calculation integrity:**
+      1. Extensive unit testing for investment limit calculations
+         covering: tier classification, cross-platform aggregation,
+         calendar year boundaries, qualified investor exemption.
+      2. SAST scanning for limit enforcement code to detect bypass
+         vulnerabilities (e.g., race conditions allowing concurrent
+         investments to exceed limits).
+      3. Integration tests simulating multi-platform investment
+         scenarios with shared investor identity.
+
+      **Security of financial data:**
+      4. Secret detection to prevent investor financial information
+         (income, assets) from leaking into logs or non-secure storage.
+      5. Code review by compliance team for any changes to limit
+         calculation logic.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - jest
+  secops:
+    prose: |
+      **Limit compliance monitoring:**
+      1. Daily report of investors approaching annual limits (80%, 90%,
+         95% thresholds) with proactive notification to the investor.
+      2. Monitor for limit circumvention attempts: multiple accounts,
+         identity fraud, falsified income declarations.
+      3. Post-hoc reconciliation of investor declarations against
+         actual investment activity.
+
+      **Regulatory evidence:**
+      4. Maintain complete audit trail of all limit checks, investor
+         declarations, and any override decisions.
+      5. Annual report to CVM on investor limit compliance rates and
+         any breaches detected.
+    tools:
+      - siem
+      - grc-platform
+      - fraud-detection
+legal_references:
+  - framework_id: cvm-175
+    articles: ["art-48"]
+    relationship: complements
+  - framework_id: cvm-135
+    articles: ["art-20"]
+    relationship: complements

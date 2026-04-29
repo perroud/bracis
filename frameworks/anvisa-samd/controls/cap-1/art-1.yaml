@@ -1,0 +1,108 @@
+id: art-1
+family: cap-1
+title: "Escopo e Definicao de Software como Dispositivo Medico"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 1. Esta Resolução estabelece os requisitos técnicos e regulatórios
+    aplicáveis ao Software como Dispositivo Médico (SaMD) para fins de
+    registro, alteração, revalidação e cancelamento de registro junto à
+    Agência Nacional de Vigilância Sanitária (ANVISA).
+
+    Parágrafo 1. Entende-se por Software como Dispositivo Médico (SaMD)
+    o software destinado a ser usado para uma ou mais finalidades médicas,
+    que desempenha essas finalidades sem fazer parte de um dispositivo
+    médico de hardware (in vitro ou implantável).
+
+    Parágrafo 2. Não se enquadram como SaMD:
+    I - software que aciona ou controla hardware de dispositivo médico;
+    II - software de gestão hospitalar sem função clínica direta;
+    III - aplicativos de bem-estar geral sem finalidade médica declarada.
+guidance:
+  prose: |
+    O art. 1 delimita o escopo regulatorio da RDC 657/2022 adotando a
+    definicao de SaMD do IMDRF (International Medical Device Regulators
+    Forum), alinhando o Brasil ao consenso regulatorio internacional.
+
+    **Criterio fundamental de enquadramento:**
+    Um software e SaMD quando (1) tem finalidade medica declarada e
+    (2) opera de forma independente de hardware de dispositivo medico.
+    O criterio determinante e a intencao de uso declarada pelo fabricante.
+
+    **Exemplos de SaMD:**
+    - Software de triagem clinica baseado em questionarios validados
+    - Aplicativo de analise de imagens radiologicas com auxilio de IA
+    - Plataforma de telemonitoramento com alertas clinicos automatizados
+    - Software de apoio a decisao clinica para prescricao medicamentosa
+
+    **Exemplos que NAO sao SaMD:**
+    - Software embarcado em monitor multiparametrico (faz parte do hardware)
+    - Sistema de prontuario eletronico sem funcao de decisao clinica
+    - Aplicativo de meditacao ou rastreamento de passos sem declaracao medica
+
+    **Alinhamento internacional:**
+    A definicao brasileira segue IMDRF/SaMD WG/N10:2013, compativel com
+    MDR 2017/745 (EU), FDA 21 CFR 820 (EUA) e TGA (Australia).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificacao e catalogacao de software em escopo:**
+      1. Criar taxonomia de classificacao para todos os componentes de
+         software do portfolio, identificando quais se enquadram como SaMD
+         versus software acessorio ou software de gestao.
+      2. Implementar metadados obrigatorios em cada repositorio que
+         declarem: finalidade medica (sim/nao), independencia de hardware
+         (sim/nao), classe de risco (I/II/III/IV).
+      3. Manter catalogo centralizado (CMDB ou Service Catalog) com
+         registro de todos os SaMD, suas versoes, status regulatorio
+         e dependencias de infraestrutura.
+      4. Definir politica de compliance como codigo (OPA/Kyverno) que
+         impeca deploy de SaMD sem metadados regulatorios preenchidos.
+    tools:
+      - cmdb
+      - opa-gatekeeper
+      - kyverno
+      - service-catalog
+  devsecops:
+    prose: |
+      **Pipeline regulatorio para SaMD:**
+      1. Criar label de repositorio "samd-regulated" que ativa pipeline
+         especializado com gates regulatorios obrigatorios.
+      2. Implementar verificacao automatica de intencao de uso: todo
+         novo servico ou funcionalidade deve declarar se tem finalidade
+         medica antes de merge na branch principal.
+      3. Manter rastreabilidade bidirecional entre requisitos regulatorios
+         (RDC 657) e artefatos de codigo (user stories, commits, tests).
+      4. Bloquear deploy de software classificado como SaMD que nao
+         possua registro ANVISA valido no catalogo regulatorio.
+    tools:
+      - gitlab-ci
+      - compliance-pipeline
+      - requirements-tracing
+      - regulatory-catalog
+  secops:
+    prose: |
+      **Governanca de enquadramento regulatorio:**
+      1. Designar Responsavel Tecnico (RT) e Responsavel Regulatorio
+         para o programa de SaMD da organizacao.
+      2. Implementar processo formal de avaliacao de enquadramento para
+         cada novo software ou funcionalidade, documentando a analise
+         de intencao de uso medico.
+      3. Manter registro de todos os SaMD com seus respectivos numeros
+         de registro ANVISA, datas de validade e historico de alteracoes.
+      4. Realizar auditoria semestral de enquadramento para detectar
+         software nao classificado que possa ter adquirido funcao medica
+         por evolucao de funcionalidades.
+    tools:
+      - grc-platform
+      - regulatory-tracking
+      - document-management
+      - audit-trail
+legal_references:
+  - framework_id: hipaa
+    articles: ["164-312"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: complements

@@ -1,0 +1,129 @@
+id: rec-14
+family: seguranca
+title: "HL7 FHIR Interoperability Standards"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 26. Os sistemas de prescrição eletrônica e dispensação devem
+    adotar padrões de interoperabilidade reconhecidos internacionalmente
+    para troca de informações, observando:
+
+    I — utilização do padrão HL7 FHIR (Fast Healthcare Interoperability
+    Resources) versão R4 ou superior como formato de troca de dados de
+    prescrição entre sistemas;
+
+    II — adoção dos recursos FHIR MedicationRequest para prescrições e
+    MedicationDispense para dispensações;
+
+    III — utilização de terminologias padronizadas: CID-10 para
+    diagnósticos, DCB/DCI para medicamentos e CNES para identificação
+    de estabelecimentos de saúde;
+
+    IV — publicação de APIs abertas seguindo o padrão RESTful FHIR para
+    integração com sistemas de saúde, prontuários eletrônicos e
+    aplicativos de pacientes;
+
+    V — conformidade com o perfil FHIR BR (brasileiro) definido pela
+    Rede Nacional de Dados em Saúde (RNDS) do Ministério da Saúde.
+
+    Parágrafo único. Os sistemas devem ser capazes de receber e processar
+    prescrições eletrônicas de outros sistemas credenciados, garantindo
+    interoperabilidade bidirecional.
+guidance:
+  prose: |
+    Article 26 mandates HL7 FHIR R4+ as the interoperability standard
+    for electronic prescription data exchange, aligning Brazil's
+    prescription ecosystem with international healthcare interoperability
+    standards.
+
+    **FHIR resources required:**
+    - MedicationRequest: for electronic prescriptions
+    - MedicationDispense: for dispensation records
+    - Patient: for patient identification
+    - Practitioner: for prescriber identification
+    - Organization: for healthcare facility identification
+    - Medication: for drug catalog entries
+
+    **Terminology standards:**
+    - ICD-10 (CID-10 in Brazil): diagnosis codes
+    - DCB/DCI: drug naming (Brazilian/International Common Denomination)
+    - CNES: healthcare facility registry codes
+    - TUSS: healthcare procedure codes (when applicable)
+
+    **RNDS integration:**
+    The regulation aligns with Brazil's National Health Data Network
+    (RNDS), which uses FHIR BR profiles as the national standard for
+    health data exchange. Prescription systems must conform to these
+    profiles.
+
+    **Bidirectional interoperability:**
+    Systems must both publish and consume FHIR resources, enabling
+    prescriptions to flow between different software vendors seamlessly.
+    This prevents vendor lock-in and enables patient-centric workflows.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **FHIR interoperability platform:**
+      1. Implement a FHIR R4 server (e.g., HAPI FHIR, IBM FHIR,
+         Microsoft FHIR Server) supporting MedicationRequest,
+         MedicationDispense, Patient, Practitioner, Organization,
+         and Medication resources.
+      2. Deploy FHIR BR profile validation using the official Brazilian
+         FHIR profiles from RNDS, rejecting non-conformant resources.
+      3. Implement terminology services for CID-10, DCB/DCI, and
+         CNES code validation and resolution.
+      4. Deploy an integration bus or FHIR facade for legacy systems
+         that cannot natively produce FHIR resources, with
+         bidirectional transformation.
+      5. Implement SMART on FHIR authorization for third-party
+         application access to prescription data, with patient
+         consent management.
+    tools:
+      - hapi-fhir
+      - fhir-server
+      - terminology-service
+      - integration-bus
+      - smart-on-fhir
+      - oauth2
+  devsecops:
+    prose: |
+      **FHIR conformance testing:**
+      1. Run FHIR validation suite (HL7 FHIR Validator) against all
+         generated resources on every build to ensure profile
+         conformance.
+      2. Implement interoperability tests exchanging prescriptions
+         between multiple FHIR server implementations.
+      3. Add terminology validation tests verifying correct CID-10,
+         DCB/DCI, and CNES code usage in resources.
+      4. Deploy contract tests for FHIR API endpoints to ensure
+         backward compatibility across versions.
+    tools:
+      - gitlab-ci
+      - fhir-validator
+      - touchstone
+      - contract-testing
+      - interoperability-tests
+  secops:
+    prose: |
+      **FHIR interoperability operations:**
+      1. Monitor FHIR API availability and response times for all
+         connected systems, alerting on degradation.
+      2. Audit FHIR resource validation failure rates by source
+         system and coordinate corrections.
+      3. Track terminology code usage patterns and alert on
+         deprecated or invalid codes.
+      4. Conduct annual interoperability assessments with connected
+         systems to verify ongoing FHIR profile conformance.
+    tools:
+      - api-monitoring
+      - fhir-analytics
+      - terminology-audit
+      - interoperability-dashboard
+legal_references:
+  - framework_id: tiss
+    articles: ["art-1", "art-5"]
+    relationship: complements
+  - framework_id: pep
+    articles: ["art-4", "art-6"]
+    relationship: complements

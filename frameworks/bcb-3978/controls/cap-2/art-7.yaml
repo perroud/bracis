@@ -1,0 +1,114 @@
+id: art-7
+family: cap-2
+title: "Categorias de Risco"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 7. Com base na avaliação interna de risco de que trata o art. 6, as instituições
+    devem definir categorias de risco que possibilitem a adoção de controles de gerenciamento
+    de risco de prevenção à lavagem de dinheiro e ao financiamento do terrorismo de forma
+    proporcional ao risco identificado.
+guidance:
+  prose: |
+    O art. 7 determina que a avaliacao de risco do art. 6 deve se materializar em
+    categorias de risco concretas que orientam a intensidade dos controles aplicados.
+
+    **Principio da proporcionalidade:**
+    Controles de PLD/FT devem ser proporcionais ao nivel de risco identificado.
+    Isso significa:
+    - Risco baixo: controles simplificados (due diligence simplificada)
+    - Risco medio: controles padrao (due diligence padrao)
+    - Risco alto: controles reforcados (enhanced due diligence)
+
+    **Categorias tipicas:**
+    Embora a circular nao prescreva categorias especificas, a pratica de mercado
+    utiliza tipicamente:
+    - Risco muito baixo / Baixo / Medio / Alto / Muito alto
+    - Ou escala numerica (1 a 5) com descritores
+
+    **Aplicacao pratica:**
+    Cada categoria deve ter associada:
+    - Nivel de due diligence exigido (simplificada, padrao, reforcada)
+    - Frequencia de atualizacao cadastral
+    - Intensidade do monitoramento transacional
+    - Regras de alerta diferenciadas
+    - Nivel de aprovacao para inicio/manutencao de relacao
+
+    **Granularidade:**
+    As categorias devem ser suficientemente granulares para diferenciar tratamentos,
+    mas nao tao granulares que inviabilizem a operacionalizacao. Tres a cinco
+    niveis e considerado adequado pelo mercado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de categorizacao de risco:**
+      1. Modelo de scoring que combina fatores de risco em score numerico.
+      2. Regras de mapeamento de score para categoria de risco (ex: 0-30 baixo,
+         31-60 medio, 61-100 alto).
+      3. Limiares configuraveis por compliance officer sem necessidade de deploy.
+      4. Historico de classificacoes de risco por cliente com data e justificativa.
+
+      **Controles diferenciados por categoria:**
+      5. Configuracao de workflows diferenciados por nivel de risco:
+         - Baixo: onboarding automatico, monitoramento batch
+         - Medio: verificacao adicional, monitoramento near-real-time
+         - Alto: aprovacao manual, monitoramento real-time, revisao periodica
+      6. Regras de monitoramento parametrizadas por categoria de risco.
+      7. Frequencia de atualizacao cadastral automatizada por categoria:
+         - Baixo: a cada 5 anos
+         - Medio: a cada 2 anos
+         - Alto: anual
+      8. Limites transacionais diferenciados por categoria de risco.
+    tools:
+      - aml-platform
+      - rules-engine
+      - workflow-engine
+      - scoring-engine
+  devsecops:
+    prose: |
+      **Validacao do modelo de categorias:**
+      1. Testes unitarios para logica de scoring e mapeamento score-categoria.
+      2. Testes de fronteira (boundary tests) nos limiares de categoria.
+      3. Testes de distribuicao para verificar que categorias nao estao
+         desbalanceadas (ex: 99% em risco baixo indica modelo inadequado).
+      4. Backtesting contra comunicacoes ao COAF historicas.
+
+      **Pipeline de recategorizacao:**
+      5. Job batch para recategorizacao periodica de toda a base de clientes.
+      6. Trigger de recategorizacao em tempo real quando atributo relevante muda.
+      7. Alertas automaticos quando cliente muda de categoria de risco.
+      8. Relatorio de migracoes entre categorias (upgrade/downgrade).
+    tools:
+      - gitlab-ci
+      - batch-processing
+      - event-streaming
+      - monitoring
+  secops:
+    prose: |
+      **Governanca das categorias:**
+      1. Documentacao da metodologia de categorizacao aprovada pelo diretor.
+      2. Revisao periodica dos limiares de categoria (anual ou quando necessario).
+      3. Analise de distribuicao por categoria para validar adequacao do modelo.
+      4. Validacao independente (auditoria interna) da categorizacao.
+
+      **Monitoramento de efetividade:**
+      5. Correlacao entre categoria de risco e comunicacoes ao COAF.
+      6. Analise de clientes comunicados que estavam em risco baixo (indicador
+         de falha no modelo).
+      7. Benchmarking de distribuicao de categorias com pares do mercado.
+      8. Relatorio de efetividade do modelo para o comite de PLD/FT.
+    tools:
+      - grc-platform
+      - aml-platform
+      - reporting-dashboard
+      - audit-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "RA-3", "PM-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.9", "A.5.10"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

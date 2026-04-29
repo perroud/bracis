@@ -1,0 +1,121 @@
+id: art-8
+family: cap-2
+title: "Perfil de Risco dos Clientes"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 8. Na definição das categorias de risco de que trata o art. 7, devem ser
+    considerados, no mínimo, em relação ao cliente:
+    I - a identificação do cliente e, quando for o caso, do beneficiário final;
+    II - a qualificação do cliente;
+    III - a natureza e a finalidade da relação de negócio;
+    IV - a capacidade financeira do cliente;
+    V - os valores envolvidos nas transações dos clientes;
+    VI - a origem e a destinação dos recursos;
+    VII - a área geográfica de residência ou de atuação do cliente.
+guidance:
+  prose: |
+    O art. 8 detalha os fatores minimos que devem compor o perfil de risco dos
+    clientes para fins de categorizacao.
+
+    **I - Identificacao e beneficiario final:**
+    Qualidade e completude da identificacao afetam o risco. Clientes com
+    identificacao incompleta, documentacao fragil ou beneficiario final nao
+    identificado representam risco mais elevado.
+
+    **II - Qualificacao:**
+    Atividade economica, profissao, funcao publica (PEP). Atividades de alto
+    risco incluem: joalherias, casas de cambio, comercio de arte, imoveis,
+    criptoativos, ONGs internacionais.
+
+    **III - Natureza da relacao:**
+    O proposito da relacao de negocio influencia o risco. Conta corrente para
+    pessoa fisica assalariada tem perfil diferente de conta para holding
+    offshore com multiplos beneficiarios.
+
+    **IV - Capacidade financeira:**
+    Renda declarada, patrimonio, faturamento. Operacoes incompativeis com a
+    capacidade financeira sao o principal indicador de lavagem de dinheiro.
+
+    **V - Valores transacionados:**
+    Volume e frequencia de transacoes. Operacoes de alto valor ou alta
+    frequencia em relacao ao perfil declarado indicam risco elevado.
+
+    **VI - Origem e destino dos recursos:**
+    Paises de origem/destino, natureza dos pagadores/recebedores,
+    justificativa economica das movimentacoes.
+
+    **VII - Area geografica:**
+    Jurisdicoes de alto risco (GAFI grey list), regioes de fronteira,
+    paraisos fiscais, paises com deficiencias em AML.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelo de scoring de risco de cliente:**
+      1. Variavel de identificacao: qualidade da documentacao, completude cadastral,
+         biometria validada, beneficiario final identificado.
+      2. Variavel de qualificacao: CNAE/CBO de risco, PEP (titular/familiar/proximo),
+         status de sancoes.
+      3. Variavel de relacao: tipo de conta, proposito declarado, tempo de relacao.
+      4. Variavel de capacidade financeira: renda/faturamento declarado, patrimonio.
+      5. Variavel transacional: volume medio mensal, ticket medio, frequencia.
+      6. Variavel de origem/destino: paises de risco nos fluxos, concentracao.
+      7. Variavel geografica: jurisdicao de residencia, GAFI grey/black list.
+
+      **Infraestrutura de dados:**
+      8. Data lake com dados de todas as dimensoes de risco consolidados.
+      9. Feature store para variaveis calculadas (media movel, percentil).
+      10. Cache distribuido para consultas de risco em tempo real no onboarding.
+      11. ETL automatizado para atualizacao periodica de variaveis de risco.
+    tools:
+      - aml-platform
+      - scoring-engine
+      - data-pipeline
+      - feature-store
+  devsecops:
+    prose: |
+      **Validacao do perfil de risco:**
+      1. Testes unitarios para calculo de cada variavel de risco.
+      2. Testes de integracao para fluxo completo de scoring de cliente.
+      3. Testes de regressao quando variaveis ou pesos sao alterados.
+      4. Data quality checks para cada fonte de dados que alimenta o modelo.
+
+      **Monitoramento de qualidade:**
+      5. Alertas quando completude cadastral cai abaixo de threshold.
+      6. Metricas de qualidade de dados por variavel de risco.
+      7. Pipeline de deteccao de anomalias em dados de entrada.
+      8. Relatorios automatizados de distribuicao de risco por variavel.
+    tools:
+      - gitlab-ci
+      - data-quality
+      - monitoring
+      - test-automation
+  secops:
+    prose: |
+      **Governanca do perfil de risco:**
+      1. Documentacao da metodologia de scoring com justificativa para cada
+         variavel e peso.
+      2. Validacao periodica do modelo por auditoria interna ou consultoria.
+      3. Revisao dos fatores de risco quando houver nova tipologia de PLD/FT.
+      4. Atualizacao de listas de jurisdicoes de alto risco conforme GAFI.
+
+      **Monitoramento operacional:**
+      5. Dashboard com distribuicao de clientes por categoria de risco.
+      6. Alertas quando concentracao em uma categoria excede threshold.
+      7. Analise de clientes comunicados vs. categoria atribuida (feedback loop).
+      8. Relatorio trimestral de qualidade do modelo para o comite de PLD/FT.
+    tools:
+      - grc-platform
+      - aml-platform
+      - reporting-dashboard
+      - risk-assessment-tool
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-2", "RA-3", "RA-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.9", "A.5.10", "A.5.12"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

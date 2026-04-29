@@ -1,0 +1,109 @@
+id: basel-or-sma
+family: operational-risk
+title: "Operational Risk — Standardised Measurement Approach (SMA)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    From January 2023 (phased to 2028 in some jurisdictions), all banks must calculate
+    minimum capital requirements for operational risk using the Standardised Measurement
+    Approach (SMA), which replaces all previous approaches (Basic Indicator Approach, BIA;
+    Standardised Approach, TSA/ASA; and Advanced Measurement Approach, AMA). Under the SMA,
+    operational risk capital is calculated as the product of a Business Indicator Component
+    (BIC) and an Internal Loss Multiplier (ILM). The Business Indicator (BI) is a proxy for
+    operational risk exposure and is computed as the sum of three components derived from
+    the income statement: (1) the Interest, Leases and Dividend Component (ILDC), measured
+    as the average of the absolute value of net interest income and dividend income over three
+    years; (2) the Services Component (SC), measured as the average of the maximum of fee
+    income and fee expense, and the maximum of other operating income and other operating
+    expense; and (3) the Financial Component (FC), measured as the average of the absolute
+    values of net P&L on the trading book and banking book. Banks with BI > EUR 1bn must
+    incorporate their 10-year internal loss history into the ILM, which scales the BIC up
+    (for banks with higher-than-average losses) or down (for banks with lower-than-average
+    losses) relative to a reference level.
+
+guidance:
+  prose: >-
+    The SMA was introduced to address the model complexity and non-comparability of AMA
+    results across banks, which had allowed some large banks to significantly reduce their
+    operational risk capital by arguing that their risk management practices warranted a
+    lower charge. The SMA eliminates internal modelling discretion from the minimum capital
+    calculation, though supervisors retain the ability to require additional Pillar 2 capital
+    for banks with deficient operational risk management. Banks with BI above EUR 1bn must
+    now invest in maintaining a high-quality internal loss database (ILD) containing all
+    gross operational risk loss events of EUR 20,000 or more over the past 10 years, with
+    accurate date, business line, loss amount, and loss type data. The ILM introduces
+    operational risk accountability: banks with poor loss experience will pay higher capital
+    charges. Banks must therefore treat internal loss data quality as a capital-critical
+    process. Mapping losses to the correct BI component for ILM calculation requires careful
+    alignment between the accounting team (source of BI data) and the operational risk team
+    (source of ILD data).
+
+references:
+  - citation: "BCBS, Basel III: Finalising post-crisis reforms, December 2017, Chapter 9"
+    url: "https://www.bis.org/bcbs/publ/d424.htm"
+  - citation: "BCBS, Calculation of RWA for operational risk (OPE), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/OPE/01.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build an integrated SMA calculation platform that: (a) pulls BI component data from
+      the general ledger and management accounting systems on a quarterly basis and computes
+      the three-year average BI; (b) maintains the internal loss database (ILD) as a
+      structured, auditable dataset with mandatory fields (gross loss amount, date of
+      occurrence, date of discovery, recovery amount, business line, Basel event type, cause);
+      (c) computes the ILM from the 10-year ILD history annually; and (d) calculates the
+      SMA operational risk capital requirement, applying the BIC bucket multipliers
+      (12%, 15%, 18%) and the ILM. Expose SMA metrics in the firmwide capital dashboard
+      with trend charts showing the impact of material loss events on the ILM and capital
+      requirement.
+    tools:
+      - postgresql
+      - dbt
+      - apache-airflow
+      - grafana
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain BIC multiplier tables and ILM formula logic as versioned code with
+      automated unit tests confirming correctness against the BCBS SMA worked examples.
+      Implement automated data quality checks on ILD ingestion — flag entries with missing
+      required fields, gross losses below EUR 20k threshold, or suspicious rounding
+      (all figures ending in 000) before they enter the ILM calculation. Build automated
+      reconciliation between SMA capital outputs and COREP C 47.00 template. Implement
+      change control for any retroactive correction to historical ILD records with full
+      audit trail.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - sonarqube
+
+  secops:
+    prose: >-
+      Operational loss data is sensitive; restrict access to the ILD to the operational
+      risk team and internal audit. Implement controls to prevent manipulation of loss
+      amounts or event dates that would affect the ILM. Retain all ILD records for at
+      least 10 years with immutable audit trail. Monitor for access to the ILD from
+      unexpected systems or user accounts. Include ILD and SMA systems in annual DR
+      testing to confirm recoverability within regulatory reporting deadlines.
+    tools:
+      - cyberark
+      - hashicorp-vault
+      - splunk
+      - aws-s3-object-lock
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9", "art-10"]
+    relationship: complements
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12", "DSS05"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2", "AU-9", "AC-5"]
+    relationship: mapped

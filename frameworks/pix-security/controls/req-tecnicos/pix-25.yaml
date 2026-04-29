@@ -1,0 +1,99 @@
+id: pix-25
+family: req-tecnicos
+title: "Contingencia e Continuidade Operacional"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP participante do arranjo Pix deve implementar plano de contingência e
+    continuidade operacional específico para o canal Pix, contemplando cenários de
+    falha de infraestrutura, indisponibilidade do SPI ou DICT, falha de enlace RSFN,
+    incidente de segurança cibernética e desastre natural. O plano deve prever
+    procedimentos de failover, comunicação ao BCB, notificação aos usuários e
+    recuperação dentro dos SLAs definidos.
+guidance:
+  prose: |
+    **Cenarios de contingencia obrigatorios:**
+
+    1. **Falha de infraestrutura do PSP:**
+       - Servidor de aplicacao: failover automatico para instancia standby.
+       - Banco de dados: replicacao sincrona com failover automatico.
+       - Rede interna: enlaces redundantes com roteamento automatico.
+
+    2. **Indisponibilidade do SPI:**
+       - Enfileiramento de transacoes para envio posterior.
+       - Notificacao ao usuario sobre atraso na liquidacao.
+       - Comunicacao ao BCB sobre impacto operacional.
+
+    3. **Falha de enlace RSFN:**
+       - Failover automatico para enlace secundario.
+       - Se ambos os enlaces falham: contingencia manual ou suspensao temporaria.
+
+    4. **Incidente de seguranca cibernetica:**
+       - Isolamento de componentes comprometidos.
+       - Ativacao do plano de resposta a incidentes.
+       - Comunicacao ao BCB conforme Resolucao BCB 85.
+
+    5. **Desastre natural ou falha de site:**
+       - Ativacao de site de disaster recovery.
+       - RTO (Recovery Time Objective) e RPO (Recovery Point Objective) definidos.
+
+    **Testes obrigatorios:**
+    O plano de contingencia deve ser testado periodicamente (minimo semestral) com
+    simulacoes realistas e documentacao dos resultados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de DR:**
+      1. Site de disaster recovery em regiao geografica distinta.
+      2. Replicacao de dados sincrona ou assincrona (conforme RPO definido).
+      3. Failover automatizado com RTO < 30 minutos para servicos Pix.
+      4. Testes de DR semestrais com failover real para o site secundario.
+
+      **Resiliencia de aplicacao:**
+      5. Circuit breakers em todas as integracoes externas (SPI, DICT, parceiros).
+      6. Retry com backoff exponencial e jitter para evitar thundering herd.
+      7. Graceful degradation: funcionalidades nao-criticas desabilitadas sob estresse.
+      8. Queue-based architecture para absorver picos e falhas temporarias.
+    tools:
+      - disaster-recovery
+      - database-replication
+      - circuit-breaker
+      - message-queue
+      - chaos-engineering
+  devsecops:
+    prose: |
+      **Testes de contingencia:**
+      1. Chaos engineering: injecao de falhas em producao controlada.
+      2. Testes de failover de banco de dados com validacao de RPO.
+      3. Testes de failover RSFN com medicao de tempo de recuperacao.
+      4. Game day: simulacao de incidente completo com equipe interdisciplinar.
+      5. DR drill: failover para site secundario com verificacao de funcionalidade.
+    tools:
+      - chaos-engineering
+      - gitlab-ci
+      - dr-testing
+      - game-day-platform
+  secops:
+    prose: |
+      **Gestao de continuidade:**
+      1. BCP (Business Continuity Plan) documentado e atualizado para canal Pix.
+      2. Runbooks de contingencia para cada cenario documentado.
+      3. Arvore de comunicacao para acionamento de equipes em incidentes.
+      4. Comunicacao ao BCB conforme procedimento do arranjo.
+      5. Post-mortem de cada exercicio de DR com plano de melhoria.
+    tools:
+      - bcp-platform
+      - runbook-automation
+      - incident-management
+      - communication-platform
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-9", "art-10", "art-11"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-9", "art-10"]
+    relationship: complements
+  - framework_id: bcb-44
+    articles: ["art-18", "art-19"]
+    relationship: implements

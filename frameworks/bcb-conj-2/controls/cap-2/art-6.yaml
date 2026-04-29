@@ -1,0 +1,154 @@
+id: art-6
+family: cap-2
+title: "Canal e Formato da Notificacao ao BCB"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 6. A notificação de que trata o art. 3 deve ser encaminhada ao Banco
+    Central do Brasil por meio dos canais de comunicação definidos pelo regulador.
+
+    § 1º O Banco Central do Brasil poderá solicitar informações complementares
+    além daquelas previstas no art. 4.
+
+    § 2º A notificação prevista neste Capítulo não exime a instituição do dever
+    de comunicar a ocorrência de incidentes de segurança a outros órgãos e
+    entidades competentes, nos termos da legislação vigente.
+guidance:
+  prose: |
+    O art. 6 trata dos aspectos operacionais da comunicacao com o BCB e reafirma
+    a cumulatividade das obrigacoes de notificacao.
+
+    **Canal de comunicacao:**
+    O BCB define os canais oficiais para recebimento de notificacoes. Atualmente:
+    - Sistema de comunicacao oficial do BCB (via UNICAD ou sistema proprio)
+    - E-mail institucional da area de supervisao competente
+    - Em casos de extrema urgencia (ex: incidente critico no SFN), contato
+      telefonico com a area de supervisao seguido de formalizacao escrita
+
+    A instituicao deve testar periodicamente o canal de comunicacao para garantir
+    que esta operacional e que os contatos estao atualizados.
+
+    **Informacoes complementares (ss 1):**
+    O BCB pode solicitar informacoes adicionais alem do conteudo minimo do art. 4.
+    Isso pode incluir:
+    - Detalhamento tecnico do ataque (TTPs, IOCs)
+    - Logs e evidencias forenses
+    - Informacoes sobre terceiros envolvidos
+    - Detalhamento de medidas de mitigacao
+    - Avaliacao de impacto financeiro detalhada
+    A instituicao deve ter capacidade de fornecer essas informacoes em tempo habil.
+
+    **Cumulatividade com outros orgaos (ss 2):**
+    A notificacao ao BCB nao substitui outras obrigacoes:
+    - ANPD (Lei 13.709/2018 - LGPD, art. 48): incidentes envolvendo dados pessoais
+    - CVM (se afetar mercado de capitais ou valores mobiliarios)
+    - SUSEP (se envolver operacoes de seguros)
+    - Policia Federal (crimes ciberneticos)
+    - CERT.br (recomendado para compartilhamento de IOCs)
+    - Titulares de dados pessoais (LGPD art. 48, ss 1)
+
+    A instituicao deve manter checklist regulatorio para cada incidente, verificando
+    todas as obrigacoes de notificacao aplicaveis.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com canais do BCB:**
+      1. Configuracao e teste periodico do canal de comunicacao com o BCB.
+      2. Automacao de envio de notificacao via API ou formulario oficial do BCB,
+         quando disponivel.
+      3. Fallback documentado: se canal principal falhar, procedimento manual de
+         envio por e-mail ou telefone com formalizacao posterior.
+      4. Registro automatico de confirmacao de envio e recebimento.
+
+      **Capacidade de resposta a solicitacoes complementares (ss 1):**
+      5. Repositorio centralizado de evidencias do incidente acessivel para equipe
+         de compliance.
+      6. Export automatizado de logs, IOCs e timeline para atender solicitacoes
+         do BCB em < 4 horas.
+      7. Templates para relatorios complementares com nivel de detalhe tecnico
+         adequado ao regulador.
+
+      **Orquestracao multi-orgao (ss 2):**
+      8. Workflow de notificacao que, ao classificar o incidente, identifica
+         automaticamente todos os orgaos que devem ser notificados:
+         - Dados pessoais comprometidos -> adicionar ANPD a lista
+         - Impacto em valores mobiliarios -> adicionar CVM a lista
+         - Crime cibernetico identificado -> adicionar Policia Federal a lista
+      9. Status tracking de cada notificacao (enviada, recebida, respondida).
+      10. Dashboard consolidado de comunicacoes regulatorias do incidente.
+    tools:
+      - incident-management
+      - soar
+      - centralized-logging
+      - communication-tools
+      - grc-platform
+  devsecops:
+    prose: |
+      **Export de dados tecnicos para notificacao:**
+      1. Pipeline de export de IOCs (Indicators of Compromise) em formato padrao
+         (STIX/TAXII) para compartilhamento com BCB e outros orgaos.
+      2. Log aggregation com capacidade de export filtrado por periodo, sistema
+         e tipo de evento para atender solicitacoes complementares.
+      3. SBOM exportavel para demonstrar composicao dos sistemas afetados.
+
+      **Rastreabilidade multi-orgao:**
+      4. Registro no incident management de todas as notificacoes enviadas a
+         cada orgao regulador, com status de acompanhamento.
+      5. Templates diferenciados por orgao regulador no repositorio de
+         documentacao de incidentes.
+      6. Checklist automatizado no pipeline de encerramento de incidente:
+         "Todas as notificacoes regulatorias foram enviadas?"
+    tools:
+      - gitlab-ci
+      - centralized-logging
+      - stix-taxii
+      - incident-management
+  secops:
+    prose: |
+      **Gestao de canais de comunicacao com o BCB:**
+      1. Cadastro atualizado dos contatos do BCB para notificacao de incidentes.
+      2. Teste semestral do canal de comunicacao (exercicio de notificacao simulada).
+      3. Backup do canal principal: se sistema indisponivel, e-mail oficial; se
+         e-mail falhar, contato telefonico com formalizacao em ate 24 horas.
+      4. Documentacao do canal principal e fallbacks aprovada pelo CISO.
+
+      **Atendimento a solicitacoes complementares (ss 1):**
+      5. Processo formal para receber e atender solicitacoes do BCB.
+      6. SLA interno para fornecimento de informacoes complementares: ate 24 horas
+         para informacoes disponiveis; ate 72 horas para informacoes que exijam
+         investigacao adicional.
+      7. Equipe juridica envolvida na revisao de informacoes antes do envio.
+      8. Registro de todas as interacoes com o BCB durante o incidente.
+
+      **Checklist multi-orgao (ss 2):**
+      9. Para cada incidente, executar checklist de obrigacoes:
+         | Orgao/Entidade     | Criterio de Notificacao                | Prazo         |
+         |--------------------|----------------------------------------|---------------|
+         | BCB                | Incidente relevante (art. 3)           | 24 horas      |
+         | ANPD               | Dados pessoais comprometidos           | 2 dias uteis  |
+         | CVM                | Impacto em valores mobiliarios         | Imediato      |
+         | SUSEP              | Operacoes de seguros afetadas          | Conforme norma|
+         | Policia Federal    | Crime cibernetico                      | Imediato      |
+         | Titulares (LGPD)   | Dados pessoais comprometidos           | Prazo razoavel|
+         | CERT.br            | IOCs para compartilhamento             | Recomendado   |
+      10. Registro da decisao e justificativa para cada orgao (notificou/nao notificou).
+      11. Retencao de todas as comunicacoes regulatorias por minimo de 5 anos.
+    tools:
+      - grc-platform
+      - incident-management
+      - soar
+      - communication-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-10"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-48", "art-49"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-6", "IR-7"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.26", "A.6.8"]
+    relationship: supports

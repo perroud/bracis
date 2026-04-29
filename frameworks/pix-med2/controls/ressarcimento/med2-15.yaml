@@ -1,0 +1,108 @@
+id: med2-15
+family: ressarcimento
+title: "Settlement Between PSPs and Victim Reimbursement"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    A liquidação financeira da devolução no âmbito do MED 2.0 deve ser realizada entre os PSPs
+    por meio do SPI, utilizando os mecanismos de liquidação existentes no arranjo Pix. O PSP
+    recebedor deve transferir os valores devolvidos diretamente ao PSP pagador, que por sua vez
+    deve creditar imediatamente a conta do usuário vítima de fraude. No caso de devoluções
+    provenientes de múltiplas contas em uma cadeia de bloqueio em cascata, cada PSP da cadeia
+    deve liquidar sua parcela diretamente com o PSP pagador. O PSP pagador é responsável pela
+    consolidação dos valores recebidos e pelo crédito integral ao usuário. Quando os valores
+    recuperados forem insuficientes para cobrir o prejuízo total do usuário, o PSP pagador deve
+    informar ao usuário o valor efetivamente recuperado e orientá-lo sobre as demais vias de
+    ressarcimento disponíveis, incluindo ação judicial contra o fraudador.
+guidance:
+  prose: |
+    **Settlement Flow:**
+
+    **Standard (single account):**
+    Receiver PSP → (SPI return) → Payer PSP → (credit) → Victim's account
+
+    **Cascade (multiple accounts):**
+    Receiver PSP A → (SPI return R$X) → Payer PSP
+    Receiver PSP B → (SPI return R$Y) → Payer PSP  → (credit R$X+Y+Z) → Victim
+    Receiver PSP C → (SPI return R$Z) → Payer PSP
+
+    **Key principles:**
+    1. **Direct settlement:** Each receiver PSP settles directly with the payer PSP —
+       no intermediary clearing for MED returns.
+    2. **Immediate credit:** The payer PSP must credit the victim as soon as it receives
+       return funds — no batching or delayed processing.
+    3. **Consolidated communication:** The victim receives a single notification of the
+       total recovered amount, even if it came from multiple sources.
+    4. **Shortfall handling:** When recovery is partial, the payer PSP must clearly
+       communicate the shortfall and advise on alternative remedies.
+    5. **No double recovery:** The cascade orchestrator must ensure the total returned
+       does not exceed the original fraud amount.
+
+    **Accounting:** PSPs must maintain separate ledger entries for MED returns to
+    facilitate reconciliation, regulatory reporting, and financial auditing.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a MED settlement orchestrator that manages the multi-party settlement
+         flow: track expected returns from each PSP in the cascade, receive confirmations,
+         and trigger victim credit when all returns are received (or after timeout).
+      2. Implement a settlement ledger with dedicated accounts for MED flows, enabling
+         clean reconciliation between fraud amounts, blocked amounts, returned amounts,
+         and victim credits.
+      3. Build a victim reimbursement service: upon receiving return confirmation(s),
+         immediately credit the victim's account and send a notification with the
+         recovered amount.
+      4. Implement shortfall communication: when the total recovered is less than the
+         fraud amount, generate a clear explanation for the victim including the
+         recovered amount, the shortfall, and guidance on alternative remedies.
+      5. Build anti-double-recovery controls: the settlement orchestrator must reject
+         return transactions that would cause total returns to exceed the original
+         fraud amount.
+    tools:
+      - settlement-engine
+      - spi-client
+      - ledger-system
+      - notification-service
+      - reconciliation-service
+  devsecops:
+    prose: |
+      1. Test single-account settlement: end-to-end from favorable decision to victim
+         credit, verify amounts and timing.
+      2. Test cascade settlement: multiple receiver PSPs returning different amounts,
+         verify consolidation and victim credit.
+      3. Test anti-double-recovery: attempt to process returns exceeding the fraud
+         amount and verify rejection.
+      4. Test shortfall communication: partial recovery scenarios with correct victim
+         messaging.
+      5. Test settlement reconciliation: verify ledger entries balance correctly across
+         all parties.
+      6. Test timeout handling: what happens when one PSP in the cascade fails to
+         return funds within the 96-hour window.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - financial-testing
+      - reconciliation-testing
+  secops:
+    prose: |
+      1. Monitor settlement completion times: time from favorable decision to victim
+         credit for each case.
+      2. Track recovery completeness: full recovery vs. partial recovery rates.
+      3. Monitor settlement exceptions: failed returns, timeout cases, reconciliation
+         discrepancies.
+      4. Daily settlement reconciliation: verify all MED returns balance correctly
+         across the ledger.
+      5. Monthly financial report on MED settlements for management, BCB, and audit.
+    tools:
+      - monitoring-platform
+      - reconciliation-dashboard
+      - alerting-system
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-21", "pix-22"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-22"]
+    relationship: implements

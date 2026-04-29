@@ -1,0 +1,86 @@
+id: oi-sa-01
+family: sa
+title: "Autenticacao via OAuth 2.0 e Perfil FAPI"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O Open Insurance adota o protocolo OAuth 2.0 com perfil FAPI (Financial-grade API)
+    1.0 Advanced como padrão obrigatório de autenticação e autorização para acesso a
+    APIs que requerem consentimento.
+
+    Os participantes devem implementar:
+    I - Authorization Server conforme FAPI 1.0 Advanced Security Profile;
+    II - Authorization Code Flow com PKCE (Proof Key for Code Exchange) obrigatório;
+    III - PAR (Pushed Authorization Requests) para proteger parâmetros de autorização;
+    IV - JARM (JWT Secured Authorization Response Mode) para proteger respostas de
+    autorização;
+    V - Token binding ou sender-constrained tokens para prevenir roubo de tokens;
+    VI - Escopos OAuth 2.0 alinhados com as categorias de dados do Open Insurance.
+
+    Access tokens devem ter validade máxima limitada e refresh tokens devem ser
+    vinculados ao consentimento, expirando junto com ele.
+guidance:
+  prose: |
+    O perfil FAPI 1.0 Advanced e o padrao de seguranca mais elevado para APIs
+    financeiras, adotado tambem pelo Open Finance Brasil, UK Open Banking e
+    Australian CDR.
+
+    As protecoes adicionais em relacao ao OAuth 2.0 basico incluem:
+    - PKCE: previne interceptacao de authorization codes
+    - PAR: previne manipulacao de parametros de autorizacao na URL
+    - JARM: protege respostas de autorizacao contra tampering
+    - Sender-constrained tokens: vinculam tokens ao certificado do cliente,
+      prevenindo roubo e replay
+
+    A implementacao deve ser certificada pela OpenID Foundation (conformance
+    testing). A SUSEP pode exigir evidencia de certificacao.
+
+    Access tokens devem ter validade curta (tipicamente 5 a 15 minutos) para
+    limitar a janela de exposicao em caso de comprometimento. Refresh tokens
+    permitem renovacao sem nova autorizacao do cliente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar ou adotar Authorization Server compativel com FAPI 1.0 Advanced
+         (ex: Keycloak com modulo FAPI, ForgeRock, Curity).
+      2. Configurar PKCE obrigatorio para todos os fluxos de autorizacao.
+      3. Implementar PAR endpoint para recepcao de authorization requests.
+      4. Configurar JARM para respostas de autorizacao.
+      5. Implementar mTLS-based sender-constrained tokens (certificate-bound access tokens).
+      6. Definir escopos OAuth 2.0 conforme especificacao do Open Insurance.
+      7. Configurar validade de access tokens (max 300 segundos) e refresh tokens
+         (vinculado ao prazo do consentimento).
+    tools:
+      - oauth2-server
+      - identity-provider
+      - pki-management
+      - api-gateway
+  devsecops:
+    prose: |
+      1. Executar FAPI conformance suite no pipeline de CI/CD para validar
+         conformidade do Authorization Server.
+      2. Testes de seguranca especificos: PKCE bypass, token replay, authorization
+         code injection, redirect URI manipulation.
+      3. Validar que tokens expirados e revogados sao rejeitados.
+      4. Testes de integracao com Diretorio de Participantes para validacao de
+         certificados.
+    tools:
+      - fapi-conformance-suite
+      - security-testing
+      - dast
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar uso de tokens: volume, taxa de erros, tentativas de replay.
+      2. Alertar sobre padroes anomalos de autorizacao (multiplas tentativas
+         falhadas, tokens de origens inesperadas).
+      3. Auditar certificacao FAPI periodicamente (recertificacao anual).
+    tools:
+      - siem
+      - oauth2-monitoring
+      - threat-detection
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-4", "art-5"]
+    relationship: complements

@@ -1,0 +1,99 @@
+id: art-1
+family: cap-1
+title: "Objeto e Escopo -- Prontuario Eletronico do Paciente"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 1. Aprovar as normas técnicas concernentes à digitalização e uso
+    dos sistemas informatizados para a guarda e manuseio dos documentos
+    dos prontuários dos pacientes, autorizando a eliminação do papel e
+    a troca de informação identificada em saúde.
+
+    Parágrafo único. O prontuário eletrônico do paciente (PEP) é o
+    repositório de informações clínicas, administrativas e sociodemográficas
+    referentes à saúde de um indivíduo, armazenado e transmitido em meio
+    eletrônico seguro, constituindo o documento legal de registro de toda
+    a assistência prestada ao paciente.
+guidance:
+  prose: |
+    O art. 1 define o objeto central da regulamentacao: a substituicao do
+    prontuario em papel pelo prontuario eletronico do paciente (PEP) como
+    documento legal.
+
+    **Definicao de PEP:**
+    O PEP nao e um simples sistema de registro. E o documento medico-legal
+    oficial que comprova a assistencia prestada, com valor probatorio em
+    processos eticos, civis e penais. Todo dado clinico, prescricao,
+    evolucao e resultado de exame deve estar registrado no PEP.
+
+    **Eliminacao do papel:**
+    A autorizacao para eliminar papel so se aplica quando o sistema PEP
+    atende TODOS os requisitos das Resolucoes CFM 1.821/2007 e 2.299/2021,
+    incluindo certificacao SBIS/CFM nivel NGS2 (assinatura digital).
+
+    **Troca de informacao identificada:**
+    A resolucao autoriza o intercambio de dados identificados de saude
+    entre sistemas, desde que cumpridos os requisitos de seguranca,
+    consentimento e confidencialidade.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para PEP como fonte unica de verdade:**
+      1. Implementar plataforma de PEP como servico central da
+         arquitetura de saude, com API padronizada (HL7 FHIR) para
+         integracao com demais sistemas hospitalares.
+      2. Garantir que toda escrita de dados clinicos passe
+         obrigatoriamente pelo PEP, evitando silos de informacao
+         em sistemas departamentais.
+      3. Provisionar infraestrutura com alta disponibilidade
+         (99.9%+) dado que o PEP e documento legal e nao pode
+         ter indisponibilidade que comprometa o atendimento.
+      4. Implementar versionamento completo de registros clinicos
+         (append-only) para garantir rastreabilidade e imutabilidade.
+    tools:
+      - hl7-fhir
+      - high-availability-cluster
+      - api-gateway
+      - event-sourcing
+  devsecops:
+    prose: |
+      **Pipeline de qualidade para sistemas PEP:**
+      1. Implementar testes automatizados que validem conformidade
+         com requisitos SBIS/CFM em cada release do sistema PEP.
+      2. Criar suite de testes de integracao que verifique a
+         integridade referencial entre registros clinicos.
+      3. Incluir verificacao automatica de que nenhum endpoint
+         permite escrita direta no banco de dados do PEP sem
+         passar pela camada de validacao e auditoria.
+      4. Implementar contract testing para APIs de integracao
+         HL7 FHIR que garantam retrocompatibilidade.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - contract-testing
+      - fhir-validator
+  secops:
+    prose: |
+      **Governanca do PEP como documento legal:**
+      1. Estabelecer politica institucional que define o PEP como
+         documento medico-legal oficial da organizacao de saude.
+      2. Capacitar equipe assistencial sobre a validade juridica
+         do PEP e a responsabilidade sobre os registros realizados.
+      3. Manter inventario de todos os sistemas que alimentam ou
+         consomem dados do PEP, classificando-os por nivel de
+         criticidade e dados tratados.
+      4. Criar processo formal de autorizacao para eliminacao de
+         prontuarios em papel apos migracao para o PEP.
+    tools:
+      - grc-platform
+      - document-management
+      - awareness-training
+      - asset-inventory
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-22"]
+    relationship: complements

@@ -1,0 +1,135 @@
+id: pip-3
+family: principles
+title: "Principle 3 — Consent"
+class: PIPEDA
+statement:
+  prose: >-
+    The knowledge and consent of the individual are required for the collection, use, or disclosure
+    of personal information, except where inappropriate.
+  parts:
+    - id: pip-3.4.3.1
+      label: "4.3.1"
+      prose: >-
+        Consent is required for the collection of personal information and the subsequent use
+        or disclosure of this information. Typically, an organization will seek consent for the
+        use or disclosure of the information at the time of collection. In certain circumstances,
+        consent with respect to use or disclosure may be sought after the information has been
+        collected but before use.
+    - id: pip-3.4.3.2
+      label: "4.3.2"
+      prose: >-
+        In obtaining consent, the reasonable expectations of the individual are also relevant.
+        An organization should generally seek express consent when the information is likely to
+        be considered sensitive. Implied consent may be appropriate when the information is less
+        sensitive.
+    - id: pip-3.4.3.3
+      label: "4.3.3"
+      prose: >-
+        In determining the form of consent to use, organizations shall take into account the
+        sensitivity of the information. Although some information (for example, medical records
+        and income records) is almost always considered to be sensitive, any information can be
+        sensitive, depending on the context.
+    - id: pip-3.4.3.4
+      label: "4.3.4"
+      prose: >-
+        An organization shall not, as a condition of the supply of a product or service, require
+        an individual to consent to the collection, use, or disclosure of information beyond that
+        required to fulfil the explicitly specified and legitimate purposes.
+    - id: pip-3.4.3.5
+      label: "4.3.5"
+      prose: >-
+        Consent can be given in various ways. Express consent could be given orally, electronically,
+        or in writing. Implied consent may arise when an individual voluntarily provides information
+        for an obvious purpose.
+    - id: pip-3.4.3.6
+      label: "4.3.6"
+      prose: >-
+        An individual may withdraw consent at any time, subject to legal or contractual restrictions
+        and reasonable notice. The organization shall inform the individual of the implications of
+        such withdrawal.
+    - id: pip-3.4.3.7
+      label: "4.3.7"
+      prose: >-
+        In certain circumstances personal information can be collected, used, or disclosed without
+        the knowledge and consent of the individual, including when collection is clearly in the
+        interests of the individual and consent cannot be obtained in a timely way, when legal,
+        medical, or security reasons make it impossible or impractical to seek consent, or when
+        the information is publicly available as specified by regulation.
+guidance:
+  prose: >-
+    PIPEDA consent is more nuanced than a simple "agree/disagree" checkbox. Key distinctions:
+    (1) Express consent is required for sensitive information — medical, financial, children's
+    data, precise geolocation, biometrics. (2) Implied consent may suffice for non-sensitive
+    information with obvious purposes, but the OPC's guidelines on meaningful consent (2018)
+    significantly raised the bar. (3) Consent cannot be bundled — clause 4.3.4 prohibits tying
+    consent to service delivery when the collection exceeds what is needed. (4) Withdrawal must
+    be as easy as giving consent — the OPC has found violations where withdrawal was buried in
+    complex processes. (5) The 2015 Digital Privacy Act added exceptions for business contact
+    information and certain business transactions. In digital platforms, meaningful consent requires:
+    plain language explanations, granular consent options, easy withdrawal mechanisms, and
+    consent renewal for new purposes.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      CONSENT MANAGEMENT SERVICE: Build a centralized consent management API as a platform service.
+      All microservices must query the consent store before processing personal information.
+      Implement consent versioning — when terms change, track which version each individual
+      consented to. GRANULAR CONSENT: Design consent APIs that support granular, purpose-specific
+      consent. Individuals must be able to consent to specific processing purposes independently.
+      CONSENT WITHDRAWAL: Implement real-time consent withdrawal propagation. When an individual
+      withdraws consent, all downstream services must stop processing within the defined SLA.
+      Use event-driven architecture (Kafka/NATS) for consent change propagation. CONSENT RECORDS:
+      Store immutable consent records with timestamp, version, purpose, method (express/implied),
+      and channel. These records are evidence for OPC investigations. SENSITIVITY CLASSIFICATION:
+      Implement data sensitivity classification that automatically determines whether express or
+      implied consent is appropriate for each data category.
+    tools:
+      - "Centralized consent management API with versioning"
+      - "Apache Kafka / NATS for consent change event propagation"
+      - "Redis / DynamoDB for low-latency consent lookups"
+      - "Data sensitivity classification engine"
+      - "Consent audit log with immutable storage"
+  devsecops:
+    prose: >-
+      CONSENT VERIFICATION: CI/CD pipeline checks must verify that every data processing code
+      path includes a consent check against the consent management service. SENSITIVE DATA
+      DETECTION: SAST rules must detect processing of sensitive data categories (health, financial,
+      biometric) and verify that express consent is enforced. CONSENT FLOW TESTING: Automated
+      integration tests must verify consent withdrawal propagation across all dependent services.
+      ANTI-PATTERN DETECTION: Linting rules must flag consent bundling patterns (collecting
+      unnecessary data as a condition of service). WITHDRAWAL TESTING: End-to-end tests must
+      verify that consent withdrawal stops all processing within the defined SLA.
+    tools:
+      - "Semgrep rules for consent check verification"
+      - "Custom SAST rules for sensitive data without express consent"
+      - "Integration test suites for consent withdrawal propagation"
+      - "Consent bundling detection in code review"
+      - "E2E consent withdrawal SLA verification tests"
+  secops:
+    prose: >-
+      CONSENT COMPLIANCE MONITORING: Monitor for personal information processing without valid
+      consent records. Alert when services process data for individuals who have withdrawn consent.
+      WITHDRAWAL MONITORING: Track consent withdrawal propagation latency. Alert when withdrawal
+      does not reach all services within the defined SLA. CONSENT ANOMALIES: Detect unusual consent
+      patterns (mass opt-ins without user interaction, consent records without corresponding user
+      activity). EVIDENCE PRESERVATION: Maintain tamper-proof consent records for OPC investigations.
+      Implement consent audit reporting for compliance reviews.
+    tools:
+      - "SIEM rules for processing-without-consent detection"
+      - "Consent withdrawal propagation monitoring"
+      - "Consent anomaly detection (UEBA)"
+      - "Tamper-proof consent record storage"
+      - "OPC investigation readiness dashboards"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7", "art-8", "art-9"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.120", "sec-1798.135"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["7.2.3", "7.2.4", "7.3.4"]
+    relationship: supports

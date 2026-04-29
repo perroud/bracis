@@ -1,0 +1,103 @@
+id: samm-ver-requirements-testing
+family: verification
+title: "Requirements-Driven Testing"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Develop and execute security test cases derived from security requirements, threat
+    models, and applicable compliance standards to verify that software meets its security
+    obligations. Integrate security test cases into the standard testing process so that
+    security verification is systematic, repeatable, and directly traceable to defined
+    security requirements rather than relying solely on opportunistic vulnerability discovery.
+  parts:
+    - id: samm-ver-requirements-testing_smt.a
+      label: "Stream A — Control Verification"
+      prose: >-
+        Derive security test cases from security requirements, threat model mitigations,
+        and applicable security standards (OWASP ASVS, PCI DSS, HIPAA). For each security
+        requirement, define one or more test cases with documented expected outcomes.
+        Execute security test cases as part of the standard test execution cycle (unit,
+        integration, system testing). Track security test coverage metrics: percentage of
+        security requirements with associated test cases, and test pass/fail rates.
+        Maintain security test cases in version control alongside source code.
+    - id: samm-ver-requirements-testing_smt.b
+      label: "Stream B — Misuse/Abuse Cases"
+      prose: >-
+        Supplement requirement-based test cases with misuse cases and abuse cases derived
+        from threat models — explicitly testing what the system should not do, not just
+        what it should do. Define negative test cases for authentication bypass, authorization
+        escalation, input validation failures, and business logic abuse. Include misuse
+        cases in automated test suites where feasible, and in manual security test plans
+        for scenarios requiring human judgment. Review and update misuse cases when
+        system functionality changes or new attack techniques emerge.
+
+guidance:
+  prose: >-
+    Security testing that is not derived from requirements is gambling — you find what
+    you happen to test, not necessarily what matters most. Requirements-driven testing
+    provides a systematic, auditable approach to security verification. At maturity level 1,
+    the organization creates basic security test cases for authentication and authorization
+    controls. At level 2, test cases are systematically derived from all security
+    requirements and tracked for coverage; misuse cases are developed from threat models.
+    At level 3, security test cases are fully automated in CI/CD, coverage metrics drive
+    the security testing backlog, and test failure trend data is fed back into the defect
+    management and training programs.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Verification: Requirements-driven Testing"
+    url: "https://owaspsamm.org/model/verification/requirements-driven-testing/"
+  - citation: "OWASP Testing Guide (OTG)"
+    url: "https://owasp.org/www-project-web-security-testing-guide/"
+  - citation: "OWASP ASVS (security requirements baseline)"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide platform-managed security test suites that implement OWASP ASVS level 1
+      checks as automated integration tests, available to all teams via shared pipeline
+      components. Maintain a library of parameterized security test templates in the
+      IDP that teams can consume and customize for their specific security requirements.
+      Integrate test coverage tracking into the software catalog so each service displays
+      its security test coverage percentage and outstanding untested requirements.
+      Implement platform-level test orchestration that automatically runs security test
+      suites against deployed services in staging environments after each deployment.
+    tools:
+      - "OWASP ZAP (automated ASVS testing)"
+      - "Nuclei (requirements-driven vulnerability templates)"
+      - "pytest / JUnit (security test frameworks)"
+      - "Backstage (security test coverage tracking)"
+      - "GitLab CI/CD (test orchestration)"
+  devsecops:
+    prose: >-
+      Integrate security test case execution into CI/CD pipelines at multiple stages:
+      unit-level security tests at commit time, integration security tests at merge time,
+      and full ASVS suite execution before production deployment. Use OWASP ZAP in
+      passive and active scan modes to automate ASVS checks against staging environments.
+      Map ZAP scan findings to ASVS control identifiers so failures can be traced directly
+      to specific security requirements. Implement security test reporting in merge requests,
+      surfacing security test results alongside functional test results so reviewers have
+      complete quality context.
+    tools:
+      - "OWASP ZAP (ASVS-mapped active scanning)"
+      - "Burp Suite Enterprise (automated scanning)"
+      - "Nuclei (custom security test templates)"
+      - "GitLab DAST (CI-integrated dynamic testing)"
+      - "Playwright / Selenium (security scenario automation)"
+  secops:
+    prose: >-
+      Coordinate with development teams to ensure security test cases cover all
+      regulatory compliance requirements applicable to each system (HIPAA, PCI DSS,
+      GDPR). Produce quarterly security test coverage reports for audit purposes,
+      demonstrating that all security requirements have been tested and passed. Conduct
+      manual security testing for complex business logic scenarios that cannot be
+      automated. Incorporate security test results into risk assessment reports, using
+      test pass/fail trends to quantify security posture change over time.
+    tools:
+      - "DefectDojo (security test result tracking)"
+      - "OWASP Testing Guide (manual test procedures)"
+      - "Burp Suite Professional (manual security testing)"
+      - "TestRail / Xray (test management)"
+      - "Confluence / GitLab Wiki (test procedure documentation)"

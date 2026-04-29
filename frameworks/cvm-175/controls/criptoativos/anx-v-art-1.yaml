@@ -1,0 +1,116 @@
+id: anx-v-art-1
+family: criptoativos
+title: "Requisitos para Investimento em Criptoativos"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Anexo Normativo V, Art. 1. Os fundos de investimento que invistam direta ou
+    indiretamente em criptoativos devem observar, além das disposições da parte
+    geral desta Resolução, os requisitos específicos deste Anexo Normativo.
+
+    Parágrafo 1. Para fins deste Anexo, consideram-se criptoativos os ativos
+    representados digitalmente, protegidos por criptografia, que podem ser
+    objeto de transações executadas e armazenadas por meio de tecnologias de
+    registro distribuído (DLT -- Distributed Ledger Technology).
+
+    Parágrafo 2. Os fundos de investimento que invistam em criptoativos devem
+    ser destinados exclusivamente a investidores qualificados, conforme definido
+    na regulamentação da CVM, salvo quando a exposição a criptoativos for
+    limitada a até 5% do patrimônio líquido do fundo.
+
+    Parágrafo 3. O regulamento do fundo deve informar expressamente que o fundo
+    investe em criptoativos e descrever os riscos específicos associados.
+guidance:
+  prose: |
+    O Anexo V e a grande inovacao da CVM 175: pela primeira vez, a regulamentacao
+    brasileira trata formalmente de fundos de investimento em criptoativos.
+
+    **Definicao de criptoativo:**
+    A CVM adota definicao ampla: ativos digitais protegidos por criptografia,
+    transacionados via DLT. Inclui Bitcoin, Ethereum, tokens, stablecoins e
+    demais ativos em blockchains.
+
+    **Restricao a investidores qualificados:**
+    Fundos com exposicao superior a 5% do PL em criptoativos so podem ser
+    destinados a investidores qualificados (patrimonio > R$ 1 milhao). Abaixo
+    de 5%, fundos de varejo podem investir.
+
+    **Transparencia obrigatoria:**
+    O regulamento deve informar EXPRESSAMENTE que o fundo investe em criptoativos
+    e descrever riscos especificos: volatilidade extrema, risco tecnologico
+    (falha de blockchain, hack), risco regulatorio (mudancas de regulamentacao),
+    risco de custodia (perda de chaves privadas).
+
+    **Impacto em TI:**
+    Sistemas devem suportar: integracao com exchanges e custodiantes de cripto,
+    precificacao de criptoativos 24/7 (mercado nao fecha), custodia de chaves
+    privadas com seguranca institucional, reconciliacao on-chain.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura para criptoativos:**
+      1. Integracao com exchanges regulamentadas para execucao de ordens de
+         compra e venda de criptoativos.
+      2. Custodia institucional de chaves privadas: HSM (Hardware Security
+         Module) ou custodiante qualificado de cripto.
+      3. Precificacao 24/7 de criptoativos com fontes multiplas (exchanges,
+         agregadores como CoinGecko, CoinMarketCap).
+
+      **Controles de exposicao:**
+      4. Motor de limites para exposicao a criptoativos: hard block quando
+         exposicao se aproxima de 5% para fundos de varejo.
+      5. Classificacao de cotistas (qualificado vs. varejo) integrada ao
+         controle de limites.
+      6. Monitoramento on-chain de posicoes e transacoes.
+    tools:
+      - vault
+      - terraform
+      - opa-gatekeeper
+      - git
+  devsecops:
+    prose: |
+      **Seguranca de criptoativos:**
+      1. Secret detection rigoroso: chaves privadas, seeds, API keys de
+         exchanges NUNCA podem aparecer em codigo ou logs.
+      2. SAST para codigo de integracao com blockchains e exchanges:
+         vulnerabilidades podem causar perda de ativos.
+      3. Container scanning para imagens que interagem com blockchains.
+
+      **Validacao de limites:**
+      4. Testes automatizados de limites de exposicao a criptoativos.
+      5. Pipeline de validacao de integracoes com exchanges e custodiantes.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-container-scanning
+      - gitlab-dependency-scanning
+  secops:
+    prose: |
+      **Monitoramento de criptoativos:**
+      1. Dashboard de exposicao a criptoativos: posicao por ativo, exposicao
+         percentual, limites regulatorios.
+      2. Monitoramento on-chain: verificar que ativos estao nas wallets
+         custodiadas e nao foram movidos sem autorizacao.
+      3. Alertas para: exposicao se aproximando de 5% (varejo), volatilidade
+         extrema, eventos de blockchain (forks, hacks).
+
+      **Auditoria de custodia cripto:**
+      4. Proof of reserves periodico: verificar que o custodiante possui
+         os criptoativos declarados.
+      5. Reconciliacao on-chain versus sistema do fundo.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-5", "art-9"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-3", "art-10"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

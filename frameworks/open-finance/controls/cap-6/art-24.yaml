@@ -1,0 +1,100 @@
+id: art-24
+family: cap-6
+title: "Diretorio de Participantes"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 24. O diretório de participantes é o sistema centralizado responsável
+    por:
+
+    I - cadastrar e manter registro atualizado de todas as instituições
+    participantes do Open Finance e seus software statements;
+
+    II - emitir e gerenciar Software Statement Assertions (SSA) que
+    identificam unicamente cada aplicação participante;
+
+    III - publicar os endpoints (well-known URIs) de cada participante
+    para discovery de APIs;
+
+    IV - gerenciar o ciclo de vida de certificados digitais utilizados
+    no ecossistema, incluindo publicação de JWKS;
+
+    V - fornecer mecanismo de Dynamic Client Registration (DCR) para
+    registro automático de clientes OAuth entre participantes.
+guidance:
+  prose: |
+    O art. 24 define o diretorio como hub central do ecossistema:
+
+    **Funcoes do diretorio:**
+    1. Registro de participantes (instituicoes autorizadas pelo BCB)
+    2. Emissao de SSA (Software Statement Assertion)
+    3. Discovery de endpoints (well-known configuration)
+    4. Gerenciamento de certificados e chaves publicas
+    5. Dynamic Client Registration (DCR) automatizado
+
+    **Software Statement Assertion (SSA):**
+    JWT assinado pelo diretorio que identifica uma aplicacao:
+    - organisation_id: ID da instituicao no diretorio
+    - software_id: ID unico da aplicacao
+    - software_roles: papeis autorizados (DADOS, PAGTO, CONTA)
+    - redirect_uris: URIs de callback autorizados
+    - Assinado com chave do diretorio para autenticidade
+
+    **Dynamic Client Registration (DCR):**
+    Processo automatizado pelo qual um participante registra suas
+    aplicacoes em outro participante usando o SSA:
+    1. Receptor obtem SSA do diretorio
+    2. Receptor envia SSA ao endpoint de DCR da transmissora
+    3. Transmissora valida SSA e cria client_id para o receptor
+    4. Receptor usa client_id para fluxos OAuth subsequentes
+
+    **Discovery (well-known):**
+    Cada participante publica endpoints em formato padronizado
+    para que outros participantes possam localizar suas APIs.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com diretorio:**
+      1. Implementar cliente de DCR para registro automatico em
+         transmissoras usando SSA obtido do diretorio.
+      2. Publicar well-known endpoint com metadados do authorization
+         server e endpoints de APIs.
+      3. Implementar endpoint de DCR para receber registros de
+         receptores (validando SSA contra diretorio).
+      4. Sincronizar periodicamente dados do diretorio (participantes,
+         certificados, endpoints) em cache local.
+      5. Implementar rotacao de SSA conforme ciclo de vida do diretorio.
+    tools:
+      - oauth-server
+      - directory-client
+      - dcr-endpoint
+      - cache-sync
+  devsecops:
+    prose: |
+      **Validacao de integracao com diretorio:**
+      1. Testar fluxo DCR completo em sandbox do diretorio.
+      2. Validar SSA antes de aceitar registros DCR.
+      3. Testar discovery de endpoints com well-known configuration.
+      4. Verificar que apenas participantes validos do diretorio
+         conseguem se registrar.
+    tools:
+      - integration-tests
+      - sandbox-tests
+      - security-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de registros no diretorio:**
+      1. Auditar software statements registrados no diretorio.
+      2. Monitorar registros DCR recebidos e efetuados.
+      3. Verificar que SSAs expirados nao sao aceitos.
+      4. Alertar sobre tentativas de registro com SSA invalido.
+    tools:
+      - directory-monitoring
+      - audit-trail
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

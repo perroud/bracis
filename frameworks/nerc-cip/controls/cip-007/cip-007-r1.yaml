@@ -1,0 +1,102 @@
+id: cip-007-r1
+family: cip-007
+title: "Ports and Services"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes to manage ports and services on BES Cyber Systems,
+    including the applicable requirement parts.
+  parts:
+    - id: cip-007-r1.1
+      label: "1.1"
+      prose: >-
+        Where technically feasible, enable only logical network
+        accessible ports that have been determined to be needed
+        by the Responsible Entity, including port ranges or
+        services where needed to handle dynamic ports. If a
+        device has no provision for disabling or restricting
+        logical ports on the device, then those ports that are
+        open are deemed needed.
+    - id: cip-007-r1.2
+      label: "1.2"
+      prose: >-
+        Protect against the use of unnecessary physical input/output
+        ports used for network connectivity, console commands, or
+        removable media.
+
+guidance:
+  prose: >-
+    CIP-007 R1 implements the principle of least functionality for
+    BES Cyber Systems. Every open port and running service represents
+    a potential attack surface. Entities must document which ports and
+    services are needed, disable all others, and protect physical ports
+    from unauthorized use. The "where technically feasible" qualifier
+    acknowledges that some OT devices (PLCs, RTUs, relays) may have
+    limited configurability. For such devices, the entity must document
+    the technical feasibility exception. Port and service documentation
+    should be maintained alongside configuration baselines and updated
+    when system configurations change.
+
+references:
+  - citation: "NERC CIP-007-6 — System Security Management"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-007-6.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define allowed ports and services as Infrastructure-as-Code
+      network policies (Kubernetes NetworkPolicies, firewall rules,
+      security groups). Implement automated port scanning to detect
+      unauthorized open ports on BES Cyber Systems. Deploy default-deny
+      network policies that require explicit port enablement with
+      documented justification. Use container security tools to enforce
+      minimal port exposure in containerized BES applications. Maintain
+      a port and service inventory as a machine-readable artifact
+      linked to each BES Cyber System in the CMDB.
+    tools:
+      - terraform
+      - calico
+      - cilium
+      - nmap
+      - grafana
+
+  devsecops:
+    prose: >-
+      Implement CI pipeline checks that validate container images
+      and VM configurations expose only documented required ports.
+      Store port and service baselines as version-controlled artifacts
+      with mandatory approval for changes. Create automated port
+      scanning jobs that compare actual open ports against approved
+      baselines and flag deviations. Enforce that Dockerfiles and
+      deployment manifests explicitly declare required ports with
+      justification comments.
+    tools:
+      - gitlab-ci
+      - checkov
+      - trivy
+      - conftest
+
+  secops:
+    prose: >-
+      Perform periodic automated port scans across all BES Cyber
+      System network segments and compare results against approved
+      port baselines. Alert on newly detected open ports or services
+      not in the approved inventory. Monitor for unauthorized
+      physical port usage through endpoint detection and USB device
+      monitoring. Generate compliance reports showing port and
+      service status across all BES Cyber Systems.
+    tools:
+      - nmap
+      - splunk
+      - tenable
+      - elastic-siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-7", "SC-7"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["3-3-5.1"]
+    relationship: supports

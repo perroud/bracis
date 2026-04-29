@@ -1,0 +1,100 @@
+id: rmf-m-01
+family: rmf-monitor
+title: "Continuous Monitoring Strategy and Implementation"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Implement a continuous monitoring strategy for the information system that maintains
+    ongoing awareness of the security and privacy posture, detects changes to the system
+    and its environment of operation, and supports ongoing authorization decisions.
+    Continuous monitoring includes monitoring control effectiveness, tracking changes to
+    the system, conducting ongoing assessments, reporting the security and privacy status,
+    and actively managing risk on an ongoing basis.
+
+guidance:
+  prose: >-
+    Continuous monitoring transforms the traditional periodic reauthorization model into
+    an ongoing process. The monitoring strategy defines what is monitored, how frequently,
+    using what tools and methods, and how results are reported and acted upon. Key activities
+    include automated security status monitoring (vulnerability scanning, configuration
+    compliance checking, log analysis), change monitoring (configuration change detection,
+    software updates, personnel changes), ongoing assessments (subset of controls assessed
+    on a rotating basis), and risk reporting. The monitoring frequency should be risk-based —
+    critical controls and high-risk areas are monitored more frequently. Monitoring results
+    feed into the ongoing authorization decision by providing the authorizing official with
+    current risk information.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Monitor Step — Tasks M-1, M-2, M-3"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "NIST SP 800-137, Information Security Continuous Monitoring"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-137/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement continuous monitoring through automated, always-on security data
+      collection and analysis. Deploy infrastructure monitoring agents that continuously
+      assess configuration compliance (InSpec, OpenSCAP), detect configuration drift
+      (OPA Gatekeeper), and report vulnerability status (Trivy, Grype). Aggregate
+      monitoring data into a centralized observability platform (Grafana, Elastic Stack)
+      with dashboards tailored for different stakeholders — system owners see system-specific
+      metrics, authorizing officials see risk-level summaries, and the CISO sees
+      organization-wide posture. Implement automated alerting when monitoring thresholds
+      are breached. Provide API endpoints for GRC platforms to query current security
+      posture data.
+    tools:
+      - inspec
+      - open-scap
+      - open-policy-agent
+      - trivy
+      - grafana
+      - elastic-stack
+      - prometheus
+
+  devsecops:
+    prose: >-
+      Implement continuous monitoring as an extension of the CI/CD pipeline. Schedule
+      periodic security scans (not just at deployment time) that run against deployed
+      environments. Monitor dependency vulnerabilities through scheduled SCA scans and
+      automated alerts for newly disclosed CVEs affecting project dependencies. Track
+      security finding trends over time and alert when the finding count exceeds
+      established thresholds. Implement change monitoring by tracking security-relevant
+      configuration changes through GitLab audit logs and merge request activity.
+      Generate periodic continuous monitoring status reports as pipeline artifacts.
+    tools:
+      - gitlab-ci
+      - gitlab-security-dashboard
+      - gitlab-vulnerability-management
+      - dependabot
+      - renovate
+
+  secops:
+    prose: >-
+      Implement the continuous monitoring strategy in the GRC platform with defined
+      monitoring frequencies, data sources, and reporting requirements per control.
+      Integrate automated monitoring data feeds (vulnerability scan results, compliance
+      check results, SIEM alerts) into the GRC platform for centralized tracking.
+      Conduct ongoing assessments of control subsets on a rotating schedule as defined
+      in the monitoring strategy. Generate continuous monitoring status reports for
+      authorizing officials on a monthly or quarterly cadence. Use monitoring results
+      to update the system risk assessment and POA&M. Trigger reauthorization activities
+      when monitoring reveals significant changes in the system's risk posture.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - splunk
+      - emass
+      - tenable-sc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-7", "PM-14", "SI-4"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.35", "A8.15", "A8.16"]
+    relationship: mapped
+  - framework_id: iso-27005
+    articles: ["10.2"]
+    relationship: mapped

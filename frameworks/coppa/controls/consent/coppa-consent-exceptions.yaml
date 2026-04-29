@@ -1,0 +1,130 @@
+id: coppa-consent-exceptions
+family: consent
+title: "Exceptions to Verifiable Parental Consent Requirement"
+class: COPPA
+
+statement:
+  prose: |
+    An operator is not required to obtain verifiable parental consent in the following
+    limited circumstances (16 CFR § 312.5(c)):
+
+    (1) Collecting the parent's or child's name or online contact information solely to
+        obtain consent or to provide notice to the parent. The information must be deleted
+        if consent is not obtained after a reasonable time.
+    (2) Collecting online contact information to respond directly on a one-time basis to
+        a specific request from the child, where the information is not used for any other
+        purpose and is deleted after responding.
+    (3) Collecting online contact information to respond more than once to a specific
+        request (e.g., newsletter subscription), provided the operator notifies the parent
+        and gives the parent the opportunity to opt out before the second contact.
+    (4) Collecting the child's name and online contact information to the extent reasonably
+        necessary to protect the safety of the child, provided the information is not used
+        for any other purpose.
+    (5) Collecting a persistent identifier for the sole purpose of supporting the internal
+        operations of the website or online service, including: maintaining or analyzing the
+        functioning of the website, performing network communications, authenticating users,
+        personalizing content (not behaviorally targeted advertising), serving contextual
+        advertising, and capping ad frequency.
+
+    These exceptions are narrowly construed. Any use beyond the specific exception
+    requires verifiable parental consent.
+
+guidance:
+  prose: |
+    The exceptions are narrowly defined escape valves, not broad safe harbors. Operators
+    must exercise extreme caution:
+
+    1. **Internal operations exception (most commonly invoked):** Persistent identifiers
+       (cookies, device IDs) used for analytics, authentication, contextual ads, and
+       frequency capping do NOT require consent. However, using these identifiers for
+       behavioral advertising, cross-site tracking, or profiling DOES require consent.
+       The line between "contextual" and "behavioral" is where most violations occur.
+
+    2. **One-time response:** If a child emails a question and the operator responds once,
+       no consent is needed — but the contact information must be deleted immediately
+       after responding. If the operator stores the email in a CRM, that is a violation.
+
+    3. **Multiple-response with parent opt-out:** For subscriptions like newsletters, the
+       operator may send the first communication but must notify the parent before the
+       second communication and honor opt-out requests.
+
+    4. **Safety exception:** Narrowly limited to situations where a child's safety is at
+       risk. Cannot be used as a general justification for collecting PI.
+
+    5. **Consent-seeking exception:** Collecting parent email to obtain consent is permitted,
+       but only for that purpose. If consent is not obtained within a reasonable time, the
+       parent's contact information must be deleted.
+
+    The FTC has enforcement actions demonstrating that operators cannot stretch these
+    exceptions beyond their intended scope.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a purpose-tagging system for all data collection that categorizes each
+         collection event as either consent-required or exception-eligible, with the specific
+         exception cited.
+      2. For the internal operations exception: configure analytics and ad systems to use
+         persistent identifiers only for permitted purposes (contextual ads, frequency
+         capping, analytics). Block any behavioral targeting or cross-site tracking
+         configuration for child users.
+      3. For one-time response: build an auto-deletion pipeline that removes child contact
+         information immediately after the response is sent.
+      4. For multiple-response: implement a "parent notification before second contact"
+         workflow that blocks the second communication until the parent is notified and
+         the opt-out window has elapsed.
+      5. Build exception audit logging — every time an exception is relied upon, log the
+         exception type, justification, data collected, and deletion schedule.
+      6. Implement configuration-as-code for third-party analytics and ad SDKs to enforce
+         COPPA-compliant settings and prevent runtime reconfiguration.
+    tools:
+      - data-classification
+      - analytics-platform
+      - ad-server
+      - workflow-engine
+      - audit-log
+      - scheduler
+
+  devsecops:
+    prose: |
+      1. Scan third-party SDKs and scripts for behavioral tracking capabilities that would
+         exceed the internal operations exception if applied to child users.
+      2. Test that one-time response flows actually delete contact information after response
+         delivery — verify no data remains in queues, logs, caches, or backup systems.
+      3. Validate that the multiple-response workflow blocks the second communication until
+         parent notification is complete.
+      4. Test purpose-tagging system accuracy — verify collection events are categorized
+         correctly and consent is enforced for non-excepted activities.
+      5. Implement integration tests that verify child-flagged sessions do not trigger
+         behavioral advertising or cross-site tracking.
+    tools:
+      - sdk-audit
+      - integration-testing
+      - gitlab-ci
+      - data-flow-testing
+      - privacy-testing
+
+  secops:
+    prose: |
+      1. Audit exception usage periodically — flag any exception being relied upon more
+         frequently than expected, which may indicate misclassification.
+      2. Monitor third-party analytics and ad network configurations for changes that might
+         introduce behavioral tracking on child-directed content.
+      3. Verify one-time response deletion compliance — audit that contact information is
+         not persisting beyond the response.
+      4. Monitor for data flowing from COPPA-protected users to third-party advertising
+         systems in violation of the internal operations exception.
+      5. Track and report on exception usage by type for compliance reporting.
+    tools:
+      - compliance-dashboard
+      - network-monitoring
+      - data-flow-monitoring
+      - audit-log
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 6(1)(b)", "art. 6(1)(d)", "art. 6(1)(f)"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art. 7", "art. 14 §3"]
+    relationship: mapped

@@ -1,0 +1,98 @@
+id: iec-2-1-3
+family: part-2
+title: "System Security Architecture"
+class: IEC62443
+part: "62443-2-1"
+
+statement:
+  prose: >-
+    The asset owner shall design and maintain a system security architecture
+    based on the defense-in-depth principle, implementing multiple layers of
+    security using the zone and conduit model. The architecture shall enforce
+    separation between zones of different security levels and control all
+    data flows through defined conduits.
+
+guidance:
+  prose: >-
+    The system security architecture should implement the zone and conduit
+    model as defined in IEC 62443-3-2. Key considerations include:
+    segmenting the IACS into clearly defined security zones with consistent
+    security requirements; establishing a demilitarized zone (DMZ) between
+    the enterprise IT network and the IACS network; implementing unidirectional
+    gateways (data diodes) where appropriate for critical zones requiring
+    SL-3 or SL-4; defining conduits with explicit allow-list rules permitting
+    only the minimum necessary traffic between zones; deploying industrial-aware
+    firewalls capable of deep packet inspection for OT protocols; implementing
+    redundant security controls at each layer (network, host, application);
+    documenting all zone boundaries, conduit paths, and security controls in
+    architecture diagrams maintained under version control; and validating the
+    architecture against the target security levels assigned during risk
+    assessment.
+
+references:
+  - citation: "IEC 62443-2-1:2010, Clause 4.3"
+    url: "https://webstore.iec.ch/en/publication/7030"
+  - citation: "IEC 62443-3-2:2020, Zone and Conduit Model"
+    url: "https://webstore.iec.ch/en/publication/30727"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement network segmentation using industrial-grade firewalls and
+      managed switches that enforce zone boundaries. Deploy software-defined
+      networking (SDN) where feasible to enable dynamic micro-segmentation
+      within OT zones. Use infrastructure-as-code to define and enforce network
+      policies, firewall rules, and VLAN configurations as version-controlled
+      artifacts. Implement data diodes or unidirectional security gateways
+      for critical zones that require outbound-only data flow. Deploy jump
+      servers with session recording for all administrative access to IACS
+      zones. Maintain architecture-as-code diagrams that automatically
+      validate against the zone and conduit model.
+    tools:
+      - palo-alto-ngfw
+      - fortinet-fortigate
+      - waterfall-security
+      - cisco-ise
+      - terraform
+
+  devsecops:
+    prose: >-
+      Treat network architecture definitions as code. Store firewall rules,
+      ACLs, and zone definitions in version-controlled repositories with
+      mandatory code review before any changes are applied. Implement automated
+      testing that validates zone isolation by verifying that traffic between
+      zones is only permitted through defined conduits. Use policy-as-code
+      frameworks to enforce that new deployments comply with the zone and
+      conduit model. Automate compliance drift detection that alerts when
+      network configurations deviate from the approved architecture.
+    tools:
+      - gitlab-ci
+      - terraform
+      - opa
+      - batfish
+      - ansible
+
+  secops:
+    prose: >-
+      Deploy network detection and response (NDR) sensors at each zone
+      boundary and conduit to monitor for unauthorized communication patterns.
+      Implement baseline models for normal traffic flows between zones and
+      alert on deviations. Monitor for lateral movement attempts across zone
+      boundaries. Validate that segmentation controls are effective through
+      periodic penetration testing that specifically targets zone boundary
+      bypasses. Log and analyze all cross-zone traffic to detect policy
+      violations.
+    tools:
+      - darktrace-ot
+      - nozomi-guardian
+      - zeek
+      - suricata
+      - splunk-es
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-32", "AC-4", "SA-8"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.22", "a8.23"]
+    relationship: supports

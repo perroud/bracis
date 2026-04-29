@@ -1,0 +1,122 @@
+id: art-7
+family: cap-2
+title: "Seguranca na Cadeia de Suprimentos e Terceiros"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 7. Os agentes do setor elétrico devem estabelecer requisitos de segurança
+    cibernética para a contratação e manutenção de relações com fornecedores e
+    prestadores de serviço que tenham acesso, prestem manutenção ou desenvolvam
+    sistemas críticos para a operação do agente, em especial:
+
+    I - incluir cláusulas de segurança cibernética em contratos com fornecedores
+    de sistemas de controle industrial, equipamentos de campo e serviços de
+    manutenção remota;
+
+    II - avaliar os riscos de segurança cibernética antes da contratação de
+    novos fornecedores de sistemas críticos;
+
+    III - monitorar e controlar os acessos remotos concedidos a prestadores
+    de serviço, garantindo que sejam temporários, auditáveis e restritos ao
+    mínimo necessário;
+
+    IV - incluir requisitos de notificação de incidentes cibernéticos nos
+    contratos com fornecedores que operam ou mantêm sistemas críticos.
+guidance:
+  prose: |
+    O art. 7 aborda o risco da cadeia de suprimentos, que e uma das principais
+    ameacas emergentes ao setor eletrico mundial.
+
+    **Por que a cadeia de suprimentos OT e critica:**
+    Ataques via cadeia de suprimentos OT sao particularmente perigosos porque:
+    - Fornecedores geralmente possuem acesso privilegiado a sistemas criticos
+    - Atualizacoes de firmware/software de ICS podem ser vetorizadas com malware
+    - O ataque TRITON/TRISIS (2017) comprometeu um Safety Instrumented System
+      via acesso remoto de um fornecedor
+    - O acesso remoto de manutencao e um vetor frequente (VPNs de fornecedores)
+
+    **Clausulas contratuais obrigatorias (inciso I):**
+    Contratos com fornecedores de sistemas ICS/SCADA devem incluir:
+    - Obrigacao de notificar o agente em caso de incidente que afete produtos fornecidos
+    - Direito de auditoria de seguranca dos fornecedores
+    - Requisitos minimos de seguranca no desenvolvimento (SDLC seguro)
+    - Restricoes de acesso: apenas pessoal autorizado pode acessar sistemas do agente
+    - Obrigacao de usar MFA para acesso remoto
+
+    **Avaliacao pre-contratacao (inciso II):**
+    O due diligence de seguranca deve incluir:
+    - Verificacao de certificacoes relevantes (IEC 62443, ISO 27001)
+    - Questionario de seguranca OT
+    - Analise de incidentes historicos do fornecedor
+    - Revisao do processo de SDLC seguro para software ICS
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar infraestrutura de acesso seguro para fornecedores e terceiros:
+
+      1. Portal dedicado de acesso de fornecedores com MFA obrigatoria
+      2. PAM (Privileged Access Management) com gravacao de sessao para todo
+         acesso remoto de terceiros a sistemas OT
+      3. Tickets de acesso temporario: acesso de fornecedores sempre vinculado
+         a um ticket de manutencao com prazo definido e aprovacao previa
+      4. Segmentacao de rede: fornecedores acessam apenas a zona DMZ industrial,
+         nunca diretamente a rede OT
+      5. Verificacao de integridade: checksums e assinaturas digitais para todo
+         firmware e software recebido de fornecedores antes da implantacao
+      6. SBOM de fornecedores: exigir Software Bill of Materials para componentes
+         criticos de ICS/SCADA
+    tools:
+      - cyberark
+      - beyondtrust
+      - bomgar
+      - claroty
+      - nozomi-networks
+  devsecops:
+    prose: |
+      Integrar requisitos de seguranca de cadeia de suprimentos no pipeline:
+
+      1. Scanner de vulnerabilidades em imagens de containers e binarios de
+         fornecedores antes do deploy em sistemas criticos
+      2. Verificacao automatica de CVEs em componentes OT (ICS-CERT advisories)
+      3. Pipeline de onboarding de fornecedores: validar documentacao de seguranca
+         (ISO 27001, IEC 62443, questionario de seguranca) antes de aprovar integracao
+      4. Gestao de contratos como codigo: repositorio Git com clausulas de seguranca
+         padronizadas, versionadas e aprovadas pelo juridico e CISO
+      5. Scan de composicao de software (SCA) com bases de dados especializadas
+         em vulnerabilidades OT (ICS-CERT, Claroty Research)
+    tools:
+      - gitlab-ci
+      - grype
+      - trivy
+      - dependency-track
+      - cyclonedx
+  secops:
+    prose: |
+      Gerenciar o risco de terceiros e cadeia de suprimentos operacionalmente:
+
+      1. Registro de fornecedores criticos: inventario de todos os fornecedores
+         com acesso a sistemas OT, incluindo escopo de acesso e nivel de criticidade
+      2. Due diligence anual: questionario de seguranca e revisao de certificacoes
+         para fornecedores de sistemas criticos
+      3. Monitoramento de acessos: revisar mensalmente logs de acesso remoto de
+         fornecedores, detectar anomalias (horario incomum, volumes inusitados)
+      4. Gestao de incidentes de fornecedores: processo para receber e responder
+         a notificacoes de incidentes de fornecedores que impactam sistemas criticos
+      5. ICS-CERT monitoring: assinar e processar alertas do ICS-CERT (CISA) e
+         do CERT.br sobre vulnerabilidades em sistemas ICS/SCADA utilizados
+    tools:
+      - cyberark
+      - servicenow-vendor-risk
+      - archer-grc
+      - tenable-ot
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-013-R1", "CIP-013-R2"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.10", "2-4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22"]
+    relationship: supports

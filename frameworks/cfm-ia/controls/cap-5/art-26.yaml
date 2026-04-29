@@ -1,0 +1,117 @@
+id: art-26
+family: cap-5
+title: "Monitoramento de Performance e Deteccao de Drift"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 26. Sistemas de IA médica em produção devem ser submetidos a
+    monitoramento contínuo de performance e detecção de degradação:
+
+    I - as métricas de performance monitoradas devem incluir, no mínimo,
+    as mesmas métricas utilizadas na validação clínica, permitindo
+    comparação direta;
+
+    II - devem ser implementados mecanismos de detecção de data drift
+    (mudança na distribuição dos dados de entrada) e concept drift
+    (mudança na relação entre dados de entrada e desfecho clínico);
+
+    III - limiares de alerta devem ser definidos para cada métrica
+    monitorada, com procedimento documentado de resposta quando
+    limiares forem ultrapassados;
+
+    IV - a performance deve ser monitorada desagregadamente por subgrupo
+    clinicamente relevante, conforme art. 23-III;
+
+    V - relatório de performance deve ser produzido periodicamente e
+    disponibilizado ao médico responsável técnico, ao comitê de
+    governança e, quando solicitado, ao CRM.
+guidance:
+  prose: |
+    O art. 26 reconhece que modelos de IA degradam ao longo do tempo
+    e exige monitoramento ativo para detectar essa degradacao.
+
+    **Por que modelos degradam em medicina:**
+
+    - Data drift: a distribuicao de pacientes muda (envelhecimento
+      populacional, novas doencas, mudanca de protocolos de exame).
+
+    - Concept drift: a relacao entre dados e desfecho muda (novas
+      terapias mudam prognostico, novos criterios diagnosticos,
+      mudanca de prevalencia).
+
+    - Drift de equipamento: mudanca de fabricante de equipamento
+      de imagem, calibracao, protocolo de aquisicao.
+
+    - Drift de pratica: mudanca no padrao de preenchimento de
+      prontuario, novos campos, mudanca de terminologia.
+
+    **Monitoramento por subgrupo (inciso IV):**
+    Degradacao pode ser subgrupo-especifica. Modelo pode manter
+    performance geral mas degradar para idosos ou para regiao
+    geografica especifica. Monitoramento desagregado detecta isso.
+
+    **Procedimento de resposta (inciso III):**
+    Quando alerta dispara: investigar causa raiz, comunicar medico
+    responsavel tecnico, avaliar necessidade de desativacao temporaria,
+    planejar mitigacao (retreinamento, ajuste, substituicao).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de monitoramento de modelos:**
+      1. Implementar plataforma de model monitoring com metricas
+         clinicas (sensibilidade, especificidade, VPP, VPN, AUC)
+         calculadas continuamente em producao.
+      2. Configurar deteccao automatica de data drift (PSI, KS test,
+         divergencia de Jensen-Shannon) e concept drift (deteccao
+         de mudanca em performance temporal).
+      3. Implementar alerting hierarquico: alerta informativo (leve
+         degradacao), alerta de atencao (degradacao moderada), alerta
+         critico (degradacao severa — acionar desativacao).
+      4. Criar dashboard de monitoramento por modelo, subgrupo e
+         periodo, acessivel ao medico responsavel tecnico.
+    tools:
+      - model-monitoring
+      - drift-detection
+      - alerting
+      - monitoring-dashboard
+  devsecops:
+    prose: |
+      **Monitoramento integrado ao pipeline:**
+      1. Implementar pipeline de monitoramento continuo que executa
+         periodicamente (diario/semanal) avaliacao de performance
+         com dados recentes de producao.
+      2. Automatizar comparacao de metricas de producao com metricas
+         de validacao: alerta quando divergencia exceder limiar.
+      3. Implementar pipeline de retreinamento automatizado acionado
+         por deteccao de drift, com revalidacao clinica obrigatoria.
+      4. Gerar relatorio de performance automatizado como artefato
+         do pipeline, com distribuicao automatica aos stakeholders.
+    tools:
+      - gitlab-ci
+      - monitoring-pipeline
+      - retraining-pipeline
+      - report-generation
+  secops:
+    prose: |
+      **Governanca de monitoramento:**
+      1. Definir limiares de alerta para cada modelo em conjunto com
+         equipe clinica e engenharia, documentando justificativa.
+      2. Implementar processo de resposta a alertas com SLA: alerta
+         critico (1h), atencao (24h), informativo (7 dias).
+      3. Revisar relatorios de performance mensalmente no comite de
+         governanca, com decisoes documentadas.
+      4. Manter historico de todos os alertas, investigacoes e acoes
+         tomadas para auditoria e aprendizado organizacional.
+    tools:
+      - grc-platform
+      - incident-response
+      - performance-review
+      - audit-trail
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-72"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["measure-1", "measure-3", "manage-2"]
+    relationship: mapped

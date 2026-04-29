@@ -1,0 +1,93 @@
+id: art-11
+family: cap-3
+title: "Autenticacao do Cliente na Detentora de Conta"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 11. A autenticação do cliente para fins de iniciação de transação
+    de pagamento deve ser realizada exclusivamente no ambiente da instituição
+    detentora da conta, por meio de redirecionamento seguro.
+
+    Parágrafo 1. A instituição detentora da conta deve:
+    I - autenticar o cliente utilizando os mesmos mecanismos de autenticação
+    disponíveis em seus canais digitais próprios;
+    II - apresentar ao cliente as informações da transação para confirmação
+    antes da execução;
+    III - registrar o consentimento do cliente para a transação específica;
+    IV - retornar o controle ao iniciador após a autenticação e confirmação.
+
+    Parágrafo 2. O redirecionamento deve utilizar o protocolo OAuth 2.0
+    com as extensões FAPI (Financial-grade API) definidas nas especificações
+    técnicas.
+guidance:
+  prose: |
+    O art. 11 garante que a autenticacao ocorra no dominio da detentora:
+
+    **Principio de autenticacao delegada:**
+    O cliente nunca insere credenciais no ambiente do iniciador.
+    A autenticacao e feita via redirect para o app/site da detentora.
+
+    **Fluxo FAPI de autenticacao:**
+    1. Iniciador envia authorization request com request object assinado (JAR)
+    2. Detentora apresenta tela de login ao cliente
+    3. Cliente autentica com seus mecanismos habituais (senha, biometria, token)
+    4. Detentora apresenta dados da transacao para confirmacao
+    5. Cliente confirma a transacao
+    6. Detentora redireciona de volta ao iniciador com authorization code
+    7. Iniciador troca code por access token (token endpoint com mTLS)
+
+    **Mecanismos de autenticacao da detentora:**
+    - Senha + segundo fator (SMS, e-mail, app)
+    - Biometria (facial, digital)
+    - Token fisico ou virtual
+    - Push notification no app bancario
+
+    **Informacoes exibidas ao cliente:**
+    - Valor da transacao
+    - Beneficiario (nome e identificacao)
+    - Conta de origem
+    - Data da transacao
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de autenticacao FAPI:**
+      1. Implementar Authorization Server compativel com FAPI 1.0 Advanced
+         (ou FAPI 2.0) com suporte a PAR (Pushed Authorization Requests).
+      2. Configurar request objects assinados (JAR - JWT-Secured
+         Authorization Request) conforme RFC 9101.
+      3. Implementar PKCE (Proof Key for Code Exchange) obrigatorio.
+      4. Configurar redirect URIs com validacao estrita (exact match).
+      5. Implementar tela de confirmacao de transacao com todos os
+         dados obrigatorios antes da autorizacao.
+    tools:
+      - oauth-server
+      - identity-provider
+      - fapi-conformance
+  devsecops:
+    prose: |
+      **Testes de seguranca do fluxo de autenticacao:**
+      1. Executar suite de conformidade FAPI do OpenID Foundation.
+      2. Testar contra ataques de redirect (open redirect, CSRF).
+      3. Validar que authorization codes sao single-use e de curta duracao.
+      4. Verificar binding do token ao certificado mTLS (certificate-bound tokens).
+    tools:
+      - fapi-conformance-suite
+      - security-testing
+      - owasp-zap
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de autenticacao:**
+      1. Monitorar tentativas de autenticacao por IP, dispositivo e horario.
+      2. Detectar padroes de ataque (brute force, credential stuffing).
+      3. Registrar log de todas as autenticacoes e consentimentos.
+      4. Alertar sobre redirecionamentos para URIs nao-registradas.
+    tools:
+      - siem
+      - fraud-detection
+      - identity-monitoring
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

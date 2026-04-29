@@ -1,0 +1,119 @@
+id: art-7
+family: cap-2
+title: "Criterios Objetivos de Classificacao de Risco"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 7. A classificação de risco prevista no art. 6 deve considerar,
+    cumulativamente, os seguintes critérios:
+
+    I - severidade do potencial dano ao paciente em caso de falha do sistema,
+    considerando possibilidade de dano físico, psicológico ou atraso
+    diagnóstico/terapêutico;
+
+    II - reversibilidade da decisão clínica influenciada pelo sistema de IA,
+    distinguindo entre decisões reversíveis (ex: solicitação de exame) e
+    irreversíveis (ex: procedimento cirúrgico);
+
+    III - grau de autonomia do sistema na formação da decisão clínica,
+    considerando se o sistema fornece sugestões, recomendações ou executa
+    ações automaticamente;
+
+    IV - vulnerabilidade da população-alvo, incluindo neonatos, crianças,
+    gestantes, idosos e pacientes com transtornos mentais;
+
+    V - contexto temporal da decisão, distinguindo entre decisões eletivas
+    (com tempo para revisão humana aprofundada) e decisões de urgência ou
+    emergência (com tempo limitado para revisão);
+
+    VI - volume de pacientes potencialmente afetados pelo sistema.
+guidance:
+  prose: |
+    O art. 7 operacionaliza a classificacao de risco com criterios
+    objetivos e mensuaveis, evitando subjetividade no enquadramento.
+
+    **Aplicacao dos criterios:**
+
+    - Severidade (I): usar escalas existentes como CTCAE (Common
+      Terminology Criteria for Adverse Events) para graduar potencial
+      de dano. Grau 1-2 = baixo, Grau 3 = medio/alto, Grau 4-5 = muito alto.
+
+    - Reversibilidade (II): decisoes que podem ser revertidas sem
+      consequencia (pedir exame adicional) tem menor risco que decisoes
+      irreversiveis (amputacao, quimioterapia iniciada).
+
+    - Autonomia (III): escala progressiva — informativo (mostra dados),
+      sugestivo (sugere opcoes), recomendativo (recomenda uma opcao),
+      executivo (executa acao). Quanto mais autonomo, maior o risco.
+
+    - Vulnerabilidade (IV): populacoes especiais elevam automaticamente
+      o nivel de risco em pelo menos um grau.
+
+    - Contexto temporal (V): urgencia/emergencia eleva risco porque
+      reduz tempo disponivel para supervisao humana significativa.
+
+    - Volume (VI): sistemas que afetam milhares de pacientes simultaneamente
+      (ex: triagem populacional) tem risco agregado maior que sistemas
+      que atendem pacientes individuais.
+
+    **Metodo de classificacao:** a Resolucao exige analise cumulativa.
+    Todos os criterios devem ser avaliados, e o nivel de risco final
+    deve refletir o criterio de maior impacto.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de avaliacao de risco:**
+      1. Implementar formulario estruturado no model registry que capture
+         avaliacao de cada um dos 6 criterios do art. 7 para todo modelo.
+      2. Criar scoring automatizado que calcule nivel de risco com base
+         nos criterios: cada criterio recebe pontuacao, e o nivel final
+         e determinado pelo criterio de maior pontuacao.
+      3. Integrar dados de volume de pacientes (estimativa de uso) como
+         input automatico para o criterio VI.
+      4. Implementar workflow de reavaliacao automatica quando metadados
+         do modelo mudam (ex: nova populacao-alvo, novo contexto de uso).
+    tools:
+      - ml-registry
+      - risk-scoring
+      - workflow-engine
+      - model-metadata
+  devsecops:
+    prose: |
+      **Validacao de criterios no pipeline:**
+      1. Implementar check no CI/CD que verifica preenchimento completo
+         dos 6 criterios de risco como pre-requisito para merge request.
+      2. Automatizar validacao de consistencia: modelo classificado como
+         risco baixo nao pode ter criterio individual de alta severidade.
+      3. Exigir justificativa documentada quando o nivel de risco
+         atribuido for inferior ao sugerido pelo scoring automatizado.
+      4. Gerar report automatizado de classificacao de risco como
+         artefato do pipeline, anexado ao model card.
+    tools:
+      - gitlab-ci
+      - risk-assessment
+      - model-cards
+      - compliance-reports
+  secops:
+    prose: |
+      **Auditoria de classificacao de risco:**
+      1. Auditar semestralmente se classificacoes de risco estao
+         corretamente aplicadas conforme os 6 criterios do art. 7.
+      2. Manter registro de todas as decisoes de classificacao com
+         documentacao de justificativa por criterio.
+      3. Implementar processo de contestacao: medicos e equipe clinica
+         podem solicitar reclassificacao com base em evidencia clinica.
+      4. Reportar ao CRM distribuicao de sistemas por nivel de risco
+         e eventuais reclassificacoes realizadas.
+    tools:
+      - grc-platform
+      - audit-tools
+      - risk-register
+      - regulatory-reporting
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-6", "anexo-iii"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["map-2", "map-3"]
+    relationship: mapped

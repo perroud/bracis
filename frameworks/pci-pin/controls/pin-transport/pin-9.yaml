@@ -1,0 +1,90 @@
+id: pin-9
+family: pin-transport
+title: "Encrypted PIN Transmission"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    PINs must be transmitted between entities only in encrypted form using approved
+    cryptographic algorithms. The encrypted PIN block must be transmitted within a secure
+    session or using point-to-point encryption between communicating endpoints. Each link in
+    the PIN transmission chain must either maintain the same encryption (end-to-end
+    encryption) or re-encrypt the PIN block within an SCD before forwarding (zone
+    encryption). Where zone encryption is used, PIN translation from one encryption zone to
+    another must occur exclusively within an SCD. PINs must not be transmitted in cleartext
+    over any communication channel, including internal networks. The minimum encryption
+    strength for PIN block encryption during transmission is 112 bits (double-length TDEA
+    or AES-128).
+
+guidance:
+  prose: >-
+    PIN transmission security ensures that the PIN remains protected as it traverses
+    potentially hostile network environments between the point of interaction and the
+    issuer's verification system. There are two primary architectures: end-to-end
+    encryption (where the same key protects the PIN from PED to issuer HSM) and zone
+    encryption (where the PIN is re-encrypted at each network boundary). Zone encryption
+    is more common in multi-party payment networks because it allows each party to manage
+    its own key relationships. However, it introduces translation points that become high-
+    value targets. Organizations must ensure that all PIN translation occurs within HSMs
+    and that no intermediate system ever has access to the cleartext PIN during translation.
+    Network-layer encryption (TLS/IPsec) provides transport security but does not satisfy
+    the requirement for PIN-level encryption.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement point-to-point encryption for PIN blocks using TLS 1.2+ with mutual
+      authentication as the transport layer, combined with PIN-level encryption using
+      AES or TDEA within PIN blocks. Deploy PIN translation HSMs at every zone boundary
+      in the payment network. Configure network firewalls to restrict PIN-carrying traffic
+      to approved routes between registered endpoints. Implement DUKPT (Derived Unique
+      Key Per Transaction) for PED-to-acquirer links to ensure unique encryption per
+      transaction. Monitor PIN translation volumes at each zone boundary for capacity
+      planning and anomaly detection.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - network-encryption-appliances
+      - mutual-tls
+      - palo-alto-ngfw
+  devsecops:
+    prose: >-
+      Validate TLS configuration for all PIN transmission channels using automated
+      compliance scanners. Test PIN block encryption end-to-end in staging environments
+      using test keys and verify correct encryption at each hop. Scan network
+      configuration files for any routes that could allow PIN data to traverse unencrypted
+      links. Implement integration tests for DUKPT key derivation and PIN block
+      encryption/decryption.
+    tools:
+      - gitlab-sast
+      - ssl-labs-scanner
+      - testssl-sh
+      - wireshark-automated-tests
+  secops:
+    prose: >-
+      Monitor network traffic for PIN data patterns on unencrypted channels using
+      deep packet inspection. Alert on any degradation of TLS connections carrying PIN
+      data (cipher downgrade, certificate expiration). Audit PIN translation logs at
+      each zone boundary to verify all translations occur within HSMs. Conduct quarterly
+      network trace analysis to verify PIN data never appears in cleartext at any
+      monitored network point.
+    tools:
+      - splunk
+      - elastic-siem
+      - palo-alto-ngfw
+      - network-packet-broker
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-4.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.5.14"]
+    relationship: mapped

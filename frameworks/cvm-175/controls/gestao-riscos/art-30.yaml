@@ -1,0 +1,113 @@
+id: art-30
+family: gestao-riscos
+title: "Stress Test e Analise de Cenarios"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 30. O gestor deve realizar periodicamente testes de estresse (stress test)
+    da carteira do fundo, simulando cenários adversos que possam impactar
+    significativamente o valor do patrimônio do fundo.
+
+    Parágrafo 1. Os cenários de estresse devem contemplar, no mínimo: I - cenários
+    históricos de crise relevantes para a classe de ativos do fundo; II - cenários
+    hipotéticos que reflitam riscos emergentes ou concentrações da carteira;
+    III - cenários de estresse de liquidez, simulando resgates massivos simultâneos.
+
+    Parágrafo 2. Os resultados dos testes de estresse devem ser documentados e
+    reportados ao administrador, ao comitê de riscos e, quando aplicável, ao
+    conselho de supervisão do fundo.
+
+    Parágrafo 3. Quando os resultados dos testes de estresse indicarem
+    vulnerabilidades relevantes, o gestor deve adotar providências para mitigar
+    os riscos identificados.
+guidance:
+  prose: |
+    O art. 30 exige testes de estresse periodicos como ferramenta de gestao
+    de riscos proativa.
+
+    **Tres tipos de cenarios obrigatorios:**
+    (i) Historicos: reproduzir crises passadas (2008, Covid-2020, crise da
+    Russia-Ucrania 2022) e medir impacto na carteira atual;
+    (ii) Hipoteticos: construir cenarios que ainda nao ocorreram, baseados em
+    riscos emergentes (inflacao descontrolada, calote soberano, falha de
+    contraparte);
+    (iii) Liquidez: simular resgates massivos e verificar se o fundo consegue
+    honrar sem venda forcada de ativos.
+
+    **Periodicidade:**
+    A resolucao exige periodicidade, sem definir frequencia minima. A pratica
+    de mercado e mensal para fundos liquidos e trimestral para fundos iliquidos.
+    Em periodos de estresse, a frequencia deve aumentar.
+
+    **Obrigacao de agir:**
+    O paragrafo 3 e fundamental: se o stress test mostra vulnerabilidade, o
+    gestor DEVE agir. Nao basta documentar. Isso pode significar reduzir posicoes,
+    aumentar caixa, contratar hedges ou comunicar cotistas.
+
+    **Documentacao e reporte:**
+    Resultados devem ser documentados e reportados. Isso cria trilha de auditoria
+    que a CVM pode verificar durante fiscalizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de stress test:**
+      1. Motor de stress test integrado ao sistema de risco: capacidade de
+         aplicar choques em fatores de risco e recalcular NAV do fundo.
+      2. Biblioteca de cenarios historicos parametrizados: variacao de juros,
+         cambio, bolsa, credito, liquidez.
+      3. Pipeline automatizado de execucao de stress test: agendamento, execucao,
+         geracao de relatorio, envio a stakeholders.
+
+      **Cenarios como codigo:**
+      4. Cenarios de estresse versionados em repositorio Git (YAML/JSON)
+         com historico de alteracoes e justificativas.
+      5. Cenarios customizaveis por fundo com heranca de cenarios base.
+    tools:
+      - git
+      - terraform
+      - gitlab-ci
+      - vault
+  devsecops:
+    prose: |
+      **Validacao de modelos de stress:**
+      1. Testes automatizados de cenarios: verificar se os choques sao
+         aplicados corretamente e os resultados sao consistentes.
+      2. Pipeline de CI/CD para alteracoes em modelos de stress test:
+         revisao obrigatoria por equipe de risco.
+      3. Backtesting de cenarios historicos: verificar se o modelo reproduz
+         perdas reais observadas em crises passadas.
+
+      **Integridade de dados:**
+      4. Validacao de dados de entrada (posicoes, fatores de risco, precos)
+         antes da execucao do stress test.
+      5. Audit trail de cada execucao: parametros, dados, resultados.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - sonarqube
+  secops:
+    prose: |
+      **Monitoramento de resultados:**
+      1. Dashboard de stress test: resultados atuais, evolucao historica,
+         fundos mais vulneraveis.
+      2. Alertas para resultados que excedem thresholds de alerta.
+      3. Tracking de acoes mitigadoras: quando vulnerabilidade e identificada,
+         monitorar se providencias foram adotadas.
+
+      **Auditoria de stress test:**
+      4. Verificar periodicidade de execucao: stress test esta sendo realizado
+         na frequencia definida?
+      5. Avaliar adequacao de cenarios: cenarios refletem riscos reais da carteira?
+      6. Verificar se acoes mitigadoras foram implementadas apos resultados adversos.
+    tools:
+      - grc-platform
+      - siem
+      - compliance-scanner
+legal_references:
+  - framework_id: bcb-304
+    articles: ["art-5", "art-7"]
+    relationship: complements
+  - framework_id: cvm-35
+    articles: ["art-9"]
+    relationship: complements

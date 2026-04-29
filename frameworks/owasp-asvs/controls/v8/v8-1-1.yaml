@@ -1,0 +1,100 @@
+id: v8.1.1
+family: v8
+title: "General Data Protection"
+class: OWASP-ASVS
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Verify the application protects sensitive data from being cached in server components
+    such as load balancers and application caches. The application must identify sensitive
+    data according to a data classification scheme and apply appropriate protection controls
+    based on the classification level. Sensitive data must not be stored in client-side
+    storage mechanisms (localStorage, sessionStorage, cookies) unless encrypted and
+    necessary for application functionality.
+
+guidance:
+  prose: >-
+    Data protection requires understanding what data is sensitive and where it resides
+    throughout the application stack. Sensitive data includes authentication credentials,
+    session tokens, personal data (PII), financial data, health data, and any data whose
+    exposure would cause harm. Caching sensitive data in server components creates copies
+    that persist beyond the intended lifecycle and may be accessible through cache poisoning
+    or side-channel attacks. Client-side storage is inherently accessible to JavaScript
+    running in the browser context, including XSS payloads. A formal data classification
+    scheme (public, internal, confidential, restricted) enables consistent protection
+    decisions. Cache-Control headers (no-store, no-cache, private) must be applied to
+    responses containing sensitive data.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V8.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP Data Protection Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data classification labels at the API response level using custom headers
+      or response metadata. Configure reverse proxies and CDNs to respect Cache-Control
+      directives and never cache responses marked as sensitive. Set default Cache-Control
+      headers to no-store for all authenticated endpoints. Implement field-level encryption
+      for sensitive columns in the database using application-level encryption with
+      KMS-managed keys. Deploy data masking in non-production environments to prevent
+      sensitive data exposure during development and testing. Implement automatic PII
+      detection and classification using data loss prevention tools integrated with the
+      data pipeline.
+    tools:
+      - vault
+      - aws-kms
+      - cloudflare
+      - nginx
+      - varnish
+      - redis
+      - postgresql
+
+  devsecops:
+    prose: >-
+      Implement SAST rules that detect sensitive data written to client-side storage
+      (localStorage.setItem, sessionStorage.setItem) without encryption. Scan API responses
+      for missing Cache-Control headers on authenticated endpoints. Write automated tests
+      that verify sensitive data is not present in browser storage, response caches, or
+      debug outputs. Validate that non-production environments use masked or synthetic data
+      rather than production copies. Include data classification validation in code review
+      checklists. Scan for logging statements that output sensitive data fields.
+    tools:
+      - semgrep
+      - sonarqube
+      - owasp-zap
+      - burp-suite
+      - gitlab-ci
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor for data exfiltration patterns: unusual data volumes in API responses, bulk
+      data downloads, or access to sensitive data outside business hours. Implement DLP
+      rules at the network and endpoint level to detect sensitive data leaving the
+      organization through unauthorized channels. Audit cache server contents periodically
+      to verify sensitive data is not being cached. Review CDN configurations to ensure
+      sensitive content is not cached at edge nodes. Track data classification compliance
+      through periodic data discovery scans.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog-security
+      - symantec-dlp
+      - mcafee-dlp
+      - cloudflare-security-analytics
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-28", "MP-4", "SI-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.12", "A5.13", "A8.11"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["3.4.1", "3.5.1"]
+    relationship: implements

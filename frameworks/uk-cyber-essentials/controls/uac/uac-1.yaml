@@ -1,0 +1,99 @@
+id: uac-1
+family: uac
+title: "User Account Management and Principle of Least Privilege"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    User accounts must be assigned to named individuals. Access to data and services
+    must be granted only to those user accounts (or special accounts such as service
+    accounts) that need access in order to perform their role. Standard (non-privileged)
+    user accounts must not have the ability to install software, change system settings,
+    or access data beyond what is required for their job function. User accounts must
+    be removed or disabled when no longer required, including when staff leave the
+    organisation or change roles.
+
+guidance:
+  prose: >-
+    The principle of least privilege is fundamental to limiting the damage an attacker
+    can cause after compromising an account. Every user account should be granted only
+    the minimum level of access needed to perform their duties. Shared or generic
+    accounts undermine accountability and must be avoided. Service accounts should be
+    tightly scoped and regularly reviewed. A formal joiners/movers/leavers process must
+    be in place to ensure access is granted, modified, and revoked in a timely manner
+    as staff roles change. Dormant accounts are a significant risk and must be identified
+    and disabled.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: User Access Control"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: 10 Steps — Managing User Privileges"
+    url: "https://www.ncsc.gov.uk/collection/10-steps/managing-user-privileges"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralised identity management through an identity provider (Azure AD,
+      Okta, Google Workspace) with role-based access control (RBAC). Define roles with
+      minimum required permissions and assign users to roles rather than granting
+      individual permissions. Use automated provisioning (SCIM) to synchronise user
+      accounts with HR systems for joiners/movers/leavers processes. Implement Just-In-Time
+      (JIT) access for elevated privileges with time-limited access grants. Deploy
+      Privileged Access Management (PAM) solutions for administrative access to
+      infrastructure. Configure automated account disablement after defined inactivity
+      periods.
+    tools:
+      - azure-ad
+      - okta
+      - google-workspace
+      - cyberark
+      - hashicorp-vault
+      - terraform
+
+  devsecops:
+    prose: >-
+      Define access policies as code using RBAC definitions in version-controlled
+      repositories. Implement automated tests that validate role assignments match the
+      documented access matrix. Use pipeline automation to provision and deprovision
+      access across development tools (GitLab, artifact registries, cloud accounts)
+      based on group membership changes. Enforce separation of duties in CI/CD pipelines
+      — developers should not be able to approve their own merge requests or deploy to
+      production without peer review.
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - terraform
+      - ansible
+      - gitlab-rbac
+
+  secops:
+    prose: >-
+      Conduct quarterly access reviews for all systems, with particular focus on
+      privileged accounts and accounts with access to sensitive data. Monitor for
+      dormant accounts (no login within 90 days) and disable them automatically.
+      Audit service account usage and verify that each has a documented owner and
+      business justification. Monitor for privilege escalation attempts and anomalous
+      access patterns. Generate regular reports on account lifecycle metrics including
+      time-to-provision, time-to-revoke, and dormant account counts.
+    tools:
+      - sailpoint
+      - saviynt
+      - splunk
+      - elastic-siem
+      - microsoft-entra-id
+      - crowdstrike-falcon
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.18", "A8.2", "A8.3"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-5", "AC-6"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-restrict-admin"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS 5.1", "CIS 5.3", "CIS 5.4", "CIS 6.1"]
+    relationship: mapped

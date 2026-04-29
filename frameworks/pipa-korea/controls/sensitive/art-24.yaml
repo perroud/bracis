@@ -1,0 +1,122 @@
+id: art-24
+family: sensitive
+title: "Restriction on Processing Unique Identification Information"
+class: PIPA-KR
+baselines: [privacy-baseline]
+statement:
+  prose: |
+    Article 24 (Restriction on Processing Unique Identification Information)
+    (1) A personal information processor shall not process unique identification
+    information prescribed by Presidential Decree (hereinafter referred to as "unique
+    identification information") such as the resident registration number, passport
+    number, driver's license number, and alien registration number, except in any of
+    the following cases:
+
+    1. Where there is a specific provision in a statute requiring or permitting the
+       processing of unique identification information;
+    2. Where it is unavoidably necessary for the personal information processor to
+       process unique identification information to comply with statutory obligations;
+    3. Other cases prescribed by Presidential Decree, taking into account the degree
+       of infringement on the data subject's rights.
+
+    (2) Notwithstanding paragraph (1), a personal information processor shall not
+    process the resident registration number except in the following cases:
+    1. Where there is a specific provision in a statute or Presidential Decree
+       requiring or permitting the processing of the resident registration number;
+    2. Where it is unavoidably necessary for the performance of urgent duties related
+       to the life, body, or property of the data subject or a third party, when the
+       consent of the data subject cannot be obtained.
+
+    (3) A personal information processor shall take necessary measures, such as
+    encryption, to ensure the safe management of unique identification information
+    in accordance with Presidential Decree.
+
+    (4) Where a personal information processor fails to meet the requirements of
+    paragraph (1) or (2), it shall immediately destroy the unique identification
+    information in its possession.
+guidance:
+  prose: |
+    Article 24 addresses a uniquely Korean compliance challenge: the resident
+    registration number (RRN). The RRN is a 13-digit lifetime identifier assigned
+    to every Korean citizen and resident. Its historical overuse by both government
+    and private sector led to massive data breaches, prompting increasingly strict
+    restrictions.
+
+    Key requirements:
+
+    - **RRN special protection (para. 2):** The resident registration number has
+      the strictest protection of any data element in PIPA. Consent alone is NOT
+      sufficient — only explicit statutory authorization or vital interest emergency
+      allows RRN processing. This is stricter than GDPR's approach to any single
+      identifier.
+
+    - **Other unique IDs (para. 1):** Passport numbers, driver's license numbers,
+      and alien registration numbers require statutory basis but have slightly
+      broader exceptions than the RRN.
+
+    - **Mandatory encryption (para. 3):** Unique identification information must
+      be encrypted. This is not optional or risk-based — it is an absolute
+      requirement. The PIPC has specified AES-256 or equivalent as the minimum
+      standard.
+
+    - **Destruction obligation (para. 4):** If a processor discovers it holds
+      unique identification information without a valid legal basis, immediate
+      destruction is required — not merely cessation of use.
+
+    - **Alternative authentication:** Article 24-2 (enacted 2014) required
+      internet service providers to provide alternative authentication methods
+      (i-PIN, mobile verification) instead of collecting RRNs. This drove the
+      Korean digital identity ecosystem.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement mandatory encryption for all unique identification information
+         (RRN, passport, driver's license, alien registration number) using AES-256
+         or stronger, at rest and in transit.
+      2. Build RRN detection and blocking at the data ingestion layer: reject
+         or tokenize RRNs unless statutory authorization is documented.
+      3. Deploy alternative authentication mechanisms (mobile verification,
+         i-PIN integration) to eliminate the need for RRN collection.
+      4. Implement tokenization for unique IDs: store tokens with encrypted
+         mappings in a dedicated vault, not raw identifiers in application databases.
+      5. Build automated destruction workflows for unique IDs that lose their
+         legal basis.
+    tools:
+      - encryption-at-rest-aes256
+      - tokenization-service
+      - rrn-detection-scanner
+      - mobile-verification-api
+      - data-destruction-orchestrator
+  devsecops:
+    prose: |
+      1. Scan code and configurations for RRN patterns (13-digit Korean format)
+         and alert on any unencrypted storage or transmission.
+      2. Block deployments that store unique identification information without
+         encryption.
+      3. Test that alternative authentication paths function correctly without
+         requiring RRN collection.
+      4. Validate encryption implementation meets PIPC standards (AES-256 minimum).
+    tools:
+      - rrn-pattern-scanner
+      - encryption-validator
+      - authentication-flow-tester
+      - compliance-gate
+  secops:
+    prose: |
+      1. Monitor for unique identification information in logs, error messages,
+         and debugging output — these are common leakage vectors.
+      2. Conduct quarterly scans of all data stores for unencrypted unique IDs.
+      3. Audit legal basis documentation for all unique ID processing activities.
+      4. Alert immediately on any RRN exposure in non-authorized contexts.
+    tools:
+      - dlp
+      - data-store-scanner
+      - legal-basis-audit
+      - real-time-alerting
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-87"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: mapped

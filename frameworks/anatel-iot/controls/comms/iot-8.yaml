@@ -1,0 +1,112 @@
+id: iot-8
+family: comms
+title: "Encryption of Personal Data in Transit"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve permitir a utilização de criptografia na
+    transmissão de dados pessoais e sensíveis, utilizando protocolos
+    e algoritmos baseados em padronização internacionalmente reconhecida.
+    A comunicação de dados pessoais entre o equipamento e serviços
+    externos (nuvem, servidores de gerenciamento, aplicativos) deve ser
+    protegida por criptografia de ponta a ponta ou, no mínimo, por
+    criptografia de transporte (TLS/DTLS).
+
+    (Ato 77/2021 §5.1.6, inciso I)
+guidance:
+  prose: |
+    This control ensures that personal and sensitive data transmitted by
+    the device is protected against interception. It applies to all data
+    flows carrying user information, including but not limited to:
+
+    **Data flows in scope:**
+    - Device-to-cloud telemetry containing user data (usage patterns,
+      network traffic metadata, device configuration).
+    - Device-to-app communication (mobile app ↔ device pairing,
+      remote management via manufacturer app).
+    - Device-to-ACS communication (TR-069/USP sessions carrying
+      subscriber configuration data).
+    - Device-to-device communication in mesh/smart-home scenarios
+      where personal data is exchanged.
+
+    **Minimum requirements:**
+    - TLS 1.2 or higher for TCP-based communications.
+    - DTLS 1.2 or higher for UDP-based communications (CoAP, MQTT-SN).
+    - Certificate validation must be enforced — no "accept all"
+      certificate handling.
+    - Forward secrecy (ECDHE) should be preferred in cipher suite
+      negotiation.
+
+    **What constitutes "personal data" in this context:**
+    Per LGPD Art. 5, any information relating to an identified or
+    identifiable natural person — including network usage data, IP
+    addresses, device identifiers linked to a user, and configuration
+    data that reveals user behavior.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement TLS 1.2+ as the mandatory transport for all
+         outbound connections carrying user data — no fallback to
+         plaintext.
+      2. For constrained IoT devices using CoAP, implement DTLS 1.2
+         with PSK or certificate-based authentication.
+      3. Embed a trusted CA certificate store in the firmware for
+         server certificate validation — update it via the secure
+         firmware update mechanism.
+      4. Configure cipher suite preference to prioritize forward secrecy
+         (ECDHE-based suites).
+      5. Implement certificate pinning for connections to known
+         manufacturer servers (cloud backend, ACS) to prevent
+         MITM attacks even with compromised CAs.
+    tools:
+      - mbedtls
+      - wolfssl
+      - openssl-embedded
+      - certificate-store
+      - firmware-build-pipeline
+  devsecops:
+    prose: |
+      1. Add automated TLS testing to the CI pipeline: verify all
+         outbound connections use TLS 1.2+, validate certificate
+         chain, and reject weak cipher suites.
+      2. Implement network capture tests: boot device, trigger all
+         data-transmitting features, and verify no personal data
+         appears in plaintext in captured packets.
+      3. Scan firmware for hardcoded "verify=false" or
+         "SSL_VERIFY_NONE" patterns that disable certificate
+         validation.
+      4. Test TLS downgrade attack resistance (POODLE, DROWN, FREAK
+         scenarios).
+    tools:
+      - gitlab-ci
+      - testssl-sh
+      - wireshark
+      - semgrep
+      - sast-scanner
+  secops:
+    prose: |
+      1. Perform network traffic analysis on production devices to
+         verify all personal data transmissions are encrypted —
+         capture traffic and inspect for plaintext PII.
+      2. Conduct MITM testing: use a proxy with a rogue certificate
+         and verify the device rejects the connection or warns the
+         user.
+      3. Review the device's data flow inventory against LGPD
+         requirements to ensure all personal data streams are
+         identified and encrypted.
+      4. Maintain encryption protocol evidence (TLS versions, cipher
+         suites, certificate validation behavior) for ANATEL and
+         LGPD compliance audits.
+    tools:
+      - mitmproxy
+      - wireshark
+      - burp-suite
+      - grc-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-5"]
+    relationship: complements
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

@@ -1,0 +1,128 @@
+id: sec-26d
+family: enforcement
+title: "Data Portability Obligation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    (1) At the request of an individual, an organisation that has the individual's
+    personal data in its possession or under its control must transmit a copy of
+    that data to another organisation in a commonly used machine-readable format.
+
+    (2) The obligation under subsection (1) applies to —
+    (a) personal data that was provided by the individual to the organisation; and
+    (b) personal data that was created by the organisation in the course of providing
+    goods or services to the individual, being data derived from the use by the
+    individual of the goods or services.
+
+    (3) The receiving organisation must not use the ported data for any purpose other
+    than a purpose —
+    (a) related to the provision of goods or services by the receiving organisation
+    to the individual; or
+    (b) that the individual has consented to.
+
+    (4) The transmitting organisation shall comply with a porting request as soon as
+    is reasonably possible, and may charge the requesting individual a reasonable fee
+    for the transmission.
+
+    (5) The Commission may, on application by any person, determine any question
+    relating to the format, manner, or other aspects of data portability under this
+    section.
+
+guidance:
+  prose: |
+    Section 26D (introduced by the 2021 amendments) establishes a data portability
+    right — allowing individuals to request transfer of their personal data from one
+    organization to another.
+
+    Key features:
+
+    1. **Scope of portable data:**
+       - Data provided by the individual (e.g., profile information, uploaded content)
+       - Data derived from the individual's use of services (e.g., transaction history,
+         usage patterns, activity logs)
+       - Excludes data created by the organization through its own analysis (e.g.,
+         internal credit scores, proprietary assessments)
+
+    2. **Machine-readable format:** Data must be transmitted in a commonly used,
+       machine-readable format. The PDPC can prescribe specific formats.
+
+    3. **Purpose restriction on receiving organization:** The receiving organization
+       may only use ported data for providing services to the individual or for
+       consented purposes — preventing data hoarding.
+
+    4. **Fee permitted:** Unlike the GDPR's free portability right, PDPA permits a
+       reasonable fee.
+
+    5. **Organization-to-organization transfer:** The right is for direct transmission
+       between organizations, not just providing data to the individual.
+
+references:
+  - citation: "PDPA 2012, Sections 26D-26H"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a data portability API that enables organization-to-organization data
+         transfer in standardized machine-readable formats (JSON, XML, CSV).
+      2. Implement data categorization that distinguishes individual-provided data,
+         derived data, and organization-created data to determine portability scope.
+      3. Create portability request management workflows with identity verification,
+         receiving organization authentication, and transfer tracking.
+      4. Build format negotiation capabilities — support multiple export formats and
+         allow the receiving organization to specify its preferred format.
+      5. Implement transfer audit trails that record what data was transmitted, to
+         whom, when, and in what format.
+      6. Create secure transfer channels (encrypted API endpoints, SFTP) for
+         organization-to-organization data transmission.
+    tools:
+      - data-portability-api
+      - backstage
+      - data-export-engine
+      - secure-transfer
+      - api-gateway
+
+  devsecops:
+    prose: |
+      1. Test data portability API endpoints for correctness, completeness, and
+         format compliance.
+      2. Validate that only in-scope data (individual-provided and derived) is
+         included in portability exports.
+      3. Test secure transfer mechanisms — verify encryption, authentication, and
+         integrity of transferred data.
+      4. Implement load testing for portability endpoints to handle concurrent
+         requests without degradation.
+    tools:
+      - gitlab-ci
+      - api-testing
+      - postman
+      - k6
+      - security-testing
+
+  secops:
+    prose: |
+      1. Monitor portability request volumes and fulfillment SLAs.
+      2. Audit portability exports to verify scope correctness — no over-inclusion
+         or under-inclusion of data.
+      3. Track receiving organization usage of ported data for purpose restriction
+         compliance (if contractually obligated).
+      4. Investigate anomalous portability request patterns that may indicate
+         unauthorized access attempts.
+    tools:
+      - compliance-dashboard
+      - api-monitoring
+      - siem
+      - audit-management
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-20"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: mapped
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: mapped

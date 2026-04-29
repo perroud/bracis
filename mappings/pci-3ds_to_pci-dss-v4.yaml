@@ -1,0 +1,442 @@
+id: pci-3ds_to_pci-dss-v4
+title: "PCI 3DS v2.0 to PCI DSS v4.0 Control Mapping"
+source_framework: pci-3ds
+target_framework: pci-dss-v4
+version: "1.0.0"
+last_updated: "2026-04-05"
+methodology: semantic
+
+mappings:
+  # tds-network — Network Security
+  - source_control: tds-network-1
+    target_controls:
+      - id: req-1.1
+        relationship: derived-from
+        confidence: 0.92
+        rationale: >
+          PCI 3DS tds-network-1 (3DS Environment Network Segmentation) derives
+          directly from PCI DSS Requirement 1 (Install and Maintain Network
+          Security Controls). Both require network segmentation using firewalls,
+          security groups, and access control lists to isolate sensitive
+          environments from untrusted networks. The 3DS control specializes
+          Requirement 1 by applying it specifically to the 3DS environment
+          (3DS Server, Directory Server, Access Control Server) rather than
+          the broader CDE. Both mandate default-deny policies, traffic
+          restriction to only necessary flows, and periodic review of
+          network security control configurations.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          PCI 3DS tds-network-1 requires annual validation of network
+          segmentation including penetration testing that specifically
+          targets segmentation boundaries. PCI DSS Requirement 11 (Test
+          Security of Systems and Networks Regularly) mandates penetration
+          testing and segmentation validation. The 3DS control complements
+          Requirement 11 by adding 3DS-specific segmentation validation
+          requirements for the 3DS environment boundary.
+
+  - source_control: tds-network-2
+    target_controls:
+      - id: req-4.1
+        relationship: derived-from
+        confidence: 0.93
+        rationale: >
+          PCI 3DS tds-network-2 (Secure Communication Channels for 3DS
+          Transactions) derives from PCI DSS Requirement 4 (Protect Cardholder
+          Data with Strong Cryptography During Transmission). Both require TLS
+          1.2 or higher, trusted certificates, certificate chain validation,
+          revocation checking, and disabling weak cipher suites. The 3DS control
+          specializes Requirement 4 by mandating mutual TLS (mTLS) for
+          server-to-server communications between 3DS components (3DS Server,
+          Directory Server, Access Control Server) as specified by the EMVCo
+          protocol, which goes beyond the general PCI DSS transmission
+          encryption requirements.
+      - id: req-3.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          PCI 3DS tds-network-2 addresses encryption of sensitive
+          authentication data during transmission, complementing PCI DSS
+          Requirement 3 which protects stored account data. Both share
+          the objective of protecting sensitive payment data through strong
+          cryptography, with tds-network-2 focused on the transit dimension
+          and Requirement 3 on the storage dimension.
+
+  - source_control: tds-network-3
+    target_controls:
+      - id: req-1.1
+        relationship: derived-from
+        confidence: 0.94
+        rationale: >
+          PCI 3DS tds-network-3 (Firewall and Network Security Control
+          Configuration) is a direct specialization of PCI DSS Requirement 1.
+          Both require documented firewall rulesets with business justification,
+          default-deny policies for inbound and outbound traffic, specification
+          of allowed protocols, ports, and addresses, and periodic review of
+          firewall configurations. The 3DS control mirrors Requirement 1's
+          six-month review cycle and adds 3DS-specific context for rule
+          documentation and review.
+      - id: req-2.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          PCI 3DS tds-network-3 requires that firewall configurations be
+          established, documented, and maintained following secure practices.
+          PCI DSS Requirement 2 (Apply Secure Configurations to All System
+          Components) addresses secure configuration of all system components
+          including network devices. The 3DS control complements Requirement 2
+          by applying system hardening principles specifically to firewall and
+          network security controls in the 3DS environment.
+
+  # tds-data — Data Protection
+  - source_control: tds-data-1
+    target_controls:
+      - id: req-3.1
+        relationship: derived-from
+        confidence: 0.93
+        rationale: >
+          PCI 3DS tds-data-1 (Protection of 3DS Authentication Data) derives
+          from PCI DSS Requirement 3 (Protect Stored Account Data). Both
+          prohibit storage of sensitive authentication data after authorization
+          unless a specific requirement exists, mandate strong cryptography
+          (AES-128+ symmetric, RSA-2048+ asymmetric) for any permitted
+          storage, and require access restriction based on business need.
+          The 3DS control specializes Requirement 3 by focusing on 3DS-specific
+          authentication data types including Authentication Values (AVs),
+          cryptographic keys, and transaction-specific data rather than general
+          cardholder data (PAN, track data, CVV).
+      - id: req-7.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          PCI 3DS tds-data-1 requires that access to stored authentication
+          data be restricted to personnel and systems with an explicit business
+          need. PCI DSS Requirement 7 (Restrict Access by Business Need to
+          Know) establishes the same principle for cardholder data access.
+          The 3DS control complements Requirement 7 by extending need-to-know
+          access restrictions specifically to 3DS authentication data.
+
+  - source_control: tds-data-2
+    target_controls:
+      - id: req-4.1
+        relationship: derived-from
+        confidence: 0.95
+        rationale: >
+          PCI 3DS tds-data-2 (Encryption of 3DS Data in Transit) is nearly
+          equivalent to PCI DSS Requirement 4 in its core requirements. Both
+          mandate TLS 1.2 or later for all data transmissions, trusted keys
+          and certificates, prohibition of cleartext transmission of sensitive
+          data, and data integrity mechanisms. The 3DS control derives from
+          Requirement 4 while adding 3DS-specific requirements for message-level
+          integrity (HMAC, digital signatures) for critical 3DS message fields
+          exchanged between the 3DS Server, Directory Server, and Access
+          Control Server.
+
+  - source_control: tds-data-3
+    target_controls:
+      - id: req-3.1
+        relationship: derived-from
+        confidence: 0.88
+        rationale: >
+          PCI 3DS tds-data-3 (Cryptographic Key Management for 3DS Operations)
+          derives from PCI DSS Requirement 3, which includes key management
+          requirements for protecting stored account data. Both require secure
+          key generation, storage in tamper-resistant devices (HSMs), defined
+          rotation periods, secure destruction, split knowledge, and dual
+          control. The 3DS control specializes these requirements for the 3DS
+          cryptographic context, emphasizing HSM usage for Authentication
+          Value generation and 3DS message signing operations.
+      - id: req-4.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          PCI 3DS tds-data-3 covers key management lifecycle for keys used
+          in both data-at-rest and data-in-transit protection. PCI DSS
+          Requirement 4 includes trusted key and certificate management for
+          transmission security. The 3DS control complements Requirement 4
+          by providing detailed key management procedures for TLS certificates
+          and session keys used in 3DS communication channels.
+
+  # tds-vuln — Vulnerability Management
+  - source_control: tds-vuln-1
+    target_controls:
+      - id: req-6.1
+        relationship: derived-from
+        confidence: 0.91
+        rationale: >
+          PCI 3DS tds-vuln-1 (Vulnerability Scanning and Patch Management)
+          derives from PCI DSS Requirement 6 (Develop and Maintain Secure
+          Systems and Software). Both require formal patch management with
+          critical patches applied within 30 days, quarterly internal and
+          external vulnerability scans (external by PCI-approved ASV), and
+          remediation with rescanning for high and critical findings. The
+          3DS control specializes Requirement 6's vulnerability management
+          provisions for the 3DS environment's system components.
+      - id: req-11.1
+        relationship: derived-from
+        confidence: 0.90
+        rationale: >
+          PCI 3DS tds-vuln-1 also derives from PCI DSS Requirement 11 (Test
+          Security of Systems and Networks Regularly), which mandates quarterly
+          internal and external vulnerability scans. Both require ASV-conducted
+          external scans, rescanning after remediation, and addressing all
+          high/critical findings. The 3DS control combines vulnerability
+          scanning requirements from both Requirement 6 (patch management)
+          and Requirement 11 (security testing) into a single control.
+      - id: req-5.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          PCI 3DS tds-vuln-1 addresses protection against known vulnerabilities
+          through patching and scanning. PCI DSS Requirement 5 (Protect Against
+          Malicious Software) covers a complementary aspect of system protection
+          by focusing on malware detection and prevention. Both controls
+          contribute to maintaining the security posture of system components,
+          with tds-vuln-1 addressing known vulnerability remediation and
+          Requirement 5 addressing active malware threats.
+
+  - source_control: tds-vuln-2
+    target_controls:
+      - id: req-11.1
+        relationship: derived-from
+        confidence: 0.93
+        rationale: >
+          PCI 3DS tds-vuln-2 (Penetration Testing of 3DS Environment) derives
+          directly from PCI DSS Requirement 11, which mandates annual
+          penetration testing, testing after significant changes, coverage
+          of both network-layer and application-layer tests, segmentation
+          validation, qualified testers, and remediation with retesting. The
+          3DS control applies these requirements specifically to the 3DS
+          environment, adding emphasis on testing APIs used for 3DS message
+          exchange and the complex protocol-level interactions between 3DS
+          Server, Directory Server, and Access Control Server.
+      - id: req-6.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          PCI 3DS tds-vuln-2 includes application-layer penetration testing
+          of 3DS components. PCI DSS Requirement 6 addresses secure development
+          and vulnerability management for applications. The 3DS control
+          complements Requirement 6 by validating through penetration testing
+          that the secure development practices mandated by Requirement 6
+          have been effective in preventing exploitable vulnerabilities in
+          3DS application interfaces.
+
+  # tds-access — Access Control
+  - source_control: tds-access-1
+    target_controls:
+      - id: req-7.1
+        relationship: derived-from
+        confidence: 0.95
+        rationale: >
+          PCI 3DS tds-access-1 (Access Control for 3DS System Components)
+          derives directly from PCI DSS Requirement 7 (Restrict Access by
+          Business Need to Know). Both require role-based access control
+          (RBAC), least privilege principle, formal authorization before
+          access is granted, default-deny access model, and semi-annual
+          access reviews. The 3DS control applies these exact requirements
+          to the 3DS environment, making it a near-equivalent specialization
+          of Requirement 7 scoped to 3DS system components and data.
+      - id: req-9.1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          PCI 3DS tds-access-1 focuses on logical access control to 3DS
+          system components. PCI DSS Requirement 9 (Restrict Physical Access)
+          addresses the physical dimension of access control. Both share the
+          fundamental principle of restricting access to authorized personnel
+          only. The 3DS control complements Requirement 9 by providing the
+          logical access layer that works alongside physical access controls
+          for comprehensive protection of 3DS infrastructure.
+
+  - source_control: tds-access-2
+    target_controls:
+      - id: req-8.1
+        relationship: derived-from
+        confidence: 0.95
+        rationale: >
+          PCI 3DS tds-access-2 (Multi-Factor Authentication for 3DS
+          Environment Access) derives directly from PCI DSS Requirement 8
+          (Identify Users and Authenticate Access). Both require MFA for
+          administrative access, remote access, and non-console access.
+          Both specify at least two of three authentication factors
+          (knowledge, possession, inherence) that must be independent of
+          each other. The 3DS control applies Requirement 8's MFA
+          requirements specifically to the 3DS environment, matching the
+          PCI DSS v4.0 expansion of MFA requirements to all CDE access.
+
+  - source_control: tds-access-3
+    target_controls:
+      - id: req-8.1
+        relationship: derived-from
+        confidence: 0.93
+        rationale: >
+          PCI 3DS tds-access-3 (Unique Identification and Account Management)
+          derives from PCI DSS Requirement 8, which mandates unique user IDs,
+          prohibition of shared/group/generic accounts for administrative
+          access, account lifecycle management (provisioning through
+          revocation), and immediate disablement upon termination. The 3DS
+          control applies these identity and account management requirements
+          to the 3DS environment, including specific provisions for uniquely
+          identifiable service accounts used by 3DS system components.
+      - id: req-7.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          PCI 3DS tds-access-3 requires service accounts to be restricted
+          to minimum privileges and for all access to be formally authorized.
+          PCI DSS Requirement 7 establishes the access control model based
+          on business need and least privilege. The 3DS control complements
+          Requirement 7 by ensuring that the identity management layer
+          (unique IDs, account lifecycle) supports the access control model
+          defined in Requirement 7.
+
+  # tds-monitor — Monitoring and Logging
+  - source_control: tds-monitor-1
+    target_controls:
+      - id: req-10.1
+        relationship: derived-from
+        confidence: 0.95
+        rationale: >
+          PCI 3DS tds-monitor-1 (Security Monitoring and Audit Logging) derives
+          directly from PCI DSS Requirement 10 (Log and Monitor All Access).
+          Both require audit logging on all system components, identical event
+          categories (user access, admin actions, authentication changes,
+          invalid access attempts, audit trail access, log start/stop, object
+          creation/deletion), and identical log entry fields (user ID, event
+          type, date/time, success/failure, origination, affected resource).
+          The 3DS control is a near-identical specialization of Requirement 10
+          applied to the 3DS environment.
+
+  - source_control: tds-monitor-2
+    target_controls:
+      - id: req-10.1
+        relationship: derived-from
+        confidence: 0.85
+        rationale: >
+          PCI 3DS tds-monitor-2 (Anomaly Detection and Security Event
+          Correlation) derives from PCI DSS Requirement 10, which requires
+          audit log review to identify anomalies and suspicious activity,
+          and detection of failures of critical security controls. The 3DS
+          control extends Requirement 10's monitoring provisions by mandating
+          automated correlation across all 3DS components and anomaly
+          detection for 3DS-specific patterns including unexpected transaction
+          volumes and protocol-level anomalies.
+      - id: req-11.1
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          PCI 3DS tds-monitor-2 requires monitoring for unauthorized changes
+          to 3DS system configurations, which aligns with PCI DSS Requirement
+          11's file integrity monitoring (FIM) and intrusion detection
+          requirements. Both mandate detection of unexpected changes and
+          network anomalies. The 3DS control complements Requirement 11 by
+          adding real-time event correlation and behavioral analysis
+          capabilities specific to the 3DS transaction environment.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          PCI 3DS tds-monitor-2 requires defined severity levels and
+          response procedures for triaging and investigating alerts. PCI DSS
+          Requirement 12 includes incident response planning and security
+          awareness. The 3DS control complements Requirement 12 by ensuring
+          that the monitoring and detection capabilities feed into the
+          incident response process with clearly defined escalation paths.
+
+  # tds-ops — Operations and Policy
+  - source_control: tds-ops-1
+    target_controls:
+      - id: req-12.1
+        relationship: derived-from
+        confidence: 0.94
+        rationale: >
+          PCI 3DS tds-ops-1 (Security Policies and Procedures) derives directly
+          from PCI DSS Requirement 12 (Support Information Security with
+          Organizational Policies and Programs). Both require a comprehensive
+          information security policy covering all standard requirements,
+          documented operational procedures for security-relevant processes,
+          annual review and update of policies, and personnel acknowledgment
+          of security policies. The 3DS control tailors Requirement 12's
+          policy governance framework to the 3DS environment, requiring
+          policies to address the unique risks of 3DS operations (ACS, DS,
+          3DSS operator roles).
+      - id: req-2.1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          PCI 3DS tds-ops-1 requires documented operational procedures for
+          system configuration, which aligns with PCI DSS Requirement 2
+          (Apply Secure Configurations). Both address the governance layer
+          of secure configuration management. The 3DS control complements
+          Requirement 2 by providing the policy framework within which
+          secure configuration standards for 3DS components are established
+          and maintained.
+
+  - source_control: tds-ops-2
+    target_controls:
+      - id: req-6.1
+        relationship: derived-from
+        confidence: 0.90
+        rationale: >
+          PCI 3DS tds-ops-2 (Change Management and Secure Development) derives
+          from PCI DSS Requirement 6 (Develop and Maintain Secure Systems and
+          Software). Both require formal change management with documentation,
+          testing in non-production environments, authorized approval, and
+          rollback procedures. Both mandate secure development practices
+          including secure coding guidelines, code review by independent
+          reviewers, and security testing prior to production release.
+          The 3DS control applies Requirement 6's SDLC and change management
+          requirements specifically to custom 3DS software and infrastructure.
+      - id: req-6.2
+        relationship: derived-from
+        confidence: 0.88
+        rationale: >
+          PCI 3DS tds-ops-2 addresses secure development of custom 3DS software,
+          which directly aligns with PCI DSS Requirement 6.2 (Bespoke and
+          Custom Software Security). Both require secure coding guidelines,
+          code review by personnel other than the author, security testing
+          before release, and separation of development, testing, and
+          production environments. The 3DS control derives from Requirement
+          6.2 by applying these bespoke software security practices to 3DS
+          application development.
+      - id: req-12.1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          PCI 3DS tds-ops-2 requires formal change management processes with
+          documented authorization and rollback procedures. PCI DSS Requirement
+          12 includes overall governance for managing changes and maintaining
+          security programs. The 3DS control complements Requirement 12 by
+          implementing the operational change control mechanisms that support
+          the broader security governance framework established by Requirement 12.
+
+  # tds-incident — Incident Response
+  - source_control: tds-incident-1
+    target_controls:
+      - id: req-12.1
+        relationship: derived-from
+        confidence: 0.93
+        rationale: >
+          PCI 3DS tds-incident-1 (Incident Response Plan for 3DS Security
+          Events) derives from PCI DSS Requirement 12, which mandates incident
+          response planning, including roles and responsibilities, communication
+          procedures, escalation paths, containment strategies, evidence
+          preservation, recovery procedures, post-incident analysis, and annual
+          testing. The 3DS control specializes Requirement 12's IR requirements
+          for the 3DS ecosystem, adding 3DS-specific scenarios (authentication
+          data compromise, cryptographic key compromise, ACS/DS service
+          disruptions) and multi-party notification obligations to payment
+          brands and acquirers.
+      - id: req-10.1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          PCI 3DS tds-incident-1 requires evidence preservation during incident
+          response, which depends on the audit logging infrastructure mandated
+          by PCI DSS Requirement 10. The logging and monitoring capabilities
+          from Requirement 10 feed directly into the incident response process
+          defined in tds-incident-1, providing the forensic data needed for
+          investigation and the detection mechanisms that trigger incident
+          response activation.

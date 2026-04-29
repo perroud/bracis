@@ -1,0 +1,104 @@
+id: iec-3-3-fr5
+family: part-3
+title: "FR5: Restricted Data Flow (RDF)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr5
+
+statement:
+  prose: >-
+    The control system shall provide the capability to segment the network
+    into zones and manage data flow through conduits to limit unnecessary
+    communication. Data flow restrictions shall enforce the zone and conduit
+    model, ensuring that only authorized and necessary communications are
+    permitted between zones. The granularity of data flow restrictions shall
+    be commensurate with the target security level.
+
+guidance:
+  prose: >-
+    Restricted data flow is the network-level enforcement of the zone and
+    conduit model and is fundamental to the defense-in-depth strategy. Key
+    considerations include: implementing network segmentation that physically
+    or logically separates zones with different security levels; deploying
+    industrial-aware firewalls at conduit boundaries with deep packet
+    inspection for OT protocols (Modbus TCP, EtherNet/IP, OPC UA, DNP3);
+    implementing allow-list-only rules at zone boundaries that permit only
+    documented and approved communication flows; deploying unidirectional
+    security gateways (data diodes) for zones requiring SL-3 or SL-4 where
+    inbound communication from lower-security zones must be prevented;
+    segmenting safety instrumented systems (SIS) from basic process control
+    systems (BPCS); implementing network access control (NAC) to prevent
+    unauthorized devices from connecting to IACS zones; controlling wireless
+    access within industrial environments; restricting inter-zone
+    communication to specific protocols, ports, and source/destination pairs;
+    and implementing microsegmentation where modern network infrastructure
+    allows.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 5.1 through SR 5.4"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy industrial-grade next-generation firewalls with OT protocol
+      awareness at all zone boundaries. Implement unidirectional security
+      gateways (Waterfall, OPSWAT) at boundaries between safety-critical
+      zones and less-trusted zones. Configure VLAN segmentation on
+      managed switches for logical zone separation within the same
+      physical network. Deploy 802.1X network access control on all
+      switch ports in IACS zones. Implement software-defined networking
+      for dynamic microsegmentation where supported. Use infrastructure-
+      as-code to define, version, and deploy all network segmentation
+      policies. Implement network monitoring at each conduit to verify
+      that only approved traffic flows exist.
+    tools:
+      - waterfall-security
+      - opswat-netwall
+      - palo-alto-ngfw
+      - cisco-firepower
+      - fortinet-fortigate
+
+  devsecops:
+    prose: >-
+      Define network policies as code in version-controlled repositories.
+      Implement automated validation that deployment configurations do
+      not introduce unauthorized communication paths between zones.
+      Test network segmentation effectiveness as part of the deployment
+      pipeline by running connectivity checks that verify zone isolation.
+      Enforce that application deployment manifests specify only the
+      minimum required network communications. Review all changes to
+      firewall rules and network policies through mandatory merge
+      request approvals with OT security review.
+    tools:
+      - terraform
+      - ansible
+      - batfish
+      - gitlab-ci
+      - opa
+
+  secops:
+    prose: >-
+      Deploy network monitoring at every conduit to detect unauthorized
+      data flows. Implement network baseline profiling that maps all
+      normal communication patterns and alerts on new or unexpected
+      flows. Detect and alert on attempts to bypass zone boundaries
+      through tunneling, protocol manipulation, or physical connections.
+      Monitor for rogue devices connecting to IACS network segments.
+      Conduct periodic data flow analysis to identify and remediate
+      unnecessary communications that have accumulated over time.
+      Validate segmentation effectiveness through automated testing.
+    tools:
+      - nozomi-guardian
+      - darktrace-ot
+      - zeek
+      - extrahop-reveal
+      - splunk-es
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-4", "SC-7", "SC-32", "SC-39"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.22", "a8.23"]
+    relationship: supports

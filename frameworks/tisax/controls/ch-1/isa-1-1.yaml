@@ -1,0 +1,117 @@
+id: isa-1.1
+family: ch-1
+title: "Information Security Policies"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall define, approve, publish, and communicate an
+    information security policy that provides management direction and
+    support for information security in accordance with business requirements
+    and relevant laws and regulations. The policy shall be reviewed at
+    planned intervals or when significant changes occur to ensure its
+    continuing suitability, adequacy, and effectiveness. Topic-specific
+    policies shall be derived from the overarching policy and address
+    areas such as access control, asset classification, cryptography,
+    physical security, and incident management.
+
+guidance:
+  prose: >-
+    The information security policy represents top management commitment
+    and sets the strategic direction for the ISMS. VDA ISA requires that
+    the policy is formally approved by executive management, distributed
+    to all employees and relevant third parties, and acknowledged in
+    writing or electronically. The policy must define roles, responsibilities,
+    and accountability for information security. Topic-specific policies
+    should be maintained as controlled documents with version history and
+    review records. For AL2 and AL3 assessments, auditors will verify
+    that the policy is actively enforced and that deviations are tracked
+    and resolved. The review cycle should not exceed 12 months, and ad-hoc
+    reviews must be triggered by organizational changes, security incidents,
+    or regulatory updates.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of policy existence and communication."
+  al2:
+    applicability: required
+    notes: "Auditor verifies policy approval, distribution, and acknowledgment records."
+  al3:
+    applicability: required
+    notes: "On-site verification of policy enforcement, review records, and employee awareness."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 1.1"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.5.1"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Codify the information security policy as a machine-readable
+      policy-as-code artifact (OPA/Rego, Kyverno, or Cedar) stored in
+      a dedicated Git repository. Use a GitOps workflow where policy
+      changes require pull-request approval from the CISO or designated
+      security officer. Distribute policies to all platform components
+      via an internal developer portal (Backstage, Port) so that every
+      team can discover applicable policies. Implement automated policy
+      versioning with semantic versioning and changelog generation.
+      Enforce policy acknowledgment through onboarding automation that
+      requires engineers to accept current policies before receiving
+      platform access tokens.
+    tools:
+      - open-policy-agent
+      - kyverno
+      - cedar
+      - backstage
+      - git
+      - argocd
+
+  devsecops:
+    prose: >-
+      Integrate policy validation gates into every CI/CD pipeline stage.
+      Use pre-commit hooks and pipeline steps to verify that code,
+      infrastructure definitions, and container images comply with the
+      organization's information security policy before merge or deploy.
+      Store policy documents alongside code in version-controlled
+      repositories with mandatory review workflows. Implement automated
+      notifications to development teams when policies are updated, and
+      require re-acknowledgment through the pipeline tooling. Generate
+      compliance evidence artifacts (attestation logs, approval records)
+      automatically during each pipeline run for audit readiness.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - checkov
+      - conftest
+      - trivy
+      - semgrep
+
+  secops:
+    prose: >-
+      Map each information security policy to corresponding detection
+      rules and compliance checks in the SIEM and SOAR platforms. Create
+      dashboards showing real-time policy compliance status across all
+      organizational units. Configure automated alerts for policy
+      deviations detected through log analysis, configuration drift
+      monitoring, or vulnerability scanning. Schedule quarterly automated
+      audits that compare actual system configurations against published
+      policies and generate exception reports for management review.
+      Maintain an audit trail of all policy changes, acknowledgments,
+      and violation records.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - microsoft-sentinel
+      - chronicle
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.1"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-1", "PM-1"]
+    relationship: mapped

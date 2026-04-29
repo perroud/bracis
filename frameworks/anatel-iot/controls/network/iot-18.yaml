@@ -1,0 +1,115 @@
+id: iot-18
+family: network
+title: "DDoS Mitigation and Anti-Spoofing"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve implementar mecanismos de limitação da taxa de
+    transmissão de saída para evitar que o dispositivo seja utilizado
+    como vetor em ataques de negação de serviço distribuído (DDoS).
+
+    O equipamento deve implementar filtro antispoofing para impedir
+    a geração de pacotes com endereços IP de origem falsificados.
+
+    O equipamento deve ser resistente a ataques de negação de serviço
+    (DoS) direcionados ao próprio dispositivo, mantendo a operação
+    básica mesmo sob condições de ataque.
+
+    (Ato 77/2021 §5.1.7)
+guidance:
+  prose: |
+    This control addresses the Mirai-era threat: compromised IoT devices
+    being weaponized for DDoS attacks. ANATEL requires devices to
+    implement countermeasures that prevent abuse as attack amplifiers
+    and maintain resilience under attack.
+
+    **Three distinct requirements:**
+
+    1. **Outbound rate limiting:** The device must limit the rate of
+       outgoing traffic to prevent participation in volumetric DDoS
+       attacks. This applies to all traffic types (DNS amplification,
+       NTP reflection, SYN flood, HTTP flood).
+
+    2. **Anti-spoofing (BCP38/BCP84):** The device must implement
+       ingress/egress filtering (RFC 2827/RFC 3704) to prevent
+       generation of packets with spoofed source IP addresses.
+       This is particularly critical for CPE routers that perform NAT.
+
+    3. **DoS resilience:** The device must continue basic operation
+       (routing, management access) when under network attack. The
+       management plane must be protected from data plane flooding.
+
+    **Implementation notes:**
+    - For CPE routers: implement uRPF (unicast Reverse Path Forwarding)
+      strict or feasible mode on WAN interfaces.
+    - Rate limiting should be configurable but have sensible defaults
+      based on the device's expected traffic profile.
+    - Management plane protection: separate management traffic (SSH,
+      web UI) from forwarded traffic with QoS/priority queuing.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement egress rate limiting in the network stack: set
+         per-protocol and aggregate outbound traffic limits based on
+         the device's expected traffic profile (e.g., max 10 Mbps
+         outbound from LAN hosts, with per-connection limits).
+      2. Enable BCP38 anti-spoofing: implement uRPF (strict mode) on
+         the WAN interface to drop packets with source IPs not matching
+         the device's assigned address or downstream subnets.
+      3. Implement connection rate limiting in the firewall: maximum
+         new connections per second (e.g., 100 SYN/s per LAN host)
+         to prevent SYN flood participation.
+      4. Implement management plane protection: dedicate a separate
+         processing queue for management traffic (SSH, HTTPS) with
+         guaranteed bandwidth, ensuring management access survives
+         data plane flooding.
+      5. Add DNS response rate limiting (RRL) if the device runs a
+         DNS resolver/forwarder, to prevent DNS amplification abuse.
+    tools:
+      - iptables-nftables
+      - tc-traffic-control
+      - urpf-implementation
+      - qos-engine
+      - dns-rrl
+  devsecops:
+    prose: |
+      1. Add DDoS resilience tests to the CI pipeline: generate high-
+         volume traffic (hping3, iperf) toward the device and verify
+         management access remains responsive.
+      2. Test anti-spoofing: send packets with spoofed source IPs
+         through the device and verify they are dropped.
+      3. Test rate limiting: generate outbound traffic exceeding the
+         configured limits and verify traffic is shaped/dropped.
+      4. Verify DNS amplification resistance: send DNS queries from
+         the WAN side and confirm the device does not act as an open
+         resolver.
+    tools:
+      - gitlab-ci
+      - hping3
+      - iperf
+      - scapy
+      - integration-testing
+  secops:
+    prose: |
+      1. During penetration testing, attempt to use the device as a
+         DDoS amplifier: test DNS amplification, NTP reflection, SSDP
+         reflection, and verify the device does not participate.
+      2. Verify anti-spoofing by sending spoofed packets through the
+         device and monitoring egress traffic for spoofed source IPs.
+      3. Test device resilience under DoS conditions: flood the WAN
+         interface and verify management access remains available via
+         LAN.
+      4. Monitor deployed fleet for indicators of DDoS participation
+         (unusual outbound traffic volumes) via NetFlow or SNMP
+         traffic counters.
+    tools:
+      - penetration-testing-tools
+      - scapy
+      - netflow-analyzer
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7", "art-18"]
+    relationship: complements

@@ -1,0 +1,96 @@
+id: cse-1
+family: cse
+title: "Communicate Securely"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The consumer IoT device shall use best practice cryptography to communicate securely.
+    All security-relevant data, including remote management and control, shall be
+    encrypted in transit using cryptography appropriate to the properties of the
+    technology and usage. The confidentiality of sensitive security parameters that are
+    communicated via remotely accessible network interfaces shall be protected using
+    cryptography suited to the properties of the technology and usage. All cryptographic
+    algorithms and parameters shall be industry-recognized, evaluated, and shall not be
+    proprietary or deprecated.
+
+guidance:
+  prose: >-
+    IoT devices frequently communicate over networks (Wi-Fi, Bluetooth, cellular, Zigbee,
+    etc.) where traffic can be intercepted. This provision mandates that all communications
+    carrying security-relevant data use strong, standards-based encryption. TLS 1.2 or higher
+    is the expected baseline for TCP/IP communications. DTLS should be used for UDP-based
+    protocols. Proprietary or deprecated algorithms (DES, RC4, MD5, SHA-1 for signing) are
+    explicitly excluded. Certificate validation must be properly implemented — the device must
+    verify server certificates and reject connections to servers with invalid, expired, or
+    self-signed certificates in production environments. The provision applies to all
+    communication paths: device-to-cloud, device-to-device, and device-to-companion-app.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.5-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement TLS 1.2+ for all TCP/IP communications and DTLS for UDP protocols. Configure
+      strong cipher suites (AES-256-GCM, ChaCha20-Poly1305) and disable deprecated algorithms.
+      Implement proper certificate pinning or validation against trusted CA bundles. Use mutual
+      TLS (mTLS) for device-to-cloud authentication where feasible. For constrained devices
+      using protocols like CoAP, implement DTLS with pre-shared keys or raw public keys as
+      appropriate. Ensure the device's TLS library is kept updated with security patches.
+      Implement certificate rotation mechanisms for long-lived devices.
+    tools:
+      - openssl
+      - mbedtls
+      - wolfssl
+      - lets-encrypt
+      - certificate-manager
+      - mosquitto-tls
+
+  devsecops:
+    prose: >-
+      Run automated TLS configuration tests in the CI/CD pipeline that verify minimum protocol
+      versions, cipher suite configurations, and certificate validation behavior. Use tools
+      like testssl.sh or sslyze to scan device communication endpoints for weak configurations.
+      Implement negative tests that attempt connections with deprecated protocols and verify
+      they are rejected. Scan the firmware binary for use of deprecated cryptographic functions.
+      Validate that certificate validation cannot be bypassed via configuration flags or debug
+      settings in production builds.
+    tools:
+      - testssl-sh
+      - sslyze
+      - semgrep
+      - gitlab-sast
+      - nmap
+      - cipher-suite-scanner
+
+  secops:
+    prose: >-
+      Monitor network traffic from deployed devices for unencrypted communications or use
+      of deprecated protocols. Alert on TLS downgrade attempts or certificate validation
+      failures. Conduct periodic TLS assessments of device fleet communication endpoints.
+      Track the cryptographic algorithm inventory across the product portfolio and plan
+      migrations before algorithms reach end-of-life. Monitor for new cryptographic
+      vulnerabilities that affect the libraries used in device firmware.
+    tools:
+      - wireshark
+      - zeek
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-4.1", "SR-4.3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-13", "SC-23"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.5.14"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V9.1.1", "V9.1.2", "V9.1.3"]
+    relationship: complements

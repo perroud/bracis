@@ -1,0 +1,83 @@
+id: ps-2
+family: ps
+title: "Provide a Mechanism for Verifying Software Release Integrity"
+class: SP800-218
+statement:
+  prose: >-
+    Help software acquirers ensure that the software they acquire is legitimate and has not been
+    tampered with. Provide a mechanism for verifying the integrity and authenticity of each
+    software release, including cryptographic signatures, checksums, and provenance attestations.
+  parts:
+    - id: ps-2_smt.a
+      label: "a."
+      prose: >-
+        Cryptographically sign all software releases and provide verification mechanisms that
+        consumers can use to validate the authenticity and integrity of acquired software.
+    - id: ps-2_smt.b
+      label: "b."
+      prose: >-
+        Generate and publish provenance attestations for each release that document the build
+        environment, inputs, and process used to produce the release artifacts.
+    - id: ps-2_smt.c
+      label: "c."
+      prose: >-
+        Publish cryptographic hashes (checksums) for all release artifacts and provide secure
+        channels for distributing verification keys and certificates.
+guidance:
+  prose: >-
+    Software integrity verification is critical for supply chain security. Without it,
+    consumers cannot distinguish legitimate software from tampered or counterfeit versions.
+    Organizations should implement artifact signing using established frameworks like Sigstore,
+    which provides keyless signing with transparency logs. Build provenance following the SLSA
+    framework provides consumers with verifiable claims about how software was built. Checksums
+    should use strong cryptographic hash functions (SHA-256 or stronger) and be published
+    through separate, authenticated channels to prevent simultaneous compromise of artifacts
+    and their checksums.
+references:
+  - citation: "NIST SP 800-218 Section 2.2"
+    url: "https://csrc.nist.gov/pubs/sp/800/218/final"
+  - citation: "SLSA Provenance"
+    url: "https://slsa.dev/provenance/v1"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate artifact signing into the platform's release pipeline as a mandatory,
+      non-bypassable step. Deploy a centralized signing infrastructure using Sigstore or
+      traditional PKI. Configure container registries and artifact repositories to enforce
+      signature verification on pull/deployment. Generate SLSA provenance attestations
+      automatically for all builds. Provide a transparency log (Rekor or equivalent) where
+      all signatures and attestations are recorded for auditability.
+    tools:
+      - "Sigstore (cosign, Rekor, Fulcio)"
+      - "Notation (OCI signing)"
+      - "Harbor (content trust)"
+      - "GitLab Container Registry"
+      - "SLSA GitHub Generator"
+      - "The Update Framework (TUF)"
+  devsecops:
+    prose: >-
+      Automate artifact signing in CI/CD pipelines so that every build artifact (container
+      images, binaries, packages) is signed before publication. Generate SBOMs and attach them
+      as signed attestations to release artifacts. Configure deployment pipelines to verify
+      signatures before deploying any artifact. Implement reproducible builds where feasible
+      to enable independent verification of build outputs. Publish release checksums as part
+      of the automated release process.
+    tools:
+      - "Cosign (container signing)"
+      - "GPG (binary signing)"
+      - "Syft (SBOM generation)"
+      - "In-toto (supply chain attestation)"
+      - "GitLab Release CLI"
+      - "GitHub Releases (checksums)"
+  secops:
+    prose: >-
+      Monitor transparency logs for unauthorized or unexpected signing events. Verify that
+      all production-deployed artifacts have valid signatures and provenance attestations.
+      Alert on signature verification failures during deployment. Conduct periodic audits of
+      signing key management, including key rotation schedules and access controls. Investigate
+      incidents where unsigned or improperly signed artifacts are detected in production.
+    tools:
+      - "Rekor (transparency log)"
+      - "Kyverno (admission control)"
+      - "OPA Gatekeeper"
+      - "SIEM (Splunk, Elastic Security)"

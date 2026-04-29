@@ -1,0 +1,122 @@
+id: art-32
+family: cap-6
+title: "Controle de Acesso a Dados de Treinamento"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 32. O acesso a dados de saúde utilizados para treinamento e
+    validação de sistemas de IA médica deve ser rigorosamente controlado:
+
+    I - o acesso deve ser concedido segundo princípio do menor privilégio,
+    limitado ao estritamente necessário para a função desempenhada;
+
+    II - todo acesso a dados de treinamento deve ser registrado em log
+    de auditoria imutável, com identificação do usuário, finalidade,
+    data, hora e dados acessados;
+
+    III - dados de treinamento em repouso devem ser criptografados com
+    algoritmos e comprimentos de chave adequados ao nível de
+    sensibilidade dos dados;
+
+    IV - o compartilhamento de dados de treinamento com terceiros
+    (incluindo fornecedores de IA) deve ser formalizado em contrato
+    que assegure conformidade com a LGPD e com esta Resolução;
+
+    V - ao término do contrato ou da finalidade, dados compartilhados
+    com terceiros devem ser devolvidos ou destruídos, com certificação
+    formal de destruição.
+guidance:
+  prose: |
+    O art. 32 protege especificamente os dados de treinamento, que
+    representam um dos ativos mais sensiveis em IA medica.
+
+    **Risco dos dados de treinamento:**
+    Datasets de treinamento de IA medica concentram dados de saude
+    de milhares ou milhoes de pacientes. Seu vazamento tem impacto
+    massivo: exposicao de diagnosticos, historico clinico, dados
+    geneticos de populacao inteira.
+
+    **Menor privilegio (inciso I):**
+    Cientista de dados precisa de dados para treinar, mas nao precisa
+    de acesso a dados identificados. Engenheiro de ML precisa de
+    acesso ao modelo, mas nao aos dados de treinamento. DBA precisa
+    gerenciar o banco, mas nao precisa ler os dados.
+
+    **Log de auditoria (inciso II):**
+    Quem acessou, quando, por que e quais dados. Essencial para
+    investigacao de incidentes e para demonstrar conformidade com
+    LGPD (principio de prestacao de contas).
+
+    **Compartilhamento com terceiros (incisos IV e V):**
+    Cenario comum: hospital compartilha dados com startup de IA
+    para desenvolvimento de modelo. O contrato deve prever:
+    finalidade especifica, medidas de seguranca, auditoria,
+    retencao, devolucao/destruicao ao termino.
+
+    **Destruicao certificada (inciso V):**
+    A destruicao deve ser verificavel: certificado de destruicao
+    por empresa especializada ou evidencia tecnica de destruicao
+    criptografica (crypto-shredding).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de controle de acesso a dados:**
+      1. Implementar controle de acesso role-based (RBAC) e
+         attribute-based (ABAC) para datasets de treinamento:
+         segregacao por funcao, projeto e finalidade.
+      2. Configurar audit logging imutavel para todo acesso a
+         dados de treinamento: WORM storage com retencao minima
+         de 5 anos.
+      3. Implementar criptografia AES-256 para dados em repouso
+         e TLS 1.3 para dados em transito, com gestao de chaves
+         centralizada.
+      4. Criar data room virtual para compartilhamento controlado
+         com terceiros: acesso remoto sem copia, com watermark e
+         rastreamento.
+    tools:
+      - rbac-abac
+      - audit-log
+      - encryption
+      - secure-data-room
+  devsecops:
+    prose: |
+      **Controle de acesso no pipeline:**
+      1. Implementar identity-based access no pipeline de ML:
+         cada etapa do pipeline tem credenciais proprias com
+         menor privilegio.
+      2. Automatizar rotacao de credenciais de acesso a dados
+         de treinamento.
+      3. Implementar deteccao de data exfiltration no pipeline:
+         alertar quando volumes anormais de dados forem transferidos.
+      4. Validar que dados de treinamento compartilhados com
+         terceiros possuem contrato e aprovacao documentados.
+    tools:
+      - gitlab-ci
+      - secrets-rotation
+      - data-exfiltration-detection
+      - contract-validation
+  secops:
+    prose: |
+      **Governanca de acesso a dados:**
+      1. Revisar permissoes de acesso a dados de treinamento
+         trimestralmente: remover acessos desnecessarios.
+      2. Auditar logs de acesso para detectar padroes anomalos:
+         acesso fora de horario, volume incomum, acesso a dados
+         fora do escopo do projeto.
+      3. Gerenciar ciclo de vida de contratos com terceiros:
+         vencimento, renovacao, destruicao de dados.
+      4. Manter inventario de todos os compartilhamentos de dados
+         de treinamento com terceiros ativos e encerrados.
+    tools:
+      - access-review
+      - audit-analytics
+      - contract-management
+      - data-sharing-registry
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46", "art-47", "art-26"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-10"]
+    relationship: mapped

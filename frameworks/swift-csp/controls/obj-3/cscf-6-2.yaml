@@ -1,0 +1,105 @@
+id: cscf-6.2
+family: obj-3
+title: "Software Integrity"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Ensure the integrity of SWIFT-related software by verifying that only
+    authorized, unmodified software is installed and executed within the
+    secure zone. Software integrity checks must detect unauthorized
+    modifications to SWIFT applications, operating system files, and
+    critical configuration files.
+  parts:
+    - id: cscf-6.2.a
+      label: "6.2.a"
+      prose: >-
+        File integrity monitoring (FIM) is deployed on all systems within
+        the SWIFT secure zone, monitoring critical system files, SWIFT
+        application binaries, and configuration files for unauthorized
+        changes.
+    - id: cscf-6.2.b
+      label: "6.2.b"
+      prose: >-
+        SWIFT software updates are verified against SWIFT-published
+        checksums or digital signatures before installation.
+    - id: cscf-6.2.c
+      label: "6.2.c"
+      prose: >-
+        Unauthorized software installation on secure zone systems is
+        blocked through application control policies.
+
+guidance:
+  prose: >-
+    Software integrity verification detects tampering by attackers who have
+    gained access to the secure zone. In documented SWIFT breaches, attackers
+    modified SWIFT Alliance Lite2 application files and DLLs to bypass
+    transaction validation and remove audit trails. File integrity monitoring
+    provides an early warning when critical files are modified outside
+    approved change windows. Organizations should establish baseline file
+    hashes for all critical software and compare them regularly. Any
+    unexpected change must trigger an immediate security investigation.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 6.2"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-89 — Recommendation for Obtaining Assurances for Digital Signature Applications"
+    url: "https://doi.org/10.6028/NIST.SP.800-89"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy file integrity monitoring (OSSEC, Wazuh, Tripwire, CrowdStrike
+      FIM) on all secure zone systems. Monitor SWIFT application directories,
+      system binaries, DLLs, kernel modules, and critical configuration
+      files. Establish cryptographic baselines after each approved change
+      and alert on deviations. Use code signing for internally developed
+      integration scripts. Validate SWIFT software package integrity using
+      GPG signatures before deployment.
+    tools:
+      - wazuh
+      - ossec
+      - tripwire
+      - crowdstrike-falcon-fim
+      - aide
+
+  devsecops:
+    prose: >-
+      Include software integrity verification in deployment pipelines.
+      Sign all deployment artifacts and verify signatures before
+      installation. Automate FIM baseline updates as part of approved
+      change deployment workflows. Block unsigned or unverified packages
+      from reaching the secure zone.
+    tools:
+      - cosign
+      - sigstore
+      - notary
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor FIM alerts in real time, prioritizing changes to SWIFT
+      application files. Investigate all unauthorized file changes within
+      4 hours. Correlate FIM alerts with change management tickets to
+      distinguish authorized changes from potential tampering. Review
+      FIM coverage completeness quarterly.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - tripwire
+      - crowdstrike-falcon
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "SI-7(1)", "CM-5"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.7", "A8.19"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-11.5"]
+    relationship: complements

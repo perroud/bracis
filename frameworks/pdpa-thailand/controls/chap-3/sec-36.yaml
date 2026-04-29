@@ -1,0 +1,106 @@
+id: sec-36
+family: chap-3
+title: "Right to Object"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 36. A data subject shall have the right to object to the collection, use,
+    or disclosure of personal data relating to him or her at any time in the following
+    cases:
+    (1) where the personal data is collected, used, or disclosed on the basis of
+        public interest or legitimate interests under Section 24(4) or (5);
+    (2) where the personal data is collected, used, or disclosed for the purposes of
+        direct marketing;
+    (3) where the personal data is collected, used, or disclosed for the purposes of
+        scientific, historical, or statistical research.
+
+    Where the data subject objects under (2), the data controller must stop processing
+    for direct marketing immediately.
+  parts:
+    - id: sec-36-1
+      label: "Paragraph 1"
+      prose: |
+        Right to object to processing based on public interest or legitimate
+        interests. The data controller must demonstrate compelling legitimate
+        grounds that override the interests of the data subject.
+    - id: sec-36-2
+      label: "Paragraph 2"
+      prose: |
+        Unconditional right to object to direct marketing. The data controller
+        must cease processing immediately upon objection.
+    - id: sec-36-3
+      label: "Paragraph 3"
+      prose: |
+        Right to object to processing for scientific, historical, or
+        statistical research, unless necessary for public interest.
+guidance:
+  prose: |
+    Section 36 mirrors GDPR Article 21. The direct marketing objection is absolute:
+    there is no balancing test, and the controller must stop immediately.
+
+    Key implementation considerations:
+
+    - **Direct Marketing Opt-Out:** Must be immediate and unconditional. Implement
+      a global suppression list that is checked before any marketing communication.
+      "Immediate" means real-time, not "within 48 hours."
+
+    - **Legitimate Interest Balancing:** For objections based on legitimate interests,
+      the controller must perform a balancing test. Document the assessment and
+      communicate the outcome to the data subject.
+
+    - **Granularity:** Allow objection at the purpose level, not just all-or-nothing.
+      A data subject may object to marketing but not to service delivery.
+
+    - **Propagation to Processors:** Objections must propagate to all processors
+      and third parties processing data for the objected purpose.
+
+    - **Profiling:** If processing includes automated profiling based on legitimate
+      interests, the right to object applies. This impacts recommendation engines,
+      credit scoring, and behavioral analytics.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a global suppression/objection registry, checked in real-time
+         by all marketing and communication systems.
+      2. Build purpose-level objection controls: allow data subjects to object
+         to specific purposes while maintaining others.
+      3. Implement real-time objection propagation to all downstream processors
+         and third-party marketing platforms.
+      4. For legitimate interest objections: build a workflow for the balancing
+         test, including documentation and data subject notification.
+      5. Ensure profiling systems check objection status before including a data
+         subject in automated decision-making.
+    tools:
+      - suppression-list-service
+      - objection-management-api
+      - marketing-platform-integration
+      - profiling-gate
+  devsecops:
+    prose: |
+      1. Test that marketing systems respect the suppression list in real-time
+         (zero-delay between objection and suppression).
+      2. Validate objection propagation to all integrated marketing platforms.
+      3. Test that profiling systems exclude objecting data subjects.
+      4. Verify legitimate interest balancing workflows produce documented outcomes.
+    tools:
+      - suppression-test-suite
+      - marketing-integration-tests
+      - profiling-exclusion-tests
+  secops:
+    prose: |
+      1. Monitor for marketing communications sent to data subjects on the
+         suppression list (compliance violations).
+      2. Audit suppression list propagation latency.
+      3. Track objection rates by purpose for trend analysis.
+      4. Alert on profiling activities involving objecting data subjects.
+    tools:
+      - marketing-compliance-monitor
+      - suppression-propagation-audit
+      - objection-analytics-dashboard
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 21"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18-IV"]
+    relationship: equivalent-to

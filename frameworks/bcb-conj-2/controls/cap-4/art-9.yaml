@@ -1,0 +1,213 @@
+id: art-9
+family: cap-4
+title: "Estrutura de Gerenciamento do Risco Cibernetico"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 9. As instituições referidas no art. 1 devem manter estrutura de
+    gerenciamento do risco cibernético compatível com o porte, o perfil de risco
+    e o modelo de negócio da instituição.
+
+    Parágrafo único. A estrutura de que trata o caput deve abranger, no mínimo:
+    I - a identificação e a classificação de incidentes de segurança;
+    II - a avaliação de impacto dos incidentes nos sistemas, nas infraestruturas
+    e nos dados da instituição;
+    III - a definição de procedimentos de resposta a incidentes;
+    IV - a realização de testes periódicos de resiliência cibernética;
+    V - a designação de equipe responsável pelo gerenciamento de incidentes.
+guidance:
+  prose: |
+    O art. 9 institui a obrigacao de uma estrutura permanente e formalizada de
+    gerenciamento do risco cibernetico. Nao se trata apenas de ter um plano de
+    resposta (coberto pela Resolucao 4.893, art. 9), mas de uma estrutura
+    organizacional dedicada.
+
+    **Estrutura proporcional:**
+    Reitera o principio de proporcionalidade do art. 2. A estrutura deve ser
+    dimensionada ao porte da instituicao, mas deve existir em todas elas.
+
+    **I - Identificacao e classificacao de incidentes:**
+    A instituicao deve ter:
+    - Taxonomia formal de tipos de incidentes (ransomware, DDoS, data breach,
+      insider threat, fraud, etc.)
+    - Criterios de classificacao de severidade documentados e quantitativos
+    - Processo de triagem com tempo maximo de resposta definido
+    - Correlacao entre classificacao interna e criterios de relevancia do art. 3
+
+    **II - Avaliacao de impacto:**
+    Metodologia formal para avaliar impacto de incidentes em tres dimensoes:
+    - Sistemas: quais sistemas foram afetados, criticidade, interdependencias
+    - Infraestruturas: componentes de infraestrutura comprometidos
+    - Dados: tipo, volume e sensibilidade dos dados impactados
+    A avaliacao deve ser rapida (para cumprir o prazo de 24h do art. 3) e
+    progressivamente refinada durante o tratamento.
+
+    **III - Procedimentos de resposta:**
+    Playbooks documentados para cada tipo de incidente, cobrindo:
+    - Deteccao e triagem
+    - Contencao
+    - Erradicacao
+    - Recuperacao
+    - Comunicacao (interna, BCB, outros orgaos)
+    - Licoes aprendidas
+
+    **IV - Testes de resiliencia:**
+    Exercicios periodicos para validar a capacidade de resposta:
+    - Tabletop exercises (exercicios de mesa): simulacoes teoricas
+    - Exercicios tecnicos: simulacoes praticas com equipes operacionais
+    - Red team / Purple team: testes ofensivos reais
+    - Exercicios setoriais: participacao em exercicios coordenados pelo BCB
+      ou FEBRABAN
+    A frequencia deve ser proporcional ao porte (trimestral para S1/S2,
+    semestral para S3, anual para S4/S5).
+
+    **V - Equipe responsavel:**
+    Designacao formal de equipe com:
+    - CSIRT (Computer Security Incident Response Team) constituido
+    - Papeis definidos: Incident Commander, Technical Lead, Communications Lead
+    - Autoridade para tomar decisoes operacionais durante incidentes
+    - Treinamento continuo e certificacoes relevantes
+    - Disponibilidade 24x7 para instituicoes de maior porte
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I - Deteccao e classificacao automatizada:**
+      1. SIEM com regras de correlacao que classificam automaticamente incidentes
+         por tipo e severidade.
+      2. Motor de classificacao alinhado a taxonomia regulatoria (art. 3, ss 1).
+      3. Integracao SIEM -> incident management com campos regulatorios obrigatorios.
+      4. Dashboard de incidentes com visualizacao de classificacao em tempo real.
+
+      **II - Avaliacao de impacto automatizada:**
+      5. CMDB com dependencias mapeadas para calcular blast radius automatico.
+      6. Integracao com metricas de uso para estimar clientes afetados.
+      7. Classificacao de dados por sensibilidade no data catalog para quantificar
+         impacto em dados.
+      8. Score de impacto calculado automaticamente com base em: criticidade do
+         sistema + sensibilidade dos dados + numero de usuarios.
+
+      **III - Playbooks automatizados:**
+      9. SOAR com playbooks para cada tipo de incidente:
+         - Ransomware: isolamento de rede, snapshot forense, verificacao de backups
+         - DDoS: ativacao de mitigacao, roteamento de trafego, comunicacao
+         - Data breach: bloqueio de acesso, identificacao de dados comprometidos
+         - Credential compromise: reset de senhas, revogacao de tokens
+      10. Automacao de acoes de contencao com aprovacao humana para acoes criticas.
+
+      **IV - Plataforma de testes de resiliencia:**
+      11. Chaos engineering framework para testes tecnicos (Chaos Monkey, Litmus).
+      12. Ambiente isolado para simulacoes de incidentes.
+      13. Metricas de resiliencia: MTTR, MTTD, recovery success rate.
+      14. Registro automatico de resultados de testes para auditoria.
+
+      **V - Infraestrutura para equipe:**
+      15. War room virtual provisionado automaticamente ao declarar incidente.
+      16. On-call rotation com escalacao automatica.
+      17. Break-glass access com audit trail para emergencias.
+      18. Communication channels dedicados (bridge call, chat) para incidentes.
+    tools:
+      - siem
+      - soar
+      - incident-management
+      - cmdb
+      - chaos-engineering
+      - monitoring-alerting
+      - centralized-logging
+  devsecops:
+    prose: |
+      **I - Classificacao no desenvolvimento:**
+      1. Security labels em issues e merge requests vinculadas a incidentes.
+      2. Vulnerability management integrado com classificacao de incidentes.
+      3. Alertas do pipeline que alimentam o fluxo de incidentes.
+
+      **II - Avaliacao de impacto tecnico:**
+      4. SBOM para identificar rapidamente componentes afetados por vulnerabilidade.
+      5. Dependency graph para mapear impacto cascata de vulnerabilidades.
+      6. Feature flags inventory para avaliar quais funcionalidades estao expostas.
+
+      **III - Resposta no pipeline:**
+      7. Hotfix pipeline com fast-track para incidentes de seguranca.
+      8. Automated rollback baseado em metricas de saude.
+      9. Canary deployment para validar fix antes de rollout completo.
+      10. Post-mortem template no repositorio com checklist obrigatorio.
+
+      **IV - Testes de resiliencia no pipeline:**
+      11. Chaos tests integrados no pipeline de staging.
+      12. Security regression tests rodando em CI.
+      13. Simulacao de falhas de dependencias em ambiente de teste.
+
+      **V - Suporte a equipe:**
+      14. Runbooks acessiveis no repositorio para cada sistema.
+      15. Documentacao de arquitetura atualizada para facilitar investigacao.
+      16. On-call handoff documentation no repositorio.
+    tools:
+      - gitlab-ci
+      - sast
+      - dast
+      - dependency-scanning
+      - feature-flags
+      - canary-deployment
+      - chaos-engineering
+  secops:
+    prose: |
+      **I - Processo de classificacao:**
+      1. Taxonomia documentada e aprovada pela diretoria.
+      2. Criterios quantitativos de classificacao de severidade:
+         - Critico: impacto no SFN, dados massivos, interrupcao > 4h
+         - Alto: > 10.000 clientes, dados pessoais, interrupcao > 1h
+         - Medio: > 1.000 clientes, dados operacionais, degradacao
+         - Baixo: < 1.000 clientes, impacto limitado
+      3. Decision tree para triagem rapida.
+      4. Registro da classificacao e justificativa para cada incidente.
+
+      **II - Metodologia de avaliacao de impacto:**
+      5. Framework de avaliacao documentado com tres dimensoes (sistemas,
+         infraestrutura, dados).
+      6. Avaliacao inicial em ate 2 horas (para cumprir timeline de notificacao).
+      7. Avaliacao refinada em ate 24 horas.
+      8. Avaliacao final no relatorio de encerramento.
+
+      **III - Playbooks operacionais:**
+      9. Playbook especifico para cada tipo de incidente da taxonomia.
+      10. Playbooks revisados e testados semestralmente.
+      11. Playbook de comunicacao regulatoria integrado (BCB, ANPD, outros).
+      12. Checklist de acoes por fase: contencao, erradicacao, recuperacao.
+
+      **IV - Programa de testes de resiliencia:**
+      13. Calendario anual de testes aprovado pela diretoria.
+      14. Tipos de teste por trimestre:
+          - Q1: tabletop exercise (cenario de ransomware)
+          - Q2: exercicio tecnico (simulacao de DDoS)
+          - Q3: red team engagement
+          - Q4: exercicio setorial (se disponivel) ou tabletop
+      15. Relatorio de resultados com gap analysis e plano de melhoria.
+      16. Metricas de evolucao entre testes.
+
+      **V - CSIRT formalizado:**
+      17. Charter do CSIRT aprovado pela diretoria.
+      18. Membros designados formalmente com roles documentados.
+      19. Treinamento anual obrigatorio (SANS, FIRST, certificacoes).
+      20. Disponibilidade 24x7 com on-call rotation.
+      21. Exercicios de team building e coordinacao do CSIRT.
+    tools:
+      - siem
+      - soar
+      - edr-xdr
+      - incident-management
+      - grc-platform
+      - forensic-tools
+      - red-team-tools
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-1", "IR-2", "IR-3", "IR-4", "IR-8", "CA-8"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.5.26", "A.5.29"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-50"]
+    relationship: complements

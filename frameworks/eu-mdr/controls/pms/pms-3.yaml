@@ -1,0 +1,129 @@
+id: pms-3
+family: pms
+title: "Field Safety Corrective Actions and Recalls"
+class: EU-MDR
+baselines: [mdr-essential]
+statement:
+  prose: |
+    Manufacturers shall report any field safety corrective action through
+    the electronic system referred to in Article 92, including any recall
+    of a device from the market.
+
+    Where a manufacturer of a device placed on the Union market considers
+    or has reason to consider that a device which it has placed on the
+    market is not in conformity with this Regulation, it shall immediately
+    take the necessary corrective action to bring that device into
+    conformity, to withdraw it or to recall it, as appropriate. It shall
+    inform the distributors of the device in question and, where
+    applicable, the authorised representative and importers accordingly.
+
+    Where a manufacturer considers or has reason to consider that a device
+    which it has placed on the market presents a serious risk, it shall
+    immediately inform the competent authorities of the Member States in
+    which it made the device available and, where applicable, the notified
+    body that issued a certificate in accordance with Article 56 for the
+    device in question, in particular, of the non-compliance and of any
+    corrective action taken.
+
+    For software medical devices, a field safety corrective action may
+    include a mandatory software update, a configuration change, guidance
+    to users on usage restrictions, or temporary or permanent
+    decommissioning of affected functionality.
+guidance:
+  prose: |
+    Field safety corrective actions (FSCA) are a critical mechanism for
+    addressing safety issues with devices already in the field. For
+    software medical devices, FSCAs have unique characteristics:
+
+    - Software updates can be deployed remotely, enabling faster
+      corrective action than hardware recalls.
+    - However, software updates carry their own risks (regression,
+      compatibility issues) and must be validated.
+    - Users must be notified of the corrective action through a
+      Field Safety Notice (FSN) in the language(s) of each affected
+      member state.
+    - The manufacturer must track that the corrective action reaches
+      all affected users and verify its effectiveness.
+    - Competent authorities must be notified before or simultaneously
+      with the implementation of the FSCA.
+
+    Types of FSCA for software devices:
+    - Mandatory software update fixing a safety defect.
+    - Disabling a feature pending a corrective update.
+    - Issuing usage guidance to mitigate a known risk until a fix is
+      available.
+    - Recalling (decommissioning) the software entirely.
+references:
+  - citation: "EU MDR 2017/745, Articles 87–89, Article 10(12)"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745"
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement rapid deployment capabilities enabling emergency
+         software updates to be built, tested, and deployed to all
+         affected instances within defined SLA timelines (e.g., 24
+         hours for critical safety fixes).
+      2. Configure deployment tracking systems that monitor which
+         device instances have received the corrective update, which
+         are pending, and which have failed, with automated retry
+         and escalation for failed deployments.
+      3. Implement feature flag infrastructure enabling immediate
+         deactivation of affected functionality across all deployed
+         instances without requiring a full software deployment.
+      4. Maintain rollback capabilities for every production deployment,
+         enabling rapid reversion to a known-good state if a corrective
+         update introduces new issues.
+    tools:
+      - argocd
+      - feature-flags
+      - deployment-tracking
+      - rollback-automation
+      - canary-deployment
+  devsecops:
+    prose: |
+      1. Establish an emergency change pipeline with abbreviated but
+         documented verification and validation steps for urgent FSCA
+         software updates, including automated regression testing and
+         expedited code review.
+      2. Implement automated impact analysis tooling that identifies
+         all affected code paths, configurations, and deployments
+         when a safety defect is discovered.
+      3. Configure automated field safety notice generation from
+         structured templates, populating device identification, issue
+         description, risk assessment, and corrective action details.
+      4. Implement FSCA verification testing: automated tests that
+         specifically validate the corrective action resolves the
+         identified safety issue without introducing new risks.
+    tools:
+      - gitlab-ci
+      - impact-analysis
+      - fsca-templates
+      - regression-testing
+      - release-management
+  secops:
+    prose: |
+      1. Maintain a field safety corrective action procedure with
+         defined roles, responsibilities, decision criteria, and
+         communication templates for initiating and managing FSCAs.
+      2. Implement a field safety notice distribution system that
+         delivers notifications to all affected users, distributors,
+         and competent authorities in the required languages and
+         formats.
+      3. Track FSCA effectiveness through metrics: update adoption
+         rate, time to deployment, customer acknowledgment, and
+         post-correction incident monitoring.
+      4. Conduct FSCA readiness assessments periodically, validating
+         that the organization can execute an FSCA within required
+         timelines through tabletop exercises and simulations.
+    tools:
+      - field-action-management
+      - regulatory-reporting
+      - communication-management
+      - effectiveness-tracking
+legal_references:
+  - framework_id: anvisa-samd
+    articles: ["art-22"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.26"]
+    relationship: complements

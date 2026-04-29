@@ -1,0 +1,105 @@
+id: iot-11
+family: update
+title: "Firmware Integrity Verification at Boot"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve realizar verificação de integridade do software
+    e firmware durante o processo de inicialização (boot), assegurando
+    que apenas código autêntico e não adulterado seja executado. O
+    mecanismo de verificação de integridade deve ser capaz de detectar
+    alterações não autorizadas no firmware e, nesse caso, impedir a
+    operação normal do equipamento ou reverter para uma versão
+    conhecidamente íntegra.
+
+    (Ato 77/2021 §5.1.3, inciso III; §5.1.1)
+guidance:
+  prose: |
+    This control requires devices to implement secure boot or equivalent
+    boot-time integrity verification. It ensures that firmware tampering
+    (whether by malware, supply chain attack, or physical access) is
+    detected before the compromised code can execute.
+
+    **Implementation approaches (in order of robustness):**
+    1. **Full secure boot chain:** Hardware root of trust (ROM bootloader)
+       → verified first-stage bootloader → verified kernel → verified
+       rootfs. Each stage cryptographically verifies the next.
+    2. **Verified boot:** The bootloader verifies firmware image
+       signature/hash before execution but may allow boot with a warning.
+    3. **Integrity measurement:** dm-verity or equivalent block-level
+       integrity verification of the root filesystem.
+
+    **Recovery behavior on integrity failure:**
+    - Option A: Refuse to boot and display error (brick protection
+      requires recovery mechanism).
+    - Option B: Fall back to a known-good backup firmware image (A/B
+      partition scheme).
+    - Option C: Boot into a recovery mode that allows re-flashing
+      authenticated firmware.
+
+    **Hardware requirements:**
+    - A hardware root of trust (eFuse, OTP memory, or secure element)
+      that stores the immutable verification key.
+    - For SoCs that support it: ARM TrustZone, secure boot ROM, or
+      equivalent hardware security primitives.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Enable the SoC's hardware secure boot capability (e.g., HAB
+         on NXP, secure boot on MediaTek/Qualcomm/Broadcom) and
+         program the manufacturer's public key into OTP/eFuse.
+      2. Implement a chain-of-trust: ROM bootloader → U-Boot (signed)
+         → Linux kernel (signed) → rootfs (dm-verity hash tree).
+      3. Use A/B partition scheme so that on integrity verification
+         failure, the device automatically boots the alternate
+         (known-good) partition.
+      4. Implement a recovery mode accessible via physical button
+         (factory reset) that re-flashes authenticated firmware from
+         a protected recovery partition.
+      5. Log integrity verification results (pass/fail per boot stage)
+         and report them via TR-069/USP for fleet monitoring.
+    tools:
+      - u-boot-secure-boot
+      - dm-verity
+      - hardware-root-of-trust
+      - a-b-partition-manager
+  devsecops:
+    prose: |
+      1. Integrate secure boot image generation into the CI/CD pipeline:
+         automatically sign bootloader, kernel, and rootfs images.
+      2. Add automated tests that verify: (a) tampered firmware image
+         fails boot, (b) rollback to backup partition succeeds on
+         primary corruption, (c) recovery mode accepts only signed
+         firmware.
+      3. Include dm-verity hash tree generation as a build step — the
+         hash tree is signed and embedded in the firmware package.
+      4. Perform regular penetration testing of the boot chain: attempt
+         to bypass secure boot via JTAG, UART, or glitching attacks.
+    tools:
+      - gitlab-ci
+      - firmware-signing-pipeline
+      - dm-verity-toolchain
+      - fault-injection-testing
+  secops:
+    prose: |
+      1. During security certification, verify the secure boot chain
+         end-to-end: tamper with each boot stage and confirm the
+         device detects and rejects the modification.
+      2. Monitor fleet-wide boot integrity reports via TR-069/USP to
+         detect devices that have experienced integrity failures
+         (potential compromise indicator).
+      3. Maintain hardware root-of-trust key management procedures:
+         key generation, storage, rotation (if applicable), and
+         revocation processes.
+      4. Document the secure boot architecture and test results for
+         ANATEL homologation evidence.
+    tools:
+      - hardware-security-module
+      - tr-069-acs
+      - fleet-monitoring
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

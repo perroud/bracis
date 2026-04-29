@@ -1,0 +1,129 @@
+id: glba-opt-out
+family: privacy-rule
+title: "Opt-Out Rights for Information Sharing"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall provide customers with a reasonable opportunity to opt
+    out of the disclosure of their nonpublic personal information (NPI) to non-affiliated
+    third parties, before any such disclosure occurs. The opt-out notice must be clear,
+    conspicuous, and provide a reasonable means for the customer to exercise the opt-out
+    right. Once a customer has opted out, the institution shall not disclose NPI to
+    non-affiliated third parties except as permitted by statutory exceptions.
+  parts:
+    - id: glba-opt-out.1
+      label: "(1)"
+      prose: >-
+        The institution shall provide an opt-out notice that clearly describes the
+        customer's right to direct the institution not to share NPI with non-affiliated
+        third parties. The notice must identify the categories of NPI subject to
+        opt-out and the categories of third parties to whom disclosure would be made.
+    - id: glba-opt-out.2
+      label: "(2)"
+      prose: >-
+        The institution shall provide a reasonable means for the customer to exercise
+        the opt-out right, including but not limited to: a toll-free telephone number,
+        a return mail form, an electronic opt-out mechanism, or any other reasonable
+        method. The method must not impose unreasonable barriers to opting out.
+    - id: glba-opt-out.3
+      label: "(3)"
+      prose: >-
+        The institution shall provide a reasonable period of time (not less than 30 days)
+        for the customer to exercise the opt-out right before disclosing NPI to
+        non-affiliated third parties.
+    - id: glba-opt-out.4
+      label: "(4)"
+      prose: >-
+        The institution shall honor opt-out directions as soon as reasonably practicable
+        and shall continue to honor them until the customer revokes the opt-out. The
+        institution shall maintain records of opt-out elections sufficient to ensure
+        compliance and demonstrate adherence during examinations.
+
+guidance:
+  prose: >-
+    The opt-out right is a fundamental consumer protection under GLBA. Regulators
+    scrutinize whether opt-out mechanisms are genuinely accessible and whether institutions
+    honor opt-out elections consistently. Common examination findings include: opt-out
+    mechanisms that are difficult to locate or use, failure to process opt-out elections
+    in a timely manner, sharing NPI with third parties before the opt-out period has
+    expired, and inadequate record-keeping of opt-out elections. Note that GLBA provides
+    exceptions to the opt-out requirement for certain disclosures, including those
+    necessary to process transactions requested by the customer, disclosures to service
+    providers under contractual confidentiality obligations, and disclosures required by
+    law. Institutions must carefully distinguish between disclosures that require opt-out
+    and those that fall under exceptions. Joint marketing agreements with other financial
+    institutions may also have specific opt-out requirements.
+
+references:
+  - citation: "Gramm-Leach-Bliley Act, Section 502 — Obligations with Respect to Disclosures of Personal Information"
+    url: "https://www.ftc.gov/legal-library/browse/statutes/gramm-leach-bliley-act"
+  - citation: "Regulation P, Subpart A — Privacy and Opt-Out Notices (12 CFR § 1016.7)"
+    url: "https://www.consumerfinance.gov/rules-policy/regulations/1016/7/"
+  - citation: "FTC Privacy Rule — Opt-Out Requirements (16 CFR § 313.7)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-313"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized consent and preference management service that stores
+      customer opt-out elections with full audit trails (timestamp, channel, customer ID,
+      preference value, previous value). Expose opt-out APIs that can be consumed by all
+      customer-facing channels (web, mobile, call center, branch systems). Implement
+      event-driven architecture where opt-out elections are published as events that
+      downstream data-sharing systems consume in real time to halt NPI disclosures.
+      Build an opt-out enforcement layer in the data pipeline that intercepts all outbound
+      NPI transmissions and validates against the customer's current opt-out status before
+      releasing data. Implement the 30-day waiting period as a configurable hold in the
+      data-sharing pipeline that prevents NPI disclosure to newly added third-party
+      recipients until the opt-out window has closed. Deploy a self-service preference
+      center that allows customers to view, modify, and confirm their opt-out elections
+      through authenticated sessions.
+    tools:
+      - kubernetes
+      - kafka
+      - redis
+      - postgresql
+      - vault
+      - backstage
+  devsecops:
+    prose: >-
+      Implement automated tests that verify opt-out enforcement across all data-sharing
+      pathways. Create integration tests that simulate a customer opt-out and confirm that
+      NPI is blocked from disclosure to non-affiliated third parties within the required
+      timeframe. Add pipeline stages that scan data export code paths for NPI fields and
+      verify that opt-out checks are present. Implement contract tests between the consent
+      management service and all consuming systems to ensure opt-out events are properly
+      processed. Use feature flags to manage opt-out mechanism changes with rollback
+      capability. Deploy canary tests that verify opt-out functionality in production
+      by testing with synthetic customer records.
+    tools:
+      - gitlab-ci
+      - selenium
+      - cypress
+      - pact
+      - open-policy-agent
+  secops:
+    prose: >-
+      Monitor opt-out election volumes and processing times to detect anomalies (sudden
+      spikes indicating a data breach notification response, processing delays exceeding
+      SLAs). Generate monthly reports on: total opt-out elections received, processing
+      time metrics, opt-out rate by customer segment, third-party sharing volumes before
+      and after opt-out. Implement alerting for opt-out processing failures or delays.
+      Conduct periodic audits to verify that opted-out customers' NPI is not appearing
+      in data feeds to non-affiliated third parties. Maintain evidence packages for
+      examinations showing opt-out mechanisms, processing workflows, and compliance
+      metrics.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IP-1", "IP-2", "IP-3", "IP-4", "PT-4"]
+    relationship: supports
+  - framework_id: ccpa-cpra
+    articles: ["1798.120", "1798.135"]
+    relationship: complements

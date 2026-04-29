@@ -1,0 +1,118 @@
+id: art-9
+family: cap-2
+title: "Telemonitoramento -- Monitoramento Remoto de Pacientes"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 9. O telemonitoramento consiste no monitoramento a distância
+    de parâmetros de saúde ou doença do paciente, por meio de
+    dispositivos e tecnologias de comunicação.
+
+    Parágrafo 1. O telemonitoramento deve ser realizado sob
+    supervisão médica, com definição de parâmetros de alerta e
+    protocolos de intervenção em caso de alterações clínicas
+    significativas.
+
+    Parágrafo 2. Os dispositivos utilizados para telemonitoramento
+    devem ser registrados na ANVISA e calibrados conforme normas
+    técnicas vigentes.
+
+    Parágrafo 3. Os dados coletados pelo telemonitoramento devem
+    ser armazenados de forma segura e integrados ao prontuário
+    eletrônico do paciente.
+
+    Parágrafo 4. O paciente deve ser informado sobre quais
+    parâmetros estão sendo monitorados, a frequência de coleta
+    e como os dados serão utilizados.
+guidance:
+  prose: |
+    O art. 9 regula o monitoramento remoto continuo de pacientes,
+    modalidade que tem crescido com a proliferacao de dispositivos
+    IoT medicos (wearables, sensores domiciliares, oximetros).
+
+    **Parametros de alerta (paragrafo 1):**
+    O medico deve definir para cada paciente limiares de alerta
+    personalizados. Exemplos:
+    - Frequencia cardiaca: alerta se < 50 ou > 120 bpm
+    - Saturacao O2: alerta se < 92%
+    - Pressao arterial: alerta se sistolica > 180 ou diastolica > 110
+    - Glicemia: alerta se < 70 ou > 250 mg/dL
+
+    **Dispositivos ANVISA (paragrafo 2):**
+    Todo dispositivo de monitoramento deve ter registro na ANVISA.
+    Dispositivos de consumo (smartwatches, apps genericos) nao
+    podem ser utilizados como fonte primaria de dados clinicos
+    para telemonitoramento regulado.
+
+    **Integracao com prontuario (paragrafo 3):**
+    Dados de telemonitoramento devem ser integrados ao prontuario
+    eletronico, nao armazenados apenas no dispositivo ou em
+    plataforma isolada. Interoperabilidade (HL7 FHIR) e essencial.
+
+    **Consentimento informado (paragrafo 4):**
+    O paciente deve consentir de forma especifica para o
+    telemonitoramento, com conhecimento claro dos parametros
+    monitorados e uso dos dados.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de telemonitoramento:**
+      1. Implementar gateway IoT seguro para recepcao de dados de
+         dispositivos medicos, com autenticacao mutua (mTLS) e
+         validacao de integridade de dados.
+      2. Criar motor de regras de alerta configuravel por paciente,
+         com limiares personalizados definidos pelo medico e
+         notificacao automatica em caso de violacao.
+      3. Implementar integracao com prontuario eletronico via
+         HL7 FHIR para registro automatico de dados coletados.
+      4. Manter registro de calibracao e certificacao ANVISA de
+         todos os dispositivos conectados a plataforma.
+      5. Implementar armazenamento time-series para dados de
+         monitoramento com retencao conforme exigido por lei.
+    tools:
+      - iot-gateway
+      - alert-engine
+      - hl7-fhir
+      - time-series-database
+  devsecops:
+    prose: |
+      **Pipeline de qualidade para telemonitoramento:**
+      1. Testar motor de regras de alerta com cenarios de dados
+         normais, criticos e ambiguos, validando comportamento
+         esperado para cada limiar.
+      2. Implementar testes de integracao com dispositivos IoT
+         medicos, validando protocolo, autenticacao e integridade.
+      3. Testar integracao HL7 FHIR com prontuario eletronico,
+         validando que dados sao registrados corretamente.
+      4. Implementar testes de carga para gateway IoT, simulando
+         volume de dados de multiplos pacientes simultaneos.
+    tools:
+      - gitlab-ci
+      - iot-testing
+      - fhir-validation
+      - load-testing
+  secops:
+    prose: |
+      **Operacao de telemonitoramento:**
+      1. Monitorar disponibilidade e saude dos dispositivos IoT
+         conectados, alertando quando dispositivo nao reporta
+         dados por periodo acima do esperado.
+      2. Verificar que todos os dispositivos possuem registro
+         ANVISA vigente e estao calibrados conforme normas tecnicas.
+      3. Auditar que dados coletados estao sendo integrados ao
+         prontuario eletronico do paciente.
+      4. Verificar que consentimento informado especifico para
+         telemonitoramento foi obtido de cada paciente.
+    tools:
+      - device-monitoring
+      - compliance-dashboard
+      - audit-trail
+      - consent-management
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11", "art-18"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-a-1", "164.312-c-1"]
+    relationship: mapped

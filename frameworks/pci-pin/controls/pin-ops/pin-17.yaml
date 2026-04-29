@@ -1,0 +1,93 @@
+id: pin-17
+family: pin-ops
+title: "Change Management and Configuration Control"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    All changes to PIN processing systems, HSM configurations, cryptographic key parameters,
+    network configurations, and security controls must be subject to a formal change
+    management process. Changes must be documented, risk-assessed, tested in a non-production
+    environment, and approved by authorized personnel before implementation in production.
+    Emergency changes must follow an expedited process that still requires authorization and
+    must be formally documented and reviewed within a defined timeframe after implementation.
+    HSM firmware updates must be validated against manufacturer-provided signatures and
+    tested on non-production HSMs before deployment. Configuration baselines for all PIN
+    processing components must be documented, and deviations from the baseline must be
+    detected and investigated.
+
+guidance:
+  prose: >-
+    Change management prevents unauthorized or untested modifications from introducing
+    vulnerabilities into the PIN processing environment. The PIN processing chain is
+    particularly sensitive to configuration changes because even minor misconfigurations
+    — such as incorrect key identifiers, wrong PIN block format settings, or firewall
+    rule changes — can either disrupt transaction processing or create security gaps.
+    Configuration drift monitoring is essential because unauthorized changes may indicate
+    compromise. Organizations must maintain a known-good configuration baseline for each
+    component and have automated mechanisms to detect and alert on deviations. HSM
+    firmware updates are especially critical because a compromised firmware image could
+    expose all keys managed by the device.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 5, Change Management"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement infrastructure-as-code (IaC) for all PIN processing infrastructure
+      components to establish version-controlled configuration baselines. Deploy
+      configuration drift detection tools that continuously compare running
+      configurations against the approved baseline. Implement a change advisory board
+      (CAB) workflow with mandatory approval gates for changes to PIN processing
+      systems. Deploy staged deployment pipelines (dev, staging, production) for HSM
+      firmware and configuration updates. Implement automated rollback mechanisms
+      for failed deployments.
+    tools:
+      - terraform
+      - ansible
+      - gitlab-ci
+      - service-now
+      - config-drift-detection
+  devsecops:
+    prose: >-
+      Implement GitOps workflows for PIN processing infrastructure changes where all
+      modifications are tracked in version control with mandatory merge request
+      approvals. Run automated compliance scans on infrastructure changes before
+      deployment. Implement pre-deployment validation tests that verify key
+      connectivity, PIN block processing, and transaction routing after configuration
+      changes. Enforce branch protection and code review for all IaC repositories
+      containing PIN processing configurations.
+    tools:
+      - gitlab-ci
+      - gitlab-code-review
+      - scanner-iac-scanning
+      - checkov
+      - tfsec
+      - opa-conftest
+  secops:
+    prose: >-
+      Monitor configuration management databases for unauthorized changes to PIN
+      processing components. Review change logs weekly for completeness and proper
+      authorization. Audit emergency change records to verify post-implementation
+      review was completed within the defined timeframe. Alert on any configuration
+      changes to HSMs, firewalls, or network devices in the PIN processing zone that
+      were not preceded by an approved change request.
+    tools:
+      - splunk
+      - elastic-siem
+      - service-now
+      - tripwire
+      - osquery
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.1", "req-6.2"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "CM-5", "CM-6", "SI-7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.32", "A.8.9"]
+    relationship: mapped

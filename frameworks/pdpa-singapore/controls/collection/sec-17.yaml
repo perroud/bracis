@@ -1,0 +1,98 @@
+id: sec-17
+family: collection
+title: "Collection of Personal Data — Limitation"
+class: PDPA-SG
+baselines: [privacy-baseline]
+
+statement:
+  prose: |
+    An organisation shall not collect personal data about an individual unless —
+    (a) the personal data is collected for a purpose that a reasonable person would
+    consider appropriate in the circumstances; and
+    (b) the personal data is necessary for that purpose.
+
+guidance:
+  prose: |
+    Section 17 establishes the collection limitation principle — a combination of
+    purpose appropriateness and data minimization:
+
+    1. **Reasonable purpose:** The purpose of collection must be one that a
+       "reasonable person" would consider appropriate. This is an objective
+       standard, not the organization's subjective view.
+
+    2. **Necessity:** Only data that is necessary for the stated purpose may be
+       collected. This is Singapore's data minimization principle.
+
+    Together, these requirements prevent organizations from collecting excessive
+    personal data "just in case" or for vague future purposes. The necessity test
+    requires organizations to justify each data element collected against the
+    stated purpose.
+
+    The PDPC has issued guidance indicating that organizations should periodically
+    review their data collection practices to ensure they continue to meet the
+    necessity test as business processes evolve.
+
+references:
+  - citation: "PDPA 2012, Section 17"
+    url: "https://sso.agc.gov.sg/Act/PDPA2012"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement data collection inventories that map each data field to its
+         collection purpose and necessity justification.
+      2. Build form and API validations that reject collection of fields not listed
+         in the approved data collection inventory for that purpose.
+      3. Implement progressive data collection — only request data fields when they
+         are needed for the specific step in the user journey.
+      4. Create automated data minimization reports that compare collected fields
+         against fields actually used in processing.
+      5. Build schema governance that requires purpose-necessity documentation for
+         any new personal data field added to databases or APIs.
+    tools:
+      - datahub
+      - openmetadata
+      - backstage
+      - opa
+      - schema-registry
+
+  devsecops:
+    prose: |
+      1. Create CI/CD gates that flag new personal data collection fields without
+         corresponding necessity documentation.
+      2. Implement static analysis rules that detect collection of common
+         over-collection patterns (e.g., collecting NRIC when only name is needed).
+      3. Validate that API request schemas only accept fields documented in the
+         data collection inventory.
+      4. Review database migration scripts for new personal data columns without
+         purpose-necessity justification.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - spectral
+      - schema-validation
+
+  secops:
+    prose: |
+      1. Conduct quarterly data minimization audits — compare data collected versus
+         data actually used for stated purposes.
+      2. Monitor for collection of undocumented personal data fields.
+      3. Track data collection scope changes and verify necessity assessments are
+         updated accordingly.
+      4. Report on over-collection findings and remediation timelines.
+    tools:
+      - data-discovery
+      - compliance-dashboard
+      - siem
+      - data-quality-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.4.1"]
+    relationship: supports

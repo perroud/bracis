@@ -1,0 +1,102 @@
+id: art-4
+family: cap-1
+title: "Ambito de Aplicacao e Restricoes Territoriais"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 4. A telemedicina aplica-se a todo médico regularmente inscrito
+    no Conselho Regional de Medicina (CRM) competente, no exercício de
+    suas atividades profissionais.
+
+    Parágrafo 1. O médico que praticar telemedicina deve estar inscrito
+    no CRM do estado onde se encontra, devendo observar a legislação
+    vigente sobre jurisdição profissional.
+
+    Parágrafo 2. A telemedicina entre médico no Brasil e paciente no
+    exterior, ou vice-versa, deve observar a regulamentação específica
+    de ambos os países, além das normas do CFM.
+
+    Parágrafo 3. É vedada a prática de telemedicina por profissionais
+    não habilitados ou por plataformas que não garantam a identificação
+    e verificação do registro profissional do médico.
+guidance:
+  prose: |
+    O art. 4 delimita quem pode praticar telemedicina e em quais
+    condicoes territoriais. As implicacoes para sistemas tecnologicos
+    sao significativas.
+
+    **Verificacao de CRM ativo:**
+    Plataformas de telemedicina devem verificar em tempo real se o
+    medico possui inscricao ativa no CRM do estado onde se encontra.
+    Isso requer integracao com o sistema de consulta do CFM.
+
+    **Restricoes transfrontericas (paragrafo 2):**
+    Atendimentos internacionais exigem conformidade dupla: regulacao
+    brasileira (CFM) e regulacao do pais estrangeiro. Na pratica,
+    sistemas devem detectar a localizacao do paciente e medico e
+    aplicar regras de conformidade adequadas.
+
+    **Vedacao a nao habilitados (paragrafo 3):**
+    Plataformas tecnologicas possuem responsabilidade solidaria se
+    permitirem pratica de telemedicina por profissionais sem CRM
+    ativo. A verificacao deve ser sistematica, nao eventual.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Verificacao automatizada de credenciais medicas:**
+      1. Integrar plataforma com API de consulta do CFM/CRM para
+         verificacao em tempo real do registro profissional antes
+         de cada atendimento.
+      2. Implementar deteccao de geolocalizacao do medico e
+         paciente para validacao de jurisdicao profissional.
+      3. Bloquear automaticamente acesso a funcionalidades de
+         atendimento se CRM estiver suspenso ou cancelado.
+      4. Implementar cache de verificacao de CRM com TTL maximo
+         de 24 horas, com reverificacao antes de cada sessao.
+      5. Para atendimentos transfrontericos, implementar workflow
+         de validacao adicional que inclua conformidade bilateral.
+    tools:
+      - identity-verification
+      - geolocation-service
+      - credential-management
+      - api-integration
+  devsecops:
+    prose: |
+      **Pipeline de verificacao de identidade:**
+      1. Implementar testes automatizados que validem o fluxo de
+         verificacao de CRM, incluindo cenarios de CRM invalido,
+         suspenso e de jurisdicao incorreta.
+      2. Criar testes de integracao com API do CFM como parte do
+         pipeline CI/CD para garantir que integracao funciona.
+      3. Implementar monitoramento de SLA da API do CFM com
+         fallback para modo offline seguro.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - api-monitoring
+      - sla-tracking
+  secops:
+    prose: |
+      **Governanca de credenciais e jurisdicao:**
+      1. Manter registro auditavel de todas as verificacoes de CRM
+         realizadas, incluindo data, resultado e medico verificado.
+      2. Implementar alerta imediato quando verificacao de CRM
+         retorna status inativo ou suspenso para medico ativo
+         na plataforma.
+      3. Auditar trimestralmente a base de medicos cadastrados,
+         verificando que todos possuem CRM ativo e competente.
+      4. Manter politica documentada para tratamento de
+         atendimentos transfrontericos.
+    tools:
+      - grc-platform
+      - audit-trail
+      - alerting-system
+      - credential-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312"]
+    relationship: mapped

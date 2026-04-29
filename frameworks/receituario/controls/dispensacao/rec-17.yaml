@@ -1,0 +1,131 @@
+id: rec-17
+family: dispensacao
+title: "Electronic Dispensation Workflow and Pharmacist Verification"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 32. A dispensação de medicamentos com base em prescrição eletrônica
+    deve seguir o seguinte fluxo obrigatório:
+
+    I — recepção da prescrição eletrônica pelo sistema da farmácia ou
+    drogaria, por meio de código de autenticação SNCR, QR Code ou
+    transmissão direta via padrão FHIR;
+
+    II — verificação da autenticidade, integridade e validade da prescrição
+    conforme art. 13 desta Resolução;
+
+    III — análise farmacêutica da prescrição pelo farmacêutico responsável,
+    incluindo verificação de interações medicamentosas, contraindicações e
+    adequação da posologia;
+
+    IV — registro da dispensação no sistema com identificação do
+    farmacêutico responsável, data, hora e quantidade dispensada;
+
+    V — atualização do status da prescrição no SNCR (dispensada, dispensada
+    parcialmente);
+
+    VI — entrega do medicamento ao paciente ou seu representante legal,
+    com confirmação da entrega no sistema.
+
+    Parágrafo único. A dispensação de medicamentos sujeitos a controle
+    especial exige, adicionalmente, a identificação do paciente ou
+    representante legal por meio de documento com foto.
+guidance:
+  prose: |
+    Article 32 defines the end-to-end electronic dispensation workflow,
+    establishing mandatory steps from prescription receipt through
+    medication delivery to the patient.
+
+    **Six-step dispensation workflow:**
+    1. Prescription receipt (via SNCR code, QR code, or FHIR)
+    2. Authenticity and validity verification (four-point check per
+       rec-7)
+    3. Pharmaceutical analysis (clinical review by pharmacist)
+    4. Dispensation recording (pharmacist ID, timestamp, quantity)
+    5. SNCR status update (dispensed or partially dispensed)
+    6. Patient delivery confirmation
+
+    **Pharmaceutical analysis:**
+    The pharmacist must review the prescription for drug interactions,
+    contraindications, and dosage appropriateness before dispensing.
+    This is a professional obligation, not just a system check.
+
+    **Controlled substance additional requirement:**
+    For controlled substances, the patient or legal representative
+    must present photo identification at the point of dispensation.
+
+    **Prescription receipt methods:**
+    - SNCR authentication code: manual entry at pharmacy
+    - QR code: scan from patient's device or printed document
+    - FHIR transmission: direct system-to-system prescription exchange
+
+    **Partial dispensation:**
+    When not all prescribed medications are available, the system must
+    support partial dispensation with balance tracking for subsequent
+    dispensation visits.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Dispensation workflow engine:**
+      1. Implement a step-based dispensation workflow engine that
+         enforces the six mandatory steps in order, preventing step
+         skipping or out-of-order execution.
+      2. Deploy multiple prescription receipt channels: manual SNCR
+         code entry, QR code scanner integration, and FHIR
+         MedicationRequest endpoint for system-to-system.
+      3. Integrate a drug interaction database (e.g., DrugBank, Anvisa
+         Bulario Eletronico) for automated pharmaceutical analysis
+         support, flagging potential interactions for pharmacist review.
+      4. Implement patient identity verification for controlled
+         substances with document type, number, and optional photo
+         capture at the point of dispensation.
+      5. Deploy real-time SNCR status update upon dispensation
+         completion, with queuing for offline scenarios.
+    tools:
+      - workflow-engine
+      - qr-scanner
+      - fhir-client
+      - drug-interaction-db
+      - identity-verification
+      - sncr-api
+  devsecops:
+    prose: |
+      **Dispensation workflow testing:**
+      1. Create end-to-end tests for the complete six-step dispensation
+         workflow, including all receipt methods (SNCR code, QR, FHIR).
+      2. Implement step enforcement tests verifying that workflow steps
+         cannot be skipped or reordered.
+      3. Add drug interaction detection tests with known interaction
+         pairs to verify pharmaceutical analysis support accuracy.
+      4. Deploy controlled substance dispensation tests verifying
+         patient identification requirements are enforced.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - workflow-tests
+      - drug-interaction-tests
+      - integration-tests
+  secops:
+    prose: |
+      **Dispensation operations monitoring:**
+      1. Monitor dispensation workflow completion rates and flag
+         incomplete workflows (started but not completed).
+      2. Track pharmaceutical analysis override rates (pharmacist
+         proceeds despite interaction warning) and review monthly.
+      3. Audit controlled substance identity verification records
+         quarterly for completeness and compliance.
+      4. Monitor SNCR status update success rates and investigate
+         failures promptly.
+    tools:
+      - workflow-monitoring
+      - compliance-dashboard
+      - audit-platform
+      - siem
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

@@ -1,0 +1,115 @@
+id: art-22
+family: cap-5
+title: "Guias de Autorizacao"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 22. A solicitação de autorização prévia de procedimentos na
+    saúde suplementar deve ser realizada exclusivamente por meio das
+    guias TISS de autorização, conforme schemas e regras de preenchimento
+    definidos pela ANS.
+
+    Parágrafo 1. As guias de autorização incluem:
+    I - Guia de consulta: para autorização de consultas médicas e
+    odontológicas;
+    II - Guia de SP/SADT (Serviços Profissionais / Serviços Auxiliares
+    de Diagnóstico e Terapia): para exames, procedimentos e terapias;
+    III - Guia de internação: para autorização de internações hospitalares;
+    IV - Guia de tratamento odontológico: para procedimentos dentários
+    que exigem autorização prévia.
+
+    Parágrafo 2. A operadora deve responder à solicitação de autorização:
+    I - Em tempo real para verificação de elegibilidade;
+    II - Em até 2 horas para procedimentos de urgência/emergência;
+    III - Em até 5 dias úteis para procedimentos eletivos.
+
+    Parágrafo 3. A autorização prévia não garante cobertura contratual,
+    que será verificada no momento da análise da cobrança.
+guidance:
+  prose: |
+    O art. 22 padroniza o processo de autorizacao previa, um dos fluxos
+    mais criticos e volumosos do TISS.
+
+    **Tipos de guia de autorizacao:**
+    1. Consulta: mais simples, pode ser autorizada automaticamente
+       se beneficiario elegivel e procedimento coberto
+    2. SP/SADT: requer analise de indicacao clinica (CID + TUSS),
+       pode exigir auditoria medica
+    3. Internacao: mais complexa, requer analise de necessidade,
+       tipo de acomodacao, previsao de diarias
+    4. Odontologica: requer analise de procedimentos dentarios
+       conforme rol ANS
+
+    **Fluxo de autorizacao:**
+    1. Prestador envia guia de solicitacao via web service TISS
+    2. Operadora valida elegibilidade do beneficiario
+    3. Operadora analisa cobertura contratual e indicacao clinica
+    4. Operadora responde: autorizado, negado (com motivo), ou
+       pendente (solicita informacao adicional)
+    5. Numero de autorizacao gerado pela operadora
+
+    **Autorizacao automatica (autoauth):**
+    Muitas operadoras implementam regras de autorizacao automatica
+    para procedimentos de baixa complexidade, agilizando o atendimento.
+    Regras baseadas em: elegibilidade + cobertura + limites contratuais.
+
+    **Prazos regulamentares:**
+    O descumprimento dos prazos de resposta pode resultar em sancoes
+    pela ANS e em autorizacao tacita do procedimento.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de autorizacao TISS:**
+      1. Implementar engine de autorizacao com regras configuraveis
+         por operadora: elegibilidade, cobertura, limites, auditoria.
+      2. Configurar autorizacao automatica (autoauth) para procedimentos
+         de baixa complexidade com regras baseadas em TUSS + CID.
+      3. Implementar fila de auditoria medica para autorizacoes que
+         exigem analise humana, com SLA monitoring de 2h/5 dias.
+      4. Criar servico de notificacao que alerte prestador sobre
+         status da autorizacao em tempo real (webhook, polling).
+    tools:
+      - authorization-engine
+      - rules-engine
+      - audit-queue
+      - notification-service
+  devsecops:
+    prose: |
+      **Validacao de autorizacao no pipeline:**
+      1. Implementar testes end-to-end para cada tipo de guia de
+         autorizacao (consulta, SP/SADT, internacao, odonto).
+      2. Criar testes de SLA que validem tempos de resposta: tempo
+         real para elegibilidade, 2h para urgencia, 5 dias para eletiva.
+      3. Automatizar testes de regras de autoauth com cenarios positivos
+         e negativos para cada combinacao TUSS + CID relevante.
+      4. Incluir testes de carga simulando pico de solicitacoes de
+         autorizacao (segunda-feira de manha, retorno de feriado).
+    tools:
+      - e2e-testing
+      - sla-testing
+      - rules-testing
+      - load-testing
+  secops:
+    prose: |
+      **Gestao operacional de autorizacoes:**
+      1. Monitorar SLA de autorizacao em tempo real com dashboards
+         por tipo de guia, operadora e prestador.
+      2. Implementar alertas para filas de auditoria medica que
+         ultrapassem 80% do prazo regulamentar.
+      3. Auditar periodicamente as regras de autoauth para verificar
+         se estao alinhadas com o rol de procedimentos ANS vigente.
+      4. Reportar metricas de autorizacao (taxa de aprovacao, tempo
+         medio, recusas por motivo) mensalmente.
+    tools:
+      - sla-dashboard
+      - queue-monitoring
+      - rules-audit
+      - authorization-analytics
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-11"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1101"]
+    relationship: mapped

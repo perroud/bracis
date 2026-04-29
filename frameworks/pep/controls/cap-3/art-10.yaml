@@ -1,0 +1,113 @@
+id: art-10
+family: cap-3
+title: "Carimbo de Tempo -- Tempestividade e Prova Temporal"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 10. Todo registro clínico assinado digitalmente no PEP deve
+    receber carimbo de tempo (timestamp) emitido por Autoridade de
+    Carimbo de Tempo (ACT) credenciada na ICP-Brasil.
+
+    Parágrafo 1. O carimbo de tempo deve ser emitido imediatamente
+    após a assinatura digital do registro, vinculando-se de forma
+    indissociável ao documento assinado.
+
+    Parágrafo 2. O carimbo de tempo tem a função de provar a
+    existência do documento em determinada data e hora, garantindo
+    a tempestividade do registro mesmo após a expiração ou revogação
+    do certificado digital do profissional assinante.
+
+    Parágrafo 3. Em caso de indisponibilidade da ACT, o sistema
+    deve registrar o horário local e solicitar o carimbo de tempo
+    assim que o serviço for restabelecido, documentando o intervalo.
+guidance:
+  prose: |
+    O art. 10 trata do carimbo de tempo como elemento essencial para
+    a validade juridica de longo prazo dos registros clinicos.
+
+    **Por que carimbo de tempo e critico:**
+    Certificados digitais tem validade limitada (1-3 anos). Sem
+    carimbo de tempo, apos a expiracao do certificado, a assinatura
+    digital perde a capacidade de prova temporal. O carimbo de tempo
+    "congela" a prova de que a assinatura foi feita enquanto o
+    certificado era valido.
+
+    **Cenario pratico:**
+    Medico assina evolucao em 2024 com certificado valido ate 2025.
+    Em 2030, paciente abre processo judicial. Sem carimbo de tempo,
+    nao ha prova de que a assinatura foi feita em 2024 (quando o
+    certificado era valido). Com carimbo de tempo, a prova temporal
+    e incontestavel.
+
+    **Prontuarios sao guardados por 20 anos (art. 12):**
+    Como o prazo de guarda e 20 anos e certificados valem 1-3 anos,
+    o carimbo de tempo e absolutamente essencial para manter a
+    validade juridica dos registros ao longo de todo o periodo.
+
+    **Contingencia (paragrafo 3):**
+    Se a ACT estiver indisponivel, o sistema deve usar relogio local
+    sincronizado via NTP e solicitar carimbo retroativo quando a ACT
+    voltar. O intervalo deve ser documentado.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com Autoridade de Carimbo de Tempo:**
+      1. Integrar com ACT credenciada na ICP-Brasil via protocolo
+         TSP (RFC 3161) para emissao de carimbos de tempo.
+      2. Implementar fila resiliente de solicitacoes de carimbo:
+         se ACT estiver indisponivel, enfileirar e retentar com
+         backoff exponencial.
+      3. Sincronizar relogio de todos os servidores do PEP via
+         NTP com fontes confilaveis (ntp.br, pool.ntp.org) para
+         garantir precisao do horario local em contingencia.
+      4. Armazenar carimbo de tempo vinculado ao registro assinado
+         (embedded ou detached, conforme padrao CAdES-T ou PAdES-T).
+      5. Implementar renovacao periodica de carimbos de tempo
+         (re-timestamp) antes da expiracao do algoritmo de hash
+         para garantir validade ao longo dos 20 anos de guarda.
+    tools:
+      - timestamp-authority-client
+      - ntp-sync
+      - message-queue
+      - cades-library
+  devsecops:
+    prose: |
+      **Validacao de carimbo de tempo:**
+      1. Testar integracao com ACT em ambiente de homologacao,
+         validando formato RFC 3161 do carimbo emitido.
+      2. Testar cenario de indisponibilidade da ACT: verificar
+         que o sistema enfileira e solicita carimbo retroativo.
+      3. Validar que carimbo de tempo esta vinculado ao hash
+         correto do documento assinado.
+      4. Testar que a alteracao do conteudo invalida tanto a
+         assinatura digital quanto o carimbo de tempo.
+    tools:
+      - gitlab-ci
+      - timestamp-validation-tests
+      - resilience-tests
+      - hash-integrity-tests
+  secops:
+    prose: |
+      **Monitoramento e governanca de carimbos de tempo:**
+      1. Monitorar disponibilidade da ACT com alertas automaticos
+         para indisponibilidade superior a 5 minutos.
+      2. Auditar periodicamente registros para verificar presenca
+         e validade do carimbo de tempo.
+      3. Implementar processo de re-timestamp antes da expiracao
+         do algoritmo de hash (ex.: SHA-256 projetado para ser
+         seguro ate ~2030, planejar migracao para SHA-3).
+      4. Manter registro de todas as situacoes de contingencia
+         de carimbo de tempo com datas e justificativas.
+    tools:
+      - act-monitoring
+      - timestamp-audit
+      - crypto-lifecycle
+      - contingency-log
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-c"]
+    relationship: mapped

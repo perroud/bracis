@@ -1,0 +1,101 @@
+id: pix-10
+family: authn-authz
+title: "Autenticacao do Pagador"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP do pagador é responsável por autenticar o usuário antes de autorizar qualquer
+    transação Pix. A autenticação deve utilizar mecanismos seguros, incluindo no mínimo
+    dois fatores de autenticação para transações acima dos limites definidos, e deve ser
+    proporcional ao risco da transação. O PSP deve garantir que a autenticação ocorra
+    em canal seguro, com proteção contra interceptação, replay e engenharia social.
+guidance:
+  prose: |
+    **Responsabilidade do PSP pagador:**
+    O PSP que detifica a conta do pagador e o unico responsavel por autenticar o usuario
+    antes de debitar a conta. Essa responsabilidade nao pode ser delegada a terceiros
+    (nem ao recebedor, nem a intermediarios).
+
+    **Fatores de autenticacao aceitos:**
+    1. **Algo que o usuario sabe:** Senha, PIN, padrao de desbloqueio
+    2. **Algo que o usuario possui:** Dispositivo cadastrado, token, SIM card
+    3. **Algo que o usuario e:** Biometria facial, impressao digital, reconhecimento de voz
+
+    **Autenticacao por nivel de risco:**
+    - Transacoes de baixo valor: autenticacao simplificada (biometria ou PIN)
+    - Transacoes acima do limite noturno: autenticacao reforcada
+    - Novas chaves ou novos destinatarios: confirmacao adicional
+    - Dispositivo nao cadastrado: autenticacao completa com segundo fator
+
+    **Protecao contra ataques:**
+    - Rate limiting de tentativas de autenticacao (bloqueio apos N tentativas)
+    - Deteccao de dispositivo comprometido (root/jailbreak)
+    - Protecao contra screen capture e keylogger
+    - Timeout de sessao configuravel pelo usuario
+
+    **Consentimento explicito:**
+    O usuario deve confirmar explicitamente cada transacao Pix, visualizando o valor,
+    a chave do recebedor e o nome do destinatario antes de autorizar.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de autenticacao:**
+      1. Identity Provider (IdP) dedicado para autenticacao Pix com suporte a MFA.
+      2. Device binding: vinculacao de dispositivo a conta do usuario.
+      3. Biometria nativa (Face ID, Touch ID, Android Biometric) integrada ao fluxo.
+      4. Session management com tokens de curta duracao (max 5 minutos para transacao).
+
+      **Seguranca do canal:**
+      5. Certificate pinning no aplicativo mobile para prevenir MITM.
+      6. Protecao contra replay com nonce em cada requisicao de autenticacao.
+      7. Criptografia end-to-end entre app e backend de autenticacao.
+      8. Rate limiting por usuario e por dispositivo.
+
+      **Autenticacao adaptativa:**
+      9. Risk engine que ajusta o nivel de autenticacao conforme contexto (valor,
+         horario, localizacao, historico do usuario, dispositivo).
+      10. Step-up authentication para transacoes de alto risco.
+    tools:
+      - identity-provider
+      - mfa-service
+      - biometric-sdk
+      - risk-engine
+      - rate-limiter
+  devsecops:
+    prose: |
+      **Seguranca de autenticacao:**
+      1. SAST para detectar falhas de autenticacao (bypass, hardcoded credentials).
+      2. DAST para testar fluxos de autenticacao contra ataques conhecidos.
+      3. Testes de forca bruta e rate limiting no pipeline.
+      4. Pen testing periodico focado em autenticacao Pix.
+      5. Code review obrigatorio para alteracoes em fluxos de autenticacao.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - burp-suite
+      - zap
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de autenticacao:**
+      1. Monitoramento de tentativas de autenticacao falhas por usuario e IP.
+      2. Alerta para brute force e credential stuffing.
+      3. Deteccao de account takeover (mudanca de dispositivo + transacao atipica).
+      4. Bloqueio preventivo de conta em caso de atividade suspeita.
+      5. Relatorio de metricas de autenticacao (sucesso, falha, MFA usage).
+    tools:
+      - siem
+      - fraud-detection
+      - user-behavior-analytics
+      - account-protection
+legal_references:
+  - framework_id: bcb-85
+    articles: ["art-3", "art-7"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

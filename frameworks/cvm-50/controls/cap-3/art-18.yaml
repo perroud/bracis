@@ -1,0 +1,103 @@
+id: art-18
+family: cap-3
+title: "Atualizacao Cadastral"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 18. Os participantes devem manter os dados cadastrais dos clientes
+    atualizados, adotando procedimentos para revisão periódica das informações
+    de identificação e qualificação.
+
+    § 1. A periodicidade de atualização cadastral deve ser proporcional ao
+    nível de risco do cliente:
+    I - clientes de alto risco: revisão no mínimo anual;
+    II - clientes de médio risco: revisão no mínimo a cada dois anos; e
+    III - clientes de baixo risco: revisão no mínimo a cada três anos.
+
+    § 2. Além das revisões periódicas, os participantes devem atualizar
+    o cadastro sempre que:
+    I - houver mudança relevante no perfil do cliente, como alteração da
+    atividade econômica, do patrimônio ou da residência;
+    II - for identificada inconsistência entre o perfil do cliente e as
+    operações realizadas; ou
+    III - for solicitado pela CVM ou por autoridade competente.
+guidance:
+  prose: |
+    Dados de KYC desatualizados sao tao problematicos quanto dados ausentes.
+    Um cliente que era de baixo risco ha tres anos pode ter se tornado PEP,
+    mudado de jurisdicao ou alterado drasticamente seu perfil economico.
+
+    **Ciclos de atualizacao por nivel de risco:**
+    A proporcionalidade se aplica aqui: clientes de alto risco (PEPs, empresas
+    offshore, clientes com historico de alertas) precisam de revisao mais frequente.
+    O participante pode definir ciclos mais curtos que os minimos, mas nao mais longos.
+
+    **Gatilhos de atualizacao imediata (ss 2):**
+    Os tres incisos do ss 2 sao gatilhos de atualizacao fora do ciclo regular:
+    1. Mudanca no perfil: cliente PJ que muda de atividade economica de comercio
+       varejista para mineracao merece revisao imediata.
+    2. Inconsistencia perfil/operacoes: cliente com renda declarada de R$ 5.000
+       que comeca a investir R$ 200.000/mes e um gatilho de atualizacao.
+    3. Requisicao regulatoria: CVM ou COAF podem solicitar atualizacao especifica.
+
+    **Processo de recadastramento:**
+    O participante deve ter processo para notificar o cliente sobre necessidade
+    de atualizacao e lidar com clientes que nao respondem — incluindo suspensao
+    temporaria de operacoes ate a atualizacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao do ciclo de vida cadastral:**
+      1. Sistema de controle de validade cadastral: cada cliente tem data de
+         proxima revisao calculada com base no nivel de risco.
+      2. Notificacoes automaticas: ao cliente (e-mail, app) com antecedencia
+         para atualizacao cadastral; ao analista de compliance para casos criticos.
+      3. Bloqueio progressivo: aviso 30 dias antes do vencimento, restricao
+         de operacoes 15 dias antes, bloqueio total no vencimento sem atualizacao.
+      4. Portal de auto-servico para o cliente atualizar dados com validacao
+         automatica dos documentos.
+
+      **Deteccao de mudancas externas:**
+      5. Integracao com Receita Federal para deteccao automatica de mudancas
+         no CNPJ (status, atividade, quadro societario).
+      6. Monitoramento de alteracoes de endereco via bureaus de credito.
+      7. Rescanning de PEP e sancoes como parte da atualizacao cadastral.
+    tools:
+      - kyc-platform
+      - notification-service
+      - data-enrichment-api
+      - aml-platform
+  devsecops:
+    prose: |
+      **Automacao de atualizacoes:**
+      1. Jobs agendados para calculo de cadastros proximos do vencimento.
+      2. Testes de ciclo de vida: simulacao de cliente passando pelos tres
+         ciclos de atualizacao.
+      3. Testes de gatilhos automaticos: mudanca de nivel de risco deve
+         recalcular data de proxima revisao.
+    tools:
+      - scheduled-jobs
+      - test-automation
+      - gitlab-ci
+  secops:
+    prose: |
+      **Metricas de atualizacao:**
+      1. KPI: percentual de clientes com cadastro dentro do prazo de validade.
+      2. Alerta quando percentual de cadastros vencidos supera threshold (ex: 5%).
+      3. Relatorio de clientes com cadastro vencido por nivel de risco —
+         clientes de alto risco com cadastro vencido devem ter operacoes
+         suspensas imediatamente.
+      4. Auditoria de qualidade das atualizacoes: verificar se dados atualizados
+         sao substancialmente diferentes dos anteriores (indicador de efetividade).
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - audit-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-11"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: complements

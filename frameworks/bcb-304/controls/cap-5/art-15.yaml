@@ -1,0 +1,94 @@
+id: art-15
+family: cap-5
+title: "Politica de PLD/FT para Ativos Virtuais"
+class: BCB-304
+baselines: [vasps-autorizadas]
+statement:
+  prose: |
+    Art. 15. A prestadora de serviços de ativos virtuais deve implementar e manter
+    política de prevenção à lavagem de dinheiro e ao financiamento do terrorismo
+    compatível com a natureza e a complexidade dos serviços prestados, incluindo:
+    I - procedimentos de identificação e qualificação de clientes (Know Your Customer - KYC),
+    incluindo verificação de identidade, endereço e origem de recursos;
+    II - procedimentos de diligência reforçada para clientes de maior risco, incluindo
+    pessoas politicamente expostas (PEPs) e clientes de jurisdições de alto risco;
+    III - avaliação de risco de lavagem de dinheiro por tipo de ativo virtual,
+    considerando o grau de anonimato proporcionado pelo protocolo;
+    IV - monitoramento contínuo de transações on-chain e off-chain para detecção de
+    padrões suspeitos;
+    V - procedimentos específicos para ativos virtuais com características de
+    privacidade aprimorada (privacy coins).
+guidance:
+  prose: |
+    O art. 15 adapta os requisitos classicos de PLD/FT (Circular 3.978) ao contexto
+    especifico de ativos virtuais.
+
+    **Peculiaridades do PLD/FT cripto:**
+    1. KYC: alem do cadastro tradicional, inclui verificacao de origem de
+       criptoativos (de qual carteira vieram?)
+    2. Diligencia reforcada: PEPs e jurisdicoes de alto risco do GAFI/FATF
+    3. Risco por tipo de ativo: Bitcoin tem pseudonimato rastreavel, Monero
+       tem anonimato forte -- risco diferente
+    4. Monitoramento dual: on-chain (transacoes na blockchain) e off-chain
+       (transacoes internas na plataforma)
+    5. Privacy coins: Monero, Zcash, Dash -- exigem procedimentos especificos
+       ou podem ser vedados
+
+    **Abordagem baseada em risco para ativos:**
+    Ativos com maior grau de anonimato exigem controles mais rigorosos.
+    A VASP pode optar por nao listar privacy coins para simplificar compliance.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack de PLD/FT cripto:**
+      1. KYC digital com verificacao de identidade (OCR de documentos, liveness
+         detection, face match) integrado ao onboarding.
+      2. Blockchain analytics integrado (Chainalysis, Elliptic, CipherTrace)
+         para rastrear origem de fundos on-chain.
+      3. Transaction monitoring engine com regras especificas para cripto:
+         mixer detection, darknet exposure, sanctioned wallets, structuring.
+      4. Risk scoring por cliente combinando dados on-chain e off-chain.
+      5. Regras especificas para privacy coins: bloqueio de depositos de
+         Monero/Zcash ou procedimentos reforcados de verificacao de origem.
+    tools:
+      - kyc-provider
+      - blockchain-analytics
+      - transaction-monitoring
+      - risk-scoring
+      - privacy-coin-rules
+  devsecops:
+    prose: |
+      **PLD/FT no pipeline:**
+      1. Testes automatizados de regras de transaction monitoring com cenarios
+         de lavagem conhecidos (structuring, layering, mixing).
+      2. Testes de integracao com blockchain analytics (validar parsing de
+         transacoes, scoring de risco).
+      3. Validacao de que screening de listas restritivas (OFAC, EU, FATF)
+         esta atualizado e funcional.
+      4. Testes de regressao para regras de PLD/FT a cada atualizacao.
+    tools:
+      - gitlab-ci
+      - aml-testing
+      - sanctions-screening
+      - regression-tests
+  secops:
+    prose: |
+      **Operacao de PLD/FT:**
+      1. Equipe de analise de alertas (L1/L2/L3) com SLAs de resolucao.
+      2. Investigacao de casos suspeitos com ferramentas de blockchain forensics.
+      3. Comunicacao ao COAF no prazo legal (24h para operacoes em especie,
+         30 dias para demais).
+      4. Treinamento periodico da equipe sobre tipologias de lavagem em cripto.
+      5. Relatorio mensal de PLD/FT ao diretor responsavel.
+    tools:
+      - case-management
+      - blockchain-forensics
+      - coaf-reporting
+      - training-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-3", "art-10", "art-11", "art-21"]
+    relationship: implements
+  - framework_id: bcb-44
+    articles: ["art-4", "art-8", "art-19"]
+    relationship: complements

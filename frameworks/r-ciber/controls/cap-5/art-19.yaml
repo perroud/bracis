@@ -1,0 +1,110 @@
+id: art-19
+family: cap-5
+title: "Requisitos de Seguranca para Infraestrutura Critica de Telecomunicacoes"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 19. Os elementos de rede classificados como Infraestrutura Crítica
+    de Telecomunicações (ICT) devem ser protegidos por controles de
+    segurança aprimorados, incluindo:
+
+    I - segmentação lógica e física de redes de gestão dos elementos ICT,
+    com controles de acesso mais restritivos que os demais sistemas;
+
+    II - monitoramento de segurança contínuo e dedicado, com alertas
+    prioritários e SLA de resposta reduzido;
+
+    III - redundância de conectividade e de elementos de gestão, de forma
+    a garantir continuidade do monitoramento e controle mesmo em caso
+    de falhas parciais;
+
+    IV - restrição de acesso físico a instalações onde estão localizados
+    elementos ICT, com registro de todos os acessos;
+
+    V - revisão de segurança obrigatória antes de qualquer mudança em
+    elementos ICT, com aprovação do responsável pela segurança cibernética.
+guidance:
+  prose: |
+    O art. 19 estabelece camada adicional de protecao especifica para
+    os elementos classificados como ICT no art. 18.
+
+    **Segmentacao de redes de gestao (inciso I):**
+    A rede OAM de elementos ICT deve ser uma rede separada das demais
+    redes OAM, com firewall dedicado e lista de origem de acesso mais
+    restritiva. Idealmente, acesso apenas a partir de jumpservers
+    especificos com autenticacao forte.
+
+    **SLA de resposta reduzido (inciso II):**
+    Para alertas de seguranca em elementos ICT, o tempo de resposta
+    deve ser significativamente menor que para outros sistemas.
+    Recomenda-se: critico = 15 minutos, alto = 30 minutos.
+
+    **Controle de acesso fisico (inciso IV):**
+    Instalacoes com elementos ICT (data centers, centrais telefonicas,
+    estacoes de celular criticas) devem ter controle de acesso fisico
+    com biometria ou dois fatores, CFTV e registro de todos os acessos.
+
+    **Revisao pre-mudanca (inciso V):**
+    Mudancas em ICT nao podem ser feitas sem aprovacao do CISO ou
+    responsavel designado, mesmo em situacoes de urgencia operacional.
+    O processo emergencial deve estar documentado no PRISC.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de protecao para ICT:**
+      1. Implementar VRFs ou VLANs dedicadas para gestao de elementos
+         ICT, com acesso restrito a jumpservers especificos com MFA.
+      2. Configurar politicas de firewall mais restritivas para trafego
+         de gestao de ICT: apenas portas e protocolos necessarios,
+         origem de IPs especificos, sem acesso da internet.
+      3. Implementar IDS/IPS dedicado para monitoramento de trafego
+         em redes de gestao de ICT.
+      4. Garantir redundancia de conectividade de gestao de ICT via
+         caminhos fisicamente independentes.
+    tools:
+      - network-segmentation
+      - firewall
+      - ids-ips
+      - redundancy
+  devsecops:
+    prose: |
+      **Automacao com controles aprimorados para ICT:**
+      1. Implementar workflow de aprovacao adicional no pipeline CI/CD
+         para deploys e mudancas de configuracao que afetam ICT.
+      2. Exigir aprovacao do responsavel de seguranca via processo
+         formal (ITSM) antes de qualquer mudanca automatizada em ICT.
+      3. Implementar simulacao obrigatoria de mudancas em ICT em
+         ambiente de lab antes de execucao em producao.
+      4. Registrar imutavelmente todas as mudancas aplicadas em ICT
+         com registro de aprovacoes e executores.
+    tools:
+      - change-management
+      - itsm
+      - lab-simulation
+      - audit-trail
+  secops:
+    prose: |
+      **Operacao de seguranca dedicada para ICT:**
+      1. Criar regras de correlacao e alertas especificos para ICT
+         no SIEM, com SLA de resposta de ate 15 minutos para alertas
+         criticos.
+      2. Designar analistas de SOC com treinamento especifico em
+         tecnologias de rede de telecomunicacoes para analise de
+         alertas de ICT.
+      3. Realizar revisao de seguranca de ICT trimestralmente: analise
+         de acessos, revisao de configuracoes, teste de controles.
+      4. Implementar processo de aprovacao de acesso fisico a instalacoes
+         ICT com autorizacao previa do responsavel de seguranca.
+    tools:
+      - siem
+      - soc-platform
+      - physical-access-control
+      - security-review
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-7-1", "A-7-2", "A-7-3", "A-7-4", "A-8-20", "A-8-21"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-43", "art-44", "art-45", "art-46"]
+    relationship: mapped

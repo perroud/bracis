@@ -1,0 +1,102 @@
+id: sec-11-10e
+family: erec
+title: "Closed System Controls — Audit Trails"
+class: FDA-21CFR11
+baselines: [electronic-records-signatures]
+
+statement:
+  prose: >-
+    (e) Use of secure, computer-generated, time-stamped audit trails to
+    independently record the date and time of operator entries and actions
+    that create, modify, or delete electronic records. Record changes shall
+    not obscure previously recorded information. Such audit trail documentation
+    shall be retained for a period at least as long as that required for the
+    subject electronic records and shall be available for agency review and
+    copying.
+
+guidance:
+  prose: >-
+    Section 11.10(e) is one of the most critical requirements of Part 11.
+    It mandates secure, computer-generated, time-stamped audit trails that
+    independently record all operator actions that create, modify, or delete
+    electronic records. Key requirements include: (1) Audit trails must be
+    computer-generated, not manually created. (2) Each entry must include a
+    timestamp with date and time. (3) Previously recorded information must
+    not be obscured by changes — the original value and the new value must
+    both be visible. (4) Audit trails must be retained at least as long as
+    the underlying records. (5) Audit trails must be available for FDA review
+    and copying. The 2003 FDA guidance identifies audit trails as a key
+    requirement on which the agency will continue to focus enforcement. The
+    audit trail should capture who made the change, what was changed (old
+    value and new value), when the change was made, and why the change was
+    made (reason for change).
+
+references:
+  - citation: "21 CFR Part 11, Section 11.10(e)"
+    url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Implement immutable, append-only audit trail storage that prevents
+      modification or deletion of audit entries. 2. Configure audit trail
+      capture at the database and application level to record the identity
+      of the operator, the date and time of the action, the type of action
+      (create, modify, delete), the old value, and the new value for every
+      change to an electronic record. 3. Synchronize system clocks to a
+      trusted time source (NTP) to ensure accurate timestamps across all
+      systems. 4. Implement audit trail retention policies matching or
+      exceeding the retention period for the underlying electronic records.
+      5. Provide audit trail query and export capabilities for regulatory
+      inspection support. 6. Implement reason-for-change prompts requiring
+      operators to document why a change was made.
+    tools:
+      - audit-trail-system
+      - immutable-logging
+      - ntp-synchronization
+      - database-audit
+      - siem
+  devsecops:
+    prose: >-
+      1. Enable comprehensive audit logging in the version control system to
+      track all code changes, approvals, and deployments for Part 11 systems.
+      2. Implement pipeline audit trails that record who triggered builds,
+      what was deployed, and when deployments occurred. 3. Verify audit trail
+      completeness and immutability through automated compliance tests in the
+      CI/CD pipeline. 4. Ensure that CI/CD pipeline logs are retained for the
+      required retention period.
+    tools:
+      - gitlab-ci
+      - audit-logging
+      - immutable-logs
+      - compliance-tests
+  secops:
+    prose: >-
+      1. Monitor audit trail systems for availability and integrity to ensure
+      continuous capture of all record changes. 2. Review audit trails
+      periodically for anomalous patterns such as unusual modification
+      frequency, after-hours changes, or bulk deletions. 3. Verify that
+      audit trail entries contain all required elements (who, what, when,
+      old value, new value, reason). 4. Conduct periodic audits of audit
+      trail retention to verify entries are preserved for the required
+      duration. 5. Test audit trail export and review capabilities as part
+      of inspection readiness.
+    tools:
+      - siem
+      - audit-review
+      - retention-management
+      - inspection-readiness
+
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-19", "art-20"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-b"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-11"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-15"]
+    relationship: mapped

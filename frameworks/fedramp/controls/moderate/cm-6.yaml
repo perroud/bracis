@@ -1,0 +1,133 @@
+id: cm-6
+family: cm
+title: "Configuration Settings"
+class: FedRAMP
+
+baselines: [low, moderate, high]
+
+parameters:
+  - id: cm-06_odp.01
+    label: "common secure configurations"
+    guidance: "FedRAMP requirement: Use USGCB, CIS Benchmarks, DISA STIGs, or vendor hardening guides as the basis for secure configuration baselines."
+  - id: cm-06_odp.02
+    label: "system components requiring configuration"
+    guidance: "FedRAMP requirement: All system components including operating systems, databases, web servers, application servers, network devices, and container images."
+  - id: cm-06_odp.03
+    label: "operational requirements requiring deviation"
+    guidance: "FedRAMP requirement: Document and approve all deviations from established configuration baselines."
+
+statement:
+  prose: >-
+    a. Establish and document configuration settings for components
+       employed within the system that reflect the most restrictive mode
+       consistent with operational requirements using USGCB, CIS
+       Benchmarks, DISA STIGs, or equivalent hardening guides;
+    b. Implement the configuration settings;
+    c. Identify, document, and approve any deviations from established
+       configuration settings for system components based on explicit
+       operational requirements;
+    d. Monitor and control changes to the configuration settings in
+       accordance with organizational policies and procedures.
+
+guidance:
+  prose: >-
+    FedRAMP requires CSPs to establish and maintain secure configuration
+    baselines for all system components. The baselines must be derived
+    from authoritative sources (CIS Benchmarks, DISA STIGs, USGCB).
+    Configuration compliance must be continuously monitored and reported
+    as part of ConMon. Deviations from baselines must be formally
+    documented, justified by operational requirements, approved by
+    the ISSO, and tracked in the SSP. FedRAMP assessors (3PAOs)
+    specifically evaluate configuration management during assessments,
+    including sampling system components for baseline compliance.
+    CSPs should maintain automated configuration compliance scanning
+    with the ability to demonstrate continuous adherence.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, CM-6"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "CIS Benchmarks"
+    url: "https://www.cisecurity.org/cis-benchmarks"
+  - citation: "DISA STIGs"
+    url: "https://public.cyber.mil/stigs/"
+  - citation: "FedRAMP SSP Template"
+    url: "https://www.fedramp.gov/documents/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Define configuration baselines as code using CIS-hardened
+      infrastructure-as-code modules (Terraform, Ansible). Implement
+      automated configuration compliance scanning (OpenSCAP, InSpec)
+      that runs continuously against all deployed infrastructure.
+      Deploy CIS-hardened container base images as the mandatory
+      foundation for all workloads with automated compliance validation.
+      Implement Kubernetes admission controllers (OPA Gatekeeper,
+      Kyverno) that enforce configuration policies at deploy time.
+      Deploy automated drift detection that compares runtime
+      configurations against declared baselines and generates alerts
+      for deviations. Maintain a configuration exception register
+      with approval workflows and periodic revalidation. Automate
+      configuration compliance reporting for FedRAMP ConMon submissions.
+    tools:
+      - terraform
+      - ansible
+      - openscap
+      - inspec
+      - kyverno
+      - opa-gatekeeper
+      - cis-benchmarks
+      - kube-bench
+
+  devsecops:
+    prose: >-
+      Enforce configuration baselines in CI/CD pipelines through
+      automated scanning of IaC against CIS/STIG benchmarks before
+      provisioning. Implement container image scanning that validates
+      base images against hardening standards. Deploy admission control
+      policies that reject workloads deviating from configuration
+      baselines unless an approved exception exists. Automate
+      configuration compliance evidence generation as pipeline
+      artifacts. Implement GitOps workflows where all configuration
+      changes are tracked in version control with required approvals.
+      Scan Dockerfiles and container compositions for hardening
+      deviations.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - kube-bench
+      - hadolint
+      - conftest
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor configuration compliance continuously through automated
+      scanning and report deviations as part of monthly ConMon
+      submissions. Manage the configuration exception register with
+      documented justifications, approvals, and periodic revalidation
+      (at least annually). Alert on unauthorized configuration changes
+      detected through drift monitoring. Track configuration compliance
+      metrics: percentage of components compliant, number of exceptions,
+      time-to-remediate for deviations. Coordinate with 3PAO during
+      assessments to demonstrate configuration management effectiveness
+      through evidence portfolios.
+    tools:
+      - qualys
+      - nessus
+      - splunk
+      - elastic-siem
+      - servicenow
+      - tenable-sc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a8.9"]
+    relationship: supports
+  - framework_id: cmmc-v2
+    articles: ["cm-l2-006"]
+    relationship: equivalent-to

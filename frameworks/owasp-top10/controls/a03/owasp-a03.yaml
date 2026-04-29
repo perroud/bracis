@@ -1,0 +1,116 @@
+id: owasp-a03
+family: a03
+title: "A03:2021 — Injection"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    An application is vulnerable to injection attacks when user-supplied data is not validated,
+    filtered, or sanitized by the application; dynamic queries or non-parameterized calls without
+    context-aware escaping are used directly in the interpreter; hostile data is used within ORM
+    search parameters to extract additional, sensitive records; or hostile data is directly used
+    or concatenated, such that the SQL or command contains both structure and hostile data in
+    dynamic queries, commands, or stored procedures. Injection vulnerabilities include SQL injection,
+    NoSQL injection, OS command injection, Object Relational Mapping (ORM) injection, LDAP injection,
+    Expression Language (EL) or Object Graph Navigation Library (OGNL) injection, Server-Side
+    Template Injection (SSTI), and Cross-Site Scripting (XSS) — all of which exploit the failure
+    to properly separate data from commands and queries.
+
+guidance:
+  prose: >-
+    Injection vulnerabilities slipped from the number one position in 2017 to third in 2021, but
+    remain one of the most prevalent and dangerous categories, appearing in 94% of applications
+    tested. The unifying root cause across all injection types is that untrusted data is sent to an
+    interpreter as part of a command or query, where it changes the semantics of the intended
+    operation. The primary defense is context-aware output encoding and the use of parameterized
+    interfaces: prepared statements (parameterized queries) for SQL, shell escaping functions for
+    OS commands, and output encoding for HTML/JavaScript contexts. Source code review is the best
+    method for detecting injection vulnerabilities. Automated SAST tools can find many but not all
+    injection patterns — DAST testing with fuzzing is complementary. Stored procedures and ORMs
+    are not inherently safe if they construct queries dynamically from user input.
+
+references:
+  - citation: "OWASP Top 10:2021 A03 Injection"
+    url: "https://owasp.org/Top10/A03_2021-Injection/"
+  - citation: "OWASP SQL Injection Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+  - citation: "OWASP Query Parameterization Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a WAF with injection detection rules in blocking mode for all internet-facing
+      applications — configure ModSecurity CRS (Core Rule Set) or equivalent managed rule groups
+      from cloud providers. Implement API gateway-level request validation (JSON Schema, OpenAPI
+      spec enforcement) to reject malformed or unexpected input before it reaches application code.
+      Use a database proxy (ProxySQL, pgBouncer with query filtering) to enforce parameterized
+      query requirements and detect anomalous query patterns. Apply database-level least privilege:
+      application accounts should have only the minimum required permissions (SELECT, INSERT on
+      specific tables; never DROP, ALTER, or CREATE). Implement network segmentation to prevent
+      direct internet access to database servers, limiting blast radius of SQL injection exploitation.
+    tools:
+      - modsecurity
+      - cloudflare-waf
+      - aws-waf
+      - kong
+      - proxysql
+      - opa
+      - vault
+
+  devsecops:
+    prose: >-
+      Mandate parameterized queries/prepared statements in code review as a hard requirement —
+      reject any pull request containing dynamic SQL string construction. Implement SAST rules
+      (Semgrep, SonarQube, CodeQL) to detect injection patterns: string concatenation into SQL
+      queries, user input passed to exec()/system()/subprocess calls, template injection patterns,
+      and direct use of request parameters in ORM filters. Run DAST with injection fuzzing payloads
+      against all API endpoints in staging environments. Use sqlmap for comprehensive SQL injection
+      testing in authorized penetration testing phases. Integrate IAST agents in test environments
+      for runtime injection detection with code-level tracing. Implement input validation schemas
+      (JSON Schema, Pydantic models, Bean Validation) as a defense-in-depth measure.
+    tools:
+      - semgrep
+      - sonarqube
+      - codeql
+      - gitlab-sast
+      - sqlmap
+      - owasp-zap
+      - burp-suite
+      - nuclei
+
+  secops:
+    prose: >-
+      Configure WAF and IDS/IPS signatures for SQL injection, command injection, and XSS patterns.
+      Enable database query logging and implement anomaly detection for unusual query patterns:
+      unexpected UNION selects, uncommon table access, high-volume data extraction queries, or
+      administrative operations from application accounts. Alert on database errors that indicate
+      injection attempts (syntax errors, permission errors on unusual tables). Monitor application
+      error logs for stack traces revealing database structure or internal query patterns — these
+      provide attackers with information for targeted injection. Implement a threat hunting program
+      for injection indicators of compromise (data exfiltration patterns, unexpected outbound
+      connections from database servers, unusual process execution from web server processes).
+    tools:
+      - splunk
+      - elastic-siem
+      - cloudflare-waf
+      - aws-waf
+      - crowdstrike
+      - falco
+      - wazuh
+
+legal_references:
+  - framework_id: owasp-asvs
+    articles: ["V5.2", "V5.3", "V5.4"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15", "SA-15"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: implements
+  - framework_id: cis-controls-v8
+    articles: ["16.1", "16.2"]
+    relationship: mapped

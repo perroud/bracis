@@ -1,0 +1,100 @@
+id: art-28
+family: cap-6
+title: "Sigilo das Comunicacoes e Vedacao de Tipping Off"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 28. É vedado às instituições de pagamento e a seus funcionários:
+
+    I - dar ciência ao investigado, direta ou indiretamente, de qualquer
+    procedimento de análise, investigação ou de comunicação ao COAF realizado
+    em relação a suas operações;
+
+    II - comunicar a terceiros, incluindo parceiros comerciais e prestadores
+    de serviço, sobre a existência ou o conteúdo de comunicações ao COAF;
+
+    III - utilizar as informações obtidas no curso de investigação de PLD/FT
+    para finalidades distintas da prevenção e do combate à lavagem de dinheiro
+    e ao financiamento do terrorismo.
+
+    Parágrafo único. A violação do sigilo previsto neste artigo sujeita as
+    pessoas físicas responsáveis às penalidades previstas na Lei n. 9.613, de 1998,
+    incluindo detenção de 1 a 3 anos e multa.
+guidance:
+  prose: |
+    O art. 28 trata do sigilo como obrigacao juridica, nao apenas como boa pratica.
+    A violacao e crime com pena de detencao.
+
+    **"Tipping off" -- tres formas de violar:**
+    1. Direto: dizer ao cliente "estamos te investigando" ou "fizemos uma comunicacao
+       ao COAF sobre voce".
+    2. Indireto: perguntar ao cliente "por que voce fez X transacao?" de forma que
+       ele perceba que esta sendo investigado.
+    3. Por terceiros: contar ao atendimento, a equipe de marketing, ao advogado
+       externo do cliente (que nao e o advogado da IP) sobre a comunicacao.
+
+    **Excecoes legais:**
+    - O proprio COAF pode receber a informacao (o ponto)
+    - O BCB em supervisao pode receber a informacao
+    - A Policia Federal/MP em investigacao formal podem receber
+    - O auditor externo da IP (sujeito a sigilo profissional)
+
+    **Implicacao para processos internos:**
+    - Encerramento de conta por suspeita: nao comunicar ao cliente o motivo real.
+      Usar motivo generico ("politica de uso aceitavel") ou simplesmente nao informar.
+    - Atendimento ao cliente: equipe de atendimento nao pode ter acesso a informacoes
+      de que um cliente esta em investigacao de PLD/FT.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles tecticos de sigilo:**
+      1. Segregacao logica: sistema de PLD/FT/case management em camada de acesso
+         separada, completamente inacessivel para equipes de atendimento, produto
+         e operacoes.
+      2. Nenhuma indicacao de PLD/FT em sistemas de front-office: o CRM ou
+         sistema de atendimento NAO deve mostrar flags de investigacao PLD/FT.
+      3. Notificacoes ao cliente durante investigacao: suprimir notificacoes
+         automaticas que possam revelar que a conta esta sob investigacao
+         (ex: "sua conta esta em analise de conformidade" -- muito especifico).
+      4. Encerramento de conta: sistema deve permitir encerramento com motivo
+         generico sem revelar a razao real.
+      5. Auditoria de acesso: log de todos os acessos a informacoes de casos
+         de PLD/FT, com alerta para acessos incomuns.
+    tools:
+      - iam-system
+      - audit-logging
+      - aml-platform
+      - notification-system
+  devsecops:
+    prose: |
+      **Controles de acesso e segregacao:**
+      1. Testes de acesso: verificar que roles de atendimento e operacoes NAO
+         tem acesso a informacoes de investigacao PLD/FT.
+      2. Testes de notificacao: verificar que nenhuma notificacao ao cliente
+         revela investigacao em andamento.
+      3. Scanner de segurança: garantir que dados de SAR/COAF nao aparecem
+         em logs acessiveis a outras equipes.
+    tools:
+      - gitlab-ci
+      - access-control-testing
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Cultura de sigilo:**
+      1. Treinamento obrigatorio especifico sobre tipping off para todos os
+         envolvidos no programa de PLD/FT.
+      2. Politica escrita sobre o que pode e nao pode ser comunicado sobre
+         investigacoes PLD/FT.
+      3. Auditoria de acessos: verificar mensalmente se houve acessos
+         nao autorizados a dados de investigacoes.
+      4. Processo de resposta a solicitacao de informacao de terceiros sobre
+         cliente investigado (resposta padrao que nao confirma nem nega investigacao).
+    tools:
+      - grc-platform
+      - audit-logging
+      - training-management
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-29"]
+    relationship: equivalent-to

@@ -1,0 +1,75 @@
+id: oi-cd-04
+family: cd
+title: "Qualidade e Integridade dos Dados Compartilhados"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    A instituição transmissora de dados é responsável pela qualidade, integridade e
+    atualização dos dados compartilhados por meio das APIs do Open Insurance.
+
+    Os dados compartilhados devem:
+    I - Refletir fielmente as informações constantes dos sistemas da transmissora;
+    II - Ser transmitidos de forma íntegra, sem alterações, omissões ou corrupção;
+    III - Estar atualizados, refletindo a situação corrente do produto ou cadastro;
+    IV - Ser completos conforme o escopo da especificação técnica aplicável;
+    V - Ser disponibilizados em formato padronizado, conforme schemas definidos
+    pela governança do Open Insurance.
+
+    A transmissora deve implementar mecanismos de controle de qualidade de dados
+    e processos de reconciliação entre sistemas internos e APIs expostas.
+guidance:
+  prose: |
+    A qualidade dos dados e pre-requisito para que o ecossistema funcione. Dados
+    incorretos ou desatualizados podem gerar: cotacoes erradas, recusas indevidas,
+    prejuizos financeiros ao cliente e responsabilidade civil da transmissora.
+
+    A responsabilidade da transmissora nao se limita a disponibilizar a API -- ela
+    deve garantir que os dados retornados sao corretos e atuais. Isso exige:
+    - Sincronizacao near-real-time entre sistemas core e APIs
+    - Validacao automatica de dados antes da transmissao
+    - Mecanismos de deteccao de inconsistencias
+    - Processos de reconciliacao periodica
+
+    Dados de sinistros em tramitacao, por exemplo, devem refletir o status atualizado
+    do processo, nao apenas o status no momento da abertura.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implementar camada de sincronizacao entre sistemas core (legados) e APIs
+         do Open Insurance, preferencialmente event-driven.
+      2. Configurar data validation rules na camada de API para rejeitar dados
+         malformados ou inconsistentes antes da transmissao.
+      3. Implementar reconciliacao automatica entre dados nos sistemas core e dados
+         expostos pelas APIs (batch diario minimo).
+      4. Monitorar latencia de atualizacao (delta entre mudanca no core e
+         disponibilidade na API).
+    tools:
+      - event-streaming
+      - data-quality
+      - data-reconciliation
+      - monitoring
+  devsecops:
+    prose: |
+      1. Testes automatizados de integridade de dados: verificar que transformacoes
+         entre formato interno e schema Open Insurance nao perdem ou corrompem dados.
+      2. Testes de regressao quando schemas sao atualizados.
+      3. Validacao automatica de schemas JSON contra especificacao oficial.
+    tools:
+      - data-validation
+      - schema-testing
+      - regression-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar metricas de qualidade de dados (completude, atualizacao, consistencia).
+      2. Alertar quando taxa de erros de validacao ultrapassar threshold definido.
+      3. Auditar reconciliacoes e divergencias detectadas entre sistemas core e APIs.
+    tools:
+      - data-quality-monitoring
+      - alerting
+      - audit-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-6", "art-18"]
+    relationship: complements

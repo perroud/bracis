@@ -1,0 +1,102 @@
+id: art-18
+family: cap-4
+title: "Alteracao de Contrato de Servicos em Nuvem"
+class: SUSEP-638
+statement:
+  prose: |
+    Art. 18. A supervisionada deve comunicar à SUSEP qualquer alteração contratual
+    que implique modificação das informações previstas no art. 16, § 1º.
+
+    Parágrafo único. A comunicação de que trata o caput deve ser realizada até
+    30 (trinta) dias antes da efetivação da alteração contratual.
+guidance:
+  prose: |
+    O art. 18 exige que alteracoes contratuais relevantes em servicos de nuvem
+    no exterior sejam comunicadas a SUSEP com antecedencia de 30 dias.
+
+    **Alteracoes que devem ser comunicadas:**
+    Qualquer mudanca que modifique as informacoes do art. 16, ss 1:
+    - Mudanca de provedor de nuvem (inciso I)
+    - Mudanca de servicos contratados (inciso I)
+    - Mudanca de pais ou regiao de armazenamento (inciso II)
+    - Mudanca no escopo de dados processados/armazenados (inciso III)
+
+    **Prazo de 30 dias:**
+    A comunicacao deve ser feita com 30 dias de antecedencia antes da efetivacao.
+    Isso significa que a supervisionada deve planejar migracoes e alteracoes com
+    antecedencia suficiente.
+
+    **Exemplos praticos para seguradoras:**
+    - Migracao de AWS para Azure: comunicacao 30 dias antes
+    - Adicao de nova regiao de DR no exterior: comunicacao 30 dias antes
+    - Inclusao de dados de segurados em servico ja comunicado mas com escopo
+      diferente: comunicacao 30 dias antes
+    - Mudanca de provedor de backup no exterior: comunicacao 30 dias antes
+
+    **Risco de nao comunicar:**
+    A falta de comunicacao pode resultar em:
+    - Autuacao pela SUSEP
+    - Determinacao de reversao da alteracao
+    - Restricoes adicionais em futuras contratacoes
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Deteccao automatica de alteracoes:**
+      1. Monitoramento de mudancas em configuracoes de nuvem que afetem localizacao
+         de dados: alertas quando recursos sao movidos entre regioes.
+      2. Drift detection em IaC para identificar mudancas de regiao nao planejadas.
+      3. Asset inventory com rastreamento de historico de localizacao.
+      4. Alertas quando novos servicos sao provisionados em regioes no exterior.
+
+      **Processo de change management:**
+      5. Workflow de aprovacao para mudancas em servicos de nuvem no exterior:
+         solicitacao -> analise CISO -> aprovacao diretoria -> comunicacao SUSEP
+         -> aguardar 30 dias -> efetivacao.
+      6. Calendario de mudancas com prazo de 30 dias embutido.
+      7. Bloqueio de efetivacao de mudancas antes do prazo de 30 dias.
+    tools:
+      - cloud-governance
+      - cspm
+      - asset-inventory
+      - change-management
+  devsecops:
+    prose: |
+      **Prevencao de mudancas nao autorizadas:**
+      1. Policy-as-code que bloqueia mudancas de regiao em producao sem aprovacao.
+      2. IaC review obrigatorio para mudancas que afetam localizacao de dados.
+      3. Pipeline gates que verificam se mudanca de regiao foi comunicada a SUSEP.
+      4. Branch protection rules para IaC que modifica configuracoes de nuvem.
+    tools:
+      - opa-gatekeeper
+      - checkov
+      - gitlab-ci
+      - terraform
+  secops:
+    prose: |
+      **Gestao de comunicacoes a SUSEP:**
+      1. Registro de todas as comunicacoes a SUSEP sobre servicos de nuvem.
+      2. Calendario de alteracoes planejadas com datas de comunicacao e efetivacao.
+      3. Processo de revisao trimestral para identificar alteracoes nao comunicadas.
+      4. Auditoria interna de conformidade com art. 18.
+
+      **Monitoramento de alteracoes:**
+      5. Revisao mensal de inventario de servicos de nuvem vs. comunicacoes a SUSEP.
+      6. Alertas de alteracoes contratuais que exigem comunicacao.
+      7. Retencao de historico de comunicacoes por 5 anos.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - contract-management
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-8"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-16"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20"]
+    relationship: supports

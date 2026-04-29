@@ -1,0 +1,97 @@
+id: fci-ia-l1-001
+family: ia
+title: "Identify information system users, processes acting on behalf of users, or devices"
+class: CMMC-L1
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Identify information system users, processes acting on behalf of users,
+    or devices.
+
+guidance:
+  prose: >-
+    This control requires positive identification of all entities before
+    granting system access. Users must be uniquely identified through
+    user accounts. Processes must be identified through service accounts
+    or process identifiers linked to the authorizing user. Devices must
+    be identified through device certificates, MAC addresses, or other
+    device attestation mechanisms. Shared accounts are discouraged as
+    they prevent attribution. For CMMC Level 1, the requirement can be
+    met through basic username/password authentication combined with
+    unique user accounts. This maps to NIST SP 800-171 control 3.5.1
+    and NIST SP 800-53 IA-2, IA-3, IA-5, IA-8.
+
+references:
+  - citation: "FAR 52.204-21, Section (b)(1)(vi)"
+    url: "https://www.acquisition.gov/far/52.204-21"
+  - citation: "NIST SP 800-171 Rev 2, 3.5.1"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, IA-2, IA-3, IA-5, IA-8"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized identity provider (IdP) that serves as the
+      authoritative source for user, service account, and device identity.
+      Enforce unique user accounts with prohibition of shared credentials.
+      Implement device identity through certificate-based authentication
+      (mTLS) or device management platform integration. Use service mesh
+      identity (SPIFFE/SPIRE) for workload-to-workload identification.
+      Ensure all platform components authenticate against the centralized
+      IdP and reject anonymous access. Implement naming conventions for
+      service accounts that clearly identify the owning team and purpose.
+      Deploy audit logging that captures identity information for all
+      system interactions.
+    tools:
+      - keycloak
+      - okta
+      - spiffe-spire
+      - cert-manager
+      - kubernetes-service-accounts
+      - hashicorp-vault
+
+  devsecops:
+    prose: >-
+      Enforce individual user accounts for all CI/CD system access with
+      prohibition of shared credentials. Implement bot accounts for
+      automated processes with clearly documented ownership and scoped
+      permissions. Require commit signing to cryptographically verify
+      developer identity. Deploy pipeline identity through short-lived
+      tokens issued by the CI/CD system identity broker. Scan for
+      hardcoded credentials and shared secrets in pipeline configurations.
+      Enforce device trust verification before allowing CI/CD access
+      from developer workstations.
+    tools:
+      - gitlab-ci
+      - gitlab-protected-branches
+      - cosign
+      - gitleaks
+      - vault
+
+  secops:
+    prose: >-
+      Monitor for identification anomalies: shared account usage,
+      simultaneous logins from different locations, and device
+      impersonation. Alert on failed identification attempts exceeding
+      defined thresholds. Conduct periodic identity hygiene reviews to
+      identify orphaned accounts, shared credentials, and unauthorized
+      service accounts. Generate compliance reports demonstrating unique
+      identification enforcement across all system access points. Track
+      device inventory and certificate lifecycle for device identification
+      compliance.
+    tools:
+      - splunk
+      - elastic-siem
+      - okta-syslog
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-3", "IA-5", "IA-8"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a5.16", "a8.5"]
+    relationship: supports

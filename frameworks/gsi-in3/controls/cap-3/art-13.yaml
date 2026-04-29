@@ -1,0 +1,75 @@
+id: art-13
+family: cap-3
+title: "Segregacao de Funcoes"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 13. Os órgãos e entidades devem implementar a segregação de funções em
+    processos críticos de tecnologia da informação, assegurando que:
+
+    I - quem solicita acesso não seja o mesmo que aprova;
+    II - quem desenvolve sistemas não seja o mesmo que realiza deploy em produção;
+    III - quem opera sistemas não seja o mesmo que audita;
+    IV - conflitos de interesse sejam identificados e mitigados.
+guidance:
+  prose: |
+    O art. 13 formaliza a segregacao de funcoes (SoD) como principio operacional.
+    Visa evitar fraudes e erros nao detectados em processos criticos.
+
+    **Pares de funcoes incompativeis:**
+    - Solicitante vs. Aprovador de acesso
+    - Desenvolvedor vs. Deployer em producao
+    - Operador vs. Auditor
+    - DBA vs. Desenvolvedor de aplicacao
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.5.3 (Segregation of duties)
+    - NIST 800-53 rev5: AC-5 (Separation of Duties)
+    - COBIT 2019: DSS05.04
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **SoD como codigo:**
+      1. Definir matriz de SoD em codigo (OPA policies).
+      2. Enforce automatico: impedir que mesma pessoa tenha roles conflitantes.
+      3. Ambientes separados: dev, staging, producao com roles distintas.
+      4. Approval gates entre ambientes (dev -> staging requer QA; staging -> prod
+         requer gestor).
+    tools:
+      - opa-sod-policies
+      - environment-separation
+      - approval-gates
+  devsecops:
+    prose: |
+      **SoD em GitLab:**
+      1. Merge request obrigatoria: autor nao pode aprovar proprio codigo.
+      2. Minimo 2 aprovadores de equipes diferentes para codigo critico.
+      3. Deploy para producao via pipeline automatizado (nao manual).
+      4. Protected environments com deploy approval por gestor.
+    tools:
+      - merge-request-approvals
+      - codeowners
+      - protected-environments
+      - deployment-approval
+  secops:
+    prose: |
+      **Auditoria de SoD:**
+      1. Revisao trimestral da matriz de SoD.
+      2. Deteccao automatica de violacoes de SoD (mesma pessoa com roles conflitantes).
+      3. Excecoes documentadas e aprovadas pelo gestor de SI.
+      4. Teste anual de efetividade dos controles de SoD.
+    tools:
+      - sod-matrix
+      - conflict-detection
+      - exception-management
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.5.3"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-5"]
+    relationship: mapped

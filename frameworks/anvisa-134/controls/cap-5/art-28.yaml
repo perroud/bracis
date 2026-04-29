@@ -1,0 +1,119 @@
+id: art-28
+family: cap-5
+title: "Interface entre Sistemas e Transferencia de Dados"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 28. Interfaces entre sistemas computadorizados que processam
+    dados GMP devem ser validadas para garantir transferência precisa,
+    completa e íntegra dos dados entre os sistemas.
+
+    Parágrafo 1. A validação de interfaces deve verificar:
+    I - precisão dos dados transferidos (dados recebidos idênticos
+    aos enviados);
+    II - completude da transferência (todos os registros transferidos);
+    III - integridade dos dados durante a transferência;
+    IV - tratamento correto de erros de comunicação;
+    V - rastreabilidade de transferências executadas;
+    VI - segurança da comunicação (criptografia, autenticação).
+
+    Parágrafo 2. Interfaces críticas devem possuir mecanismos automatizados
+    de detecção e alerta de falhas de transferência, e procedimentos
+    definidos para recuperação e retransmissão de dados.
+guidance:
+  prose: |
+    O art. 28 aborda um ponto critico em ambientes GMP modernos: a
+    integridade de dados em interfaces entre sistemas interconectados.
+
+    **Tipos de interfaces em ambiente GMP:**
+    - SCADA/DCS -> MES: dados de processo em tempo real
+    - MES -> ERP: dados de producao e consumo de materiais
+    - LIMS -> ERP: resultados analiticos e liberacao
+    - Instrumentos -> LIMS: dados analiticos brutos
+    - ERP -> WMS: ordens de movimentacao e expedicao
+    - QMS -> todos: desvios, CAPAs, mudancas
+
+    **Riscos em interfaces:**
+    - Perda de dados durante transmissao
+    - Duplicacao de registros
+    - Transformacao incorreta de dados (formato, unidade, precisao)
+    - Falta de sincronismo temporal entre sistemas
+    - Falhas silenciosas (sem alerta de erro)
+    - Vulnerabilidades de seguranca na comunicacao
+
+    **Controles de interface:**
+    - Checksums de integridade em cada transferencia
+    - Contagem de registros enviados vs. recebidos (reconciliacao)
+    - Validacao de formato e faixa de valores apos transferencia
+    - Logs de transferencia com timestamp e status
+    - Alertas automaticos para falhas ou discrepancias
+    - Mecanismos de retransmissao para falhas transientes
+    - Criptografia e autenticacao mutua entre sistemas
+
+    **Validacao de interfaces:**
+    Cada interface entre sistemas GMP deve ser qualificada como parte
+    da OQ, com testes de cenarios normais, de erro e de limites.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de integracao confiavel:**
+      1. Implementar barramento de integracao (message broker) com
+         garantia de entrega (at-least-once/exactly-once) para
+         transferencias de dados entre sistemas GMP.
+      2. Configurar checksums automaticos em cada mensagem/transferencia
+         com verificacao no destinatario e alerta para discrepancias.
+      3. Implementar dead-letter queues para mensagens que falham e
+         mecanismos de retransmissao automatica com logging.
+      4. Configurar reconciliacao automatizada entre sistemas que
+         verifique completude e consistencia de dados transferidos.
+      5. Implementar criptografia TLS 1.2+ e autenticacao mutua (mTLS)
+         entre todos os sistemas GMP integrados.
+    tools:
+      - message-broker
+      - integration-platform
+      - reconciliation-tools
+      - mtls
+      - monitoring
+  devsecops:
+    prose: |
+      **Validacao de interfaces no pipeline:**
+      1. Implementar testes de integracao automatizados que verifiquem
+         interfaces entre sistemas GMP: precisao, completude, integridade
+         e tratamento de erros.
+      2. Configurar testes de chaos engineering para simular falhas de
+         comunicacao e verificar mecanismos de recuperacao.
+      3. Verificar automaticamente que interfaces implementam checksums,
+         reconciliacao e alertas conforme especificacao.
+      4. Testar cenarios de carga para garantir que interfaces suportam
+         volume de producao sem perda de dados.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - chaos-engineering
+      - load-testing
+  secops:
+    prose: |
+      **Governanca de interfaces:**
+      1. Manter inventario de todas as interfaces entre sistemas GMP
+         com classificacao de criticidade e status de validacao.
+      2. Monitorar saude de interfaces criticas 24x7 com alertas
+         automaticos para falhas de transferencia.
+      3. Investigar e documentar todas as falhas de interface como
+         desvios de qualidade com analise de impacto em dados GMP.
+      4. Revisar interfaces como parte da revalidacao periodica de
+         sistemas computadorizados.
+      5. Conduzir reconciliacao periodica de dados entre sistemas
+         interconectados para confirmar integridade end-to-end.
+    tools:
+      - integration-monitoring
+      - incident-management
+      - quality-management-system
+      - data-reconciliation
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-24", "controle-A-8-26"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["network-security"]
+    relationship: mapped

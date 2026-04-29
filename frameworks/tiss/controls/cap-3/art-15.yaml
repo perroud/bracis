@@ -1,0 +1,113 @@
+id: art-15
+family: cap-3
+title: "Trilhas de Auditoria e Rastreabilidade"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 15. Os sistemas que processam transações TISS devem manter
+    trilhas de auditoria completas e invioláveis de todas as operações
+    realizadas sobre dados de saúde.
+
+    Parágrafo 1. As trilhas de auditoria devem registrar, no mínimo:
+    I - Identificação do usuário ou sistema que realizou a operação;
+    II - Data e hora da operação com precisão de milissegundos;
+    III - Tipo de operação realizada (consulta, criação, alteração,
+    exclusão, envio, recebimento);
+    IV - Identificação dos registros acessados ou modificados;
+    V - Endereço IP de origem e identificação da sessão;
+    VI - Resultado da operação (sucesso ou falha com motivo).
+
+    Parágrafo 2. As trilhas de auditoria devem ser retidas por período
+    mínimo de 5 anos, em formato que garanta integridade e não-repúdio.
+
+    Parágrafo 3. As trilhas de auditoria devem estar disponíveis para
+    consulta pela ANS e pelos órgãos de fiscalização competentes.
+guidance:
+  prose: |
+    O art. 15 exige rastreabilidade completa de todas as operacoes
+    sobre dados de saude, essencial para accountability regulatoria.
+
+    **Eventos obrigatorios de log:**
+    - Autenticacao (login, logout, falha de login)
+    - Acesso a dados de beneficiarios (consulta, download)
+    - Criacao e alteracao de guias TISS
+    - Envio e recebimento de transacoes TISS
+    - Alteracao de configuracoes de seguranca
+    - Uso de break-glass (acesso de emergencia)
+    - Acoes administrativas (criacao de usuarios, alteracao de perfis)
+
+    **Integridade dos logs:**
+    - Logs devem ser append-only (nao permitir alteracao ou exclusao)
+    - Idealmente em storage WORM (Write Once Read Many)
+    - Assinatura digital ou chain hash para detectar adulteracao
+    - Segregacao: quem opera o sistema nao pode alterar logs
+
+    **Retencao de 5 anos:**
+    - Prazo alinhado com prescricao de acoes administrativas da ANS
+    - Logs devem ser armazenados em formato legivel por todo o periodo
+    - Compactacao e archival permitidos, desde que reversivel
+    - Custo de armazenamento deve ser planejado (logs de saude podem
+      ser volumosos)
+
+    **Disponibilidade para fiscalizacao:**
+    - ANS pode solicitar logs em auditorias e investigacoes
+    - Tempo de resposta maximo: 5 dias uteis para entrega
+    - Formato: legivel por maquina (JSON, CSV) e por humano (relatorio)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de auditoria TISS:**
+      1. Implementar sistema de logs centralizado (ELK Stack, Loki,
+         Splunk) com ingestao de todos os eventos TISS em tempo real.
+      2. Configurar storage WORM (S3 Object Lock, Azure Immutable Blob)
+         para logs de auditoria com retencao de 5 anos.
+      3. Implementar chain hash ou assinatura digital nos logs para
+         garantir integridade e detectar adulteracao.
+      4. Criar pipeline de archival que mova logs antigos para cold
+         storage sem perder legibilidade ou capacidade de busca.
+    tools:
+      - centralized-logging
+      - worm-storage
+      - log-integrity
+      - archival-pipeline
+  devsecops:
+    prose: |
+      **Auditoria no pipeline de desenvolvimento:**
+      1. Implementar logging framework padronizado que garanta que
+         todos os servicos TISS registrem os eventos obrigatorios
+         no formato correto.
+      2. Criar testes automatizados que validem a presenca de logs
+         de auditoria para cada tipo de operacao TISS.
+      3. Incluir verificacao de integridade de logs como teste de
+         conformidade no pipeline CI/CD.
+      4. Automatizar geracao de relatorios de auditoria em formatos
+         exigidos pela ANS (JSON, CSV, PDF).
+    tools:
+      - logging-framework
+      - audit-testing
+      - integrity-checks
+      - report-generation
+  secops:
+    prose: |
+      **Operacao de auditoria TISS:**
+      1. Monitorar em tempo real a integridade dos logs de auditoria,
+         com alertas para tentativas de adulteracao ou gaps temporais.
+      2. Realizar revisao periodica (mensal) dos logs de auditoria,
+         identificando acessos suspeitos ou anomalos.
+      3. Manter procedimento documentado para atender solicitacoes
+         de logs pela ANS dentro do prazo de 5 dias uteis.
+      4. Testar semestralmente a capacidade de recuperar e consultar
+         logs archivados dos ultimos 5 anos.
+    tools:
+      - log-monitoring
+      - audit-review
+      - regulatory-response
+      - archive-testing
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-37", "art-49"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-312-b"]
+    relationship: mapped

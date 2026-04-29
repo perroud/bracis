@@ -1,0 +1,113 @@
+id: owasp-a08-cicd
+family: a08
+title: "A08:2021 — CI/CD Pipeline Integrity and Security"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    CI/CD pipeline integrity failures allow attackers who gain access to the build and deployment
+    pipeline to inject malicious code into software artifacts before they are deployed to production,
+    bypassing all code review and application security controls. Vulnerabilities in CI/CD pipelines
+    include: use of long-lived, high-privilege credentials stored as CI/CD variables; shared
+    mutable build runners susceptible to cache poisoning between jobs; pipeline configurations
+    that reference mutable external resources (third-party CI/CD actions at a mutable tag, scripts
+    fetched from URLs without integrity verification); insufficient access controls on pipeline
+    configuration files allowing injection of malicious pipeline steps; pull request pipelines
+    that execute with write access to the repository or production credentials; and lack of
+    separation between build, test, and deployment environments.
+
+guidance:
+  prose: >-
+    CI/CD pipelines are a critical but often under-secured component of the software delivery
+    chain. A compromised pipeline can deliver malicious code to every customer through normal
+    release channels, as demonstrated by the SolarWinds attack. Unlike an application vulnerability,
+    a pipeline compromise bypasses application security controls because it happens before the
+    software is delivered — customers receive and trust a signed artifact that contains attacker-
+    controlled code. The primary attack vectors are credential theft from CI/CD variable storage,
+    pipeline poisoning through PR-triggered pipelines with excessive permissions, and third-party
+    action compromise through mutable version references. Defense-in-depth for CI/CD requires:
+    ephemeral runners, least-privilege pipeline credentials using OIDC federation (no long-lived
+    secrets), pinned and verified external dependencies, strong access controls on pipeline
+    configurations, and comprehensive audit logging of all pipeline activities.
+
+references:
+  - citation: "OWASP Top 10 CI/CD Security Risks"
+    url: "https://owasp.org/www-project-top-10-ci-cd-security-risks/"
+  - citation: "SLSA — Supply Chain Security"
+    url: "https://slsa.dev/"
+  - citation: "GitLab CI/CD Security Best Practices"
+    url: "https://docs.gitlab.com/ee/ci/pipelines/pipeline_security.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement OIDC-based credential federation between the CI/CD system and cloud providers
+      (AWS OIDC, GCP Workload Identity, Azure federated credentials) to eliminate long-lived
+      static credentials in CI/CD variable storage. Configure pipelines to use ephemeral,
+      single-job runners that are destroyed after each job with no persistent state. Implement
+      protected pipelines with separate credential scopes: pull request pipelines execute with
+      read-only, no-secret permissions; merge-to-main pipelines execute with deployment permissions;
+      only protected branch pipelines have access to production credentials. Enforce branch
+      protection rules that prevent direct pushes to main branches, require pipeline pass before
+      merge, and require code owner approval. Implement pipeline signing and attestation — sign
+      pipeline outputs (SBOMs, test reports, binaries) and verify signatures before deployment.
+    tools:
+      - gitlab-ci
+      - cosign
+      - sigstore
+      - vault
+      - aws-oidc
+      - kyverno
+      - opa
+
+  devsecops:
+    prose: >-
+      Audit all CI/CD pipeline configurations for security misconfigurations: identify pipelines
+      that allow pull requests from forks to access protected variables, CI/CD jobs that reference
+      third-party scripts via mutable URLs, environment variables containing secrets that are
+      unnecessarily available to all pipeline stages, and pipeline configurations that allow
+      arbitrary code execution from untrusted input. Pin all CI/CD action references to specific
+      SHA digests (not version tags). Implement pipeline linting and policy checks that enforce
+      security rules on pipeline configuration files (gitlab-ci.yml, GitHub Actions workflow files).
+      Add supply chain security gates to the pipeline: SLSA provenance generation, artifact signing,
+      SBOM generation, and signature verification as required steps before deployment.
+    tools:
+      - gitlab-ci
+      - gitlab-secret-detection
+      - checkov
+      - semgrep
+      - cosign
+      - syft
+      - slsa-verifier
+
+  secops:
+    prose: >-
+      Enable comprehensive audit logging for all CI/CD activities: pipeline triggers, credential
+      access, artifact uploads, deployment events, and configuration changes. Configure SIEM
+      alerts for anomalous pipeline behavior: pipelines triggered from unexpected branches,
+      pipelines accessing credentials they normally do not use, pipeline configuration changes
+      outside of normal working hours or by non-approved accounts, and pipeline failures due
+      to signature verification. Monitor for indicators of pipeline compromise: unexpected
+      outbound network connections from build runners, unusual process spawning during build jobs,
+      or artifacts that fail integrity verification. Implement a pipeline security review process
+      for any changes to pipeline configurations in security-sensitive repositories.
+    tools:
+      - splunk
+      - elastic-siem
+      - gitlab-audit-events
+      - crowdstrike
+      - falco
+      - datadog
+
+legal_references:
+  - framework_id: nist-ssdf
+    articles: ["PS.1.1", "PS.2.1", "PS.3.1", "PW.4.1"]
+    relationship: implements
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-10", "SA-12", "SI-7", "CM-3"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.4.1", "6.4.2", "6.5.6"]
+    relationship: implements

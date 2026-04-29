@@ -1,0 +1,91 @@
+id: med2-10
+family: responsabilidade
+title: "Payer PSP Responsibilities"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP do usuário pagador tem as seguintes responsabilidades no âmbito do MED 2.0:
+    (i) disponibilizar canais eficientes para que o usuário reporte suspeita de fraude;
+    (ii) realizar a avaliação de fundada suspeita de fraude com base nos critérios estabelecidos;
+    (iii) registrar tempestivamente a notificação de infração no DICT quando confirmada a
+    suspeita; (iv) acompanhar o andamento do processo junto ao PSP recebedor e ao DICT;
+    (v) manter o usuário pagador informado sobre o progresso e resultado do processo de
+    devolução; (vi) creditar os valores devolvidos na conta do usuário pagador tão logo
+    recebidos; e (vii) implementar medidas preventivas para reduzir a incidência de fraudes,
+    incluindo alertas ao usuário sobre transações de risco e mecanismos de autenticação reforçada.
+guidance:
+  prose: |
+    **Payer PSP Role in MED 2.0:**
+    The payer PSP is the advocate for the fraud victim. Its responsibilities span the
+    entire MED lifecycle, from initial complaint to fund recovery.
+
+    **Key responsibilities:**
+    1. **Complaint intake:** Easy, accessible channels for fraud reporting — in-app,
+       phone, chat. The faster the complaint is received, the better the recovery chances.
+    2. **Fraud evaluation:** Apply well-founded suspicion criteria (see med2-4) to
+       determine if MED should be activated.
+    3. **Notification filing:** Register the infraction in DICT promptly.
+    4. **Case tracking:** Monitor the cascade blocking and analysis at the receiver PSP.
+    5. **User communication:** Keep the victim informed at every stage.
+    6. **Fund credit:** When funds are returned, credit the victim's account immediately.
+    7. **Prevention:** Implement proactive measures — pre-transaction warnings for
+       flagged keys, enhanced authentication for high-risk transactions.
+
+    **Accountability:** If the payer PSP fails to file a timely notification or
+    implements inadequate anti-fraud measures, it may share liability for the user's loss.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a fraud complaint intake system with in-app, API, and phone channel
+         support — each complaint automatically creates a structured case record.
+      2. Integrate complaint intake with the MED triage service (med2-4) for automated
+         well-founded suspicion evaluation.
+      3. Build a case management workflow that tracks each MED case from complaint to
+         resolution, with automated stage transitions and SLA monitoring.
+      4. Implement an automatic credit service: when the PSP receives returned funds
+         via SPI, credit the victim's account and notify them immediately.
+      5. Build pre-transaction risk warning UI: when a user initiates Pix to a flagged
+         key, display a risk warning with the option to proceed or cancel.
+    tools:
+      - case-management
+      - workflow-engine
+      - spi-client
+      - notification-service
+      - risk-warning-ui
+  devsecops:
+    prose: |
+      1. Test the complaint intake flow end-to-end across all channels: in-app, API,
+         phone — verify case creation and data completeness.
+      2. Test the automatic MED triage integration: complaint submission triggers
+         fraud evaluation and, when appropriate, DICT notification.
+      3. Test automatic credit on fund return: verify the victim's account is credited
+         within seconds of receiving the SPI return message.
+      4. Test pre-transaction risk warnings: verify display for flagged keys and
+         correct behavior for user proceed/cancel actions.
+      5. Test case management SLA compliance: verify alerts at threshold percentages.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - e2e-testing
+      - ui-testing
+  secops:
+    prose: |
+      1. Monitor complaint volumes and response times: average time from complaint to
+         MED activation, and from activation to resolution.
+      2. Track fund recovery rates: percentage of reported fraud value that is
+         successfully returned to victims.
+      3. Audit complaint handling quality: periodic review of case records for
+         completeness and proper procedure adherence.
+      4. Report payer PSP performance metrics to BCB as required.
+      5. Conduct periodic user satisfaction surveys on the fraud reporting and recovery
+         experience.
+    tools:
+      - analytics-dashboard
+      - quality-assurance
+      - reporting-platform
+      - survey-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-20", "pix-21"]
+    relationship: extends

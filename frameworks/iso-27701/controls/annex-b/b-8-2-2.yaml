@@ -1,0 +1,120 @@
+id: b-8.2.2
+family: annex-b
+title: "Organization's purposes"
+class: ISO27701
+baselines: [pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization acting as a PII processor shall ensure that PII processed on
+    behalf of a customer is only processed for the purposes expressed in the documented
+    instructions of the customer and not for any other purposes, unless required by
+    applicable legislation. The organization shall not use PII processed on behalf of
+    customers for its own purposes, including marketing, analytics, profiling, or any
+    other purpose not authorized by the PII controller, unless such use has been
+    explicitly authorized in the contractual agreement. Where the organization
+    determines that a processing instruction from the PII controller infringes
+    applicable legislation, the organization shall inform the PII controller.
+    The organization shall document the purposes for which it processes PII and
+    maintain clear separation between PII processed for different customers and
+    PII processed for different purposes.
+
+guidance:
+  prose: >-
+    Purpose limitation for PII processors is stricter than for PII controllers:
+    processors may only process PII as instructed by the controller. This prohibition
+    on purpose expansion is absolute — the processor cannot decide to use customer
+    data for its own analytics, model training, product improvement, or any other
+    purpose without explicit controller authorization. This is a common compliance
+    failure, particularly for SaaS providers that aggregate customer data for
+    benchmarking or product insights. The organization must implement technical
+    controls that enforce purpose separation, not merely rely on policy and
+    training. Data commingling across customers for processor's own purposes is
+    a serious regulatory violation that can result in the processor being classified
+    as a controller for that processing, with all associated obligations and
+    liabilities. The organization should also have a process for handling situations
+    where it identifies that a customer's processing instructions may violate
+    applicable law, including documentation of the notification to the customer.
+
+references:
+  - citation: "ISO/IEC 27701:2019, B.8.2.2"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement strict purpose enforcement at the platform level. Build
+      tenant data isolation that prevents cross-customer data access and
+      aggregation at the infrastructure level. Use separate database schemas,
+      encryption keys, or logical partitioning per customer with purpose-bound
+      access controls. Implement policy engine rules that block any data
+      access patterns that cross customer boundaries without explicit
+      authorization. Build purpose-tagged data pipelines where PII can only
+      flow through processing stages authorized for the declared purpose.
+      Block any analytics, aggregation, or export operations on customer
+      PII unless explicitly authorized in the customer's processing
+      configuration. Implement audit logging that captures every access
+      to customer PII with purpose justification, enabling detection of
+      unauthorized purpose expansion.
+    tools:
+      - tenant-data-isolation
+      - purpose-tagged-pipelines
+      - open-policy-agent
+      - database-level-isolation
+      - per-tenant-encryption-keys
+      - audit-logging
+
+  devsecops:
+    prose: >-
+      Integrate purpose compliance into code review and CI/CD. Implement
+      static analysis rules that detect data access patterns crossing tenant
+      boundaries: queries without tenant filters, aggregation functions
+      spanning multiple customers, data exports without purpose validation.
+      Build automated tests that verify tenant isolation: attempt cross-
+      tenant data access and verify it is blocked. Implement pipeline gates
+      that flag any new analytics or aggregation features for privacy review
+      to ensure they do not use customer PII for unauthorized purposes. Code
+      review automation should flag patterns that indicate purpose creep:
+      new data processing logic that does not reference the authorized
+      purpose configuration. Build data lineage tracking that verifies
+      PII flows only through authorized processing stages.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - semgrep
+      - tenant-isolation-tests
+      - data-lineage-tracking
+      - purpose-compliance-scanners
+
+  secops:
+    prose: >-
+      Monitor for unauthorized purpose processing in real time. Build SIEM
+      correlation rules that detect: cross-tenant data queries, aggregation
+      of customer PII without authorization, data access by internal
+      analytics systems on customer PII, bulk data exports without purpose
+      justification. Alert on data access patterns that suggest purpose
+      creep: gradual increase in the scope of PII accessed by internal
+      systems. Monitor for data commingling indicators: shared data stores
+      used for both customer processing and internal analytics. Generate
+      per-customer purpose compliance reports showing that PII was processed
+      only for authorized purposes. Track and investigate any internal
+      access to customer PII that is not linked to a customer-authorized
+      processing activity.
+    tools:
+      - splunk
+      - elastic-siem
+      - cross-tenant-access-detection
+      - purpose-violation-alerts
+      - data-commingling-detection
+      - per-customer-audit-reports
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28.3.a", "art-29"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-39"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.140.j"]
+    relationship: supports

@@ -1,0 +1,108 @@
+id: cis-1.1
+family: cis-1
+title: "Establish and Maintain Detailed Enterprise Asset Inventory"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain an accurate, detailed, and up-to-date inventory of all
+    enterprise assets with the potential to store or process data, to include: end-user
+    devices (including portable and mobile), network devices, non-computing/IoT devices,
+    and servers. Ensure the inventory records the network address (if static), hardware
+    address, machine name, enterprise asset owner, department for each asset, and whether
+    the asset has been approved to connect to the network. For mobile end-user devices,
+    MDM type tools can support this process, where appropriate. This inventory includes
+    assets connected to the infrastructure physically, virtually, remotely, and those
+    within cloud environments. Additionally, it includes assets that are regularly
+    connected to the enterprise's network infrastructure, even if they are not under
+    control of the enterprise. Review and update the inventory of all enterprise assets
+    bi-annually, or more frequently.
+
+guidance:
+  prose: >-
+    The enterprise asset inventory is the foundation of all other CIS Controls. Without
+    knowing what assets exist, it is impossible to protect them. The inventory must capture
+    both managed and unmanaged assets. Modern environments include a mix of physical,
+    virtual, cloud-hosted, and containerized workloads, all of which must be tracked.
+    Automated discovery tools should be used to supplement manual processes and ensure
+    completeness. The inventory should be treated as a living document, continuously
+    updated through integration with CMDB, cloud provider APIs, container orchestration
+    platforms, and network scanning tools. Assets not appearing in the inventory should
+    trigger investigation and remediation workflows.
+
+references:
+  - citation: "CIS Controls v8.1, Control 1, Safeguard 1.1"
+    url: "https://www.cisecurity.org/controls/v8"
+  - citation: "NIST SP 800-53 CM-8"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy automated asset discovery across all infrastructure layers. Use cloud provider
+      APIs (AWS Config, Azure Resource Graph, GCP Cloud Asset Inventory) to maintain
+      real-time visibility into cloud assets. Integrate Kubernetes node and pod inventories
+      via the cluster API. Feed all discovery data into a centralized CMDB or asset management
+      platform. Implement Infrastructure-as-Code (Terraform, Pulumi) to ensure all provisioned
+      assets are automatically registered. Use service mesh sidecar injection to track
+      service-to-service communication patterns and identify unregistered services. Configure
+      auto-tagging policies so every resource created through IaC pipelines is tagged with
+      owner, department, environment, and cost center metadata.
+    tools:
+      - terraform
+      - pulumi
+      - aws-config
+      - azure-resource-graph
+      - gcp-cloud-asset-inventory
+      - backstage-catalog
+      - servicenow-cmdb
+      - kubernetes-api
+
+  devsecops:
+    prose: >-
+      Enforce asset registration as a mandatory step in CI/CD pipelines. Require that
+      every Terraform plan or Pulumi preview produces a manifest of assets to be created,
+      modified, or destroyed, and validate this against the approved asset inventory
+      before applying changes. Implement pre-commit hooks and pipeline checks that reject
+      infrastructure code creating untagged or unregistered resources. Use GitLab CI/CD
+      pipeline outputs to automatically update the asset inventory when infrastructure
+      changes are deployed. Integrate container image scanning into the pipeline to
+      maintain an inventory of all images deployed to production.
+    tools:
+      - gitlab-ci
+      - terraform-plan
+      - checkov
+      - trivy
+      - conftest
+      - opa
+
+  secops:
+    prose: >-
+      Run continuous network discovery scans (at minimum weekly) to detect unknown or
+      rogue assets. Compare scan results against the approved asset inventory to identify
+      gaps. Configure SIEM alerting for network connections from unrecognized MAC addresses
+      or IP ranges. Implement NAC (Network Access Control) to quarantine unapproved devices
+      attempting to connect. Generate bi-annual asset inventory review reports for
+      management sign-off. Correlate vulnerability scanner asset lists with the CMDB to
+      detect inventory drift.
+    tools:
+      - nmap
+      - qualys
+      - tenable-nessus
+      - splunk
+      - elastic-siem
+      - forescout
+      - cisco-ise
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-8", "PM-5"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.9"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["ID.AM-01", "ID.AM-02"]
+    relationship: implements

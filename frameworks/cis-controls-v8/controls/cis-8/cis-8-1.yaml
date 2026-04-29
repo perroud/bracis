@@ -1,0 +1,99 @@
+id: cis-8.1
+family: cis-8
+title: "Establish and Maintain an Audit Log Management Process"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain an audit log management process that defines the enterprise's
+    logging requirements. At a minimum, address the collection, review, and retention
+    of audit logs for enterprise assets. Review and update documentation annually, or
+    when significant enterprise changes occur that could impact this Safeguard.
+
+guidance:
+  prose: >-
+    Audit logs are essential for detecting security incidents, supporting forensic
+    investigations, and demonstrating compliance. The audit log management process must
+    define: which events to log (authentication, authorization, data access, configuration
+    changes, administrative actions, errors), log format standards, centralized collection
+    architecture, retention periods (aligned with regulatory requirements), integrity
+    protections (tamper-evidence), and review procedures. Logs must be collected from
+    all layers: network devices, operating systems, applications, databases, cloud
+    services, and containers/orchestrators. Log collection must not impact system
+    performance or availability. Logs containing sensitive data must be protected
+    with appropriate access controls.
+
+references:
+  - citation: "CIS Controls v8.1, Control 8, Safeguard 8.1"
+    url: "https://www.cisecurity.org/controls/v8"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized log aggregation platform (Elasticsearch/OpenSearch, Loki,
+      Splunk) that ingests logs from all infrastructure components. Implement structured
+      logging standards (JSON format with correlation IDs, timestamps, source identifiers).
+      Use log shippers (Fluentd, Fluent Bit, Vector) deployed as DaemonSets in Kubernetes
+      to capture container stdout/stderr and system logs. Configure cloud provider audit
+      logging (AWS CloudTrail, GCP Audit Logs, Azure Activity Log) with immutable
+      storage. Implement log pipeline as code, defining log routing, parsing, and
+      retention rules in version-controlled configuration. Ensure audit logs are stored
+      in write-once storage (S3 Object Lock, GCS retention policies) to prevent
+      tampering. Define separate retention tiers: hot (30 days, searchable), warm
+      (90 days, queryable), cold (1+ years, archived).
+    tools:
+      - elasticsearch
+      - opensearch
+      - grafana-loki
+      - fluentd
+      - fluent-bit
+      - vector
+      - aws-cloudtrail
+      - gcp-audit-logs
+
+  devsecops:
+    prose: >-
+      Enforce structured logging in application code through shared logging libraries
+      with consistent formats. Include pipeline execution logs in the centralized
+      logging platform. Implement audit logging for CI/CD events: pipeline triggers,
+      deployment approvals, secret access, and environment promotions. Use GitLab
+      Audit Events to capture all project and group-level administrative actions.
+      Scan application logs for sensitive data leakage (PII, credentials) in the
+      pipeline before deployment. Implement log-based testing to verify that
+      security-relevant events produce the expected audit trail.
+    tools:
+      - gitlab-audit-events
+      - gitlab-ci
+      - structured-logging-libs
+      - fluentd
+      - vector
+
+  secops:
+    prose: >-
+      Configure SIEM correlation rules that detect security-relevant patterns across
+      aggregated logs: brute force attempts, privilege escalation, lateral movement,
+      data exfiltration, and configuration tampering. Implement automated log review
+      for critical assets with alert thresholds tuned to reduce false positives.
+      Conduct weekly manual review of logs for high-value assets. Monitor log pipeline
+      health, alerting on log collection gaps or delays exceeding 5 minutes. Produce
+      monthly audit log coverage reports showing which assets are logging, which events
+      are captured, and any gaps. Test log integrity and retention compliance quarterly.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - wazuh
+      - sumo-logic
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-1", "AU-2", "AU-3", "AU-6", "AU-11"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.17"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["DE.CM-01", "DE.CM-09"]
+    relationship: implements

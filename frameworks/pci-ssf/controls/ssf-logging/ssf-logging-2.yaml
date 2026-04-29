@@ -1,0 +1,91 @@
+id: ssf-logging-2
+family: ssf-logging
+title: "Log Integrity and Monitoring"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall implement mechanisms to ensure the integrity of audit logs and
+    detect unauthorized modifications. Logs shall be stored in append-only or
+    write-once storage where technically feasible. The software shall support
+    real-time log monitoring and alerting capabilities for security-critical events.
+    Log data shall be retained for a minimum period defined by the data retention
+    policy and shall be available for forensic analysis. The software shall not
+    expose log management interfaces to unauthorized users.
+
+guidance:
+  prose: >-
+    Log integrity is a critical concern because attackers frequently attempt to
+    modify or delete logs to conceal their activities. PCI SSF requires that the
+    software protects log data from tampering through technical controls such as
+    write-once storage, cryptographic integrity verification, or centralized log
+    collection that removes local modification capability. Real-time monitoring
+    enables rapid detection and response to security incidents. The log retention
+    requirement ensures that forensic data is available for incident investigations
+    that may not begin until well after the initial compromise.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 13 — Log Integrity"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 9.4-9.5"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure log storage with immutability policies (S3 Object Lock, WORM storage)
+      to prevent modification or deletion during the retention period. Implement
+      log integrity verification using cryptographic checksums or hash chains. Deploy
+      real-time log streaming to a SIEM with alerting rules for security-critical
+      events. Configure log pipeline monitoring to detect and alert on collection
+      gaps or anomalies. Enforce access controls on log management interfaces
+      restricting administrative access to authorized security personnel only.
+    tools:
+      - elasticsearch
+      - splunk
+      - aws-s3-object-lock
+      - grafana-loki
+      - fluentd
+      - terraform
+
+  devsecops:
+    prose: >-
+      Implement log integrity verification as part of the CI/CD pipeline for
+      log-related infrastructure changes. Write integration tests that validate
+      log immutability by attempting modification and confirming rejection. Use
+      infrastructure-as-code scanning to detect misconfigured log storage that
+      lacks immutability protections. Enforce code review for changes to log
+      processing logic to prevent introduction of log manipulation vulnerabilities.
+    tools:
+      - gitlab-sast
+      - checkov
+      - terraform-compliance
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor log integrity verification results and alert on detected tampering.
+      Conduct periodic log retention compliance audits verifying logs are available
+      for the required retention period. Implement alerting for log pipeline
+      disruptions that could indicate an attacker attempting to blind monitoring.
+      Review access to log management interfaces and investigate unauthorized
+      access attempts. Maintain incident response procedures for log integrity
+      violations.
+    tools:
+      - splunk
+      - elastic-siem
+      - datadog
+      - pagerduty
+      - servicenow
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-10.4", "req-10.5", "req-10.7"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v7.3", "v7.4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.15", "A8.17"]
+    relationship: mapped

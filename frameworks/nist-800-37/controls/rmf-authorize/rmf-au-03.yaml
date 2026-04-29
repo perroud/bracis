@@ -1,0 +1,90 @@
+id: rmf-au-03
+family: rmf-authorize
+title: "Authorization Decision and Response"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Issue an authorization decision for the information system based on the risk
+    determination. The authorizing official issues one of three authorization decisions:
+    authorization to operate (ATO), authorization to use, or denial of authorization.
+    An authorization to operate authorizes the system to operate for a specified period
+    or under ongoing authorization conditions. A denial of authorization prohibits the
+    system from operating until unacceptable risks are remediated. The authorization
+    decision is communicated to the system owner, common control providers, and other
+    organizational officials as appropriate.
+
+guidance:
+  prose: >-
+    The authorization decision is the formal risk acceptance by the authorizing official.
+    An authorization to operate (ATO) may include terms and conditions that constrain
+    system operation (e.g., restricted connectivity, enhanced monitoring requirements,
+    mandatory POA&M milestone completion dates). Time-limited ATOs specify an expiration
+    date after which reauthorization is required. Ongoing authorization eliminates the
+    fixed expiration date and instead relies on continuous monitoring to maintain the
+    authorization. Denial of authorization results in the system being prohibited from
+    operating; it requires remediation of unacceptable risks and resubmission of the
+    authorization package. The authorization decision, its terms and conditions, and the
+    authorization date are documented and retained.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Authorize Step — Task R-3, R-4"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement authorization status as an enforceable attribute in the platform.
+      Systems without a valid ATO should be blocked from receiving production traffic
+      or accessing production data through network policies or service mesh
+      authorization rules. Track ATO status, expiration dates, and terms/conditions
+      in the service catalog. Automate ATO expiration alerts and trigger
+      reauthorization workflows before expiration. For ongoing authorization, integrate
+      continuous monitoring data feeds with the authorization status — if monitoring
+      indicates the security posture has degraded below acceptable thresholds,
+      automatically restrict the system and alert the authorizing official.
+    tools:
+      - backstage
+      - kubernetes
+      - istio
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Integrate authorization status checks into deployment pipelines. Block
+      deployments to production environments for systems without a valid ATO.
+      Implement a pipeline gate that queries the authorization status from the
+      GRC system and halts deployment if the ATO is expired, revoked, or denied.
+      For ongoing authorization, implement continuous compliance checks in the
+      pipeline that verify the system remains within the authorized security posture.
+      Generate authorization status badges that are visible in the project README
+      and the service catalog.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-pipelines
+      - backstage
+
+  secops:
+    prose: >-
+      Record the authorization decision in the GRC platform with the decision type
+      (ATO, authorization to use, denial), decision date, authorizing official
+      identity, terms and conditions, and expiration date (if applicable). Track
+      authorization status for all systems in a centralized dashboard. Alert when
+      ATOs are approaching expiration and initiate reauthorization activities.
+      For ongoing authorization, define the continuous monitoring criteria that
+      sustain the authorization and configure automated alerts when criteria are
+      not met. Maintain an audit trail of all authorization decisions, including
+      any changes to terms and conditions during the authorization period.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+      - xacta
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-6"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.35"]
+    relationship: mapped

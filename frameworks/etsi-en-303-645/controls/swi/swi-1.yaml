@@ -1,0 +1,95 @@
+id: swi-1
+family: swi
+title: "Ensure Software Integrity"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The consumer IoT device shall verify its software using secure boot mechanisms.
+    If an unauthorized change to the software is detected, the device shall alert the
+    user and/or administrator to the issue and shall not connect to wider networks than
+    those necessary to perform the alerting function. The device shall use code-signing
+    mechanisms to verify the integrity and authenticity of software updates before they
+    are installed.
+
+guidance:
+  prose: >-
+    Software integrity verification ensures that only authorized, unmodified code runs on
+    the device. Secure boot establishes a chain of trust from hardware through bootloader to
+    the operating system and application software. Each stage cryptographically verifies the
+    next before executing it. If any stage fails verification, the device should enter a safe
+    state rather than execute potentially compromised code. Code signing of updates extends
+    this integrity guarantee to the update process itself — the device verifies that an update
+    was produced by the legitimate manufacturer and has not been tampered with in transit or
+    at rest. This prevents attackers from deploying malicious firmware even if they gain
+    access to the update delivery channel.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.7-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a hardware-rooted secure boot chain starting from an immutable boot ROM.
+      Each boot stage must verify the cryptographic signature of the next stage using
+      asymmetric cryptography (RSA-2048+ or ECDSA-P256+). Store the root of trust public
+      key in one-time-programmable (OTP) fuses or a secure element. Implement measured boot
+      alongside secure boot to create attestation records. Configure the bootloader to enter
+      a recovery mode (not normal operation) if verification fails. Sign all firmware releases
+      with keys stored in an HSM. Implement anti-rollback protection using monotonic counters
+      to prevent downgrade attacks.
+    tools:
+      - u-boot-verified-boot
+      - arm-trustzone
+      - tpm
+      - hsm
+      - sigstore
+      - secure-element
+
+  devsecops:
+    prose: >-
+      Integrate code signing into the release pipeline so every production build is
+      automatically signed. Implement CI/CD tests that verify secure boot rejects unsigned
+      or tampered firmware images. Test anti-rollback protection by attempting to install
+      older firmware versions. Validate the secure boot chain in emulated environments as
+      part of the automated test suite. Store signing keys in an HSM with strict access
+      controls and audit logging. Implement reproducible builds to enable independent
+      verification of firmware integrity.
+    tools:
+      - gitlab-ci
+      - cosign
+      - sigstore
+      - codeql
+      - sbom-tool
+      - in-toto
+
+  secops:
+    prose: >-
+      Monitor for boot integrity failures across the device fleet using remote attestation.
+      Alert on devices reporting secure boot violations. Track firmware signature verification
+      failures in the update infrastructure logs. Conduct periodic physical inspections and
+      firmware extractions to verify secure boot is functioning on production devices.
+      Monitor public channels for reports of secure boot bypasses affecting the device's
+      hardware platform.
+    tools:
+      - remote-attestation-service
+      - splunk
+      - elastic-siem
+      - nessus
+      - grafana
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-3.4", "SR-7.7"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "SI-7(1)", "SI-7(6)"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.19", "A.8.24"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V10.3.1", "V10.3.2"]
+    relationship: complements

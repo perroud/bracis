@@ -1,0 +1,141 @@
+id: art-23
+family: cap-5
+title: "Monitoramento Continuo de Operacoes"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 23. As supervisionadas devem implementar procedimentos de monitoramento
+    contínuo das operações realizadas por seus clientes, com o objetivo de
+    identificar operações ou situações que possam configurar indícios de lavagem
+    de dinheiro ou de financiamento do terrorismo, contemplando:
+    I - monitoramento compatível com o perfil de risco do cliente e com a natureza,
+    complexidade e volume de suas operações;
+    II - análise de operações ou situações que apresentem atipicidade em relação ao
+    perfil do cliente ou aos parâmetros de normalidade do mercado;
+    III - utilização de sistemas informatizados para auxiliar no monitoramento.
+guidance:
+  prose: |
+    O art. 23 estabelece a obrigacao de monitoramento continuo de todas as operacoes,
+    utilizando sistemas informatizados como principal ferramenta de deteccao.
+
+    **Principio do monitoramento continuo:**
+    Diferentemente de verificacoes pontuais (onboarding, sinistro), o monitoramento
+    do art. 23 deve ser permanente e abranger toda a base de clientes e operacoes.
+
+    **Monitoramento proporcional ao risco (inciso I):**
+    - Clientes de alto risco: monitoramento em tempo real ou near-real-time com
+      thresholds mais sensiveis
+    - Clientes de risco medio: monitoramento diario/semanal com thresholds padrao
+    - Clientes de baixo risco: monitoramento mensal com thresholds mais tolerantes
+
+    **Atipicidade no mercado securitario (inciso II):**
+    Situacoes atipicas especificas do mercado de seguros:
+
+    1. Premios:
+       - Pagamento de premio incompativel com renda do segurado
+       - Aumento subito e significativo do valor do premio
+       - Pagamento de premio por terceiro sem vinculo evidente
+       - Pagamento antecipado de premios futuros de alto valor
+       - Pagamento em especie de qualquer valor
+
+    2. Sinistros:
+       - Frequencia anormal de sinistros para mesmo segurado
+       - Sinistro de alto valor pouco tempo apos contratacao
+       - Sinistro com beneficiario alterado recentemente
+       - Pedido de pagamento em conta de terceiro
+       - Sinistro com documentacao suspeita ou inconsistente
+
+    3. Resgates/Portabilidade:
+       - Resgate total de VGBL/PGBL pouco tempo apos aporte significativo
+       - Portabilidade entre instituicoes seguida de resgate
+       - Multiplos resgates parciais em curto periodo
+       - Resgate com transferencia para conta de terceiro
+
+    4. Capitalizacao:
+       - Compra de multiplos titulos de alto valor
+       - Resgate antecipado com penalidade aceita
+       - Transferencia de titulos entre titulares
+
+    **Sistemas informatizados (inciso III):**
+    A Circular exige o uso de sistemas automatizados. Monitoramento puramente
+    manual nao atende ao requisito. O sistema deve:
+    - Processar 100% das operacoes
+    - Aplicar regras parametrizaveis
+    - Gerar alertas priorizados
+    - Manter trilha de auditoria
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de monitoramento de transacoes:**
+      1. Transaction Monitoring System (TMS) com regras especificas para o
+         mercado securitario, processando 100% das operacoes (premios,
+         sinistros, resgates, portabilidade, capitalizacao).
+      2. Regras parametrizaveis por tipo de operacao, produto, perfil de
+         risco do cliente e geografia.
+      3. Deteccao de padroes: sequencias suspeitas (contratacao-alteracao-
+         cancelamento, aporte-portabilidade-resgate), fracionamento,
+         concentracao temporal.
+      4. Machine learning para deteccao de anomalias que complementa regras
+         deterministicas.
+
+      **Processamento e priorizacao:**
+      5. Processamento near-real-time para clientes de alto risco,
+         batch diario para demais.
+      6. Scoring de alertas para priorizacao: urgencia x gravidade x
+         confiabilidade.
+      7. Agrupamento de alertas por cliente para visao consolidada.
+      8. Integracao com workflow de investigacao para tratamento de alertas.
+    tools:
+      - transaction-monitoring-system
+      - rules-engine
+      - ml-anomaly-detection
+      - alerting-platform
+  devsecops:
+    prose: |
+      **Testes do motor de monitoramento:**
+      1. Testes unitarios para cada regra de monitoramento com cenarios de
+         true positive, false positive e false negative.
+      2. Testes de carga: motor deve processar volume diario de operacoes
+         dentro do SLA de tempo.
+      3. Testes de regressao: alteracao de regra nao deve desativar deteccao
+         de cenarios existentes.
+
+      **Qualidade do monitoramento:**
+      4. Backtesting mensal de regras contra operacoes historicas comunicadas
+         ao COAF.
+      5. Monitoramento de taxa de falsos positivos por regra (meta: < 90%).
+      6. Testes de cenarios end-to-end: operacao suspeita > alerta > investigacao
+         > decisao > comunicacao.
+    tools:
+      - gitlab-ci
+      - performance-tests
+      - regression-tests
+      - backtesting-framework
+  secops:
+    prose: |
+      **Gestao de alertas:**
+      1. Processo de triagem de alertas com SLA por prioridade: urgentes em 24h,
+         altos em 72h, medios em 5 dias, baixos em 10 dias.
+      2. Equipe de analistas de PLD/FT treinados em tipologias do mercado
+         securitario.
+      3. Workflow de escalacao para alertas complexos ou de alto valor.
+
+      **Efetividade do monitoramento:**
+      4. Metricas de efetividade: taxa de conversao (alertas > comunicacoes ao
+         COAF), tempo medio de analise, taxa de falsos positivos.
+      5. Ajuste continuo de parametros baseado em metricas de efetividade.
+      6. Revisao periodica de cenarios e regras com participacao de areas de
+         negocio.
+      7. Relatorio de monitoramento para diretoria com indicadores quantitativos.
+    tools:
+      - case-management
+      - investigation-workflow
+      - analytics-dashboard
+      - reporting-engine
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-23"]
+    relationship: equivalent-to
+  - framework_id: susep-638
+    articles: ["art-3"]
+    relationship: complements

@@ -1,0 +1,149 @@
+id: itgc-operations
+family: itgc
+title: "IT General Control: IT Operations"
+class: SOX
+
+statement:
+  prose: >-
+    The organization shall establish and maintain controls over IT operations to ensure
+    that IT systems supporting financial reporting operate reliably, securely, and as
+    intended. This includes controls over job scheduling and batch processing, data
+    backup and recovery, incident management, system monitoring, and physical and
+    environmental security of computing infrastructure. Operations procedures shall be
+    documented, and deviations shall be detected, investigated, and resolved in a
+    timely manner.
+  parts:
+    - id: itgc-operations.1
+      label: "(1)"
+      prose: >-
+        Batch jobs and scheduled processes that affect financial data shall be
+        monitored to ensure successful completion. Failed jobs shall be detected,
+        investigated, and re-executed according to defined procedures.
+    - id: itgc-operations.2
+      label: "(2)"
+      prose: >-
+        Data backups of financial systems and data shall be performed according
+        to a defined schedule. Backup integrity shall be verified, and restoration
+        procedures shall be periodically tested to confirm recoverability.
+    - id: itgc-operations.3
+      label: "(3)"
+      prose: >-
+        IT incidents affecting financial reporting systems shall be logged,
+        classified, escalated, and resolved according to defined procedures.
+        Root causes shall be identified and addressed for significant incidents.
+    - id: itgc-operations.4
+      label: "(4)"
+      prose: >-
+        System performance and availability shall be monitored to detect
+        conditions that could affect the reliability of financial data processing.
+    - id: itgc-operations.5
+      label: "(5)"
+      prose: >-
+        Vulnerability management processes shall ensure that security patches
+        and updates are evaluated, tested, and applied to in-scope systems
+        within defined timeframes based on risk severity.
+
+guidance:
+  prose: >-
+    IT Operations controls ensure that the infrastructure supporting financial
+    reporting runs reliably and that issues are detected and corrected before they
+    affect data integrity. Auditors typically test batch job monitoring (especially
+    for reconciliation and closing processes), backup procedures and restoration
+    testing, incident management for production issues, and vulnerability/patch
+    management. Common audit findings include: batch job failures without documented
+    investigation, untested backup restores, missing incident documentation, unpatched
+    systems with known vulnerabilities, and lack of monitoring for critical financial
+    processing jobs. The scope includes all infrastructure layers: compute, storage,
+    network, database, and application services that support in-scope financial systems.
+    Business continuity and disaster recovery plans for financial systems also fall
+    under this domain.
+
+references:
+  - citation: "COSO Internal Control — Integrated Framework, Principle 11: Select and Develop General Controls Over Technology"
+    url: "https://www.coso.org/guidance-on-ic"
+  - citation: "COBIT 2019 — DSS01: Manage Operations"
+    url: "https://www.isaca.org/resources/cobit"
+  - citation: "COBIT 2019 — DSS02: Manage Service Requests and Incidents"
+    url: "https://www.isaca.org/resources/cobit"
+  - citation: "COBIT 2019 — DSS04: Manage Continuity"
+    url: "https://www.isaca.org/resources/cobit"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement comprehensive observability across all financial system infrastructure
+      using metrics, logs, and traces. Deploy automated job scheduling with built-in
+      failure detection, retry logic, and alerting for batch processes that affect
+      financial data (period-end closings, reconciliations, data feeds). Implement
+      automated backup orchestration with integrity verification (checksum validation)
+      and automated restore testing on a defined cadence (monthly at minimum). Deploy
+      infrastructure-as-code for disaster recovery configurations to ensure recovery
+      environments can be rapidly provisioned. Implement automated vulnerability
+      scanning integrated into the platform that identifies unpatched systems and
+      tracks remediation progress. Deploy health check endpoints and synthetic
+      monitoring for all critical financial system services. Establish SLOs for
+      financial system availability and processing latency with automated alerting
+      when error budgets are consumed.
+    tools:
+      - prometheus
+      - grafana
+      - datadog
+      - pagerduty
+      - terraform
+      - velero
+      - trivy
+      - kubernetes
+  devsecops:
+    prose: >-
+      Integrate operational controls into the deployment pipeline: automated smoke
+      tests post-deployment, health check verification, and automated rollback on
+      failure. Implement automated vulnerability scanning in CI/CD pipelines that
+      blocks deployment of images with critical or high-severity vulnerabilities.
+      Deploy container image scanning and software composition analysis (SCA) to
+      identify vulnerable dependencies before they reach production. Implement
+      automated patching pipelines that can build, test, and deploy patched versions
+      of base images and dependencies. Configure pipeline monitoring that tracks
+      deployment success rates, rollback frequency, and mean time to recovery.
+      Establish runbooks-as-code for common operational procedures (failover,
+      scaling, data recovery) that are version-controlled and testable.
+    tools:
+      - gitlab-ci
+      - trivy
+      - grype
+      - dependabot
+      - renovate
+      - argocd
+      - helm
+  secops:
+    prose: >-
+      Monitor IT operations continuously through a centralized operations console
+      or SIEM that aggregates alerts from all in-scope financial systems. Implement
+      tiered incident response procedures with defined severity levels, escalation
+      paths, and resolution SLAs for incidents affecting financial reporting systems.
+      Track and report on key operational metrics: system availability, batch job
+      success rates, backup completion and restore test results, mean time to detect
+      and resolve incidents, and patch compliance levels. Conduct periodic disaster
+      recovery tests for financial systems and document results including recovery
+      time achieved versus RTO and data loss versus RPO. Maintain a vulnerability
+      management program with defined SLAs for patch application based on severity
+      (critical: 72 hours, high: 30 days, medium: 90 days). Generate monthly IT
+      operations compliance reports for management review.
+    tools:
+      - splunk
+      - elastic-siem
+      - pagerduty
+      - servicenow
+      - qualys
+      - nessus
+      - grc-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-9", "CP-10", "IR-4", "IR-5", "IR-6", "SI-2", "SI-4", "SI-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.24", "a5.25", "a5.29", "a5.30", "a8.13", "a8.14", "a8.15"]
+    relationship: supports
+  - framework_id: soc2
+    articles: ["cc7.1", "cc7.2", "cc7.3", "cc7.4", "a1.1", "a1.2"]
+    relationship: supports

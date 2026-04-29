@@ -1,0 +1,113 @@
+id: bpf-12
+family: audit-trail
+title: "Audit Trail Protection and Tamper Evidence"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    A trilha de auditoria deve ser protegida contra adulteração, exclusão
+    e modificação por meio de controles técnicos que impossibilitem a
+    alteração de registros de auditoria por qualquer usuário, incluindo
+    administradores de sistema e administradores de banco de dados.
+
+    Os controles de proteção devem incluir: armazenamento em formato
+    somente leitura (append-only), separação lógica ou física entre
+    dados de auditoria e dados de aplicação, controles de acesso
+    independentes para o repositório de auditoria, e mecanismos de
+    detecção de adulteração (hashes criptográficos, cadeia de hashes,
+    ou assinaturas digitais).
+
+    Qualquer tentativa de desabilitar, modificar ou excluir trilha de
+    auditoria deve gerar alerta automático para o responsável pela
+    Garantia da Qualidade e deve ser investigada como potencial incidente
+    de integridade de dados.
+guidance:
+  prose: |
+    Audit trail protection is essential to prevent the most serious form
+    of data integrity violation: the concealment of unauthorized
+    modifications to GMP records. Regulatory agencies specifically look
+    for evidence that audit trails cannot be manipulated.
+
+    Technical protection mechanisms:
+    - Append-only storage: database or file system that physically
+      prevents modification of existing records
+    - Cryptographic hash chains: each audit entry includes a hash of
+      the previous entry, creating a verifiable chain where any
+      modification is detectable
+    - Digital signatures on audit blocks: periodic signing of audit
+      batches provides non-repudiation
+    - Segregated storage: audit data stored in a separate database or
+      server with independent access controls
+    - Privileged access monitoring: all administrative access to audit
+      storage is itself audited by an independent mechanism
+
+    Common regulatory findings:
+    - Audit trails stored in the same database table as application
+      data, accessible to database administrators
+    - No tamper detection mechanism (ability to modify audit records
+      undetected)
+    - Audit trail disable function available to system administrators
+    - No alerting on audit trail tampering attempts
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Deploy audit trail storage using append-only databases or
+         WORM storage that technically prevent modification or deletion
+         of existing audit records at the storage layer.
+      2. Implement cryptographic hash chaining for audit records where
+         each entry includes a hash of the preceding entry, enabling
+         automated integrity verification of the complete audit chain.
+      3. Configure independent access controls for audit trail storage
+         separate from application and database administrator privileges,
+         requiring dedicated audit administrator role with dual-control.
+      4. Deploy real-time tamper detection alerting that monitors audit
+         trail integrity and immediately notifies Quality Assurance of
+         any detected anomaly or tampering attempt.
+    tools:
+      - worm-storage
+      - hash-chain-engine
+      - independent-access-control
+      - tamper-detection-alerting
+  devsecops:
+    prose: |
+      1. Implement penetration testing specifically targeting audit
+         trail protection: attempt to modify, delete, or disable audit
+         records through all available pathways (application, database,
+         OS, backup restore).
+      2. Test hash chain integrity verification: introduce deliberate
+         modifications and verify that tamper detection correctly
+         identifies the alteration and affected records.
+      3. Validate that no application function or administrative tool
+         provides the ability to modify or delete audit trail records.
+      4. Include audit trail protection verification in security
+         testing for every system release.
+    tools:
+      - gitlab-ci
+      - penetration-testing
+      - integrity-testing
+      - security-testing
+  secops:
+    prose: |
+      1. Define audit trail protection requirements in the data
+         integrity policy, specifying mandatory technical controls
+         for each system risk classification level.
+      2. Conduct periodic audit trail protection assessments verifying
+         that tamper-proofing mechanisms are functioning correctly
+         and no unauthorized modification pathways exist.
+      3. Investigate all audit trail tamper detection alerts as
+         priority data integrity incidents with mandatory CAPA.
+      4. Include audit trail protection testing in the scope of
+         periodic computerized system security assessments and
+         penetration testing programs.
+    tools:
+      - siem
+      - grc-platform
+      - incident-management
+      - security-assessment
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-19", "art-20"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-15", "controle-A-8-12"]
+    relationship: mapped

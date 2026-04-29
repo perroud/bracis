@@ -1,0 +1,120 @@
+id: rec-6
+family: assinatura
+title: "Timestamp Authority and Long-Term Signature Validation"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 11. A prescrição eletrônica deve conter carimbo de tempo emitido
+    por Autoridade de Carimbo de Tempo (ACT) credenciada na ICP-Brasil,
+    atestando a data e hora exatas da assinatura.
+
+    § 1.º O carimbo de tempo deve ser aposto no momento da assinatura
+    digital, garantindo a comprovação inequívoca do momento da prescrição.
+
+    § 2.º O sistema de prescrição eletrônica deve manter a capacidade de
+    validação da assinatura digital e do carimbo de tempo por, no mínimo,
+    20 (vinte) anos a partir da data de emissão, independentemente da
+    expiração do certificado digital do prescritor.
+
+    § 3.º Para garantir a validação de longo prazo, o sistema deve
+    armazenar todos os elementos necessários à verificação da assinatura,
+    incluindo a cadeia de certificação completa, as respostas OCSP e as
+    listas de certificados revogados vigentes no momento da assinatura.
+guidance:
+  prose: |
+    Article 11 mandates timestamp authority integration and long-term
+    validation (LTV) for electronic prescriptions.
+
+    **Timestamp requirements:**
+    - Must be issued by an ICP-Brasil accredited Timestamp Authority (ACT)
+    - Must be applied at the moment of signing
+    - Proves the exact date and time of prescription issuance
+
+    **Long-term validation (LTV):**
+    The 20-year retention requirement demands LTV signatures that remain
+    verifiable even after the prescriber's certificate expires. This
+    requires embedding all validation materials at signing time.
+
+    **LTV signature elements:**
+    - Complete certificate chain from the signing certificate to the
+      ICP-Brasil root CA
+    - OCSP responses valid at the time of signing
+    - CRL (Certificate Revocation List) valid at the time of signing
+    - The timestamp token itself
+
+    **Signature formats for LTV:**
+    - CAdES-A (archival) or PAdES-LTV (PDF long-term validation)
+    - These formats embed all necessary validation data within the
+      signed document
+
+    **Why 20 years:**
+    Aligns with the medical record retention period established by
+    CFM Resolution 1.821/2007, ensuring prescriptions remain
+    verifiable throughout the legally required storage period.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Long-term validation infrastructure:**
+      1. Integrate with an ICP-Brasil accredited Timestamp Authority
+         (ACT) for real-time timestamp issuance during prescription
+         signing.
+      2. Implement CAdES-A or PAdES-LTV signature format generation,
+         embedding the complete certificate chain, OCSP responses,
+         and CRL snapshots at signing time.
+      3. Deploy a LTV signature re-stamping service that periodically
+         adds new timestamps to archived prescriptions before existing
+         timestamps expire, extending verifiability.
+      4. Implement immutable archival storage with minimum 20-year
+         retention for signed prescriptions with all LTV materials.
+      5. Deploy a signature verification service capable of
+         validating LTV signatures without external network access
+         (offline validation using embedded materials).
+    tools:
+      - timestamp-authority
+      - lacuna-pki
+      - cades-library
+      - archival-storage
+      - s3-glacier
+      - minio
+  devsecops:
+    prose: |
+      **LTV signature testing:**
+      1. Create tests verifying that timestamp tokens are correctly
+         embedded in signed prescriptions.
+      2. Implement time-manipulation tests simulating certificate
+         expiration to verify that LTV signatures remain valid.
+      3. Add tests confirming that all required LTV elements
+         (certificate chain, OCSP, CRL) are embedded in archived
+         prescriptions.
+      4. Deploy integration tests with the timestamp authority
+         covering availability and response validation.
+    tools:
+      - gitlab-ci
+      - time-manipulation-testing
+      - integration-tests
+      - signature-validation-tests
+  secops:
+    prose: |
+      **LTV signature operations:**
+      1. Monitor timestamp authority availability and response times,
+         with failover to secondary ACTs if the primary becomes
+         unavailable.
+      2. Schedule quarterly re-stamping campaigns for prescriptions
+         approaching timestamp expiration.
+      3. Audit the archival storage system annually for data integrity,
+         verifying that all LTV signatures remain valid.
+      4. Maintain disaster recovery procedures for the prescription
+         archive, including geographically distributed replicas.
+    tools:
+      - monitoring
+      - archival-verification
+      - disaster-recovery
+      - backup-validation
+legal_references:
+  - framework_id: icp-brasil
+    articles: ["art-3", "art-7"]
+    relationship: implements
+  - framework_id: pep
+    articles: ["art-12", "art-13"]
+    relationship: complements

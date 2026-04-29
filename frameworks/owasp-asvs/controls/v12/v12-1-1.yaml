@@ -1,0 +1,99 @@
+id: v12.1.1
+family: v12
+title: "File Upload Requirements"
+class: OWASP-ASVS
+
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Verify that the application will not accept large files that could fill up storage
+    or cause a denial of service attack. Verify the application checks compressed files
+    (e.g., zip, gz, docx, odt) against maximum allowed uncompressed size and maximum
+    number of files. Uploaded files must be validated for expected type using content
+    inspection (magic bytes), not solely by file extension or MIME type from the client.
+    Uploaded files must be stored outside the web root with no execute permissions.
+
+guidance:
+  prose: >-
+    File upload functionality is one of the highest-risk features in web applications.
+    Unrestricted file uploads can lead to remote code execution (uploading web shells),
+    storage exhaustion (denial of service), cross-site scripting (uploading HTML/SVG files),
+    directory traversal, and malware distribution. Validation must occur server-side using
+    content inspection because file extensions and client-supplied MIME types are trivially
+    spoofed. Zip bombs and compression bombs can consume excessive resources during
+    extraction. Uploaded files must be stored in locations that prevent direct execution
+    by the web server, preferably in object storage (S3, GCS) with separate serving
+    infrastructure. File metadata (original name, content type) must be sanitized before
+    use to prevent injection attacks through filenames.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V12.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "OWASP File Upload Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Store uploaded files in object storage (S3, GCS, Azure Blob) with no public access
+      and serve through pre-signed URLs or a dedicated media proxy. Implement file size
+      limits at the load balancer, API gateway, and application levels. Use content-type
+      detection libraries (libmagic, file-type) to validate file content against the
+      expected type. Scan all uploaded files with antivirus (ClamAV) before making them
+      available. Apply decompression limits for archive files: maximum uncompressed size,
+      maximum file count, and maximum nesting depth. Generate new filenames (UUIDs) for
+      stored files; never use the original filename in the storage path. Implement virus
+      scanning as an asynchronous pipeline to avoid blocking uploads.
+    tools:
+      - aws-s3
+      - gcp-cloud-storage
+      - clamav
+      - nginx
+      - kong
+      - imagemagick
+      - sharp
+
+  devsecops:
+    prose: >-
+      Write automated tests that attempt to upload: files exceeding size limits, files
+      with mismatched extension and content (e.g., PHP file with .jpg extension), zip
+      bombs, files with path traversal in filenames (../../etc/passwd), HTML/SVG files
+      containing XSS payloads, and polyglot files. Verify that uploaded files are not
+      accessible via direct URL in the web root. Test that antivirus scanning blocks
+      EICAR test files. Implement SAST rules that detect file operations using
+      unsanitized user-provided filenames.
+    tools:
+      - owasp-zap
+      - burp-suite
+      - semgrep
+      - gitlab-ci
+      - nuclei
+      - postman
+
+  secops:
+    prose: >-
+      Monitor file upload activity for anomalous patterns: high-volume uploads, unusual
+      file types, or uploads from suspicious sources. Alert on antivirus detection events
+      and investigate the source. Track storage consumption trends to detect gradual
+      exhaustion attacks. Monitor for web shell indicators: new executable files in web
+      root directories, unexpected process execution from web server processes. Review
+      file access patterns for potential data exfiltration through uploaded content.
+    tools:
+      - clamav
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog-security
+      - falco
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-10"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.23", "A8.26"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["5.2.1", "6.2.4"]
+    relationship: supports

@@ -1,0 +1,83 @@
+id: ct-p.04
+family: ct-p
+title: "Data Retention and Disposal"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    Data are destroyed according to policy. Retention schedules are established and
+    data are securely disposed of when no longer needed for the identified processing
+    purpose or when required by law.
+
+guidance:
+  prose: >-
+    Data retention and disposal is a critical privacy control that ensures personal data
+    is not kept longer than necessary. Organizations must establish clear retention
+    schedules that specify the maximum retention period for each category of personal
+    data, aligned with the processing purpose and legal requirements. When data reaches
+    the end of its retention period, it must be securely destroyed using methods
+    appropriate to the storage medium and data sensitivity. Disposal must be verifiable —
+    the organization should maintain evidence that data was destroyed according to policy.
+    Special attention is needed for data distributed across backups, replicas, caches,
+    and third-party systems.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, CT.DM-P7 through CT.DM-P8"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated data retention enforcement in the platform. Tag all data
+      stores with retention metadata (maximum retention period, data category, legal
+      hold status). Deploy scheduled jobs that identify and purge data exceeding
+      retention limits. Implement cascade deletion that propagates data disposal across
+      replicas, backups, and derived datasets. Build retention dashboards that show
+      compliance status across all data stores. Ensure backup systems support
+      granular deletion to comply with retention policies without requiring full
+      backup expiration.
+    tools:
+      - kubernetes-cronjobs
+      - terraform
+      - data-lifecycle-management
+      - backup-management
+      - monitoring
+
+  devsecops:
+    prose: >-
+      Enforce retention policy compliance in the development lifecycle. Require
+      retention period declarations in database schema definitions. Implement CI/CD
+      checks that validate retention configuration exists for new data stores. Build
+      automated tests that verify data is actually deleted when retention periods
+      expire. Include retention implementation in code review checklists for features
+      that store personal data.
+    tools:
+      - gitlab-ci
+      - schema-validation
+      - integration-testing
+      - custom-policy-checks
+
+  secops:
+    prose: >-
+      Monitor data retention compliance across all systems. Alert on data stores where
+      data exceeds approved retention periods. Conduct periodic retention audits that
+      verify disposal actually occurs. Manage legal holds that may override normal
+      retention schedules. Generate retention compliance reports for the privacy office.
+      Verify that data disposal at third-party processors complies with contractual
+      requirements.
+    tools:
+      - data-discovery
+      - grc-platform
+      - siem
+      - audit-management
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5", "art-17"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-12", "MP-6"]
+    relationship: derived-from
+  - framework_id: iso-27701
+    articles: ["A.7.4.7"]
+    relationship: mapped

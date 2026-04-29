@@ -1,0 +1,105 @@
+id: pip-5
+family: principles
+title: "Principle 5 — Limiting Use, Disclosure, and Retention"
+class: PIPEDA
+statement:
+  prose: >-
+    Personal information shall not be used or disclosed for purposes other than those for which
+    it was collected, except with the consent of the individual or as required by law. Personal
+    information shall be retained only as long as necessary for the fulfilment of those purposes.
+  parts:
+    - id: pip-5.4.5.1
+      label: "4.5.1"
+      prose: >-
+        Organizations using personal information for a new purpose shall document this new purpose.
+    - id: pip-5.4.5.2
+      label: "4.5.2"
+      prose: >-
+        Organizations should develop guidelines and implement procedures with respect to the
+        retention of personal information. These guidelines should include minimum and maximum
+        retention periods. Personal information that has been used to make a decision about an
+        individual shall be retained long enough to allow the individual access to the information
+        after the decision has been made. An organization may be subject to legislative requirements
+        with respect to retention periods.
+    - id: pip-5.4.5.3
+      label: "4.5.3"
+      prose: >-
+        Personal information that is no longer required to fulfil the identified purposes should
+        be destroyed, erased, or made anonymous. Organizations shall develop guidelines and
+        implement procedures to govern the destruction of personal information.
+guidance:
+  prose: >-
+    This principle combines purpose limitation with retention limitation. Three distinct
+    obligations: (1) Use limitation — personal information collected for purpose A cannot be
+    used for purpose B without fresh consent or legal authority. The OPC has found violations
+    where customer service data was repurposed for marketing without consent. (2) Disclosure
+    limitation — sharing with third parties requires either original consent covering that
+    disclosure or new consent. (3) Retention limitation — data must be deleted when no longer
+    needed. "Just in case" retention violates PIPEDA. Organizations must have documented retention
+    schedules with specific periods per data category, and they must actually enforce those
+    schedules. The OPC expects automated deletion mechanisms, not manual processes that are
+    routinely ignored. Clause 4.5.2 adds a nuance: data used for decisions about individuals
+    must be kept long enough for the individual to exercise their access rights.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      PURPOSE-BOUND PROCESSING: Implement purpose-bound access controls — services can only
+      process personal information for their declared purposes. Use policy engines to enforce
+      purpose restrictions at the data layer. RETENTION MANAGEMENT: Build a centralized retention
+      policy engine as a platform service. Define retention periods per data category and purpose.
+      Implement automated TTL (time-to-live) on all personal information stores. AUTOMATED
+      DELETION: Deploy scheduled deletion jobs that enforce retention policies. Use database-level
+      row expiration, object lifecycle policies (S3/GCS), and message queue TTLs. DELETION
+      VERIFICATION: Build verification mechanisms that confirm deletion across all data stores,
+      backups, caches, and logs. DISCLOSURE TRACKING: Implement disclosure logging — every
+      sharing of personal information with third parties must be recorded with purpose, recipient,
+      and legal basis.
+    tools:
+      - "Retention policy engine with automated TTL enforcement"
+      - "Kubernetes CronJobs for scheduled data purging"
+      - "Object storage lifecycle policies (S3/GCS/Azure Blob)"
+      - "PostgreSQL table partitioning with time-based dropping"
+      - "Disclosure registry with automated logging"
+  devsecops:
+    prose: >-
+      RETENTION ENFORCEMENT: CI/CD checks must verify that every new data store has retention
+      policies configured. Database migration linters must reject tables storing personal
+      information without TTL or retention metadata. PURPOSE DRIFT DETECTION: Code analysis
+      must flag when personal information is accessed by services outside their declared purpose
+      scope. DELETION TESTING: Automated tests must verify that deletion mechanisms work correctly
+      — data is actually removed from all stores, not just soft-deleted. DISCLOSURE REVIEW:
+      Merge requests introducing third-party data sharing must include disclosure justification
+      and consent verification.
+    tools:
+      - "Database migration linters for retention policy verification"
+      - "Custom CI/CD checks for TTL configuration"
+      - "Deletion verification test suites"
+      - "Purpose-bound access analysis in SAST"
+      - "Third-party disclosure review in merge request templates"
+  secops:
+    prose: >-
+      RETENTION MONITORING: Monitor for personal information exceeding defined retention periods.
+      Alert on data stores without active retention policies. PURPOSE VIOLATION DETECTION: Correlate
+      data access logs with purpose registry to detect unauthorized use. Alert on data flows to
+      undeclared destinations. DELETION VERIFICATION: Periodic audits verifying that deleted data
+      is not recoverable from backups, caches, or replicas. DISCLOSURE MONITORING: Track all
+      outbound data flows containing personal information. Alert on undeclared third-party disclosures.
+    tools:
+      - "Data retention compliance scanner"
+      - "SIEM rules for purpose violation and unauthorized disclosure"
+      - "Deletion audit tools (backup/cache verification)"
+      - "DLP for outbound data flow monitoring"
+      - "Retention compliance dashboards and reporting"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.b", "art-5.1.e", "art-17"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.105"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-6", "art-15", "art-16"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["7.4.2", "7.4.4", "7.4.5"]
+    relationship: supports

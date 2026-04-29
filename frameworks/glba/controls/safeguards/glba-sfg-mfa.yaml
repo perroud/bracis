@@ -1,0 +1,132 @@
+id: glba-sfg-mfa
+family: safeguards
+title: "Multi-Factor Authentication"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall implement multi-factor authentication (MFA) for any
+    individual accessing any information system containing customer information. MFA
+    shall require at least two of the following authentication factors: knowledge
+    (something the user knows), possession (something the user has), and inherence
+    (something the user is). MFA shall be applied unless the qualified individual
+    has approved in writing the use of a reasonably equivalent or more secure alternative.
+  parts:
+    - id: glba-sfg-mfa.1
+      label: "(1)"
+      prose: >-
+        MFA shall be required for all user access to information systems that store,
+        process, or transmit customer information, including application access,
+        database access, operating system access, and remote access.
+    - id: glba-sfg-mfa.2
+      label: "(2)"
+      prose: >-
+        MFA shall use at least two independent factors from different categories:
+        knowledge factor (password, PIN), possession factor (hardware token,
+        mobile device, smart card), or inherence factor (biometric). Two factors
+        from the same category (e.g., two passwords) do not satisfy the requirement.
+    - id: glba-sfg-mfa.3
+      label: "(3)"
+      prose: >-
+        If MFA is not feasible for a specific information system, the qualified
+        individual shall approve in writing the use of a reasonably equivalent
+        or more secure alternative access control, with documented justification
+        and periodic review of the exception.
+    - id: glba-sfg-mfa.4
+      label: "(4)"
+      prose: >-
+        MFA implementation shall be resistant to common bypass techniques including
+        phishing, SIM swapping, and man-in-the-middle attacks. Institutions should
+        prioritize phishing-resistant MFA methods (e.g., FIDO2/WebAuthn hardware
+        security keys) for privileged and high-risk access.
+
+guidance:
+  prose: >-
+    The 2023 Safeguards Rule amendment made MFA a mandatory technical requirement
+    for all access to systems containing customer information. This is one of the most
+    impactful changes in the rule. The FTC examines whether MFA is implemented
+    comprehensively across all NPI-handling systems, not just internet-facing
+    applications. Common findings include: MFA not implemented on internal applications
+    accessed via VPN, MFA not applied to database administrative access, MFA using
+    SMS-based one-time codes only (which is vulnerable to SIM swapping), service
+    accounts accessing NPI systems without compensating controls for MFA, and legacy
+    systems that cannot support MFA without documented exceptions. The qualified
+    individual's written approval is required for any MFA exception, and the exception
+    must specify the compensating controls that provide equivalent or greater protection.
+    Institutions should plan migration to phishing-resistant MFA (FIDO2/WebAuthn)
+    as the standard for high-value system access.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(5)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "NIST SP 800-63-3 — Digital Identity Guidelines"
+    url: "https://pages.nist.gov/800-63-3/"
+  - citation: "CISA — More Than a Password: Phishing-Resistant MFA"
+    url: "https://www.cisa.gov/mfa"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement MFA at the identity provider (IdP) level so that all federated
+      applications inherit the MFA requirement without individual configuration.
+      Deploy FIDO2/WebAuthn hardware security keys for privileged access and
+      administrative accounts. Configure conditional access policies that enforce
+      MFA based on risk signals (device compliance, location, access pattern).
+      Implement MFA for service-to-service authentication using mutual TLS with
+      certificate-based identity (compensating control for automated processes).
+      Deploy session management that requires MFA re-authentication for sensitive
+      operations (accessing NPI exports, modifying access controls, administrative
+      functions). Implement MFA enrollment automation in the onboarding pipeline
+      ensuring no user can access NPI systems without completing MFA registration.
+      Monitor MFA adoption rates and enforce deadlines for legacy system migration.
+    tools:
+      - okta
+      - azure-ad
+      - yubikey
+      - duo
+      - vault
+      - kubernetes
+      - istio
+  devsecops:
+    prose: >-
+      Implement CI/CD pipeline checks that verify MFA is enabled on all environments
+      handling customer information. Scan infrastructure-as-code for authentication
+      configurations that do not require MFA. Implement automated tests that verify
+      MFA enforcement on all NPI system endpoints. Add pipeline stages that check
+      IdP configuration exports for MFA policy compliance. Deploy automated testing
+      of MFA bypass scenarios to verify enforcement. Implement GitLab/SCM-level MFA
+      requirements for all contributors to NPI system repositories.
+    tools:
+      - gitlab-ci
+      - checkov
+      - open-policy-agent
+      - selenium
+      - cypress
+  secops:
+    prose: >-
+      Monitor MFA authentication success and failure rates to detect bypass attempts
+      and usability issues. Track MFA enrollment coverage across all users with access
+      to NPI systems and report gaps. Implement alerting for MFA bypass events,
+      excessive MFA failures, and MFA exception requests. Generate monthly MFA
+      compliance reports showing: enrollment percentage, authentication method
+      distribution (FIDO2, TOTP, SMS), exception inventory, and bypass attempt
+      analysis. Monitor for MFA fatigue attacks (repeated push notification attempts)
+      and implement rate limiting. Maintain an MFA exception register with qualified
+      individual approvals and compensating controls documentation.
+    tools:
+      - splunk
+      - elastic-siem
+      - okta-syslog
+      - grc-platform
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-2(1)", "IA-2(2)", "IA-2(6)", "IA-2(12)"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["8.4", "8.5"]
+    relationship: complements
+  - framework_id: sox
+    articles: ["itgc-access"]
+    relationship: complements

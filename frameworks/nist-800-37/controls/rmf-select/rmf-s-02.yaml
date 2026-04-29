@@ -1,0 +1,86 @@
+id: rmf-s-02
+family: rmf-select
+title: "Control Tailoring"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Tailor the selected security and privacy control baselines to align with organizational
+    risk management strategy, specific mission and business requirements, and local conditions.
+    Tailoring activities include identifying and designating common controls; applying scoping
+    considerations to eliminate controls not applicable to the system; selecting compensating
+    controls for any baseline controls that cannot be effectively implemented; assigning
+    specific values to organization-defined parameters in controls; supplementing baselines
+    with additional controls based on risk assessment; and providing specification information
+    for control implementation.
+
+guidance:
+  prose: >-
+    Tailoring adapts the generic baseline to the specific operating context of the system.
+    It is not a mechanism to reduce security below the minimum baseline without justification.
+    Every tailoring decision must be documented with a rationale in the system security plan.
+    Compensating controls must provide equivalent protection to the baseline controls they
+    replace. Organization-defined parameters (ODPs) in controls must be assigned specific
+    values that reflect organizational policy (e.g., password length, session timeout values,
+    audit retention periods). Tailoring decisions are reviewed and approved by the authorizing
+    official as part of the authorization process.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Select Step — Task S-2"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "NIST SP 800-53B, Section 3, Tailoring"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53b/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide a tailoring workbench in the governance tooling that allows system owners
+      to document tailoring decisions against the selected baseline. Pre-populate common
+      control designations from the organizational common control catalog. Enforce that
+      scoping justifications and compensating control descriptions are provided for any
+      control removed or replaced. Maintain a library of organization-defined parameter
+      (ODP) values as policy-as-code and automatically assign them during tailoring.
+      Version-control all tailoring decisions and require AO approval for the tailored
+      baseline before proceeding to implementation.
+    tools:
+      - oscal-tools
+      - compliance-trestle
+      - open-policy-agent
+      - backstage
+
+  devsecops:
+    prose: >-
+      Implement tailoring as a configuration layer on top of baseline pipeline templates.
+      System owners can customize security scanning parameters (e.g., vulnerability
+      severity thresholds, specific checks to disable) through a controlled configuration
+      file that requires compliance team review. Document tailoring decisions in the
+      project's security metadata and ensure they are traceable through merge request
+      history. Use GitLab approval rules to require compliance team sign-off on any
+      pipeline configuration that deviates from the standard baseline template.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-pipelines
+      - gitlab-approval-rules
+
+  secops:
+    prose: >-
+      Track all tailoring decisions in the GRC platform with documented rationale,
+      approval chain, and effective dates. Maintain a tailoring register per system
+      that records which controls were scoped out, compensated, or supplemented.
+      Conduct tailoring reviews during authorization renewals to validate that
+      tailoring decisions remain appropriate given changes in the threat landscape,
+      system capabilities, or organizational policies. Generate tailoring summary
+      reports that show the variance between the standard baseline and the tailored
+      control set for each system.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PL-2", "PL-10", "PM-9"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.1", "A5.36"]
+    relationship: mapped

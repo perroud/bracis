@@ -1,0 +1,117 @@
+id: art-12
+family: cap-4
+title: "Designacao do Diretor de Conformidade"
+class: CMN-4606
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 12. A instituição deve designar diretor responsável pela função de
+    conformidade, nos termos do art. 9.
+
+    § 1. O diretor de conformidade deve ser membro da diretoria estatutária
+    da instituição.
+
+    § 2. A função de diretor de conformidade é vedada a quem exerce função em
+    unidades de negócios, em unidades responsáveis pela realização de operações
+    sujeitas ao risco de conformidade ou na auditoria interna.
+
+    § 3. O nome do diretor de conformidade deve ser comunicado ao Banco Central
+    do Brasil, nos termos da regulamentação vigente.
+guidance:
+  prose: |
+    O art. 12 cria o CCO (Chief Compliance Officer) como figura regulatoria
+    obrigatoria no SFN brasileiro. Tres requisitos cumulativos.
+
+    **Membro da diretoria estatutaria (§ 1):**
+    Nao e suficiente ser um executivo senior com o titulo de "Diretor de Compliance".
+    O CCO precisa ser membro formal da diretoria estatutaria — ou seja, eleito/aprovado
+    pelo conselho, registrado na Junta Comercial, com poderes e responsabilidades
+    legais de diretor. Isso garante autoridade formal, nao apenas informal.
+
+    **Vedacoes ao CCO — o principio da separacao (§ 2):**
+    O CCO nao pode acumular com:
+    1. **Unidades de negocios**: o CCO nao pode ser simultaneamente Diretor Comercial,
+       Diretor de Credito, Diretor de Investimentos ou qualquer area que gera receita.
+    2. **Unidades de operacoes com risco de conformidade**: similar ao proibido para
+       a funcao — nao pode ser responsavel por tesouraria, mesa proprietaria,
+       distribuicao, cambio.
+    3. **Auditoria interna**: nao pode ser o auditor interno — as tres linhas de defesa
+       devem ser separadas.
+
+    **A regra e a excecao:**
+    Para instituicoes menores (tipicamente S4/S5), a norma admite cumulacao, mas apenas
+    com funcoes que nao gerem as incompatibilidades acima. Um CCO de cooperativa pode
+    acumular com areas de suporte (juridico, por exemplo), mas nao com negocios.
+
+    **Comunicacao ao BCB (§ 3):**
+    O nome do CCO deve ser formalmente comunicado ao Banco Central. O BCB mantem
+    registro dos CCOs do SFN. Mudancas de CCO devem ser imediatamente comunicadas.
+    Qualquer periodo sem CCO designado e uma violacao da norma.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao da posicao de CCO:**
+      1. Registro formal no sistema de GRC: perfil do CCO com data de designacao,
+         mandato, cargo estatutario e historico de CCOs anteriores.
+      2. Integracao com sistemas de RH e juridico: designacao do CCO sincronizada
+         entre o sistema de GRC, sistema de RH (contrato) e repositorio juridico
+         (atos societarios, registro na Junta Comercial).
+      3. Dashboard exclusivo do CCO: acesso privilegiado a todos os dados de
+         compliance da instituicao e do conglomerado.
+      4. Sistema de comunicacao com BCB: workflow para comunicacao formal ao BCB
+         da designacao/alteracao do CCO, com protocolo de entrega e rastreabilidade.
+      5. Acesso do CCO ao conselho: canal direto de comunicacao entre o CCO e
+         o conselho no sistema de board management, sem intermediacao da diretoria.
+    tools:
+      - grc-platform
+      - hr-system
+      - legal-management
+      - board-portal
+      - regulatory-reporting
+  devsecops:
+    prose: |
+      **Controles sobre a posicao do CCO:**
+      1. Verificacao de acumulacao proibida: regra automatica no sistema de IAM
+         que impede que o usuario com perfil CCO seja associado simultaneamente
+         a perfis de unidades de negocio ou auditoria interna.
+      2. Alerta de vacancia: se o perfil CCO ficar sem usuario ativo, alerta
+         automatico ao conselho e ao juridico para regularizacao imediata.
+      3. Comunicacao ao BCB como pipeline: o processo de comunicacao do novo
+         CCO ao BCB e executado via pipeline com confirmacao, reenvio em caso
+         de falha e registro de confirmacao de recebimento.
+      4. Auditoria de acesso do CCO: todos os acessos realizados pelo CCO sao
+         logados em trilha de auditoria imutavel, demonstrando exercicio ativo
+         da funcao.
+    tools:
+      - identity-management
+      - monitoring-alerting
+      - regulatory-reporting
+      - audit-logging
+  secops:
+    prose: |
+      **Governanca da posicao do CCO:**
+      1. Processo de designacao: fluxo formal incluindo aprovacao pelo conselho,
+         comunicacao ao BCB (§ 3), registro societario e onboarding no GRC.
+      2. Verificacao de incompatibilidades: checklist de incompatibilidades (§ 2)
+         aplicado antes da designacao e anualmente enquanto o CCO estiver no cargo.
+      3. Plano de sucessao: CCO substituto designado (diretor alternativo) para
+         periodos de ausencia, viagem ou vacancia, comunicado ao BCB conforme
+         regulamentacao vigente.
+      4. Comunicacao ao BCB: processo padronizado para comunicacao de designacao,
+         substituicao e vacancia — prazo, destinatario, formato e registro.
+      5. Verificacao de inscricao: confirmacao de que o CCO esta inscrito nos
+         cadastros regulatorios do BCB (UNICAD) e de outros reguladores aplicaveis
+         (CVM, SUSEP conforme escopo da instituicao).
+    tools:
+      - grc-platform
+      - legal-management
+      - hr-system
+      - regulatory-reporting
+      - succession-planning
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-27"]
+    relationship: complements
+  - framework_id: cmn-4968
+    articles: ["art-12"]
+    relationship: complements

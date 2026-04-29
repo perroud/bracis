@@ -1,0 +1,114 @@
+id: iot-20
+family: resilience
+title: "Activity Logging and Anomaly Monitoring"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve possuir capacidade de registro de atividades
+    (logs), incluindo, mas não se limitando a, eventos de autenticação
+    (sucessos e falhas), alterações de configuração, atualizações de
+    firmware, reinicializações e eventos de segurança relevantes.
+
+    O equipamento deve implementar monitoramento de comportamentos
+    não usuais, sendo capaz de detectar e registrar anomalias de
+    operação que possam indicar comprometimento de segurança.
+
+    (Ato 77/2021 §5.1.3, incisos IV e V)
+guidance:
+  prose: |
+    This control requires devices to maintain security-relevant logs
+    and implement basic anomaly detection. Logging is essential for
+    incident investigation, and anomaly detection provides early
+    warning of compromise.
+
+    **Required log events:**
+    - Authentication events: successful and failed login attempts,
+      with timestamp, source IP, interface, and username.
+    - Configuration changes: any modification to device settings,
+      with timestamp, user, and what was changed.
+    - Firmware updates: update attempts (success/failure), version
+      transitions, signature verification results.
+    - System events: reboots, factory resets, service start/stop.
+    - Security events: brute-force lockouts, certificate validation
+      failures, integrity check failures.
+
+    **Anomaly monitoring:**
+    - Unusual traffic patterns (sudden spike in outbound connections,
+      DNS queries to unusual domains).
+    - Unexpected process execution or service activation.
+    - Configuration changes outside of normal management windows.
+    - Repeated failed authentication from unusual sources.
+
+    **Log management considerations:**
+    - Logs should be stored in persistent storage (survive reboots).
+    - Log rotation with configurable retention period.
+    - Support for syslog forwarding to external log collectors.
+    - Timestamps must be accurate (NTP-synchronized).
+    - Log integrity protection (append-only or signed log entries)
+      to prevent tampering by an attacker who gains device access.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a structured logging subsystem (syslog-ng or
+         equivalent) that captures all required event categories with
+         consistent format: timestamp (ISO 8601), severity, facility,
+         event type, source, details.
+      2. Configure persistent log storage with rotation (e.g., 1 MB
+         ring buffer on flash, or dedicated log partition).
+      3. Implement syslog forwarding (RFC 5424) to external log
+         collectors — configurable via the web UI and TR-069/USP.
+      4. Add NTP client to the firmware for accurate timestamping —
+         configure default NTP servers and allow user customization.
+      5. Implement basic anomaly detection rules: alert on >10 failed
+         logins in 5 minutes, unexpected outbound connections to new
+         destinations, configuration changes outside of user sessions.
+    tools:
+      - syslog-ng
+      - ntp-client
+      - anomaly-detection-engine
+      - log-rotation
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Add CI tests that verify all required events generate
+         appropriate log entries: simulate each event type and check
+         log output.
+      2. Test syslog forwarding: configure a remote syslog receiver
+         in the test environment and verify logs are forwarded
+         correctly.
+      3. Test log persistence: generate events, reboot the device,
+         and verify logs survived the reboot.
+      4. Verify log timestamps are NTP-synchronized — inject a known
+         time offset and verify log entries reflect correct time.
+      5. Test anomaly detection rules with synthetic attack scenarios.
+    tools:
+      - gitlab-ci
+      - syslog-receiver
+      - integration-testing
+      - time-synchronization-testing
+  secops:
+    prose: |
+      1. Configure centralized log collection from deployed devices
+         for SIEM integration and correlation with other security
+         data sources.
+      2. Create SIEM detection rules based on device log events:
+         brute-force indicators, configuration tampering, firmware
+         downgrade attempts, anomalous traffic patterns.
+      3. During penetration testing, verify that all attack actions
+         generate corresponding log entries — check for logging
+         blind spots.
+      4. Maintain log collection architecture documentation and
+         retention policies for ANATEL compliance evidence.
+    tools:
+      - siem
+      - log-management-platform
+      - penetration-testing-tools
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7", "art-14"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-12"]
+    relationship: complements

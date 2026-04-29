@@ -1,0 +1,88 @@
+id: pin-5
+family: pin-crypto
+title: "Cryptographic Key Generation"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    Cryptographic keys used for PIN encryption, decryption, and translation must be
+    generated within a secure cryptographic device (SCD) using an approved random number
+    generation process. Key generation must produce keys of sufficient strength: a minimum
+    of 112 bits of effective security strength for symmetric keys (e.g., double-length
+    TDEA or AES-128) and compliant with approved algorithms (TDEA or AES). Keys must not
+    be generated outside of an SCD, and the key generation process must employ dual control
+    and split knowledge such that no single individual has access to or knowledge of the
+    complete key value at any point during or after generation.
+
+guidance:
+  prose: >-
+    Key generation is the root of the cryptographic key lifecycle and establishes the
+    foundation for all subsequent PIN protection. If key generation is compromised — through
+    weak random number generation, insider collusion, or key exposure during creation — all
+    downstream PIN protection is void. The dual control and split knowledge requirements
+    ensure that at least two trusted individuals must collaborate to generate a key, and
+    neither individual knows the complete key. Organizations migrating from TDEA to AES
+    should generate new AES keys rather than attempting to derive AES keys from existing
+    TDEA key material. All key generation ceremonies must be formally documented with
+    witnessed audit logs.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 2, Key Generation"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "NIST SP 800-133 Rev 2 — Recommendation for Cryptographic Key Generation"
+    url: "https://doi.org/10.6028/NIST.SP.800-133r2"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy HSMs certified to PCI PTS HSM v3 or FIPS 140-2 Level 3 for all key
+      generation operations. Configure HSM key generation APIs to enforce minimum
+      key lengths (AES-128 minimum, AES-256 recommended). Implement key generation
+      ceremony workflows that require physical presence of two key custodians with
+      separate authentication credentials. Deploy key management infrastructure that
+      records all generation events with tamper-evident audit logs. Migrate from TDEA
+      to AES key hierarchies in alignment with PCI SSC migration timelines.
+    tools:
+      - thales-payshield
+      - utimaco-hsm
+      - futurex-hsm
+      - aws-cloudhsm
+      - key-ceremony-management
+  devsecops:
+    prose: >-
+      Implement automated checks in CI/CD that verify all cryptographic key references
+      in configuration files point to HSM-managed keys — never to file-based or
+      software-generated keys. Scan for hardcoded key material or key generation code
+      that uses software-only random number generators. Test key generation API
+      integrations to verify that generated keys meet minimum length requirements
+      and use approved algorithms.
+    tools:
+      - gitlab-secret-detection
+      - gitlab-sast
+      - semgrep
+      - gitleaks
+      - trufflehog
+  secops:
+    prose: >-
+      Audit key generation ceremony logs to verify dual control was maintained for
+      every generation event. Monitor HSM key generation activity for anomalous volumes
+      or unauthorized generation attempts. Review key custodian access lists quarterly
+      to verify that only authorized personnel retain custodian roles. Maintain a
+      centralized key inventory with generation dates, custodian identities, and
+      expiration schedules.
+    tools:
+      - splunk
+      - thales-crypto-command-center
+      - venafi
+      - keyfactor
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24"]
+    relationship: mapped

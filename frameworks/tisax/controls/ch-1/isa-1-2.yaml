@@ -1,0 +1,118 @@
+id: isa-1.2
+family: ch-1
+title: "Organization of Information Security"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall establish a management framework to initiate
+    and control the implementation and operation of information security.
+    Roles and responsibilities for information security shall be clearly
+    defined and assigned. Segregation of duties shall be implemented
+    where appropriate to reduce the risk of unauthorized or unintentional
+    modification or misuse of organizational assets. Contact with relevant
+    authorities and special interest groups shall be maintained.
+
+guidance:
+  prose: >-
+    VDA ISA requires a clearly documented organizational structure for
+    information security with defined reporting lines to executive
+    management. An Information Security Officer (ISO) or Chief Information
+    Security Officer (CISO) must be formally appointed with sufficient
+    authority, budget, and independence. The organizational structure
+    must ensure that information security is not solely an IT function
+    but spans all business areas including engineering, production, and
+    supply chain management. For automotive organizations, special
+    attention must be given to the separation between product development,
+    prototype handling, and series production environments. Contacts with
+    ENX Association, VDA working groups, CERT organizations, and relevant
+    authorities (BSI, ENISA) shall be documented and maintained. At AL3,
+    auditors verify that the ISO/CISO has direct access to top management
+    and that security governance meetings occur regularly with documented
+    minutes and action tracking.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of organizational structure and role assignments."
+  al2:
+    applicability: required
+    notes: "Auditor verifies appointment letters, reporting lines, and governance records."
+  al3:
+    applicability: required
+    notes: "On-site verification of governance effectiveness, meeting minutes, and escalation paths."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 1.2"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.5.2, A.5.3, A.5.4, A.5.5, A.5.6"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Model the information security organizational structure in the
+      internal developer portal (Backstage, Port) with clearly defined
+      team ownership, escalation paths, and security champions per
+      platform team. Implement RBAC in all platform tooling aligned
+      with the organizational hierarchy and segregation of duties
+      requirements. Use infrastructure-as-code to enforce separation
+      of environments (dev, staging, production, prototype) with
+      distinct access controls and approval workflows per environment.
+      Automate the provisioning and de-provisioning of security roles
+      when organizational changes occur. Maintain a machine-readable
+      org chart (YAML/JSON) in version control that maps security
+      responsibilities to platform components.
+    tools:
+      - backstage
+      - port
+      - terraform
+      - vault
+      - argocd
+      - kubernetes-rbac
+
+  devsecops:
+    prose: >-
+      Enforce segregation of duties in CI/CD pipelines by requiring
+      different approvers for code review, security review, and
+      production deployment. Implement branch protection rules that
+      mandate security team approval for changes to security-critical
+      components. Use CODEOWNERS files to assign security responsibility
+      for each repository or directory. Automate the generation of
+      responsibility matrices (RACI) from pipeline configuration and
+      access control definitions. Ensure that no single individual
+      can both develop and deploy code to production without independent
+      review.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - codeowners
+      - vault
+      - opa-gatekeeper
+
+  secops:
+    prose: >-
+      Configure the SIEM to map security events to responsible
+      organizational units and escalation paths. Implement automated
+      incident routing based on the defined organizational structure
+      so that alerts reach the correct team within SLA targets.
+      Maintain an up-to-date contact database for authorities, CERTs,
+      and industry groups integrated with the incident response
+      playbooks. Monitor for segregation-of-duty violations by
+      correlating access logs across systems and alerting when a
+      single identity performs conflicting actions. Generate quarterly
+      governance reports showing security organizational effectiveness.
+    tools:
+      - splunk
+      - elastic-siem
+      - pagerduty
+      - opsgenie
+      - servicenow
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.2", "A.5.3", "A.5.4", "A.5.5", "A.5.6"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-1", "PM-2", "AC-5"]
+    relationship: mapped

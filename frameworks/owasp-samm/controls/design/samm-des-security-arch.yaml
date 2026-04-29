@@ -1,0 +1,107 @@
+id: samm-des-security-arch
+family: design
+title: "Security Architecture"
+class: OWASP-SAMM-v2
+baselines: [level-1, level-2, level-3]
+
+statement:
+  prose: >-
+    Define, document, and enforce security architecture principles and patterns that guide
+    the design of software systems. Establish reference architectures, approved technology
+    stacks, and security design patterns that development teams can reuse to implement
+    security consistently and efficiently. Review software architectures against security
+    standards and threat models before development begins and whenever significant changes
+    are planned.
+  parts:
+    - id: samm-des-security-arch_smt.a
+      label: "Stream A — Architecture Design"
+      prose: >-
+        Establish security architecture principles (defense in depth, least privilege,
+        fail secure, separation of concerns, zero trust) and document their application
+        in concrete design guidelines. Create reference architectures for common system
+        patterns (web applications, APIs, microservices, data pipelines) that embed
+        security controls by default. Define standards for authentication, authorization,
+        cryptography, secrets management, and network segmentation. Require architectural
+        review for new systems and significant changes, involving security-qualified
+        reviewers.
+    - id: samm-des-security-arch_smt.b
+      label: "Stream B — Technology Management"
+      prose: >-
+        Maintain an approved technology list covering programming languages, frameworks,
+        libraries, databases, cloud services, and infrastructure components. Evaluate
+        technologies for security properties before approval — considering known
+        vulnerability history, vendor security practices, community support, and
+        cryptographic implementation quality. Enforce the approved technology list through
+        platform controls and CI/CD pipeline gates. Manage technology lifecycle by tracking
+        end-of-life dates and triggering migration efforts before support ends.
+
+guidance:
+  prose: >-
+    Security architecture is the multiplier — get it right and every team benefits; get
+    it wrong and no amount of testing will make the system secure. At maturity level 1,
+    the organization applies basic security principles informally and has rough guidelines
+    for common patterns. At level 2, reference architectures are formally documented,
+    an approved technology list exists, and architectural reviews are mandatory for
+    high-risk systems. At level 3, architecture compliance is automated through platform
+    controls (golden paths, policy-as-code), all systems are mapped to reference
+    architectures, and the security architecture function proactively evaluates emerging
+    technologies and patterns before teams adopt them organically.
+
+references:
+  - citation: "OWASP SAMM v2.0 — Design: Security Architecture"
+    url: "https://owaspsamm.org/model/design/security-architecture/"
+  - citation: "OWASP Security Architecture Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_Security_Cheat_Sheet.html"
+  - citation: "NIST Zero Trust Architecture — SP 800-207"
+    url: "https://csrc.nist.gov/pubs/sp/800/207/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Operationalize security architecture through the IDP by encoding reference
+      architectures as golden path templates in Backstage. When a developer scaffolds
+      a new service, they automatically receive pre-configured authentication (OAuth 2.0/
+      OIDC), secrets management (Vault integration), network policy templates, and
+      TLS configuration — eliminating the need for each team to design these individually.
+      Implement an approved technology registry in the software catalog that surfaces
+      security assessment status, end-of-life dates, and migration guidance for each
+      technology. Use Crossplane or Terraform modules as the exclusive mechanism for
+      provisioning cloud resources, ensuring architectural security controls are applied
+      consistently via infrastructure-as-code.
+    tools:
+      - "Backstage (scaffolding, software catalog)"
+      - "HashiCorp Vault (secrets management)"
+      - "Crossplane / Terraform (IaC with security controls)"
+      - "Istio / Linkerd (service mesh — zero trust networking)"
+      - "Open Policy Agent (OPA)"
+  devsecops:
+    prose: >-
+      Enforce the approved technology list in CI/CD pipelines by scanning SBOMs against
+      the approved component registry and blocking builds that introduce unapproved
+      dependencies. Implement infrastructure-as-code scanning (Checkov, tfsec) to
+      detect architectural violations — open security groups, unencrypted storage,
+      missing logging. Automate architecture compliance checks as pipeline stages that
+      verify adherence to security architecture standards: TLS configuration, authentication
+      middleware presence, secrets management patterns. Generate architecture drift reports
+      comparing actual deployed configurations against approved reference architectures.
+    tools:
+      - "Checkov / tfsec / KICS (IaC security scanning)"
+      - "Syft + Grype (SBOM with technology list validation)"
+      - "Trivy (container and IaC scanning)"
+      - "GitLab SAST (framework-specific rules)"
+      - "Dagger (pipeline-as-code)"
+  secops:
+    prose: >-
+      Maintain an architecture review board (ARB) that evaluates significant architectural
+      decisions from a security perspective before implementation. Conduct cloud security
+      posture management (CSPM) to continuously monitor deployed architectures for drift
+      from approved security baselines. Correlate CSPM findings with architectural
+      standards violations and generate prioritized remediation tickets. Review approved
+      technology list quarterly based on newly disclosed vulnerabilities, EOL announcements,
+      and threat intelligence about active exploitation of specific frameworks and libraries.
+    tools:
+      - "Prisma Cloud / Wiz (CSPM)"
+      - "AWS Security Hub / Azure Defender"
+      - "Tenable.cs / Orca Security"
+      - "Cloud Custodian (policy enforcement)"
+      - "Threat intelligence platforms (Mandiant, Recorded Future)"

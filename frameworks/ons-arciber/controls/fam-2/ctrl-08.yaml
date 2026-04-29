@@ -1,0 +1,95 @@
+id: ctrl-08
+family: fam-2
+title: "Seguranca Fisica dos Ativos do ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles de segurança física para proteger
+    os ativos do ARCiber contra acesso físico não autorizado, danos físicos e
+    interferências. Devem ser definidos e implementados perímetros físicos de
+    segurança para salas de controle, salas de servidores, painéis de automação
+    e centros de controle que abrigam ativos do ARCiber. O acesso físico deve
+    ser controlado, monitorado e registrado, com mecanismos de autenticação
+    física (cartões de acesso, biometria) para áreas que contenham ativos
+    críticos do ARCiber.
+
+guidance:
+  prose: >-
+    A seguranca fisica em ambientes OT/ICS e critica porque o acesso fisico a
+    um PLC, RTU ou switch industrial pode contornar controles logicos de seguranca.
+    Os controles devem abranger: (i) perimetros fisicos definidos com controle
+    de acesso eletronico para salas que contenham sistemas do ARCiber (SCADA
+    servers, historians, jump servers, sistemas de protecao); (ii) monitoramento
+    por CFTV das areas de acesso restrito com retencao de imagens por periodo
+    minimo de 90 dias; (iii) controle de acesso a paineis de automacao em campo
+    (subestacoes, usinas) com registro de abertura; (iv) procedimentos para
+    visitantes e prestadores de servico em areas do ARCiber; (v) protecao
+    contra ameacas ambientais (temperatura, umidade, interrupcao de energia) para
+    ativos criticos do ARCiber. Integrar controle de acesso fisico ao processo
+    de gestao de identidades (quando tecnicamente viavel).
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar sistema de controle de acesso fisico (PACS — Physical Access
+      Control System) integrado ao sistema de identidade corporativo (Active
+      Directory/IAM) para provisionamento e revogacao automatica de acessos
+      fisicos a areas do ARCiber. Configurar alertas para tentativas de acesso
+      fisico fora de horario autorizado ou por usuarios com acesso revogado.
+      Implementar monitoramento ambiental (temperatura, umidade, energia) para
+      salas de servidores do ARCiber com alertas proativos. Manter logs de
+      acesso fisico por no minimo 12 meses para auditoria.
+    tools:
+      - lenel-s2
+      - genetec
+      - milestone
+      - active-directory
+  devsecops:
+    prose: >-
+      Integrar eventos de acesso fisico ao SIEM para correlacao com eventos
+      logicos — acesso fisico a sala de servidores do ARCiber sem acesso logico
+      correspondente pode indicar atividade suspeita. Implementar alertas
+      automaticos para: accesso fisico por usuario com acesso logico revogado,
+      acesso fisico fora de janela de manutencao aprovada, e acesso fisico por
+      usuario nao treinado no ARCiber. Manter documentacao de layout fisico
+      e pontos de acesso do ARCiber como diagrama versionado no repositorio
+      de arquitetura.
+    tools:
+      - splunk
+      - gitlab
+      - servicenow
+  secops:
+    prose: >-
+      Realizar auditorias de seguranca fisica das instalacoes do ARCiber ao
+      menos anualmente, incluindo: verificacao de funcionamento dos controles
+      de acesso eletronico, revisao de logs de acesso, verificacao de CFTV,
+      e inspecao fisica de protecao de paineis e racks de automacao. Manter
+      lista atualizada de pessoas com acesso fisico autorizado as areas do
+      ARCiber, com revisao trimestral para remover acessos desnecessarios.
+      Documentar e investigar qualquer acesso fisico nao autorizado a areas
+      do ARCiber como potencial incidente de seguranca cibernetica.
+    tools:
+      - servicenow
+      - lenel-s2
+      - milestone
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 8", "art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-1 cl.4.3.3.3"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-006-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a7.1", "a7.2", "a7.3", "a7.4"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["PE-2", "PE-3", "PE-6"]
+    relationship: mapped

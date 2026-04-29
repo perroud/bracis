@@ -1,0 +1,121 @@
+id: a-7.4.5
+family: annex-a
+title: "PII de-identification and deletion at end of processing"
+class: ISO27701
+baselines: [pii-controller, combined]
+
+statement:
+  prose: >-
+    The organization shall either delete PII or render it in such a form that it does
+    not permit identification of PII principals, as soon as the original PII is no
+    longer necessary for the identified purpose(s). The organization shall implement
+    mechanisms and procedures to ensure that PII is deleted or de-identified in
+    accordance with documented retention policies and applicable legal requirements.
+    Where PII cannot be immediately deleted due to technical or legal constraints,
+    the organization shall implement measures to restrict further processing of the
+    PII pending deletion. The de-identification process shall be robust enough to
+    prevent re-identification using reasonably available means, considering the state
+    of technology and the cost of re-identification.
+
+guidance:
+  prose: >-
+    Data deletion and de-identification are technically challenging in modern distributed
+    systems. PII typically exists in multiple locations: primary databases, replicas,
+    backups, caches, logs, analytics systems, data warehouses, third-party systems,
+    and message queues. Effective deletion requires comprehensive PII mapping and
+    coordinated deletion across all locations. De-identification (anonymization or
+    pseudonymization) must be evaluated against re-identification risks — simple
+    techniques like removing names may be insufficient if remaining attributes allow
+    re-identification through linkage attacks. The organization must define and document
+    its approach: hard deletion (removing data), anonymization (irreversible
+    de-identification), or pseudonymization (reversible with additional information).
+    Retention policies must be specific per data category and processing purpose,
+    not generic organization-wide periods. Automated enforcement through TTL
+    mechanisms, scheduled purge jobs, and retention policy engines is essential
+    because manual deletion is unreliable at scale.
+
+references:
+  - citation: "ISO/IEC 27701:2019, A.7.4.5"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a data lifecycle management platform that enforces retention and
+      deletion policies automatically. Implement TTL (time-to-live) mechanisms
+      at the database level: PostgreSQL row expiration, Redis key expiration,
+      S3 lifecycle policies, Elasticsearch index lifecycle management.
+      Build a centralized retention policy engine that defines retention
+      periods per data category and processing purpose, with automated
+      enforcement through scheduled deletion jobs. Implement a PII deletion
+      orchestrator that coordinates deletion across all systems where PII
+      resides: primary databases, replicas, caches, search indexes, data
+      warehouses, message queues, and backup systems. Build de-identification
+      pipelines using techniques appropriate to the data type: k-anonymity
+      for structured data, differential privacy for analytics, generalization
+      for quasi-identifiers. Implement deletion verification that confirms
+      data is actually removed from all locations, including backup rotation
+      schedules. Provide crypto-shredding capabilities for encrypted PII
+      where physical deletion from backups is impractical.
+    tools:
+      - data-lifecycle-management
+      - postgresql-row-level-ttl
+      - s3-lifecycle-policies
+      - elasticsearch-ilm
+      - deletion-orchestrator
+      - crypto-shredding
+      - anonymization-pipelines
+
+  devsecops:
+    prose: >-
+      Integrate retention and deletion compliance into CI/CD pipelines.
+      Build infrastructure-as-code validation that verifies all PII data
+      stores have configured retention policies and TTL mechanisms. Implement
+      linting rules that detect PII storage without retention configuration.
+      Build automated tests that verify deletion completeness: create test
+      PII, trigger deletion, verify removal from all data stores including
+      caches and search indexes. Implement de-identification quality tests
+      that validate anonymized datasets against re-identification risk
+      thresholds. Build pipeline stages that verify backup retention schedules
+      align with PII deletion requirements. Track retention policy coverage
+      as a compliance metric in the CI/CD dashboard.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - checkov
+      - terraform-compliance
+      - deletion-verification-tests
+      - anonymization-quality-tests
+      - retention-coverage-metrics
+
+  secops:
+    prose: >-
+      Monitor retention policy compliance and deletion effectiveness
+      continuously. Build SIEM rules that detect PII retained beyond its
+      defined retention period. Monitor deletion job execution and alert
+      on failures or incomplete deletions. Track de-identification
+      effectiveness through periodic re-identification risk assessments.
+      Alert on PII in locations where it should have been deleted (e.g.,
+      old backups, decommissioned systems, test environments). Generate
+      periodic retention compliance reports showing policy adherence rates,
+      overdue deletions, and de-identification coverage. Monitor for data
+      resurrection — PII reappearing in systems after deletion, indicating
+      incomplete deletion or backup restoration issues.
+    tools:
+      - splunk
+      - elastic-siem
+      - retention-compliance-monitoring
+      - deletion-verification-alerts
+      - re-identification-risk-assessment
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.e", "art-17", "art-89"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-15", "art-16"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.105"]
+    relationship: supports

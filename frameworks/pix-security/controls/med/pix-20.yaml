@@ -1,0 +1,90 @@
+id: pix-20
+family: med
+title: "Bloqueio de Recursos e Analise no MED"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Ao receber notificação de infração via DICT referente ao MED, o PSP recebedor deve
+    bloquear os recursos na conta do beneficiário em até 30 minutos. O bloqueio deve
+    abranger o valor total da transação ou o saldo disponível na conta, o que for menor.
+    O PSP recebedor deve realizar a análise do caso em até 7 dias corridos, verificando
+    a procedência da notificação de fraude e a disponibilidade de recursos para devolução.
+guidance:
+  prose: |
+    **Bloqueio no MED:**
+    1. **Prazo de bloqueio:** 30 minutos apos recebimento da notificacao -- tempo
+       critico para evitar que o fraudador movimente os recursos.
+    2. **Valor bloqueado:** O menor entre o valor da transacao original e o saldo
+       disponivel na conta no momento do bloqueio.
+    3. **Notificacao ao titular:** O recebedor (potencial fraudador ou vitima de
+       mula) deve ser notificado do bloqueio.
+    4. **Bloqueio parcial:** Se o saldo for inferior ao valor original, bloqueia
+       o saldo disponivel.
+
+    **Analise no MED:**
+    O PSP recebedor deve analisar:
+    1. Se a transacao foi efetivamente creditada na conta.
+    2. Se ha indicios de fraude (perfil da conta, padrao de transacoes).
+    3. Se os recursos ainda estao disponiveis (total ou parcial).
+    4. Se o titular da conta e vitima (mula involuntaria) ou participe.
+
+    **Desfechos:**
+    - **Procedente:** Devolucao dos valores bloqueados.
+    - **Parcialmente procedente:** Devolucao do saldo disponivel.
+    - **Improcedente:** Desbloqueio dos valores.
+
+    **Automatizacao critica:**
+    O prazo de 30 minutos para bloqueio exige automacao. Bloqueio manual e inviavel
+    para volumes elevados de notificacoes MED.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de bloqueio:**
+      1. Listener em tempo real para notificacoes MED via DICT.
+      2. Bloqueio automatico da conta em < 30 minutos apos recebimento.
+      3. Calculo automatico do valor a bloquear (min entre transacao e saldo).
+      4. Registro em tabela de bloqueios MED com todos os metadados.
+
+      **Fila de analise:**
+      5. Workflow automatizado para triagem e encaminhamento para analise.
+      6. Enriquecimento automatico do caso com dados do motor antifraude.
+      7. Dashboard de casos MED pendentes com countdown de prazo.
+
+      **Devolucao:**
+      8. API de devolucao integrada ao SPI para transferencia reversa.
+      9. Conciliacao automatica entre valor devolvido e bloqueio original.
+    tools:
+      - event-listener
+      - workflow-engine
+      - database
+      - spi-client
+      - scheduler
+  devsecops:
+    prose: |
+      **Testes de bloqueio MED:**
+      1. Teste de latencia: bloqueio ocorre em < 30 minutos apos notificacao.
+      2. Teste de calculo: valor bloqueado = min(valor_transacao, saldo_conta).
+      3. Teste de indisponibilidade: comportamento quando saldo e zero.
+      4. Teste de concorrencia: bloqueio MED e saque simultaneos.
+      5. Teste de devolucao: fluxo completo via SPI.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - load-testing
+  secops:
+    prose: |
+      **Operacao de analise MED:**
+      1. Equipe de analise com SLA de 5 dias uteis (margem antes dos 7 corridos).
+      2. Checklist padronizado de analise MED.
+      3. Metricas: tempo de bloqueio, tempo de analise, taxa de procedencia.
+      4. Escalacao automatica para casos nao resolvidos em 5 dias.
+      5. Auditoria de qualidade de analise (amostragem mensal).
+    tools:
+      - case-management
+      - analytics-dashboard
+      - quality-assurance
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-21", "art-22"]
+    relationship: implements

@@ -1,0 +1,108 @@
+id: cscf-1.3
+family: obj-1
+title: "Virtualization Platform Protection"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Secure the virtualization platform and virtual machines hosting SWIFT-related
+    components to the same level as physical systems. The hypervisor, management
+    plane, and virtual networking must be hardened and access-controlled to
+    prevent unauthorized access, escape attacks, or cross-tenant data leakage.
+  parts:
+    - id: cscf-1.3.a
+      label: "1.3.a"
+      prose: >-
+        Hypervisor platforms hosting SWIFT components are hardened according
+        to vendor security guidelines and CIS benchmarks. Unnecessary services
+        and management interfaces are disabled.
+    - id: cscf-1.3.b
+      label: "1.3.b"
+      prose: >-
+        Administrative access to the hypervisor management plane is restricted
+        to authorized personnel using multi-factor authentication and is
+        logged and monitored.
+    - id: cscf-1.3.c
+      label: "1.3.c"
+      prose: >-
+        Virtual machines hosting SWIFT components do not share the hypervisor
+        with untrusted or general-purpose workloads. If shared infrastructure
+        is unavoidable, strong isolation controls (dedicated resource pools,
+        network micro-segmentation) are enforced.
+
+guidance:
+  prose: >-
+    Virtualization introduces additional attack surface through the hypervisor
+    layer. A compromised hypervisor grants an attacker full access to all
+    guest virtual machines, including those in the secure zone. Organizations
+    must treat hypervisor security as equal to physical server security.
+    Management interfaces (vCenter, Proxmox UI, Hyper-V Manager) must be
+    on dedicated management networks inaccessible from general IT. Snapshots
+    and VM images containing SWIFT data must be encrypted and access-controlled.
+    Cloud-hosted environments must leverage provider isolation guarantees
+    (dedicated hosts, confidential computing) and validate compliance through
+    shared responsibility documentation.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 1.3"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "CIS VMware ESXi Benchmark"
+    url: "https://www.cisecurity.org/benchmark/vmware"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy SWIFT VMs on dedicated hypervisor clusters or cloud dedicated
+      hosts (AWS Dedicated Hosts, Azure Dedicated Host, GCP Sole-Tenant
+      Nodes). Apply CIS benchmarks to VMware ESXi, Proxmox, or Hyper-V
+      configurations via automated hardening scripts. Restrict vCenter
+      and hypervisor management to a dedicated out-of-band management
+      network. Enable VM encryption (vSphere VM Encryption, BitLocker for
+      Hyper-V) for SWIFT workloads. Use infrastructure-as-code to provision
+      and maintain hypervisor configurations, ensuring drift detection.
+    tools:
+      - terraform
+      - ansible
+      - vmware-vsphere
+      - aws-dedicated-hosts
+      - azure-dedicated-host
+      - gcp-sole-tenant-nodes
+      - cis-benchmark-tools
+
+  devsecops:
+    prose: >-
+      Scan hypervisor configurations against CIS benchmarks in CI/CD
+      pipelines. Use Ansible playbooks with compliance roles to enforce
+      hardening. Automate validation that SWIFT VMs are placed only on
+      approved host groups. Alert on any VM migration to non-compliant
+      hosts via vCenter event monitoring.
+    tools:
+      - ansible
+      - inspec
+      - checkov
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor hypervisor administrative access and log all management plane
+      operations. Detect and alert on VM escape indicators, unauthorized
+      snapshot creation, or VM cloning operations. Review hypervisor patch
+      levels monthly and prioritize critical vulnerabilities. Conduct
+      annual penetration tests targeting the virtualization layer.
+    tools:
+      - splunk
+      - elastic-siem
+      - vmware-carbon-black
+      - crowdstrike-falcon
+      - qualys
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-3", "SC-39", "CM-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.8"]
+    relationship: supports

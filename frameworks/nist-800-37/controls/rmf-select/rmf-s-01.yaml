@@ -1,0 +1,86 @@
+id: rmf-s-01
+family: rmf-select
+title: "Control Selection Based on Categorization"
+class: NIST-800-37
+
+statement:
+  prose: >-
+    Select the controls for the information system based on the security categorization.
+    Apply the appropriate security control baseline from NIST SP 800-53B corresponding to
+    the system's impact level (low, moderate, or high). The initial control baseline provides
+    a starting point for the security and privacy controls needed to protect the system and
+    the organization. The baseline selection is refined through tailoring activities in
+    subsequent tasks.
+
+guidance:
+  prose: >-
+    Control selection starts with the identification of the applicable baseline from
+    NIST SP 800-53B. The baseline corresponds to the FIPS 199 impact level determined
+    during categorization. For national security systems, CNSSI 1253 provides the
+    applicable baselines. The selected baseline represents the minimum set of controls;
+    organizations may add controls beyond the baseline based on risk assessment results,
+    threat intelligence, or regulatory requirements. Privacy controls are selected based
+    on the system's processing of personally identifiable information (PII) regardless of
+    impact level. The control selection must be documented in the system security plan.
+
+references:
+  - citation: "NIST SP 800-37 Rev 2, Chapter 3, Select Step — Task S-1"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+  - citation: "NIST SP 800-53B, Control Baselines for Information Systems and Organizations"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53b/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Automate baseline selection by linking the system's categorization metadata to
+      the appropriate NIST SP 800-53B baseline in a control selection engine. Maintain
+      baselines as machine-readable data (OSCAL catalog/profile format) in a central
+      governance repository. When a system is categorized, automatically generate the
+      applicable control set and present it to the system owner for review. Map platform
+      common controls against the selected baseline to show which controls are inherited
+      and which require system-specific implementation. Provide a dashboard showing
+      control coverage percentage and gaps requiring attention.
+    tools:
+      - oscal-tools
+      - compliance-trestle
+      - backstage
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Use the system's declared categorization to automatically select and apply the
+      correct CI/CD pipeline template. Map pipeline security jobs to specific controls
+      from the selected baseline (e.g., SAST job satisfies SA-11, dependency scanning
+      satisfies RA-5). Generate a traceability matrix as a pipeline artifact that shows
+      which pipeline activities satisfy which selected controls. Maintain baseline
+      definitions as code and version-control them so that baseline updates automatically
+      propagate to affected pipelines.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-pipelines
+      - compliance-trestle
+      - oscal-tools
+
+  secops:
+    prose: >-
+      Use the GRC platform to automate baseline selection based on categorization
+      results. Maintain current NIST SP 800-53B baselines in the platform and
+      automatically associate the appropriate controls when a system is categorized.
+      Track the selected control set for each system and provide visibility into which
+      controls are common (inherited), system-specific, or hybrid. Generate gap analysis
+      reports comparing the selected baseline against current control implementation
+      status. Alert system owners when baselines are updated by NIST and controls need
+      to be reassessed.
+    tools:
+      - archer-grc
+      - servicenow-grc
+      - emass
+      - xacta
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-1", "PL-2", "PL-10"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.1", "A5.36"]
+    relationship: mapped

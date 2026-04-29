@@ -1,0 +1,109 @@
+id: req-3.1
+family: req-3
+title: "Protect Stored Account Data"
+class: PCI-DSS-v4
+
+statement:
+  prose: >-
+    Processes and mechanisms for protecting stored account data are defined and understood.
+    Storage of account data is kept to a minimum through implementation of data retention
+    and disposal policies, procedures, and processes. Sensitive authentication data (SAD)
+    is not stored after authorization, even if encrypted. Full contents of any track,
+    the card verification code, and PIN/PIN block are never stored after authorization.
+    The primary account number (PAN) is secured wherever it is stored using strong
+    cryptography, truncation, tokenization, or one-way hashing.
+  parts:
+    - id: req-3.1.a
+      label: "3.1.1"
+      prose: >-
+        All security policies and operational procedures identified in Requirement 3
+        are documented, kept up to date, in use, and known to all affected parties.
+    - id: req-3.1.b
+      label: "3.1.2"
+      prose: >-
+        Roles and responsibilities for performing activities in Requirement 3 are
+        documented, assigned, and understood.
+
+guidance:
+  prose: >-
+    Stored account data is the primary target for attackers. The more data stored and
+    the longer it is retained, the greater the risk. Organizations must implement a data
+    minimization strategy that limits what is stored, how long it is retained, and where
+    it exists. Sensitive authentication data (full track data, CAV2/CVC2/CVV2/CID, PINs)
+    must never be stored after authorization, regardless of encryption. For PAN storage,
+    organizations must render it unreadable using one of four methods: one-way hashes
+    based on strong cryptography, truncation, index tokens with securely stored pads, or
+    strong cryptography with associated key management processes. Data retention policies
+    must define maximum storage periods and trigger automated purging when data exceeds
+    its retention period.
+
+references:
+  - citation: "PCI DSS v4.0.1, Requirement 3"
+    url: "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0_1.pdf"
+  - citation: "NIST SP 800-57 Part 1 - Recommendation for Key Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-57pt1r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement data-at-rest encryption using platform-native key management services
+      (AWS KMS, Azure Key Vault, GCP Cloud KMS, HashiCorp Vault). Use envelope
+      encryption with automatic key rotation. Deploy tokenization services that replace
+      PAN with non-reversible tokens for all non-essential processing. Implement
+      database-level encryption (TDE) for databases storing cardholder data. Use
+      Kubernetes secrets encrypted at rest with an external KMS provider. Enforce that
+      no persistent volume storing cardholder data exists without encryption. Implement
+      automated data retention enforcement using scheduled jobs that purge expired
+      cardholder data. Use data classification labels in the service catalog to identify
+      all components that store, process, or transmit account data.
+    tools:
+      - hashicorp-vault
+      - aws-kms
+      - azure-key-vault
+      - gcp-cloud-kms
+      - tokenization-service
+      - kubernetes-secrets
+      - sealed-secrets
+
+  devsecops:
+    prose: >-
+      Implement secret scanning in CI/CD pipelines to detect accidental PAN storage
+      in code repositories, logs, or configuration files. Use SAST tools configured
+      with rules to detect patterns that store sensitive authentication data after
+      authorization. Enforce code review policies for any changes to data storage
+      components in the CDE. Scan application logs to ensure PAN is never written
+      in cleartext. Implement pre-commit hooks that detect credit card number patterns
+      in source code. Test data retention enforcement in staging environments before
+      production deployment.
+    tools:
+      - gitlab-secret-detection
+      - gitlab-sast
+      - trufflehog
+      - gitleaks
+      - semgrep
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor for unauthorized storage of account data using data discovery and
+      classification tools. Scan file systems, databases, and log files for PAN
+      patterns on a regular schedule. Alert on any detection of full track data,
+      CVV, or PIN storage anywhere in the environment. Audit data retention
+      compliance by verifying that cardholder data beyond its retention period has
+      been securely deleted. Monitor key management operations for anomalies such
+      as unauthorized key exports or unusual decryption volumes.
+    tools:
+      - spirion
+      - varonis
+      - digital-guardian
+      - splunk
+      - elastic-siem
+      - thales-ciphertrust
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28", "MP-6"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.10", "A8.11", "A8.24"]
+    relationship: supports

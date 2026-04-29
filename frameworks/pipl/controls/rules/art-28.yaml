@@ -1,0 +1,91 @@
+id: art-28
+family: rules
+title: "Processing of sensitive personal information"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 28: Sensitive personal information refers to personal information that, once leaked or
+    illegally used, may easily lead to infringement of the dignity of a natural person or harm to
+    personal or property safety, including biometric identification, religious beliefs, specially
+    designated status, medical and health information, financial accounts, individual location tracking,
+    and other such information, as well as the personal information of minors under the age of fourteen.
+    The processing of sensitive personal information shall only be carried out where there is a specific
+    purpose and sufficient necessity, and under circumstances where strict protection measures are adopted.
+    Article 29: The processing of sensitive personal information requires the individual's separate
+    consent. Where laws or administrative regulations provide that written consent shall be obtained
+    for the processing of sensitive personal information, such provisions shall prevail.
+    Article 30: Where a personal information processor processes sensitive personal information, in
+    addition to the matters specified in Article 17, it shall also inform the individual of the
+    necessity for processing the sensitive personal information and the impact on the individual's
+    rights and interests, unless an exception provided for in this Law applies.
+
+guidance:
+  prose: >-
+    Articles 28 through 30 define sensitive personal information and impose heightened requirements
+    for its processing. The PIPL definition of sensitive data is broader than GDPR's "special categories"
+    in Article 9 — it includes financial accounts, location tracking, and all personal information
+    of minors under 14 (compared to GDPR's threshold of 16 or member state adjustment to 13).
+    Processing sensitive data requires: (1) a specific purpose and sufficient necessity, (2) strict
+    protection measures, (3) separate consent from the individual (or written consent where required
+    by other laws), and (4) additional notification about the necessity and impact on individual rights.
+    The "sufficient necessity" test is stricter than the GDPR approach, which allows processing
+    of special categories under various bases including explicit consent, employment obligations,
+    and substantial public interest.
+
+references:
+  - citation: "PIPL, Articles 28–30"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a sensitive data classification system that automatically tags data fields matching
+      PIPL's sensitive categories (biometrics, religious beliefs, health, financial accounts,
+      location, minors under 14). Deploy encryption-at-rest and in-transit with elevated key
+      management for sensitive personal information. Build separate consent collection flows for
+      sensitive data processing with enhanced disclosure (necessity and impact on rights).
+      Implement access controls that restrict sensitive data access to authorized personnel
+      with audit logging. Deploy data isolation patterns (separate databases or encrypted
+      partitions) for sensitive personal information.
+    tools:
+      - "Data classification engines (BigID, Securiti, Microsoft Purview)"
+      - "Encryption key management (HashiCorp Vault, AWS KMS)"
+      - "Separate consent flows for sensitive data"
+      - "Role-based access control for sensitive data (OPA, Casbin)"
+      - "Data isolation patterns (separate schemas, encrypted columns)"
+  devsecops:
+    prose: >-
+      Pipeline checks must identify new data fields that fall within PIPL's sensitive data
+      categories and enforce heightened protection measures. Automated scans must detect
+      biometric data, health information, financial data, and location data in code and
+      configurations. Secret detection must flag hardcoded sensitive data classifications.
+      Code reviews must verify that separate consent is collected before sensitive data
+      processing. Encryption validation must confirm that sensitive data is encrypted at
+      rest and in transit with appropriate algorithms.
+    tools:
+      - "Sensitive data detection in CI (Semgrep, custom rules)"
+      - "Secret and sensitive data scanning (GitLab Secret Detection, TruffleHog)"
+      - "Encryption validation tools"
+      - "Separate consent flow testing for sensitive data"
+  secops:
+    prose: >-
+      Monitor access to sensitive personal information with enhanced alerting thresholds.
+      Detect and alert on unauthorized access attempts to sensitive data stores. Track
+      separate consent status for sensitive data processing and alert on processing without
+      consent. Conduct periodic classification reviews to identify untagged sensitive data.
+      Monitor for sensitive data leakage through DLP tools.
+    tools:
+      - "Enhanced SIEM rules for sensitive data access"
+      - "DLP with sensitive data classification (Nightfall, Forcepoint)"
+      - "Database activity monitoring for sensitive tables"
+      - "Consent status monitoring for sensitive data processing"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-9"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: equivalent-to

@@ -1,0 +1,86 @@
+id: art-4
+family: processing
+title: "General Principles of Data Processing"
+class: KVKK
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 4 — General Principles.
+    Personal data shall be:
+    (a) processed lawfully and in good faith;
+    (b) accurate and, where necessary, kept up to date;
+    (c) processed for specified, explicit, and legitimate purposes;
+    (d) relevant to, limited to, and proportionate with the purposes for which
+    they are processed;
+    (e) retained for the period prescribed by the relevant legislation or necessary
+    for the purpose for which they are processed.
+
+guidance:
+  prose: >-
+    Article 4 establishes the five core data processing principles of KVKK, closely
+    mirroring GDPR Article 5 but with some distinctions. The "good faith" principle
+    goes beyond mere lawfulness — it requires controllers to act honestly and fairly
+    toward data subjects. The proportionality principle (4d) is functionally equivalent
+    to GDPR's data minimization but framed in terms of proportionality. The retention
+    principle (4e) creates a dual standard: data must be deleted when either the legal
+    retention period expires OR when the processing purpose is fulfilled, whichever
+    comes first. Organizations must implement these principles as enforceable technical
+    controls, not merely policy statements.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      LAWFULNESS AND GOOD FAITH: Implement a centralized legal basis registry that
+      every data processing service must reference. Build purpose-declaration APIs
+      that require services to state their legal basis before accessing personal data.
+      ACCURACY: Implement event-driven data correction propagation across all services.
+      Provide self-service data correction endpoints. PURPOSE LIMITATION: Tag all data
+      pipelines with declared purposes using metadata labels. Enforce purpose-bound
+      access through policy engines (OPA/Kyverno). PROPORTIONALITY: Design APIs to
+      accept and return only necessary fields. Implement field-level access control
+      on data stores. RETENTION: Implement automated TTL policies on all personal data
+      stores. Build a retention policy engine that enforces deletion schedules based on
+      both legal periods and purpose fulfillment.
+    tools:
+      - "OPA/Gatekeeper for purpose-bound access enforcement"
+      - "PostgreSQL row-level security for field-level access control"
+      - "Apache Kafka with schema registry for purpose-tagged data streams"
+      - "CronJob-based retention enforcement with audit trails"
+      - "HashiCorp Vault for encryption key management"
+      - "Data lineage tracking (Apache Atlas, OpenLineage)"
+  devsecops:
+    prose: >-
+      CI pipeline checks must verify that every new service processing personal data
+      has a documented legal basis. Linting rules must detect over-fetching of personal
+      data fields (e.g., SELECT * on PII tables). Pipeline checks must verify that new
+      data stores have TTL/retention policies configured. Code review automation must
+      flag when personal data is accessed outside its declared processing purpose.
+      Automated tests must verify data correction propagation across services.
+    tools:
+      - "Semgrep rules for PII over-fetching detection"
+      - "Database migration linters for retention policy verification"
+      - "Custom CI checks for legal basis registration"
+      - "Schema validation tools (Spectral for OpenAPI)"
+  secops:
+    prose: >-
+      Monitor for processing activities without registered legal basis. Detect and
+      alert on data access patterns that deviate from declared purposes. Monitor for
+      personal data exceeding retention periods. Alert on storage growth anomalies
+      in personal data stores. Verify data correction request SLAs are met.
+    tools:
+      - "SIEM with KVKK principle violation detection rules"
+      - "DLP with purpose-aware policies"
+      - "Automated retention compliance scanning"
+      - "Data quality monitoring dashboards"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.2.1", "A.7.2.2"]
+    relationship: supports

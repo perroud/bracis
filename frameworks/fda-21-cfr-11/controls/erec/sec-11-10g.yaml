@@ -1,0 +1,92 @@
+id: sec-11-10g
+family: erec
+title: "Closed System Controls — Authority Checks"
+class: FDA-21CFR11
+baselines: [electronic-records-signatures]
+
+statement:
+  prose: >-
+    (g) Use of authority checks to ensure that only authorized individuals
+    can use the system, electronically sign a record, access the operation
+    or computer system input or output device, alter a record, or perform
+    the operation at hand.
+
+guidance:
+  prose: >-
+    Section 11.10(g) requires authority checks to verify that individuals
+    performing specific actions are authorized to do so. This goes beyond
+    basic access control (11.10(d)) to enforce role-specific permissions
+    for critical operations. Authority checks must verify authorization for:
+    (1) system use, (2) electronically signing records, (3) accessing input
+    or output devices, (4) altering records, and (5) performing specific
+    operations. This requires granular, role-based access control where
+    each user's permissions are defined based on their job function,
+    training status, and organizational authority. Authority checks should
+    be enforced at the application level, not solely at the operating system
+    level. Segregation of duties should be implemented where appropriate to
+    prevent conflicts of interest.
+
+references:
+  - citation: "21 CFR Part 11, Section 11.10(g)"
+    url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Implement granular role-based access control (RBAC) that maps
+      organizational roles to specific system permissions (view, create,
+      modify, delete, sign, approve). 2. Enforce segregation of duties so
+      that the person creating a record cannot be the same person approving
+      or releasing it. 3. Implement signing authority checks that verify the
+      user has the appropriate role and training status before allowing
+      electronic signature execution. 4. Configure device-level access
+      controls to restrict access to specific input/output devices (e.g.,
+      label printers, data acquisition instruments) to authorized personnel.
+      5. Implement real-time authority validation that checks current user
+      permissions at the time of each action, not just at login.
+    tools:
+      - iam-platform
+      - rbac-engine
+      - policy-engine
+      - device-access-control
+  devsecops:
+    prose: >-
+      1. Implement code owner requirements and merge request approval rules
+      that enforce authority checks for code changes to Part 11 systems.
+      2. Prevent merge request authors from approving their own changes.
+      3. Require minimum number of approvals from authorized reviewers
+      before changes can be merged. 4. Verify RBAC configurations
+      automatically in the CI/CD pipeline.
+    tools:
+      - gitlab-ci
+      - code-owners
+      - merge-request-approvals
+      - rbac-validation
+  secops:
+    prose: >-
+      1. Maintain a documented authority matrix mapping each role to its
+      authorized actions within Part 11 systems. 2. Verify authority check
+      enforcement during periodic audits by testing that unauthorized users
+      are prevented from performing restricted operations. 3. Review and
+      update the authority matrix whenever organizational roles change.
+      4. Monitor for authority escalation attempts or unauthorized privilege
+      use.
+    tools:
+      - authority-matrix
+      - access-review
+      - siem
+      - audit-management
+
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-18"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-a-1"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-5", "AC-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-15", "controle-A-5-16"]
+    relationship: mapped

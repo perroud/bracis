@@ -1,0 +1,91 @@
+id: art-38
+family: cap-8
+title: "Politica de Registro de Eventos (Logging)"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 38. Os órgãos e entidades devem implementar política de registro de
+    eventos de segurança da informação, contemplando:
+
+    I - definição dos eventos a serem registrados em cada tipo de sistema;
+    II - informações mínimas a constar em cada registro: data/hora, usuário,
+    ação, resultado, origem;
+    III - sincronização de relógios de todos os sistemas (NTP);
+    IV - proteção dos registros contra alteração e exclusão não autorizadas;
+    V - período mínimo de retenção dos registros.
+guidance:
+  prose: |
+    O art. 38 estabelece os requisitos de logging: eventos, formato minimo,
+    NTP, protecao contra tampering e retencao.
+
+    **Eventos obrigatorios de registro:**
+    - Autenticacao: login, logout, falhas, MFA
+    - Autorizacao: concessao, revogacao, negacao de acesso
+    - Mudancas: CRUD em dados criticos, configuracoes
+    - Privilegios: uso de contas admin, elevacao
+    - Sistema: inicializacao, parada, erros criticos
+
+    **Formato minimo (RFC 5424/CEF):**
+    - Timestamp (UTC com NTP)
+    - Source IP/hostname
+    - User ID
+    - Action/Event type
+    - Result (success/failure)
+    - Object affected
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.15 (Logging)
+    - NIST 800-53 rev5: AU-2 (Event Logging), AU-3 (Content of Audit Records)
+    - CIS Controls v8: 8.2 (Audit Log Management)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack de logging:**
+      1. Logging centralizado (ELK Stack, Loki, Splunk).
+      2. NTP sincronizado em todos os sistemas (ntp.br como fonte primaria).
+      3. Logs enviados em tempo real para SIEM (nao armazenados apenas local).
+      4. Logs imutaveis: write-once storage (S3 Object Lock, WORM).
+      5. Schema padronizado de logs (CEF, ECS) para facilitar correlacao.
+    tools:
+      - centralized-logging
+      - ntp-sync
+      - siem
+      - immutable-storage
+      - log-schema
+  devsecops:
+    prose: |
+      **Logging em aplicacoes:**
+      1. Framework de logging padronizado em todas as aplicacoes.
+      2. Structured logging (JSON) com campos obrigatorios.
+      3. Pipeline que valida que aplicacao gera logs no formato correto.
+      4. Nao logar dados sensiveis (PII, senhas, tokens) - lint de logs.
+    tools:
+      - structured-logging
+      - log-format-validation
+      - sensitive-data-log-filter
+  secops:
+    prose: |
+      **Operacao de logging:**
+      1. Monitoramento da saude do pipeline de logs (volume, latencia, gaps).
+      2. Alerta para ausencia de logs (sistema parou de enviar logs).
+      3. Retencao: minimo 1 ano para logs de seguranca, 5 anos para logs de auditoria.
+      4. Teste trimestral de integridade dos logs armazenados.
+    tools:
+      - log-pipeline-monitoring
+      - log-gap-detection
+      - retention-management
+      - integrity-verification
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-8"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-37", "art-49"]
+    relationship: complements

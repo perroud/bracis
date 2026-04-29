@@ -1,0 +1,139 @@
+id: art-28-2
+family: sensitive
+title: "Processing of Pseudonymized Information"
+class: PIPA-KR
+baselines: [privacy-baseline]
+statement:
+  prose: |
+    Article 28-2 (Processing of Pseudonymized Information)
+    (1) A personal information processor may process pseudonymized information without
+    the consent of the data subject for the purposes of statistics, scientific research,
+    and the preservation of records of public interest.
+
+    (2) A personal information processor shall not include information that can be used
+    to identify a specific individual in the pseudonymized information processed under
+    paragraph (1).
+
+    Article 28-3 (Restriction on Combination of Pseudonymized Information)
+    (1) Where it is necessary to combine pseudonymized information processed by
+    different personal information processors for the purposes under Article 28-2(1),
+    the combination shall be performed by a specialized institution designated by
+    the Personal Information Protection Commission.
+
+    Article 28-5 (Safety Measures for Pseudonymized Information)
+    (1) A personal information processor who processes pseudonymized information under
+    Article 28-2 shall take technical, administrative, and physical measures necessary
+    for the safety of the pseudonymized information, such as separately storing and
+    managing the additional information used for pseudonymization.
+
+    (2) A personal information processor who processes pseudonymized information under
+    Article 28-2 shall not process the pseudonymized information for the purpose of
+    identifying a specific individual.
+
+    (3) Where a personal information processor identifies a specific individual from
+    pseudonymized information processed under Article 28-2, the personal information
+    processor shall immediately suspend processing and destroy the additional
+    information obtained in the identification process.
+
+    Article 28-7 (Application of Other Statutes)
+    The provisions of Articles 20, 21, 27, 34(1), 35 through 37, and 37-2 shall not
+    apply to pseudonymized information processed under Article 28-2.
+guidance:
+  prose: |
+    Articles 28-2 through 28-7 were introduced in the landmark 2020 "Data Three
+    Acts" amendment, creating a comprehensive pseudonymization framework. This was
+    a watershed moment for Korean data governance, enabling data utilization for
+    research and statistics while maintaining privacy protections.
+
+    Key framework elements:
+
+    - **Purpose limitation (Art. 28-2):** Pseudonymized information can only be
+      processed for three purposes: statistics, scientific research, and public
+      interest record preservation. Commercial analytics or marketing are excluded.
+
+    - **Combination restriction (Art. 28-3):** Combining pseudonymized datasets
+      from different processors requires a PIPC-designated specialized institution
+      as intermediary. Direct cross-organizational data combination is prohibited.
+      Designated institutions include the Korea Internet & Security Agency (KISA)
+      and approved data exchanges.
+
+    - **Safety measures (Art. 28-5):** Additional information used for
+      pseudonymization (the key/mapping table) must be stored and managed
+      separately from the pseudonymized dataset. Technical, administrative, and
+      physical measures are all required.
+
+    - **Re-identification prohibition (Art. 28-5(2)):** Attempting to re-identify
+      individuals from pseudonymized data is explicitly prohibited.
+
+    - **Mandatory destruction (Art. 28-5(3)):** If re-identification accidentally
+      occurs, processing must stop immediately and all re-identification
+      information must be destroyed.
+
+    - **Exemptions (Art. 28-7):** Pseudonymized information processing is exempt
+      from certain data subject rights (access, correction, deletion, suspension,
+      automated decision-making rights) and breach notification.
+
+    Distinction from anonymization: Anonymized information (where identification
+    is impossible even with additional information) falls outside PIPA entirely.
+    Pseudonymized information remains within PIPA's scope but enjoys specific
+    exemptions.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a pseudonymization service as a shared platform capability that
+         applies consistent techniques (k-anonymity, l-diversity, tokenization,
+         generalization) across all data sources.
+      2. Implement strict separation between pseudonymized datasets and the
+         additional information (key tables/mapping tables) used in pseudonymization.
+         Store mapping tables in a dedicated, access-restricted vault.
+      3. Design data combination workflows that route through PIPC-designated
+         institutions when combining datasets from different processors.
+      4. Build purpose-enforcement controls that restrict pseudonymized data
+         access to approved purposes (statistics, research, public interest records).
+      5. Implement re-identification detection that monitors for correlation
+         attacks or accidental re-identification.
+    tools:
+      - pseudonymization-service
+      - key-management-vault
+      - purpose-enforcement-engine
+      - re-identification-risk-monitor
+      - data-combination-gateway
+  devsecops:
+    prose: |
+      1. Validate pseudonymization quality in CI/CD: test that pseudonymized
+         datasets cannot be re-identified using available auxiliary data.
+      2. Scan for accidental inclusion of direct identifiers in pseudonymized
+         datasets.
+      3. Test separation of pseudonymized data and mapping tables in deployment
+         configurations.
+      4. Verify that purpose-limitation controls are enforced in pseudonymized
+         data APIs.
+    tools:
+      - re-identification-risk-tester
+      - identifier-detection-scanner
+      - configuration-validator
+      - purpose-enforcement-tester
+  secops:
+    prose: |
+      1. Monitor access to pseudonymization mapping tables with enhanced logging
+         and alerting.
+      2. Detect re-identification attempts through anomalous query patterns on
+         pseudonymized datasets.
+      3. Audit pseudonymized data usage against the three permitted purposes.
+      4. Track data combination requests and verify they route through designated
+         institutions.
+    tools:
+      - access-monitoring
+      - anomaly-detection
+      - purpose-audit
+      - data-combination-tracker
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-89"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-13"]
+    relationship: mapped
+  - framework_id: appi
+    articles: ["art-41"]
+    relationship: mapped

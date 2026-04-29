@@ -1,0 +1,120 @@
+id: art-22
+family: cap-4
+title: "Plano de Contingencia e Fallback Humano"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 22. Instituições que utilizem sistemas de IA em atividades médicas
+    devem possuir plano de contingência documentado para cenários de
+    indisponibilidade ou falha do sistema:
+
+    I - o plano deve garantir continuidade do atendimento médico com
+    qualidade equivalente na ausência do sistema de IA;
+
+    II - devem existir protocolos clínicos alternativos que não dependam
+    de IA, conhecidos e praticados pela equipe médica;
+
+    III - a transição de atendimento assistido por IA para atendimento
+    sem IA deve ser fluida, sem interrupção do cuidado ao paciente;
+
+    IV - o plano de contingência deve ser testado periodicamente, no
+    mínimo semestralmente, com simulação de indisponibilidade;
+
+    V - para sistemas de risco muito alto, deve existir mecanismo de
+    desativação imediata (kill switch) acessível ao médico supervisor,
+    com fallback automático para protocolo clínico convencional.
+guidance:
+  prose: |
+    O art. 22 aborda um risco real: dependencia institucional de IA.
+    Se a IA cai e ninguem sabe operar sem ela, a seguranca do paciente
+    esta comprometida.
+
+    **Cenarios de contingencia:**
+
+    - Indisponibilidade planejada: manutencao, atualizacao de modelo.
+      Deve ser agendada fora de horarios de pico clinico.
+
+    - Indisponibilidade nao planejada: falha de infraestrutura, bug,
+      degradacao de performance. Deve haver deteccao automatica e
+      ativacao imediata de protocolo alternativo.
+
+    - Desativacao por risco: modelo detectado com drift, bias ou
+      performance abaixo do aceitavel. Desativacao voluntaria com
+      comunicacao a equipe clinica.
+
+    **Qualidade equivalente (inciso I):**
+    Nao se exige qualidade identica, mas equivalente. O padrao de
+    cuidado sem IA deve atender os padroes minimos da especialidade.
+    Na pratica, isso significa que protocolos pre-IA devem ser mantidos
+    atualizados.
+
+    **Testes de contingencia (inciso IV):**
+    Simulacoes semestrais devem incluir: desligamento do sistema de IA,
+    verificacao de que equipe clinica consegue operar sem IA, medicao
+    de tempo de resposta e qualidade do atendimento. Similar a drill
+    de incendio.
+
+    **Kill switch (inciso V):**
+    Para sistemas de risco muito alto (UTI, emergencia), o medico
+    deve poder desativar a IA com um clique. O sistema deve entrar
+    em modo fallback automaticamente, sem perda de dados ou
+    interrupcao de monitoramento basico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de contingencia:**
+      1. Implementar arquitetura graceful degradation: sistema deve
+         funcionar sem IA, com degradacao controlada de funcionalidade.
+      2. Configurar kill switch por sistema de IA com fallback
+         automatico: desativacao aciona protocolo alternativo sem
+         intervencao manual adicional.
+      3. Implementar health checks continuos de sistemas de IA com
+         ativacao automatica de contingencia quando metricas de
+         saude ultrapassarem limiares.
+      4. Manter infraestrutura de monitoramento clinico basico
+         independente de IA, para garantir continuidade minima.
+    tools:
+      - graceful-degradation
+      - kill-switch
+      - health-checks
+      - fallback-systems
+  devsecops:
+    prose: |
+      **Validacao de contingencia no pipeline:**
+      1. Implementar testes de chaos engineering que simulem falha
+         de sistemas de IA e verifiquem ativacao correta de fallback.
+      2. Testar que kill switch funciona em todas as condicoes:
+         alta carga, falha parcial, falha de rede.
+      3. Validar que protocolos clinicos alternativos estao
+         documentados e acessiveis na interface mesmo com IA ativa.
+      4. Automatizar teste de degradacao: verificar que sistema
+         funciona adequadamente em modo sem-IA.
+    tools:
+      - gitlab-ci
+      - chaos-engineering
+      - resilience-tests
+      - degradation-tests
+  secops:
+    prose: |
+      **Exercicios de contingencia:**
+      1. Planejar e executar simulacoes semestrais de indisponibilidade
+         de IA, com metricas de tempo de resposta e qualidade.
+      2. Treinar equipe clinica em protocolos alternativos sem IA,
+         garantindo familiaridade com fluxos pre-IA.
+      3. Documentar resultados de cada simulacao com gaps identificados
+         e planos de melhoria.
+      4. Manter plano de contingencia atualizado e acessivel a toda
+         equipe clinica, com revisao semestral.
+    tools:
+      - contingency-planning
+      - drill-management
+      - training-platform
+      - documentation-system
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-14"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["manage-3", "manage-4"]
+    relationship: mapped

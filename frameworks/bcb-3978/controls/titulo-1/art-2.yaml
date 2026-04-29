@@ -1,0 +1,127 @@
+id: art-2
+family: titulo-1
+title: "Definicoes Aplicaveis"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 2. Para fins do disposto nesta Circular, consideram-se:
+    I - cliente: a pessoa natural ou jurídica com a qual é mantida relação de negócio;
+    II - beneficiário final: a pessoa natural que, em última instância, de forma direta
+    ou indireta, possui, controla ou influencia significativamente uma pessoa jurídica
+    ou em nome da qual uma transação é conduzida;
+    III - pessoa exposta politicamente (PEP): agentes públicos que desempenham ou
+    tenham desempenhado, nos últimos cinco anos, no Brasil ou em países, territórios
+    e dependências estrangeiros, cargos, empregos ou funções públicas relevantes;
+    IV - produto: qualquer bem ou serviço ofertado pela instituição;
+    V - operação: qualquer transação financeira realizada pelo cliente junto à instituição.
+guidance:
+  prose: |
+    O art. 2 estabelece as definicoes fundamentais que permeiam toda a circular.
+    A interpretacao correta destes conceitos e essencial para a implementacao adequada
+    dos procedimentos de PLD/FT.
+
+    **I - Cliente:**
+    Conceito amplo que abrange qualquer pessoa (natural ou juridica) com relacao de
+    negocio ativa ou em processo de estabelecimento. Inclui:
+    - Correntistas e poupadores
+    - Tomadores de credito
+    - Investidores
+    - Usuarios de servicos de pagamento
+    - Beneficiarios de transferencias internacionais
+
+    **II - Beneficiario final:**
+    Conceito critico para PLD/FT. Exige que a instituicao identifique a pessoa natural
+    que efetivamente possui, controla ou se beneficia de uma estrutura juridica.
+    Criterios tipicos:
+    - Participacao societaria direta ou indireta >= 25%
+    - Controle por acordos de acionistas, procuracoes ou outros mecanismos
+    - Influencia significativa na gestao, mesmo sem participacao formal
+
+    **III - PEP (Pessoa Exposta Politicamente):**
+    Definicao temporal: inclui agentes publicos atuais e dos ultimos 5 anos.
+    Abrangencia:
+    - Nacional e estrangeiro
+    - Familiares proximos de PEPs
+    - Pessoas com estreito relacionamento com PEPs
+    Cargos tipicos: chefes de estado, parlamentares, dirigentes de estatais,
+    magistrados de tribunais superiores, oficiais-generais, entre outros.
+
+    **IV-V - Produto e Operacao:**
+    Definicoes amplas que cobrem qualquer interacao financeira entre cliente e
+    instituicao, desde abertura de conta ate transferencias internacionais complexas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelo de dados de PLD/FT:**
+      1. Entidade de cliente com campos obrigatorios: tipo (PF/PJ), documentos de
+         identificacao, dados cadastrais, classificacao de risco, data de inicio da
+         relacao, status (ativo/inativo/bloqueado).
+      2. Entidade de beneficiario final com rastreamento de cadeia societaria ate
+         a pessoa natural. Suporte a estruturas multi-nivel com percentual de
+         participacao direta e indireta.
+      3. Entidade de PEP com campos: cargo, periodo de exercicio, jurisdicao,
+         tipo (titular, familiar, relacionamento proximo), data de classificacao.
+      4. Entidade de operacao com campos: tipo, valor, moeda, origem, destino,
+         data/hora, canal, dispositivo, geolocalizacao.
+
+      **Integracao com fontes de dados:**
+      5. API de consulta a listas restritivas (OFAC, EU Sanctions, ONU, lista BCB).
+      6. API de consulta a registros publicos (Receita Federal, JUCESP, juntas comerciais).
+      7. API de verificacao de PEP (bases comerciais ou bases proprias).
+      8. Webhook para atualizacao automatica quando status de PEP muda.
+    tools:
+      - aml-platform
+      - kyc-system
+      - sanctions-screening
+      - data-enrichment-api
+  devsecops:
+    prose: |
+      **Validacao de dados de PLD/FT no pipeline:**
+      1. Testes unitarios para validacao de CPF/CNPJ, parsing de documentos e
+         calculo de participacao societaria indireta.
+      2. Testes de integracao para fluxos de KYC completos (abertura de conta,
+         atualizacao cadastral, encerramento).
+      3. Data quality checks automatizados em dados de clientes e beneficiarios finais.
+
+      **Seguranca dos dados de PLD/FT:**
+      4. Criptografia de dados sensiveis de PEP e beneficiario final em repouso.
+      5. Mascaramento de dados de PLD/FT em ambientes nao produtivos.
+      6. Audit trail de acesso e modificacao de dados de PEP e beneficiario final.
+      7. Secret scanning para prevenir vazamento de chaves de API de consulta.
+    tools:
+      - gitlab-ci
+      - data-masking
+      - vault
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Governanca de dados de PLD/FT:**
+      1. Classificacao de dados de PLD/FT como confidenciais com controles
+         de acesso restritos (need-to-know basis).
+      2. Processo formal de aprovacao para concessao de acesso a dados de PEP
+         e beneficiario final.
+      3. Revisao periodica de acessos (trimestral) a sistemas de PLD/FT.
+      4. Monitoramento de acessos anomalos a dados de PEP e alertas suspeitos.
+
+      **Manutencao das definicoes:**
+      5. Atualizacao da lista de PEPs conforme mudancas em cargos publicos.
+      6. Revisao anual dos criterios de beneficiario final.
+      7. Monitoramento de alteracoes regulatorias nas definicoes (novas circulares,
+         resolucoes do COAF).
+      8. Treinamento periodico das equipes sobre as definicoes e seus impactos
+         operacionais.
+    tools:
+      - identity-governance
+      - grc-platform
+      - siem
+      - training-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-5", "RA-2", "RA-3"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.9", "A.5.12", "A.5.13"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-5", "art-7", "art-11"]
+    relationship: complements

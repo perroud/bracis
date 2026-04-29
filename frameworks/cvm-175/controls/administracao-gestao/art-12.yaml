@@ -1,0 +1,108 @@
+id: art-12
+family: administracao-gestao
+title: "Segregacao de Funcoes entre Administrador e Gestor"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 12. O administrador e o gestor devem manter suas atividades segregadas,
+    de forma a garantir a independência das funções de administração e gestão
+    do fundo.
+
+    Parágrafo 1. Quando o administrador e o gestor forem a mesma pessoa jurídica,
+    devem ser adotados mecanismos de segregação interna de funções que garantam
+    a independência das atividades de administração e gestão.
+
+    Parágrafo 2. A segregação de funções deve abranger, no mínimo: I - áreas
+    físicas separadas; II - sistemas de acesso segregados; III - políticas de
+    comunicação que impeçam o compartilhamento indevido de informações;
+    IV - estruturas de reporte independentes.
+guidance:
+  prose: |
+    O art. 12 estabelece a obrigacao de segregacao funcional entre administracao
+    e gestao. Este e um pilar central de governanca de fundos que previne
+    conflitos de interesse e fraudes.
+
+    **Segregacao obrigatoria:**
+    Mesmo quando administrador e gestor sao a mesma instituicao, a segregacao
+    interna e mandatoria. A CVM verifica na pratica se a segregacao existe de
+    fato, nao apenas no papel.
+
+    **Chinese wall:**
+    A segregacao deve incluir barreiras de informacao (chinese wall) que impecam
+    o fluxo indevido de informacoes entre areas. O gestor nao deve ter acesso
+    a informacoes operacionais privilegiadas do administrador, e vice-versa.
+
+    **Evidencias de segregacao:**
+    A CVM pode solicitar evidencias de segregacao: logs de acesso, estrutura
+    organizacional, politicas de comunicacao, layout fisico. Sistemas de TI
+    devem implementar esta segregacao em nivel tecnico.
+
+    **Impacto em tecnologia:**
+    A segregacao deve ser implementada em nivel de sistemas: perfis de acesso
+    diferentes, bancos de dados segregados, redes separadas, logs independentes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Segregacao em nivel de infraestrutura:**
+      1. Perfis de acesso distintos para funcoes de administracao e gestao:
+         RBAC (Role-Based Access Control) com papeis mutuamente exclusivos.
+      2. Ambientes de rede segregados: administracao e gestao em VLANs ou
+         namespaces Kubernetes distintos.
+      3. Repositorios Git separados para codigo de administracao e gestao,
+         com permissoes independentes.
+
+      **Barreiras de informacao:**
+      4. Politicas de rede (network policies) que impedem comunicacao direta
+         entre servicos de administracao e gestao.
+      5. Vault com secrets segregados: administracao e gestao com namespaces
+         e tokens independentes.
+      6. Logs de auditoria separados por funcao.
+    tools:
+      - vault
+      - opa-gatekeeper
+      - kyverno
+      - terraform
+  devsecops:
+    prose: |
+      **Validacao automatica de segregacao:**
+      1. Pipeline de CI/CD que verifica se commits de equipes de gestao nao
+         afetam repositorios de administracao e vice-versa.
+      2. SAST para detectar chamadas cruzadas entre modulos de administracao
+         e gestao no codigo.
+      3. Revisao obrigatoria: alteracoes em codigo de gestao devem ser aprovadas
+         por equipe de gestao, nao por administracao.
+
+      **Controle de acesso no pipeline:**
+      4. Branch protection com CODEOWNERS distintos para codigo de administracao
+         e gestao.
+      5. Audit trail de quem acessou o que e quando.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - vault
+      - opa-gatekeeper
+  secops:
+    prose: |
+      **Monitoramento de segregacao:**
+      1. Alertas para violacoes de segregacao: acesso cruzado entre areas,
+         tentativas de acesso a dados da outra funcao.
+      2. Revisao periodica de acessos: verificar se nenhum usuario possui
+         perfis de administracao E gestao simultaneamente.
+      3. Audit de segregacao fisica e logica semestral.
+
+      **Evidencias para CVM:**
+      4. Relatorio de segregacao com evidencias tecnicas: perfis de acesso,
+         logs de tentativas negadas, estrutura de rede.
+      5. Mapa de barreiras de informacao atualizado.
+    tools:
+      - siem
+      - grc-platform
+      - vault
+legal_references:
+  - framework_id: cvm-35
+    articles: ["art-20"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-7"]
+    relationship: complements

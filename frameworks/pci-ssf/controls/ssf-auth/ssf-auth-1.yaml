@@ -1,0 +1,94 @@
+id: ssf-auth-1
+family: ssf-auth
+title: "Software Authentication Mechanisms"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall implement authentication mechanisms that uniquely identify all
+    users, services, and system components before granting access to functionality or
+    data. Authentication shall support multi-factor authentication where applicable.
+    The software shall enforce account lockout or rate limiting after a defined number
+    of failed authentication attempts. Credentials shall be transmitted and stored
+    using cryptographic protections that prevent interception or offline recovery.
+    Default or shared accounts shall not be permitted for production use.
+
+guidance:
+  prose: >-
+    Strong authentication is a foundational requirement for payment software security.
+    PCI SSF requires that every entity interacting with the software is uniquely
+    identified and authenticated before access is granted. This extends beyond human
+    users to include service-to-service authentication and API consumers. Multi-factor
+    authentication must be supported for administrative and privileged access. The
+    standard explicitly prohibits default credentials in production and requires that
+    password storage use modern hashing algorithms resistant to offline brute-force
+    attacks.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 4 — Authentication"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 4.1-4.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized identity provider (IdP) supporting OIDC/SAML for all
+      software authentication. Enforce MFA at the platform level for all privileged
+      access. Implement mutual TLS (mTLS) for service-to-service authentication
+      within the service mesh. Use short-lived tokens and certificate rotation
+      rather than long-lived credentials. Deploy rate limiting at the API gateway
+      level to enforce account lockout policies. Store credentials in a secrets
+      manager with automatic rotation capabilities.
+    tools:
+      - keycloak
+      - vault
+      - istio
+      - cert-manager
+      - kong
+      - envoy
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect hardcoded credentials, weak password hashing
+      algorithms, and missing authentication checks on sensitive endpoints. Implement
+      secret detection scanning to prevent credentials from being committed to source
+      control. Enforce code review for all changes to authentication logic with a
+      designated security reviewer. Write integration tests that validate
+      authentication enforcement including negative test cases for bypass attempts.
+      Use dependency scanning to detect known vulnerabilities in authentication
+      libraries.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-dependency-scanning
+      - semgrep
+      - gitleaks
+      - owasp-zap
+
+  secops:
+    prose: >-
+      Monitor authentication events for anomalies including brute-force attempts,
+      credential stuffing patterns, and authentication from unusual locations or
+      devices. Alert on failed MFA enrollment for privileged accounts. Track and
+      report on the percentage of accounts with MFA enabled. Investigate and
+      respond to account lockout events. Conduct periodic reviews of service
+      accounts and API keys to ensure they follow least-privilege principles.
+    tools:
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - datadog
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-8.1", "req-8.2", "req-8.3"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v2.1", "v2.2", "v2.5", "v2.7"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.2", "A8.5"]
+    relationship: mapped

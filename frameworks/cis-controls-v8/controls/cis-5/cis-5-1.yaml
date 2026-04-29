@@ -1,0 +1,91 @@
+id: cis-5.1
+family: cis-5
+title: "Establish and Maintain an Inventory of Accounts"
+class: CISv8
+
+baselines: [ig1, ig2, ig3]
+
+statement:
+  prose: >-
+    Establish and maintain an inventory of all accounts managed in the enterprise.
+    The inventory must include both user and administrator accounts. The inventory, at a
+    minimum, should contain the person's name, username, start/stop dates, department,
+    and whether the account is enabled or disabled. Validate that all active accounts
+    are authorized, on a recurring schedule at a minimum quarterly, or more frequently.
+
+guidance:
+  prose: >-
+    Account inventories provide visibility into who has access to enterprise systems.
+    Stale accounts (former employees, contractors whose engagement ended, service
+    accounts for decommissioned applications) are a primary attack vector. Organizations
+    must track all account types: user accounts, service accounts, shared accounts,
+    emergency/break-glass accounts, and API keys. The inventory should integrate with
+    HR systems to detect accounts that should be disabled due to employment changes.
+    Privileged accounts require additional scrutiny and should be inventoried separately
+    with justification for elevated access documented.
+
+references:
+  - citation: "CIS Controls v8.1, Control 5, Safeguard 5.1"
+    url: "https://www.cisecurity.org/controls/v8"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Centralize identity management through an IdP (Okta, Azure AD, Keycloak) that
+      serves as the authoritative source for all user and service accounts. Implement
+      SCIM provisioning to automatically create and disable accounts based on HR system
+      events. Use Kubernetes service accounts with short-lived tokens instead of
+      long-lived credentials. Maintain a machine identity inventory covering service
+      accounts, API keys, certificates, and secrets across all platforms. Implement
+      automated account lifecycle management that disables accounts when correlated
+      HR records show termination or transfer. Use infrastructure-as-code to declare
+      service accounts, ensuring they are version-controlled and auditable.
+    tools:
+      - okta
+      - azure-ad
+      - keycloak
+      - hashicorp-vault
+      - kubernetes-rbac
+      - terraform
+
+  devsecops:
+    prose: >-
+      Enforce that CI/CD service accounts use short-lived, scoped tokens rather than
+      long-lived credentials. Implement pipeline checks that detect hardcoded credentials
+      or service account keys in code. Use GitLab CI/CD's built-in JWT/OIDC tokens for
+      pipeline authentication to cloud providers, eliminating static service account keys.
+      Audit project-level access tokens and deploy keys quarterly. Implement automated
+      checks that flag dormant bot accounts and pipeline tokens not used within 90 days.
+    tools:
+      - gitlab-ci-jwt
+      - hashicorp-vault
+      - gitleaks
+      - trufflehog
+      - gitlab-access-tokens
+
+  secops:
+    prose: >-
+      Conduct quarterly access reviews comparing the account inventory against HR
+      records. Generate alerts for accounts showing no login activity for 45+ days.
+      Monitor for impossible travel, anomalous login times, and credential stuffing
+      attacks. Implement UEBA (User and Entity Behavior Analytics) to detect compromised
+      accounts. Produce quarterly account certification reports requiring manager
+      approval for continued access. Track break-glass account usage with mandatory
+      post-use review.
+    tools:
+      - azure-ad-access-reviews
+      - sailpoint
+      - splunk-ueba
+      - crowdstrike-identity
+      - siem
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "IA-4"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.16", "A5.18"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["PR.AA-01", "PR.AA-03"]
+    relationship: implements

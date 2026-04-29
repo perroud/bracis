@@ -1,0 +1,108 @@
+id: sc-l2-001
+family: sc
+title: "Monitor, control, and protect communications at the external boundaries and key internal boundaries of organizational systems"
+class: CMMC-L2
+
+baselines: [level-2, level-3]
+
+statement:
+  prose: >-
+    Monitor, control, and protect communications (i.e., information
+    transmitted or received by organizational systems) at the external
+    boundaries and key internal boundaries of organizational systems.
+
+guidance:
+  prose: >-
+    Boundary protection requires implementing controls at all external
+    system boundaries (internet-facing) and key internal boundaries
+    (network segments, trust zones). This includes firewalls, intrusion
+    detection/prevention systems, DMZ architectures, and encrypted
+    communications. The control applies to both north-south traffic
+    (external to internal) and east-west traffic (between internal
+    segments). Modern implementations should align with zero-trust
+    architecture principles where every network boundary is treated
+    as untrusted. This maps to NIST SP 800-171 control 3.13.1 and
+    NIST SP 800-53 SC-7.
+
+references:
+  - citation: "NIST SP 800-171 Rev 2, 3.13.1"
+    url: "https://doi.org/10.6028/NIST.SP.800-171r2"
+  - citation: "NIST SP 800-53 Rev 5, SC-7"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement defense-in-depth boundary protection across all network
+      layers. Deploy WAF (Web Application Firewall) at the ingress
+      boundary for all externally exposed services. Implement Kubernetes
+      NetworkPolicies to enforce micro-segmentation between workloads.
+      Deploy service mesh (Istio/Linkerd) with mTLS for encrypted
+      east-west traffic with authorization policies controlling
+      service-to-service communication. Implement egress controls that
+      restrict outbound traffic to explicitly allowed destinations.
+      Deploy network monitoring that captures and analyzes traffic at
+      boundary points. Use infrastructure-as-code to define and version
+      all network policies, firewall rules, and security group
+      configurations. Implement automated drift detection for network
+      boundary configurations.
+    tools:
+      - istio
+      - linkerd
+      - kubernetes-network-policies
+      - cloudflare-waf
+      - aws-waf
+      - calico
+      - cilium
+      - terraform
+
+  devsecops:
+    prose: >-
+      Validate boundary protection configurations in CI/CD pipelines
+      by scanning IaC for overly permissive network rules (0.0.0.0/0
+      ingress, unrestricted egress, missing encryption). Enforce
+      NetworkPolicy declarations for all Kubernetes deployments through
+      admission control policies. Implement automated testing of
+      boundary controls as part of the deployment pipeline (verify
+      that deployed services are only reachable through authorized
+      paths). Scan application code for insecure communication patterns
+      (unencrypted HTTP, disabled certificate validation). Generate
+      network topology documentation from IaC for security review.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - conftest
+      - kubesec
+      - kube-bench
+
+  secops:
+    prose: >-
+      Deploy network detection and response (NDR) at boundary points
+      to detect malicious traffic, data exfiltration, and command-and-
+      control communications. Implement IDS/IPS at external boundaries
+      with signatures updated from threat intelligence feeds. Monitor
+      east-west traffic for lateral movement indicators. Alert on
+      boundary configuration changes and validate against approved
+      change requests. Conduct periodic boundary penetration testing
+      to validate control effectiveness. Generate compliance reports
+      showing boundary protection coverage, alert volumes, and
+      incident detection metrics.
+    tools:
+      - suricata
+      - zeek
+      - palo-alto
+      - fortinet
+      - splunk
+      - darktrace
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7"]
+    relationship: derived-from
+  - framework_id: iso-27001-2022
+    articles: ["a8.20", "a8.21", "a8.22"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["sc-7"]
+    relationship: equivalent-to

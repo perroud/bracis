@@ -1,0 +1,120 @@
+id: art-14
+family: cap-3
+title: "Protecao de Dados Pessoais de Saude"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 14. O tratamento de dados pessoais e dados pessoais sensíveis
+    de saúde nas transações TISS deve observar integralmente a Lei
+    13.709/2018 (LGPD), em especial:
+
+    I - Finalidade: os dados de saúde devem ser tratados exclusivamente
+    para as finalidades previstas no Padrão TISS (assistência, gestão,
+    faturamento);
+    II - Necessidade: apenas os dados estritamente necessários devem ser
+    coletados e trafegados nas transações TISS;
+    III - Segurança: medidas técnicas e administrativas aptas a proteger
+    os dados de saúde contra acesso não autorizado e situações acidentais
+    ou ilícitas;
+    IV - Não discriminação: os dados de saúde não podem ser utilizados
+    para fins discriminatórios.
+
+    Parágrafo 1. As operadoras e prestadores devem manter registro das
+    operações de tratamento de dados pessoais realizadas via TISS (ROPA).
+
+    Parágrafo 2. O beneficiário tem direito de acessar os dados de saúde
+    que lhe dizem respeito nas bases TISS, conforme art. 18 da LGPD.
+guidance:
+  prose: |
+    O art. 14 e a ponte entre TISS e LGPD, especificando como os
+    principios da LGPD aplicam-se ao contexto de saude suplementar.
+
+    **Dados pessoais sensiveis em transacoes TISS:**
+    - CID-10 (diagnostico): dado de saude = sensivel
+    - Procedimentos realizados: dado de saude = sensivel
+    - Resultados de exames: dado de saude = sensivel
+    - CPF e nome do beneficiario: dado pessoal
+
+    **Bases legais aplicaveis (art. 11, LGPD):**
+    - Tutela da saude (art. 11, II, f): para prestacao de servicos
+      de saude
+    - Protecao da vida (art. 11, II, e): em situacoes de urgencia
+    - Obrigacao legal (art. 11, II, a): quando ANS exige o
+      compartilhamento via TISS
+
+    **Principio da necessidade (data minimization):**
+    Transacoes TISS nao devem trafegar dados alem do estritamente
+    necessario. Exemplo: guia de elegibilidade nao precisa conter
+    historico de diagnosticos.
+
+    **ROPA (Record of Processing Activities):**
+    Obrigatorio documentar cada tipo de tratamento de dados TISS:
+    - Que dados sao tratados
+    - Para que finalidade
+    - Quem sao os operadores e controladores
+    - Medidas de seguranca aplicadas
+    - Periodo de retencao
+
+    **Direitos do titular (beneficiario):**
+    - Acesso aos seus dados de saude nas bases TISS
+    - Correcao de dados incompletos ou desatualizados
+    - Informacao sobre compartilhamentos realizados
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Privacy by design em sistemas TISS:**
+      1. Implementar data minimization nas APIs TISS: cada endpoint
+         retorna apenas os campos necessarios para a transacao
+         especifica, sem dados adicionais.
+      2. Configurar pseudonimizacao de identificadores de beneficiarios
+         em ambientes nao-produtivos (dev, staging, teste).
+      3. Implementar portal de direitos do titular (DSAR) que permita
+         ao beneficiario consultar seus dados nas bases TISS.
+      4. Manter ROPA automatizado que registre cada tipo de tratamento
+         de dados realizado pelos servicos TISS.
+    tools:
+      - data-minimization
+      - pseudonymization
+      - dsar-portal
+      - ropa-automation
+  devsecops:
+    prose: |
+      **Privacy no pipeline de desenvolvimento:**
+      1. Implementar PIA (Privacy Impact Assessment) automatizada no
+         pipeline para novos campos ou transacoes TISS que trafeguem
+         dados pessoais sensiveis.
+      2. Incluir verificacao automatica de data minimization: alertar
+         se endpoint retorna campos de dados sensiveis nao necessarios.
+      3. Automatizar geracao de ROPA a partir de metadados dos servicos
+         TISS (OpenAPI spec com anotacoes de privacidade).
+      4. Criar testes que validem mascaramento de dados em ambientes
+         nao-produtivos.
+    tools:
+      - pia-automation
+      - data-classification
+      - ropa-generation
+      - masking-validation
+  secops:
+    prose: |
+      **Operacao de privacidade TISS:**
+      1. Monitorar acessos a dados sensiveis de saude com alertas
+         para consultas em massa ou padroes atipicos (data exfiltration).
+      2. Processar solicitacoes de direitos do titular (acesso,
+         correcao, eliminacao) dentro do prazo legal de 15 dias.
+      3. Manter inventario atualizado de dados pessoais tratados via
+         TISS, classificados por sensibilidade e base legal.
+      4. Realizar DPIA (Data Protection Impact Assessment) para novos
+         tratamentos de dados de saude via TISS.
+    tools:
+      - data-access-monitoring
+      - dsar-management
+      - data-inventory
+      - dpia-tools
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5", "art-6", "art-11", "art-18", "art-37"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164-502", "164-514"]
+    relationship: mapped

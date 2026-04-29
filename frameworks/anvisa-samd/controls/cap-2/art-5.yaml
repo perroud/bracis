@@ -1,0 +1,112 @@
+id: art-5
+family: cap-2
+title: "Evidencia Clinica para SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 5. O fabricante deve gerar e manter evidência clínica suficiente
+    para demonstrar que o SaMD é seguro e eficaz para a finalidade médica
+    declarada, proporcional à sua classe de risco.
+
+    Parágrafo 1. A evidência clínica deve contemplar:
+    I - validade clínica: demonstração de que a saída do SaMD está
+    corretamente associada ao estado de saúde ou condição clínica alvo;
+    II - validade analítica: demonstração de que o SaMD processa os dados
+    de entrada corretamente e gera saídas precisas e reprodutíveis;
+    III - desempenho clínico: demonstração da capacidade do SaMD de
+    produzir saídas clinicamente significativas nas condições reais
+    de uso declaradas.
+
+    Parágrafo 2. Para SaMD Classe III e IV, a evidência clínica deve
+    incluir dados de estudos clínicos ou equivalência substancial com
+    SaMD previamente registrado e com desempenho clínico comprovado.
+guidance:
+  prose: |
+    O art. 5 adota o modelo de evidencia clinica em tres camadas do
+    IMDRF (N41:2017), que e o padrao internacional para avaliacao de
+    SaMD.
+
+    **Tres pilares da evidencia clinica:**
+    1. Validade analitica: o algoritmo faz o que promete tecnicamente?
+       Metricas: acuracia, precisao, recall, F1-score, AUC-ROC
+    2. Validade clinica: a saida tecnica tem relevancia clinica?
+       Demonstracao: associacao com estado de saude ou biomarcador
+    3. Desempenho clinico: funciona no mundo real?
+       Demonstracao: estudo clinico ou dados de mundo real (RWE)
+
+    **Proporcionalidade por classe:**
+    - Classe I: literatura e justificativa tecnica podem ser suficientes
+    - Classe II: dados de validacao analitica + justificativa clinica
+    - Classe III: estudo clinico ou equivalencia substancial
+    - Classe IV: estudo clinico mandatorio com poder estatistico adequado
+
+    **Equivalencia substancial:**
+    Permitida para Classe III quando existe SaMD predicado (ja registrado)
+    com mesma indicacao de uso, mesma tecnologia e desempenho comprovado.
+    Exige demonstracao formal de equivalencia tecnica e clinica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de validacao clinica:**
+      1. Provisionar ambientes isolados de validacao clinica com
+         datasets anonimizados e representativos, segregados de
+         ambientes de desenvolvimento e producao.
+      2. Implementar pipeline de validacao analitica automatizado que
+         calcula metricas de desempenho (acuracia, sensibilidade,
+         especificidade, AUC-ROC) em cada release candidate.
+      3. Manter repositorio versionado de datasets de referencia
+         (ground truth) com controle de acesso restrito e log de
+         auditoria para modificacoes.
+      4. Configurar infraestrutura de monitoramento de desempenho
+         clinico em producao (real-world performance monitoring)
+         com alertas para degradacao de metricas.
+    tools:
+      - mlflow
+      - data-versioning
+      - monitoring
+      - isolated-environments
+  devsecops:
+    prose: |
+      **Pipeline de evidencia clinica:**
+      1. Integrar testes de validacao analitica no pipeline CI/CD,
+         executando suite de testes com dataset de referencia em
+         cada build de SaMD.
+      2. Automatizar geracao de relatorio de validacao analitica
+         (sensitivity, specificity, PPV, NPV, AUC-ROC) como artefato
+         de pipeline assinado digitalmente.
+      3. Implementar gate de release que bloqueia deploy se metricas
+         de desempenho caem abaixo de limiares predefinidos (ex:
+         sensibilidade minima, especificidade minima).
+      4. Criar pipeline de revalidacao periodica que executa suite
+         clinica contra dataset atualizado e gera delta report.
+    tools:
+      - gitlab-ci
+      - mlflow
+      - clinical-validation-suite
+      - signed-artifacts
+  secops:
+    prose: |
+      **Governanca de evidencia clinica:**
+      1. Manter dosie de evidencia clinica completo para cada SaMD,
+         com rastreabilidade para dados brutos, protocolos de estudo
+         e resultados.
+      2. Implementar processo de revisao de evidencia clinica por
+         comite multidisciplinar (clinico, estatistico, regulatorio)
+         antes de submissao a ANVISA.
+      3. Monitorar publicacoes cientificas e evidencias pos-mercado
+         que possam impactar a validade clinica do SaMD registrado.
+      4. Manter plano de geracao de evidencia clinica continuada
+         (post-market clinical follow-up) para SaMD Classe III e IV.
+    tools:
+      - grc-platform
+      - clinical-evidence-database
+      - literature-monitoring
+      - pmcf-platform
+legal_references:
+  - framework_id: hipaa
+    articles: ["164-312-c"]
+    relationship: mapped
+  - framework_id: eu-ai-act
+    articles: ["annex-IV"]
+    relationship: mapped

@@ -1,0 +1,120 @@
+id: coppa-parent-access
+family: rights
+title: "Parent's Right to Review Child's Personal Information"
+class: COPPA
+
+statement:
+  prose: |
+    Upon request of a parent whose child has provided personal information to the operator,
+    the operator must provide to that parent (16 CFR § 312.6(a)):
+
+    (1) A description of the specific types of personal information collected from the child
+        by that operator.
+    (2) The opportunity at any time to refuse to permit the operator's further use or
+        maintenance of the child's personal information and to direct the operator to delete
+        the child's personal information collected in connection with the provision of the
+        online service.
+
+    Before providing access to the child's personal information, the operator must use
+    reasonable procedures to verify that the requestor is the child's parent. The operator
+    must not require the parent to provide the child's Social Security number to verify
+    the parent's identity.
+
+guidance:
+  prose: |
+    The parent access right is a fundamental COPPA protection that ensures parents maintain
+    control over their children's data. Key requirements:
+
+    1. **Scope of access:** Parents can review the specific personal information collected
+       from their child — not just categories, but the actual data. This includes photos,
+       videos, audio recordings, and geolocation data.
+
+    2. **Identity verification:** The operator must verify the requestor is the child's
+       parent before providing access. This is a balancing act — verification must be
+       robust enough to prevent unauthorized access but not so burdensome as to
+       effectively deny the right.
+
+    3. **Prohibited verification methods:** Operators may NOT require the child's SSN as
+       a verification mechanism.
+
+    4. **Timeliness:** While COPPA does not specify an exact timeframe like CCPA's 45 days,
+       the FTC expects prompt responses. Unreasonable delays constitute de facto denial.
+
+    5. **Format:** The information should be provided in a reasonably accessible format.
+       Electronic delivery is acceptable and generally preferred.
+
+    6. **No charge:** Access must be provided free of charge.
+
+    7. **Ongoing right:** This is not a one-time right. Parents can request access at any
+       time during the period their child's information is maintained.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a parent portal or dashboard where verified parents can view their child's
+         personal information in real time, aggregated from all data stores.
+      2. Implement a parent identity verification workflow that validates the parent-child
+         relationship without requiring the child's SSN. Acceptable methods include verifying
+         against the original consent record, KBA, or government ID.
+      3. Create a data export service that can aggregate all personal information for a
+         specific child across all microservices, databases, caches, and third-party
+         systems into a readable format.
+      4. Build a parent access request tracking system with SLA monitoring, status updates
+         to the parent, and audit trail.
+      5. Implement access controls ensuring that parents can only access their own child's
+         data — prevent horizontal privilege escalation.
+      6. Create a notification system that alerts operations when a parent access request
+         is received, with escalation for overdue requests.
+    tools:
+      - privacy-portal
+      - identity-verification-service
+      - data-aggregation-service
+      - audit-log
+      - notification-service
+      - dsar-automation
+
+  devsecops:
+    prose: |
+      1. Test parent access flows end-to-end — verify all data stores are included in the
+         response and no PI is omitted.
+      2. Test parent identity verification — ensure unauthorized requestors are blocked
+         and that SSN is never requested.
+      3. Validate data export completeness — create test child accounts with data across
+         all systems and verify the export captures everything.
+      4. Test horizontal privilege escalation — verify a parent cannot access another
+         child's data by manipulating request parameters.
+      5. Implement automated tests for SLA compliance — verify response time from request
+         to fulfillment.
+    tools:
+      - integration-testing
+      - security-testing
+      - gitlab-ci
+      - api-testing
+      - penetration-testing
+
+  secops:
+    prose: |
+      1. Monitor parent access request volume, response times, and fulfillment rates.
+      2. Audit data export completeness periodically — compare exported data against
+         actual data stores to identify gaps.
+      3. Monitor for unusual access request patterns that may indicate identity fraud
+         or social engineering.
+      4. Track and alert on overdue access requests approaching SLA deadlines.
+      5. Review identity verification procedures for effectiveness — are they blocking
+         unauthorized requestors without creating undue burden for legitimate parents?
+    tools:
+      - compliance-dashboard
+      - dsar-tracking
+      - anomaly-detection
+      - audit-log
+
+legal_references:
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100", "sec-1798-110"]
+    relationship: complements
+  - framework_id: gdpr
+    articles: ["art. 15"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 18"]
+    relationship: equivalent-to

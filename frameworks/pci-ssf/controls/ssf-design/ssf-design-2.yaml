@@ -1,0 +1,92 @@
+id: ssf-design-2
+family: ssf-design
+title: "Secure Software Architecture and Attack Surface Minimization"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall be designed to minimize the attack surface by applying the
+    principles of least privilege, defense in depth, and secure defaults. Software
+    components shall use well-defined interfaces with input validation at every trust
+    boundary. Unnecessary features, services, protocols, and ports shall be disabled
+    or removed by default. The architecture shall enforce separation of duties and
+    privilege isolation between components handling sensitive payment data.
+
+guidance:
+  prose: >-
+    A minimal attack surface reduces the number of entry points available to
+    attackers. PCI SSF requires that payment software ships with secure defaults,
+    meaning features and interfaces not required for core functionality are disabled
+    out of the box. Defense in depth ensures that compromise of one layer does not
+    grant unrestricted access to sensitive data. Least privilege dictates that each
+    software component operates with only the permissions it needs. All trust
+    boundaries must validate inputs, regardless of whether the calling component
+    is internal.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 2 — Attack Surface Minimization"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 2.1-2.3"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy software in minimal container images (distroless or scratch-based) to
+      eliminate unnecessary OS packages. Use Kubernetes network policies or service
+      mesh authorization policies to enforce least-privilege network access between
+      services. Configure pod security standards to prevent privilege escalation and
+      restrict capabilities. Enforce that only necessary ports are exposed through
+      ingress controllers. Implement infrastructure-as-code scanning to detect
+      overly permissive configurations before deployment.
+    tools:
+      - distroless
+      - kubernetes-network-policies
+      - istio
+      - linkerd
+      - falco
+      - terraform
+      - checkov
+
+  devsecops:
+    prose: >-
+      Enforce input validation at all API boundaries using schema validation libraries.
+      Use SAST rules to detect missing input validation, overly broad permissions, and
+      insecure defaults. Implement container scanning to identify unnecessary packages
+      in build artifacts. Configure dependency scanning to flag libraries that expand
+      the attack surface unnecessarily. Enforce code review policies that require
+      security review for changes to trust boundary components.
+    tools:
+      - gitlab-sast
+      - gitlab-container-scanning
+      - gitlab-dependency-scanning
+      - semgrep
+      - checkov
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor runtime behavior to detect unexpected network connections, process
+      executions, or file access that indicate attack surface violations. Use
+      runtime security tools to enforce allowed system call profiles. Conduct
+      periodic attack surface assessments comparing the live deployment against
+      the documented architecture. Alert on configuration drift that expands
+      the attack surface beyond documented boundaries.
+    tools:
+      - falco
+      - sysdig
+      - wiz
+      - crowdstrike
+      - splunk
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-2.1", "req-6.2"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v1.1", "v14.1", "v14.2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.9", "A8.25"]
+    relationship: mapped

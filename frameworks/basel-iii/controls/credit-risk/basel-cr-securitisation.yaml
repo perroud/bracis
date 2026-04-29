@@ -1,0 +1,107 @@
+id: basel-cr-securitisation
+family: credit-risk
+title: "Securitisation Framework"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks acting as originators, sponsors, or investors in securitisation transactions must
+    calculate capital requirements for securitisation exposures under the revised
+    Securitisation Framework (Basel III finalisation, December 2014, updated December 2016).
+    The hierarchy of approaches is: (1) Internal Ratings-Based Approach (SEC-IRBA), which
+    uses the bank's own IRB inputs to the supervisory formula; (2) External Ratings-Based
+    Approach (SEC-ERBA), which applies risk weights from a risk-weight table based on the
+    ECAI rating and maturity of the tranche; (3) Standardised Approach for Securitisations
+    (SEC-SA), which uses the SA-CR inputs for the underlying pool and applies a supervisory
+    formula to compute tranche risk weights. Banks must use the highest available approach
+    in the hierarchy for each exposure. A risk-weight floor of 15% applies to senior
+    non-STC securitisation tranches and 10% for qualifying Simple, Transparent and
+    Comparable (STC) securitisations. Re-securitisation positions receive a minimum risk
+    weight of 40%. Originators and sponsors must meet risk retention requirements (typically
+    5%) in each jurisdiction before obtaining regulatory capital relief from the transfer
+    of risk.
+
+guidance:
+  prose: >-
+    The revised securitisation framework eliminates the look-through to underlying asset
+    quality that was available under Basel II internal assessment approaches, replacing it
+    with a more conservative hierarchy designed to limit the extent to which banks can
+    use securitisation to achieve capital relief that is not commensurate with the actual
+    credit risk transferred. Banks acting as originators must conduct a rigorous true-sale
+    analysis and operational risk transfer test to confirm that significant credit risk has
+    been transferred. Investors must perform independent due diligence on the underlying
+    pool and not rely exclusively on external ratings. The STC designation allows qualifying
+    securitisations — those meeting BCBS/IOSCO criteria for simplicity, transparency, and
+    comparability — to benefit from modestly lower capital requirements, incentivising
+    market participants to adopt higher standards of transparency and documentation.
+    Resecuritisation positions (CDOs of ABS, CDOs squared) attract punitive capital
+    treatment reflecting their demonstrated systemic risk.
+
+references:
+  - citation: "BCBS, Revisions to the securitisation framework, December 2014 (updated December 2016)"
+    url: "https://www.bis.org/bcbs/publ/d374.htm"
+  - citation: "BCBS, Criteria for identifying simple, transparent and comparable securitisations, July 2015"
+    url: "https://www.bis.org/bcbs/publ/d332.htm"
+  - citation: "BCBS, Calculation of RWA for credit risk — securitisation (CRE40-CRE45), Basel Framework, January 2023"
+    url: "https://www.bis.org/basel_framework/chapter/CRE/40.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a securitisation data platform that maintains complete records of all
+      securitisation positions — tranche level data, underlying pool composition, ECAI
+      ratings, maturity, STC designation, origination vs. investor role — integrated with
+      the credit risk RWA calculation engine. Automate the approach hierarchy selection
+      (SEC-IRBA > SEC-ERBA > SEC-SA) based on data availability and supervisory approvals.
+      For investor positions, build automated pipeline feeds from data reporting utilities
+      (DRUs) and data tape providers that update underlying pool characteristics monthly.
+      Publish securitisation RWA by exposure class, approach, and vintage to the capital
+      reporting dashboard.
+    tools:
+      - postgresql
+      - apache-airflow
+      - dbt
+      - grafana
+      - terraform
+      - apache-kafka
+
+  devsecops:
+    prose: >-
+      Maintain the supervisory formula (SEC-SA/SEC-IRBA formula parameters — KA, W, tau,
+      omega, p-floor) as versioned configuration with automated tests confirming formula
+      correctness against BCBS worked examples. Implement data quality pipelines that flag
+      securitisation positions with missing or stale ratings, missing pool data, or
+      maturities that have not been updated after extension events. Automate the generation
+      of FINREP/COREP securitisation templates with embedded reconciliation checks.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - sonarqube
+
+  secops:
+    prose: >-
+      Apply strict access controls to securitisation position and parameter data given the
+      complexity and opacity historically associated with these instruments. Implement
+      independent data verification — cross-check internally maintained securitisation data
+      against Bloomberg, Moody's Analytics, or trustee reports monthly. Ensure that risk
+      transfer tests and legal opinion documents supporting capital relief are retained in
+      a controlled document management system accessible to auditors and supervisors.
+    tools:
+      - cyberark
+      - hashicorp-vault
+      - splunk
+      - sharepoint-dlm
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "AU-2"]
+    relationship: mapped
+  - framework_id: cobit-2019
+    articles: ["APO12", "EDM03"]
+    relationship: supports

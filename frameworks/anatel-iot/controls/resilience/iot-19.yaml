@@ -1,0 +1,114 @@
+id: iot-19
+family: resilience
+title: "Secure Default Configuration and Restrictive Posture"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve ser configurado de forma restritiva ao invés de
+    forma permissiva. A configuração padrão de fábrica deve adotar o
+    princípio do menor privilégio, habilitando apenas os serviços e
+    funcionalidades estritamente necessários para a operação básica do
+    equipamento.
+
+    As rotinas de instalação e operação devem ser simplificadas de modo
+    a evitar a ocorrência de falhas não intencionais de segurança por
+    parte do usuário. O equipamento deve possuir documentação técnica
+    completa, descrevendo todas as funcionalidades, serviços, portas
+    de comunicação e interfaces disponíveis.
+
+    (Ato 77/2021 §5.1.3, incisos I e II; §5.1.5, inciso IV)
+guidance:
+  prose: |
+    This control establishes the "secure by default" principle for
+    device configuration. The device must ship in a hardened state,
+    and the setup process must be designed to prevent the user from
+    inadvertently creating security weaknesses.
+
+    **Secure default configuration principles:**
+    - Restrictive over permissive: deny by default, allow explicitly.
+    - Least privilege: no service runs with more permissions than needed.
+    - Minimal functionality: only essential features enabled at factory
+      default.
+    - Safe setup: the installation wizard should guide the user toward
+      secure choices (e.g., strong WiFi password, WPA3 preferred).
+
+    **Documentation requirements:**
+    - Complete technical documentation listing all features, services,
+      ports, and interfaces.
+    - Security-relevant configuration options must be clearly explained
+      with recommended settings.
+    - The documentation must be available in Portuguese for the
+      Brazilian market.
+
+    **User experience design for security:**
+    - Setup wizards should default to the most secure option (e.g.,
+      WPA3-SAE for WiFi, HTTPS for management).
+    - Warning messages for security-reducing actions (e.g., "Enabling
+      UPnP may expose your network to attacks").
+    - Clear visual indication of security status (e.g., security
+      dashboard in the web UI).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Define and document the "factory-default security baseline"
+         for each product: firewall rules, enabled services, management
+         access restrictions, WiFi security mode, etc.
+      2. Implement a first-boot setup wizard that guides the user
+         through essential security configuration: admin password
+         change, WiFi network name and password (defaulting to WPA3),
+         timezone, automatic update preference.
+      3. Default the firewall to deny-all on WAN ingress, allow-all
+         on LAN-to-WAN egress — matching expected CPE behavior while
+         blocking unsolicited inbound traffic.
+      4. Implement security status indicators in the web UI: green/
+         yellow/red dashboard showing password strength, firmware
+         update status, enabled services, WiFi security mode.
+      5. Provide complete technical documentation generated from
+         firmware metadata: all services, ports, protocols, and their
+         default enable/disable state.
+    tools:
+      - firmware-build-pipeline
+      - setup-wizard-framework
+      - firewall-engine
+      - documentation-generator
+  devsecops:
+    prose: |
+      1. Maintain the factory-default security baseline as a versioned
+         configuration file in the firmware repository — any changes
+         require security team approval.
+      2. Add CI tests that boot the device in factory-default state
+         and validate the configuration against the security baseline:
+         firewall rules, enabled services, WiFi mode, management
+         access restrictions.
+      3. Test the setup wizard flow: verify the user is guided toward
+         secure choices and cannot easily skip security-critical steps
+         (password change, WiFi configuration).
+      4. Automate documentation generation from firmware configuration
+         metadata as a build artifact.
+    tools:
+      - gitlab-ci
+      - configuration-validation
+      - ui-testing
+      - documentation-as-code
+  secops:
+    prose: |
+      1. During security certification, audit the factory-default
+         configuration against the documented security baseline —
+         verify no deviations.
+      2. Perform usability testing of the setup wizard with
+         non-technical users to verify it effectively guides them
+         toward secure configurations.
+      3. Review technical documentation for completeness and accuracy
+         against actual device behavior.
+      4. Maintain factory-default configuration audit reports for
+         ANATEL homologation evidence.
+    tools:
+      - configuration-auditing
+      - usability-testing
+      - grc-platform
+      - documentation-review
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7", "art-8"]
+    relationship: complements

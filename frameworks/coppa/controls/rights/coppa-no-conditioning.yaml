@@ -1,0 +1,120 @@
+id: coppa-no-conditioning
+family: rights
+title: "Prohibition on Conditioning Participation on Excessive Collection"
+class: COPPA
+
+statement:
+  prose: |
+    An operator may not condition a child's participation in a game, the offering of a prize,
+    or another activity on the child disclosing more personal information than is reasonably
+    necessary to participate in such activity (16 CFR § 312.7).
+
+    This prohibition means operators cannot:
+    (1) Require a child to provide personal information beyond what is reasonably necessary
+        for the child to participate in the specific activity.
+    (2) Use the promise of prizes, games, or other incentives to induce a child to provide
+        unnecessary personal information.
+    (3) Lock features or content behind data collection requirements that exceed what is
+        needed for the feature to function.
+
+guidance:
+  prose: |
+    Section 312.7 is COPPA's anti-manipulation provision, designed to prevent operators
+    from leveraging children's desire to participate in activities as leverage for excessive
+    data collection. Key principles:
+
+    1. **Reasonable necessity test:** The operator must be able to justify WHY each piece
+       of personal information is necessary for the specific activity. "Nice to have" or
+       "for future use" are not valid justifications.
+
+    2. **Activity-specific:** The analysis is per-activity, not per-service. A game that
+       requires a username does not justify collecting a mailing address. A newsletter
+       requires an email but does not justify collecting a phone number.
+
+    3. **Dark patterns:** The FTC considers dark patterns that nudge children toward
+       providing more data as violations. This includes making "skip" buttons hard to find,
+       using guilt language ("Don't you want to tell us about yourself?"), or gating
+       popular features behind excessive collection.
+
+    4. **Prize conditioning:** Offering prizes or rewards in exchange for personal
+       information beyond what is needed is explicitly prohibited. This includes virtual
+       currency, in-game items, and access to premium content.
+
+    5. **Default-on collection:** Pre-filled fields, default-enabled location sharing,
+       or automatic camera/microphone access that children must affirmatively disable
+       may violate this provision.
+
+    The FTC has brought enforcement actions against operators who required children to
+    provide detailed profile information (interests, school name, birthday) to access
+    basic game features.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a data minimization framework that maps each feature or activity to
+         the minimum set of personal information required for it to function.
+      2. Build feature-level data requirement manifests that document what PI each feature
+         collects and why it is necessary — these manifests serve as both development
+         guidance and audit evidence.
+      3. Implement progressive data collection — collect only what is needed for the current
+         activity, not everything upfront. Allow children to participate in basic features
+         with minimal or no PI.
+      4. Configure all optional data fields as truly optional — no dark patterns, no
+         nudging, no gating. "Skip" buttons must be equally prominent as "Submit" buttons.
+      5. Build automated detection for data collection forms that request more PI than
+         the feature manifest specifies.
+      6. Implement permission management for device capabilities (camera, microphone,
+         location) that defaults to OFF for child users and requires explicit, informed
+         action to enable.
+    tools:
+      - feature-flag-service
+      - form-builder
+      - permission-management
+      - data-catalog
+      - ux-testing
+
+  devsecops:
+    prose: |
+      1. Validate data collection forms against feature manifests in CI/CD — fail builds
+         that add new PI collection without updating the manifest and providing justification.
+      2. Test that all data fields marked as optional actually allow proceeding without input.
+      3. Scan UI flows for dark patterns — verify "skip" and "decline" options are as
+         prominent as "accept" and "submit" options.
+      4. Test that device permissions (camera, microphone, location) default to OFF for
+         child user sessions.
+      5. Implement automated UX testing for child-directed features to verify no coercive
+         or manipulative collection patterns.
+    tools:
+      - ui-testing
+      - accessibility-scanner
+      - gitlab-ci
+      - semgrep
+      - form-validation
+
+  secops:
+    prose: |
+      1. Audit data collection per feature — verify each feature collects only the PI
+         documented in its manifest.
+      2. Monitor for new features or form changes that introduce additional PI collection
+         without manifest updates.
+      3. Review prize, reward, and incentive programs to verify they do not condition
+         participation on excessive PI disclosure.
+      4. Track complaints from parents about excessive data collection requirements.
+      5. Conduct periodic UX audits of child-directed features to identify dark patterns
+         or coercive data collection.
+    tools:
+      - compliance-dashboard
+      - data-discovery
+      - ux-audit
+      - complaint-tracking
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(c)"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 6(III)"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: complements

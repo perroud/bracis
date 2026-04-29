@@ -1,0 +1,96 @@
+id: rc.rp-01
+family: rc
+title: "Incident Recovery Plan Execution - The recovery portion of the incident response plan is executed once initiated from the incident response process"
+class: CSF2
+
+statement:
+  prose: >-
+    The recovery portion of the incident response plan is executed once initiated
+    from the incident response process.
+
+guidance:
+  prose: >-
+    Recovery plan execution restores affected assets and operations to their pre-incident
+    state or a defined acceptable state. Recovery procedures must address: restoration
+    priority (based on business impact analysis), data restoration from verified clean
+    backups, infrastructure rebuilding from trusted templates, credential rotation for
+    all potentially compromised accounts, verification that restored systems are free
+    of compromise, and gradual service restoration with monitoring. Recovery must be
+    coordinated with containment and eradication to ensure recovered systems are not
+    immediately re-compromised. Communication with stakeholders during recovery should
+    provide realistic timelines and progress updates. Post-recovery validation must
+    confirm system integrity before returning to normal operations.
+
+references:
+  - citation: "NIST Cybersecurity Framework 2.0, RC.RP-01"
+    url: "https://www.nist.gov/cyberframework"
+  - citation: "NIST SP 800-184"
+    url: "https://doi.org/10.6028/NIST.SP.800-184"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Leverage infrastructure-as-code and GitOps to enable rapid, repeatable recovery.
+      Maintain the ability to rebuild entire environments from Git repositories without
+      depending on the compromised infrastructure. Implement automated backup and
+      restore procedures for all stateful services (databases, object stores, message
+      queues). Test restore procedures monthly through automated backup validation
+      pipelines. Maintain immutable infrastructure templates that guarantee clean
+      rebuilds. Implement blue-green or canary deployment patterns that maintain
+      standby environments ready for failover. Use multi-region deployments for
+      critical services to enable geographic failover. Define and test Recovery Time
+      Objectives (RTO) and Recovery Point Objectives (RPO) for each platform component.
+    tools:
+      - terraform
+      - argocd
+      - flux
+      - velero
+      - aws-backup
+      - gcp-backup
+      - azure-backup
+
+  devsecops:
+    prose: >-
+      Maintain CI/CD pipelines that can rebuild and deploy the entire application
+      stack from source control. Implement automated database restore pipelines
+      that restore from verified backups. Ensure all deployment artifacts are
+      reproducible: given the same source commit, the same artifact is produced.
+      Maintain environment parity so that recovery procedures tested in staging
+      work identically in production. Implement automated smoke tests that run
+      after recovery to validate system functionality. Store deployment runbooks
+      and recovery procedures alongside application code in version control.
+    tools:
+      - gitlab-ci
+      - gitlab-environments
+      - argocd
+      - helm
+      - kustomize
+
+  secops:
+    prose: >-
+      Execute recovery procedures according to the prioritized recovery plan
+      derived from the business impact analysis. Coordinate credential rotation
+      across all affected systems and accounts. Verify system integrity using
+      file integrity monitoring, configuration compliance scans, and vulnerability
+      assessments before returning systems to production. Monitor recovered systems
+      with enhanced scrutiny for a defined period (minimum 30 days) to detect
+      re-compromise. Document all recovery actions and timelines for compliance
+      reporting and lessons learned. Update the recovery plan based on lessons
+      learned from each incident.
+    tools:
+      - pagerduty
+      - servicenow
+      - splunk
+      - wazuh
+      - osquery
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-4", "CP-10", "IR-4"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A5.29", "A5.30", "A8.13", "A8.14"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS-11.1"]
+    relationship: equivalent-to

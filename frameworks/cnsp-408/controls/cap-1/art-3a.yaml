@@ -1,0 +1,147 @@
+id: art-3a
+family: cap-1
+title: "Integrity, Authenticity, Non-Repudiation and Confidentiality in Remote Operations"
+class: CNSP-408
+baselines: [seguradoras-digitais]
+statement:
+  prose: |
+    Art. 3º. A utilização de meios remotos nas operações de seguro, previdência
+    complementar aberta e capitalização deverá garantir:
+
+    I — a integridade, a autenticidade, o não-repúdio e a confidencialidade das
+    informações e dos documentos eletrônicos;
+guidance:
+  prose: |
+    Article 3, inciso I establishes four fundamental security properties that must be
+    guaranteed in all remote insurance operations. These are non-negotiable requirements.
+
+    **Integrity:**
+    Information and electronic documents must not be altered during transmission or
+    storage without detection. This requires cryptographic hashing, digital signatures,
+    or equivalent tamper-evident mechanisms.
+
+    **Authenticity:**
+    The origin of information and documents must be verifiable. The client must be able
+    to confirm that a document genuinely came from the supervised entity, and vice versa.
+    This requires authentication mechanisms for both parties.
+
+    **Non-repudiation:**
+    Neither party can deny having sent or received information or documents. This is
+    critical for electronic contracting — if a client accepts a policy digitally, that
+    acceptance must be provable. Requires audit trails with cryptographic evidence.
+
+    **Confidentiality:**
+    Information exchanged through remote means must be protected against unauthorized
+    access. This applies during transmission (encryption in transit) and storage
+    (encryption at rest), particularly for sensitive personal and financial data.
+
+    **Practical implication:**
+    These four properties must be implemented at the infrastructure level and cannot
+    be satisfied by mere contractual disclaimers. They require technical controls:
+    TLS/mTLS for transport, digital signatures for documents, access control for
+    storage, and comprehensive audit logging for non-repudiation.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integrity controls:**
+      1. Implement cryptographic hashing (SHA-256 minimum) for all electronic
+         documents generated or transmitted through remote means.
+      2. Digital signature infrastructure (PKI) for contractual documents,
+         using ICP-Brasil certificates for legally binding signatures.
+      3. Document integrity verification service that validates hash chains
+         and signatures on demand.
+      4. Immutable storage for signed documents (WORM storage or blockchain-based
+         notarization for critical contracts).
+
+      **Authenticity controls:**
+      5. Mutual TLS (mTLS) for API-to-API communications between supervised
+         entities, intermediaries, and service providers.
+      6. Multi-factor authentication (MFA) for client access to digital channels.
+      7. Server-side certificates with Extended Validation (EV) for public-facing
+         web portals and applications.
+
+      **Non-repudiation controls:**
+      8. Comprehensive audit trail with tamper-evident logging (append-only,
+         cryptographically chained log entries).
+      9. Timestamp authority integration for provable event ordering.
+      10. Receipt confirmation service generating cryptographic proof of delivery.
+
+      **Confidentiality controls:**
+      11. TLS 1.3 enforcement for all data in transit.
+      12. AES-256 encryption at rest for all stored client data and documents.
+      13. Key management system (KMS) with HSM backing for encryption keys.
+      14. Data classification and access control policies enforced at the platform level.
+    tools:
+      - pki-infrastructure
+      - hsm
+      - kms
+      - waf
+      - tls-termination
+      - vault
+      - immutable-storage
+  devsecops:
+    prose: |
+      **Security scanning for cryptographic compliance:**
+      1. SAST rules checking for proper use of cryptographic libraries
+         (no weak algorithms, proper key sizes, no hardcoded keys).
+      2. DAST scanning for TLS configuration (cipher suites, protocol versions,
+         certificate validity).
+      3. Secret detection in CI/CD to prevent leakage of signing keys,
+         certificates, and encryption keys.
+      4. Dependency scanning for vulnerable cryptographic libraries.
+
+      **Pipeline enforcement:**
+      5. Automated verification that all API endpoints enforce TLS 1.2+.
+      6. Document signing validation in the build pipeline — every contractual
+         document template must support digital signatures.
+      7. Integration tests verifying integrity checks, authenticity validation,
+         and non-repudiation evidence generation.
+      8. Container scanning for cryptographic compliance (no deprecated
+         algorithms in container images).
+    tools:
+      - gitlab-ci
+      - sast-scanner
+      - dast-scanner
+      - secret-detection
+      - dependency-scanning
+      - ssl-labs-api
+      - trivy
+  secops:
+    prose: |
+      **Continuous monitoring of security properties:**
+      1. Real-time monitoring of TLS certificate validity and configuration
+         across all digital channels.
+      2. Integrity monitoring: periodic verification of stored document hashes
+         against recorded values (detect tampering).
+      3. Authentication monitoring: track failed authentication attempts,
+         detect credential stuffing and brute force attacks.
+      4. Non-repudiation audit: periodic verification that audit logs are
+         intact and tamper-evident properties hold.
+
+      **Incident response for security property violations:**
+      5. Specific playbooks for each property violation (integrity breach,
+         authenticity failure, repudiation dispute, confidentiality leak).
+      6. Forensic evidence preservation procedures aligned with ICP-Brasil
+         and Brazilian digital evidence standards.
+      7. SUSEP notification procedures for security incidents affecting
+         remote insurance operations.
+      8. Quarterly security assessment of all four properties across channels.
+    tools:
+      - siem
+      - certificate-monitoring
+      - integrity-monitoring
+      - dlp
+      - soar
+legal_references:
+  - framework_id: susep-638
+    articles: ["art-3", "art-4"]
+    relationship: complements
+  - framework_id: cnsp-381
+    articles: ["art-4"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.8.26", "A.5.14"]
+    relationship: supports

@@ -1,0 +1,131 @@
+id: art-15
+family: cap-3
+title: "Identificacao de Nao-Residentes e Estrangeiros"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 15. Para clientes não-residentes ou estrangeiros, as supervisionadas devem
+    adotar procedimentos adicionais de identificação, incluindo:
+    I - número do passaporte ou documento de identificação equivalente, com
+    indicação do país emissor;
+    II - endereço no país de origem e, quando aplicável, endereço no Brasil;
+    III - verificação da regularidade da situação migratória, quando aplicável;
+    IV - identificação da fonte de recursos para pagamento de prêmios ou aportes
+    realizados no Brasil.
+guidance:
+  prose: |
+    O art. 15 estabelece procedimentos adicionais para clientes nao-residentes e
+    estrangeiros, que representam risco elevado de PLD/FT por dificuldade de
+    verificacao e potencial uso transfronteirico.
+
+    **Clientes nao-residentes no mercado securitario:**
+    Cenarios tipicos de operacoes com nao-residentes:
+    1. Seguro de vida contratado por estrangeiro residente temporario no Brasil
+    2. VGBL/PGBL contratado por brasileiro residente no exterior
+    3. Seguro patrimonial de imovel no Brasil por nao-residente
+    4. Resseguro com cedentes internacionais
+    5. Seguro de viagem contratado por estrangeiro
+    6. Capitalizacao adquirida por turista
+
+    **Riscos especificos:**
+    - Dificuldade de verificacao documental em paises sem cooperacao
+    - Possibilidade de uso de seguros para transferencia internacional de valores
+    - Pagamento de premios com recursos de origem nao verificavel
+    - Beneficiarios em jurisdicoes de risco (paraisos fiscais, paises sem
+      cooperacao com COAF)
+
+    **Procedimentos adicionais (incisos I-IV):**
+
+    1. Documentacao (I-II):
+       Passaporte ou documento equivalente com validade verificavel.
+       Embaixadas e consulados podem emitir documentos de identidade
+       para nacionais no exterior.
+
+    2. Situacao migratoria (III):
+       Verificacao junto a Policia Federal para estrangeiros no Brasil:
+       - Visto de residencia permanente ou temporario
+       - Registro Nacional de Estrangeiro (RNE/CRNM)
+       - Refugiados com documentacao especifica
+
+    3. Fonte de recursos (IV):
+       Critico para PLD/FT -- como o nao-residente paga premios no Brasil?
+       - Transferencia internacional registrada no BCB
+       - Conta bancaria no Brasil (em nome do proprio)
+       - Pagamento por terceiro residente (quem?)
+       - Recursos de trabalho no Brasil (comprovante de renda)
+
+    **Paises de alto risco GAFI:**
+    Para nao-residentes de paises da lista cinza ou negra do GAFI, EDD e
+    obrigatoria independentemente do valor da operacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Onboarding de nao-residentes:**
+      1. Fluxo de onboarding diferenciado para nao-residentes com campos
+         adicionais obrigatorios (passaporte, endereco exterior, fonte de
+         recursos).
+      2. Validacao de passaporte com verificacao de MRZ (Machine Readable Zone).
+      3. Integracao com bases de verificacao migratoria (Policia Federal).
+      4. Screening contra listas GAFI (paises de alto risco) com classificacao
+         automatica de risco por nacionalidade/residencia.
+
+      **Controles de pagamento:**
+      5. Verificacao automatica de que premios pagos por nao-residentes tem
+         origem documentada (remessa internacional, conta no Brasil).
+      6. Bloqueio de emissao quando fonte de recursos nao comprovada.
+      7. Alerta automatico para operacoes com nao-residentes de paises de
+         alto risco GAFI.
+      8. Cross-reference entre nacionalidade do cliente e lista atualizada
+         de paises sob sancoes (ONU, OFAC, UE).
+    tools:
+      - kyc-platform
+      - passport-verification
+      - sanctions-screening
+      - fatf-lists-integration
+  devsecops:
+    prose: |
+      **Testes de fluxo internacional:**
+      1. Testes para cenarios de onboarding de nao-residentes de diferentes
+         nacionalidades e tipos de documento.
+      2. Testes de bloqueio para nao-residentes de paises de alto risco GAFI
+         sem EDD completa.
+      3. Testes de validacao de passaporte com MRZ valido e invalido.
+
+      **Integracao internacional:**
+      4. Testes de integracao com servicos de verificacao migratoria.
+      5. Testes de atualizacao de listas GAFI e sancoes.
+      6. Testes de performance para screening internacional em tempo real.
+    tools:
+      - gitlab-ci
+      - e2e-tests
+      - integration-tests
+      - performance-tests
+  secops:
+    prose: |
+      **Monitoramento de nao-residentes:**
+      1. Dashboard de operacoes com nao-residentes por nacionalidade, produto
+         e valor.
+      2. Monitoramento de alteracoes nas listas GAFI com reclassificacao
+         automatica de clientes afetados.
+      3. Revisao periodica de todos os clientes nao-residentes de paises de
+         alto risco (minimo semestral).
+
+      **Cooperacao internacional:**
+      4. Procedimentos para responder a solicitacoes de informacoes de
+         autoridades estrangeiras (via COAF).
+      5. Registro de todas as operacoes com nao-residentes com detalhamento
+         de fonte de recursos.
+      6. Relatorio de exposicao internacional para diretoria e SUSEP.
+      7. Retencao de documentacao de nao-residentes por 10 anos.
+    tools:
+      - kyc-platform
+      - international-monitoring
+      - regulatory-reporting
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-15"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-34"]
+    relationship: complements

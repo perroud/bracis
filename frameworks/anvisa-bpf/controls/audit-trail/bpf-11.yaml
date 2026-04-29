@@ -1,0 +1,110 @@
+id: bpf-11
+family: audit-trail
+title: "Audit Trail Retention and Archival"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    A trilha de auditoria deve ser retida pelo mesmo período do registro
+    eletrônico ao qual está vinculada, conforme os requisitos regulatórios
+    de retenção de dados de BPF: mínimo de cinco anos para registros de
+    lote de fabricação, ou um ano após a data de validade do lote liberado,
+    o que for mais longo.
+
+    Durante todo o período de retenção, a trilha de auditoria deve
+    permanecer legível, pesquisável e acessível para revisão, auditoria
+    interna e inspeção regulatória. A migração de trilhas de auditoria
+    entre sistemas ou formatos de armazenamento deve preservar a integridade
+    e a completude de todos os registros.
+
+    O arquivamento de trilhas de auditoria deve seguir procedimento
+    documentado que inclua verificação de integridade após a transferência,
+    testes periódicos de restauração, e controles de acesso ao acervo
+    arquivado equivalentes aos controles do sistema de origem.
+guidance:
+  prose: |
+    Audit trail retention is a frequently overlooked requirement that
+    becomes critical during regulatory inspections, product recalls, or
+    data integrity investigations that may occur years after manufacturing.
+
+    Key retention considerations:
+    - Audit trails are inseparable from the parent record; they must be
+      retained together and accessible together
+    - System decommissioning must include audit trail migration or
+      archival with validated data transfer
+    - Storage media must be periodically verified for readability
+    - Format migration (e.g., database upgrade) must preserve all
+      audit trail data including timestamps and user information
+    - Archived audit trails must remain searchable, not just preserved
+      as flat files or images
+
+    Retention periods per Brazilian pharmaceutical regulation:
+    - Batch manufacturing records: 5 years minimum or 1 year after
+      product expiry, whichever is longer
+    - Stability data: throughout product lifecycle plus retention period
+    - Validation records: lifecycle of the system plus retention period
+    - Quality system records: 5 years minimum
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement tiered storage architecture for audit trail data
+         with automated lifecycle management: active storage for current
+         records, nearline storage for accessible archives, and cold
+         storage for long-term retention.
+      2. Deploy automated data migration validation for audit trail
+         archival: cryptographic hash comparison, record count
+         verification, and sample content validation pre/post migration.
+      3. Configure periodic restoration testing (minimum annually)
+         verifying that archived audit trails can be restored, read,
+         and searched within defined recovery time objectives.
+      4. Implement storage media health monitoring with proactive
+         migration before media degradation affects data readability.
+    tools:
+      - tiered-storage
+      - data-migration-tools
+      - restoration-testing
+      - media-monitoring
+  devsecops:
+    prose: |
+      1. Build automated archival validation tests verifying data
+         completeness and integrity after every audit trail migration
+         or archival operation.
+      2. Implement automated retention compliance checks verifying
+         that audit trail data meets minimum retention periods before
+         any deletion or disposal operation is permitted.
+      3. Test audit trail search and retrieval performance from archived
+         storage to ensure accessibility requirements are met within
+         acceptable response times.
+      4. Create automated restoration test pipelines that periodically
+         verify archived data readability and integrity.
+    tools:
+      - gitlab-ci
+      - archival-validation
+      - retention-compliance
+      - restoration-testing
+  secops:
+    prose: |
+      1. Define audit trail retention policy aligned with pharmaceutical
+         regulatory requirements, specifying retention periods by record
+         type and disposal procedures.
+      2. Conduct periodic retention compliance audits verifying that
+         audit trails are retained for required periods and accessible
+         for inspection.
+      3. Manage system decommissioning procedures ensuring audit trail
+         data is migrated or archived before system retirement with
+         validated evidence of complete transfer.
+      4. Maintain disposal records documenting authorized destruction
+         of audit trail data after retention periods expire, with
+         approval from Quality Assurance.
+    tools:
+      - retention-management
+      - grc-platform
+      - decommissioning-tools
+      - quality-management-system
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-19", "art-27"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-10"]
+    relationship: mapped

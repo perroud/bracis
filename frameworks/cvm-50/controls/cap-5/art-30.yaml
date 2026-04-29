@@ -1,0 +1,95 @@
+id: art-30
+family: cap-5
+title: "Monitoramento de Operacoes em Dinheiro e Ativos de Alta Liquidez"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 30. Os participantes devem dispensar especial atenção a operações
+    que envolvam:
+
+    I - depósitos, aportes ou transferências em valores individuais iguais
+    ou superiores a R$ 50.000,00 (cinquenta mil reais) em conta de titularidade
+    de pessoa física, ou R$ 200.000,00 (duzentos mil reais) em conta de
+    titularidade de pessoa jurídica;
+    II - múltiplas operações que somadas no período de 30 dias atinjam os
+    limites previstos no inciso I;
+    III - operações que envolvam criptoativos ou outros ativos digitais de
+    alta liquidez em valores acima de R$ 30.000,00; e
+    IV - transferências internacionais acima de USD 10.000.
+guidance:
+  prose: |
+    Os thresholds do art. 30 sao valores de referencia para atencao especial —
+    nao automaticamente suspeitos, mas que demandam analise adicional.
+
+    **Diferenca entre "atencao especial" e "comunicacao automatica":**
+    O art. 30 exige "especial atencao" — analise e verificacao de consistencia
+    com o perfil do cliente. Diferente do art. 36 (cap. 6) que estabelece
+    obrigacoes de comunicacao ao COAF.
+
+    **Fracionamento/smurfing (inciso II):**
+    O inciso II e especialmente importante: o criminoso pode fracionar uma
+    transacao grande em varias menores para evitar os thresholds do inciso I.
+    O sistema deve somar transacoes em janelas de 30 dias para detectar esse padrao.
+
+    **Criptoativos (inciso III):**
+    O threshold menor para criptoativos (R$ 30.000 vs. R$ 50.000 para PF)
+    reflete o maior risco de anonimato e dificuldade de rastreamento nesse
+    tipo de ativo.
+
+    **Transferencias internacionais (inciso IV):**
+    O limite em dolares reflete o alinhamento com padroes internacionais
+    (USD 10.000 e o threshold classico do FinCEN nos EUA).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controles por threshold:**
+      1. Regras de monitoramento para cada inciso do art. 30 com thresholds
+         configurados e parametrizaveis pelo compliance.
+      2. Deteccao de fracionamento com janela deslizante de 30 dias: soma
+         acumulada de transacoes por cliente, tipo e direcao.
+      3. Tratamento de criptoativos: se o participante opera com ativos
+         tokenizados ou aceita criptoativos, regra especifica com threshold
+         de R$ 30.000.
+      4. Integracao com sistema de cambio para monitoramento de transferencias
+         internacionais acima de USD 10.000.
+
+      **Gestao de alertas de threshold:**
+      5. Alertas de threshold vao para fila de analise, nao para bloqueio
+         automatico (diferente de sancoes).
+      6. Prioridade de analise proporcional ao quanto o threshold foi superado.
+    tools:
+      - transaction-monitoring
+      - rules-engine
+      - aml-platform
+      - fx-integration
+  devsecops:
+    prose: |
+      **Testes de thresholds:**
+      1. Testes para cada threshold do art. 30: transacao exatamente no limite,
+         ligeiramente acima, ligeiramente abaixo.
+      2. Testes de fracionamento: sequencia de transacoes que somam acima do
+         threshold deve gerar alerta.
+      3. Testes de janela deslizante: garantir que soma de 30 dias e calculada
+         corretamente independente do dia do mes.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - unit-testing
+  secops:
+    prose: |
+      **Monitoramento de efetividade:**
+      1. Relatorio mensal de alertas por threshold: quantos alertas por inciso,
+         taxa de confirmacao como suspeito.
+      2. Analise de thresholds: se muitos alertas sao "falso positivo", avaliar
+         se os thresholds precisam ser ajustados.
+      3. Revisao anual de thresholds com base em tendencias do mercado e
+         orientacoes do COAF.
+    tools:
+      - aml-platform
+      - reporting-dashboard
+      - analytics-platform
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-26", "art-27"]
+    relationship: equivalent-to

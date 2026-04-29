@@ -1,0 +1,121 @@
+id: rec-2
+family: prescricao
+title: "Electronic Prescription of Controlled Substances"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 3.º A prescrição eletrônica de medicamentos sujeitos a controle
+    especial, definidos nas Portarias SVS/MS n.º 344/1998 e suas atualizações,
+    deve atender, além dos requisitos gerais desta Resolução, aos seguintes
+    requisitos adicionais:
+
+    I — identificação da Notificação de Receita eletrônica correspondente,
+    quando exigida pela legislação vigente;
+
+    II — número sequencial de controle gerado automaticamente pelo sistema
+    de prescrição, vinculado ao SNCR;
+
+    III — classificação da substância prescrita conforme as listas da
+    Portaria SVS/MS n.º 344/1998 (listas A1, A2, A3, B1, B2, C1 a C5, D1,
+    D2, E e F);
+
+    IV — limite de quantidade máxima por prescrição, conforme a lista de
+    classificação da substância;
+
+    V — validade da receita conforme definido para cada lista de substâncias.
+guidance:
+  prose: |
+    Article 3 imposes additional controls for electronically prescribing
+    controlled substances regulated under Portaria SVS/MS 344/1998 (Brazil's
+    equivalent of the DEA Controlled Substances Act).
+
+    **Substance classification lists:**
+    - Lists A1, A2, A3: narcotic and psychotropic substances (strictest
+      controls, yellow Notificação de Receita)
+    - Lists B1, B2: psychotropic substances (blue Notificação de Receita)
+    - Lists C1-C5: other controlled substances (special-control prescription)
+    - Lists D1, D2: precursor substances
+    - Lists E, F: anabolic steroids and immunosuppressants
+
+    **Electronic Notificação de Receita:**
+    The traditional paper-based Notificação de Receita (color-coded forms)
+    is replaced by an electronic equivalent linked to the SNCR, maintaining
+    the same regulatory controls digitally.
+
+    **Quantity and validity limits:**
+    Systems must enforce maximum quantity and prescription validity periods
+    per substance list (e.g., List A substances limited to 5 days of
+    treatment per prescription, valid for 30 days).
+
+    **Sequential control number:**
+    Each controlled substance prescription must receive a unique sequential
+    number from the SNCR, enabling full traceability from prescribing
+    to dispensing.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controlled substance prescription engine:**
+      1. Implement a substance classification service mapping all drugs
+         to their Portaria 344/1998 list classifications (A1-F), with
+         automatic synchronization from ANVISA's published updates.
+      2. Deploy business rules engine enforcing per-list quantity limits,
+         prescription validity periods, and Notificação de Receita
+         requirements based on substance classification.
+      3. Integrate with SNCR API to obtain sequential control numbers
+         in real time during prescription generation.
+      4. Implement a Notificação de Receita digital workflow that
+         generates, signs, and registers electronic notifications
+         automatically when required by the substance list.
+      5. Store all controlled substance prescriptions in a segregated,
+         auditable data store with enhanced access controls and
+         encryption at rest.
+    tools:
+      - rules-engine
+      - drools
+      - postgresql
+      - vault
+      - kafka
+      - sncr-api
+  devsecops:
+    prose: |
+      **Controlled substance validation pipeline:**
+      1. Create comprehensive test suites covering all Portaria 344
+         substance lists, quantity limits, and validity periods.
+      2. Implement property-based testing to verify that no code path
+         can bypass controlled substance validation rules.
+      3. Add mutation testing to confirm that quantity and validity
+         limit enforcement cannot be silently disabled.
+      4. Deploy automated regression tests for SNCR sequential number
+         generation and Notificação de Receita workflow.
+    tools:
+      - gitlab-ci
+      - mutation-testing
+      - property-based-testing
+      - integration-tests
+      - sast
+  secops:
+    prose: |
+      **Controlled substance monitoring and compliance:**
+      1. Monitor all controlled substance prescriptions in real time,
+         alerting on unusual prescribing patterns (volume spikes,
+         off-hours prescribing, prescriber concentration).
+      2. Generate weekly reports on controlled substance prescription
+         volumes by substance list, prescriber, and dispensing pharmacy.
+      3. Investigate and report potential prescription fraud patterns
+         (doctor shopping, quantity manipulation) to ANVISA as required.
+      4. Conduct quarterly audits of Notificação de Receita issuance
+         versus dispensation records for reconciliation.
+    tools:
+      - siem
+      - fraud-detection
+      - anomaly-detection
+      - compliance-dashboard
+      - audit-logging
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-23"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: complements

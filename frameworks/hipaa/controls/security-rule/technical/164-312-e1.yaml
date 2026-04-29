@@ -1,0 +1,106 @@
+id: 164.312-e1
+family: security-rule-technical
+title: "Transmission Security"
+class: HIPAA-Security-Rule
+
+statement:
+  prose: >-
+    Implement technical security measures to guard against unauthorized access to
+    electronic protected health information that is being transmitted over an electronic
+    communications network.
+  parts:
+    - id: 164.312-e2-i
+      label: "164.312(e)(2)(i)"
+      prose: >-
+        Integrity Controls (Addressable). Implement security measures to ensure that
+        electronically transmitted electronic protected health information is not
+        improperly modified without detection until disposed of.
+    - id: 164.312-e2-ii
+      label: "164.312(e)(2)(ii)"
+      prose: >-
+        Encryption (Addressable). Implement a mechanism to encrypt electronic protected
+        health information whenever deemed appropriate.
+
+guidance:
+  prose: >-
+    Transmission security protects ePHI from unauthorized interception during
+    transmission over electronic networks. This includes internal network transmissions,
+    internet communications, email, and data transfers between systems. Encryption
+    (TLS 1.2+) is the primary mechanism for protecting data in transit. While encryption
+    is addressable rather than required, the HHS Breach Notification Rule defines
+    "unsecured PHI" as PHI not rendered unusable through encryption meeting NIST
+    standards. Using compliant encryption during transmission therefore provides safe
+    harbor from breach notification requirements. Integrity controls during transmission
+    include digital signatures, message authentication codes, and TLS which provides
+    built-in integrity verification. Organizations must assess their transmission risks
+    and implement appropriate protections.
+
+references:
+  - citation: "45 CFR 164.312(e)(1)"
+    url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.312"
+  - citation: "HHS Guidance on Rendering Unsecured PHI Unusable"
+    url: "https://www.hhs.gov/hipaa/for-professionals/breach-notification/guidance/index.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ for all network communications involving ePHI. Deploy service
+      mesh (Istio, Linkerd) to enforce mutual TLS between all microservices processing
+      ePHI. Automate certificate management using cert-manager with automatic renewal.
+      Configure ingress controllers to reject connections using deprecated TLS versions.
+      Implement network policies that block unencrypted traffic within the ePHI
+      environment. Use VPN or encrypted tunnels for any ePHI transmission over untrusted
+      networks. Configure email gateways with mandatory TLS for ePHI transmissions and
+      S/MIME or PGP for email encryption where required.
+    tools:
+      - istio
+      - linkerd
+      - cert-manager
+      - nginx-ingress
+      - traefik
+      - wireguard
+      - aws-acm
+      - lets-encrypt
+
+  devsecops:
+    prose: >-
+      Integrate TLS validation into CI/CD pipelines using testssl.sh or sslyze.
+      Scan IaC templates for insecure transmission configurations (unencrypted
+      endpoints, TLS < 1.2, weak cipher suites). Enforce that application code
+      handling ePHI does not disable certificate verification or use insecure
+      HTTP for API calls. Include transmission security tests in DAST scans.
+      Monitor certificate expiration in pipeline stages and alert before expiry.
+      Verify that all inter-service communication in the ePHI environment uses
+      mTLS through automated integration tests.
+    tools:
+      - gitlab-ci
+      - testssl.sh
+      - sslyze
+      - checkov
+      - tfsec
+      - gitlab-dast
+
+  secops:
+    prose: >-
+      Monitor network traffic for unencrypted ePHI transmissions using network
+      detection tools. Alert on TLS downgrade attacks and expired certificates.
+      Track certificate inventory with expiration dates and automated renewal
+      status. Conduct periodic TLS configuration assessments on all ePHI
+      endpoints. Monitor for data exfiltration patterns in network traffic.
+      Verify email encryption compliance for ePHI transmissions. Audit VPN
+      and encrypted tunnel configurations quarterly.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+      - zeek
+      - suricata
+      - hardenize
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.26"]
+    relationship: supports

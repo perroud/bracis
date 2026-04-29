@@ -1,0 +1,100 @@
+id: iec-3-3-fr2
+family: part-3
+title: "FR2: Use Control (UC)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr2
+
+statement:
+  prose: >-
+    The control system shall enforce assigned privileges for all authenticated
+    entities to perform authorized actions on the system. Use control shall
+    implement the principle of least privilege, enforce role-based access,
+    and restrict the execution of unauthorized software and operations. The
+    granularity and enforcement strength shall be commensurate with the
+    target security level of the zone.
+
+guidance:
+  prose: >-
+    Use control in IACS environments must account for the hierarchical
+    nature of industrial systems and the different roles at each Purdue
+    model level. Key considerations include: defining roles aligned with
+    operational functions (operator, engineer, maintenance technician,
+    administrator, auditor); implementing authorization matrices that map
+    roles to specific allowed actions on specific assets within each zone;
+    enforcing write protection on safety-critical controller configurations
+    with physical key switches where available; implementing application
+    whitelisting on HMIs, engineering workstations, and SCADA servers to
+    prevent unauthorized software execution; restricting USB and portable
+    media usage through endpoint controls; implementing time-based access
+    restrictions for maintenance windows; enforcing separation of duties
+    between those who develop control logic and those who deploy it;
+    implementing wireless access controls for field devices with zone-
+    appropriate authentication; and logging all authorization decisions
+    including denied access attempts for security monitoring.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 2.1 through SR 2.12"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement application whitelisting solutions on all Windows-based
+      IACS endpoints (HMIs, engineering workstations, historians).
+      Deploy endpoint protection platforms designed for OT that can enforce
+      execution control without impacting real-time performance. Implement
+      role-based access control in the centralized identity provider with
+      fine-grained permissions mapped to IACS zones and asset types.
+      Configure industrial firewalls with application-layer filtering
+      that restricts OT protocol commands based on user role. Deploy
+      USB device control that blocks unauthorized removable media on
+      IACS endpoints.
+    tools:
+      - carbon-black-app-control
+      - cyberark
+      - trellix-application-control
+      - forescout
+      - cisco-ise
+
+  devsecops:
+    prose: >-
+      Enforce role-based deployment permissions in the CI/CD pipeline so
+      that only authorized roles can deploy to specific IACS zones.
+      Implement approval workflows requiring sign-off from both OT
+      engineering and cybersecurity before changes to control logic.
+      Automate validation that deployed software matches the approved
+      whitelist before allowing deployment. Scan for privilege escalation
+      vulnerabilities in custom IACS applications. Enforce code signing
+      for all software deployed to control system environments.
+    tools:
+      - gitlab-ci
+      - cosign
+      - opa
+      - vault
+      - semgrep
+
+  secops:
+    prose: >-
+      Monitor for unauthorized software execution attempts on IACS
+      endpoints. Alert on privilege escalation and role abuse patterns.
+      Detect unauthorized USB device usage and portable media connections.
+      Implement continuous authorization monitoring that validates users
+      remain within their approved access scope. Monitor for unauthorized
+      PLC programming attempts and configuration changes. Track and
+      alert on after-hours access to control systems outside of
+      scheduled maintenance windows.
+    tools:
+      - crowdstrike-falcon
+      - claroty-ctd
+      - nozomi-guardian
+      - splunk-es
+      - trellix-edr
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-4", "AC-6", "CM-7", "CM-11"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.15", "a5.18", "a8.2", "a8.19"]
+    relationship: supports

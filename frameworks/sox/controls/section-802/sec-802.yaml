@@ -1,0 +1,129 @@
+id: sec-802
+family: section-802
+title: "Criminal Penalties for Altering Documents"
+class: SOX
+
+statement:
+  prose: >-
+    Whoever knowingly alters, destroys, mutilates, conceals, covers up, falsifies, or
+    makes a false entry in any record, document, or tangible object with the intent to
+    impede, obstruct, or influence the investigation or proper administration of any
+    matter within the jurisdiction of any department or agency of the United States or
+    any case filed under title 11, or in relation to or contemplation of any such matter
+    or case, shall be fined under this title, imprisoned not more than 20 years, or both.
+    Any accountant who conducts an audit of an issuer shall maintain all audit or review
+    workpapers for a period of 5 years from the end of the fiscal period in which the
+    audit or review was conducted.
+  parts:
+    - id: sec-802.a
+      label: "(a)"
+      prose: >-
+        It is unlawful to knowingly alter, destroy, mutilate, conceal, cover up,
+        falsify, or make a false entry in any record, document, or tangible object
+        with the intent to impede, obstruct, or influence any federal investigation
+        or bankruptcy proceeding. Penalties include fines and/or imprisonment up to
+        20 years.
+    - id: sec-802.b
+      label: "(b)"
+      prose: >-
+        Any accountant who conducts an audit of an issuer of securities shall
+        maintain all audit or review workpapers for a period of 5 years from the end
+        of the fiscal period in which the audit or review was conducted.
+
+guidance:
+  prose: >-
+    Section 802 has two critical implications for IT organizations. First, it establishes
+    severe criminal penalties for altering, destroying, or falsifying records that may
+    be relevant to federal investigations. This means IT systems must be configured to
+    produce tamper-evident records — logs, audit trails, backups, and archives that
+    cannot be silently modified or deleted. Second, it mandates a minimum 5-year
+    retention period for audit workpapers. For IT, this extends to electronic records
+    that support the audit: system logs, access records, change management records,
+    configuration baselines, and any other digital artifacts that auditors rely upon
+    in their assessment. Organizations must implement data retention policies that
+    ensure these records are preserved for the required period and are readily
+    retrievable. Log tampering, premature log deletion, or destruction of audit
+    evidence are not merely compliance failures — they are federal crimes.
+
+references:
+  - citation: "Sarbanes-Oxley Act of 2002, Section 802 (18 U.S.C. 1519, 1520)"
+    url: "https://www.law.cornell.edu/uscode/text/18/1519"
+  - citation: "SEC Rule 2-06 — Retention of Records Relevant to Audits and Reviews"
+    url: "https://www.ecfr.gov/current/title-17/chapter-II/part-210/subpart-A/section-210.2-06"
+  - citation: "PCAOB Rule 3100 — Compliance with Auditing and Related Professional Practice Standards"
+    url: "https://pcaobus.org/oversight/standards/general-auditing-standards"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement immutable logging infrastructure using write-once storage backends
+      (S3 Object Lock, Azure Immutable Blob Storage, WORM-compliant storage) for all
+      audit-relevant records. Deploy centralized log aggregation with cryptographic
+      integrity verification (hash chains, Merkle trees) that detects any tampering
+      with log data. Establish automated data lifecycle management that enforces
+      minimum 5-year retention for all audit-related records and prevents premature
+      deletion. Implement role-based access controls on log storage that separate
+      log producers from log administrators, ensuring no single role can both generate
+      and delete audit records. Deploy backup and archival systems with integrity
+      verification and periodic restore testing to ensure records remain retrievable
+      throughout the retention period. Use infrastructure-as-code to define and enforce
+      retention policies, making policy changes auditable and version-controlled.
+    tools:
+      - aws-s3-object-lock
+      - elasticsearch
+      - grafana-loki
+      - terraform
+      - vault
+      - kubernetes-rbac
+  devsecops:
+    prose: >-
+      Configure CI/CD systems to produce immutable audit trails of all pipeline
+      executions, deployments, and configuration changes to financial reporting
+      systems. Implement commit signing and branch protection rules that establish
+      cryptographic proof of authorship and prevent history rewriting (force pushes)
+      on repositories containing financial system code. Deploy automated compliance
+      checks that verify log retention policies are correctly applied and that no
+      audit-relevant log sources have been disabled or diverted. Establish pipeline
+      controls that prevent the deployment of changes that would reduce log verbosity,
+      disable audit logging, or shorten retention periods on in-scope systems.
+      Maintain version-controlled retention policy definitions that are enforced
+      through policy-as-code across all environments.
+    tools:
+      - gitlab-ci
+      - gitlab-audit-events
+      - git-commit-signing
+      - conftest
+      - open-policy-agent
+      - trivy
+  secops:
+    prose: >-
+      Operate a records management program that ensures all audit-relevant IT records
+      are classified, retained, and protected for the required 5-year minimum period.
+      Implement SIEM-based monitoring that detects attempts to alter, delete, or
+      tamper with audit logs and triggers immediate alerts. Establish legal hold
+      procedures that can rapidly preserve all relevant electronic records when
+      litigation or investigation is anticipated. Conduct periodic integrity audits
+      of log archives to verify that retained records have not been modified.
+      Maintain a records retention schedule that maps specific record types to
+      retention requirements and identifies the systems where those records reside.
+      Configure automated alerts for retention policy violations (records approaching
+      deletion before the retention period expires, storage systems approaching
+      capacity limits that could cause premature data loss).
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-cloudtrail
+      - grc-platform
+      - archive-management
+      - data-loss-prevention
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-9", "AU-11", "SI-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["a5.33", "a8.10", "a8.15"]
+    relationship: supports
+  - framework_id: soc2
+    articles: ["cc7.2", "cc7.3"]
+    relationship: supports

@@ -1,0 +1,123 @@
+id: art-3
+family: cap-1
+title: "Principios de Seguranca Cibernetica no Setor Eletrico"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 3. A segurança cibernética no setor elétrico deve observar os seguintes
+    princípios:
+
+    I - disponibilidade prioritária: a continuidade operacional dos sistemas elétricos
+    tem precedência sobre outros objetivos de segurança, dado o impacto social e
+    econômico das interrupções de fornecimento de energia;
+
+    II - proporcionalidade: as medidas de segurança devem ser proporcionais ao nível
+    de risco e à criticidade do ativo para o sistema elétrico nacional;
+
+    III - convergência IT/OT: a segurança cibernética deve contemplar a integração
+    e os riscos inerentes à convergência entre sistemas de tecnologia da informação
+    e tecnologia operacional;
+
+    IV - responsabilidade compartilhada: os agentes do setor elétrico são responsáveis
+    pela segurança cibernética de seus sistemas, independentemente de terceirização
+    de serviços ou uso de tecnologias de terceiros.
+guidance:
+  prose: |
+    Os principios do art. 3 refletem as particularidades do setor eletrico que o
+    diferenciam de outros setores regulados em seguranca cibernetica.
+
+    **Disponibilidade como prioridade:**
+    Diferentemente do setor financeiro, onde confidencialidade e frequentemente
+    a prioridade maxima, no setor eletrico a disponibilidade e paramount.
+    Mecanismos de seguranca que possam causar interrupcao operacional (ex.: patches
+    que requerem reinicializacao de sistemas SCADA) devem ser planejados cuidadosamente
+    com janelas de manutencao predefinidas e planos de rollback.
+
+    **Convergencia IT/OT como vetor de risco:**
+    A conexao crescente entre redes corporativas (IT) e redes industriais (OT)
+    e o principal vetor de ataques ao setor eletrico. O ataque a Ukraine Power Grid
+    em 2015/2016 (BlackEnergy/Industroyer) e o Colonial Pipeline em 2021 demonstram
+    como a convergencia IT/OT cria caminhos de ataque de alto impacto. A ANEEL 964
+    exige que os agentes contemplem explicitamente esse risco.
+
+    **Proporcionalidade e classificacao de ativos:**
+    Nem todos os sistemas do agente tem o mesmo nivel de criticidade. O principio
+    da proporcionalidade permite que medidas mais rigorosas sejam aplicadas a
+    sistemas criticos do SIN, enquanto sistemas corporativos seguem controles
+    padrao de seguranca da informacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar arquitetura de rede em zonas (defense-in-depth) que reflete os
+      principios da ANEEL 964:
+
+      1. Zona Corporativa (IT): redes de negocio com controles IT tradicionais
+      2. Zona DMZ Industrial: area de desmilitarizacao entre IT e OT com jump servers,
+         data historians unidirecionais e proxies de protocolo industrial
+      3. Zona OT Supervisoria: rede SCADA, servidores HMI, estacoes de engenharia
+      4. Zona OT de Campo: RTUs, PLCs, IEDs — isolados ao maximo possivel
+
+      Implementar data diodes (gateways unidirecionais) para transferencia de dados
+      da zona OT para IT sem permitir trafego reverso. Utilizar historian replicado
+      em zona DMZ para evitar acesso direto ao servidor SCADA a partir de redes IT.
+    tools:
+      - fortinet-ot
+      - palo-alto-ot
+      - waterfall-security
+      - claroty
+      - nozomi-networks
+  devsecops:
+    prose: |
+      Aplicar os principios de disponibilidade e proporcionalidade no pipeline de
+      desenvolvimento e mudancas:
+
+      1. Implementar classificacao de criticidade em todos os pipelines de deploy
+         (critico-SIN, importante, corporativo)
+      2. Para sistemas criticos-SIN: exigir aprovacao do CISO OT + janela de manutencao
+         aprovada antes de qualquer mudanca
+      3. Implementar testes de regressao automatizados para sistemas OT antes de
+         aplicar patches ou atualizacoes
+      4. Manter ambientes de teste segregados que simulam o ambiente OT de producao
+
+      Adotar politica de patch management diferenciada:
+      - IT: ciclo mensal padrao
+      - OT critico: ciclo trimestral com testes extensivos + aprovacao dupla
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - ansible
+      - testinfra
+  secops:
+    prose: |
+      Operacionalizar os principios da ANEEL 964 no programa de seguranca:
+
+      1. Disponibilidade prioritaria: configurar alertas e respostas a incidentes
+         que priorizem restauracao do servico em sistemas OT criticos
+      2. Proporcionalidade: calibrar controles de monitoramento por nivel de
+         criticidade — sistemas criticos do SIN com monitoramento 24/7, maior
+         frequencia de scans e resposta a incidentes mais rapida
+      3. Convergencia IT/OT: monitorar o trafego na zona DMZ industrial para
+         detectar movimentacao lateral entre IT e OT
+      4. Responsabilidade: manter cadeia de custodia e accountability para
+         todos os ativos, incluindo fornecedores e prestadores de servico
+
+      Realizar red team exercises anuais focados em ataques de convergencia IT/OT.
+    tools:
+      - splunk
+      - claroty
+      - nozomi-networks
+      - tenable-ot
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-005", "CIP-007"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["1-1", "2-1-4.2", "3-3"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30"]
+    relationship: supports
+  - framework_id: gsi-in3
+    articles: ["art-2"]
+    relationship: complements

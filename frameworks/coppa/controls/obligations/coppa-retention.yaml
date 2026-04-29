@@ -1,0 +1,119 @@
+id: coppa-retention
+family: obligations
+title: "Retention Only as Long as Reasonably Necessary"
+class: COPPA
+
+statement:
+  prose: |
+    An operator shall retain personal information collected online from a child for only as
+    long as is reasonably necessary to fulfill the purpose for which the information was
+    collected (16 CFR § 312.10).
+
+    The operator must delete such information using reasonable measures to protect against
+    unauthorized access to, or use of, the information in connection with its deletion.
+
+guidance:
+  prose: |
+    Section 312.10 establishes a retention limitation principle that works in conjunction
+    with the data minimization requirement. Key considerations:
+
+    1. **Purpose-linked retention:** Retention is tied to the original purpose of collection.
+       Once the purpose is fulfilled, the data must be deleted. "We might need it someday"
+       is not a valid retention justification.
+
+    2. **Reasonable necessity:** The retention period must be "reasonably necessary" — not
+       the maximum legally permissible, but the minimum needed to fulfill the purpose.
+       For example, retaining a child's drawing submission after the art contest ends has
+       no reasonable necessity.
+
+    3. **Secure deletion:** Deletion must be secure — simple database DELETE is insufficient
+       if data persists in backups, replicas, caches, or logs. The operator must use
+       reasonable measures to ensure data is actually destroyed.
+
+    4. **Backup considerations:** Data in backups must be included in retention schedules.
+       If immediate deletion from backups is not technically feasible, the operator must
+       have a documented schedule for backup rotation/destruction.
+
+    5. **Third-party retention:** Operators must ensure third parties who received children's
+       PI also comply with retention limits. Contractual provisions must include retention
+       and deletion obligations.
+
+    6. **Retention schedules:** Operators should maintain documented retention schedules
+       specifying the maximum retention period for each category of children's PI, with
+       justification.
+
+    The 2024 proposed rule updates would require operators to establish and publicly
+    disclose retention schedules for children's PI.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement automated data lifecycle management that enforces retention schedules
+         for all categories of children's PI — data is automatically flagged for deletion
+         when the retention period expires.
+      2. Build retention schedule configuration as code — define retention periods per data
+         category, enforce via automated policies, and version control changes.
+      3. Implement secure deletion procedures that cover: primary databases, replicas,
+         caches, search indices, message queues, analytics stores, log files, and backups.
+      4. Build deletion verification that confirms data is actually removed from all storage
+         tiers after the deletion pipeline completes.
+      5. Implement data aging dashboards that show the age distribution of children's PI
+         across all systems, flagging data approaching or exceeding retention limits.
+      6. Create third-party retention tracking — monitor whether third parties are complying
+         with contractual retention limits.
+    tools:
+      - data-lifecycle-management
+      - scheduler
+      - secure-deletion-service
+      - data-catalog
+      - monitoring-dashboard
+      - backup-management
+
+  devsecops:
+    prose: |
+      1. Test automated deletion pipelines — verify data is removed from ALL storage tiers
+         when retention periods expire, including edge cases like archived data and
+         read replicas.
+      2. Validate secure deletion — verify deleted data is not recoverable from storage
+         media, caches, or temporary files.
+      3. Test retention schedule enforcement — create test records with short retention
+         periods and verify they are deleted on schedule.
+      4. Scan code for hardcoded retention values that may override configured retention
+         policies.
+      5. Test backup rotation — verify that backups containing expired children's PI are
+         rotated out within the documented schedule.
+    tools:
+      - integration-testing
+      - data-remnant-scanner
+      - gitlab-ci
+      - backup-testing
+      - security-testing
+
+  secops:
+    prose: |
+      1. Audit retention compliance quarterly — verify data older than the retention period
+         has been deleted from all systems.
+      2. Monitor deletion pipeline execution — alert on failures, delays, or incomplete
+         deletions.
+      3. Track backup rotation schedules — verify backups containing children's PI are
+         destroyed on schedule.
+      4. Audit third-party retention compliance — request confirmation from third parties
+         that expired data has been deleted.
+      5. Report on retention metrics: data age distribution, deletion volumes, overdue
+         deletions, and third-party compliance rates.
+    tools:
+      - compliance-dashboard
+      - data-discovery
+      - data-lifecycle-management
+      - audit-log
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(e)"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 16"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798-100"]
+    relationship: complements

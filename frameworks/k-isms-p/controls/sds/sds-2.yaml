@@ -1,0 +1,83 @@
+id: sds-2
+family: sds
+title: "Change Management and Test Environment Security"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    The organization shall implement formal change management procedures
+    for all modifications to information systems and their configurations.
+    Changes shall be assessed for security impact, tested in a non-production
+    environment, approved by authorized personnel, and documented before
+    deployment to production. Test environments shall not use actual
+    personal information unless it has been de-identified, and test data
+    management procedures shall be established.
+
+guidance:
+  prose: |
+    Change management is a critical control area in K-ISMS-P audits. KISA
+    auditors look for evidence that every change to production systems
+    follows a documented process with proper authorization. Emergency
+    changes must also be captured with post-implementation review. The
+    prohibition on using real personal information in test environments is
+    strictly enforced. Organizations must implement data masking or synthetic
+    data generation for testing purposes. This control intersects with
+    personal information protection requirements, as unauthorized use of
+    personal information for testing constitutes a violation.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 2.8 — Change Management"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement GitOps-based change management where all infrastructure
+      changes are tracked through version control. Provide isolated test
+      environments that are automatically provisioned with synthetic data.
+      Deploy data masking tools that generate realistic but non-identifiable
+      test data. Enforce environment promotion workflows that require
+      approval gates between staging and production.
+    tools:
+      - argocd
+      - gitlab
+      - terraform
+      - tonic-ai
+
+  devsecops:
+    prose: |
+      Require merge request approvals from designated reviewers for all
+      production changes. Implement automated testing including security
+      regression tests before deployment approval. Prevent direct commits
+      to production branches through branch protection rules. Scan test
+      environments for presence of actual personal information and block
+      deployments that include unmasked data.
+    tools:
+      - gitlab-ci
+      - argocd
+      - conftest
+      - semgrep
+
+  secops:
+    prose: |
+      Audit change management records for compliance with the approved
+      process. Monitor for unauthorized changes to production systems that
+      bypass the change management process. Track emergency changes and
+      ensure post-implementation reviews are completed. Verify that test
+      environments do not contain actual personal information through
+      periodic scans.
+    tools:
+      - servicenow
+      - splunk
+      - elastic-siem
+      - wazuh
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["annex-a.8.32", "annex-a.8.33"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "CM-4", "SA-11"]
+    relationship: mapped

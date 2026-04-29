@@ -1,0 +1,132 @@
+id: nist-63-data-minimization
+family: privacy
+title: "Data Minimization in Identity Systems"
+class: SP800-63
+
+baselines: [ial1, ial2, ial3, aal1, aal2, aal3, fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    The CSP SHALL collect only the minimum set of attributes necessary to
+    accomplish the intended identity assurance purpose. The CSP SHALL NOT
+    retain sensitive information such as the actual authenticator secret or
+    PII that is not necessary for the operation of the CSP. The verifier SHALL
+    use pseudonymous identifiers for subscribers where possible to limit
+    linkability across multiple RP sessions. The RP SHALL request only the
+    attributes from the IdP that are necessary for the RP's business purpose.
+    The IdP SHALL release only the attributes that the subscriber has consented
+    to release to the RP and that are necessary for the RP's stated purpose.
+    Where possible, pairwise pseudonymous identifiers SHALL be used to prevent
+    correlation across multiple RPs receiving assertions about the same
+    subscriber. Attribute aggregation by RPs across multiple sessions is
+    prohibited without explicit subscriber consent and a lawful basis for
+    aggregation. Verifiers SHALL implement controls to prevent unnecessary
+    collection of sensitive attributes during authentication events.
+
+guidance:
+  prose: >-
+    Data minimization in identity systems addresses a systemic risk: identity
+    infrastructure, by virtue of its position in the authentication flow,
+    collects information about every user interaction. Without deliberate
+    minimization, this data becomes a high-value surveillance resource. The
+    800-63 series takes a strong position on data minimization: even technically
+    necessary data should be collected and retained only as long as required,
+    and the identity system should be designed to limit its own knowledge of
+    user activities. Pairwise pseudonymous identifiers (PPIDs) are the primary
+    technical mechanism for preventing RP correlation: each RP receives a
+    different sub value for the same subscriber, making it impossible for two
+    RPs to compare notes and correlate the same subscriber's activities across
+    their systems. The federated identity model also enables attribute minimization
+    at the RP level: instead of giving every RP the subscriber's email address,
+    the RP can receive only a verification that the subscriber is over 18
+    (without revealing the actual birthdate). These selective disclosure patterns
+    are the foundation of privacy-preserving identity.
+
+references:
+  - citation: "NIST SP 800-63-3 Section 9.3 — Use Limitation"
+    url: "https://doi.org/10.6028/NIST.SP.800-63-3"
+  - citation: "NIST SP 800-63C Section 9 — Privacy Considerations"
+    url: "https://doi.org/10.6028/NIST.SP.800-63c"
+  - citation: "NIST SP 800-63B Section 9.2 — Data Minimization"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "OpenID Connect Core — Pairwise Pseudonymous Identifiers"
+    url: "https://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg"
+
+related_controls:
+  - id: nist-63-privacy-proofing
+    relationship: implements
+    description: "Data minimization applies throughout the proofing process, not just at assertion time."
+  - id: nist-63-assertions
+    relationship: implements
+    description: "Assertion content must follow data minimization — release only necessary attributes per RP."
+  - id: nist-63-oidc-saml
+    relationship: complements
+    description: "OIDC pairwise sub and selective scope release implement data minimization in federation."
+  - id: nist-63-enrollment
+    relationship: complements
+    description: "Enrollment evidence collection must be limited to what is required for the applicable IAL."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure the authorization server to implement pairwise pseudonymous
+      identifiers as the default subject identifier type for external RPs.
+      Use the sector identifier URI approach in OIDC to assign the same PPID
+      to RPs that share a common backend while isolating from unrelated RPs.
+      Implement a per-RP attribute release policy engine: each registered RP
+      has a configured claim set and scope → claim mapping. Requests for
+      scopes beyond the RP's registered maximum are denied. Implement
+      selective disclosure for age verification: instead of releasing the
+      full birthdate, release a boolean age_over_18 or age_over_21 claim.
+      Apply a data lifecycle policy to all identity attributes: define
+      retention periods per attribute class, implement automated purging
+      or anonymization, and maintain a data catalog of all identity
+      attributes collected by the platform. Disable authentication event
+      logging at the subscriber detail level for low-risk sessions —
+      log the session outcome (success/failure) and AAL, not the
+      identity attributes accessed.
+    tools:
+      - keycloak
+      - okta
+      - vault
+      - postgres
+      - kafka
+
+  devsecops:
+    prose: >-
+      Build static analysis rules that detect code patterns that aggregate
+      identity attributes across multiple API calls and store the combined
+      result, which may constitute unauthorized attribute aggregation. Include
+      privacy-by-design review as a mandatory step in the feature development
+      workflow for any change to the identity or federation service. Implement
+      automated data mapping tests: given a test subscriber, verify that each
+      RP receives only the claims corresponding to their registered scope and
+      consent. Validate that pairwise identifiers are generated correctly:
+      the same subscriber should receive different sub values for different
+      RPs. Detect and flag any code that uses the global (public) subject
+      identifier for an RP that should receive a pairwise identifier.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - open-policy-agent
+      - playwright
+
+  secops:
+    prose: >-
+      Implement continuous monitoring of attribute release patterns to detect
+      scope creep: alert when an RP receives claim types that are not in its
+      registered claim set. Monitor data store access patterns for bulk
+      queries against subscriber attributes that may indicate unauthorized
+      aggregation. Audit the pairwise identifier mapping store for integrity:
+      a leak of the mapping between pairwise and public identifiers would
+      undermine the privacy protection. Implement anomaly detection on the
+      volume of attribute queries from specific RPs: a sudden increase may
+      indicate a misconfigured RP or a compromised RP attempting to harvest
+      subscriber data. Conduct annual privacy audits of all identity data
+      stores to verify retention policies are being enforced and no orphaned
+      data exists beyond the defined retention period.
+    tools:
+      - splunk
+      - microsoft-purview
+      - elastic-siem
+      - crowdstrike

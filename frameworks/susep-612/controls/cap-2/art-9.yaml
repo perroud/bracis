@@ -1,0 +1,133 @@
+id: art-9
+family: cap-2
+title: "Classificacao de Risco de Clientes"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 9. As supervisionadas devem classificar seus clientes nas categorias de
+    risco definidas na avaliação interna de risco, considerando, no mínimo:
+    I - a identificação do cliente e, quando aplicável, do beneficiário final;
+    II - a qualificação do cliente, incluindo capacidade financeira;
+    III - o tipo de produto ou serviço contratado;
+    IV - a compatibilidade entre o perfil do cliente e a natureza e volume das
+    operações realizadas;
+    V - a origem dos recursos;
+    VI - a área geográfica de residência ou atuação do cliente.
+guidance:
+  prose: |
+    O art. 9 detalha os criterios obrigatorios para classificacao de risco de
+    clientes, que e a base para definir o nivel de due diligence e monitoramento
+    aplicavel a cada relacionamento.
+
+    **Criterios obrigatorios de classificacao:**
+
+    1. Identificacao e beneficiario final (I):
+       - Pessoa fisica: CPF, documento de identidade, endereco, profissao
+       - Pessoa juridica: CNPJ, contrato social, quadro societario, beneficiario
+         final com participacao >= 25%
+       - Risco aumenta quando beneficiario final nao pode ser identificado
+
+    2. Qualificacao e capacidade financeira (II):
+       - Renda declarada vs. premios pagos
+       - Patrimonio declarado vs. aportes em VGBL/PGBL
+       - Fonte de renda compativel com operacoes
+       - Historico profissional e comercial
+
+    3. Tipo de produto (III):
+       Escala de risco por produto (do menor ao maior):
+       - Seguro auto, residencial, saude: risco baixo (sem componente de investimento)
+       - Seguro de vida risco puro: risco medio-baixo
+       - Seguro de vida com acumulacao: risco medio-alto
+       - VGBL/PGBL: risco alto (instrumento de investimento)
+       - Capitalizacao pagamento unico alto valor: risco alto
+       - Resseguro internacional: risco alto
+
+    4. Compatibilidade perfil vs. operacoes (IV):
+       Indicadores de incompatibilidade no mercado securitario:
+       - Assalariado de baixa renda com VGBL de aporte elevado
+       - Pessoa fisica jovem com seguro de vida de alto valor
+       - Empresa recente com seguros empresariais de grande porte
+       - Multiplas apolices sem justificativa economica
+
+    5. Origem dos recursos (V):
+       - Recursos proprios declarados em IRPF
+       - Recursos de terceiros (quem paga o premio?)
+       - Pagamento em especie (altissimo risco)
+       - Transferencias internacionais para pagamento de premios
+
+    6. Area geografica (VI):
+       - Paises e territorios de alto risco GAFI (lista cinza e negra)
+       - Regioes de fronteira brasileira
+       - Municipios com alto indice de lavagem identificados pelo COAF
+       - Paraisos fiscais e zonas de livre comercio
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de classificacao de risco de clientes:**
+      1. Engine de scoring parametrizavel com os 6 fatores obrigatorios do art. 9,
+         com pesos ajustaveis por tipo de produto e perfil da supervisionada.
+      2. Integracao com fontes externas: Receita Federal (CPF/CNPJ), Transparencia
+         (PEP), listas GAFI, listas de sancoes (ONU, OFAC, UE).
+      3. Scoring automatico no onboarding (contratacao de apolice, adesao a plano)
+         e reclassificacao periodica.
+      4. Matriz de risco cliente x produto para definir nivel de due diligence.
+
+      **Automacao de validacao:**
+      5. Verificacao automatica de CPF/CNPJ na Receita Federal.
+      6. Cruzamento de renda declarada com premios pagos usando dados de emissao.
+      7. Geocodificacao de enderecos para classificacao de risco geografico.
+      8. Screening automatico contra listas de PEP, sancoes e paises de alto risco.
+      9. Alertas automaticos quando classificacao de risco muda por nova operacao.
+    tools:
+      - kyc-platform
+      - scoring-engine
+      - sanctions-screening
+      - pep-screening
+      - geocoding-service
+  devsecops:
+    prose: |
+      **Testes do motor de classificacao:**
+      1. Testes unitarios para cada fator de risco com cenarios especificos do
+         mercado securitario (PEP com VGBL, nao-residente com capitalizacao, etc.).
+      2. Testes de integracao para fluxo completo de classificacao: onboarding,
+         scoring, due diligence requerida, aprovacao.
+      3. Testes de performance para garantir que scoring nao impacte tempo de
+         emissao de apolice ou adesao a plano.
+
+      **Monitoramento de qualidade:**
+      4. Metricas de distribuicao de risco por categoria para detectar anomalias
+         (ex: 95% dos clientes como baixo risco indica modelo mal calibrado).
+      5. Backtesting do modelo contra comunicacoes historicas ao COAF.
+      6. Data quality checks nos dados de entrada do scoring.
+    tools:
+      - gitlab-ci
+      - backtesting-framework
+      - data-quality-framework
+      - performance-tests
+  secops:
+    prose: |
+      **Governanca da classificacao:**
+      1. Documentacao dos criterios de classificacao com justificativa para cada
+         fator e peso utilizado.
+      2. Revisao periodica dos criterios alinhada com revisao da AIR (art. 8).
+      3. Processo de override manual com aprovacao alinhada ao nivel de risco
+         e justificativa documentada.
+
+      **Monitoramento e reclassificacao:**
+      4. Reclassificacao automatica quando eventos trigger ocorrem: novo produto
+         contratado, operacao atipica, alteracao cadastral significativa.
+      5. Revisao periodica de clientes de alto risco (minimo semestral).
+      6. Relatorio de distribuicao de risco da carteira para diretoria.
+      7. Arquivo de decisoes de classificacao e override por minimo de 10 anos.
+    tools:
+      - grc-platform
+      - kyc-platform
+      - risk-analytics
+      - document-retention
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-9", "art-10"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-6", "art-7"]
+    relationship: complements

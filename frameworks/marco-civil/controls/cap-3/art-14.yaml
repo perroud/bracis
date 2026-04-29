@@ -1,0 +1,97 @@
+id: art-14
+family: cap-3
+title: "Vedação de Guarda de Registros de Acesso a Aplicações por Provedores de Conexão"
+class: marco-civil
+statement:
+  prose: |
+    Art. 14. Na provisão de conexão, onerosa ou gratuita, é vedado guardar os
+    registros de acesso a aplicações de internet.
+guidance:
+  prose: |
+    O art. 14 estabelece uma proibição expressa e absoluta: provedores de conexão
+    NÃO podem guardar registros de acesso a aplicações de internet.
+
+    **Separação de responsabilidades:**
+    - Provedores de conexão: DEVEM guardar registros de conexão (art. 13) por 1 ano.
+    - Provedores de conexão: VEDADO guardar registros de acesso a aplicações (art. 14).
+    - Provedores de aplicação: DEVEM guardar registros de acesso a aplicações (art. 15) por 6 meses.
+
+    **Fundamento:**
+    A vedação protege a privacidade dos usuários. Se o provedor de conexão pudesse
+    guardar registros de acesso a aplicações, teria visibilidade completa sobre todo
+    o comportamento online do usuário — quais sites visita, quando, com que frequência.
+
+    **Implicação técnica:**
+    - Deep Packet Inspection (DPI) para fins de registro de aplicações acessadas é vedado.
+    - Logs de DNS queries que permitam identificar aplicações acessadas são vedados.
+    - Qualquer mecanismo que permita ao provedor de conexão saber quais aplicações
+      o usuário acessou é vedado.
+
+    **Atenção:** A vedação se aplica tanto a conexões onerosas quanto gratuitas,
+    incluindo Wi-Fi público oferecido por estabelecimentos comerciais.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Para provedores de conexão:**
+      1. Configurar sistemas de logging para registrar APENAS dados de conexão
+         (IP, data/hora início, término, duração) — conforme art. 13.
+      2. Garantir que roteadores e switches NÃO registrem URLs, hostnames
+         ou identificadores de aplicações.
+      3. Desabilitar logging de DNS queries que identifiquem aplicações.
+      4. Desabilitar Deep Packet Inspection para fins de registro.
+      5. Firewall e NAT logs devem conter apenas informações de camada 3/4
+         (IP e porta), nunca camada 7 (aplicação).
+
+      **Para provedores de Wi-Fi público:**
+      6. Captive portals não devem registrar navegação do usuário.
+      7. Logs de autenticação (MAC, IP, horário) são permitidos;
+         logs de URLs acessadas são vedados.
+
+      **Segregação de infraestrutura:**
+      8. Se a empresa opera como provedor de conexão E de aplicação,
+         separar fisicamente ou logicamente os sistemas de logging.
+    tools:
+      - network-logging
+      - firewall-configuration
+      - dns-resolver
+      - data-classification
+      - log-filtering
+  devsecops:
+    prose: |
+      **Validação de conformidade:**
+      1. Testes automatizados para verificar que logs de rede NÃO contêm
+         dados de camada 7 (URLs, hostnames, application data).
+      2. Scanning de configurações de firewall para detectar DPI habilitado.
+      3. Auditoria de DNS resolvers para verificar que não retêm queries.
+      4. Validação de que captive portals não registram navegação.
+
+      **Pipeline de compliance:**
+      5. Check de conformidade art. 14 integrado ao pipeline de
+         infraestrutura-como-código.
+      6. Policy-as-code para rejeitar configurações que habilitem
+         logging de aplicações em infraestrutura de conexão.
+    tools:
+      - log-content-scanner
+      - firewall-config-auditor
+      - iac-policy-checker
+      - dns-config-validator
+  secops:
+    prose: |
+      **Monitoramento contínuo:**
+      1. Alertas para detecção de dados de camada 7 em logs de conexão.
+      2. Auditoria periódica de sistemas de logging de rede.
+      3. Verificação de que DPI não está sendo usado para registro.
+
+      **Gestão de incidentes:**
+      4. Processo de resposta para casos em que registros de aplicação
+         foram inadvertidamente coletados (expurgo imediato).
+      5. Documentação de conformidade com art. 14 para demonstrar
+         a autoridades reguladoras.
+
+      **Treinamento:**
+      6. Capacitação de equipes de rede sobre a vedação do art. 14.
+    tools:
+      - siem
+      - log-audit
+      - dpi-monitoring
+      - compliance-documentation

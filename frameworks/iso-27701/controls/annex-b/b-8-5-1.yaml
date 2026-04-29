@@ -1,0 +1,125 @@
+id: b-8.5.1
+family: annex-b
+title: "Basis for PII transfer between jurisdictions for PII processors"
+class: ISO27701
+baselines: [pii-processor, combined]
+
+statement:
+  prose: >-
+    The organization acting as a PII processor shall inform the PII controller in a
+    timely manner of any intended changes concerning the addition or replacement of
+    jurisdictions for PII processing, thereby giving the PII controller the opportunity
+    to object to such changes. The organization shall only transfer PII to another
+    jurisdiction in accordance with the documented instructions of the PII controller
+    and applicable legislation. The organization shall ensure that the basis for
+    transfer to another jurisdiction is documented and that appropriate safeguards are
+    in place, including any safeguards required by the PII controller's regulatory
+    obligations. Where the organization engages sub-processors in other jurisdictions,
+    it shall ensure that the sub-processor provides an equivalent level of protection
+    and complies with the same transfer requirements. The organization shall maintain
+    records of all cross-jurisdictional PII transfers including the transfer basis,
+    safeguards applied, and destinations.
+
+guidance:
+  prose: >-
+    Cross-border PII transfer obligations for processors are driven by the controller's
+    regulatory requirements, not the processor's own compliance obligations. The
+    processor must understand and respect the transfer restrictions that apply to each
+    customer's PII based on the originating jurisdiction. A processor operating
+    globally may have different transfer constraints for different customers: EU
+    customer PII requires GDPR Chapter V compliance, Brazilian customer PII requires
+    LGPD Article 33 compliance, and so on. The processor must implement technical
+    controls that enforce per-customer jurisdictional constraints and prevent PII
+    from being processed in non-authorized jurisdictions. This includes controlling
+    where data is stored, where processing workloads run, where sub-processors
+    operate, and where support personnel access data from. The processor must proactively
+    notify controllers of any changes to processing locations, including changes to
+    cloud infrastructure regions, sub-processor locations, or support team locations.
+    Failure to maintain jurisdictional compliance can expose the processor to regulatory
+    action and contractual liability.
+
+references:
+  - citation: "ISO/IEC 27701:2019, B.8.5.1"
+    url: "https://www.iso.org/standard/71670.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement per-customer jurisdiction enforcement at the infrastructure level.
+      Build tenant-level data residency configuration that controls where PII is
+      stored and processed. Use Kubernetes node affinity, cloud provider region
+      constraints, and database deployment policies to enforce data residency per
+      customer. Implement network policies that prevent PII from being routed to
+      non-authorized regions. Build a sub-processor registry with per-customer
+      authorization tracking: each customer's DPA specifies approved sub-processors
+      and jurisdictions. Implement automated notification workflows that alert
+      customers when infrastructure changes affect processing jurisdictions
+      (new cloud regions, sub-processor changes). Build jurisdiction compliance
+      dashboards per customer showing where their PII is stored, processed,
+      and accessed. Implement geo-fencing for administrative access: support
+      personnel can only access customer PII from jurisdictions authorized
+      in the customer's DPA.
+    tools:
+      - tenant-data-residency-config
+      - kubernetes-node-affinity
+      - cloud-region-policies
+      - network-geo-restrictions
+      - sub-processor-registry
+      - customer-notification-workflows
+      - jurisdiction-dashboards
+
+  devsecops:
+    prose: >-
+      Integrate per-customer jurisdiction compliance into CI/CD. Build
+      infrastructure-as-code validation that verifies data store deployments
+      comply with per-customer jurisdiction requirements. Implement pipeline
+      gates that detect changes to processing locations (new regions, new
+      sub-processor integrations) and trigger customer notification workflows.
+      Build automated tests that verify data residency enforcement: attempt
+      to provision PII storage in non-authorized regions and verify it is
+      blocked. Test sub-processor data flow compliance: verify PII only
+      reaches sub-processors authorized per customer. Implement change
+      detection for cloud provider region configurations and sub-processor
+      routing that flags jurisdiction-affecting changes for review.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - terraform-compliance
+      - checkov
+      - data-residency-tests
+      - sub-processor-routing-tests
+      - change-detection-pipeline
+
+  secops:
+    prose: >-
+      Monitor per-customer jurisdictional compliance continuously. Build
+      SIEM rules that detect PII access from non-authorized jurisdictions
+      using geo-IP analysis of access logs. Monitor data flow destinations
+      and alert when PII is routed to non-authorized regions. Track sub-
+      processor compliance: monitor data flows to sub-processors and verify
+      they match per-customer authorization. Alert on administrative access
+      to customer PII from non-authorized geographic locations. Generate
+      per-customer transfer compliance reports showing all cross-border
+      data flows, transfer bases, and safeguard status. Monitor cloud
+      provider infrastructure for region changes that could affect data
+      residency compliance. Implement incident response playbooks for
+      jurisdictional compliance violations.
+    tools:
+      - splunk
+      - elastic-siem
+      - geo-ip-analysis
+      - network-flow-monitoring
+      - per-customer-transfer-reports
+      - sub-processor-compliance-monitoring
+      - incident-response-playbooks
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-28.3.a", "art-44", "art-46"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-33", "art-39"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.140"]
+    relationship: supports

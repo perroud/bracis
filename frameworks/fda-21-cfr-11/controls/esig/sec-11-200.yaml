@@ -1,0 +1,112 @@
+id: sec-11-200
+family: esig
+title: "Electronic Signature Components and Controls"
+class: FDA-21CFR11
+baselines: [electronic-records-signatures]
+
+statement:
+  prose: >-
+    (a) Electronic signatures that are not based upon biometrics shall: (1)
+    Employ at least two distinct identification components such as an
+    identification code and password. (1)(i) When an individual executes a
+    series of signings during a single, continuous period of controlled system
+    access, the first signing shall be executed using all electronic signature
+    components; subsequent signings shall be executed using at least one
+    electronic signature component that is only executable by, and designed to
+    be used only by, the individual. (1)(ii) When an individual executes one
+    or more signings not performed during a single, continuous period of
+    controlled system access, each signing shall be executed using all of the
+    electronic signature components. (2) Be used only by their genuine owners;
+    and (3) Be administered and executed to ensure that attempted use of an
+    individual's electronic signature by anyone other than its genuine owner
+    requires collaboration of two or more individuals. (b) Electronic
+    signatures based upon biometrics shall be designed to ensure that they
+    cannot be used by anyone other than their genuine owners.
+
+guidance:
+  prose: >-
+    Section 11.200 defines the technical requirements for electronic
+    signature components. For non-biometric signatures (the most common
+    type), at least two distinct identification components are required —
+    typically a user ID (identification code) and password. The section
+    distinguishes between continuous and non-continuous signing sessions:
+    during a continuous session, only the first signing requires both
+    components (user ID + password); subsequent signings may use only one
+    component (e.g., password re-entry). If the signing session is
+    interrupted (e.g., user logs out, session times out), all subsequent
+    signings require both components again. The requirement that attempted
+    misuse requires collaboration of two or more individuals effectively
+    mandates that the identification code and password be independently
+    controlled — the user knows the password, and the system assigns the
+    identification code. For biometric signatures, the biometric itself must
+    ensure that only the genuine owner can execute the signature.
+
+references:
+  - citation: "21 CFR Part 11, Section 11.200"
+    url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.200"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      1. Implement two-factor electronic signature execution requiring both
+      identification code (user ID) and password at the point of signature,
+      not just at system login. 2. Design signature session management that
+      distinguishes between continuous controlled access (first sign =
+      full credentials, subsequent signs = password only) and
+      non-continuous access (every sign = full credentials). 3. Implement
+      session continuity detection to automatically require full credential
+      re-entry when a session is interrupted. 4. Ensure the identification
+      code is system-assigned (not user-chosen) and the password is
+      user-controlled, so misuse would require collaboration between the
+      system administrator (who knows the ID mapping) and another person
+      (who knows the password). 5. Where biometric signatures are used,
+      implement liveness detection and anti-spoofing measures to ensure the
+      biometric cannot be replicated.
+    tools:
+      - e-signature-platform
+      - identity-provider
+      - session-management
+      - biometric-systems
+      - mfa-provider
+  devsecops:
+    prose: >-
+      1. Test electronic signature component requirements through automated
+      test suites that verify both identification components are required
+      at appropriate times. 2. Implement session continuity tests that
+      verify full re-authentication is required after session interruption.
+      3. Scan for signature bypass vulnerabilities in application code.
+      4. Verify that signature credential storage follows secure practices
+      (hashed passwords, encrypted storage).
+    tools:
+      - gitlab-ci
+      - automated-testing
+      - security-testing
+      - sast
+  secops:
+    prose: >-
+      1. Verify during periodic audits that electronic signatures require
+      both identification components at the correct times. 2. Monitor for
+      patterns suggesting credential sharing or collaborative signature
+      misuse. 3. Test signature session continuity controls to verify
+      re-authentication after interruption. 4. Review password policies
+      to ensure they meet the implicit requirement that signature misuse
+      requires multi-person collaboration.
+    tools:
+      - audit-management
+      - siem
+      - penetration-testing
+      - compliance-monitoring
+
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-17", "art-26"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-d"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-5", "IA-11"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-5"]
+    relationship: mapped

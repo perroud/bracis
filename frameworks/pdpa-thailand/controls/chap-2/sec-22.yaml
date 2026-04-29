@@ -1,0 +1,96 @@
+id: sec-22
+family: chap-2
+title: "Data Minimization and Accuracy"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 22. In collecting personal data, the data controller shall collect personal
+    data only to the extent necessary for the lawful purposes of the data controller as
+    notified to the data subject.
+
+    The data controller shall ensure that the personal data collected is accurate,
+    up-to-date, complete, and not misleading. Where the personal data is inaccurate,
+    incomplete, or misleading, the data controller shall rectify, amend, or delete such
+    personal data without delay.
+  parts:
+    - id: sec-22-1
+      label: "Paragraph 1"
+      prose: |
+        Data minimization: collect only what is necessary for the notified purposes.
+    - id: sec-22-2
+      label: "Paragraph 2"
+      prose: |
+        Data accuracy: personal data must be accurate, up-to-date, and complete.
+        Inaccurate data must be rectified or deleted without delay.
+guidance:
+  prose: |
+    Section 22 combines two GDPR principles into a single provision: data minimization
+    (GDPR Art. 5(1)(c)) and accuracy (GDPR Art. 5(1)(d)).
+
+    Practical implications:
+
+    - **Data Minimization:** Every field in a database table, API payload, or form
+      that contains personal data must be justified. "Nice to have" fields violate
+      minimization. Conduct field-level reviews.
+
+    - **Accuracy Obligation:** This is not just about not corrupting data. The
+      controller must proactively ensure data stays accurate and current. This
+      requires mechanisms for data subjects to update their data and periodic
+      data quality checks.
+
+    - **Rectification Without Delay:** When inaccuracy is identified (by the data
+      subject or internally), correction must be prompt. Define SLAs for rectification.
+
+    - **Downstream Propagation:** Corrections must propagate to all systems holding
+      copies of the data, including caches, analytics stores, and third-party
+      processors.
+
+    - **Data Quality as Compliance:** Data quality is not just a technical concern
+      but a legal obligation. Invest in data validation, deduplication, and
+      enrichment verification.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement schema-level validation: reject API requests with fields not
+         listed in the approved data dictionary for the declared purpose.
+      2. Build data quality pipelines with automated accuracy checks (format validation,
+         cross-reference verification, staleness detection).
+      3. Provide self-service data correction interfaces for data subjects.
+      4. Implement change propagation (CDC or event-driven) to ensure corrections
+         reach all downstream systems.
+      5. Set TTL (time-to-live) on personal data fields to trigger staleness reviews.
+    tools:
+      - data-quality-framework
+      - schema-validation-engine
+      - cdc-pipeline
+      - self-service-portal
+  devsecops:
+    prose: |
+      1. Enforce data minimization in CI/CD: block schema migrations that add personal
+         data fields without ROPA justification.
+      2. Run data quality tests in pipelines (null checks, format validation, referential
+         integrity for personal data).
+      3. Detect and flag unnecessary personal data fields in code reviews.
+      4. Validate that rectification APIs propagate changes to all registered consumers.
+    tools:
+      - schema-diff-validator
+      - data-quality-tests
+      - privacy-linter
+  secops:
+    prose: |
+      1. Monitor data quality metrics and alert on degradation (stale records,
+         duplicate entries, format violations).
+      2. Track rectification requests and measure response times against SLAs.
+      3. Audit data propagation completeness after corrections.
+      4. Detect data hoarding (personal data stored beyond declared retention periods).
+    tools:
+      - data-quality-dashboard
+      - rectification-tracker
+      - retention-monitor
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(c)", "art. 5(1)(d)"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 6-III", "art. 6-V"]
+    relationship: equivalent-to

@@ -1,0 +1,102 @@
+id: ac-6
+family: ac
+title: "Least Privilege"
+class: SP800-53
+baselines: [moderate, high]
+statement:
+  prose: >-
+    Employ the principle of least privilege, allowing only authorized accesses for users
+    (or processes acting on behalf of users) that are necessary to accomplish assigned
+    organizational tasks.
+guidance:
+  prose: >-
+    Organizations employ least privilege for specific duties and systems. The principle of least
+    privilege is also applied to system processes, ensuring that the processes have access to
+    systems and operate at privilege levels no higher than necessary to accomplish organizational
+    missions or business functions. Organizations consider the creation of additional processes,
+    roles, and accounts as necessary to achieve least privilege. Organizations apply least privilege
+    to the development, implementation, and operation of organizational systems. Security functions
+    include establishing system accounts, configuring access authorizations (i.e., permissions,
+    privileges), configuring settings for events to be audited, and establishing intrusion detection
+    parameters. Security-relevant information includes filtering rules for routers or firewalls,
+    configuration parameters for security services, cryptographic key management information, and
+    access control lists. Developers and implementers of systems can increase the level of assurance
+    in security functions by limiting the privilege levels of accounts used to develop, implement,
+    and test these functions to only those privileges needed for the development, implementation,
+    and testing activities. Requiring a change of roles to perform a different function limits the
+    exposure of the system to a compromise of any one individual.
+enhancements:
+  - id: ac-6.1
+    title: "Authorize Access to Security Functions"
+    baselines: [moderate, high]
+  - id: ac-6.2
+    title: "Non-privileged Access for Nonsecurity Functions"
+    baselines: [moderate, high]
+  - id: ac-6.3
+    title: "Network Access to Privileged Commands"
+    baselines: [high]
+  - id: ac-6.5
+    title: "Privileged Accounts"
+    baselines: [moderate, high]
+  - id: ac-6.7
+    title: "Review of User Privileges"
+    baselines: [moderate, high]
+  - id: ac-6.9
+    title: "Log Use of Privileged Functions"
+    baselines: [moderate, high]
+  - id: ac-6.10
+    title: "Prohibit Non-privileged Users from Executing Privileged Functions"
+    baselines: [moderate, high]
+references:
+  - citation: "NIST SP 800-40 Rev. 4"
+    url: "https://doi.org/10.6028/NIST.SP.800-40r4"
+  - citation: "NIST SP 800-162"
+    url: "https://doi.org/10.6028/NIST.SP.800-162"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design platform roles with granular permissions that map to specific job functions. Implement
+      Kubernetes RBAC with custom ClusterRoles and Roles scoped to the minimum permissions needed.
+      Use namespace-level isolation to limit blast radius. Deploy containers with non-root users,
+      read-only root filesystems, and dropped Linux capabilities. Implement Pod Security Standards
+      (Restricted profile) across all namespaces. Use cloud IAM with condition-based policies to
+      restrict access by time, IP, and resource tags. Implement just-in-time (JIT) privileged access
+      for administrative operations. Use Terraform modules that enforce least-privilege IAM policies
+      by default with explicit opt-in for elevated permissions.
+    tools:
+      - "Kubernetes RBAC / Pod Security Standards"
+      - "OPA Gatekeeper (constraint templates)"
+      - "Kyverno policies"
+      - "Terraform IAM modules"
+      - "Vault (dynamic short-lived credentials)"
+      - "Cloud IAM (AWS IAM, GCP IAM, Azure RBAC)"
+      - "Teleport / Boundary (JIT access)"
+  devsecops:
+    prose: >-
+      Enforce least privilege in CI/CD pipelines by using scoped tokens with minimal permissions
+      for each job. Implement GitLab CI job tokens with limited access rather than personal access
+      tokens. Use protected variables to restrict secret access to specific branches and environments.
+      Scan infrastructure-as-code for overly permissive IAM policies using Checkov or tfsec as
+      pipeline gates. Implement separation of duties through distinct pipeline stages with different
+      service accounts. Review and minimize permissions for GitLab project and group access tokens
+      regularly.
+    tools:
+      - "GitLab CI Job Tokens"
+      - "GitLab Protected Variables"
+      - "Checkov / tfsec / Bridgecrew"
+      - "IAM Access Analyzer"
+      - "Trivy (misconfiguration scanning)"
+      - "GitLab Protected Environments"
+  secops:
+    prose: >-
+      Monitor and alert on privilege escalation attempts and use of privileged functions. Implement
+      Privileged Access Management (PAM) solutions for all administrative access. Log all privileged
+      operations and review logs regularly. Conduct quarterly reviews of user privileges comparing
+      assigned privileges against job requirements. Alert on anomalous privileged activity including
+      off-hours administrative actions and bulk permission changes.
+    tools:
+      - "PAM (CyberArk, BeyondTrust, HashiCorp Boundary)"
+      - "SIEM (privilege escalation detection rules)"
+      - "Cloud Security Command Center"
+      - "GitLab Audit Events"
+      - "Falco (runtime privilege monitoring)"

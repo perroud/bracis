@@ -1,0 +1,106 @@
+id: art-7
+family: cap-2
+title: "Componente de Representacao de Conceitos em Saude"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 7. O componente de representação de conceitos em saúde do
+    Padrão TISS estabelece as terminologias, classificações e tabelas
+    de domínio utilizadas para codificação de procedimentos, diagnósticos,
+    materiais e medicamentos nas transações TISS.
+
+    Parágrafo 1. As terminologias obrigatórias incluem:
+    I - TUSS (Terminologia Unificada da Saúde Suplementar) para
+    codificação de procedimentos médicos e odontológicos;
+    II - CID-10 (Classificação Internacional de Doenças) para
+    codificação de diagnósticos;
+    III - Tabela ANVISA para codificação de materiais e medicamentos;
+    IV - CBHPM (Classificação Brasileira Hierarquizada de Procedimentos
+    Médicos) como referência para valoração de honorários.
+
+    Parágrafo 2. A ANS mantém e publica periodicamente atualizações
+    das tabelas de domínio e terminologias do Padrão TISS.
+guidance:
+  prose: |
+    O componente de representacao de conceitos garante que todos os
+    participantes do ecossistema falem a mesma linguagem ao descrever
+    procedimentos, diagnosticos e materiais.
+
+    **TUSS (Terminologia Unificada da Saude Suplementar):**
+    - Baseada na CBHPM, com extensoes para odontologia
+    - Codigo de 8 digitos que identifica univocamente cada procedimento
+    - Atualizada periodicamente pela ANS (novas tecnologias, exclusoes)
+    - Obrigatoria em todas as guias TISS
+
+    **CID-10 (Classificacao Internacional de Doencas):**
+    - Padrao da OMS para codificacao de diagnosticos
+    - Formato alfanumerico (ex: J18.9 - Pneumonia)
+    - Obrigatorio nas guias de consulta, internacao e SP/SADT
+    - Dado pessoal sensivel conforme LGPD
+
+    **Tabela ANVISA:**
+    - Identifica materiais e medicamentos por registro ANVISA
+    - Obrigatoria para OPME (Orteses, Proteses e Materiais Especiais)
+    - Rastreabilidade de lote e validade
+
+    **CBHPM:**
+    - Referencia de valoracao de procedimentos medicos
+    - Porte, custo operacional, porte anestesico
+    - Usada para calculo de honorarios e negociacao contratual
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Servidor de terminologias TISS:**
+      1. Implementar terminology server centralizado que armazene e
+         sirva TUSS, CID-10, tabela ANVISA e CBHPM via API REST.
+      2. Automatizar importacao de atualizacoes de tabelas publicadas
+         pela ANS, com versionamento e historico de alteracoes.
+      3. Implementar cache local de terminologias nos servicos que
+         processam transacoes TISS para performance.
+      4. Manter indice de busca full-text nas terminologias para
+         suporte a interface de usuario (busca por descricao).
+    tools:
+      - terminology-server
+      - fhir-server
+      - cache-layer
+      - full-text-search
+  devsecops:
+    prose: |
+      **Validacao de terminologias no pipeline:**
+      1. Implementar validacao automatica de codigos TUSS, CID-10 e
+         ANVISA em mensagens TISS de teste contra as tabelas vigentes.
+      2. Criar alertas no pipeline quando tabelas de dominio estiverem
+         desatualizadas (comparar versao local com publicacao ANS).
+      3. Testar cenarios de transicao de tabelas: codigos deprecados,
+         codigos novos, mapeamento entre versoes.
+      4. Automatizar geracao de fixtures de teste com codigos validos
+         de cada terminologia para suite de testes.
+    tools:
+      - terminology-validation
+      - version-checking
+      - test-fixtures
+      - ci-cd-pipeline
+  secops:
+    prose: |
+      **Governanca de terminologias:**
+      1. Designar responsavel pela gestao de terminologias TISS na
+         organizacao (comite de padronizacao ou area de TI em saude).
+      2. Monitorar publicacoes da ANS sobre atualizacoes de TUSS,
+         CID-10 e demais tabelas, com plano de acao para adocao.
+      3. Treinar equipes de faturamento e codificacao no uso correto
+         das terminologias TISS.
+      4. Auditar periodicamente a qualidade da codificacao (taxa de
+         erros, codigos invalidos, codigos deprecados).
+    tools:
+      - terminology-governance
+      - training-platform
+      - coding-audit
+      - regulatory-tracking
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-11"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1002"]
+    relationship: mapped

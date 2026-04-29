@@ -1,0 +1,95 @@
+id: iot-3
+family: auth
+title: "Brute-Force Attack Protection"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento deve possuir mecanismos de defesa contra tentativas
+    exaustivas de acesso não autorizado (ataques de força bruta),
+    incluindo, mas não se limitando a, bloqueio temporário de conta,
+    aumento progressivo do intervalo entre tentativas de autenticação
+    (backoff exponencial) ou limitação do número de tentativas de
+    login em um período determinado.
+
+    (Ato 77/2021 §5.1.4, inciso V; Ato 2436/2023 §4)
+guidance:
+  prose: |
+    This control requires devices to implement active countermeasures
+    against credential brute-forcing — a primary attack vector for
+    internet-exposed IoT devices.
+
+    **Acceptable mechanisms (one or more required):**
+    - Account lockout after N consecutive failed attempts (e.g., 5
+      failures → 15-minute lockout).
+    - Exponential backoff: progressively increasing delay between
+      authentication attempts (e.g., 1s, 2s, 4s, 8s, ...).
+    - Rate limiting: maximum N authentication attempts per time window
+      per source IP or session.
+    - CAPTCHA or proof-of-work challenge after repeated failures.
+
+    **Design considerations:**
+    - Lockout mechanisms must not create a denial-of-service vector
+      (e.g., an attacker locking out the legitimate admin). Consider
+      lockout only on the specific interface/IP, not globally.
+    - For headless IoT devices without a web UI, rate limiting at the
+      protocol level (SSH, MQTT, CoAP) is the primary mechanism.
+    - Log all failed authentication attempts with timestamp, source IP,
+      and interface for forensic analysis.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement rate limiting in the authentication module: maximum
+         5 failed attempts per 60-second window, then 15-minute lockout
+         per source IP.
+      2. Add exponential backoff to the login handler: delay = min(2^n
+         seconds, 300 seconds) where n is the consecutive failure count.
+      3. For devices with multiple access interfaces (web, SSH, TR-069,
+         SNMP), apply brute-force protection independently per interface.
+      4. Implement failed-login event logging with structured fields:
+         timestamp, source_ip, interface, username_attempted.
+      5. For TR-069 managed devices, expose a parameter indicating
+         current lockout state so the ACS can monitor fleet-wide
+         brute-force attempts.
+    tools:
+      - fail2ban-embedded
+      - rate-limiter
+      - syslog
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Write integration tests that simulate brute-force attacks and
+         verify the lockout/backoff mechanism activates correctly.
+      2. Add fuzzing tests for the authentication endpoint to ensure
+         rate limiting cannot be bypassed via protocol-level tricks
+         (e.g., connection reuse, parameter manipulation).
+      3. Include brute-force protection validation in the release
+         checklist — no firmware build ships without passing these tests.
+      4. Scan for code patterns that implement authentication without
+         rate limiting (custom SAST rule).
+    tools:
+      - gitlab-ci
+      - hydra
+      - fuzzing-framework
+      - sast-scanner
+  secops:
+    prose: |
+      1. During penetration testing, verify brute-force protection by
+         running Hydra or similar tools against all device interfaces
+         and confirming lockout activates.
+      2. Collect and analyze failed-login logs from deployed devices
+         (via syslog forwarding or TR-069 parameter polling) to detect
+         ongoing brute-force campaigns.
+      3. Establish alerting thresholds: if >100 failed logins across the
+         device fleet in 1 hour, trigger investigation.
+      4. Document test results and protection mechanism details for
+         ANATEL homologation evidence.
+    tools:
+      - siem
+      - penetration-testing-tools
+      - tr-069-acs
+      - grc-platform
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-7"]
+    relationship: complements

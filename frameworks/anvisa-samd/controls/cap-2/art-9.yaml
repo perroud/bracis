@@ -1,0 +1,115 @@
+id: art-9
+family: cap-2
+title: "Interoperabilidade e Padroes de Dados Clinicos"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 9. O fabricante deve assegurar que o SaMD que troca dados
+    com outros sistemas de informação em saúde utilize padrões de
+    interoperabilidade reconhecidos, garantindo:
+
+    I - integridade dos dados clínicos durante transmissão, processamento
+    e armazenamento entre sistemas;
+    II - compatibilidade com padrões internacionais de dados clínicos,
+    incluindo HL7 FHIR, DICOM, IHE e terminologias como SNOMED-CT,
+    CID-10, LOINC e TUSS, conforme aplicável;
+    III - documentação técnica de todas as interfaces de integração,
+    incluindo protocolos, formatos de dados, fluxos de informação
+    e tratamento de erros;
+    IV - validação de dados de entrada para prevenir processamento
+    de dados corrompidos, incompletos ou fora do escopo de uso
+    declarado do SaMD.
+
+    Parágrafo único. O fabricante deve documentar os requisitos mínimos
+    de infraestrutura e sistemas com os quais o SaMD foi validado para
+    interoperar, e comunicar limitações de interoperabilidade ao usuário.
+guidance:
+  prose: |
+    O art. 9 estabelece requisitos de interoperabilidade para SaMD que
+    se integra com o ecossistema de saude digital, garantindo que dados
+    clinicos fluam de forma integra e padronizada.
+
+    **Padroes de interoperabilidade relevantes:**
+    - HL7 FHIR R4: padrao de API REST para troca de dados clinicos
+    - DICOM: padrao para imagens medicas (radiologia, patologia)
+    - IHE profiles: perfis de integracao para casos de uso especificos
+    - SNOMED-CT: terminologia clinica internacional
+    - CID-10: Classificacao Internacional de Doencas
+    - LOINC: terminologia para resultados laboratoriais
+    - TUSS: Terminologia Unificada da Saude Suplementar (Brasil)
+
+    **Contexto brasileiro:**
+    A Estrategia de Saude Digital (ESD 2020-2028) do Ministerio da
+    Saude adota HL7 FHIR como padrao de interoperabilidade para a
+    Rede Nacional de Dados em Saude (RNDS). SaMD que se integra com
+    a RNDS deve obrigatoriamente suportar FHIR R4.
+
+    **Validacao de dados de entrada:**
+    SaMD deve implementar validacao rigorosa de dados de entrada para
+    garantir que apenas dados dentro do escopo de uso declarado sejam
+    processados. Dados fora do escopo devem ser rejeitados com
+    mensagem clara ao usuario, nao processados silenciosamente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de interoperabilidade:**
+      1. Implementar gateway de integracao (API Gateway) dedicado para
+         interfaces clinicas, com suporte nativo a HL7 FHIR R4, DICOM
+         Web e perfis IHE relevantes.
+      2. Configurar servidor FHIR (HAPI FHIR, Firely) como camada de
+         interoperabilidade entre SaMD e sistemas externos, com validacao
+         de conformidade de recursos FHIR.
+      3. Implementar message broker para integracao assincrona com
+         sistemas hospitalares, garantindo entrega confiavel e ordenada
+         de dados clinicos.
+      4. Manter registry de terminologias (SNOMED-CT, CID-10, LOINC,
+         TUSS) com atualizacao periodica e servico de resolucao de
+         codigos (terminology server).
+    tools:
+      - api-gateway
+      - hapi-fhir
+      - message-broker
+      - terminology-server
+  devsecops:
+    prose: |
+      **Pipeline de validacao de interoperabilidade:**
+      1. Implementar testes de conformidade FHIR automatizados no
+         pipeline CI/CD utilizando FHIR Validator e Touchstone.
+      2. Criar suite de testes de integracao que valida troca de dados
+         com sistemas de referencia (HAPI FHIR server, DICOM server)
+         em cada build.
+      3. Implementar validacao de schema e business rules para dados
+         de entrada clinicos, com rejeicao e logging de dados invalidos.
+      4. Automatizar testes de conformidade com perfis IHE relevantes
+         (ex: IHE MHD para documentos, IHE PIXm para identificacao
+         de pacientes).
+    tools:
+      - fhir-validator
+      - touchstone
+      - integration-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de interoperabilidade:**
+      1. Manter inventario de todas as interfaces de integracao do
+         SaMD, com documentacao tecnica de protocolos, formatos, SLAs
+         e responsaveis.
+      2. Monitorar conformidade com padroes de interoperabilidade
+         em producao, detectando desvios e degradacao de integracao.
+      3. Participar de conectathons e eventos de interoperabilidade
+         (IHE, HL7 Brasil) para validar conformidade com padroes.
+      4. Revisar e atualizar documentacao de interoperabilidade em
+         cada versao major do SaMD e quando padroes forem atualizados.
+    tools:
+      - api-monitoring
+      - integration-monitoring
+      - grc-platform
+      - documentation-platform
+legal_references:
+  - framework_id: hipaa
+    articles: ["164-312-e"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: complements

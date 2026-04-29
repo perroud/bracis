@@ -1,0 +1,108 @@
+id: iec-3-3-fr7
+family: part-3
+title: "FR7: Resource Availability (RA)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr7
+
+statement:
+  prose: >-
+    The control system shall provide the capability to ensure the availability
+    of the system and its components against degradation or denial-of-service
+    conditions. Availability mechanisms shall protect against both cyber and
+    physical threats that could disrupt control system operations. The
+    resilience and recovery capabilities shall be commensurate with the
+    target security level and the criticality of the controlled process.
+
+guidance:
+  prose: >-
+    Resource availability in IACS environments is directly tied to safety
+    and operational continuity, making it distinct from IT availability
+    concerns. Key considerations include: implementing redundancy for
+    critical control system components (dual controllers, redundant
+    communication paths, hot-standby servers); designing the system to
+    degrade gracefully under attack, maintaining safety functions even
+    if other capabilities are lost; protecting against denial-of-service
+    attacks on industrial protocols that could disrupt control loops;
+    implementing rate limiting and traffic shaping at zone boundaries
+    to prevent network flooding; ensuring that safety instrumented
+    systems remain available and independent from the basic process
+    control system; maintaining offline backups of all control system
+    configurations, PLC programs, and critical data; defining and
+    testing recovery time objectives (RTO) and recovery point objectives
+    (RPO) for each zone based on process criticality; implementing
+    automatic failover mechanisms that maintain process control during
+    component failures; protecting against resource exhaustion attacks
+    targeting controllers with limited computational resources; and
+    conducting regular disaster recovery testing that validates the
+    ability to restore control system operations from backups.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 7.1 through SR 7.8"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement high-availability architectures for critical IACS
+      components including redundant controllers, dual communication
+      paths, and hot-standby SCADA servers. Deploy industrial-grade
+      load balancers and traffic management at zone boundaries that
+      can absorb denial-of-service attacks. Implement automated backup
+      solutions that capture PLC programs, HMI configurations, historian
+      data, and server configurations on a schedule and after every
+      change. Deploy out-of-band management networks for recovery
+      access when primary networks are disrupted. Implement
+      infrastructure monitoring with OT-specific health checks that
+      detect resource degradation before it impacts control operations.
+    tools:
+      - veeam
+      - zerto
+      - prtg
+      - nagios-xi
+      - rockwell-ftassetcentre
+
+  devsecops:
+    prose: >-
+      Implement chaos engineering practices adapted for OT environments
+      to test resilience in non-production replicas. Include availability
+      testing (failover testing, backup restoration verification) as
+      part of the CI/CD pipeline for IACS software releases. Automate
+      backup verification by periodically restoring control system
+      configurations in test environments. Implement resource usage
+      testing that validates control system software does not exceed
+      the computational limits of target controllers under stress
+      conditions. Ensure deployment procedures include rollback plans
+      tested before production deployment.
+    tools:
+      - gitlab-ci
+      - locust
+      - k6
+      - ansible
+      - terraform
+
+  secops:
+    prose: >-
+      Monitor resource utilization across all IACS components to detect
+      degradation and potential denial-of-service conditions. Implement
+      DDoS detection and mitigation at the enterprise-OT boundary.
+      Monitor industrial protocol traffic for anomalies that could
+      indicate resource exhaustion attacks on controllers. Validate
+      backup integrity through regular automated restoration tests.
+      Maintain runbooks for rapid recovery of each IACS zone from
+      backup. Conduct annual disaster recovery exercises that include
+      full restoration of control system operations from backups.
+    tools:
+      - dragos-platform
+      - nozomi-vantage
+      - cloudflare-spectrum
+      - zabbix
+      - splunk-itsi
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-7", "CP-9", "CP-10", "SC-5"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.29", "a5.30", "a8.13", "a8.14"]
+    relationship: supports

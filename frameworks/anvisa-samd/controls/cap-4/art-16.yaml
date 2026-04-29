@@ -1,0 +1,123 @@
+id: art-16
+family: cap-4
+title: "Analise e Avaliacao de Riscos de SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 16. A análise de riscos do SaMD deve identificar e documentar:
+
+    I - perigos associados ao uso pretendido e ao uso previsivelmente
+    incorreto do SaMD, incluindo:
+    a) perigos clínicos: diagnóstico incorreto, tratamento inadequado,
+    atraso em intervenção necessária;
+    b) perigos de dados: corrupção, perda, acesso não autorizado a
+    dados clínicos e pessoais;
+    c) perigos de interoperabilidade: falha de integração com sistemas
+    de saúde, dados incompatíveis, versão de protocolo;
+    d) perigos de infraestrutura: indisponibilidade, degradação de
+    desempenho, falha de conectividade;
+
+    II - sequências de eventos que podem levar a situação perigosa;
+    III - estimativa de severidade e probabilidade de cada dano;
+    IV - avaliação de aceitabilidade de cada risco conforme critérios
+    predefinidos na política de gestão de riscos.
+
+    Parágrafo único. Para SaMD com algoritmos de IA/ML, a análise de
+    riscos deve considerar riscos específicos de modelos estatísticos,
+    incluindo overfitting, underfitting, data drift, concept drift
+    e vieses algorítmicos.
+guidance:
+  prose: |
+    O art. 16 detalha a fase de analise e avaliacao de riscos conforme
+    ISO 14971, com categorias de perigo especificas para SaMD.
+
+    **Tecnicas de analise de riscos para SaMD:**
+    - FMEA (Failure Mode and Effects Analysis): analise sistematica de
+      modos de falha de cada componente do SaMD
+    - FTA (Fault Tree Analysis): analise top-down de eventos que levam
+      a dano (ex: diagnostico incorreto -> quais falhas causam?)
+    - HAZOP: analise de desvios em processos clinicos suportados pelo SaMD
+    - Use-related risk analysis: riscos derivados de erros de uso
+
+    **Matriz de risco tipica para SaMD:**
+    Severidade: insignificante, menor, seria, critica, catastrofica
+    Probabilidade: improvavel, rara, ocasional, provavel, frequente
+
+    **Riscos especificos de IA/ML:**
+    - Overfitting: modelo memoriza dados de treino, falha em dados novos
+    - Data drift: distribuicao de dados em producao difere do treino
+    - Concept drift: relacao entre features e outcome muda ao longo do tempo
+    - Adversarial attacks: inputs manipulados para enganar o modelo
+    - Lack of explainability: impossibilidade de explicar decisao clinica
+
+    **Uso previsivelmente incorreto:**
+    O fabricante deve antecipar usos incorretos previssiveis e analisar
+    riscos associados (ex: usar SaMD fora da indicacao declarada, ignorar
+    alertas, confiar em resultado sem confirmacao clinica).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de analise de riscos:**
+      1. Implementar sistema de FMEA digital integrado ao risk register,
+         com capacidade de vincular modos de falha a componentes de
+         software, requisitos e testes.
+      2. Configurar monitoramento de indicadores de risco especificos
+         de IA/ML: data drift detection, concept drift detection,
+         model performance degradation, distributional shift.
+      3. Implementar pipeline de avaliacao de risco automatizada que
+         calcula metricas de desempenho do SaMD contra limiares de
+         aceitabilidade de risco em cada release.
+      4. Manter ambiente de simulacao de cenarios de risco (chaos
+         engineering adaptado para SaMD): injecao de falhas de rede,
+         dados corrompidos, latencia, para validar resiliencia.
+    tools:
+      - fmea-tool
+      - drift-detection
+      - model-monitoring
+      - chaos-engineering
+  devsecops:
+    prose: |
+      **Pipeline de analise de riscos:**
+      1. Integrar checklist de analise de riscos ao template de merge
+         request para SaMD: todo MR deve declarar perigos potenciais
+         introduzidos pela alteracao e controles correspondentes.
+      2. Automatizar deteccao de data drift no pipeline de ML: comparar
+         distribuicao de dados de validacao com dados de producao,
+         alertar se divergencia excede limiar (KL divergence, PSI).
+      3. Implementar testes de adversarial robustness para SaMD com
+         IA/ML: verificar comportamento do modelo com inputs perturbados
+         e fora da distribuicao de treino.
+      4. Criar relatorio automatico de status de riscos como artefato
+         de release: riscos ativos, controles implementados, risco
+         residual calculado, aprovacao pendente.
+    tools:
+      - gitlab-ci
+      - evidently-ai
+      - adversarial-testing
+      - risk-reporting
+  secops:
+    prose: |
+      **Governanca de analise de riscos:**
+      1. Conduzir workshop de analise de riscos (FMEA/HAZOP) com equipe
+         multidisciplinar (engenharia, clinico, qualidade, regulatorio)
+         para cada novo SaMD e apos alteracoes significativas.
+      2. Revisar e atualizar analise de riscos com base em dados de
+         pos-mercado: eventos adversos, reclamacoes, dados de
+         monitoramento de desempenho clinico.
+      3. Manter registro de cenarios de uso incorreto previsivelmente
+         documentados, com medidas de mitigacao implementadas.
+      4. Realizar benchmarking de riscos com fabricantes de SaMD
+         similares e literatura regulatoria (FDA TPLC, MDCG guidance).
+    tools:
+      - risk-workshop
+      - post-market-data
+      - grc-platform
+      - regulatory-intelligence
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "annex-IV"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["SR-3-4", "SR-3-5"]
+    relationship: mapped

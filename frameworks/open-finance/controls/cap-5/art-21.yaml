@@ -1,0 +1,96 @@
+id: art-21
+family: cap-5
+title: "Revogacao do Consentimento"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 21. O cliente tem o direito de revogar o consentimento para
+    compartilhamento de dados a qualquer momento, sem ônus, observadas
+    as seguintes condições:
+
+    I - a revogação deve estar disponível tanto no ambiente da instituição
+    receptora quanto no ambiente da instituição transmissora;
+
+    II - a revogação deve ser efetivada imediatamente após a solicitação
+    do cliente, cessando o compartilhamento de dados;
+
+    III - a instituição que receber a solicitação de revogação deve
+    comunicar a outra instituição participante sobre a revogação;
+
+    IV - a revogação do consentimento não implica na exclusão dos dados
+    já compartilhados, que ficam sujeitos às regras de retenção e
+    exclusão da LGPD;
+
+    V - o cliente deve ser informado sobre as consequências da revogação,
+    incluindo a interrupção de serviços que dependem do compartilhamento.
+guidance:
+  prose: |
+    O art. 21 garante o direito de revogacao imediata:
+
+    **Canais de revogacao (obrigatorios):**
+    - Na receptora: tela ou opcao de revogar consentimento
+    - Na transmissora: gerenciador de consentimentos ativos
+    - Ambos os canais devem estar facilmente acessiveis
+
+    **Imediatidade:**
+    A revogacao deve ser processada em tempo real ou quase real.
+    Nao e aceitavel demora de horas ou dias para efetivar.
+
+    **Comunicacao entre participantes:**
+    Quando o cliente revoga na receptora, esta deve notificar a transmissora.
+    Quando revoga na transmissora, esta deve notificar a receptora.
+    Mecanismo: API de status de consentimento + webhook.
+
+    **Dados ja compartilhados:**
+    - Revogacao NAO apaga dados ja recebidos pela receptora
+    - Receptora deve tratar dados conforme LGPD (base legal de retencao)
+    - Cliente pode exercer direito de exclusao separadamente (art. 18 LGPD)
+
+    **Consequencias informadas:**
+    - Servicos que usam os dados compartilhados serao interrompidos
+    - Analises de credito em andamento podem ser impactadas
+    - Propostas de produtos baseadas nos dados cessam
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de revogacao:**
+      1. Implementar endpoint DELETE /consents/{id} na API de consentimento.
+      2. Processar revogacao em tempo real (nao em batch).
+      3. Revogar imediatamente todos os tokens vinculados ao consentimento.
+      4. Implementar webhook ou polling para notificar a outra parte.
+      5. Apresentar tela de confirmacao com consequencias da revogacao.
+      6. Registrar log de revogacao com timestamp, canal e motivo.
+    tools:
+      - consent-management
+      - token-revocation
+      - webhook-handler
+      - notification-service
+  devsecops:
+    prose: |
+      **Testes de revogacao:**
+      1. Testar revogacao via receptor e via transmissor separadamente.
+      2. Verificar que tokens sao invalidados imediatamente.
+      3. Testar que tentativas de acesso apos revogacao retornam 403.
+      4. Validar que notificacao entre participantes e enviada.
+      5. Testar cenarios concorrentes (revogacao durante acesso a dados).
+    tools:
+      - integration-tests
+      - concurrency-tests
+      - api-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de revogacoes:**
+      1. Monitorar volume de revogacoes por instituicao e motivo.
+      2. Alertar sobre picos de revogacao (pode indicar problema de UX).
+      3. Auditar que dados nao sao acessados apos revogacao efetivada.
+      4. Verificar que notificacoes entre participantes sao processadas.
+    tools:
+      - consent-analytics
+      - siem
+      - audit-trail
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-8", "art-15", "art-18"]
+    relationship: complements

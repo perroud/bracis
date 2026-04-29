@@ -1,0 +1,152 @@
+id: art-15
+family: cap-4
+title: "Dados Armazenados no Exterior"
+class: BACEN-4893
+statement:
+  prose: |
+    Art. 15. No caso da contratação de serviços relevantes de processamento e armazenamento
+    de dados e de computação em nuvem prestados no exterior, as instituições referidas no
+    art. 1 devem assegurar que:
+    I - a legislação e a regulamentação nos países e nas regiões em cada país onde os
+    serviços poderão ser prestados não restrinjam nem impeçam o acesso da instituição
+    contratante e do Banco Central do Brasil aos dados e às informações;
+    II - a prestação dos serviços não cause prejuízo ao seu regular funcionamento nem
+    embaraço à atuação do Banco Central do Brasil;
+    III - sejam definidos, em contrato, os países e as regiões em cada país onde os
+    dados poderão ser armazenados, processados e gerenciados; e
+    IV - sejam implementados controles, inclusive de criptografia, que assegurem a
+    proteção dos dados trafegados, processados e armazenados.
+
+    Parágrafo único. A instituição contratante deve assegurar, ainda, que o provedor de
+    serviços de computação em nuvem adote procedimentos de segurança compatíveis com os
+    requisitos previstos nesta Resolução.
+guidance:
+  prose: |
+    O art. 15 trata especificamente de dados armazenados ou processados no exterior.
+    E um dos artigos mais sensíveis para instituicoes que usam provedores de cloud
+    globais (AWS, Azure, GCP).
+
+    **Requisitos para dados no exterior:**
+
+    **I - Compatibilidade legal:**
+    A legislacao do pais hospedeiro nao pode impedir o acesso da instituicao ou do
+    BCB aos dados. Na pratica, isso requer analise juridica de:
+    - Leis de privacidade locais (ex: GDPR na Europa)
+    - Leis de acesso governamental (ex: CLOUD Act nos EUA)
+    - Acordos de cooperacao internacional
+    - Sancoes e embargos
+
+    **II - Continuidade operacional:**
+    A localizacao no exterior nao pode prejudicar o funcionamento da instituicao
+    nem a atuacao do BCB. Latencia, disponibilidade e jurisdicao devem ser avaliadas.
+
+    **III - Especificacao contratual:**
+    Paises e regioes devem estar explicitamente definidos no contrato. Nao pode
+    haver ambiguidade sobre onde os dados estao.
+
+    **IV - Criptografia obrigatoria:**
+    Controles de criptografia sao explicitamente exigidos para dados no exterior.
+    Deve cobrir dados em transito, em processamento e em repouso.
+
+    **Paragrafo unico — Responsabilidade da instituicao:**
+    A instituicao e responsavel por garantir que o provedor adota procedimentos
+    de seguranca compativeis com a resolucao. Nao basta confiar no provedor;
+    e preciso verificar.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **I - Garantia de acesso:**
+      1. Data residency analysis juridica para cada regiao de cloud utilizada.
+      2. Evitar regioes onde legislacao local conflita com acesso do BCB.
+      3. Customer-managed encryption keys (CMEK) para garantir controle sobre dados
+         mesmo em jurisdicao estrangeira.
+      4. Capability de exportacao/migracao de dados a qualquer momento.
+
+      **II - Continuidade operacional:**
+      5. Latency testing para regioes de cloud no exterior.
+      6. Multi-region deployment com fallback para regiao no Brasil.
+      7. RPO/RTO definidos considerando localizacao geografica.
+      8. Redundancia de conectividade internacional.
+
+      **III - Controle de regioes:**
+      9. Policy-as-code que bloqueia provisionamento em regioes nao autorizadas.
+      10. Tagging obrigatorio com pais/regiao em todos os recursos.
+      11. Monitoramento continuo de localizacao de dados.
+      12. Alerta automatico se dados migram para regiao nao autorizada.
+
+      **IV - Criptografia:**
+      13. TLS 1.3 para dados em transito entre Brasil e exterior.
+      14. AES-256 com customer-managed keys para dados em repouso.
+      15. Encryption in-use (confidential computing) para workloads sensiveis.
+      16. Key management com chaves armazenadas no Brasil quando possivel.
+
+      **Paragrafo unico — Verificacao do provedor:**
+      17. CSPM cobrindo todos os ambientes no exterior.
+      18. Compliance scanning contra requisitos da resolucao.
+      19. Benchmark de seguranca do provedor (CIS, SOC 2).
+    tools:
+      - cspm
+      - kms-hsm
+      - opa-gatekeeper
+      - network-policies
+      - cloud-governance
+      - confidential-computing
+  devsecops:
+    prose: |
+      **Controles no pipeline para dados no exterior:**
+      1. IaC validation que verifica se regioes de deploy estao na lista autorizada.
+      2. Proibicao de hardcoded regions; uso de variáveis centralizadas.
+      3. Pre-deploy check: recursos no exterior exigem aprovacao adicional.
+
+      **Criptografia no codigo:**
+      4. Libraries de criptografia aprovadas e padronizadas.
+      5. Linting rules que verificam uso correto de criptografia.
+      6. Proibicao de criptografia custom (uso obrigatorio de bibliotecas auditadas).
+
+      **Portabilidade:**
+      7. Data serialization em formatos portateis (nao proprietarios).
+      8. API abstraction layers para independencia de provedor.
+      9. Testes de portabilidade no pipeline.
+    tools:
+      - checkov
+      - tfsec
+      - opa-gatekeeper
+      - semgrep
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de dados no exterior:**
+      1. DLP monitorando fluxo de dados para exterior.
+      2. Monitoramento de acesso a dados armazenados no exterior.
+      3. Alertas de anomalia em transferencias de dados internacionais.
+
+      **Analise juridica e compliance:**
+      4. Assessment juridico para cada pais/regiao utilizada.
+      5. Monitoramento de mudancas legislativas em jurisdicoes estrangeiras.
+      6. Reavaliacao periodica de compatibilidade legal.
+
+      **Auditoria de provedores no exterior:**
+      7. Verificacao anual de certificacoes do provedor por regiao.
+      8. Right to audit exercido para servicos no exterior.
+      9. Testes de acesso e exportacao de dados periodicos.
+
+      **Plano de contingencia:**
+      10. Plano de repatriacao de dados para o Brasil se necessario.
+      11. Simulacao de cenario de bloqueio de acesso por legislacao estrangeira.
+      12. Backup de dados criticos em regiao no Brasil.
+    tools:
+      - dlp
+      - siem
+      - grc-platform
+      - vendor-risk-management
+      - cspm
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28", "SA-9", "AC-20"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.22", "A.5.23", "A.8.24"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35"]
+    relationship: complements

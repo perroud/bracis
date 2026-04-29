@@ -1,0 +1,120 @@
+id: art-7
+family: cap-2
+title: "Secure Access Instructions for Contractual Documents After Remote Contracting"
+class: CNSP-408
+baselines: [seguradoras-digitais]
+statement:
+  prose: |
+    Art. 7º. No caso de contratação com a utilização de meios remotos o cliente deverá
+    receber, preferencialmente pelo mesmo meio remoto usado na contratação, instruções
+    detalhadas para acesso seguro aos documentos contratuais dos produtos contratados.
+guidance:
+  prose: |
+    Article 7 establishes a post-contracting obligation: when a client contracts a
+    product through remote means, they must receive detailed instructions for securely
+    accessing the contractual documents.
+
+    **Preferential channel consistency:**
+    The instructions should preferably be sent through the same remote means used for
+    contracting. If the client contracted via a mobile app, the instructions should be
+    delivered via the same mobile app. If via web portal, then via the web portal.
+    The word "preferencialmente" (preferably) indicates this is a strong preference,
+    not an absolute obligation — alternative channels may be used when the contracting
+    channel is unsuitable for delivering instructions.
+
+    **"Detailed instructions for secure access":**
+    This is more than just sending a link. The instructions must:
+    1. Be detailed: step-by-step guidance, not just a URL
+    2. Address secure access: include security-relevant information (authentication
+       requirements, password setup, MFA enrollment)
+    3. Cover all contractual documents: not just the policy, but conditions,
+       regulations, endorsements, etc.
+
+    **Practical implications:**
+    - After online insurance purchase: email or in-app notification with instructions
+      for accessing the policy portal, setting up credentials, downloading the policy
+    - After phone insurance purchase: SMS or email with portal access instructions
+    - After partner-embedded purchase: redirect to insurer's portal or email with
+      access instructions
+
+    **Timing:**
+    The article does not specify a deadline, but the instructions should be provided
+    immediately after contracting or as soon as the contractual documents are available.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Post-contracting communication workflow:**
+      1. Automated workflow triggered immediately after successful contract creation
+         that generates and sends access instructions to the client.
+      2. Channel-aware delivery: detect the contracting channel and route the
+         instructions through the same channel (with fallback options).
+      3. Instruction template engine generating personalized, step-by-step guides
+         based on the product type, contracting channel, and client profile.
+      4. Deep linking: instructions should include direct links to the specific
+         contractual documents (not just the portal homepage).
+
+      **Secure document portal:**
+      5. Client self-service portal with secure authentication for accessing
+         all contractual documents.
+      6. First-access onboarding flow: credential setup, MFA enrollment, consent
+         to digital communication.
+      7. Document organization by product, with clear labeling and navigation.
+      8. Push notification when new documents are available (endorsements, renewals).
+    tools:
+      - notification-service
+      - template-engine
+      - identity-management
+      - client-portal
+      - deep-linking
+  devsecops:
+    prose: |
+      **Communication flow validation:**
+      1. End-to-end tests verifying that access instructions are sent for every
+         successful contract creation across all channels.
+      2. Template validation: ensure instructions include all required elements
+         (access URL, authentication steps, document list, support contact).
+      3. Channel consistency tests: verify that instructions are routed through
+         the same channel used for contracting.
+      4. Timing tests: verify instructions are sent within the defined SLA
+         after contract creation.
+
+      **Security testing:**
+      5. Penetration testing of the document access flow described in the
+         instructions (authentication bypass, session fixation, IDOR).
+      6. Phishing resistance testing: ensure instruction emails/messages
+         include verifiable authenticity indicators.
+      7. Deep link security: validate that document links are authenticated
+         and expire appropriately.
+    tools:
+      - gitlab-ci
+      - selenium
+      - burp-suite
+      - postman
+      - email-testing
+  secops:
+    prose: |
+      **Delivery monitoring:**
+      1. Track instruction delivery success rate per channel — alert on
+         delivery failures.
+      2. Monitor client first-access rates: if clients are not accessing
+         their documents, the instructions may be ineffective.
+      3. Track instruction-to-access conversion time: how long between
+         receiving instructions and first document access.
+      4. Client complaint monitoring related to document access difficulties.
+
+      **Security monitoring:**
+      5. Monitor for phishing campaigns impersonating the supervised entity's
+         document access instructions.
+      6. Track failed authentication attempts on the document portal.
+      7. Alert on unusual document access patterns (bulk downloads,
+         geolocation anomalies).
+      8. Periodic review of instruction content for accuracy and completeness.
+    tools:
+      - monitoring-alerting
+      - siem
+      - anti-phishing
+      - analytics-platform
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-9"]
+    relationship: complements

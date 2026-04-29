@@ -1,0 +1,97 @@
+id: ctrl-07
+family: fam-2
+title: "Gestao da Cadeia de Suprimentos e Seguranca de Terceiros no ARCiber"
+class: ONS-ARCIBER
+baselines:
+  - sin-agents
+
+statement:
+  prose: >-
+    O agente do SIN deve implementar controles para gerenciar os riscos de
+    segurança cibernética associados à cadeia de suprimentos de hardware e
+    software para o ARCiber, bem como para acesso de terceiros (fornecedores,
+    integradores, fabricantes de equipamentos OT) aos sistemas do Ambiente
+    Regulado Cibernético. Deve existir processo formal de avaliação de segurança
+    de fornecedores críticos, cláusulas contratuais de segurança cibernética,
+    e controles para acesso remoto e presencial de terceiros ao ARCiber.
+
+guidance:
+  prose: >-
+    A cadeia de suprimentos de sistemas OT/ICS representa risco crescente,
+    conforme demonstrado por incidentes como SolarWinds e ataques a fabricantes
+    de equipamentos de automacao industrial. Os controles devem abranger:
+    (i) avaliacao de seguranca de fornecedores criticos antes da contratacao,
+    incluindo praticas de desenvolvimento seguro de software embarcado;
+    (ii) clausulas contratuais exigindo notificacao de vulnerabilidades e
+    incidentes em produtos fornecidos para o ARCiber; (iii) procedimentos
+    de acesso remoto de terceiros — acesso sob supervisao, com gravacao de
+    sessao e janela de acesso limitada; (iv) verificacao de integridade de
+    hardware e software antes da instalacao no ARCiber; (v) processo de
+    descomissionamento seguro de equipamentos substituidos que contenham dados
+    de configuracao do ARCiber.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implementar solucao de acesso remoto privilegiado (PAM) especifica para
+      terceiros com acesso ao ARCiber, como CyberArk ou BeyondTrust, com
+      gravacao completa de sessao, aprovacao just-in-time e expiracoes de
+      acesso automaticas. Implementar rede de acesso de terceiros segregada
+      do ARCiber operacional, com jump server dedicado na DMZ industrial.
+      Configurar alertas para qualquer acesso de terceiros fora de janelas
+      de manutencao aprovadas. Manter registro de todos os acessos de
+      terceiros com evidencia de aprovacao previa.
+    tools:
+      - cyberark
+      - beyondtrust
+      - cisco-asa
+      - gitlab
+      - servicenow
+  devsecops:
+    prose: >-
+      Implementar processo de avaliacao de seguranca de software e firmware
+      de terceiros antes da integracao ao ARCiber, incluindo analise de
+      vulnerabilidades conhecidas (CVE) e, quando possivel, analise estatica
+      de codigo. Exigir SBOM (Software Bill of Materials) de fornecedores
+      criticos de software para o ARCiber. Implementar pipeline de validacao
+      de integridade (checksums, assinaturas digitais) para updates de firmware
+      e software antes da aplicacao em sistemas do ARCiber. Manter repositorio
+      de versoes aprovadas de firmware/software para cada ativo critico do ARCiber.
+    tools:
+      - gitlab-ci
+      - syft
+      - grype
+      - trivy
+      - dependency-track
+  secops:
+    prose: >-
+      Realizar avaliacao de seguranca de fornecedores criticos do ARCiber ao
+      menos anualmente, incluindo revisao de praticas de seguranca, historico
+      de vulnerabilidades e conformidade contratual. Monitorar divulgacoes de
+      vulnerabilidades de fabricantes de equipamentos OT do ARCiber (ICS-CERT,
+      CISA) e acionar plano de remediacao quando aplicavel. Auditar acessos
+      de terceiros periodicamente para verificar conformidade com os procedimentos
+      definidos. Manter lista de fornecedores criticos do ARCiber com nivel de
+      confianca e historico de conformidade de seguranca.
+    tools:
+      - servicenow
+      - cyberark
+      - splunk
+      - archer
+
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art. 9"]
+    relationship: implements
+  - framework_id: iec-62443
+    articles: ["62443-2-4", "62443-4-1"]
+    relationship: derived-from
+  - framework_id: nerc-cip
+    articles: ["CIP-013-R1"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["a5.19", "a5.20", "a5.21", "a5.22"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SR-1", "SR-3", "SR-5", "IA-3"]
+    relationship: mapped

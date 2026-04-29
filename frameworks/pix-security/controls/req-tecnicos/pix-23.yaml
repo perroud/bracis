@@ -1,0 +1,95 @@
+id: pix-23
+family: req-tecnicos
+title: "Certificados Digitais ICP-Brasil"
+class: PIX-SECURITY
+baselines: [participantes-pix]
+statement:
+  prose: |
+    Todo participante do arranjo Pix deve utilizar certificados digitais emitidos por
+    Autoridade Certificadora vinculada à ICP-Brasil (Infraestrutura de Chaves Públicas
+    Brasileira) para autenticação na RSFN, assinatura digital de mensagens no SPI e
+    criptografia de comunicações. Os certificados devem ser do tipo A3 (armazenados em
+    dispositivo criptográfico -- HSM ou token) e mantidos válidos, com processo de
+    renovação proativa e procedimento de revogação imediata em caso de comprometimento.
+guidance:
+  prose: |
+    **ICP-Brasil no contexto do Pix:**
+    A ICP-Brasil e a infraestrutura nacional de certificacao digital, hierarquicamente
+    organizada sob a raiz da AC-Raiz (ITI). Os certificados ICP-Brasil sao obrigatorios
+    para:
+    1. Autenticacao mTLS na RSFN
+    2. Assinatura digital de mensagens ISO 20022 no SPI
+    3. Criptografia de mensagens no SPI
+
+    **Tipos de certificado:**
+    - A1: Armazenado em software (nao aceito para SPI)
+    - A3: Armazenado em dispositivo criptografico (HSM, smartcard, token) -- OBRIGATORIO
+    - A4: Armazenado em HSM com nivel de seguranca superior
+
+    **Gestao de ciclo de vida:**
+    1. **Emissao:** Solicitar a AC credenciada com documentacao completa.
+    2. **Instalacao:** Instalar em HSM com acesso restrito e auditado.
+    3. **Monitoramento:** Verificar validade diariamente, alertar 90 dias antes.
+    4. **Renovacao:** Iniciar processo 60 dias antes da expiracao.
+    5. **Revogacao:** Em caso de comprometimento, revogar imediatamente e comunicar BCB.
+    6. **Backup:** Backup seguro da chave privada com processo de recuperacao testado.
+
+    **Cadeia de certificacao:**
+    A validacao deve percorrer toda a cadeia: certificado do participante -> AC intermediaria
+    -> AC-Raiz (ITI). Qualquer elo invalido invalida a comunicacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura PKI:**
+      1. HSM certificado (FIPS 140-2 Level 3 ou superior) para armazenamento de chaves.
+      2. HSM em cluster com failover para garantir disponibilidade 24x7.
+      3. Processo automatizado de verificacao de validade de certificados.
+      4. Alertas em cascata: 90, 60, 30, 15, 7 dias antes da expiracao.
+
+      **Distribuicao de certificados:**
+      5. Certificado registrado no BCB para autenticacao na RSFN.
+      6. Certificado publico compartilhado com contrapartes para validacao de assinatura.
+      7. CRL (Certificate Revocation List) e OCSP para verificacao de revogacao.
+
+      **Rotacao:**
+      8. Processo de rotacao que ativa novo certificado antes de revogar o anterior.
+      9. Periodo de sobreposicao durante a rotacao (ambos certificados validos).
+      10. Teste pos-rotacao: validar que novo certificado funciona no SPI e RSFN.
+    tools:
+      - hsm
+      - pki-platform
+      - cert-manager
+      - monitoring-stack
+  devsecops:
+    prose: |
+      **Testes de certificado:**
+      1. Validacao automatica de cadeia de certificacao em ambiente de homologacao.
+      2. Testes de mTLS com certificados validos, expirados e revogados.
+      3. Testes de rotacao: simular troca de certificado sem interrupcao.
+      4. Verificacao de que chaves privadas nao estao em codigo ou configuracao.
+      5. SAST rules para detectar hardcoded certificates ou paths de chave privada.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - cert-testing
+  secops:
+    prose: |
+      **Gestao operacional de certificados:**
+      1. Inventario centralizado de todos os certificados ICP-Brasil.
+      2. Dashboard de validade com alertas automaticos.
+      3. Processo de resposta a comprometimento (revogacao + comunicacao ao BCB).
+      4. Auditoria anual de conformidade PKI.
+      5. Teste trimestral de procedimento de revogacao.
+    tools:
+      - certificate-inventory
+      - pki-management
+      - incident-response
+      - audit-platform
+legal_references:
+  - framework_id: bcb-44
+    articles: ["art-9", "art-10", "art-11"]
+    relationship: implements
+  - framework_id: bcb-85
+    articles: ["art-7"]
+    relationship: complements

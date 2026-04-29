@@ -1,0 +1,95 @@
+id: epd-5-3
+family: art-5
+title: "Cookies and Similar Technologies"
+class: ePrivacy
+statement:
+  prose: >-
+    3. Member States shall ensure that the storing of information, or the gaining of access to information
+    already stored, in the terminal equipment of a subscriber or user is only allowed on condition that the
+    subscriber or user concerned has given his or her consent, having been provided with clear and
+    comprehensive information, in accordance with Directive 95/46/EC, inter alia, about the purposes of
+    the processing. This shall not prevent any technical storage or access for the sole purpose of carrying
+    out the transmission of a communication over an electronic communications network, or as strictly
+    necessary in order for the provider of an information society service explicitly requested by the
+    subscriber or user to provide the service.
+  parts:
+    - id: epd-5.3.consent
+      label: "(3) consent requirement"
+      prose: >-
+        Member States shall ensure that the storing of information, or the gaining of access to information
+        already stored, in the terminal equipment of a subscriber or user is only allowed on condition that the
+        subscriber or user concerned has given his or her consent, having been provided with clear and
+        comprehensive information, in accordance with Directive 95/46/EC, inter alia, about the purposes of
+        the processing.
+    - id: epd-5.3.exemption
+      label: "(3) essential cookies exemption"
+      prose: >-
+        This shall not prevent any technical storage or access for the sole purpose of carrying out the
+        transmission of a communication over an electronic communications network, or as strictly necessary
+        in order for the provider of an information society service explicitly requested by the subscriber
+        or user to provide the service.
+guidance:
+  prose: >-
+    Article 5(3) is the famous "cookie law." It requires prior informed consent before storing or accessing
+    information on a user's terminal equipment. This covers cookies, local storage, device fingerprinting,
+    tracking pixels, and any similar technology. The consent must meet GDPR standards (freely given, specific,
+    informed, unambiguous indication by statement or clear affirmative action). There are only two exemptions:
+    (1) technical storage strictly necessary for transmitting a communication (e.g., load balancer cookies),
+    and (2) storage strictly necessary for providing a service explicitly requested by the user (e.g.,
+    shopping cart cookies, authentication session cookies, user preference cookies for the service itself).
+    Analytics cookies, advertising cookies, social media tracking pixels, and cross-site tracking technologies
+    are NOT exempt and require consent. The CJEU Planet49 judgment (C-673/17) confirmed that consent must be
+    active (no pre-ticked boxes) and that the information requirement includes cookie duration and third-party
+    access. EDPB guidelines further clarify that cookie walls (blocking access unless consent is given) are
+    generally not valid consent mechanisms because consent is not freely given.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a centralized consent management platform (CMP) as a core infrastructure service. The CMP must
+      support: granular consent per cookie category (necessary, functional, analytics, advertising), consent
+      storage with cryptographic proof, consent withdrawal with immediate effect, and consent audit trail.
+      Implement server-side cookie classification that automatically categorizes cookies and blocks
+      non-essential cookies before consent. Build a tag management system (TMS) that only fires non-essential
+      tags after consent verification. Implement consent signal propagation to all downstream services via
+      API or event bus. Design the cookie consent banner as a platform component with A/B testing disabled
+      for consent flows (dark patterns prohibition). Implement automatic cookie scanning that detects new
+      cookies introduced by code changes and classifies them before deployment.
+    tools:
+      - "Consent Management Platform (CMP) as a microservice (custom or Cookiebot, OneTrust API)"
+      - "Server-side tag management with consent gating (Google Tag Manager server-side, custom)"
+      - "Automated cookie scanning and classification in staging environments"
+      - "Consent event bus for real-time consent signal propagation"
+      - "Cookie inventory database with automated drift detection"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must include automated cookie auditing. Every deployment to staging must trigger a
+      headless browser scan that inventories all cookies, local storage entries, and fingerprinting
+      techniques. Pipeline gates must block deployment if new unclassified cookies are detected. Code
+      review automation must flag direct cookie-setting code that bypasses the CMP. SAST rules must
+      detect tracking pixel injection, fingerprinting code, and local storage abuse. Every new third-party
+      script inclusion must be reviewed for cookie/tracking behavior before merge. Maintain a whitelist
+      of approved cookies and block any cookie not on the list in production.
+    tools:
+      - "Headless browser cookie scanning in CI/CD (Playwright, Puppeteer)"
+      - "Semgrep rules for direct cookie manipulation bypassing CMP"
+      - "Third-party script analysis tooling for tracking behavior"
+      - "Cookie whitelist enforcement in deployment pipelines"
+      - "Automated regression testing for consent banner functionality"
+  secops:
+    prose: >-
+      Continuously monitor production environments for cookie compliance drift. Automated scanners must
+      verify that non-essential cookies are not set before consent on every page. Monitor for third-party
+      script injection that introduces unauthorized tracking. Alert on consent rate anomalies that may
+      indicate dark patterns or broken consent flows. Track consent withdrawal effectiveness (verify
+      cookies are actually deleted when consent is withdrawn). Monitor for cookie wall patterns that
+      may invalidate consent. Conduct regular compliance audits comparing cookie inventory against
+      consent categories.
+    tools:
+      - "Continuous cookie compliance monitoring (CookieBot, custom scanners)"
+      - "Third-party script monitoring for unauthorized tracking injection"
+      - "Consent analytics dashboard tracking opt-in/opt-out rates"
+      - "Automated compliance audit comparing deployed cookies vs. consent policy"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7"]
+    relationship: complements

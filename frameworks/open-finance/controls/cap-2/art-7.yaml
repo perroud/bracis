@@ -1,0 +1,101 @@
+id: art-7
+family: cap-2
+title: "Dados Transacionais e Historico de Operacoes"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 7. O compartilhamento de dados transacionais abrange:
+
+    I - dados de contas de depósito à vista e de poupança: saldos, extratos
+    de movimentação e limites;
+
+    II - dados de operações de crédito: contratos, parcelas, pagamentos
+    realizados, taxas efetivas e valores em aberto;
+
+    III - dados de cartão de crédito: faturas, limites, transações e
+    pagamentos;
+
+    IV - dados de investimentos: posições, rentabilidade, movimentações
+    e características dos produtos.
+
+    Parágrafo 1. Os dados transacionais devem ser disponibilizados referentes
+    ao período mínimo de 12 (doze) meses anteriores à data da solicitação.
+
+    Parágrafo 2. A atualização dos dados transacionais deve respeitar os
+    prazos definidos nas especificações técnicas do diretório.
+guidance:
+  prose: |
+    O art. 7 define o escopo de dados transacionais por produto:
+
+    **Contas (deposito a vista e poupanca):**
+    - Saldo atual e saldo bloqueado
+    - Extrato com historico de 12 meses
+    - Limites de cheque especial
+    - Movimentacoes: creditos, debitos, transferencias
+
+    **Credito (emprestimos e financiamentos):**
+    - Contratos vigentes e condicoes
+    - Parcelas pagas e a vencer
+    - Taxa efetiva (CET) e encargos
+    - Garantias vinculadas
+
+    **Cartao de credito:**
+    - Faturas abertas e fechadas (12 meses)
+    - Limite total, disponivel e utilizado
+    - Transacoes detalhadas por fatura
+    - Pagamento minimo e total
+
+    **Investimentos:**
+    - Posicoes atuais por produto
+    - Rentabilidade acumulada
+    - Movimentacoes (aplicacoes e resgates)
+
+    **Janela temporal:**
+    Minimo de 12 meses de historico. As especificacoes tecnicas podem
+    definir janelas maiores para produtos especificos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de dados transacionais:**
+      1. Implementar servicos de consulta que acessem dados dos ultimos
+         12 meses com paginacao eficiente.
+      2. Definir estrategia de cache por tipo de dado (saldo = baixo TTL,
+         extrato historico = alto TTL).
+      3. Implementar streaming ou batch para atualizacao de dados conforme
+         frequencia definida nas especificacoes.
+      4. Otimizar queries de banco de dados para extratos volumosos
+         com indices apropriados.
+    tools:
+      - database-optimization
+      - caching-layer
+      - api-gateway
+      - pagination
+  devsecops:
+    prose: |
+      **Validacao de dados transacionais:**
+      1. Testar completude do historico de 12 meses em cenarios de borda.
+      2. Validar formatos de data, moeda e valores conforme especificacao.
+      3. Implementar testes de carga para APIs de extrato (alto volume).
+      4. Verificar consistencia entre saldo e movimentacoes.
+    tools:
+      - load-testing
+      - k6
+      - integration-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Protecao de dados transacionais:**
+      1. Classificar dados transacionais como dados pessoais sensiveis.
+      2. Criptografar em transito (TLS 1.2+) e em repouso.
+      3. Monitorar padrao de acesso a extratos para deteccao de anomalias.
+      4. Implementar rate limiting por consentimento para evitar exfiltracao.
+    tools:
+      - encryption
+      - rate-limiting
+      - siem
+      - anomaly-detection
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-46"]
+    relationship: complements

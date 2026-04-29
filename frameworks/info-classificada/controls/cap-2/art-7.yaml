@@ -1,0 +1,94 @@
+id: art-7
+family: cap-2
+title: "Security Clearance Levels and Granting Process"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 7. O credenciamento de segurança será concedido mediante:
+
+    I - credencial de segurança no grau de sigilo ultrassecreto,
+    para tratamento de informação classificada nos graus de sigilo
+    ultrassecreto, secreto e reservado;
+
+    II - credencial de segurança no grau de sigilo secreto, para
+    tratamento de informação classificada nos graus de sigilo secreto
+    e reservado; e
+
+    III - credencial de segurança no grau de sigilo reservado, para
+    tratamento de informação classificada no grau de sigilo reservado.
+
+    Parágrafo único. A concessão de credencial de segurança em qualquer
+    grau de sigilo dependerá de investigação e procedimentos especiais
+    conduzidos pelo Núcleo de Segurança e Credenciamento — NSC, do
+    Gabinete de Segurança Institucional da Presidência da República.
+guidance:
+  prose: |
+    Article 7 defines the clearance hierarchy and the granting authority:
+
+    **Clearance hierarchy (cumulative downward):**
+    | Clearance Level | Grants Access To                     |
+    |-----------------|--------------------------------------|
+    | Ultrassecreta   | Ultrassecreta + Secreta + Reservada  |
+    | Secreta         | Secreta + Reservada                  |
+    | Reservada       | Reservada only                       |
+
+    **Granting authority:**
+    All clearance investigations and grants are handled by the NSC
+    (Nucleo de Segurança e Credenciamento) within the GSI/PR (Gabinete
+    de Segurança Institucional da Presidência da Republica).
+
+    **Key implications:**
+    - A higher-level clearance automatically grants access to lower levels
+    - The investigation process is centralized in the NSC/GSI, not
+      distributed to individual agencies
+    - No clearance can be self-granted or granted by the employing agency
+      alone — NSC must be involved
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Hierarchical clearance model:**
+      1. Implement clearance levels as an ordered enum:
+         ultrassecreto > secreto > reservado.
+      2. Access control rules must compare clearance level ordinally:
+         a person with secreto clearance can access reservado content.
+      3. Integrate with NSC/GSI clearance database (or maintain a
+         synchronized mirror) for real-time credential verification.
+      4. Implement clearance level as an immutable attribute that can
+         only be set by designated NSC-authorized administrators.
+    tools:
+      - iam-platform
+      - abac-engine
+      - directory-sync
+      - admin-controls
+  devsecops:
+    prose: |
+      **Clearance enforcement in code repositories:**
+      1. Tag repositories and branches with their minimum clearance level.
+      2. Implement pre-access checks that verify the developer's clearance
+         level against the repository's classification.
+      3. Block clone/pull operations for users without adequate clearance.
+    tools:
+      - gitlab-access-control
+      - pre-access-hooks
+      - clearance-service
+  secops:
+    prose: |
+      **Clearance lifecycle management:**
+      1. Track all clearance grants with: person, level, grant date,
+         granting NSC decision reference, and renewal date.
+      2. Integrate with HR systems to automatically flag clearance reviews
+         when personnel change roles, departments, or leave the agency.
+      3. Conduct annual verification that all active clearances have
+         valid NSC backing documentation.
+    tools:
+      - clearance-database
+      - hr-integration
+      - grc-platform
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-5"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PS-3", "PS-4"]
+    relationship: mapped

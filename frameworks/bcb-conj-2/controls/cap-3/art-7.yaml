@@ -1,0 +1,190 @@
+id: art-7
+family: cap-3
+title: "Compartilhamento de Informacoes entre Instituicoes"
+class: BCB-CONJ-2
+baselines: [todas-ifs]
+statement:
+  prose: |
+    Art. 7. As instituições referidas no art. 1 devem compartilhar entre si
+    informações sobre incidentes de segurança relevantes, observando o sigilo
+    bancário, a proteção de dados pessoais e demais disposições legais aplicáveis.
+
+    § 1º O compartilhamento de informações de que trata o caput deve abranger,
+    no mínimo:
+    I - indicadores de comprometimento (IoCs);
+    II - táticas, técnicas e procedimentos (TTPs) utilizados no incidente;
+    III - medidas de mitigação adotadas.
+
+    § 2º O compartilhamento de informações pode ser realizado por meio de
+    organismos setoriais, foros de compartilhamento ou plataformas tecnológicas
+    adequadas.
+guidance:
+  prose: |
+    O art. 7 institui a obrigacao de compartilhamento de informacoes sobre
+    incidentes entre instituicoes financeiras. Este e um dos artigos mais
+    inovadores da resolucao, criando um ecossistema de inteligencia coletiva
+    no setor financeiro.
+
+    **Obrigacao de compartilhamento:**
+    Diferente de muitas regulamentacoes que apenas recomendam compartilhamento,
+    esta resolucao o torna obrigatorio ("devem compartilhar"). Isso reflete o
+    entendimento do BCB de que a seguranca cibernetica do SFN depende de
+    cooperacao entre as instituicoes.
+
+    **Limites legais:**
+    O compartilhamento deve respeitar:
+    - Sigilo bancario (Lei Complementar 105/2001): nao compartilhar dados de
+      clientes, saldos, transacoes
+    - LGPD (Lei 13.709/2018): nao compartilhar dados pessoais sem base legal
+    - Segredo comercial: nao compartilhar informacoes proprietarias alem do
+      necessario para a seguranca coletiva
+
+    **I - IoCs (Indicators of Compromise):**
+    Compartilhamento de indicadores tecnicos que permitam a outras instituicoes
+    detectar se foram afetadas pelo mesmo ataque:
+    - Hashes de malware (MD5, SHA-256)
+    - Enderecos IP maliciosos
+    - Dominios de command & control (C2)
+    - URLs de phishing
+    - Assinaturas de rede (regras Snort/Suricata)
+    - Padroes de e-mail malicioso (headers, remetentes)
+    - File paths e registry keys alterados
+
+    **II - TTPs (Tactics, Techniques and Procedures):**
+    Descricao do modus operandi do atacante usando, preferencialmente, o
+    framework MITRE ATT&CK:
+    - Vetor de acesso inicial (phishing, exploit, supply chain)
+    - Tecnicas de movimentacao lateral
+    - Mecanismos de persistencia
+    - Tecnicas de exfiltracao
+
+    **III - Medidas de mitigacao:**
+    Acoes praticas que outras instituicoes podem adotar:
+    - Regras de firewall / WAF
+    - Patches aplicados
+    - Configuracoes de hardening
+    - Alteracoes em politicas de acesso
+    - Monitoramento adicional recomendado
+
+    **Canais de compartilhamento (ss 2):**
+    - CIAB (Congresso Internacional de Automacao Bancaria) - forum setorial
+    - FEBRABAN (Federacao Brasileira de Bancos) - CSIRT setorial
+    - ABBI (Associacao Brasileira de Bancos Internacionais)
+    - ISACs (Information Sharing and Analysis Centers)
+    - Plataformas de Threat Intelligence (MISP, OpenCTI, TIP comerciais)
+    - Acordos bilaterais entre instituicoes
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de compartilhamento de IoCs:**
+      1. Instancia MISP (Malware Information Sharing Platform) configurada para
+         compartilhamento setorial.
+      2. Feeds de IoCs em formato STIX 2.1 para interoperabilidade.
+      3. Automacao de export de IoCs do SIEM para a plataforma de compartilhamento:
+         quando incidente e classificado como relevante, IoCs sao automaticamente
+         formatados e preparados para compartilhamento.
+      4. Automacao de import: IoCs recebidos de outras instituicoes sao
+         automaticamente ingeridos no SIEM, firewall e EDR.
+
+      **Pipeline de TTPs:**
+      5. Mapeamento automatico de eventos do incidente para MITRE ATT&CK.
+      6. Export de TTPs em formato padrao para compartilhamento.
+      7. Correlacao de TTPs recebidos com telemetria interna para deteccao proativa.
+
+      **Sanitizacao de dados:**
+      8. Pipeline de sanitizacao automatica antes do compartilhamento:
+         - Remocao de dados pessoais (CPF, nome, conta)
+         - Remocao de dados de sigilo bancario (saldos, transacoes)
+         - Remocao de informacoes proprietarias (nomes de sistemas internos,
+           topologia de rede)
+         - Retencao apenas de IoCs, TTPs e medidas de mitigacao
+      9. Revisao humana obrigatoria antes de compartilhamento externo.
+
+      **Ingestao de inteligencia externa:**
+      10. Feeds de threat intelligence de ISACs e parceiros configurados.
+      11. Enriquecimento automatico de IoCs com contexto (reputacao, geo, ASN).
+      12. Dashboard de inteligencia compartilhada com metricas de contribuicao.
+    tools:
+      - misp
+      - stix-taxii
+      - siem
+      - threat-intelligence-platform
+      - soar
+      - firewall-waf
+  devsecops:
+    prose: |
+      **Consumo de inteligencia no pipeline:**
+      1. Integracao de feeds de IoCs com dependency scanning: verificar se
+         bibliotecas em uso estao associadas a indicadores de supply chain attack
+         compartilhados pelo setor.
+      2. Integracao de IOCs com secret detection: padroes de credenciais
+         comprometidas compartilhados pelo setor adicionados aos scanners.
+      3. Container image scanning contra indicadores de imagens comprometidas.
+
+      **Contribuicao de inteligencia pelo desenvolvimento:**
+      4. Quando vulnerabilidade zero-day e descoberta internamente, processo para
+         gerar e compartilhar IoC/advisory com o setor.
+      5. SBOM compartilhado (anonimizado) para ajudar o setor a identificar
+         componentes vulneraveis em comum.
+
+      **Automacao de mitigacao recebida:**
+      6. Patches e workarounds recebidos via compartilhamento setorial aplicados
+         automaticamente no pipeline (com validacao).
+      7. Regras de WAF compartilhadas ingeridas automaticamente.
+    tools:
+      - gitlab-ci
+      - dependency-scanning
+      - container-scanning
+      - stix-taxii
+      - misp
+  secops:
+    prose: |
+      **Processo de compartilhamento operacional:**
+      1. Responsavel designado pelo compartilhamento de inteligencia (CTI lead).
+      2. Workflow de aprovacao para compartilhamento externo:
+         Analista CTI -> Revisao CISO -> Revisao Juridico -> Compartilhamento.
+      3. SLA de compartilhamento: IoCs compartilhados em ate 24 horas apos
+         deteccao do incidente.
+
+      **Participacao em foros setoriais:**
+      4. Participacao ativa no CSIRT setorial da FEBRABAN.
+      5. Contribuicao regular para o CERT.br.
+      6. Participacao em exercicios setoriais de resposta a incidentes.
+      7. Reunioes periodicas de threat intelligence com pares do setor.
+
+      **Gestao de privacidade no compartilhamento:**
+      8. Protocolo TLP (Traffic Light Protocol) para classificar nivel de
+         compartilhamento:
+         - TLP:RED: somente destinatarios especificos
+         - TLP:AMBER: organizacao do destinatario
+         - TLP:GREEN: comunidade do setor financeiro
+         - TLP:WHITE: compartilhamento irrestrito
+      9. Auditoria periodica do conteudo compartilhado para garantir que nao
+         houve vazamento de dados protegidos.
+      10. Registro de tudo que foi compartilhado, com quem e quando.
+
+      **Consumo de inteligencia recebida:**
+      11. Triagem de IoCs recebidos para aplicacao imediata.
+      12. Hunt operations baseadas em TTPs compartilhados pelo setor.
+      13. Retroactive hunting em logs historicos usando novos IoCs.
+      14. Metricas de eficacia: deteccoes originadas de inteligencia compartilhada.
+    tools:
+      - threat-intelligence-platform
+      - misp
+      - siem
+      - soar
+      - edr-xdr
+      - grc-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-20"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["PM-15", "PM-16", "SI-5"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.6", "A.5.7"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

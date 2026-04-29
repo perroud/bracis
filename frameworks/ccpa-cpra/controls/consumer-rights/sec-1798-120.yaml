@@ -1,0 +1,132 @@
+id: sec-1798-120
+family: consumer-rights
+title: "Right to Opt-Out of Sale or Sharing of Personal Information"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A consumer shall have the right, at any time, to direct a business that sells or shares
+    personal information about the consumer to third parties not to sell or share the consumer's
+    personal information. This right may be referred to as the right to opt-out of sale or
+    sharing.
+
+    (b) A business that sells or shares consumers' personal information to, or shares it with,
+    third parties shall provide notice to consumers, pursuant to subdivision (a) of Section
+    1798.135, that this information may be sold or shared and that consumers have the "right to
+    opt-out" of the sale or sharing of their personal information.
+
+    (c) Notwithstanding subdivision (a), a business shall not sell or share the personal
+    information of consumers if the business has actual knowledge that the consumer is less than
+    16 years of age, unless the consumer, in the case of consumers at least 13 years of age and
+    less than 16 years of age, or the consumer's parent or guardian, in the case of consumers who
+    are less than 13 years of age, has affirmatively authorized the sale or sharing of the
+    consumer's personal information. A business that willfully disregards the consumer's age
+    shall be deemed to have had actual knowledge of the consumer's age.
+
+    (d) A business that has received direction from a consumer not to sell or share the
+    consumer's personal information or, in the case of a minor consumer's personal information
+    has not received consent to sell or share the minor consumer's personal information, shall
+    be prohibited, pursuant to paragraph (4) of subdivision (c) of Section 1798.135, from
+    selling or sharing the consumer's personal information after its receipt of the consumer's
+    direction, unless the consumer subsequently provides express authorization for the sale or
+    sharing of the consumer's personal information.
+
+guidance:
+  prose: |
+    Section 1798.120 is one of the most distinctive features of CCPA/CPRA — the opt-out model
+    for data selling and sharing. Key aspects:
+
+    1. **Opt-out, not opt-in:** Unlike GDPR's consent model, CCPA/CPRA allows businesses to
+       sell/share PI by default but must offer consumers the ability to opt out at any time.
+
+    2. **"Sharing" added by CPRA:** The original CCPA only covered "sale." CPRA expanded to
+       include "sharing" — defined as making PI available to third parties for cross-context
+       behavioral advertising (even without monetary exchange).
+
+    3. **Minors require opt-in:** For consumers under 16, the model flips — businesses need
+       affirmative authorization (opt-in) before selling/sharing. Under 13 requires parental
+       consent.
+
+    4. **Persistent effect:** Once a consumer opts out, the business cannot sell/share their
+       PI unless the consumer later provides express re-authorization.
+
+    5. **Universal Opt-Out Mechanisms (CPRA):** CPRA and CPPA regulations require businesses
+       to honor opt-out preference signals (e.g., Global Privacy Control / GPC browser signal).
+
+    6. **No retaliation:** Businesses cannot discriminate against consumers who exercise
+       opt-out rights (reinforced by Section 1798.125).
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a centralized opt-out preference store that is queried by all systems and
+         services before any sale or sharing of PI.
+      2. Build Global Privacy Control (GPC) signal detection at the API gateway / web server
+         level — automatically honor browser-level opt-out signals per CPPA regulations.
+      3. Implement real-time opt-out enforcement in data pipelines — block PI from flowing
+         to third-party sale/sharing integrations when a consumer has opted out.
+      4. Create age-gating mechanisms for minors — implement age verification and parental
+         consent workflows for consumers under 16.
+      5. Build opt-out preference propagation to all downstream service providers, contractors,
+         and third parties who receive PI for sale/sharing.
+      6. Implement opt-out re-authorization workflow — if a consumer later wishes to allow
+         sale/sharing, capture express authorization with documented consent.
+      7. Deploy a Do Not Sell/Share API that internal and external systems can query in
+         real-time before processing PI for sale or sharing.
+    tools:
+      - consent-management-platform
+      - api-gateway
+      - kong
+      - privacy-portal
+      - gpc-signal-handler
+      - kafka
+      - feature-flags
+
+  devsecops:
+    prose: |
+      1. Implement automated tests verifying GPC signal detection and honoring at all
+         consumer-facing endpoints.
+      2. Test opt-out enforcement in data pipelines — verify that opted-out consumers' PI
+         is blocked from sale/sharing flows.
+      3. Validate age verification and parental consent workflows for minor consumers.
+      4. Test opt-out preference persistence — verify that preferences survive system
+         restarts, deployments, and data migrations.
+      5. Implement CI/CD checks for new third-party integrations to verify opt-out
+         enforcement is integrated before deployment.
+      6. Test that opt-out preferences are correctly propagated to all third-party recipients.
+    tools:
+      - gitlab-ci
+      - integration-testing
+      - selenium
+      - playwright
+      - postman
+      - api-testing
+
+  secops:
+    prose: |
+      1. Monitor for PI transfers to sale/sharing recipients that bypass opt-out controls.
+      2. Audit GPC signal processing — verify signals are detected and honored consistently.
+      3. Monitor for unauthorized sale/sharing of minor consumers' PI without proper
+         authorization.
+      4. Track opt-out rates and patterns for compliance reporting to CPPA.
+      5. Alert on third-party recipients who receive PI from opted-out consumers, indicating
+         a control failure.
+      6. Verify that re-authorization requests are legitimate and not the result of dark
+         patterns or deceptive practices.
+    tools:
+      - siem
+      - elastic-siem
+      - dlp
+      - compliance-dashboard
+      - network-monitoring
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 21"]
+    relationship: intersects-with
+  - framework_id: lgpd
+    articles: ["art. 18-ix"]
+    relationship: intersects-with
+  - framework_id: iso-27701
+    articles: ["A.7.3.4"]
+    relationship: supports

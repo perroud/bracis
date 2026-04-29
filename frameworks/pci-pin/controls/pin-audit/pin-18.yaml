@@ -1,0 +1,90 @@
+id: pin-18
+family: pin-audit
+title: "Logging and Monitoring of PIN Security Events"
+class: PCI-PIN
+
+statement:
+  prose: >-
+    All security-relevant events in the PIN processing environment must be logged with
+    sufficient detail to support detection of unauthorized activity and forensic
+    investigation. Logged events must include at minimum: HSM administrative operations,
+    key management events (generation, distribution, rotation, destruction), PIN translation
+    operations, authentication successes and failures, physical access events, configuration
+    changes, and security alerts. Log entries must include timestamps synchronized to an
+    authoritative time source, user/system identifiers, event type, and event outcome. Logs
+    must be protected against unauthorized modification and deletion. Log data must be
+    retained for a minimum period consistent with regulatory requirements and organizational
+    policy, and must be available for review and investigation within defined timeframes.
+
+guidance:
+  prose: >-
+    Comprehensive logging and monitoring is the detective control that makes all other PIN
+    security controls verifiable. Without adequate logging, organizations cannot determine
+    whether preventive controls are functioning, detect attacks in progress, or conduct
+    effective incident investigation. The emphasis on tamper-proof log storage is critical
+    because an attacker who compromises a PIN processing system will likely attempt to
+    destroy or modify logs to conceal their activity. Organizations should implement
+    centralized log collection with real-time forwarding to a SIEM platform that is
+    architecturally separate from the PIN processing environment, ensuring that compromise
+    of PIN systems does not compromise the audit trail.
+
+references:
+  - citation: "PCI PIN v3.1, Control Objective 6"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized SIEM platform that collects logs from all PIN processing
+      components: HSMs, network devices, physical access systems, application servers,
+      and databases. Implement log forwarding using encrypted, authenticated protocols
+      (syslog-TLS, HTTPS). Configure NTP synchronization for all PIN processing
+      components with millisecond accuracy. Deploy write-once storage for audit logs
+      (WORM storage or immutable object storage). Implement log retention policies
+      aligned with regulatory requirements (minimum 1 year online, 7 years archived
+      for most jurisdictions). Configure real-time alerting rules for critical PIN
+      security events.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-cloudwatch
+      - azure-sentinel
+      - ntp-servers
+      - immutable-log-storage
+  devsecops:
+    prose: >-
+      Implement log format validation tests in CI/CD pipelines to verify that all
+      required fields are present in log entries. Scan application code for logging
+      gaps — identify PIN processing code paths that do not produce audit log entries.
+      Test log integrity mechanisms by simulating log tampering and verifying detection.
+      Validate SIEM correlation rules against known attack scenarios using red team
+      test data.
+    tools:
+      - gitlab-sast
+      - log-validation-framework
+      - siem-testing-tools
+  secops:
+    prose: >-
+      Review SIEM dashboards daily for PIN security alerts. Investigate all critical
+      and high-severity alerts within defined SLA timeframes. Conduct weekly reviews of
+      HSM administrative activity logs. Audit log completeness monthly by verifying that
+      all registered PIN processing components are forwarding logs and no gaps exist in
+      log timelines. Test log retrieval and investigation procedures quarterly using
+      tabletop exercises.
+    tools:
+      - splunk
+      - elastic-siem
+      - pagerduty
+      - service-now
+      - incident-response-platform
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-10.1"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-11"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.15", "A.8.16", "A.8.17"]
+    relationship: mapped

@@ -1,0 +1,113 @@
+id: art-6
+family: cap-2
+title: "Validacao Clinica e Desempenho do SaMD"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 6. O fabricante deve realizar validação clínica do SaMD
+    utilizando metodologia cientificamente robusta e estatisticamente
+    adequada, demonstrando:
+
+    I - que o SaMD atinge os níveis de desempenho clínico declarados
+    nas condições de uso pretendidas;
+    II - que os benefícios clínicos do uso do SaMD superam os riscos
+    residuais identificados;
+    III - que a população de validação é representativa da população
+    alvo brasileira, considerando diversidade étnica, etária e de
+    condições de saúde prevalentes no Brasil.
+
+    Parágrafo único. Para SaMD que utilizam algoritmos de inteligência
+    artificial ou aprendizado de máquina, a validação clínica deve
+    incluir avaliação de desempenho em subpopulações relevantes para
+    identificar vieses algorítmicos.
+guidance:
+  prose: |
+    O art. 6 enfatiza a necessidade de validacao clinica robusta e
+    representativa da populacao brasileira, com atencao especial a
+    vieses algoritmicos em SaMD com IA/ML.
+
+    **Representatividade populacional:**
+    O Brasil tem diversidade etnica e demografica significativa. SaMD
+    validado apenas em populacoes europeias ou norte-americanas pode
+    apresentar desempenho degradado na populacao brasileira. O fabricante
+    deve demonstrar validacao com dados representativos.
+
+    **Avaliacao de vieses algoritmicos:**
+    Para SaMD com IA/ML, a validacao deve estratificar resultados por
+    subpopulacoes (genero, etnia, faixa etaria, comorbidades) para
+    identificar disparidades de desempenho. Vieses nao mitigados podem
+    resultar em negativa de registro.
+
+    **Metodologia estatistica:**
+    - Sample size: calculo de poder estatistico adequado
+    - Endpoints primarios e secundarios definidos a priori
+    - Analise de subgrupos pre-especificada
+    - Intervalo de confianca para metricas de desempenho
+    - Handling de dados faltantes documentado
+
+    **Relacao beneficio-risco:**
+    O fabricante deve demonstrar que beneficios clinicos (melhoria em
+    diagnostico, tempo de tratamento, outcomes) superam riscos residuais
+    (falsos positivos/negativos, atrasos, dependencia do software).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de validacao com foco em equidade:**
+      1. Implementar data pipeline que coleta e categoriza datasets
+         de validacao por subpopulacao (etnia, genero, idade, comorbidades)
+         para deteccao de vieses.
+      2. Provisionar ambiente de validacao com capacidade de executar
+         analises estratificadas por subgrupo em cada release candidate.
+      3. Configurar monitoring de desempenho em producao com segmentacao
+         por perfil demografico, com alertas para degradacao em
+         subpopulacoes especificas.
+      4. Manter infraestrutura de anonimizacao e pseudonimizacao de
+         dados clinicos compativel com LGPD para uso em validacao.
+    tools:
+      - mlflow
+      - data-pipeline
+      - monitoring
+      - anonymization-engine
+  devsecops:
+    prose: |
+      **Pipeline de deteccao de vieses:**
+      1. Integrar fairness metrics (demographic parity, equalized odds,
+         calibration by group) como metricas obrigatorias no pipeline
+         de validacao de SaMD com IA/ML.
+      2. Implementar gate de release que bloqueia deploy se disparidade
+         de desempenho entre subgrupos excede limiar predefinido.
+      3. Gerar relatorio automatizado de validacao clinica estratificada
+         como artefato de pipeline, incluindo analises de subgrupo.
+      4. Criar suite de testes de regressao clinica que valida desempenho
+         em datasets de referencia representativos da populacao brasileira.
+    tools:
+      - gitlab-ci
+      - fairlearn
+      - aequitas
+      - clinical-validation-suite
+  secops:
+    prose: |
+      **Governanca de validacao clinica:**
+      1. Estabelecer protocolo de validacao clinica padrao para a
+         organizacao, com templates de plano de validacao, relatorio
+         e analise estatistica.
+      2. Implementar revisao de protocolo de validacao por comite de
+         etica e/ou IRB (Institutional Review Board) quando aplicavel.
+      3. Manter registro de datasets de validacao utilizados, incluindo
+         procedencia, tamanho, distribuicao demografica e limitacoes.
+      4. Monitorar evidencias pos-mercado para detectar sinais de
+         degradacao de desempenho clinico ou emergencia de vieses nao
+         identificados na validacao pre-mercado.
+    tools:
+      - grc-platform
+      - clinical-evidence-database
+      - ethics-review
+      - post-market-surveillance
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9", "art-10"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-12", "art-20"]
+    relationship: complements

@@ -1,0 +1,77 @@
+id: art-17
+family: cap-4
+title: "Firewall e Filtragem de Trafego"
+class: GSI-IN3
+baselines: [apf-federal]
+statement:
+  prose: |
+    Art. 17. Os órgãos e entidades devem implementar soluções de firewall e
+    filtragem de tráfego, observando:
+
+    I - firewall de borda para proteção do perímetro da rede;
+    II - regras de filtragem baseadas em política de negação padrão (deny-by-default);
+    III - inspeção de tráfego criptografado quando tecnicamente viável;
+    IV - filtragem de conteúdo web e de e-mail;
+    V - revisão periódica das regras de firewall.
+guidance:
+  prose: |
+    O art. 17 exige firewall com politica deny-by-default, inspecao de trafego
+    criptografado e revisao periodica de regras.
+
+    **Principios de firewall:**
+    1. Deny-by-default: tudo bloqueado exceto o explicitamente permitido
+    2. Inspecao TLS: break-and-inspect para trafico criptografado (com cuidado legal)
+    3. Content filtering: web proxy e anti-spam
+    4. Revisao de regras: eliminar regras orfas e excessivamente permissivas
+
+    **Equivalencias internacionais:**
+    - ISO 27001:2022 A.8.23 (Web filtering)
+    - NIST 800-53 rev5: SC-7(4) (External Telecommunications Services)
+    - CIS Controls v8: 9.2 (DNS Filtering), 13.3 (Network Monitoring)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Stack de firewall:**
+      1. Next-Gen Firewall (NGFW) no perimetro com IPS integrado.
+      2. WAF para aplicacoes web expostas (ModSecurity, AWS WAF, Cloudflare).
+      3. Security groups/NACLs em cloud com regras deny-by-default.
+      4. DNS filtering para bloquear dominios maliciosos.
+      5. E-mail gateway com anti-spam, anti-phishing e sandbox.
+    tools:
+      - ngfw
+      - waf
+      - cloud-security-groups
+      - dns-filtering
+      - email-gateway
+  devsecops:
+    prose: |
+      **Firewall rules como codigo:**
+      1. Regras de firewall/security groups versionadas em Terraform/Pulumi.
+      2. Merge request obrigatoria para alteracao de regras de firewall.
+      3. Validacao automatica: detectar regras 0.0.0.0/0 (overly permissive).
+      4. Pipeline que aplica regras via GitOps com rollback automatico.
+    tools:
+      - terraform-security-groups
+      - firewall-rule-validation
+      - gitops-firewall
+  secops:
+    prose: |
+      **Operacao de firewall:**
+      1. Revisao mensal de regras de firewall (cleanup de regras nao utilizadas).
+      2. Monitoramento de regras com hit count zero (candidatas a remocao).
+      3. Alerta para criacao de regras excessivamente permissivas.
+      4. Teste trimestral de efetividade do firewall (bypass testing).
+    tools:
+      - firewall-rule-review
+      - hit-count-analysis
+      - bypass-testing
+legal_references:
+  - framework_id: gsi-in1
+    articles: ["art-12"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.23"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7(4)", "SC-7(8)"]
+    relationship: mapped

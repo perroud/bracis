@@ -1,0 +1,120 @@
+id: cip-004-r4
+family: cip-004
+title: "Access Management Program"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented access
+    management programs that include the provisions in parts 4.1 through
+    4.4 for authorized electronic and authorized unescorted physical
+    access to BES Cyber Systems.
+  parts:
+    - id: cip-004-r4.1
+      label: "4.1"
+      prose: >-
+        Process to authorize based on need, as determined by the
+        Responsible Entity, except for CIP Exceptional Circumstances:
+        electronic access, unescorted physical access into a Physical
+        Security Perimeter, and access to designated storage locations
+        for BES Cyber System Information.
+    - id: cip-004-r4.2
+      label: "4.2"
+      prose: >-
+        Verify at least once each calendar quarter that individuals
+        with active electronic or unescorted physical access have
+        authorization records.
+    - id: cip-004-r4.3
+      label: "4.3"
+      prose: >-
+        For termination actions, revoke the individual's access to
+        the BES Cyber System within 24 hours of the effective date
+        of the termination action, and revoke the individual's
+        non-shared user accounts within 30 calendar days.
+    - id: cip-004-r4.4
+      label: "4.4"
+      prose: >-
+        For reassignments or transfers, review and update access
+        rights within 30 calendar days following the date of the
+        personnel action.
+
+guidance:
+  prose: >-
+    CIP-004 R4 establishes the lifecycle management of access to BES
+    Cyber Systems. The access management program must cover the full
+    lifecycle: authorization (need-based), periodic verification
+    (quarterly), termination (24-hour revocation for access, 30-day
+    for accounts), and transfer/reassignment (30-day review). The
+    quarterly access review is a critical audit point — entities must
+    demonstrate they compared active access lists against authorization
+    records and resolved any discrepancies. The 24-hour termination
+    requirement for access revocation requires well-integrated HR and
+    IT workflows to be achievable consistently.
+
+references:
+  - citation: "NERC CIP-004-7 — Personnel and Training"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-004-7.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized identity and access management (IAM)
+      integrated with HR systems for automated lifecycle events
+      (onboarding, transfer, termination). Configure the IdP to
+      enforce need-based access provisioning with documented
+      justification and manager approval. Deploy automated
+      quarterly access review campaigns that compare active access
+      against authorization records and generate discrepancy reports.
+      Implement automated access revocation workflows triggered by
+      HR termination events with SLA tracking for the 24-hour
+      requirement. Use RBAC models that map roles to BES Cyber
+      System access requirements.
+    tools:
+      - keycloak
+      - terraform
+      - kubernetes-rbac
+      - backstage
+      - grafana
+
+  devsecops:
+    prose: >-
+      Enforce access-as-code where all BES Cyber System access
+      grants are managed through merge requests with documented
+      justification and approval. Implement CI pipelines that
+      validate access configurations match authorized personnel
+      lists. Create automated quarterly review jobs that compare
+      active access (Git repository permissions, CI/CD variables,
+      deployment credentials) against HR-sourced authorization
+      records. Deploy pipeline gates that block access changes
+      without proper authorization workflow completion. Automate
+      termination-triggered access revocation for repository access,
+      CI/CD credentials, and deployment keys.
+    tools:
+      - gitlab-ci
+      - gitlab-approval-rules
+      - terraform
+      - vault
+
+  secops:
+    prose: >-
+      Monitor access events in real time and alert on unauthorized
+      access attempts to BES Cyber Systems. Implement automated
+      correlation between HR termination events and access revocation
+      timestamps to verify the 24-hour SLA. Generate quarterly access
+      review reports comparing active access against authorization
+      records. Track access anomalies such as dormant accounts,
+      excessive privileges, and access from unexpected locations.
+      Maintain audit evidence for all access lifecycle events.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - cyberark
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6", "PS-4", "PS-5"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-1-4.3.3.3", "2-1-4.3.3.6"]
+    relationship: supports

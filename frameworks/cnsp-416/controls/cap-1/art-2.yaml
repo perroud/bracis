@@ -1,0 +1,109 @@
+id: art-2
+family: cap-1
+title: "Ambito de Aplicacao"
+class: CNSP-416
+baselines: [todas-supervisionadas]
+statement:
+  prose: |
+    Art. 2. Esta Resolução aplica-se às:
+    I - sociedades seguradoras;
+    II - entidades abertas de previdência complementar;
+    III - sociedades de capitalização;
+    IV - resseguradores locais.
+
+    § 1. As sucursais de resseguradores admitidos devem observar os requisitos desta
+    Resolução no que couber, considerando sua estrutura organizacional específica.
+
+    § 2. As supervisionadas integrantes de conglomerado podem implementar o sistema
+    de controles internos e a estrutura de gestão de riscos de forma consolidada,
+    desde que garantida a cobertura de todos os riscos específicos de cada entidade.
+guidance:
+  prose: |
+    O art. 2 define com precisao as quatro categorias de supervisionadas SUSEP sujeitas
+    a resolucao. E importante compreender as especificidades de cada categoria.
+
+    **Sociedades seguradoras (inciso I):**
+    Empresas autorizadas a operar seguros de danos, vida, saude suplementar e DPVAT.
+    Riscos dominantes: subscricao (precificacao, selecao), sinistros catastróficos,
+    longevidade, reinsuro, investimentos.
+
+    **Entidades abertas de previdencia complementar (inciso II):**
+    EAPCs que comercializam planos PGBL/VGBL e planos de beneficios. Riscos dominantes:
+    longevidade, descasamento ALM (ativos x passivos atuariais), portabilidade, resgates
+    em massa, risco atuarial de tona.
+
+    **Sociedades de capitalizacao (inciso III):**
+    Empresas que comercializam titulos de capitalizacao (PM, PU, PP). Riscos dominantes:
+    resgate antecipado, risco de investimento da provisao tecnica, risco operacional.
+
+    **Resseguradores locais (inciso IV):**
+    Empresas de resseguro sediadas no Brasil (diferente de admitidos e eventual).
+    Riscos dominantes: concentracao de risco de subscricao, credito de cedentes,
+    recuperacao de sinistros, risco de retrocessao.
+
+    **Conglomerado (ss 2):**
+    Grupos que possuem multiplas supervisionadas podem implementar estruturas consolidadas.
+    Economias de escala sao permitidas, mas cada entidade deve ter seus riscos
+    especificos cobertos. Risco de uma seguradora e diferente de uma EAPC.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura multi-entidade:**
+      1. Plataforma GRC com suporte a multi-tenancy para grupos que possuem diversas
+         supervisionadas (seguradora + EAPC + capitalizacao).
+      2. Visao consolidada do conglomerado com drill-down por entidade.
+      3. Segregacao logica de dados entre entidades distintas (LGPD e regulatorio).
+      4. Consolidacao de riscos em nivel de grupo com eliminacao de dupla contagem.
+
+      **Especificidades por categoria:**
+      5. Modulo atuarial integrado para seguradoras e EAPCs (provisoes tecnicas, ORSA).
+      6. ALM system para gestao ativo-passivo de EAPCs (LDI, duration matching).
+      7. Modulo de titulos de capitalizacao para sociedades de capitalizacao.
+      8. Modulo de retrocessao para resseguradores locais.
+    tools:
+      - grc-platform
+      - actuarial-system
+      - alm-platform
+      - risk-engine
+      - data-lake
+  devsecops:
+    prose: |
+      **Segmentacao por tipo de entidade no pipeline:**
+      1. Tags de entidade em todos os repositorios (seguradora, eapc, capitalizacao, resseguro).
+      2. Compliance policies diferenciadas por tipo de supervisionada.
+      3. Gates adicionais para sistemas que processam provisoes tecnicas atuariais.
+      4. Controles especificos para sistemas de ALM de EAPCs.
+
+      **Gestao de conglomerado:**
+      5. Pipelines centralizados para sistemas compartilhados do grupo.
+      6. Pipelines especificos por entidade para sistemas individuais.
+      7. Policy inheritance: politicas do grupo herdadas pelas entidades, com override.
+    tools:
+      - gitlab-ci
+      - opa-gatekeeper
+      - tagging-policies
+      - policy-engine
+  secops:
+    prose: |
+      **Inventario de entidades supervisionadas:**
+      1. Registro de todas as entidades do grupo sujeitas a CNSP 416.
+      2. Mapeamento dos riscos especificos de cada categoria (subscricao, ALM, etc.).
+      3. Responsaveis designados por entidade para SCI, EGR e Auditoria.
+      4. Cronograma de conformidade alinhado a todas as entidades do grupo.
+
+      **Conformidade consolidada vs. individual:**
+      5. Plano de conformidade consolidado para o conglomerado.
+      6. Evidencias de cobertura de riscos especificos de cada entidade.
+      7. Relatorio de conformidade individualizado e consolidado.
+      8. Assessment de suficiencia das estruturas consolidadas para cada entidade.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - reporting-platform
+legal_references:
+  - framework_id: cmn-4557
+    articles: ["art-1"]
+    relationship: equivalent-to
+  - framework_id: cnsp-381
+    articles: ["art-1", "art-2"]
+    relationship: complements

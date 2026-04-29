@@ -1,0 +1,109 @@
+id: p2pe-app-3
+family: p2pe-app
+title: "P2PE Application Update and Patch Management"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    The solution provider shall maintain a documented process for the
+    development, testing, and deployment of P2PE application updates and
+    security patches. Updates shall be digitally signed by the solution
+    provider and verified by the receiving system before installation.
+    The update mechanism shall use secure communication channels and shall
+    not introduce cleartext account data exposure during the update process.
+    Rollback procedures shall be documented and tested to ensure recovery
+    from failed updates without data compromise.
+  parts:
+    - id: p2pe-app-3.a
+      label: "Domain 2, 2E"
+      prose: >-
+        All P2PE application updates and patches are digitally signed and
+        verified before installation, using secure distribution channels.
+    - id: p2pe-app-3.b
+      label: "Domain 2, 2F"
+      prose: >-
+        Update procedures include tested rollback capabilities and ensure
+        no cleartext account data exposure during the update lifecycle.
+
+guidance:
+  prose: >-
+    Application updates represent a critical attack vector — a compromised
+    update could bypass all encryption controls and expose cleartext account
+    data. Digital signatures using asymmetric cryptography (RSA-2048+ or
+    ECDSA P-256+) ensure authenticity and integrity of updates. The update
+    distribution infrastructure must be hardened and monitored. Updates
+    should be staged through a testing environment that validates both
+    functional correctness and security controls before production
+    deployment. The update process itself must not require disabling
+    encryption or exposing keys. Rollback must be possible without
+    re-keying devices, as re-keying is a costly and time-consuming
+    operation.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 2 — Application Security"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "NIST SP 800-40 Rev. 4 — Guide to Enterprise Patch Management Planning"
+    url: "https://doi.org/10.6028/NIST.SP.800-40r4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a code-signing pipeline where release artifacts are signed
+      using keys stored in an HSM. Use Sigstore/cosign or GPG-based signing
+      with keys that are rotated annually. Build an update distribution
+      server that serves signed artifacts over mutual TLS. Implement
+      blue-green or canary deployment strategies for P2PE application
+      updates to limit blast radius. Maintain versioned artifact
+      repositories with immutable storage to prevent tampering with
+      historical releases.
+    tools:
+      - sigstore-cosign
+      - hashicorp-vault
+      - artifactory
+      - nexus
+      - argocd
+      - kubernetes
+      - aws-cloudhsm
+
+  devsecops:
+    prose: >-
+      Enforce that all release branches trigger the signing pipeline and
+      that unsigned artifacts cannot be promoted to production repositories.
+      Include signature verification tests in the deployment pipeline.
+      Scan update packages for supply chain attacks (dependency confusion,
+      typosquatting). Implement SBOM (Software Bill of Materials) generation
+      for every release and verify SBOM against known vulnerability
+      databases. Test rollback procedures as part of every release cycle.
+    tools:
+      - gitlab-ci
+      - syft
+      - grype
+      - trivy
+      - cosign-verify
+      - opa-gatekeeper
+
+  secops:
+    prose: >-
+      Monitor update distribution infrastructure for unauthorized access
+      or signing key usage outside of the CI/CD pipeline. Alert on any
+      artifact deployed to production that fails signature verification.
+      Track all deployed versions across the fleet and flag any systems
+      running outdated or unpatched versions. Conduct annual reviews of the
+      code-signing key management process, including key ceremony audits.
+    tools:
+      - splunk
+      - elastic-siem
+      - grafana
+      - prometheus
+      - artifactory-audit-logs
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.3", "req-6.5"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "CM-3", "SA-10"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.25", "A8.32"]
+    relationship: supports

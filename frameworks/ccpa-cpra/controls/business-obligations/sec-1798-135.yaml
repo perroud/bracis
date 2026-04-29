@@ -1,0 +1,146 @@
+id: sec-1798-135
+family: business-obligations
+title: "Methods of Opt-Out — Links and Alternative Opt-Out Mechanisms"
+class: CCPA-CPRA
+
+statement:
+  prose: |
+    (a) A business that is required to comply with Section 1798.120 shall, in a form that is
+    reasonably accessible to consumers:
+    (1) Provide a clear and conspicuous link on the business's internet homepage(s), titled
+    "Do Not Sell or Share My Personal Information," to an internet web page that enables a
+    consumer, or a person authorized by the consumer, to opt-out of the sale or sharing of the
+    consumer's personal information.
+    (2) Provide a clear and conspicuous link on the business's internet homepage(s), titled
+    "Limit the Use of My Sensitive Personal Information," to an internet web page that enables
+    a consumer, or a person authorized by the consumer, to limit the use or disclosure of the
+    consumer's sensitive personal information to those uses authorized by subdivision (a) of
+    Section 1798.121.
+    (3) At the business's discretion, utilize a single, clearly-labeled link on the business's
+    internet homepage(s), in lieu of posting the links required by paragraphs (1) and (2), if
+    such link easily allows a consumer to opt-out of the sale or sharing of the consumer's
+    personal information and to limit the use or disclosure of the consumer's sensitive personal
+    information.
+    (4) In the event that a business responds to opt-out requests received pursuant to Section
+    1798.120 by informing the consumer of a charge for the use of any product or service, present
+    the terms of any financial incentive offered pursuant to subdivision (b) of Section 1798.125
+    for the retention, sale, or sharing of the consumer's personal information.
+
+    (b) A business shall not be required to comply with subdivision (a) if the business allows
+    consumers to opt-out of the sale or sharing of their personal information and to limit the
+    use of their sensitive personal information through an opt-out preference signal sent with
+    the consumer's consent by a platform, technology, or mechanism, based on technical
+    specifications set forth in regulations adopted pursuant to paragraph (19) of subdivision
+    (a) of Section 1798.185, to the business indicating the consumer's intent to opt-out of the
+    business's sale or sharing of the consumer's personal information or to limit the use or
+    disclosure of the consumer's sensitive personal information, or both.
+
+    (c) A business that complies with subdivision (a) of this section is not required to comply
+    with subdivision (b). A business may elect to comply with subdivision (b) in addition to, or
+    in lieu of, compliance with subdivision (a).
+
+    (e) A business shall not use a consumer's personal information that is collected or processed
+    through the use of any dark pattern for any purpose. Consent obtained through use of dark
+    patterns does not constitute consent.
+
+guidance:
+  prose: |
+    Section 1798.135 prescribes the specific technical mechanisms businesses must provide for
+    opt-out and SPI limitation. Key requirements:
+
+    1. **Homepage links:** Two required links (or one combined): "Do Not Sell or Share My
+       Personal Information" and "Limit the Use of My Sensitive Personal Information." These
+       must be clear and conspicuous on the homepage.
+
+    2. **Alternative: Opt-out preference signals (GPC):** Instead of homepage links, businesses
+       can honor opt-out preference signals (e.g., Global Privacy Control). This can be done
+       instead of OR in addition to homepage links.
+
+    3. **Dark patterns prohibition:** Subdivision (e) is critical — any consent obtained through
+       dark patterns is void. This means opt-out interfaces must be straightforward, not
+       confusing, and not designed to manipulate consumers into staying opted in.
+
+    4. **Financial incentive disclosure:** If a business charges for products/services after
+       opt-out, it must present financial incentive terms per Section 1798.125(b).
+
+    5. **CPPA regulations specify:** The CPPA has issued detailed regulations on acceptable
+       opt-out mechanisms, GPC technical specifications, and what constitutes dark patterns.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement the required opt-out links on all homepage(s) — either two separate links
+         ("Do Not Sell or Share My Personal Information" and "Limit the Use of My Sensitive
+         Personal Information") or a single combined link.
+      2. Build Global Privacy Control (GPC) signal detection middleware that intercepts
+         Sec-GPC: 1 HTTP headers at the edge/gateway level and automatically applies opt-out
+         preferences.
+      3. Create a unified opt-out and SPI limitation preference center accessible from the
+         homepage links — single page where consumers can manage both preferences.
+      4. Implement preference persistence that stores opt-out and SPI limitation choices,
+         associated with the consumer identity (authenticated) or browser/device (unauthenticated).
+      5. Build real-time preference propagation to all downstream systems via event bus —
+         when a consumer opts out, all sale/sharing integrations must be notified immediately.
+      6. Implement dark pattern detection tooling in the UI component library — automated
+         checks for confirm-shaming, hidden options, confusing language, and asymmetric choices.
+      7. Deploy opt-out verification system that confirms preferences are applied and provides
+         consumers with confirmation of their choices.
+    tools:
+      - consent-management-platform
+      - api-gateway
+      - kong
+      - gpc-signal-handler
+      - privacy-portal
+      - kafka
+      - cdn
+
+  devsecops:
+    prose: |
+      1. Implement automated visual regression tests verifying opt-out links are present,
+         visible, and correctly positioned on all homepage variations (desktop, mobile, app).
+      2. Test GPC signal handling — send requests with and without Sec-GPC header and verify
+         correct preference application.
+      3. Implement dark pattern scanning in CI/CD — use accessibility and UX linting tools
+         to detect manipulative patterns in privacy-related interfaces.
+      4. Test that preference center functionality works correctly — opt-out, opt-back-in,
+         SPI limitation, and preference persistence.
+      5. Validate that opt-out preferences propagate correctly to all third-party
+         sale/sharing integrations within acceptable latency.
+      6. Test that financial incentive terms are correctly displayed when applicable.
+    tools:
+      - playwright
+      - selenium
+      - gitlab-ci
+      - lighthouse
+      - accessibility-testing
+      - visual-regression-testing
+
+  secops:
+    prose: |
+      1. Monitor GPC signal processing rates — track detection, honoring, and any failures
+         in signal processing.
+      2. Audit homepage link placement periodically — verify links remain visible and
+         functional after site updates.
+      3. Conduct periodic dark pattern assessments of privacy-related user interfaces.
+      4. Monitor for consumer complaints about opt-out difficulty or confusing interfaces.
+      5. Track opt-out preference change rates for anomaly detection (sudden drops may
+         indicate broken mechanisms or dark pattern introduction).
+      6. Verify that GPC signals are honored consistently across all business properties
+         (websites, apps, APIs).
+    tools:
+      - compliance-dashboard
+      - siem
+      - web-monitoring
+      - accessibility-audit
+      - analytics
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 7", "art. 12", "art. 21"]
+    relationship: intersects-with
+  - framework_id: lgpd
+    articles: ["art. 8", "art. 18-ix"]
+    relationship: intersects-with
+  - framework_id: iso-27701
+    articles: ["A.7.2.3", "A.7.3.4"]
+    relationship: supports

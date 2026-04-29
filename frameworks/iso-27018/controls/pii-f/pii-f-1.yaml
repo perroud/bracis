@@ -1,0 +1,98 @@
+id: pii-f.1
+family: pii-f
+title: "PII principal access and rectification capabilities"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall provide the cloud service customer with
+    the capability to access, retrieve, and where necessary, correct or amend the
+    PII of PII principals processed on behalf of the customer. The public cloud PII
+    processor shall provide tools, APIs, and procedures that enable the cloud service
+    customer to respond to PII principal requests for access, rectification, erasure,
+    and restriction of processing within the timeframes required by applicable law.
+    The format of PII returned to PII principals should be structured, commonly used,
+    and machine-readable.
+
+guidance:
+  prose: >-
+    This control recognizes that while the cloud service customer (controller) bears
+    the legal obligation to respond to PII principal rights requests, the cloud
+    processor must provide the technical infrastructure to fulfill those requests.
+    Without adequate processor capabilities, the controller cannot meet its legal
+    obligations. The processor must provide comprehensive self-service tools that
+    the customer can use without requiring manual intervention from the processor's
+    support team. This includes APIs for searching, retrieving, modifying, and
+    deleting PII across all storage systems. The tools must be granular enough to
+    target individual PII principal records and must cover all PII locations,
+    including derived data, logs, backups, and caches. Machine-readable formats
+    (JSON, CSV, XML) enable PII principals to exercise data portability rights.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.6"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a comprehensive PII rights API that supports the full lifecycle of
+      data subject requests: search (find all PII for a given principal), retrieve
+      (export in machine-readable format), rectify (update specific PII fields),
+      erase (delete with cascade to all derived data), and restrict (freeze
+      processing while maintaining storage). Implement a PII discovery service
+      that maintains a real-time index of where each principal's PII is stored
+      across all systems. Build export pipelines that produce PII in standard
+      formats (JSON-LD, CSV, XML) with schema documentation. Provide SLA-backed
+      response times for API operations. Implement idempotent request handling
+      and status tracking for long-running operations.
+    tools:
+      - pii-rights-api
+      - pii-discovery-index
+      - data-export-pipeline
+      - request-status-tracker
+      - cascade-operation-engine
+      - sla-enforcement
+
+  devsecops:
+    prose: >-
+      Ensure all new data stores and services integrate with the PII rights
+      API from day one. CI pipeline gates must validate that new PII storage
+      locations are registered in the PII discovery index and reachable by the
+      rights API. Build integration tests that exercise the full rights lifecycle:
+      create PII, request access, verify export completeness, request
+      rectification, verify update propagation, request erasure, verify deletion
+      across all stores. Static analysis should flag PII storage that is not
+      registered in the discovery index. Include PII rights compatibility in the
+      architecture review checklist.
+    tools:
+      - gitlab-ci
+      - pii-discovery-validator
+      - rights-lifecycle-tests
+      - semgrep
+      - architecture-review-checklist
+      - storage-registration-linter
+
+  secops:
+    prose: >-
+      Monitor PII rights request metrics: volume, completion rate, average
+      response time, and SLA compliance. Alert on failed or timed-out requests.
+      Audit the completeness of rights fulfillment by sampling completed requests
+      and verifying the PII was correctly retrieved, modified, or deleted across
+      all storage systems. Track PII re-emergence after erasure requests. Monitor
+      for unauthorized PII access through the rights API. Generate rights
+      fulfillment compliance reports for customer and regulatory review.
+    tools:
+      - splunk
+      - elastic-siem
+      - rights-metrics-dashboard
+      - erasure-verification-auditor
+      - re-emergence-detector
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-15", "art-16", "art-17", "art-18", "art-20"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.3.1", "a-7.3.2"]
+    relationship: complements

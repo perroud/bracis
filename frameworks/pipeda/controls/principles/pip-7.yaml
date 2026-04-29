@@ -1,0 +1,128 @@
+id: pip-7
+family: principles
+title: "Principle 7 — Safeguards"
+class: PIPEDA
+statement:
+  prose: >-
+    Personal information shall be protected by security safeguards appropriate to the sensitivity
+    of the information.
+  parts:
+    - id: pip-7.4.7.1
+      label: "4.7.1"
+      prose: >-
+        The security safeguards shall protect personal information against loss or theft, as well
+        as unauthorized access, disclosure, copying, use, or modification. Organizations shall
+        protect personal information regardless of the format in which it is held.
+    - id: pip-7.4.7.2
+      label: "4.7.2"
+      prose: >-
+        The nature of the safeguards will vary depending on the sensitivity of the information
+        that has been collected, the amount, distribution, and format of the information, and
+        the method of storage. More sensitive information should be safeguarded by a higher level
+        of protection.
+    - id: pip-7.4.7.3
+      label: "4.7.3"
+      prose: >-
+        The methods of protection should include (a) physical measures, for example, locked filing
+        cabinets and restricted access to offices; (b) organizational measures, for example,
+        security clearances and limiting access on a "need to know" basis; and (c) technological
+        measures, for example, the use of passwords and encryption.
+    - id: pip-7.4.7.4
+      label: "4.7.4"
+      prose: >-
+        Organizations shall make their employees aware of the importance of maintaining the
+        confidentiality of personal information.
+    - id: pip-7.4.7.5
+      label: "4.7.5"
+      prose: >-
+        Care shall be used in the disposal or destruction of personal information, to prevent
+        unauthorized parties from gaining access to the information.
+guidance:
+  prose: >-
+    This is PIPEDA's security principle and the most technically prescriptive. The OPC interprets
+    "appropriate to the sensitivity" using a risk-based approach: higher sensitivity demands
+    stronger safeguards. The OPC has found violations for: unencrypted databases containing
+    sensitive personal information, lack of multi-factor authentication on systems with access
+    to personal information, inadequate network segmentation, failure to patch known vulnerabilities,
+    and weak password policies. Clause 4.7.3 explicitly calls out three categories of safeguards:
+    physical, organizational, and technological — all three must be addressed. The OPC regularly
+    references industry standards (NIST, ISO 27001) as benchmarks for "appropriate" safeguards.
+    Since the 2015 Digital Privacy Act introduced mandatory breach notification, the consequences
+    of inadequate safeguards now include both the breach itself and the failure to have prevented
+    it. This principle is the primary focus of OPC security investigations.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      ENCRYPTION: Encrypt all personal information at rest (AES-256) and in transit (TLS 1.3).
+      Implement column-level encryption for sensitive personal information. Use envelope encryption
+      with centralized key management. ACCESS CONTROL: Implement role-based and attribute-based
+      access control (RBAC/ABAC) across all services handling personal information. Enforce
+      principle of least privilege. Use service mesh mutual TLS for service-to-service
+      authentication. NETWORK SEGMENTATION: Isolate personal information processing systems in
+      dedicated network segments. Implement zero-trust network architecture with micro-segmentation.
+      SECRETS MANAGEMENT: Centralize secrets management with dynamic credential rotation. Eliminate
+      hardcoded credentials and long-lived API keys. SECURE DISPOSAL: Implement cryptographic
+      erasure for encrypted data. Use secure deletion mechanisms (overwrite, degauss) for
+      unencrypted storage. Verify disposal across all replicas and backups.
+    tools:
+      - "HashiCorp Vault for encryption key management and dynamic secrets"
+      - "Service mesh (Istio/Linkerd) with mutual TLS"
+      - "Kubernetes NetworkPolicies and Calico for micro-segmentation"
+      - "PostgreSQL column-level encryption and RLS"
+      - "Cryptographic erasure with key destruction verification"
+      - "AWS KMS / GCP Cloud KMS / Azure Key Vault for envelope encryption"
+  devsecops:
+    prose: >-
+      VULNERABILITY SCANNING: Comprehensive security scanning pipeline — SAST for code
+      vulnerabilities, DAST for runtime vulnerabilities, dependency scanning for known CVEs,
+      container scanning for image vulnerabilities, and secret detection to prevent credential
+      leakage. INFRASTRUCTURE SECURITY: IaC scanning (Checkov, tfsec) must verify encryption
+      configuration, network segmentation, and access control in infrastructure definitions.
+      SECURE CODING: Enforce secure coding standards through linting and SAST. Block merges with
+      critical or high-severity findings in personal information handling code. PATCH MANAGEMENT:
+      Automated dependency updates with security-focused merge requests. SLA-based remediation
+      timelines for known vulnerabilities. DISPOSAL VERIFICATION: Pipeline checks must verify
+      that data deletion code uses secure erasure methods, not simple DELETE operations on
+      sensitive data.
+    tools:
+      - "SAST (Semgrep, SonarQube, Checkmarx)"
+      - "DAST (OWASP ZAP, Burp Suite)"
+      - "Dependency scanning (Snyk, Trivy, Grype)"
+      - "Container scanning (Trivy, Grype, Anchore)"
+      - "Secret detection (GitLeaks, TruffleHog, GitLab Secret Detection)"
+      - "IaC scanning (Checkov, tfsec, KICS)"
+  secops:
+    prose: >-
+      CONTINUOUS MONITORING: 24/7 monitoring of systems processing personal information. SIEM
+      correlation rules for unauthorized access, anomalous data access patterns, and potential
+      data exfiltration. VULNERABILITY MANAGEMENT: Continuous vulnerability scanning with
+      risk-based prioritization. Accelerated remediation SLAs for systems containing sensitive
+      personal information. INCIDENT DETECTION: Intrusion detection and prevention systems
+      tuned for personal information system threats. Behavioral analytics (UEBA) for insider
+      threat detection. ACCESS MONITORING: Monitor privileged access to personal information
+      systems. Alert on access outside business hours, bulk data access, and access from unusual
+      locations. DISPOSAL MONITORING: Verify secure disposal operations are completed. Audit
+      disposal logs for completeness.
+    tools:
+      - "SIEM (Splunk/Elastic Security) with PIPEDA-specific rules"
+      - "Vulnerability scanner (Qualys, Nessus, Rapid7)"
+      - "EDR/XDR for endpoint protection"
+      - "UEBA for behavioral analytics"
+      - "DLP for data exfiltration prevention"
+      - "PAM (CyberArk, BeyondTrust) for privileged access management"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-32"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.100", "sec-1798.150"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-46", "art-47"]
+    relationship: equivalent-to
+  - framework_id: iso-27701
+    articles: ["6.9"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-12", "SC-13", "SC-28", "AC-2", "AC-3", "AC-6"]
+    relationship: supports

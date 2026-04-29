@@ -1,0 +1,102 @@
+id: epd-9
+family: art-9
+title: "Location Data Other Than Traffic Data"
+class: ePrivacy
+statement:
+  prose: >-
+    1. Where location data other than traffic data, relating to users or subscribers of public
+    communications networks or publicly available electronic communications services, can be processed,
+    such data may only be processed when they are made anonymous, or with the consent of the users or
+    subscribers to the extent and for the duration necessary for the provision of a value added service.
+    The service provider must inform the users or subscribers, prior to obtaining their consent, of the
+    type of location data other than traffic data which will be processed, of the purposes and duration
+    of the processing and whether the data will be transmitted to a third party for the purpose of
+    providing the value added service. Users or subscribers shall be given the possibility to withdraw
+    their consent for the processing of location data other than traffic data at any time.
+
+    2. Where consent of the users or subscribers has been obtained for the processing of location data
+    other than traffic data, the user or subscriber must continue to have the possibility, using a simple
+    means and free of charge, of temporarily refusing the processing of such data for each connection to
+    the network or for each transmission of a communication.
+
+    3. Processing of location data other than traffic data in accordance with paragraphs 1 and 2 must be
+    restricted to persons acting under the authority of the provider of the public communications network
+    or publicly available electronic communications service or of the third party providing the value
+    added service, and must be restricted to what is necessary for the purposes of providing the value
+    added service.
+  parts:
+    - id: epd-9.1
+      label: "(1)"
+      prose: >-
+        Location data other than traffic data may only be processed when made anonymous or with consent,
+        for the provision of a value added service. Users must be informed of data type, purpose, duration,
+        and third-party transmission prior to consent. Consent may be withdrawn at any time.
+    - id: epd-9.2
+      label: "(2)"
+      prose: >-
+        Users must have the possibility, using simple means and free of charge, of temporarily refusing
+        the processing of location data for each connection or transmission.
+    - id: epd-9.3
+      label: "(3)"
+      prose: >-
+        Processing must be restricted to authorized persons and to what is necessary for providing the
+        value added service.
+guidance:
+  prose: >-
+    Article 9 provides special protection for location data (GPS, cell tower triangulation, Wi-Fi
+    positioning, IP geolocation). Location data is considered particularly sensitive because it reveals
+    physical movements, habits, social contacts, and intimate details of private life. The default rule
+    is anonymization. Consent is the only legal basis for non-anonymous processing, and it must be
+    informed consent (data type, purpose, duration, third-party sharing). The per-connection/per-transmission
+    opt-out right in paragraph 2 is unique: even after giving general consent, users must be able to
+    temporarily disable location tracking for individual sessions or connections using a "simple means."
+    This means a prominent on/off toggle, not a buried settings page. Paragraph 3 applies the minimum
+    necessary principle and restricts access to authorized personnel only. This article is critical for
+    mobile apps, location-based services, fleet management, and any service that processes user location.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build location data processing with privacy-by-default (anonymization as the default state).
+      Implement granular consent management specifically for location data, capturing data type, purpose,
+      duration, and third-party sharing details. Build a real-time location opt-out mechanism that allows
+      users to temporarily disable location processing per session/connection with a simple toggle in the
+      UI. Implement location data anonymization services (spatial cloaking, location generalization,
+      differential privacy for location). Build purpose-bound access controls restricting location data
+      to authorized value-added service processing. Implement automated location data purging when the
+      consent-specified duration expires. Build third-party data sharing controls that enforce consent
+      scope for location data transmitted to value-added service partners.
+    tools:
+      - "Location privacy middleware with anonymization (spatial cloaking, generalization)"
+      - "Real-time consent toggle API for per-session location opt-out"
+      - "ABAC policies restricting location data access to authorized VAS processing"
+      - "Location data TTL enforcement with automated purging"
+      - "Third-party data sharing gateway with consent scope enforcement"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must verify that all location data processing paths include consent verification
+      checkpoints. SAST rules must detect raw location data logging, storage without anonymization,
+      and third-party transmission without consent checks. Pipeline gates must verify that new features
+      accessing location data declare purpose and legal basis. Code review must verify that the
+      per-session opt-out mechanism is properly integrated. Automated tests must verify anonymization
+      effectiveness and opt-out functionality.
+    tools:
+      - "SAST rules detecting raw location data exposure and storage"
+      - "Pipeline gates requiring purpose declaration for location data access"
+      - "Anonymization effectiveness verification tests"
+      - "Per-session opt-out functionality regression tests"
+  secops:
+    prose: >-
+      Monitor location data access patterns for unauthorized processing. Alert on location data access
+      outside declared value-added service purposes. Verify anonymization effectiveness through regular
+      re-identification risk assessments. Monitor third-party location data transmissions against consent
+      scope. Track opt-out mechanism usage and verify immediate effectiveness. Audit location data
+      retention compliance against consent-specified durations.
+    tools:
+      - "Location data access monitoring with purpose verification"
+      - "Re-identification risk assessment for anonymized location data"
+      - "Third-party transmission monitoring against consent scope"
+      - "Opt-out effectiveness verification monitoring"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7", "art-9"]
+    relationship: complements

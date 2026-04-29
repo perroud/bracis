@@ -1,0 +1,96 @@
+id: ssf-crypto-2
+family: ssf-crypto
+title: "Cryptographic Key Management"
+class: PCI-SSF
+baselines: [secure-software-standard]
+
+statement:
+  prose: >-
+    The software shall implement or integrate with key management systems that
+    support the full key lifecycle including generation, distribution, storage,
+    rotation, revocation, and destruction. Cryptographic keys shall be generated
+    using approved random number generators with sufficient entropy. Keys shall be
+    stored in protected key stores separate from the data they protect. Key access
+    shall be restricted to the minimum number of custodians required. Dual control
+    and split knowledge shall be enforced for key management operations on
+    production key-encrypting keys. Key rotation shall occur at defined intervals
+    and immediately upon suspected compromise.
+
+guidance:
+  prose: >-
+    The security of encrypted data is only as strong as the management of the keys
+    that protect it. PCI SSF requires that the software either implements or
+    integrates with key management capabilities that cover the entire key lifecycle.
+    Key generation must use cryptographically secure random number generators, and
+    keys must never be stored alongside the data they protect. The standard requires
+    separation of duties for key management, meaning no single individual can
+    perform a key management operation alone for production keys. This reduces the
+    risk of insider threats compromising the key infrastructure.
+
+references:
+  - citation: "PCI SSF v1.2, Control Objective 11 — Key Management"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2, Section 8.3-8.5"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy HashiCorp Vault or equivalent centralized key management with transit
+      secrets engine for encryption-as-a-service. Implement auto-unseal using cloud
+      KMS to avoid manual key ceremony for operational restarts. Configure automatic
+      key rotation policies aligned with PCI SSF requirements. Use separate key
+      hierarchies for different data classifications with the master key stored in
+      an HSM. Enforce dual-authorization for administrative key management operations
+      through approval workflows. Implement comprehensive audit logging for all key
+      management operations.
+    tools:
+      - vault
+      - aws-kms
+      - google-cloud-kms
+      - azure-key-vault
+      - hsm
+      - terraform
+
+  devsecops:
+    prose: >-
+      Use SAST rules to detect hardcoded cryptographic keys, keys stored alongside
+      data, and improper key handling patterns. Implement secret detection scanning
+      to prevent cryptographic keys from being committed to source control. Write
+      integration tests that validate key rotation does not cause data loss or
+      service interruption. Enforce code review for all changes to key management
+      logic. Use dependency scanning to detect libraries with known key management
+      vulnerabilities.
+    tools:
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-dependency-scanning
+      - semgrep
+      - gitleaks
+      - trufflehog
+
+  secops:
+    prose: >-
+      Monitor key management operations for unauthorized access, unusual key
+      creation or rotation patterns, and policy violations. Alert on key access
+      from unauthorized sources or at unusual times. Track key rotation compliance
+      and report on overdue rotations. Conduct periodic key management audits
+      verifying dual control and split knowledge enforcement. Investigate and
+      respond to key compromise indicators with defined incident response procedures.
+    tools:
+      - splunk
+      - elastic-siem
+      - vault-audit
+      - servicenow
+      - pagerduty
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-3.6", "req-3.7"]
+    relationship: derived-from
+  - framework_id: owasp-asvs
+    articles: ["v6.2", "v6.4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

@@ -1,0 +1,94 @@
+id: cls9.2
+family: cls9
+title: "User registration and de-registration for cloud services"
+class: ISO27017
+
+statement:
+  prose: >-
+    A formal user registration and de-registration process shall be
+    implemented to enable assignment of access rights. For cloud services,
+    the cloud service provider shall provide user registration and
+    de-registration capabilities to the cloud service customer. The cloud
+    service customer shall manage user registration and de-registration
+    for access to the cloud service within their organizational boundary.
+    The cloud service provider shall ensure that the de-registration of
+    a cloud service customer account results in the revocation of all
+    access rights associated with that account, including access to
+    data, configurations, and administrative functions.
+
+guidance:
+  prose: >-
+    User lifecycle management in cloud environments must coordinate between
+    the organization's identity provider and the cloud service provider's
+    identity systems. Automated provisioning and de-provisioning through
+    standards such as SCIM (System for Cross-domain Identity Management)
+    should be used where supported. The de-registration process must
+    ensure that all access tokens, API keys, SSH keys, and certificates
+    associated with the user are revoked. Orphaned accounts in cloud
+    services pose a significant security risk and should be detected
+    through regular reconciliation between the authoritative identity
+    source and cloud service user directories.
+
+references:
+  - citation: "ISO/IEC 27017:2015, Section 9.2.1"
+    url: "https://www.iso.org/standard/43757.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated user provisioning and de-provisioning using
+      SCIM or equivalent protocols to synchronize identity lifecycle
+      events between the organization's identity provider and all cloud
+      services. Configure identity federation so that cloud service
+      access is dependent on the user's status in the authoritative
+      identity directory. Implement just-in-time provisioning where
+      possible to create cloud accounts only when needed. Automate
+      the revocation of all cloud service credentials, tokens, and
+      keys when a user is de-registered.
+    tools:
+      - keycloak
+      - azure-entra-id
+      - okta
+      - terraform
+      - vault
+
+  devsecops:
+    prose: >-
+      Implement pipeline checks that verify service accounts and
+      machine identities follow the same lifecycle management
+      processes as human users. Scan for orphaned credentials,
+      unused API keys, and stale service accounts in cloud
+      configurations. Enforce that all cloud service access from
+      CI/CD pipelines uses short-lived tokens generated through
+      workload identity federation rather than static credentials.
+    tools:
+      - gitlab-ci
+      - checkov
+      - gitleaks
+      - trivy
+
+  secops:
+    prose: >-
+      Monitor for orphaned accounts by regularly reconciling cloud
+      service user directories against the authoritative identity
+      source. Alert on login attempts from de-registered users or
+      use of credentials that should have been revoked. Track the
+      time between user de-registration in the identity provider
+      and actual credential revocation across all cloud services.
+      Report on accounts that exceed maximum dormancy thresholds.
+    tools:
+      - splunk
+      - elastic-siem
+      - aws-iam-access-analyzer
+      - crowdstrike
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5.16", "a5.18"]
+    relationship: derived-from
+  - framework_id: csa-ccm-v4
+    articles: ["iam-03", "iam-06"]
+    relationship: complements
+  - framework_id: nist-800-53
+    articles: ["AC-2"]
+    relationship: mapped

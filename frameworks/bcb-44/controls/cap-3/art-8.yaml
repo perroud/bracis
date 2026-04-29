@@ -1,0 +1,106 @@
+id: art-8
+family: cap-3
+title: "Procedimentos de Identificacao e Qualificacao de Clientes"
+class: BCB-44
+baselines: [todas-ips]
+statement:
+  prose: |
+    Art. 8. As instituições de pagamento devem adotar procedimentos que permitam
+    identificar, qualificar e classificar seus clientes, contemplando:
+
+    I - a coleta, a verificação e a validação das informações cadastrais do cliente,
+    de acordo com o perfil de risco e a natureza da relação de negócio;
+
+    II - a identificação do beneficiário final das pessoas jurídicas e dos arranjos
+    legais;
+
+    III - a verificação da condição de pessoa politicamente exposta;
+
+    IV - a atualização periódica das informações cadastrais, em prazo compatível
+    com o perfil de risco do cliente.
+
+    § 1. Os procedimentos de identificação devem ser realizados antes do início
+    da relação de negócio ou da realização de operações.
+
+    § 2. É vedada a manutenção de relação de negócio com cliente que não atenda
+    aos requisitos mínimos de identificação previstos nesta Resolução.
+guidance:
+  prose: |
+    O art. 8 e o eixo central do KYC (Know Your Customer) para IPs.
+    Estabelece quatro obrigacoes cumulativas.
+
+    **Timing critico (ss 1):**
+    ANTES do inicio da relacao de negocio. Para IPs digitais isso significa:
+    antes de ativar a conta, antes de liberar o primeiro pagamento, antes de
+    emitir o cartao. Nao ha excecao de "verificar depois".
+
+    **Vedacao de relacao sem KYC (ss 2):**
+    Se o cliente nao fornecer dados minimos, a IP deve recusar o onboarding.
+    Nao pode ativar conta "parcialmente" e completar KYC depois -- a menos que
+    haja previsao expressa de diligencia simplificada (art. 10).
+
+    **Dados minimos para PF:**
+    CPF, nome completo, data de nascimento, filiacao, endereco, renda/fonte de
+    recursos, PEP (autodeclaracao + verificacao), exposicao politica de familiares.
+
+    **Dados minimos para PJ:**
+    CNPJ, razao social, atividade economica, quadro societario completo, beneficiarios
+    finais (percentual >= 25% ou controle de fato), representantes legais com poderes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Fluxo de onboarding KYC:**
+      1. Formulario digital de onboarding com campos obrigatorios por tipo de cliente
+         (PF, PJ, MEI, entidade estrangeira) com validacao em tempo real.
+      2. OCR de documentos de identidade (RG, CNH, passaporte) com verificacao de
+         autenticidade e liveness detection (selfie + documento).
+      3. Consulta automatizada a fontes externas: CPF/CNPJ Receita Federal,
+         Detran (CNH), CadUnico (se aplicavel), bureaus de credito.
+      4. Motor de identificacao de PEP: consulta a listas oficiais do COAF, TCU,
+         TSE + verificacao de familiares ate 2 grau.
+      5. Modulo de beneficiario final: arvore societaria com calculo automatico
+         de participacao direta e indireta, alerta para estruturas complexas.
+      6. Blocking de onboarding: codigo que impede ativacao de conta com KYC
+         incompleto ou reprovado.
+    tools:
+      - kyc-platform
+      - ocr-engine
+      - biometric-verification
+      - aml-screening
+      - sanctions-screening
+  devsecops:
+    prose: |
+      **Testes do fluxo de KYC:**
+      1. Testes de integracao para cada fonte de dados externa (Receita Federal,
+         Detran, COAF, bureaus).
+      2. Testes de todos os caminhos de onboarding: PF, PJ, MEI, PEP, estrangeiro.
+      3. Testes de bloqueio: garantir que conta nao e ativada com KYC incompleto.
+      4. Testes de edge case: CPF invalido, nome inconsistente, documento vencido.
+      5. Criptografia de dados sensiveis (documentos, biometria) em repouso
+         e em transito -- validacao no pipeline.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - gitlab-secret-detection
+  secops:
+    prose: |
+      **Auditoria do KYC:**
+      1. Amostragem mensal de cadastros recentes para verificar completude e qualidade.
+      2. Relatorio de clientes com KYC vencido (atualizacao cadastral em atraso).
+      3. Monitoramento de taxa de bloqueio no onboarding por motivo (diagnosticar
+         problemas no processo).
+      4. Auditoria de clientes PJ sem beneficiario final identificado.
+      5. Verificacao de que todos os PEP identificados estao com diligencia
+         reforcada ativa.
+    tools:
+      - aml-platform
+      - grc-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-10", "art-11"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

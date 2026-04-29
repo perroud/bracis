@@ -1,0 +1,110 @@
+id: art-24
+family: xborder
+title: "Restriction on Cross-Border Transfer of Personal Data"
+class: APPI
+baselines:
+  - privacy-baseline
+
+statement:
+  prose: |
+    (1) A business operator handling personal information shall not provide personal
+    data to a third party in a foreign country (excluding a foreign country designated
+    by the Rules of the Personal Information Protection Commission as having a personal
+    information protection system recognized to be equivalent to that of Japan)
+    without obtaining the prior consent of the data subject, having informed the data
+    subject of the following matters:
+    (i) The name of the foreign country to which the data is to be transferred
+    (or the fact that the country has not been determined if that is the case);
+    (ii) The personal information protection system of the foreign country concerned
+    (when established by the Rules of the Personal Information Protection Commission);
+    (iii) The measures taken by the third party in the foreign country for the
+    protection of personal information.
+
+    Provided, however, that this does not apply when the third party in the foreign
+    country has established a system that conforms to standards prescribed by the Rules
+    of the Personal Information Protection Commission as necessary for the continuous
+    implementation of measures equivalent to those that a business operator handling
+    personal information must take regarding the handling of personal data in
+    accordance with the provisions of this Act.
+
+    (2) A business operator handling personal information that provides personal data
+    to a third party in a foreign country based on consent pursuant to the preceding
+    paragraph shall take measures prescribed by the Rules of the Personal Information
+    Protection Commission as necessary for ensuring the continuous implementation of
+    measures by such third party equivalent to those provided for under this Act, and
+    shall provide the data subject with information on such measures upon request.
+
+    (3) A business operator handling personal information that provides personal data
+    to a third party pursuant to the proviso of paragraph (1) shall take measures
+    prescribed by the Rules of the Personal Information Protection Commission as
+    necessary for ensuring the continuous implementation of measures equivalent to
+    those provided for under this Act, and shall provide the data subject with
+    information on such measures upon request.
+
+guidance:
+  prose: |
+    Article 24, substantially revised in the 2022 amendment, establishes Japan's
+    cross-border data transfer framework. There are three lawful mechanisms: (1)
+    transfer to a PPC-designated adequate country (currently the EU/EEA and the UK),
+    (2) obtaining consent after providing specific information about the destination
+    country's data protection regime, and (3) transfer to a recipient with an
+    equivalent protection system (e.g., binding corporate rules, contractual
+    safeguards). The 2022 amendment added transparency requirements — before obtaining
+    consent, the business operator must inform the data subject about the destination
+    country's data protection system and the recipient's specific safeguards. This
+    mirrors the GDPR's transfer mechanism structure but with distinct adequacy
+    determinations and information requirements.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement a cross-border transfer governance layer in the data platform.
+      Maintain a registry of PPC-designated adequate countries. Build automated
+      checks at data egress points that verify the destination country and
+      legal basis before allowing cross-border transfers. Implement consent
+      collection workflows that present country-specific data protection
+      information to data subjects. Track and audit all cross-border data
+      flows with destination metadata.
+    tools:
+      - open-policy-agent
+      - terraform
+      - backstage
+      - onetrust
+      - kong
+
+  devsecops:
+    prose: |
+      Enforce cross-border transfer controls in CI/CD pipelines. Validate
+      that infrastructure-as-code configurations for multi-region deployments
+      include data residency annotations. Scan API configurations for
+      endpoints that transfer data to foreign servers without corresponding
+      legal basis declarations. Test that consent flows for cross-border
+      transfers include required country-specific information.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - semgrep
+
+  secops:
+    prose: |
+      Monitor network traffic for personal data transfers to foreign
+      destinations. Alert on transfers to non-adequate countries without
+      documented consent or equivalent protection measures. Audit cross-border
+      transfer records against the registry of lawful mechanisms. Track
+      changes to PPC adequacy designations and assess impact on existing
+      transfer arrangements.
+    tools:
+      - splunk
+      - elastic-siem
+      - prisma-cloud
+      - cloudflare
+      - onetrust
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-44", "art-45", "art-46"]
+    relationship: equivalent-to
+  - framework_id: pipl
+    articles: ["art-38", "art-39"]
+    relationship: mapped

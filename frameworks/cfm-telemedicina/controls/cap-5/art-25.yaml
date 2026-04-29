@@ -1,0 +1,123 @@
+id: art-25
+family: cap-5
+title: "Guarda e Retencao de Dados Clinicos"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 25. Os dados clínicos gerados em atendimentos de
+    telemedicina devem ser guardados e retidos pelos mesmos
+    prazos aplicáveis ao prontuário médico convencional.
+
+    Parágrafo 1. O prazo mínimo de guarda do prontuário médico
+    é de 20 (vinte) anos, contados a partir do último registro
+    de atendimento, conforme Resolução CFM 1.821/2007.
+
+    Parágrafo 2. Dados de menores de idade devem ser guardados
+    até que o paciente complete 18 anos, acrescidos de 20 anos
+    adicionais a partir dessa data.
+
+    Parágrafo 3. Após o prazo de guarda, a eliminação de dados
+    deve seguir procedimento documentado que garanta a destruição
+    irreversível dos dados, com registro auditável do processo.
+
+    Parágrafo 4. A transferência de custódia de dados clínicos,
+    em caso de encerramento de atividades da instituição, deve
+    ser realizada conforme regulamentação do CRM competente.
+guidance:
+  prose: |
+    O art. 25 transpoe as regras de retencao de prontuario
+    fisico para o contexto digital da telemedicina. Os prazos
+    sao longos e impactam diretamente a arquitetura de
+    armazenamento.
+
+    **Prazo de 20 anos (paragrafo 1):**
+    O prazo de retencao de 20 anos conta a partir do ULTIMO
+    registro no prontuario, nao do primeiro. Isso significa que
+    um paciente atendido continuamente por 30 anos tera dados
+    retidos por 50 anos desde o primeiro atendimento.
+
+    **Menores de idade (paragrafo 2):**
+    Para um paciente atendido ao nascimento, os dados devem ser
+    guardados por 18 + 20 = 38 anos. Isso tem implicacao direta
+    no custo de armazenamento e na estrategia de lifecycle.
+
+    **Implicacoes para infraestrutura:**
+    - Storage lifecycle: dados quentes (< 2 anos), mornos
+      (2-10 anos), frios (> 10 anos) com tiering automatico
+    - Custo de armazenamento de longo prazo deve ser considerado
+      no planejamento financeiro da plataforma
+    - Migracao de formato: dados armazenados por 20+ anos devem
+      ser legiveis no futuro (formatos abertos, sem vendor lock-in)
+    - Integridade: verificacao periodica de integridade de dados
+      armazenados por longo prazo (bit rot detection)
+
+    **Eliminacao segura (paragrafo 3):**
+    Apos o prazo de retencao, a eliminacao deve ser:
+    - Irreversivel (crypto shredding ou destruicao fisica)
+    - Documentada com registro auditavel
+    - Aprovada por comissao competente
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de retencao de dados:**
+      1. Implementar politica de lifecycle de dados com tiering
+         automatico: hot storage (< 2 anos), warm storage
+         (2-10 anos), cold storage (> 10 anos).
+      2. Configurar retencao minima de 20 anos com calculo
+         automatico baseado na data do ultimo registro e
+         na data de nascimento do paciente (menores).
+      3. Implementar verificacao periodica de integridade
+         (checksum SHA-256) de dados armazenados por longo
+         prazo, com alerta em caso de corrupcao.
+      4. Utilizar formatos abertos e documentados para
+         armazenamento de longo prazo (HL7 FHIR, PDF/A,
+         DICOM) evitando vendor lock-in.
+      5. Implementar mecanismo de eliminacao segura (crypto
+         shredding) com registro auditavel do processo.
+    tools:
+      - storage-lifecycle
+      - data-integrity
+      - retention-management
+      - crypto-shredding
+  devsecops:
+    prose: |
+      **Pipeline de retencao de dados:**
+      1. Testar calculo automatico de prazo de retencao para
+         diferentes cenarios (adultos, menores, atendimento
+         continuado).
+      2. Verificar que dados dentro do prazo de retencao nao
+         podem ser eliminados (protecao contra exclusao
+         acidental ou maliciosa).
+      3. Testar processo de eliminacao segura, validando que
+         dados sao destruidos de forma irreversivel.
+      4. Validar que verificacao de integridade detecta
+         corrupcao de dados armazenados.
+    tools:
+      - gitlab-ci
+      - retention-testing
+      - data-integrity-testing
+      - deletion-verification
+  secops:
+    prose: |
+      **Operacao de retencao de dados:**
+      1. Monitorar custos de armazenamento por tier e projetar
+         crescimento para planejamento financeiro.
+      2. Executar verificacao de integridade trimestral em
+         amostras de dados armazenados por longo prazo.
+      3. Documentar e aprovar formalmente cada processo de
+         eliminacao de dados apos prazo de retencao.
+      4. Manter plano de continuidade para custodia de dados
+         em caso de encerramento de atividades.
+    tools:
+      - storage-monitoring
+      - integrity-auditing
+      - deletion-management
+      - continuity-planning
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-15", "art-16", "art-18"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.530-j"]
+    relationship: mapped

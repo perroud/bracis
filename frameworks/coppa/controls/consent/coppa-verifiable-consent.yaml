@@ -1,0 +1,117 @@
+id: coppa-verifiable-consent
+family: consent
+title: "Verifiable Parental Consent (VPC)"
+class: COPPA
+
+statement:
+  prose: |
+    An operator must obtain verifiable parental consent before any collection, use, or
+    disclosure of personal information from children (16 CFR § 312.5(a)(1)). Verifiable
+    parental consent means any reasonable effort (taking into consideration available
+    technology), including a request for authorization for future collection, use, and
+    disclosure described in the notice, to ensure that a parent of a child receives notice
+    of the operator's personal information collection, use, and disclosure practices, and
+    authorizes the collection, use, and disclosure, as applicable, of personal information
+    and the subsequent use of that information before that information is collected from
+    that child.
+
+    The method used to obtain verifiable parental consent must be reasonably calculated,
+    in light of available technology, to ensure that the person providing consent is the
+    child's parent.
+
+guidance:
+  prose: |
+    Verifiable Parental Consent (VPC) is the cornerstone of COPPA compliance. It is not
+    sufficient to simply ask a child to confirm their parent agrees — the operator must
+    take affirmative steps to verify the identity of the consenting party. Key principles:
+
+    1. **Affirmative action:** Consent requires an affirmative act by the parent. Pre-checked
+       boxes, implied consent, or passive acceptance are not valid.
+
+    2. **Verification of identity:** The method must be reasonably calculated to ensure the
+       person providing consent is actually the child's parent — not the child themselves
+       or another minor.
+
+    3. **Scope of consent:** Consent must cover the specific collection, use, and disclosure
+       practices described in the direct notice. Blanket consent for unspecified future uses
+       is not valid.
+
+    4. **Prior to collection:** No personal information may be collected from the child
+       (beyond parent contact info for obtaining consent) before consent is obtained.
+
+    5. **Revocability:** Parents must be able to revoke consent at any time (see
+       coppa-parent-revoke).
+
+    6. **Record keeping:** Operators must retain consent records for a reasonable period
+       to demonstrate compliance during FTC investigations.
+
+    The FTC evaluates consent methods based on the "sliding scale" approach — higher-risk
+    uses (e.g., public disclosure of children's PI) require more robust verification methods.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a consent verification service that supports multiple VPC methods
+         (see coppa-consent-methods) and selects the appropriate method based on risk level.
+      2. Build a consent record database that stores: parent identity, verification method
+         used, timestamp, scope of consent, version of notice presented, and consent status.
+      3. Implement a consent gateway that intercepts all data collection requests for child
+         users and blocks collection until valid consent is confirmed.
+      4. Create a consent API that downstream services can query to determine whether
+         specific collection/use/disclosure activities are authorized for a given child.
+      5. Build a consent renewal workflow for material changes to data practices — existing
+         consent does not cover new uses not described in the original notice.
+      6. Implement consent audit trail with tamper-evident logging for compliance
+         investigations.
+    tools:
+      - identity-verification-service
+      - consent-management-platform
+      - api-gateway
+      - audit-log
+      - workflow-engine
+
+  devsecops:
+    prose: |
+      1. Test that the consent gateway blocks ALL data collection pathways for child users
+         without valid consent — including edge cases like API direct access, SDK callbacks,
+         and background sync.
+      2. Validate consent record integrity — test that records are complete, tamper-evident,
+         and cannot be modified after creation.
+      3. Test consent scope enforcement — verify that consent for one purpose does not
+         authorize collection for a different purpose.
+      4. Implement canary tests that simulate child registration flows end-to-end and verify
+         no PI leaks before consent.
+      5. Test that consent renewal triggers correctly when data practices change.
+    tools:
+      - integration-testing
+      - security-testing
+      - gitlab-ci
+      - api-testing
+      - canary-testing
+
+  secops:
+    prose: |
+      1. Monitor consent rates and flag anomalies — sudden spikes may indicate consent
+         bypass, while very high rates may indicate children self-consenting.
+      2. Audit consent records periodically to verify completeness and accuracy.
+      3. Monitor for any data collection from child accounts lacking valid consent records.
+      4. Track consent method effectiveness — monitor failure rates, fraud detection triggers,
+         and parent complaints by method.
+      5. Maintain incident response procedures for consent bypass incidents, including
+         notification to affected parents and the FTC if warranted.
+    tools:
+      - compliance-dashboard
+      - audit-log
+      - anomaly-detection
+      - incident-response
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 8"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 14 §1"]
+    relationship: equivalent-to
+  - framework_id: ferpa
+    articles: ["34 CFR § 99.30"]
+    relationship: complements

@@ -1,0 +1,124 @@
+id: art-12
+family: cap-3
+title: "Processo de Desenvolvimento e Boas Praticas"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 12. O fabricante deve adotar processo de desenvolvimento de
+    software documentado e controlado que inclua:
+
+    I - uso de padrões de codificação definidos e verificáveis para
+    garantir legibilidade, manutibilidade e segurança do código;
+    II - revisão de código por pares para componentes críticos do SaMD,
+    incluindo algoritmos clínicos e funcionalidades de segurança;
+    III - gestão de configuração de software que garanta controle de
+    versão, reproducibilidade de builds e identificação única de
+    cada versão liberada;
+    IV - gestão de dependências de terceiros, incluindo avaliação de
+    riscos de componentes open-source e proprietários;
+    V - documentação de código e arquitetura suficiente para permitir
+    manutenção e auditoria por equipe técnica qualificada;
+    VI - segregação de ambientes de desenvolvimento, teste e produção,
+    com controle de acesso diferenciado.
+
+    Parágrafo único. Para SaMD Classe C (IEC 62304), o fabricante deve
+    adicionalmente realizar design detalhado de software e verificação
+    formal de unidades de software.
+guidance:
+  prose: |
+    O art. 12 detalha boas praticas de engenharia de software aplicadas
+    ao contexto regulatorio de dispositivos medicos.
+
+    **Padroes de codificacao:**
+    Para SaMD, padroes de codificacao devem ir alem de estilo e incluir
+    regras de seguranca (ex: OWASP Secure Coding Practices, CERT Secure
+    Coding Standards) e confiabilidade (ex: MISRA para C/C++).
+
+    **Revisao de codigo por pares:**
+    A IEC 62304 exige revisao de codigo para Classe B e C. Para SaMD:
+    - Algoritmos clinicos: revisao por engenheiro de software + revisor
+      com conhecimento clinico
+    - Funcionalidades de seguranca: revisao por engenheiro de seguranca
+    - Componentes criticos: revisao formal com checklist documentado
+
+    **Gestao de dependencias:**
+    SaMD frequentemente depende de bibliotecas de ML (TensorFlow,
+    PyTorch), frameworks clinicos (HAPI FHIR) e componentes de
+    infraestrutura. Cada dependencia deve ter:
+    - Avaliacao de licenca (compatibilidade regulatoria)
+    - Avaliacao de vulnerabilidades (CVEs conhecidos)
+    - Avaliacao de manutencao (projeto ativo vs. abandonado)
+    - Plano de mitigacao para dependencias criticas
+
+    **Segregacao de ambientes:**
+    Dados clinicos de producao NUNCA devem ser usados em ambientes de
+    desenvolvimento ou teste sem anonimizacao adequada conforme LGPD.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de desenvolvimento controlado:**
+      1. Configurar ambientes segregados (dev, staging, validation,
+         production) com controles de acesso diferenciados e sem
+         compartilhamento de dados clinicos reais em ambientes
+         nao-producao.
+      2. Implementar reproducibilidade de builds: containerizacao de
+         ambientes de build, pinning de dependencias, builds deterministicos
+         com hash verificavel.
+      3. Configurar gestao de configuracao com GitOps: toda configuracao
+         de infraestrutura e aplicacao versionada em Git, com drift
+         detection automatico em producao.
+      4. Implementar IaC (Infrastructure as Code) para todos os
+         ambientes de SaMD, garantindo paridade entre ambientes e
+         reproducibilidade de deployments.
+    tools:
+      - gitops
+      - terraform
+      - kubernetes
+      - container-registry
+  devsecops:
+    prose: |
+      **Pipeline de boas praticas de desenvolvimento:**
+      1. Implementar linting e verificacao de padroes de codificacao
+         como primeiro stage do pipeline, com bloqueio para violacoes
+         de regras de seguranca (OWASP, CERT).
+      2. Configurar code review obrigatorio com reviewers por area de
+         expertise: clinical-algorithm-reviewers, security-reviewers,
+         architecture-reviewers.
+      3. Automatizar SCA (Software Composition Analysis) com bloqueio
+         para dependencias com vulnerabilidades criticas, licencas
+         incompativeis ou projetos sem manutencao ativa.
+      4. Implementar dependency pinning e lock files obrigatorios,
+         com pipeline de atualizacao controlada de dependencias
+         (Dependabot/Renovate com merge request de revisao).
+    tools:
+      - linting
+      - sca
+      - dependency-scanning
+      - renovate
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de processo de desenvolvimento:**
+      1. Manter Software Development Plan (SDP) atualizado com definicao
+         de padroes de codificacao, processo de revisao, gestao de
+         configuracao e segregacao de ambientes.
+      2. Realizar auditoria trimestral de conformidade com processo de
+         desenvolvimento, incluindo verificacao de code reviews
+         realizados, dependencias atualizadas e segregacao de ambientes.
+      3. Manter inventario de dependencias de terceiros (SBOM) com
+         status de avaliacao de risco e plano de atualizacao.
+      4. Documentar excepcoes ao processo de desenvolvimento (ex:
+         hotfixes) com justificativa, aprovacao e plano de regularizacao.
+    tools:
+      - qms-platform
+      - sbom-management
+      - audit-management
+      - exception-tracking
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7-1", "SR-7-6"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164-312-c-2"]
+    relationship: mapped

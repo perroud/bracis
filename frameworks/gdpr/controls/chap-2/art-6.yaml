@@ -1,0 +1,104 @@
+id: art-6
+family: chap-2
+title: "Lawfulness of processing"
+class: GDPR
+statement:
+  prose: >-
+    1. Processing shall be lawful only if and to the extent that at least one of the following applies:
+    (a) the data subject has given consent to the processing of his or her personal data for one or more specific purposes;
+    (b) processing is necessary for the performance of a contract to which the data subject is party or in order to take
+    steps at the request of the data subject prior to entering into a contract;
+    (c) processing is necessary for compliance with a legal obligation to which the controller is subject;
+    (d) processing is necessary in order to protect the vital interests of the data subject or of another natural person;
+    (e) processing is necessary for the performance of a task carried out in the public interest or in the exercise of
+    official authority vested in the controller;
+    (f) processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party,
+    except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject
+    which require protection of personal data, in particular where the data subject is a child.
+  parts:
+    - id: art-6.1.a
+      label: "(1)(a)"
+      prose: >-
+        The data subject has given consent to the processing of his or her personal data for one or more specific purposes.
+    - id: art-6.1.b
+      label: "(1)(b)"
+      prose: >-
+        Processing is necessary for the performance of a contract to which the data subject is party or in order to take
+        steps at the request of the data subject prior to entering into a contract.
+    - id: art-6.1.c
+      label: "(1)(c)"
+      prose: >-
+        Processing is necessary for compliance with a legal obligation to which the controller is subject.
+    - id: art-6.1.d
+      label: "(1)(d)"
+      prose: >-
+        Processing is necessary in order to protect the vital interests of the data subject or of another natural person.
+    - id: art-6.1.e
+      label: "(1)(e)"
+      prose: >-
+        Processing is necessary for the performance of a task carried out in the public interest or in the exercise of
+        official authority vested in the controller.
+    - id: art-6.1.f
+      label: "(1)(f)"
+      prose: >-
+        Processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party,
+        except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject
+        which require protection of personal data, in particular where the data subject is a child.
+guidance:
+  prose: >-
+    Article 6 defines the six legal bases for processing personal data. Every single processing operation must rely on
+    exactly one of these bases, and the chosen basis must be documented BEFORE processing begins. The legal basis cannot
+    be changed retroactively. For most commercial software operations, the relevant bases are: consent (6.1.a), contract
+    performance (6.1.b), legal obligation (6.1.c), and legitimate interest (6.1.f). Consent must meet the strict
+    requirements of Article 7 (freely given, specific, informed, unambiguous). Legitimate interest requires a documented
+    balancing test (Legitimate Interest Assessment - LIA). For platform engineering, contract performance is typically
+    the basis for processing user account data, while consent is required for analytics, marketing, and optional features.
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a Legal Basis Registry as a centralized platform service. Every microservice that processes personal data
+      must declare its legal basis at service registration time. Build a consent management platform (CMP) that provides
+      APIs for: collecting consent (with granular purpose selection), storing consent records (immutable audit trail),
+      checking consent status (real-time query), and withdrawing consent (propagated to all dependent services).
+      For contract-based processing, implement purpose-bound data access that restricts services to only the data
+      necessary for contract fulfillment. For legitimate interest, maintain a machine-readable LIA registry that
+      maps processing activities to their balancing tests.
+    tools:
+      - "Consent Management Platform (OneTrust, Cookiebot, custom CMP)"
+      - "API Gateway with legal-basis-aware request routing"
+      - "Event-driven consent propagation (Kafka/NATS)"
+      - "Immutable consent audit log (append-only database or event store)"
+      - "Open Policy Agent for legal-basis enforcement at service mesh level"
+  devsecops:
+    prose: >-
+      Pipeline checks must verify that every API endpoint processing personal data has a registered legal basis.
+      Implement a CI check that cross-references the data processing registry with the codebase to detect
+      unregistered processing activities. Code review automation should flag new personal data processing
+      that lacks legal basis documentation. Consent collection UIs must be tested for compliance with
+      Article 7 requirements (no pre-ticked boxes, clear language, granular choices). Automated tests
+      must verify consent withdrawal propagation across all services within defined SLAs.
+    tools:
+      - "Custom CI/CD pipeline templates with legal basis verification gates"
+      - "Automated UI testing for consent flows (Cypress, Playwright)"
+      - "API contract testing to verify purpose-bound data access"
+      - "Data processing registry sync validation in deployment pipelines"
+  secops:
+    prose: >-
+      Monitor for processing activities that lack a registered legal basis. Alert when consent is withdrawn
+      but processing continues beyond the grace period. Detect and alert on consent manipulation attempts
+      (forged consent records, unauthorized consent status changes). Monitor consent withdrawal propagation
+      SLAs and alert on violations. Track legal basis distribution across processing activities for
+      compliance reporting. SIEM rules should detect processing of personal data by services not registered
+      in the data processing registry.
+    tools:
+      - "SIEM rules for unauthorized processing detection"
+      - "Consent audit log monitoring and anomaly detection"
+      - "Compliance dashboard with legal basis coverage metrics"
+      - "Automated alerting for consent withdrawal SLA violations"
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: equivalent-to
+  - framework_id: uk-gdpr
+    articles: ["art-6"]
+    relationship: equivalent-to

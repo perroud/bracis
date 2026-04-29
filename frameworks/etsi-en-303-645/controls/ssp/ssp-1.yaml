@@ -1,0 +1,98 @@
+id: ssp-1
+family: ssp
+title: "Securely Store Sensitive Security Parameters"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Sensitive security parameters in device storage shall be stored securely by the
+    device. Hard-coded values of sensitive security parameters in device software source
+    code shall not be used. Where a hard-coded unique per device identity is used in a
+    device for security purposes, the implementation shall prevent it from being tampered
+    with by software through logical means. Mechanisms for confidentiality, authenticity,
+    and integrity of sensitive security parameters that are not unique per device shall
+    use best practice cryptography, appropriate to the properties of the technology and
+    usage.
+
+guidance:
+  prose: >-
+    Sensitive security parameters include cryptographic keys, passwords, tokens, certificates,
+    and any other credentials or secret values used in the device's security operations.
+    Storing these in plaintext, in source code, or in easily accessible locations undermines
+    the entire security architecture. This provision requires the use of secure storage
+    mechanisms such as hardware-backed keystores, secure elements, or trusted execution
+    environments. Hardcoded credentials in source code are categorically prohibited because
+    they can be trivially extracted through reverse engineering of firmware binaries. Where
+    device-unique identities are used, they must be protected against software-based
+    tampering, typically through hardware-backed immutable storage.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.4-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Leverage hardware security capabilities for credential storage: use a Trusted Platform
+      Module (TPM), secure element, ARM TrustZone, or equivalent hardware-backed keystore.
+      Implement a secure key provisioning process during manufacturing that injects unique
+      device keys into the hardware security module. Use encrypted storage partitions for
+      any sensitive data that cannot reside in dedicated hardware. Implement key derivation
+      functions (PBKDF2, Argon2) for password-derived keys. Design the firmware architecture
+      to access sensitive parameters only through a dedicated security abstraction layer,
+      never by direct memory access.
+    tools:
+      - tpm
+      - arm-trustzone
+      - secure-element
+      - vault
+      - hsm
+      - encrypted-storage
+
+  devsecops:
+    prose: >-
+      Implement static analysis rules that detect hardcoded secrets in source code including
+      API keys, passwords, certificates, and private keys. Integrate secret scanning into
+      pre-commit hooks and CI/CD pipelines. Use entropy analysis tools on firmware binaries
+      to identify potential embedded secrets. Verify that the firmware build process does not
+      embed production secrets into the binary — use runtime injection from secure storage
+      instead. Test that sensitive parameters are not exposed through debug interfaces, log
+      files, or error messages.
+    tools:
+      - semgrep
+      - gitlab-secret-detection
+      - trufflehog
+      - gitleaks
+      - binwalk
+      - firmware-analysis-toolkit
+
+  secops:
+    prose: >-
+      Conduct periodic firmware extraction and analysis on production devices to verify
+      that sensitive parameters are not stored in plaintext. Monitor for credential leaks
+      in public repositories and paste sites that may indicate supply chain compromises.
+      Audit the key management lifecycle including provisioning, rotation, and revocation
+      of device credentials. Include hardware security module integrity verification in
+      routine security assessments.
+    tools:
+      - nessus
+      - qualys
+      - binwalk
+      - firmwalker
+      - splunk
+      - elastic-siem
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-1.9", "SR-4.3"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-13", "SC-28"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.5.33"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V6.2.1", "V6.4.1"]
+    relationship: complements

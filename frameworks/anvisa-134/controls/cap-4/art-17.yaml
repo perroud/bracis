@@ -1,0 +1,115 @@
+id: art-17
+family: cap-4
+title: "Controle de Acesso e Autenticacao"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 17. O fabricante deve implementar controles de acesso físico e
+    lógico que garantam que somente pessoas autorizadas possam acessar
+    sistemas computadorizados GMP e que cada usuário seja identificado
+    de forma única e inequívoca.
+
+    Parágrafo 1. O sistema de controle de acesso deve incluir:
+    I - identificação única e individual de cada usuário;
+    II - autenticação por meio de senha ou mecanismo equivalente;
+    III - bloqueio automático após tentativas de acesso malsucedidas;
+    IV - expiração periódica de senhas ou rotação de credenciais;
+    V - desconexão automática por inatividade;
+    VI - proibição de compartilhamento de credenciais de acesso.
+
+    Parágrafo 2. Senhas devem atender requisitos mínimos de complexidade
+    e não devem ser armazenadas em texto claro nos sistemas.
+guidance:
+  prose: |
+    O art. 17 estabelece requisitos fundamentais de controle de acesso para
+    sistemas computadorizados GMP, alinhados com 21 CFR Part 11 e EU GMP
+    Annex 11.
+
+    **Requisitos de identificacao unica:**
+    - Cada usuario deve ter credencial individual e intransferivel
+    - Contas genericas (admin, operator, etc.) nao sao aceitas para
+      atividades GMP que requeiram atribuibilidade
+    - Contas de servico devem ser documentadas e justificadas
+
+    **Requisitos de autenticacao:**
+    - Senha com minimo de 8 caracteres, incluindo maiusculas, minusculas,
+      numeros e caracteres especiais
+    - Autenticacao multifator (MFA) recomendada para sistemas criticos
+    - Bloqueio apos 3-5 tentativas malsucedidas consecutivas
+    - Expirada de senha a cada 60-90 dias
+    - Historico de senhas (minimo 12 ultimas)
+    - Timeout por inatividade: 5-15 minutos para sistemas criticos
+
+    **Controle de acesso fisico:**
+    - Salas de servidores com acesso restrito e monitorado
+    - Terminais de producao em areas controladas
+    - Registro de acesso fisico a infraestrutura critica
+
+    **Proibicoes explicitas:**
+    - Compartilhamento de senhas ou credenciais
+    - Uso de contas genericas para atividades rastreaiveis
+    - Armazenamento de senhas em texto claro
+    - Exposicao de credenciais em logs ou trilhas de auditoria
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de autenticacao e acesso:**
+      1. Implementar provedor de identidade centralizado (IdP) com
+         suporte a MFA, SSO e federacao para todos os sistemas GMP.
+      2. Configurar politicas de senha como codigo: complexidade minima,
+         expiracao, historico, bloqueio por tentativas.
+      3. Implementar timeout de sessao por inatividade configuravel por
+         nivel de criticidade do sistema (5 min para criticos, 15 min
+         para demais).
+      4. Configurar armazenamento seguro de credenciais usando vault
+         com criptografia at-rest e rotacao automatica.
+      5. Implementar controle de acesso fisico a infraestrutura com
+         logging centralizado.
+    tools:
+      - vault
+      - keycloak
+      - ldap-ad
+      - mfa-provider
+      - session-management
+  devsecops:
+    prose: |
+      **Seguranca de acesso no pipeline:**
+      1. Implementar secret scanning no pipeline para detectar credenciais
+         expostas em codigo, configuracoes ou logs.
+      2. Configurar rotacao automatica de credenciais de servico usadas
+         em pipelines de deploy de sistemas GMP.
+      3. Verificar automaticamente que sistemas GMP implementam politicas
+         de senha e MFA conforme requisitos da IN 134.
+      4. Auditar periodicamente contas de servico e seus niveis de
+         acesso via pipeline de compliance.
+    tools:
+      - gitlab-ci
+      - secret-detection
+      - vault
+      - credential-rotation
+  secops:
+    prose: |
+      **Programa de gestao de acesso:**
+      1. Implementar processo formal de concessao, revisao e revogacao
+         de acessos a sistemas GMP com aprovacao do responsavel.
+      2. Conduzir revisao periodica de acessos (minimo trimestral para
+         sistemas criticos) e revogar acessos desnecessarios.
+      3. Manter registro auditavel de todas as concessoes e revogacoes
+         de acesso com justificativa.
+      4. Monitorar tentativas de acesso malsucedidas e investigar
+         padroes anomalos.
+      5. Capacitar usuarios em politicas de acesso e responsabilidades
+         sobre credenciais individuais.
+    tools:
+      - identity-management
+      - access-review
+      - siem
+      - training-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-5-15", "controle-A-8-5"]
+    relationship: mapped
+  - framework_id: hipaa
+    articles: ["164.312-a-1", "164.312-d"]
+    relationship: mapped

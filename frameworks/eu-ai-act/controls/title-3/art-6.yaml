@@ -1,0 +1,130 @@
+id: art-6
+family: title-3
+title: "Classification Rules for High-Risk AI Systems"
+class: EU-AI-Act
+
+statement:
+  prose: >-
+    An AI system shall be considered high-risk where it is a product, or a safety
+    component of a product, covered by Union harmonisation legislation listed in
+    Annex I and is required to undergo a third-party conformity assessment; or where
+    the AI system falls within one of the areas listed in Annex III. The Commission
+    shall provide guidelines specifying the practical implementation of this Article.
+  parts:
+    - id: art-6.1
+      label: "1."
+      prose: >-
+        An AI system that is itself a product covered by the Union harmonisation
+        legislation listed in Annex I, or that is a safety component of such a product,
+        shall be considered high-risk if it is required to undergo a third-party
+        conformity assessment with a view to the placing on the market or the putting
+        into service of that product pursuant to that legislation.
+    - id: art-6.2
+      label: "2."
+      prose: >-
+        In addition to the high-risk AI systems referred to in paragraph 1, AI systems
+        referred to in Annex III shall be considered high-risk. An AI system referred
+        to in Annex III shall not be considered high-risk where it does not pose a
+        significant risk of harm to the health, safety, or fundamental rights of natural
+        persons, including by not materially influencing the outcome of decision-making.
+    - id: art-6.3
+      label: "3."
+      prose: >-
+        A provider of an AI system referred to in Annex III who considers that the AI
+        system is not high-risk shall document its assessment before placing it on the
+        market or putting it into service. Such provider shall be subject to the
+        registration obligation laid down in Article 49(2). Upon request of national
+        competent authorities, the provider shall provide the documentation of the
+        assessment.
+
+guidance:
+  prose: >-
+    Article 6 is the gateway provision that determines which AI systems face the full
+    compliance burden of Title III (Articles 8-27). Classification as high-risk
+    triggers mandatory risk management, data governance, technical documentation,
+    logging, transparency, human oversight, accuracy, and robustness requirements.
+    Annex III covers eight areas: biometric identification; management of critical
+    infrastructure; education and vocational training; employment and workers
+    management; access to essential private and public services; law enforcement;
+    migration, asylum, and border control; and administration of justice. The
+    Article 6(3) exception requires documented justification that the system does
+    not pose a significant risk to health, safety, or fundamental rights, and must
+    not materially influence decision-making outcomes. Providers claiming this
+    exception must still register the system and retain evidence of their assessment.
+
+references:
+  - citation: "EU AI Act (Regulation (EU) 2024/1689), Article 6"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "EU AI Act, Annex I — Union Harmonisation Legislation"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - citation: "EU AI Act, Annex III — High-Risk AI Systems"
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a classification engine within the internal developer portal that
+      evaluates each AI system against Annex I and Annex III criteria and
+      automatically assigns risk categories. Implement a structured intake form
+      for AI system registration that captures purpose, target domain, decision
+      impact level, and affected population characteristics to feed the
+      classification engine. Tag all AI system entries in the service catalogue
+      with their risk classification and link them to the applicable compliance
+      requirements. Enforce infrastructure policies that route high-risk AI
+      workloads to dedicated, compliance-hardened environments with enhanced
+      logging, monitoring, and access controls. Provide self-service templates
+      for the Article 6(3) non-high-risk assessment documentation, with
+      mandatory review gates before publication.
+    tools:
+      - backstage
+      - open-policy-agent
+      - terraform
+      - mlflow
+      - kubeflow
+
+  devsecops:
+    prose: >-
+      Require AI risk classification metadata in every repository containing AI
+      model code or inference services via enforced repository metadata files.
+      Implement pipeline logic that applies the appropriate compliance gate
+      profile based on the declared risk classification — high-risk systems must
+      pass all Title III compliance checks before deployment. Block deployment
+      of AI systems without a completed classification assessment artifact in the
+      repository. Automate the generation of classification documentation from
+      structured metadata, reducing manual documentation burden while ensuring
+      completeness. Validate Article 6(3) exception claims through peer review
+      approval requirements and automated checks against Annex III criteria.
+    tools:
+      - gitlab-ci
+      - gitlab-compliance-framework
+      - conftest
+      - checkov
+      - gitlab-approval-rules
+
+  secops:
+    prose: >-
+      Maintain a real-time inventory of all deployed AI systems with their risk
+      classifications, accessible through the GRC platform. Monitor for
+      classification drift where AI systems originally assessed as non-high-risk
+      evolve in scope or application to potentially meet Annex III criteria.
+      Generate periodic compliance reports mapping deployed AI systems to their
+      risk classifications and identifying gaps in conformity assessment coverage.
+      Alert when new AI systems are detected in production without corresponding
+      classification records. Conduct quarterly reviews of Article 6(3) exception
+      assessments to verify continued validity as systems evolve.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - servicenow
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-35"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["a5.8", "a8.1"]
+    relationship: supports
+  - framework_id: nist-csf-v2
+    articles: ["GV.RM-01", "GV.RM-02", "ID.RA-01"]
+    relationship: supports

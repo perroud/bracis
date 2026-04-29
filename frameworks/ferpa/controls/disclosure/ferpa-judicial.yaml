@@ -1,0 +1,108 @@
+id: ferpa-judicial
+family: disclosure
+title: "Judicial Order or Subpoena Exception"
+class: FERPA
+
+statement:
+  prose: >-
+    An educational agency or institution may disclose personally identifiable
+    information from education records without consent in compliance with a
+    judicial order or lawfully issued subpoena, provided that the institution
+    makes a reasonable effort to notify the parent or eligible student of the
+    order or subpoena in advance of compliance, so that the parent or student
+    may seek protective action.
+  parts:
+    - id: ferpa-judicial-1
+      label: "34 CFR § 99.31(a)(9)(i)"
+      prose: >-
+        An educational agency or institution may disclose PII from education records
+        without consent to comply with a judicial order or lawfully issued subpoena.
+    - id: ferpa-judicial-2
+      label: "34 CFR § 99.31(a)(9)(ii)"
+      prose: >-
+        The educational agency or institution may disclose information under this
+        section only if the agency or institution makes a reasonable effort to notify
+        the parent or eligible student of the order or subpoena in advance of
+        compliance, so that the parent or eligible student may seek protective action,
+        unless the disclosure is in compliance with a Federal grand jury subpoena or
+        any other subpoena issued for a law enforcement purpose where the court or
+        issuing agency has ordered that the existence or the contents of the subpoena
+        or the information furnished in response to the subpoena not be disclosed.
+    - id: ferpa-judicial-3
+      label: "34 CFR § 99.31(a)(9)(iii)"
+      prose: >-
+        If the educational agency or institution initiates legal action against a
+        parent or student, the agency or institution may disclose to the court,
+        without a court order or subpoena, the education records of the student
+        that are relevant for the agency or institution to proceed with the legal
+        action as plaintiff.
+
+guidance:
+  prose: >-
+    The judicial order/subpoena exception requires a balancing of legal obligations.
+    Institutions must comply with lawful judicial orders and subpoenas but must also
+    protect student privacy by providing advance notice so students/parents can seek
+    protective orders. The advance notice requirement has two exceptions: (1) Federal
+    grand jury subpoenas where secrecy is required, and (2) law enforcement subpoenas
+    where a court or agency has ordered non-disclosure. Institutions should have legal
+    counsel review subpoenas before compliance to verify legitimacy and scope.
+    Institutions should produce only the specific records identified in the subpoena
+    — not broader records. The institution should also include an entry in the
+    student's disclosure record documenting the subpoena and the records disclosed.
+
+references:
+  - citation: "34 CFR § 99.31(a)(9) - Judicial order or subpoena"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-D/section-99.31"
+  - citation: "FPCO Guidance on Subpoenas"
+    url: "https://studentprivacy.ed.gov/faq/under-what-circumstances-can-school-release-student-information-responding-subpoena"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a legal hold and subpoena response workflow integrated with the
+      records management system. Build capabilities to identify, collect, and
+      package specific records responsive to a subpoena while excluding non-
+      responsive records. Implement automated parent/student notification
+      workflows that trigger when a subpoena is received (with the ability to
+      suppress notification when legally required). Build legal hold mechanisms
+      that prevent destruction or modification of records subject to subpoena.
+      Maintain an encrypted subpoena tracking log that records: subpoena received
+      date, scope, notification status, records produced, and production date.
+    tools:
+      - postgresql
+      - vault
+      - elasticsearch
+      - keycloak
+
+  devsecops:
+    prose: >-
+      Test subpoena response workflows including the notification and suppression
+      paths. Verify that legal hold mechanisms prevent record modification and
+      deletion. Test that record production packages include only subpoena-
+      responsive records. Validate encryption and access controls on subpoena
+      tracking logs. Ensure audit trails capture all subpoena-related actions.
+    tools:
+      - gitlab-ci
+      - checkov
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor legal hold status and alert on attempted modifications to held
+      records. Track subpoena response timelines and alert on approaching
+      deadlines. Audit notification delivery for non-suppressed subpoenas.
+      Monitor access to subpoena-related records and logs. Generate compliance
+      reports on subpoena response activities. Alert on any destruction of
+      records that are subject to an active legal hold.
+    tools:
+      - splunk
+      - elastic-siem
+      - pagerduty
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-11", "SI-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.31", "A5.33", "A5.34"]
+    relationship: supports

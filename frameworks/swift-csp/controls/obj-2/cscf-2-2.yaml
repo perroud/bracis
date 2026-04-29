@@ -1,0 +1,114 @@
+id: cscf-2.2
+family: obj-2
+title: "Security Updates"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Minimize the occurrence of known technical vulnerabilities within the
+    SWIFT secure zone by ensuring all software, operating systems, and
+    firmware are kept up to date with vendor-supplied security patches.
+    A structured patch management process must prioritize and apply
+    critical and high-severity patches within defined timeframes.
+  parts:
+    - id: cscf-2.2.a
+      label: "2.2.a"
+      prose: >-
+        A documented patch management policy defines timelines for applying
+        security patches: critical patches within 1 month, high patches
+        within 2 months, and medium/low within a risk-based timeframe.
+    - id: cscf-2.2.b
+      label: "2.2.b"
+      prose: >-
+        SWIFT-supplied software updates and security patches are applied
+        within the timeframes specified by SWIFT.
+    - id: cscf-2.2.c
+      label: "2.2.c"
+      prose: >-
+        Operating systems, databases, middleware, and third-party software
+        on systems within the secure zone are maintained within vendor-supported
+        versions with current security patches.
+
+guidance:
+  prose: >-
+    Unpatched systems remain one of the most exploited attack vectors in
+    financial institution breaches. The SWIFT secure zone must have a
+    dedicated patch management process that is faster and more rigorous
+    than general IT patching. SWIFT publishes mandatory software updates
+    that must be applied within their stated deadlines. Organizations
+    should maintain a test environment that mirrors the secure zone
+    configuration to validate patches before production deployment.
+    End-of-life software that no longer receives security updates must be
+    replaced or mitigated with compensating controls (virtual patching,
+    enhanced monitoring, network isolation).
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.2"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-40 Rev. 4 — Guide to Enterprise Patch Management Planning"
+    url: "https://doi.org/10.6028/NIST.SP.800-40r4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated patch management using tools like WSUS, SCCM,
+      Ansible, or cloud-native patch managers (AWS Systems Manager Patch
+      Manager, Azure Update Manager). Maintain golden images for secure
+      zone systems that are rebuilt monthly with latest patches. Use
+      immutable infrastructure patterns where possible — redeploy from
+      patched images rather than patching in place. Automate SWIFT software
+      update deployment through controlled release pipelines with staging
+      environment validation.
+    tools:
+      - ansible
+      - aws-systems-manager
+      - azure-update-manager
+      - wsus
+      - sccm
+      - packer
+      - terraform
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning into CI/CD pipelines for container
+      images and VM templates. Block deployment of images with known
+      critical CVEs. Automate compliance reporting showing patch levels
+      across all secure zone systems. Use Software Bill of Materials
+      (SBOM) to track third-party component versions and correlate with
+      vulnerability databases.
+    tools:
+      - trivy
+      - grype
+      - syft
+      - dependabot
+      - renovate
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor patch compliance across all secure zone systems via vulnerability
+      management platforms. Generate weekly reports on outstanding patches
+      with severity and age. Alert when critical patches exceed SLA
+      timelines. Track SWIFT-published advisories and correlate with
+      deployed software versions. Maintain exception documentation for
+      any deferred patches with compensating controls.
+    tools:
+      - qualys
+      - tenable-nessus
+      - rapid7-insightvm
+      - crowdstrike-spotlight
+      - splunk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SI-2(2)", "CM-3"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.8", "A8.19"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-6.3"]
+    relationship: complements

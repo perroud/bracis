@@ -1,0 +1,127 @@
+id: art-32
+family: titulo-3
+title: "Transferencias Internacionais"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 32. As instituições mencionadas no art. 1 devem adotar procedimentos
+    específicos de prevenção à lavagem de dinheiro e ao financiamento do terrorismo
+    aplicáveis a transferências internacionais de recursos.
+
+    Parágrafo único. Os procedimentos de que trata o caput devem incluir, no mínimo:
+    I - a identificação e a verificação das informações do ordenante e do beneficiário
+    da transferência;
+    II - a adoção de medidas reforçadas quando as informações do ordenante ou do
+    beneficiário estiverem incompletas ou forem inconsistentes; e
+    III - o monitoramento específico das transferências internacionais, incluindo a
+    verificação das listas de sanções aplicáveis.
+guidance:
+  prose: |
+    O art. 32 trata de transferencias internacionais, que sao operacoes de alto
+    risco para PLD/FT devido ao carater transfronteirico.
+
+    **Riscos de PLD/FT em transferencias internacionais:**
+    - Dificuldade de rastreamento de recursos apos transferencia
+    - Diferenca de controles entre jurisdicoes
+    - Uso de jurisdicoes com controles fracos (correspondent banking)
+    - Transferencias para/de paises de alto risco (GAFI grey/black list)
+    - Uso de intermediarios para obscurecer origem/destino
+
+    **Travel Rule:**
+    As obrigacoes do art. 32 estao alinhadas com a "Travel Rule" do GAFI
+    (Recomendacao 16), que exige que informacoes do ordenante e beneficiario
+    acompanhem a transferencia.
+
+    **Medidas reforcadas (inciso II):**
+    Quando informacoes estao incompletas ou inconsistentes:
+    - Solicitar informacoes complementares ao correspondente
+    - Reter a transferencia ate completar dados
+    - Recusar a transferencia se dados nao forem obtidos
+    - Reportar ao COAF se houver suspeita
+
+    **Screening de sancoes (inciso III):**
+    Toda transferencia internacional deve ser verificada contra:
+    - Lista OFAC (SDN List e lista consolidada)
+    - Resolucoes do CSNU
+    - Listas da Uniao Europeia
+    - Lista consolidada do BCB
+    - Listas locais aplicaveis
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Pipeline de transferencias internacionais:**
+      1. Screening automatico de todas as transferencias internacionais
+         contra listas de sancoes ANTES da execucao (pre-screening).
+      2. Verificacao automatica de completude de dados do ordenante e
+         beneficiario (travel rule compliance).
+      3. Bloqueio automatico quando dados estao incompletos ou inconsistentes.
+      4. Fila de revisao para transferencias com dados incompletos.
+
+      **Monitoramento especifico:**
+      5. Regras de monitoramento dedicadas para transferencias internacionais:
+         - Paises de alto risco (GAFI grey/black list)
+         - Transferencias sem justificativa economica
+         - Volume incompativel com perfil do cliente
+         - Transferencias para/de jurisdicoes nao habituais
+         - Correspondentes com deficiencias de AML
+      6. Dashboard de transferencias internacionais com heatmap por jurisdicao.
+      7. Score de risco por jurisdicao com atualizacao automatica.
+      8. Integracao com SWIFT para captura de dados completos.
+
+      **Screening de sancoes:**
+      9. Motor de screening com matching fuzzy (nome, aliases, enderecos).
+      10. Atualizacao automatica de listas de sancoes (diaria ou mais frequente).
+      11. Cache local de listas para performance e disponibilidade.
+      12. Workflow de tratamento de matches (true positive, false positive).
+    tools:
+      - sanctions-screening
+      - transaction-monitoring
+      - aml-platform
+      - swift-integration
+  devsecops:
+    prose: |
+      **Testes de screening:**
+      1. Testes de matching com variacoes de nome (transliteracao, abreviacoes).
+      2. Testes de performance de screening (latencia < 2 segundos).
+      3. Testes de atualizacao de listas (delay maximo aceitavel).
+      4. Testes de bloqueio de transferencias com dados incompletos.
+
+      **Compliance com travel rule:**
+      5. Testes de validacao de campos obrigatorios (ordenante, beneficiario).
+      6. Testes de tratamento de transferencias com dados faltantes.
+      7. Testes de integracao com SWIFT e sistemas de cambio.
+      8. Testes de reconciliacao entre ordens e execucoes.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - performance-testing
+      - sanctions-screening
+  secops:
+    prose: |
+      **Gestao de transferencias internacionais:**
+      1. Relatorio diario de transferencias internacionais com alertas.
+      2. Analise de concentracao por jurisdicao.
+      3. Monitoramento de novas jurisdicoes (primeira transferencia para
+         determinado pais).
+      4. Revisao de matches de sancoes (confirmacao de true/false positive).
+
+      **Atualizacao de controles:**
+      5. Monitoramento de mudancas nas listas GAFI (grey/black list).
+      6. Atualizacao imediata de restricoes quando jurisdicao muda de status.
+      7. Comunicacao proativa ao COAF para transferencias de alto risco.
+      8. Treinamento de equipe de cambio sobre obrigacoes de PLD/FT.
+    tools:
+      - aml-platform
+      - sanctions-screening
+      - reporting-dashboard
+      - training-platform
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-3", "AC-4", "SI-4"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.14", "A.8.15"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-34"]
+    relationship: complements

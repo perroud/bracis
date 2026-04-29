@@ -1,0 +1,98 @@
+id: slsa-source-verified-history
+family: source
+title: "Source: Verified History"
+class: SLSA
+
+baselines: [build-l2, build-l3]
+
+statement:
+  prose: >-
+    The source revision history must be verified and authenticated. Every change to the
+    source must have an authenticated identity associated with it, establishing who made
+    each change and when. The version control platform must maintain an tamper-evident
+    history that records the chain of revisions leading to the current state. This
+    enables auditing the provenance of every line of code and detecting unauthorized
+    modifications to the source history.
+
+guidance:
+  prose: >-
+    Verified history goes beyond simply using version control — it requires that each
+    change is attributable to a verified identity. This is achieved through commit
+    signing (GPG, SSH, or Sigstore gitsign), authenticated pushes via SSH or HTTPS
+    with strong authentication, and platform-level audit logs that record all repository
+    operations. The combination of signed commits and server-side audit trails creates
+    a dual-evidence system where both the committer's identity and the platform's
+    observation of the change are recorded. This makes it significantly harder for an
+    attacker to inject code without leaving detectable traces.
+
+references:
+  - citation: "SLSA v1.0 — Source Requirements"
+    url: "https://slsa.dev/spec/v1.0/requirements#source-requirements"
+  - citation: "Sigstore gitsign"
+    url: "https://github.com/sigstore/gitsign"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce commit signing for all contributors using GPG, SSH, or Sigstore gitsign.
+      Configure the Git hosting platform to display signature verification status on
+      all commits. Require signed commits via branch protection rules — reject unsigned
+      commits to protected branches. Implement SSO-integrated authentication for Git
+      platform access to ensure all pushes are tied to verified organizational identities.
+      Deploy gitsign for keyless commit signing using OIDC identities, reducing key
+      management overhead. Enable and retain repository audit logs that record all push,
+      merge, and administrative operations.
+    tools:
+      - gitsign
+      - sigstore
+      - github
+      - gitlab
+      - gpg
+      - ssh-signing
+      - okta
+      - azure-ad
+
+  devsecops:
+    prose: >-
+      Add commit signature verification to CI/CD pipelines — reject builds from unsigned
+      or unverified commits. Implement branch protection rules that require signed commits
+      and verified merges. Configure pre-push hooks that verify the developer's signing key
+      is properly configured before allowing pushes. Include commit signature status in
+      provenance attestations so consumers can verify the source authenticity chain. Add
+      pipeline checks that verify the merge commit was created by the platform (not force-
+      pushed) to ensure the code review process was followed.
+    tools:
+      - gitsign
+      - github-actions
+      - gitlab-ci
+      - pre-commit
+      - cosign
+      - slsa-verifier
+
+  secops:
+    prose: >-
+      Monitor for unsigned commits that appear on protected branches as potential
+      indicators of compromise. Alert on repository audit log events showing force pushes,
+      branch protection changes, or administrative overrides. Implement SIEM correlation
+      rules that detect patterns of unauthorized repository access. Periodically audit
+      commit signing key ownership and revoke keys belonging to departed contributors.
+      Generate compliance reports showing the percentage of signed commits across all
+      repositories.
+    tools:
+      - splunk
+      - elastic-siem
+      - github-audit-log
+      - gitlab-audit-events
+      - grafana
+      - gitsign
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "CM-5", "AU-10", "SR-4"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PO.1.1", "PS.1.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["16.1", "16.3", "16.6"]
+    relationship: supports

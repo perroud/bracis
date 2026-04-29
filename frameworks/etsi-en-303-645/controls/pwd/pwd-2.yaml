@@ -1,0 +1,85 @@
+id: pwd-2
+family: pwd
+title: "No Easily Guessable Credential Mechanisms"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Where a user can authenticate against a device, the device shall provide to the user
+    or administrator a simple mechanism to change the authentication value used. The
+    authentication mechanisms used shall follow best practice guidelines appropriate to
+    the use case and not use easily guessable patterns.
+
+guidance:
+  prose: >-
+    This provision extends the no-default-password requirement by mandating that devices
+    provide accessible mechanisms for users to modify credentials, and that authentication
+    schemes avoid predictable patterns. Examples of easily guessable patterns include
+    passwords derived from the device serial number, MAC address, or any other public or
+    semi-public device identifier. The change mechanism must be straightforward enough
+    for non-technical consumers, while the resulting credential must resist common attack
+    vectors including dictionary attacks, credential stuffing, and pattern-based guessing.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.1-2"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a password change workflow in the device's management interface (web UI,
+      mobile app, or local API) that is accessible within three steps of the main settings
+      screen. Enforce minimum password complexity rules: at least 8 characters, mixed case,
+      and not matching known weak password lists. Ensure the password generation mechanism
+      does not derive credentials from public device identifiers such as MAC address, serial
+      number, or SSID. Implement rate limiting on authentication endpoints to prevent
+      brute-force attacks. Provide account lockout or exponential backoff after repeated
+      failed authentication attempts.
+    tools:
+      - firmware-sdk
+      - embedded-web-server
+      - mobile-companion-app
+      - rate-limiter
+
+  devsecops:
+    prose: >-
+      Add automated tests that verify the password change flow is functional and enforces
+      complexity requirements. Implement static analysis checks that flag any code deriving
+      credentials from device identifiers. Test the authentication endpoint for brute-force
+      resistance by simulating rapid login attempts in the CI/CD pipeline. Include negative
+      test cases that attempt commonly guessed passwords and verify they are rejected. Scan
+      firmware builds for hardcoded credential derivation patterns.
+    tools:
+      - semgrep
+      - burp-suite
+      - zap
+      - pytest
+      - firmware-analysis-toolkit
+
+  secops:
+    prose: >-
+      Monitor authentication logs for patterns indicating credential-guessing attacks against
+      the device fleet. Alert on multiple failed authentication attempts from the same source.
+      Track the percentage of deployed devices where users have changed the factory credential
+      and follow up on those that have not. Include credential strength auditing in periodic
+      security assessments of deployed products.
+    tools:
+      - splunk
+      - elastic-siem
+      - grafana
+      - nessus
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-1.1", "SR-1.5"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-5", "IA-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.17", "A.8.5"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V2.1.1", "V2.1.9"]
+    relationship: complements

@@ -1,0 +1,99 @@
+id: med2-7
+family: notificacao
+title: "Infraction Notification via DICT"
+class: PIX-MED2
+baselines: [participantes-pix]
+statement:
+  prose: |
+    O PSP pagador, ao identificar fundada suspeita de fraude em transação Pix, deve registrar
+    notificação de infração no DICT no prazo máximo estabelecido pelo BCB, contado a partir
+    do momento em que a suspeita é confirmada. A notificação de infração deve conter, no mínimo:
+    a identificação da transação original (end-to-end ID); o valor da transação; a chave Pix
+    utilizada; a identificação do usuário pagador (sem exposição de dados sensíveis além do
+    necessário); o tipo de fraude suspeitada; e a descrição dos elementos que fundamentam a
+    suspeita. A notificação deve ser transmitida eletronicamente via DICT, garantindo integridade,
+    autenticidade e não repúdio da comunicação.
+guidance:
+  prose: |
+    **Infraction Notification Process:**
+    The infraction notification is the formal trigger for the entire MED 2.0 process.
+    Its quality and timeliness directly impact the success of fund recovery.
+
+    **Required fields:**
+    1. **End-to-end ID:** Unique transaction identifier for traceability.
+    2. **Transaction value:** The original Pix amount.
+    3. **Pix key:** The destination key used in the fraudulent transaction.
+    4. **Payer identification:** Minimal necessary identification (account, PSP).
+    5. **Fraud type:** Classification of the suspected fraud (social engineering,
+       account takeover, fake QR code, etc.).
+    6. **Supporting evidence summary:** Description of the elements that support
+       the well-founded suspicion.
+
+    **Security requirements:**
+    - Digital signature on the notification for authentication and non-repudiation.
+    - Encryption in transit via RSFN/DICT secure channels.
+    - Audit trail of all notifications sent and received.
+
+    **Timing:** The sooner the notification is filed, the higher the probability of
+    blocking funds before they leave the receiver's account or are cascaded.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Build a notification assembly service that collects all required fields from
+         the user complaint, anti-fraud engine, and transaction records, then packages
+         them into the DICT notification format.
+      2. Implement digital signature of notifications using ICP-Brasil certificates
+         to ensure authenticity and non-repudiation.
+      3. Build a notification dispatch queue with retry logic for DICT API failures —
+         notifications must not be lost due to transient errors.
+      4. Implement a notification tracking database that records: notification ID,
+         submission time, DICT acknowledgment time, current status, and all subsequent
+         events (blocking confirmations, analysis results).
+      5. Build real-time notification status monitoring to detect delays and trigger
+         escalations.
+    tools:
+      - dict-api-client
+      - digital-signature
+      - message-queue
+      - audit-logging
+      - monitoring-platform
+  devsecops:
+    prose: |
+      1. Validate notification payload against DICT API schema — every required field
+         must be present and correctly formatted.
+      2. Test digital signature verification: valid signatures are accepted, tampered
+         notifications are rejected.
+      3. Test retry logic: simulate DICT API failures (timeout, 5xx, network errors)
+         and verify notifications are retried and eventually delivered.
+      4. Test notification tracking: verify that all status transitions are recorded
+         with correct timestamps.
+      5. Test edge cases: notification for a transaction that has already been reversed,
+         duplicate notifications for the same transaction.
+    tools:
+      - gitlab-ci
+      - contract-testing
+      - integration-testing
+      - fault-injection
+  secops:
+    prose: |
+      1. Monitor notification submission latency: time between fraud confirmation and
+         DICT notification submission.
+      2. Track notification success rate: percentage of notifications acknowledged by
+         DICT without errors.
+      3. Alert on notification failures: any notification that fails after all retries
+         requires immediate manual intervention.
+      4. Audit notification content quality: periodic review to ensure supporting
+         evidence is adequate and fraud classification is accurate.
+      5. Maintain notification volume metrics for BCB reporting.
+    tools:
+      - monitoring-platform
+      - alerting-system
+      - quality-assurance
+      - reporting-platform
+legal_references:
+  - framework_id: pix-security
+    articles: ["pix-19", "pix-20"]
+    relationship: extends
+  - framework_id: bcb-44
+    articles: ["art-21"]
+    relationship: implements

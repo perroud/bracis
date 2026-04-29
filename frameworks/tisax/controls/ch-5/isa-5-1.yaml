@@ -1,0 +1,137 @@
+id: isa-5.1
+family: ch-5
+title: "Operations Security"
+class: TISAX
+
+statement:
+  prose: >-
+    The organization shall implement documented operating procedures
+    for information processing facilities. Changes to the organization,
+    business processes, information processing facilities, and systems
+    that affect information security shall be controlled. The use of
+    resources shall be monitored and tuned, and projections shall be
+    made of future capacity requirements. Development, testing, and
+    operational environments shall be separated. The organization
+    shall implement detection, prevention, and recovery controls
+    to protect against malware. Backup copies of information,
+    software, and system configurations shall be taken and tested
+    regularly. Events shall be logged and log data shall be protected.
+
+guidance:
+  prose: >-
+    VDA ISA requires comprehensive operations security controls
+    covering change management, capacity management, environment
+    separation, malware protection, backup, and logging. Change
+    management must include a formal process for all changes to
+    production systems, with risk assessment, approval, testing,
+    and rollback procedures. Environment separation must ensure
+    that development, test, and production environments are
+    logically and, where required, physically separated, with
+    no production data in non-production environments unless
+    anonymized. Malware protection must cover all endpoints,
+    servers, and email gateways with centrally managed, auto-updating
+    solutions. Backup procedures must follow the 3-2-1 rule (3 copies,
+    2 media types, 1 offsite) and be tested through regular restore
+    drills. Logging must be centralized, tamper-evident, and retained
+    for a minimum period (typically 12 months for security events).
+    For AL3, auditors verify operational procedures are current,
+    change records are complete, backup restore tests are documented,
+    and logging covers all critical systems.
+
+baselines:
+  al1:
+    applicability: required
+    notes: "Self-assessment of operational procedures and controls."
+  al2:
+    applicability: required
+    notes: "Auditor reviews change records, backup test results, and logging configurations."
+  al3:
+    applicability: required
+    notes: "On-site verification of change management, environment separation, backup restores, and log integrity."
+
+references:
+  - citation: "VDA ISA 6.0, Chapter 5.1"
+    url: "https://www.enx.com/en-us/tisax/"
+  - citation: "ISO/IEC 27001:2022, A.5.37, A.8.1, A.8.6, A.8.7, A.8.8, A.8.9, A.8.13, A.8.15"
+    url: "https://www.iso.org/standard/27001"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps-driven change management where all changes to
+      infrastructure and platform configuration are version-controlled,
+      reviewed, approved, and applied through automated reconciliation
+      (ArgoCD, Flux). Enforce environment separation through dedicated
+      Kubernetes namespaces or clusters with network policies preventing
+      cross-environment communication. Implement automated capacity
+      monitoring with horizontal pod autoscaling and cluster autoscaling,
+      with alerting on resource utilization thresholds. Deploy centralized
+      logging (ELK, Loki) with immutable log storage and automated
+      retention policies. Implement automated backup of persistent
+      volumes, databases, and configuration state with scheduled
+      restore testing. Deploy malware scanning for container images
+      and uploaded files at the platform level.
+    tools:
+      - argocd
+      - flux
+      - kubernetes
+      - prometheus
+      - grafana
+      - loki
+      - elastic
+      - velero
+      - trivy
+
+  devsecops:
+    prose: >-
+      Enforce change management through CI/CD pipeline gates that
+      require code review, security review, and automated testing
+      before any change reaches production. Implement pipeline-level
+      environment separation ensuring that development pipelines
+      cannot deploy to production and that production secrets are
+      not accessible from non-production pipelines. Automate backup
+      validation by including restore tests in the pipeline schedule.
+      Implement centralized, structured logging in all applications
+      with log correlation IDs for distributed tracing. Scan all
+      build artifacts for malware and known vulnerabilities before
+      deployment. Generate change audit trails from pipeline
+      execution history showing the complete chain from commit
+      to production deployment.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - argocd
+      - trivy
+      - clamav
+      - elastic
+      - loki
+
+  secops:
+    prose: >-
+      Centralize all operational logs in the SIEM with automated
+      parsing, enrichment, and correlation. Implement tamper-evident
+      logging using write-once storage or blockchain-anchored log
+      hashes. Monitor change management compliance by correlating
+      production changes detected through configuration drift
+      monitoring with approved change tickets. Alert on unauthorized
+      changes to production systems. Monitor backup job success and
+      failure rates with automated alerting on backup failures.
+      Implement malware detection across all endpoints with
+      centralized management and automated quarantine. Generate
+      operational compliance reports covering change management
+      adherence, backup success rates, and logging coverage.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - crowdstrike
+      - velero
+      - pagerduty
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A.5.37", "A.8.1", "A.8.6", "A.8.7", "A.8.9", "A.8.13", "A.8.15"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-1", "CM-3", "CP-9", "CP-10", "AU-2", "AU-3", "AU-6", "SI-3"]
+    relationship: mapped

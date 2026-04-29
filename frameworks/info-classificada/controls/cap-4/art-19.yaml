@@ -1,0 +1,103 @@
+id: art-19
+family: cap-4
+title: "Cryptographic Key Management"
+class: INFO-CLASSIFICADA
+baselines: [government-all, defense, intelligence]
+statement:
+  prose: |
+    Art. 19. A gestão de chaves criptográficas utilizadas na cifração de
+    informação classificada observará os seguintes princípios:
+
+    I - as chaves criptográficas serão geradas, armazenadas, distribuídas
+    e destruídas por meio de recursos e procedimentos que garantam o sigilo,
+    a integridade e a disponibilidade da informação classificada;
+
+    II - a gestão de chaves criptográficas utilizadas na cifração de
+    informação classificada nos graus de sigilo ultrassecreto e secreto
+    será realizada exclusivamente por pessoal credenciado;
+
+    III - o comprometimento ou a suspeita de comprometimento de chave
+    criptográfica implicará a imediata substituição da chave e a
+    reclassificação do grau de segurança do recurso criptográfico
+    afetado.
+guidance:
+  prose: |
+    Article 19 establishes cryptographic key management principles that
+    parallel industry standards (NIST SP 800-57) but add
+    classification-specific requirements:
+
+    **Key lifecycle requirements:**
+    1. **Generation:** Keys must be generated using approved methods that
+       ensure randomness and unpredictability.
+    2. **Storage:** Keys must be stored with protections matching or
+       exceeding the classification level of the data they protect.
+    3. **Distribution:** Key distribution must use secure channels
+       appropriate to the classification level.
+    4. **Destruction:** Key destruction must follow the same principles
+       as classified data destruction (art. 17).
+
+    **Personnel requirement:**
+    Ultrassecreta and secreta key management can ONLY be performed by
+    personnel with active security clearance.
+
+    **Compromise response:**
+    Any key compromise or suspected compromise triggers:
+    - Immediate key replacement
+    - Security reassessment of the affected cryptographic resource
+    - This is an incident that may trigger art. 28-30 procedures
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Key management infrastructure:**
+      1. Deploy HSM (Hardware Security Module) cluster for key lifecycle
+         management of classified encryption keys.
+      2. Implement automated key rotation policies:
+         - Ultrassecreta: rotation per GSI/PR specifications
+         - Secreta: rotation per GSI/PR specifications
+         - Reservada: minimum annual rotation
+      3. Deploy split-key or multi-party key management for ultrassecreta
+         and secreta keys (no single person has full key access).
+      4. Implement key compromise detection and automated response:
+         detection triggers immediate key rotation and alerts.
+      5. Enforce that key management operations require clearance
+         verification through IAM integration.
+    tools:
+      - hsm
+      - key-management
+      - split-key-management
+      - compromise-detection
+  devsecops:
+    prose: |
+      **Key management in development workflows:**
+      1. Never store cryptographic keys in source code or configuration
+         files — use external key management services.
+      2. Implement key injection at deployment time from the HSM/KMS,
+         not during build.
+      3. Scan for hardcoded keys or key material in CI/CD pipelines.
+    tools:
+      - kms-integration
+      - secret-scanning
+      - key-injection
+  secops:
+    prose: |
+      **Key management governance:**
+      1. Maintain key inventory: all active keys, their classification
+         level, creation date, next rotation date, and custodians.
+      2. Verify key custodian clearance status matches or exceeds the
+         classification level of keys under their management.
+      3. Conduct key compromise drills: test the speed and completeness
+         of key rotation procedures semi-annually.
+      4. Audit key destruction records to verify destroyed keys are
+         irrecoverable.
+    tools:
+      - key-inventory
+      - clearance-verification
+      - compromise-drill
+      - audit-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-12", "SC-17"]
+    relationship: mapped
+  - framework_id: gsi-in1
+    articles: ["art-16"]
+    relationship: complements

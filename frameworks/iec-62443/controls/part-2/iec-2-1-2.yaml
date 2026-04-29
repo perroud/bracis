@@ -1,0 +1,95 @@
+id: iec-2-1-2
+family: part-2
+title: "Security Risk Assessment"
+class: IEC62443
+part: "62443-2-1"
+
+statement:
+  prose: >-
+    The asset owner shall conduct a cybersecurity risk assessment for the
+    industrial automation and control system. The risk assessment shall identify
+    threats, vulnerabilities, and consequences specific to the IACS environment,
+    and shall determine the target security level (SL-T) for each zone and
+    conduit based on the assessed risk.
+
+guidance:
+  prose: >-
+    The risk assessment methodology should follow the zone and conduit model
+    defined in IEC 62443-3-2. Steps include: partitioning the IACS into
+    security zones based on common security requirements and grouping assets
+    with similar risk profiles; identifying conduits that allow communication
+    between zones; performing a detailed threat analysis considering both
+    cyber and physical attack vectors relevant to industrial environments;
+    assessing vulnerabilities specific to legacy OT systems that may lack
+    patching capabilities; evaluating consequences including safety impact,
+    environmental damage, production loss, and financial impact; determining
+    the target security level (SL-T) for each zone ranging from SL 1 (basic)
+    to SL 4 (critical); performing gap analysis between current (SL-A) and
+    target (SL-T) security levels; documenting risk treatment decisions and
+    residual risk acceptance by management; and reassessing risk at least
+    annually or when significant changes occur to the IACS environment.
+
+references:
+  - citation: "IEC 62443-2-1:2010, Clause 4.2"
+    url: "https://webstore.iec.ch/en/publication/7030"
+  - citation: "IEC 62443-3-2:2020"
+    url: "https://webstore.iec.ch/en/publication/30727"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy OT-specific vulnerability assessment tools that can safely scan
+      industrial devices without disrupting operations. Implement a risk
+      register integrated with the asset inventory that tracks zone and conduit
+      assignments, current security levels (SL-A), target security levels
+      (SL-T), and identified gaps. Use network topology mapping tools that
+      understand industrial protocols to automatically identify zone boundaries
+      and conduit paths. Integrate vulnerability intelligence feeds specific
+      to ICS/SCADA systems (ICS-CERT advisories, vendor bulletins) into the
+      risk assessment workflow.
+    tools:
+      - tenable-ot
+      - nozomi-networks
+      - claroty
+      - dragos
+
+  devsecops:
+    prose: >-
+      Integrate risk assessment findings into the development pipeline by
+      enforcing security gates based on the target security level of the
+      destination zone. Software destined for SL-3 or SL-4 zones must pass
+      additional security testing including fuzzing, static analysis, and
+      penetration testing before deployment approval. Maintain risk assessment
+      artifacts as versioned documents alongside the codebase. Automate the
+      generation of security requirements from SL-T assignments so that
+      developers receive clear acceptance criteria derived from the risk
+      assessment.
+    tools:
+      - gitlab-ci
+      - defectdojo
+      - threadfix
+      - sonarqube
+
+  secops:
+    prose: >-
+      Feed risk assessment outputs into the SOC to prioritize monitoring and
+      detection efforts. Higher-SL zones should receive more granular
+      monitoring, shorter alert response times, and dedicated detection rules.
+      Map detected threats and incidents back to the risk register to validate
+      or update risk ratings. Conduct tabletop exercises simulating the threat
+      scenarios identified in the risk assessment, with participation from
+      both OT and IT teams. Use attack surface management tools to continuously
+      identify new assets and exposures that may change the risk profile.
+    tools:
+      - dragos-platform
+      - splunk-es
+      - tenable-ot
+      - mandiant-advantage
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-3", "RA-5", "RA-7", "PM-9"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a5.12", "a8.8"]
+    relationship: supports

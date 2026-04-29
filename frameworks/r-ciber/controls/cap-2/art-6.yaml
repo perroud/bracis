@@ -1,0 +1,110 @@
+id: art-6
+family: cap-2
+title: "Controle de Acesso e Autenticacao em Sistemas de Telecomunicacoes"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 6. As prestadoras devem implementar controles de acesso lógico e
+    físico adequados para proteger redes, sistemas e dados de telecomunicações,
+    incluindo:
+
+    I - autenticação forte para acesso a sistemas críticos de gestão de
+    rede, plataformas OSS/BSS e equipamentos de rede, vedado o uso de
+    credenciais compartilhadas ou senhas padrão de fabricante;
+
+    II - princípio do mínimo privilégio na concessão de acessos a sistemas
+    de telecomunicações, com revisão periódica de direitos de acesso;
+
+    III - controle de acesso privilegiado (PAM) para administradores de
+    rede e sistemas, com registro de todas as ações realizadas;
+
+    IV - autenticação multifator para acesso remoto a sistemas críticos
+    e para contas com privilégios elevados;
+
+    V - segmentação de redes de gestão (OAM -- Operations, Administration
+    and Maintenance) das redes de usuário final e da internet.
+guidance:
+  prose: |
+    O art. 6 estabelece requisitos de controle de acesso especificos para
+    o contexto de telecomunicacoes, com enfase em:
+
+    **Sistemas criticos de telecom (inciso I):**
+    - NMS (Network Management System)
+    - OSS/BSS (Amdocs, Huawei, Ericsson, Oracle)
+    - EMS (Element Management System) de equipamentos de rede
+    - Plataformas de configuracao de roteadores e switches
+    - Sistemas de interconexao (SBC, SMSC, HLR/HSS)
+
+    **Credenciais padrao (inciso I):**
+    Equipamentos de rede frequentemente vem com credenciais padrao
+    de fabricante (admin/admin, admin/1234). O R-Ciber veda
+    explicitamente o uso dessas credenciais em producao.
+
+    **Redes OAM separadas (inciso V):**
+    Requisito critico para telecomunicacoes: a rede de gestao de
+    equipamentos (OAM) deve ser fisicamente ou logicamente separada
+    da rede de usuario e da internet publica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de acesso seguro para redes de telecomunicacoes:**
+      1. Implementar solucao PAM (Privileged Access Management) para
+         acesso a todos os equipamentos de rede e sistemas OSS/BSS,
+         com gravacao de sessao e auditoria completa.
+      2. Configurar redes OAM dedicadas e segregadas (VRF ou VLAN
+         separada, sem acesso direto da internet) para toda gestao
+         de equipamentos de rede.
+      3. Eliminar credenciais padrao de fabricante em todos os
+         equipamentos via processo de hardening automatizado.
+      4. Implementar Zero Trust Network Access (ZTNA) para acesso
+         remoto de tecnicos e fornecedores a sistemas criticos.
+    tools:
+      - pam-solution
+      - network-segmentation
+      - ztna
+      - secrets-manager
+  devsecops:
+    prose: |
+      **Controle de acesso em pipelines e automacao:**
+      1. Implementar gestao de secrets para credenciais de sistemas
+         OSS/BSS e equipamentos de rede utilizadas em pipelines de
+         automacao e IaC (Vault, AWS Secrets Manager, GitLab Secrets).
+      2. Aplicar principio do minimo privilegio em service accounts
+         utilizadas por pipelines CI/CD que interagem com sistemas de
+         telecomunicacoes.
+      3. Revisar e rotacionar automaticamente credenciais de sistemas
+         de telecomunicacoes utilizadas em automacao.
+      4. Implementar deteccao de secrets expostos em repositorios de
+         codigo (scanner de secrets no pre-commit e CI).
+    tools:
+      - vault
+      - secrets-manager
+      - gitlab-secrets
+      - secret-scanning
+  secops:
+    prose: |
+      **Operacao de controle de acesso:**
+      1. Implementar processo formal de concessao, revisao e revogacao
+         de acesso a sistemas de telecomunicacoes, com aprovacao do
+         gestor responsavel.
+      2. Realizar revisao trimestral de todos os acessos privilegiados
+         a sistemas criticos (NMS, OSS/BSS, equipamentos de rede).
+      3. Monitorar e alertar para comportamentos anormais de acesso
+         (horarios incomuns, volumes altos de comandos, acessos de
+         localizacoes nao autorizadas).
+      4. Implementar processo de desligamento imediato de acessos em
+         caso de demissao ou mudanca de funcao de colaboradores e
+         tecnicos de fornecedores.
+    tools:
+      - iam-platform
+      - pam-solution
+      - ueba
+      - access-review
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-5-15", "A-5-16", "A-5-17", "A-5-18", "A-8-2", "A-8-4", "A-8-18"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-8", "art-9", "art-10", "art-11", "art-12", "art-13", "art-14"]
+    relationship: mapped

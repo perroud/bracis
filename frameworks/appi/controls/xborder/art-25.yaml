@@ -1,0 +1,88 @@
+id: art-25
+family: xborder
+title: "Record of Provision of Personal Data to Third Parties"
+class: APPI
+baselines:
+  - privacy-baseline
+
+statement:
+  prose: |
+    (1) When a business operator handling personal information provides personal data
+    to a third party (excluding a person to whom it is not deemed to be a third party
+    pursuant to Article 23, paragraph (5), items (i) through (iii)), it shall create
+    and maintain a record of the following matters in accordance with the Rules of the
+    Personal Information Protection Commission:
+    (i) The date of provision;
+    (ii) The name and address of the third party to whom the data was provided, and
+    in the case of a corporation, the name of its representative;
+    (iii) The name of the data subject and other matters prescribed by the Rules of
+    the Personal Information Protection Commission as being sufficient to identify the
+    retained personal data pertaining to the data subject;
+    (iv) The items of personal data provided.
+
+    (2) A business operator handling personal information shall maintain the records
+    prescribed in the preceding paragraph for a period prescribed by the Rules of the
+    Personal Information Protection Commission.
+
+guidance:
+  prose: |
+    Article 25 imposes record-keeping obligations on data providers. Every time
+    personal data is provided to a third party, the provider must record the date,
+    recipient identity, data subject identity, and data items transferred. These
+    records must be retained for the PPC-prescribed period (generally three years for
+    consent-based transfers, one year for opt-out-based transfers). This creates a
+    comprehensive audit trail of personal data flows. Combined with Article 26 (receipt
+    records) and Article 37 (disclosure of provision records to data subjects), this
+    forms a traceability framework for personal data movement across organizations.
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement automated provision record generation at all data egress
+      points. Build an immutable audit log that captures all required fields
+      (date, recipient, data subject, data items) for every third-party
+      data transfer. Integrate with the data catalog to automatically
+      identify data items being transferred. Implement retention policies
+      that maintain provision records for the prescribed period with
+      automated archival and deletion thereafter.
+    tools:
+      - elasticsearch
+      - kafka
+      - datahub
+      - backstage
+      - open-policy-agent
+
+  devsecops:
+    prose: |
+      Enforce that all APIs and data pipelines that transfer personal data
+      to third parties generate provision records. Validate provision record
+      completeness through automated tests. Implement schema validation for
+      provision records to ensure all required fields are populated. Test
+      that provision records are searchable by data subject identifier for
+      Article 37 disclosure compliance.
+    tools:
+      - gitlab-ci
+      - postman
+      - newman
+      - semgrep
+
+  secops:
+    prose: |
+      Monitor for third-party data transfers without corresponding provision
+      records. Alert on provision record retention approaching expiration to
+      verify compliance before deletion. Audit provision record completeness
+      against observed data flows. Generate periodic reports of data
+      provision activity for PPC reporting requirements.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - onetrust
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-30"]
+    relationship: mapped
+  - framework_id: pipl
+    articles: ["art-55"]
+    relationship: mapped

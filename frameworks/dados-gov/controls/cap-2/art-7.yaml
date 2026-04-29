@@ -1,0 +1,99 @@
+id: art-7
+family: cap-2
+title: "Citizen Base Registry — Cadastro Base do Cidadão"
+class: DADOS-GOV
+baselines: [administracao-publica-federal]
+statement:
+  prose: |
+    Art. 7º. O Cadastro Base do Cidadão é composto por dados biográficos, biométricos e
+    cadastrais de referência, conforme definido pelo Comitê Central de Governança de Dados.
+
+    § 1º. O número de inscrição no Cadastro de Pessoas Físicas — CPF é suficiente e
+    substitutivo para a apresentação de dados do cidadão no âmbito dos serviços públicos
+    prestados ao cidadão, conforme o disposto no art. 11 da Lei nº 13.444, de 11 de maio
+    de 2017.
+    § 2º. A validação dos dados biográficos e cadastrais dos cidadãos será feita por meio
+    de consulta ao Cadastro Base do Cidadão.
+    § 3º. Os atributos biométricos serão armazenados de forma centralizada no âmbito da
+    administração pública federal, conforme definição do Comitê Central de Governança de
+    Dados.
+guidance:
+  prose: |
+    Article 7 establishes the Cadastro Base do Cidadão (Citizen Base Registry) as the
+    authoritative source for citizen data across all federal agencies.
+
+    **Composition:**
+    - Biographical attributes (name, birth date, family, address)
+    - Biometric attributes (fingerprints, facial recognition data)
+    - Registration attributes (CPF, identification numbers)
+
+    **CPF as universal identifier:**
+    Art. 7 §1 reinforces the CPF as the sufficient and substitutive identifier for all
+    public services — citizens should not need to provide additional identification
+    documents when the CPF can retrieve the needed data.
+
+    **Centralized biometric storage:**
+    Art. 7 §3 mandates centralized storage of biometric data within the federal
+    administration, as defined by CCGD. This is a high-sensitivity requirement given
+    biometric data is classified as sensitive personal data under LGPD Art. 5, II.
+
+    **Privacy implications:**
+    Centralized biometric storage creates significant privacy risks requiring
+    enhanced data protection impact assessments (DPIA) per LGPD Art. 38.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Citizen Base Registry architecture:**
+      1. Design a high-availability, distributed database for citizen biographical
+         and cadastral data with read replicas for agency queries.
+      2. Implement a dedicated biometric data store with hardware security modules
+         (HSM) for encryption key management.
+      3. CPF-based universal lookup API with standardized response schema for
+         all biographical and cadastral attributes.
+      4. Biometric matching service (1:1 and 1:N) with configurable confidence
+         thresholds and audit logging of all match operations.
+      5. Data synchronization pipelines keeping the Cadastro Base current with
+         authoritative sources (Receita Federal, TSE, civil registries).
+    tools:
+      - database-cluster
+      - hsm
+      - biometric-matching
+      - api-gateway
+      - data-pipeline
+  devsecops:
+    prose: |
+      **Biometric data protection in pipelines:**
+      1. Encrypted biometric data handling at every stage — no plaintext
+         biometric data in logs, test environments, or CI/CD artifacts.
+      2. DPIA-as-code: automated impact assessment checks for changes to
+         biometric data processing components.
+      3. Security hardening of biometric APIs with rate limiting, anti-replay
+         protection, and liveness detection validation.
+      4. Penetration testing focused on biometric data extraction vectors.
+    tools:
+      - gitlab-ci
+      - hsm
+      - sast
+      - dast
+      - penetration-testing
+  secops:
+    prose: |
+      **Biometric data security operations:**
+      1. Real-time monitoring of all biometric data access with anomaly detection
+         (unusual query volumes, off-hours access, new agency access patterns).
+      2. Biometric data breach response plan with notification to ANPD per
+         LGPD requirements.
+      3. Annual security audit of biometric storage and matching systems.
+      4. Key rotation procedures for biometric data encryption keys.
+    tools:
+      - siem
+      - hsm
+      - monitoring-alerting
+      - incident-response
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-5", "art-11", "art-38"]
+    relationship: complements
+  - framework_id: gov-digital
+    articles: ["art-1"]
+    relationship: complements

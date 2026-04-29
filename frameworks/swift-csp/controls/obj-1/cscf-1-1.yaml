@@ -1,0 +1,119 @@
+id: cscf-1.1
+family: obj-1
+title: "Restrict Internet Access"
+class: SWIFT-CSP
+classification: mandatory
+architecture_types: [A1, A2, A3, A4, B]
+
+statement:
+  prose: >-
+    Ensure protection of the local SWIFT infrastructure from potentially
+    compromised elements of the general IT environment and external network
+    by restricting internet access to the secure zone. Direct internet access
+    from operator PCs and systems within the secure zone must be prevented.
+    All inbound and outbound traffic traversing the secure zone boundary
+    must be tightly controlled through firewalls, proxies, or equivalent
+    network security controls.
+  parts:
+    - id: cscf-1.1.a
+      label: "1.1.a"
+      prose: >-
+        A secure zone is defined and documented, encompassing all SWIFT-related
+        components including messaging interfaces, communication interfaces,
+        connectors, and operator PCs used for SWIFT operations.
+    - id: cscf-1.1.b
+      label: "1.1.b"
+      prose: >-
+        Direct internet access from within the secure zone is prevented.
+        All traffic to and from the internet is routed through controlled
+        intermediary systems (firewalls, proxies) outside the secure zone.
+    - id: cscf-1.1.c
+      label: "1.1.c"
+      prose: >-
+        Firewall rules governing the secure zone boundary follow a default-deny
+        policy, permitting only explicitly authorized traffic flows required
+        for SWIFT operations.
+
+guidance:
+  prose: >-
+    The secure zone is the cornerstone of the SWIFT CSP architecture. It must
+    be logically (and ideally physically) separated from the general IT
+    environment. Internet-facing services such as email, web browsing, and
+    social media must never be accessible from systems within the secure zone.
+    If business processes require internet connectivity (e.g., downloading
+    SWIFT updates), a controlled jump host or proxy outside the secure zone
+    should mediate the traffic. Organizations must document all permitted
+    traffic flows crossing the secure zone boundary and review them at least
+    annually. Any deviation from the default-deny posture requires formal
+    risk acceptance.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 1.1"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-41 Rev. 1 — Guidelines on Firewalls and Firewall Policy"
+    url: "https://doi.org/10.6028/NIST.SP.800-41r1"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement the SWIFT secure zone as an isolated network segment using
+      dedicated VLANs, VPCs, or virtual networks with no default route to the
+      internet. Define all firewall rules and network security group policies
+      as infrastructure-as-code (Terraform, Pulumi). Enforce a default-deny
+      egress policy on the secure zone; allow only SWIFT-specific traffic
+      (SWIFTNet connectivity via Alliance Lite2 or Alliance Gateway). Deploy
+      a forward proxy or network gateway appliance on a DMZ segment if
+      controlled internet access is needed for patch downloads. Use DNS
+      sinkholes within the secure zone to block unintended resolution of
+      public domains.
+    tools:
+      - terraform
+      - pulumi
+      - aws-vpc
+      - azure-vnet
+      - gcp-vpc
+      - palo-alto-ngfw
+      - fortinet-fortigate
+      - cisco-asa
+
+  devsecops:
+    prose: >-
+      Integrate firewall rule validation into CI/CD pipelines. Use policy-as-code
+      tools (OPA, Checkov, tfsec) to enforce that no infrastructure-as-code
+      change introduces a route from the secure zone to the internet. Require
+      merge-request approvals from network security for any change to secure
+      zone boundary rules. Automate drift detection by comparing live firewall
+      state against the declared IaC baseline on a scheduled pipeline.
+    tools:
+      - checkov
+      - tfsec
+      - opa
+      - conftest
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor all traffic crossing the secure zone boundary in real time via
+      SIEM. Alert on any outbound connection attempt from the secure zone to
+      the internet. Conduct quarterly reviews of firewall rules to remove
+      stale or overly permissive entries. Correlate secure zone traffic logs
+      with threat intelligence feeds to detect command-and-control callbacks
+      or data exfiltration attempts.
+    tools:
+      - splunk
+      - elastic-siem
+      - microsoft-sentinel
+      - palo-alto-cortex
+      - aws-vpc-flow-logs
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-7", "SC-7(5)", "AC-4"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.20", "A8.21", "A8.22"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["req-1.1", "req-1.2"]
+    relationship: complements

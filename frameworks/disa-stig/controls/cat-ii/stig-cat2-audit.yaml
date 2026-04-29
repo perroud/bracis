@@ -1,0 +1,123 @@
+id: stig-cat2-audit
+family: cat-ii
+title: "Audit Logging and Monitoring"
+class: DISA-STIG
+
+baselines: [cat-ii]
+
+statement:
+  prose: >-
+    The system must generate audit records for the following event types: logon
+    and logoff events (successful and failed), privilege escalation, account
+    creation and modification, object access for sensitive resources, policy
+    changes, system events including startup and shutdown, and use of
+    cryptographic functions. Audit records must include the date and time of
+    the event, the component of the system generating the record, the type of
+    event, the user or process identity associated with the event, the outcome
+    (success or failure), and the resource accessed. Audit logs must be protected
+    from unauthorized modification or deletion, transmitted to a centralized
+    log management system, and retained for a minimum of one year with at least
+    three months immediately available for analysis. The system must alert
+    responsible personnel when the audit log storage capacity reaches
+    75 percent of maximum.
+
+guidance:
+  prose: >-
+    Comprehensive audit logging is foundational to the detection of, and response
+    to, security incidents. Without complete audit trails, organizations cannot
+    determine the scope of a compromise, identify affected data, or reconstruct
+    attacker actions — rendering incident response ineffective. STIG reviewers
+    must verify not only that logging is enabled but that all required event
+    categories are being captured across all system components, including
+    application-level events (authentication, authorization decisions, data access)
+    in addition to OS-level events.
+
+    Log protection is equally important: an attacker who gains elevated access
+    will typically attempt to clear or modify logs to cover their tracks. Sending
+    logs to a write-protected, centralized system immediately after generation
+    limits the attacker's ability to destroy forensic evidence. Reviewers should
+    verify log shipping latency and confirm that local log stores on endpoints
+    are short-lived buffers, not the system of record.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AU-2, AU-3, AU-6, AU-9, AU-11, AU-12"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DISA STIG — General Purpose Operating System SRG, V1R14, SV-204539"
+    url: "https://public.cyber.mil/stigs/downloads/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized log aggregation platform (OpenSearch/Elasticsearch
+      with Fluentd or Loki with Promtail) collecting audit logs from all
+      platform components: Kubernetes API server audit logs, node syslog,
+      container runtime events, service mesh access logs, and authentication
+      events from the IdP. Implement structured logging standards with required
+      audit fields (timestamp in ISO 8601, actor identity, action, resource,
+      outcome, source IP, session ID). Configure log pipeline monitoring to
+      alert on gaps in log ingestion — a missing log stream may indicate
+      tampering or configuration failure. Use immutable log storage (S3 Object
+      Lock, WORM storage) for long-term retention. Configure audit log storage
+      capacity alerts at 75 percent threshold and automated archiving to
+      cold storage before logs are pruned.
+    tools:
+      - elasticsearch
+      - opensearch
+      - loki
+      - fluentd
+      - vector
+      - promtail
+      - grafana
+      - s3-object-lock
+
+  devsecops:
+    prose: >-
+      Enforce audit logging instrumentation as a release gate in CI/CD pipelines.
+      Implement SAST rules that verify application code emits required audit
+      events for authentication, authorization, and sensitive data access
+      operations. Store GitLab pipeline audit trails (who triggered what pipeline,
+      which approvals were granted, what artifacts were produced) in the
+      centralized log platform. Scan application dependencies for known logging
+      framework vulnerabilities (Log4Shell, logback exploits). Validate audit
+      log schema compliance in integration tests. Require all merge requests
+      that affect authentication or authorization logic to include evidence
+      of audit event coverage in the description.
+    tools:
+      - gitlab-ci
+      - gitlab-audit-events
+      - semgrep
+      - conftest
+      - vector
+
+  secops:
+    prose: >-
+      Operate the SIEM with correlation rules consuming audit logs for real-time
+      detection of suspicious activity patterns: repeated failed logins, privilege
+      escalation outside change windows, access to sensitive resources outside
+      business hours, and configuration changes not associated with approved
+      change tickets. Conduct weekly audit log completeness reviews using
+      automated tooling that verifies expected log sources are active. Perform
+      quarterly audit log integrity checks by verifying cryptographic hashes
+      of archived log files. Maintain documented audit review procedures with
+      defined roles, frequencies, and escalation paths. Produce monthly audit
+      log compliance reports for the AO.
+    tools:
+      - splunk
+      - elastic-siem
+      - chronicle
+      - qradar
+      - servicenow-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9", "AU-11", "AU-12"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["AU.L2-3.3.1", "AU.L2-3.3.2"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["au-2", "au-6", "au-11"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["DE.AE-02", "DE.CM-03", "PR.PS-04"]
+    relationship: supports

@@ -1,0 +1,115 @@
+id: art-14
+family: cap-3
+title: "Consentimento Informado para Telemedicina"
+class: CFM-TELEMEDICINA
+baselines: [telemedicina-all]
+statement:
+  prose: |
+    Art. 14. O paciente deve fornecer consentimento livre, esclarecido
+    e informado antes de qualquer atendimento por telemedicina.
+
+    Parágrafo 1. O termo de consentimento informado para telemedicina
+    deve conter, no mínimo:
+    I - explicação sobre a natureza do atendimento por telemedicina;
+    II - informação sobre as limitações da telemedicina em relação
+    ao atendimento presencial;
+    III - direito do paciente de recusar o atendimento por telemedicina
+    e solicitar atendimento presencial a qualquer momento;
+    IV - informações sobre proteção de dados pessoais e privacidade;
+    V - possibilidade de gravação da sessão, se aplicável.
+
+    Parágrafo 2. O consentimento deve ser registrado eletronicamente
+    com data, hora e identificação do paciente, podendo utilizar
+    assinatura digital ou mecanismo equivalente de comprovação.
+
+    Parágrafo 3. O consentimento pode ser revogado pelo paciente a
+    qualquer momento, sem prejuízo do atendimento já realizado.
+guidance:
+  prose: |
+    O art. 14 detalha o consentimento informado especifico para
+    telemedicina, que vai alem do consentimento generico para
+    tratamento medico. E um requisito tanto etico (CFM) quanto
+    legal (LGPD para dados sensiveis).
+
+    **Conteudo obrigatorio do termo:**
+    O termo deve ser compreensivel para o paciente leigo, sem
+    jargao tecnico excessivo. Deve abordar:
+    - O que e telemedicina e como funciona
+    - O que o medico pode e nao pode avaliar a distancia
+    - Que o paciente pode pedir consulta presencial
+    - Como seus dados serao protegidos e por quanto tempo
+    - Se a sessao sera gravada (com consentimento separado)
+
+    **Registro eletronico (paragrafo 2):**
+    O registro deve ser inequivoco e auditavel. Opcoes aceitas:
+    - Assinatura digital ICP-Brasil (maior valor juridico)
+    - Aceite via plataforma com registro de IP, timestamp e
+      identificacao do dispositivo
+    - Biometria facial ou digital, se disponivel
+
+    **Revogacao (paragrafo 3):**
+    O direito de revogacao deve ser acessivel e simples. Dados ja
+    coletados durante atendimento realizado nao precisam ser
+    eliminados (base legal de tutela da saude), mas atendimentos
+    futuros por telemedicina devem ser interrompidos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de consentimento informado:**
+      1. Implementar modulo de consentimento informado integrado ao
+         fluxo de teleconsulta, exibido obrigatoriamente antes do
+         inicio de qualquer atendimento.
+      2. Criar termo de consentimento digital com todos os itens
+         obrigatorios do paragrafo 1, em linguagem acessivel.
+      3. Registrar consentimento com timestamp (UTC), IP de origem,
+         user-agent, identificacao do paciente e metodo de aceite.
+      4. Implementar funcionalidade de revogacao de consentimento
+         acessivel ao paciente, com efeito imediato em novos
+         atendimentos por telemedicina.
+      5. Armazenar termos de consentimento com versionamento,
+         mantendo historico de versoes aceitas por cada paciente.
+    tools:
+      - consent-management
+      - digital-signature
+      - version-control
+      - audit-trail
+  devsecops:
+    prose: |
+      **Validacao de consentimento no pipeline:**
+      1. Testar que nenhum fluxo de atendimento permite inicio
+         sem consentimento informado previamente registrado.
+      2. Validar que todos os itens obrigatorios do paragrafo 1
+         estao presentes no termo de consentimento.
+      3. Testar funcionalidade de revogacao, verificando que
+         novos atendimentos sao bloqueados e atendimentos
+         anteriores nao sao afetados.
+      4. Verificar que registro de consentimento inclui todos
+         os metadados exigidos (timestamp, IP, identificacao).
+    tools:
+      - gitlab-ci
+      - consent-testing
+      - flow-validation
+      - metadata-verification
+  secops:
+    prose: |
+      **Governanca de consentimento:**
+      1. Auditar periodicamente que todos os atendimentos por
+         telemedicina possuem consentimento informado valido.
+      2. Monitorar revogacoes de consentimento e verificar que
+         estao sendo respeitadas operacionalmente.
+      3. Revisar periodicamente o texto do termo de consentimento
+         com equipe juridica e comite de etica medica.
+      4. Manter metricas de taxa de consentimento, recusa e
+         revogacao para analise de tendencias.
+    tools:
+      - audit-management
+      - consent-monitoring
+      - legal-review
+      - analytics-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-8", "art-11", "art-18"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.508", "164.532"]
+    relationship: mapped

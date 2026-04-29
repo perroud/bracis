@@ -1,0 +1,114 @@
+id: art-17
+family: cap-4
+title: "Web Services e Padroes de Integracao"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 17. A troca de transações TISS entre operadoras e prestadores
+    deve ser realizada por meio de web services padronizados, conforme
+    especificações técnicas publicadas pela ANS.
+
+    Parágrafo 1. As operadoras devem disponibilizar web services para:
+    I - Verificação de elegibilidade de beneficiários em tempo real;
+    II - Solicitação e resposta de autorização prévia;
+    III - Envio de lotes de guias para cobrança;
+    IV - Consulta de status de transações e protocolos;
+    V - Envio e resposta de recurso de glosa;
+    VI - Demonstrativo de retorno (pagamento).
+
+    Parágrafo 2. As especificações dos web services incluem WSDLs para
+    integrações SOAP e definições OpenAPI para integrações REST, ambas
+    publicadas pela ANS.
+
+    Parágrafo 3. Os web services TISS devem implementar tratamento de
+    erros padronizado, com códigos de erro e mensagens descritivas
+    conforme tabela definida pela ANS.
+guidance:
+  prose: |
+    O art. 17 define a camada de integracao tecnica do TISS, especificando
+    os web services que cada operadora deve disponibilizar.
+
+    **Web services obrigatorios:**
+    1. tissSolicitacaoProcedimento: autorizacao previa
+    2. tissVerificacaoElegibilidade: consulta de elegibilidade
+    3. tissEnvioLoteGuias: envio de lote de cobranca
+    4. tissConsultaStatus: consulta de protocolo/status
+    5. tissRecursoGlosa: envio de recurso de glosa
+    6. tissDemonstrativoRetorno: demonstrativo de pagamento
+
+    **Padroes tecnicos:**
+    - SOAP: WSDL definido pela ANS, envelope SOAP 1.1/1.2
+    - REST: OpenAPI 3.0, JSON ou XML conforme versao
+    - XML encoding UTF-8 obrigatorio
+    - Namespace XML conforme schema ANS vigente
+
+    **Tratamento de erros:**
+    - Codigos de erro numericos definidos pela ANS
+    - Mensagens descritivas em portugues
+    - Categorias: validacao de schema, regra de negocio, sistema,
+      autenticacao, autorizacao
+    - Retorno HTTP: 200 para erros de negocio (no body), 4xx/5xx
+      para erros de protocolo
+
+    **Timeout e retry:**
+    - Timeout padrao: 30 segundos para sincrono
+    - Assincrono: retorno de protocolo + consulta posterior
+    - Retry: exponential backoff, maximo 3 tentativas
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de web services TISS:**
+      1. Gerar stubs de servico a partir dos WSDLs/OpenAPI specs
+         oficiais da ANS, garantindo aderencia total ao contrato.
+      2. Implementar API gateway com rate limiting, circuit breaker
+         e health check para cada web service TISS.
+      3. Configurar load balancer com session affinity quando
+         necessario (transacoes multi-step como autorizacao).
+      4. Implementar message queue (Kafka, RabbitMQ) para transacoes
+         assincronas (lotes de guias, demonstrativos) com
+         dead-letter queue para falhas.
+    tools:
+      - api-gateway
+      - wsdl-code-generation
+      - message-queue
+      - load-balancer
+  devsecops:
+    prose: |
+      **Validacao de web services no pipeline:**
+      1. Implementar contract testing automatizado validando cada
+         web service TISS contra WSDL/OpenAPI spec oficial da ANS.
+      2. Criar suite de testes de integracao que exercite todos os
+         web services com cenarios positivos e negativos.
+      3. Incluir testes de performance (latencia, throughput) que
+         validem conformidade com SLA de 30 segundos.
+      4. Automatizar validacao de codigos de erro conforme tabela
+         ANS em cenarios de falha.
+    tools:
+      - contract-testing
+      - integration-testing
+      - performance-testing
+      - error-validation
+  secops:
+    prose: |
+      **Monitoramento de web services TISS:**
+      1. Monitorar disponibilidade e latencia de cada web service TISS
+         em tempo real, com SLA de 99% em horario comercial.
+      2. Implementar alertas para degradacao de performance, erros
+         sistematicos e indisponibilidade de endpoints.
+      3. Manter documentacao atualizada dos web services TISS
+         disponibilizados, incluindo versao e changelog.
+      4. Auditar periodicamente se os web services implementados
+         estao aderentes as especificacoes ANS vigentes.
+    tools:
+      - api-monitoring
+      - alerting
+      - api-documentation
+      - compliance-audit
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1101"]
+    relationship: mapped

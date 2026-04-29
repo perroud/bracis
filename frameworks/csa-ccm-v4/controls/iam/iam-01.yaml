@@ -1,0 +1,99 @@
+id: iam-01
+family: iam
+title: "Identity and Access Management Policy"
+class: CSA-CCM-v4
+
+statement:
+  prose: >-
+    Establish, document, approve, communicate, apply, evaluate, and maintain
+    policies and procedures for identity and access management. The
+    identity and access management policy shall address the purpose,
+    scope, roles, responsibilities, management commitment, coordination
+    among organizational entities, compliance, and the authorization and
+    access to all relevant information assets and functions.
+
+guidance:
+  prose: >-
+    The IAM policy should define requirements for identity lifecycle
+    management (provisioning, modification, deprovisioning), authentication
+    methods (including multi-factor authentication requirements),
+    authorization models (RBAC, ABAC), privileged access management,
+    service account governance, and federated identity management.
+    The policy must address cloud-specific IAM concerns including
+    cross-account access, API key management, cloud provider IAM
+    configuration, and identity federation between on-premises and
+    cloud environments. Access should follow the principle of least
+    privilege. Regular access reviews and recertification campaigns
+    should be mandated. The policy should define acceptable session
+    management practices and idle timeout requirements.
+
+references:
+  - citation: "CSA CCM v4.0 IAM-01"
+    url: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a centralized identity provider (IdP) with SAML/OIDC
+      federation across all platform services. Deploy RBAC with predefined
+      roles mapped to job functions across Kubernetes clusters, cloud
+      accounts, and platform services. Enforce MFA for all human access
+      to platform components. Implement just-in-time (JIT) privileged
+      access for administrative operations. Deploy service mesh identity
+      with mTLS for workload-to-workload authentication. Automate
+      identity lifecycle management through integration with HR systems.
+      Implement break-glass procedures for emergency access with
+      comprehensive audit logging.
+    tools:
+      - okta
+      - keycloak
+      - vault
+      - teleport
+      - kubernetes-rbac
+      - istio
+
+  devsecops:
+    prose: >-
+      Enforce least-privilege access in CI/CD pipelines using scoped
+      service accounts with minimal permissions. Implement short-lived
+      credentials for pipeline-to-cloud authentication using workload
+      identity federation. Scan infrastructure-as-code for overly
+      permissive IAM policies. Require MFA for code repository access
+      and deployment approvals. Implement CODEOWNERS to enforce
+      access-based code review requirements. Rotate all service account
+      credentials and API keys automatically through the pipeline.
+    tools:
+      - vault
+      - checkov
+      - tfsec
+      - iam-policy-analyzer
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor authentication events for anomalous patterns including
+      impossible travel, credential stuffing, and brute force attacks.
+      Implement user and entity behavior analytics (UEBA) for identity
+      threat detection. Alert on privileged access usage and privilege
+      escalation attempts. Conduct automated periodic access reviews
+      and generate recertification reports. Monitor for dormant accounts
+      and excessive permissions. Integrate IAM logs from all cloud
+      providers into the centralized SIEM for correlation.
+    tools:
+      - splunk
+      - microsoft-sentinel
+      - crowdstrike
+      - sailpoint
+      - cyberark
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a5-15", "a5-16", "a5-17", "a5-18", "a8-2", "a8-3"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-1", "AC-2", "AC-3", "IA-1", "IA-2"]
+    relationship: mapped
+  - framework_id: soc2
+    articles: ["CC6.1", "CC6.2", "CC6.3"]
+    relationship: mapped

@@ -1,0 +1,96 @@
+id: mp-3
+family: mp
+title: "Prevention of Malware Delivery Through Email and Web"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Mechanisms must be in place to prevent the delivery of malware through email
+    and web browsing. This includes filtering or blocking executable file attachments
+    in email, scanning email attachments for malware, and preventing users from
+    accessing known malicious websites. Web browsers must be configured to prevent
+    the automatic execution of downloaded content and to warn users before running
+    potentially dangerous file types.
+
+guidance:
+  prose: >-
+    Email and web browsing are the two most common vectors for malware delivery.
+    Phishing emails with malicious attachments or links account for the majority
+    of initial compromise in cyber attacks. Organisations must implement layered
+    defences: email gateway filtering to block known malicious attachments and links
+    before they reach the user, web filtering to block access to known malicious
+    domains, and endpoint controls to prevent automatic execution of downloaded
+    content. User awareness training complements but does not replace these
+    technical controls.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Malware Protection"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+  - citation: "NCSC Guidance: Phishing Attacks — Defending Your Organisation"
+    url: "https://www.ncsc.gov.uk/guidance/phishing"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy email security gateways (Microsoft Defender for Office 365, Proofpoint,
+      Mimecast) that scan attachments in a sandbox before delivery. Configure email
+      policies to block or quarantine executable attachments (.exe, .scr, .bat, .ps1,
+      .vbs, .js, .wsf). Implement DMARC, DKIM, and SPF on all organisational domains
+      to prevent email spoofing. Deploy DNS-layer web filtering (Cisco Umbrella,
+      Cloudflare Gateway, Zscaler) to block access to known malicious domains and
+      newly registered domains. Configure web proxy policies to block downloads of
+      executable file types from uncategorised websites.
+    tools:
+      - microsoft-defender-for-office-365
+      - proofpoint
+      - mimecast
+      - cisco-umbrella
+      - cloudflare-gateway
+      - zscaler
+
+  devsecops:
+    prose: >-
+      Implement email security configurations as code (e.g., Exchange Online policies
+      via PowerShell/Terraform). Automate DMARC, DKIM, and SPF record management
+      through DNS-as-Code. Integrate malware scanning into any application that
+      processes user-uploaded files or email content. Use CI/CD pipelines to test
+      email filtering policies by sending benign test samples through the gateway.
+      Scan application dependencies for libraries that process email or web content
+      for known vulnerabilities.
+    tools:
+      - terraform
+      - gitlab-ci
+      - clamav
+      - gitlab-sast
+      - gitlab-dependency-scanning
+
+  secops:
+    prose: >-
+      Monitor email gateway telemetry for spikes in blocked malicious emails that
+      may indicate a targeted phishing campaign. Review quarantined emails regularly
+      to release legitimate messages and tune filtering rules. Track click rates on
+      phishing simulation exercises as a measure of user awareness. Monitor web
+      filtering logs for users attempting to access blocked malicious sites and
+      correlate with endpoint telemetry. Generate regular threat intelligence
+      reports on the most common malware delivery methods targeting the organisation.
+    tools:
+      - microsoft-defender-for-office-365
+      - proofpoint
+      - splunk
+      - elastic-siem
+      - knowbe4
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.7", "A8.23"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-8", "SC-7"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-macro-settings", "e8-user-app-hardening"]
+    relationship: complements
+  - framework_id: cis-controls-v8
+    articles: ["CIS 9.6", "CIS 9.7", "CIS 10.1"]
+    relationship: mapped

@@ -1,0 +1,101 @@
+id: cscf-2.6
+family: obj-2
+title: "Operator Session Confidentiality"
+class: SWIFT-CSP
+classification: advisory
+architecture_types: [A1, A2, A3, A4]
+
+statement:
+  prose: >-
+    Protect the confidentiality and integrity of interactive operator sessions
+    connecting to SWIFT-related applications. All remote and local operator
+    sessions must be encrypted and protected against session hijacking,
+    replay, and man-in-the-middle attacks.
+  parts:
+    - id: cscf-2.6.a
+      label: "2.6.a"
+      prose: >-
+        All remote operator sessions to SWIFT components use encrypted
+        protocols (SSH, RDP with TLS, HTTPS) with strong cipher suites.
+        Unencrypted protocols (Telnet, plain HTTP, unencrypted VNC) are
+        disabled.
+    - id: cscf-2.6.b
+      label: "2.6.b"
+      prose: >-
+        Session timeouts are configured for all operator interfaces to
+        SWIFT applications, locking or terminating idle sessions after
+        a defined period.
+    - id: cscf-2.6.c
+      label: "2.6.c"
+      prose: >-
+        Privileged session management (PSM) or session recording is
+        implemented for administrative access to SWIFT infrastructure
+        components.
+
+guidance:
+  prose: >-
+    Operator sessions carry authentication credentials and display sensitive
+    financial transaction data. If sessions are unencrypted, an attacker
+    on the network can capture credentials or manipulate transaction data
+    in transit. Session timeouts prevent unauthorized use of unattended
+    terminals. Session recording for privileged access provides forensic
+    evidence and deters insider threats. Organizations should consider
+    implementing privileged access workstations (PAWs) dedicated exclusively
+    to SWIFT administration.
+
+references:
+  - citation: "SWIFT CSCF v2024 — Control 2.6"
+    url: "https://www.swift.com/myswift/customer-security-programme-csp"
+  - citation: "NIST SP 800-63B — Digital Identity Guidelines: Authentication and Lifecycle Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a privileged access management (PAM) solution (CyberArk,
+      HashiCorp Boundary, Teleport) that brokers all operator sessions
+      to SWIFT infrastructure. Configure session recording for all
+      administrative access. Enforce SSH certificate authentication
+      instead of password-based SSH. Set session idle timeouts to 15
+      minutes or less on all SWIFT application interfaces. Disable
+      all unencrypted remote access protocols at the network level.
+    tools:
+      - cyberark
+      - hashicorp-boundary
+      - teleport
+      - beyond-trust
+      - ssh-certificates
+
+  devsecops:
+    prose: >-
+      Scan infrastructure configurations for unencrypted protocols in
+      CI/CD pipelines. Validate session timeout configurations are
+      present and within policy limits. Test that unencrypted protocols
+      are properly blocked through automated connectivity checks.
+    tools:
+      - inspec
+      - ansible
+      - nmap
+      - gitlab-ci
+      - github-actions
+
+  secops:
+    prose: >-
+      Monitor for unencrypted protocol usage within the secure zone.
+      Review privileged session recordings for suspicious activity.
+      Alert on brute-force attempts against operator session interfaces.
+      Track session duration metrics and flag abnormally long sessions
+      for investigation.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark-pta
+      - crowdstrike-falcon
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "AC-11", "AC-12", "AU-14"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["A8.24", "A8.5"]
+    relationship: supports

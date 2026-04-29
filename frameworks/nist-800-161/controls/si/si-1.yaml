@@ -1,0 +1,105 @@
+id: si-1
+family: si
+title: "Software Supply Chain Integrity Verification"
+class: NIST800161
+baselines: [level-1, level-2, level-3]
+statement:
+  prose: >-
+    Verify the integrity of software, firmware, and information received from
+    supply chain sources prior to deployment. Employ mechanisms such as digital
+    signatures, cryptographic hashes, and provenance attestations to detect
+    unauthorized modifications to software and firmware during development,
+    transit, and storage. Reject components that fail integrity verification.
+  parts:
+    - id: si-1_smt.a
+      label: "a."
+      prose: >-
+        Employ integrity verification mechanisms including digital signatures,
+        cryptographic hashes, and provenance attestations for all software and
+        firmware acquired from supply chain sources.
+    - id: si-1_smt.b
+      label: "b."
+      prose: >-
+        Verify software and firmware integrity at each stage of the supply chain
+        including acquisition, storage, integration, and deployment.
+    - id: si-1_smt.c
+      label: "c."
+      prose: >-
+        Reject and quarantine software and firmware components that fail integrity
+        verification checks.
+guidance:
+  prose: >-
+    Software integrity verification is a fundamental control for detecting supply
+    chain tampering. Organizations should verify the integrity of all software
+    and firmware before deployment, including open-source components, commercial
+    software, and internally developed code that passes through external build
+    systems. Verification mechanisms include checking digital signatures against
+    trusted keys, validating cryptographic hashes against known-good values, and
+    verifying SLSA provenance attestations. Organizations should establish a chain
+    of custody for all software artifacts from source to deployment. The SLSA
+    framework provides a graduated approach to supply chain integrity, from basic
+    provenance (SLSA Level 1) to hermetic, reproducible builds (SLSA Level 4).
+references:
+  - citation: "NIST SP 800-161 Rev 1, Section 3.5"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final"
+  - citation: "NIST SP 800-53 Rev 5, SI-7"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement mandatory artifact signing for all container images and packages
+      in the platform. Deploy admission controllers that verify image signatures
+      before allowing deployment. Use Sigstore (cosign) for keyless signing and
+      Rekor for transparency logging. Implement SLSA provenance generation in
+      all build pipelines and verify provenance at deployment time. Maintain a
+      trust store of approved signing keys and certificate authorities. Deploy
+      private registries that validate integrity on push and pull operations.
+    tools:
+      - "Sigstore (cosign, Rekor, Fulcio)"
+      - "SLSA framework"
+      - "Kyverno / OPA (signature verification policies)"
+      - "Harbor (Notary integration)"
+      - "in-toto (supply chain attestation)"
+      - "Kubernetes admission controllers"
+  devsecops:
+    prose: >-
+      Sign all build artifacts in CI/CD pipelines using Sigstore or similar
+      tools. Generate SLSA provenance attestations for every build. Implement
+      hash-pinned dependencies in all package manager lock files. Verify
+      upstream dependency signatures and checksums during the build process.
+      Implement pipeline checks that validate artifact integrity before
+      promotion to production registries. Use reproducible builds where
+      feasible to enable independent verification.
+    tools:
+      - "Sigstore (cosign in CI)"
+      - "SLSA provenance generators"
+      - "Lock files (package-lock.json, go.sum, Cargo.lock)"
+      - "GitLab Dependency Scanning"
+      - "Trivy (integrity verification)"
+  secops:
+    prose: >-
+      Monitor for integrity verification failures across the organization
+      and investigate as potential supply chain compromises. Track the
+      percentage of deployments with verified signatures and provenance.
+      Audit the integrity verification process periodically to ensure
+      effectiveness. Investigate and respond to anomalies in software
+      integrity verification such as unexpected hash changes or signature
+      failures. Maintain metrics on supply chain integrity posture.
+    tools:
+      - "Rekor (transparency log monitoring)"
+      - "SIEM (integrity failure alerts)"
+      - "Dependency-Track (integrity monitoring)"
+      - "Compliance dashboards"
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-7", "SR-4", "SR-11"]
+    relationship: derived-from
+  - framework_id: nist-csf-v2
+    articles: ["PR.DS-06", "GV.SC-08"]
+    relationship: complements
+  - framework_id: nist-800-218
+    articles: ["PS-1", "PS-2"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.8.24", "A.8.26"]
+    relationship: mapped

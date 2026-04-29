@@ -1,0 +1,91 @@
+id: ops-1
+family: ops
+title: "Change Management"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall implement procedures to control changes to
+    the organisation, business processes, information processing
+    facilities, and systems that affect information security. Changes
+    shall be assessed for potential security impacts before implementation.
+    All changes shall be authorised, documented, and tested before
+    deployment to the production environment. Emergency changes shall
+    follow a defined expedited process and be subject to post-implementation
+    review.
+
+guidance:
+  prose: >-
+    Change management is particularly critical in cloud environments
+    because changes can affect multiple tenants simultaneously. The
+    change management process must cover infrastructure changes, software
+    deployments, configuration changes, and policy updates. Each change
+    should be assessed for security impact, tested in a non-production
+    environment, approved by an authorized party, and documented with
+    sufficient detail for rollback if needed. Emergency change procedures
+    must be defined but subject to stricter post-implementation controls.
+
+references:
+  - citation: "C5:2020, OPS-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement GitOps-based change management where all infrastructure
+      and configuration changes are made through version-controlled
+      repositories with mandatory merge request workflows. Enforce
+      multi-stage deployment pipelines (dev → staging → production) with
+      automated testing and manual approval gates for production
+      deployments. Use feature flags for progressive rollouts and
+      automated rollback capabilities. Document all changes through
+      Git commit history and merge request records.
+    tools:
+      - git
+      - gitlab
+      - argocd
+      - flux
+      - terraform
+      - backstage
+
+  devsecops:
+    prose: >-
+      Enforce mandatory merge request approvals for all changes to
+      production branches. Implement automated security scanning
+      (SAST, DAST, dependency scanning) as mandatory pipeline stages
+      before any change can be approved. Require passing pipeline status
+      before merge is allowed. Implement change impact analysis
+      automation that identifies affected services and tenants for each
+      proposed change.
+    tools:
+      - gitlab-ci
+      - checkov
+      - trivy
+      - semgrep
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor all production changes through SIEM integration with
+      deployment pipelines. Alert on unauthorized changes (changes that
+      bypass the standard change process). Maintain a change log
+      correlated with security events to support incident investigation.
+      Conduct periodic audits of emergency changes to verify post-
+      implementation reviews were completed.
+    tools:
+      - splunk
+      - elastic-siem
+      - servicenow
+      - pagerduty
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.32"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["CM-3", "CM-4"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["CCC-01", "CCC-02"]
+    relationship: mapped

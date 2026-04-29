@@ -1,0 +1,102 @@
+id: art-6
+family: cap-2
+title: "Componente de Conteudo e Estrutura"
+class: TISS
+baselines: [tiss-all]
+statement:
+  prose: |
+    Art. 6. O componente de conteúdo e estrutura do Padrão TISS define
+    o conjunto de dados que compõe cada tipo de mensagem TISS, incluindo
+    campos obrigatórios, campos opcionais, tipos de dados, tamanhos
+    máximos e regras de preenchimento.
+
+    Parágrafo 1. Os schemas XML (XSD) publicados pela ANS são a
+    especificação técnica autoritativa do componente de conteúdo e
+    estrutura.
+
+    Parágrafo 2. As guias TISS devem conter, no mínimo:
+    I - Identificação do beneficiário (número da carteira, nome, CPF);
+    II - Identificação do prestador (CNES, CNPJ, CRM/CRO);
+    III - Dados do atendimento (data, procedimento, CID, TUSS);
+    IV - Dados financeiros (valores cobrados, valores pagos, glosas);
+    V - Assinatura digital ou hash de integridade.
+guidance:
+  prose: |
+    O componente de conteudo e estrutura e a espinha dorsal tecnica do
+    TISS, definindo exatamente quais dados cada mensagem deve conter.
+
+    **Schemas XSD oficiais:**
+    A ANS publica schemas XSD que sao a referencia unica para validacao
+    de mensagens TISS. Schemas estao organizados por:
+    - Tipo de guia (consulta, SP/SADT, internacao, honorarios, odonto)
+    - Tipo de transacao (solicitacao, resposta, lote, protocolo)
+    - Versao do padrao (3.x, 4.x)
+
+    **Campos criticos por tipo de guia:**
+    - Guia de consulta: beneficiario, prestador executante, CID, TUSS
+    - Guia SP/SADT: + tecnica utilizada, quantidade, via de acesso
+    - Guia de internacao: + tipo de internacao, carater, regime
+    - Guia de honorarios: + equipe medica, porte anestesico
+    - Guia odontologica: + face dental, regiao, CRO
+
+    **Dados sensiveis (LGPD):**
+    As guias TISS contem dados pessoais sensiveis de saude (CID,
+    procedimentos, resultados). O tratamento destes dados deve
+    observar o art. 11 da LGPD (dados pessoais sensiveis).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao do modelo de dados TISS:**
+      1. Implementar biblioteca de serializacao/desserializacao XML
+         TISS gerada automaticamente a partir dos schemas XSD oficiais
+         (xjc, JAXB, xmlschema para Python).
+      2. Manter repositorio versionado com todos os schemas XSD TISS
+         vigentes e anteriores para suporte multi-versao.
+      3. Implementar validacao de schema como middleware obrigatorio
+         antes do processamento de qualquer mensagem TISS.
+      4. Criar data dictionary interno mapeando cada campo TISS para
+         o campo correspondente no banco de dados do sistema.
+    tools:
+      - xsd-code-generation
+      - schema-repository
+      - xml-validation-middleware
+      - data-dictionary
+  devsecops:
+    prose: |
+      **Validacao de conteudo e estrutura no pipeline:**
+      1. Implementar validacao automatica de XML contra XSD TISS em
+         cada build, rejeitando commits que quebrem conformidade.
+      2. Criar testes parametrizados para cada tipo de guia TISS,
+         validando campos obrigatorios, tipos de dados e tamanhos.
+      3. Automatizar deteccao de campos deprecados ou novos campos
+         obrigatorios ao atualizar versao do schema.
+      4. Incluir fuzzing de mensagens XML TISS para validar robustez
+         do parser contra inputs malformados.
+    tools:
+      - xsd-validation
+      - parameterized-tests
+      - schema-diff
+      - xml-fuzzing
+  secops:
+    prose: |
+      **Protecao de dados sensiveis nas guias TISS:**
+      1. Classificar campos TISS que contem dados pessoais sensiveis
+         (CID, procedimentos, diagnosticos) conforme LGPD art. 11.
+      2. Implementar mascaramento de dados sensiveis em logs e
+         ambientes de desenvolvimento/teste.
+      3. Auditar periodicamente se campos sensiveis estao sendo
+         armazenados com protecao adequada (criptografia at-rest).
+      4. Manter registro de tratamento de dados (ROPA) especifico
+         para dados de saude trafegados via TISS.
+    tools:
+      - data-classification
+      - data-masking
+      - encryption-audit
+      - ropa-registry
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-11", "art-37"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["162-1002"]
+    relationship: mapped

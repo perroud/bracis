@@ -1,0 +1,177 @@
+id: art-15
+family: cap-4
+title: "Requisitos para Contratacao de Servicos de Computacao em Nuvem"
+class: CVM-35
+baselines: [all]
+statement:
+  prose: |
+    Art. 15. A contratação de serviços de processamento, armazenamento de dados
+    e computação em nuvem deve observar os seguintes requisitos:
+    I - conformidade dos serviços contratados com a legislação e regulamentação
+    em vigor;
+    II - capacidade do prestador de serviços para assegurar o cumprimento da
+    legislação e regulamentação aplicáveis;
+    III - acesso da entidade contratante aos dados e informações processados
+    ou armazenados pelo prestador de serviços;
+    IV - garantia de confidencialidade, integridade e disponibilidade dos dados
+    e informações processados ou armazenados;
+    V - existência de recursos e procedimentos para a continuidade de negócios;
+    VI - possibilidade de substituição do prestador de serviços sem prejuízo
+    para o regular funcionamento das atividades;
+    VII - adoção de certificações e padrões de segurança reconhecidos
+    internacionalmente pelo prestador de serviços;
+    VIII - definição de níveis de serviço (SLAs) compatíveis com a criticidade
+    dos serviços contratados.
+guidance:
+  prose: |
+    O art. 15 estabelece os oito requisitos obrigatorios para contratacao
+    de servicos em nuvem. E o equivalente ao art. 14 da Bacen 4.893.
+
+    **I — Conformidade regulatoria:**
+    O prestador de nuvem deve estar em conformidade com a legislacao
+    brasileira (LGPD, Marco Civil da Internet, regulamentacao CVM). Isso
+    inclui requisitos de localizacao de dados se aplicavel.
+
+    **II — Capacidade do prestador:**
+    Due diligence do prestador: capacidade tecnica, financeira e operacional.
+    Avaliar se o prestador tem experiencia com clientes do setor financeiro
+    e conhece os requisitos regulatorios brasileiros.
+
+    **III — Acesso aos dados:**
+    A entidade deve manter acesso irrestrito aos seus dados, em formato
+    portavel, a qualquer momento. Clausulas contratuais devem garantir
+    isso mesmo em caso de encerramento do contrato.
+
+    **IV — CIA dos dados:**
+    Garantias contratuais e tecnicas de que dados em nuvem terao
+    confidencialidade, integridade e disponibilidade conforme exigido
+    pela regulamentacao.
+
+    **V — Continuidade de negocios:**
+    O prestador deve ter plano de continuidade que assegure disponibilidade
+    dos servicos mesmo em cenarios adversos (falha de data center,
+    desastres, ataques ciberneticos).
+
+    **VI — Substituibilidade (vendor lock-in):**
+    A entidade deve poder trocar de prestador sem impacto operacional
+    significativo. Isso implica: portabilidade de dados, APIs padronizadas,
+    arquitetura multi-cloud ou cloud-agnostic.
+
+    **VII — Certificacoes:**
+    Prestador deve possuir certificacoes reconhecidas: ISO 27001, SOC 2
+    Type II, CSA STAR, PCI DSS (se aplicavel). Certificacoes devem ser
+    verificadas periodicamente.
+
+    **VIII — SLAs:**
+    Niveis de servico definidos contratualmente, cobrindo: disponibilidade
+    (ex: 99.99%), tempo de resposta a incidentes, tempo de recuperacao,
+    suporte. SLAs devem ser proporcionais a criticidade do servico.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Due diligence do prestador (I, II, VII):**
+      1. Checklist de avaliacao de prestadores de nuvem cobrindo os oito
+         requisitos do art. 15.
+      2. Verificacao de certificacoes: ISO 27001, SOC 2 Type II, CSA STAR.
+      3. Avaliacao de capacidade tecnica: data centers no Brasil, experiencia
+         com setor financeiro, compliance com LGPD.
+      4. Avaliacao financeira: estabilidade do prestador, riscos de
+         descontinuidade.
+
+      **Acesso e portabilidade (III, VI):**
+      5. Arquitetura cloud-agnostic usando Kubernetes e IaC (Terraform/Pulumi)
+         para reduzir vendor lock-in.
+      6. Exportacao periodica de dados em formato aberto e portavel.
+      7. Multi-cloud strategy para servicos criticos (failover entre providers).
+      8. APIs de integracao padronizadas (REST, gRPC) sem dependencia de
+         servicos proprietarios exclusivos.
+
+      **Seguranca e disponibilidade (IV, V):**
+      9. Criptografia de dados em repouso e em transito na nuvem.
+      10. Chaves de criptografia sob gestao da entidade (BYOK/HYOK).
+      11. Multi-region deployment para alta disponibilidade.
+      12. Backup automatizado com replicacao geografica.
+      13. Disaster recovery testado com failover entre regioes/providers.
+
+      **SLAs (VIII):**
+      14. Monitoramento de SLAs em tempo real (uptime, latencia, erros).
+      15. Alertas automaticos quando SLAs estao proximos de serem violados.
+      16. Relatorio mensal de conformidade com SLAs para gestao.
+    tools:
+      - terraform
+      - pulumi
+      - kubernetes
+      - vault
+      - cloud-monitoring
+      - backup-solution
+  devsecops:
+    prose: |
+      **Seguranca na nuvem via pipeline (IV):**
+      1. IaC scanning (Checkov, tfsec) para detectar misconfiguration de
+         nuvem antes do deploy.
+      2. Cloud Security Posture Management (CSPM) integrado ao pipeline.
+      3. Container scanning para imagens antes de push para registry de nuvem.
+      4. Secret scanning para evitar credenciais de nuvem em codigo.
+
+      **Portabilidade e substituibilidade (VI):**
+      5. Pipelines de CI/CD que deployam em multiplos providers (abstraction layer).
+      6. Testes automatizados de portabilidade: build e deploy em provider
+         alternativo periodicamente.
+      7. Containerizacao de aplicacoes para independencia de provider.
+
+      **Monitoramento de conformidade (I, VII, VIII):**
+      8. Compliance-as-Code para validar configuracao de nuvem
+         continuamente (Regula, Checkov, Cloud Custodian).
+      9. Alertas de drift de configuracao (configuracao real vs. declarada).
+      10. Dashboard de conformidade com certificacoes do provider.
+    tools:
+      - checkov
+      - tfsec
+      - trivy
+      - cloud-custodian
+      - gitlab-ci
+      - gitlab-container-scanning
+  secops:
+    prose: |
+      **Gestao contratual e monitoramento (todos os incisos):**
+      1. Contrato com clausulas especificas para cada requisito do art. 15.
+      2. Revisao contratual anual com verificacao de certificacoes vigentes.
+      3. Right to audit clause: direito de auditar o prestador.
+      4. Monitoramento de notificacoes do prestador (incidentes, mudancas
+         de servico, descontinuacoes).
+
+      **Monitoramento de SLAs (VIII):**
+      5. Dashboard de SLAs com historico e tendencias.
+      6. Processo de escalacao quando SLAs sao violados.
+      7. Clausulas de penalidade por descumprimento de SLAs.
+
+      **Continuidade e substituicao (V, VI):**
+      8. Plano de contingencia documentado para cada servico de nuvem.
+      9. Plano de saida (exit plan) para cada prestador, com cronograma
+         e procedimentos de migracao.
+      10. Teste anual de portabilidade: exportacao completa de dados e
+          validacao de integridade.
+
+      **Avaliacao de riscos do prestador:**
+      11. Risk assessment anual do prestador de nuvem.
+      12. Monitoramento continuo de riscos: mudancas regulatorias no pais
+          do prestador, incidentes de seguranca, mudancas acionarias.
+      13. Reavaliacao imediata se o prestador sofrer incidente grave.
+    tools:
+      - grc-platform
+      - cloud-monitoring
+      - contract-management
+      - risk-management-platform
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-14", "art-15", "art-16"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-4", "SA-9", "SA-12", "CP-2", "SC-28"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.20", "A.5.21", "A.5.22", "A.5.23"]
+    relationship: mapped
+  - framework_id: lgpd
+    articles: ["art-46", "art-33", "art-35"]
+    relationship: complements

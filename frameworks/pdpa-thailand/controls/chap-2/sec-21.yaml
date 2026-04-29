@@ -1,0 +1,91 @@
+id: sec-21
+family: chap-2
+title: "Purpose Limitation"
+class: PDPA-Thailand
+statement:
+  prose: |
+    Section 21. The collection of personal data shall be carried out only to the extent
+    necessary for the purposes specified by the data controller. The data controller shall
+    not collect personal data beyond what is necessary for the purposes of collection.
+
+    The data controller shall not use or disclose personal data for purposes other than
+    those for which the personal data was collected, unless the data subject has given
+    consent or it is otherwise permitted by this Act.
+  parts:
+    - id: sec-21-1
+      label: "Paragraph 1"
+      prose: |
+        Collection limited to what is necessary for specified purposes.
+    - id: sec-21-2
+      label: "Paragraph 2"
+      prose: |
+        Use or disclosure for secondary purposes requires new consent or
+        a separate legal basis under this Act.
+guidance:
+  prose: |
+    Section 21 codifies the purpose limitation principle, directly mirroring GDPR
+    Article 5(1)(b). This is one of the most operationally impactful provisions
+    because it restricts data reuse across business functions.
+
+    Key implications:
+
+    - **No Secondary Use Without Basis:** Data collected for purpose A cannot be
+      repurposed for purpose B without additional consent or a compatible legal basis.
+      This directly impacts analytics, marketing, and ML/AI training.
+
+    - **Purpose Registry:** Maintain a machine-readable registry of purposes. Each
+      data processing operation must reference a declared purpose.
+
+    - **Data Silos by Purpose:** Consider logical or physical separation of data by
+      purpose. A customer's data collected for service delivery should not be
+      accessible to marketing systems without explicit basis.
+
+    - **API Design:** APIs should enforce purpose-bound access. Callers must specify
+      the purpose, and the system validates the caller's authorization for that purpose.
+
+    - **ML/AI Considerations:** Training models on personal data collected for another
+      purpose requires separate consent or a compatible lawful basis. Document the
+      purpose compatibility analysis.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement purpose-bound access control: data access requests must include
+         a purpose parameter validated against the ROPA.
+      2. Tag data at ingestion with the declared collection purpose. Enforce purpose
+         tags through the data pipeline.
+      3. Build purpose compatibility checks for secondary processing requests.
+      4. Implement data access policies that restrict cross-purpose data flows
+         at the infrastructure level (network policies, database views).
+      5. Create purpose-aware data sharing agreements for internal team access.
+    tools:
+      - purpose-bound-access-control
+      - data-lineage-tracker
+      - data-catalog
+      - policy-engine
+  devsecops:
+    prose: |
+      1. Lint code for data access calls that do not specify a processing purpose.
+      2. Validate in CI/CD that new data flows have corresponding purpose declarations.
+      3. Detect cross-purpose data access in integration tests.
+      4. Flag data exports or ETL jobs that mix data from different purpose scopes.
+    tools:
+      - privacy-linter
+      - data-flow-analyzer
+      - purpose-validation-tests
+  secops:
+    prose: |
+      1. Monitor for data access patterns inconsistent with declared purposes.
+      2. Alert on bulk data exports that cross purpose boundaries.
+      3. Audit purpose declarations against actual data usage quarterly.
+      4. Track purpose creep through data lineage monitoring.
+    tools:
+      - siem
+      - data-lineage-monitor
+      - purpose-audit-tool
+legal_references:
+  - framework_id: gdpr
+    articles: ["art. 5(1)(b)"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art. 6-I"]
+    relationship: equivalent-to

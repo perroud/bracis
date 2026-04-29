@@ -1,0 +1,82 @@
+id: oi-sa-04
+family: sa
+title: "Diretorio de Participantes e Registro de Software"
+class: OPEN-INSURANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    O Diretório de Participantes é a infraestrutura centralizada de confiança do
+    ecossistema Open Insurance, responsável por:
+
+    I - Registro e autenticação de todos os participantes (obrigatórios e voluntários);
+    II - Emissão e gestão de software statements que identificam cada aplicação de
+    cada participante;
+    III - Registro de certificados digitais associados a cada software statement;
+    IV - Publicação de endpoints de APIs de cada participante;
+    V - Manutenção de metadata de discovery (well-known endpoints) para cada
+    Authorization Server.
+
+    Todos os participantes devem se registrar no Diretório, manter seus registros
+    atualizados e validar a autenticidade de outros participantes consultando o
+    Diretório antes de estabelecer comunicações.
+
+    Chamadas de API de participantes não registrados no Diretório devem ser
+    rejeitadas.
+guidance:
+  prose: |
+    O Diretorio de Participantes e a "fonte de verdade" do ecossistema. Funciona
+    como um registro centralizado de identidades, similar a um DNS de confianca
+    para o Open Insurance.
+
+    Cada participante registra um ou mais "software statements" -- cada um
+    representando uma aplicacao (app mobile, portal web, backend). Cada software
+    statement tem um identificador unico (software_id) e certificados associados.
+
+    O fluxo de validacao e:
+    1. Receptora inicia chamada a transmissora
+    2. Transmissora valida certificado mTLS da receptora
+    3. Transmissora consulta Diretorio para verificar que o software_id e valido
+       e o certificado esta registrado
+    4. Se valido, processa a chamada; se invalido, rejeita
+
+    O Diretorio tambem publica metadata para discovery (OpenID Connect Discovery),
+    permitindo que participantes descubram automaticamente endpoints de autorizacao
+    e APIs de outros participantes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Registrar-se no Diretorio de Participantes do Open Insurance.
+      2. Criar software statements para cada aplicacao que participara do ecossistema.
+      3. Associar certificados ICP-Brasil a cada software statement.
+      4. Publicar well-known endpoints conforme especificacao OpenID Connect Discovery.
+      5. Implementar validacao de participantes contra o Diretorio em cada chamada
+         de API recebida.
+      6. Implementar cache do Diretorio com TTL curto para performance.
+    tools:
+      - identity-provider
+      - api-gateway
+      - service-discovery
+      - pki-management
+  devsecops:
+    prose: |
+      1. Testes de integracao com o Diretorio de Participantes (sandbox e producao).
+      2. Testar que chamadas de participantes nao registrados sao rejeitadas.
+      3. Testar que certificados nao registrados no Diretorio sao recusados.
+      4. Testar discovery de endpoints via well-known.
+    tools:
+      - integration-testing
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      1. Monitorar status do registro no Diretorio e alertar sobre inconsistencias.
+      2. Auditar que validacoes contra o Diretorio estao sendo executadas.
+      3. Monitorar tentativas de acesso de participantes nao registrados.
+    tools:
+      - api-monitoring
+      - siem
+      - compliance-dashboard
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-3"]
+    relationship: complements

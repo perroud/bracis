@@ -1,0 +1,101 @@
+id: cip-010-r2
+family: cip-010
+title: "Configuration Monitoring"
+class: NERC-CIP
+
+statement:
+  prose: >-
+    Each Responsible Entity shall implement one or more documented
+    processes to monitor for and detect unauthorized changes to BES
+    Cyber Systems that include the applicable requirement parts.
+  parts:
+    - id: cip-010-r2.1
+      label: "2.1"
+      prose: >-
+        Monitor at least once every 35 calendar days for changes to
+        the baseline configuration (as described in part 1.1).
+        Document and investigate detected unauthorized changes.
+
+guidance:
+  prose: >-
+    CIP-010 R2 complements R1 by requiring active monitoring for
+    unauthorized configuration changes. While R1 manages authorized
+    changes through a formal process, R2 detects changes that bypass
+    the authorized process. The 35-day monitoring cycle sets the
+    maximum interval between configuration compliance checks.
+    Automated, continuous monitoring is strongly recommended as it
+    provides faster detection than the 35-day minimum. Detected
+    unauthorized changes must be documented and investigated, which
+    creates a link to the incident response process (CIP-008) if
+    the change indicates a security compromise. File integrity
+    monitoring (FIM), configuration management database (CMDB)
+    reconciliation, and Infrastructure-as-Code drift detection
+    are all valid implementation approaches.
+
+references:
+  - citation: "NERC CIP-010-4 — Configuration Change Management and Vulnerability Assessments"
+    url: "https://www.nerc.com/pa/Stand/Reliability%20Standards/CIP-010-4.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy continuous configuration monitoring tools that compare
+      running system state against documented baselines. Implement
+      file integrity monitoring (FIM) on BES Cyber Systems to detect
+      unauthorized file modifications. Use Infrastructure-as-Code
+      drift detection to identify when deployed infrastructure
+      deviates from declared state. Deploy host-based agents or
+      agentless scanning that captures system configuration at regular
+      intervals. Implement alerting for detected configuration drift
+      with integration to the incident response workflow. Maintain
+      dashboards showing configuration compliance status across
+      all BES Cyber Systems.
+    tools:
+      - terraform
+      - ansible
+      - osquery
+      - grafana
+      - prometheus
+
+  devsecops:
+    prose: >-
+      Implement automated configuration drift detection as scheduled
+      CI/CD pipeline jobs running at intervals well within the
+      35-day requirement. Store baseline snapshots in version control
+      and compare against live configurations through automated
+      testing. Create pipeline alerts for detected unauthorized
+      changes with automatic ticket creation for investigation.
+      Implement GitOps reconciliation loops that detect and report
+      when deployed state diverges from the Git-declared state.
+    tools:
+      - gitlab-ci
+      - argocd
+      - terraform
+      - conftest
+      - osquery
+
+  secops:
+    prose: >-
+      Monitor file integrity and configuration state across all
+      BES Cyber Systems. Alert on unauthorized changes with
+      contextual information (what changed, when, by whom if
+      available). Investigate all detected unauthorized changes
+      and document findings. Correlate configuration changes with
+      other security events to identify potential compromise.
+      Generate compliance reports showing monitoring frequency,
+      detection results, and investigation outcomes for audit
+      evidence.
+    tools:
+      - splunk
+      - elastic-siem
+      - osquery
+      - tripwire
+      - servicenow
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-3", "CM-6", "SI-7"]
+    relationship: supports
+  - framework_id: iec-62443
+    articles: ["2-1-4.3.4.3.2"]
+    relationship: supports

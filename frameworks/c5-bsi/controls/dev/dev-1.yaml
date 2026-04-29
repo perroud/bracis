@@ -1,0 +1,95 @@
+id: dev-1
+family: dev
+title: "Secure Development Policy"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall establish and apply rules for the
+    development of software and systems that are used to provide the
+    cloud services. The development rules shall address secure coding
+    practices, code review requirements, security testing throughout
+    the development lifecycle, and the separation of development,
+    testing, and production environments. The cloud provider shall
+    ensure that security is integrated into all phases of the
+    software development lifecycle.
+
+guidance:
+  prose: >-
+    Secure development practices are essential because vulnerabilities
+    in cloud service software can affect all tenants simultaneously.
+    The secure development policy should mandate threat modelling for
+    new features, secure coding standards aligned with industry
+    frameworks (OWASP, CERT), mandatory code reviews with security
+    focus, automated security testing (SAST, DAST, SCA) integrated
+    into CI/CD pipelines, and strict environment separation. The
+    policy should also address open-source component management and
+    software supply chain security.
+
+references:
+  - citation: "C5:2020, DEV-01"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Provide standardized development environments with pre-configured
+      security tooling. Enforce environment separation (dev/staging/prod)
+      through infrastructure-as-code with distinct access controls and
+      network boundaries for each environment. Deploy golden path
+      templates in the developer portal that embed security controls
+      by default. Implement software supply chain security through
+      signed container images, verified base images, and artifact
+      provenance verification.
+    tools:
+      - backstage
+      - terraform
+      - sigstore
+      - cosign
+      - kubernetes
+      - gitlab
+
+  devsecops:
+    prose: >-
+      Integrate security scanning at every stage of the CI/CD pipeline:
+      pre-commit (secret detection, linting), build (SAST, SCA), test
+      (DAST, API fuzzing), and deploy (container scanning, IaC scanning).
+      Enforce mandatory code review by at least one reviewer other than
+      the author. Block merges when critical or high-severity security
+      findings are unresolved. Implement SBOM generation for all builds
+      and track vulnerability status across all dependencies.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - sonarqube
+      - trivy
+      - gitleaks
+      - syft
+      - grype
+      - zap
+
+  secops:
+    prose: >-
+      Monitor vulnerability trends across development projects and
+      track mean time to remediation. Correlate production security
+      incidents with development practices to identify systemic
+      weaknesses. Review security testing coverage metrics and identify
+      gaps. Conduct periodic secure development maturity assessments
+      and track improvement over time.
+    tools:
+      - splunk
+      - defectdojo
+      - elastic-siem
+      - sonarqube
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.25", "a8.26", "a8.31"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["SA-3", "SA-11", "SA-15"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["AIS-01", "AIS-02", "AIS-04"]
+    relationship: mapped

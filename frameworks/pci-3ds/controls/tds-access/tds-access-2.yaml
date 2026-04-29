@@ -1,0 +1,95 @@
+id: tds-access-2
+family: tds-access
+title: "Multi-Factor Authentication for 3DS Environment Access"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Multi-factor authentication (MFA) must be implemented for all
+    personnel accessing the 3DS environment. MFA must be required for
+    all administrative access, remote access, and any non-console access
+    to 3DS system components. At least two of the three authentication
+    factors must be used: something the user knows (password or
+    passphrase), something the user has (token device, smart card, or
+    authenticator application), or something the user is (biometric).
+    The authentication factors must be independent of each other, and
+    compromise of one factor must not affect the integrity of the other.
+
+guidance:
+  prose: >-
+    Multi-factor authentication significantly reduces the risk of
+    unauthorized access resulting from credential compromise. In the 3DS
+    environment, where compromised access can directly impact payment
+    security, MFA provides a critical additional layer of defense. Phishing,
+    credential stuffing, and password reuse attacks are mitigated by
+    requiring a second factor that the attacker is unlikely to possess.
+    Modern authenticator applications using TOTP or FIDO2/WebAuthn provide
+    stronger second factors than SMS-based one-time passwords, which are
+    vulnerable to SIM-swapping attacks.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 4 — Authentication Requirements"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 4.2 — Multi-Factor Authentication"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce MFA at the identity provider level for all users accessing
+      3DS systems. Configure SSO with mandatory MFA using SAML or OIDC
+      integration. Implement FIDO2/WebAuthn hardware security keys as the
+      preferred second factor for administrative accounts. Configure cloud
+      provider IAM policies to require MFA for all console and API access
+      to 3DS resources. Implement conditional access policies that increase
+      authentication requirements based on risk signals (location, device,
+      time).
+    tools:
+      - okta
+      - azure-ad
+      - aws-iam-identity-center
+      - google-workspace
+      - yubikey
+      - duo
+
+  devsecops:
+    prose: >-
+      Implement CI/CD pipeline checks that verify MFA is enforced on all
+      IAM policies and access configurations for 3DS resources. Scan
+      infrastructure-as-code for IAM configurations that allow access
+      without MFA conditions. Automate compliance checks that verify MFA
+      enrollment status for all accounts with 3DS environment access.
+      Block deployments that create service accounts or access paths
+      bypassing MFA requirements.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - opa
+      - conftest
+
+  secops:
+    prose: >-
+      Monitor for authentication events that bypass MFA policies. Alert on
+      failed MFA attempts and potential MFA fatigue attacks (repeated push
+      notifications). Conduct periodic audits of MFA enrollment to verify
+      all required accounts are enrolled. Track and investigate any
+      exceptions to MFA requirements. Monitor for SIM-swapping indicators
+      if SMS-based MFA is used for any accounts.
+    tools:
+      - splunk
+      - elastic-siem
+      - okta
+      - duo
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-8"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-2", "IA-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.5"]
+    relationship: mapped

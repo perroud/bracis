@@ -1,0 +1,103 @@
+id: art-29
+family: cap-7
+title: "Tratamento de Erros e Codigos de Resposta"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 29. As interfaces dedicadas devem implementar tratamento de erros
+    padronizado conforme especificações técnicas, incluindo:
+
+    I - códigos de resposta HTTP padronizados para cada tipo de erro,
+    com corpo de resposta no formato JSON contendo código, título e
+    detalhamento do erro;
+
+    II - mecanismo de retentativa (retry) com backoff exponencial para
+    erros transientes (HTTP 429, 500, 502, 503, 504);
+
+    III - header Retry-After para indicar tempo de espera em caso de
+    rate limiting (HTTP 429) ou indisponibilidade temporária (HTTP 503);
+
+    IV - correlation ID (x-fapi-interaction-id) em todas as requisições
+    e respostas para rastreabilidade fim-a-fim;
+
+    V - respostas de erro não devem expor detalhes internos de
+    implementação, stack traces ou informações sensíveis.
+guidance:
+  prose: |
+    O art. 29 padroniza o tratamento de erros:
+
+    **Codigos HTTP padronizados:**
+    - 400 Bad Request: requisicao malformada
+    - 401 Unauthorized: token invalido ou ausente
+    - 403 Forbidden: sem permissao (consentimento invalido)
+    - 404 Not Found: recurso nao encontrado
+    - 405 Method Not Allowed: metodo HTTP nao suportado
+    - 422 Unprocessable Entity: requisicao valida mas nao processavel
+    - 429 Too Many Requests: rate limit excedido
+    - 500 Internal Server Error: erro do servidor
+    - 503 Service Unavailable: servico temporariamente indisponivel
+
+    **Corpo de erro padronizado:**
+    ```json
+    {
+      "errors": [{
+        "code": "CONSENT_EXPIRED",
+        "title": "Consentimento expirado",
+        "detail": "O consentimento urn:... expirou em 2024-01-15"
+      }]
+    }
+    ```
+
+    **Retry com backoff exponencial:**
+    - 1a tentativa: esperar 1s
+    - 2a tentativa: esperar 2s
+    - 3a tentativa: esperar 4s
+    - Maximo: 5 tentativas ou 60s total
+    - Respeitar Retry-After se presente
+
+    **Correlation ID:**
+    O header x-fapi-interaction-id permite rastrear uma requisicao
+    por todo o ecossistema (receptor -> transmissor -> logs).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao de tratamento de erros:**
+      1. Implementar middleware de tratamento de erros que converta
+         excecoes em respostas padronizadas.
+      2. Gerar e propagar x-fapi-interaction-id em todas as camadas.
+      3. Configurar rate limiting com Retry-After header.
+      4. Implementar sanitizacao de respostas de erro (nao expor internals).
+      5. Implementar retry com backoff exponencial no lado cliente.
+    tools:
+      - error-handling-middleware
+      - correlation-id
+      - rate-limiter
+      - retry-client
+  devsecops:
+    prose: |
+      **Validacao de tratamento de erros:**
+      1. Testar todos os codigos de erro com cenarios especificos.
+      2. Verificar que respostas de erro NAO contem stack traces.
+      3. Validar formato padronizado do corpo de erro.
+      4. Testar retry com backoff exponencial sob carga.
+    tools:
+      - api-tests
+      - security-testing
+      - error-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de erros:**
+      1. Monitorar taxa de erros por endpoint e codigo.
+      2. Alertar sobre picos de erros 5xx (problemas no servidor).
+      3. Investigar erros 403 em massa (possivel ataque).
+      4. Rastrear requisicoes problematicas via x-fapi-interaction-id.
+    tools:
+      - error-monitoring
+      - siem
+      - log-analytics
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements

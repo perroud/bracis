@@ -1,0 +1,129 @@
+id: nist-63-aal3
+family: authentication
+title: "AAL3 — Authentication Assurance Level 3 (Hardware Cryptographic)"
+class: SP800-63B
+
+baselines: [aal3, fal3]
+
+statement:
+  prose: >-
+    AAL3 provides very high confidence that the claimant controls authenticator(s)
+    bound to the subscriber's account. Authentication at AAL3 is based on proof
+    of possession of a key through a cryptographic protocol. AAL3 authentication
+    SHALL use a hardware-based authenticator and an authenticator that provides
+    verifier impersonation resistance — the same device may fulfill both
+    requirements. In order to authenticate at AAL3, claimants SHALL prove
+    possession and control of two distinct authentication factors through secure
+    authentication protocol(s). Approved cryptographic techniques SHALL be used
+    at AAL3. AAL3 authenticators SHALL be hardware cryptographic authenticators
+    verified to FIPS 140-2 Level 2 or higher. Reauthentication SHALL occur at
+    least once per 12 hours regardless of user activity and at least once per
+    15 minutes of user inactivity. Long-term biometric recognition may be used
+    to satisfy the first factor at AAL3, provided it meets the False Match Rate
+    requirements for AAL3 (1 in 100,000).
+
+guidance:
+  prose: >-
+    AAL3 is required for the most sensitive federal systems, including national
+    security systems, law enforcement access to sensitive databases, and systems
+    handling Top Secret information. The hardware requirement is non-negotiable:
+    software-only authenticators cannot satisfy AAL3. FIDO2 security keys (YubiKey,
+    Titan Key) certified to FIPS 140-2 Level 2 or higher satisfy AAL3 when used
+    in a WebAuthn flow with user verification (PIN or biometric on the key).
+    PIV/CAC smart cards satisfy AAL3 for PKI-based environments. The verifier
+    impersonation resistance requirement means the authentication protocol must
+    cryptographically bind the authentication to the origin (as WebAuthn does
+    with the rpId), preventing phishing attacks that redirect authentication to
+    a malicious site. AAL3 sessions are limited to 12 hours absolute and 15 minutes
+    idle — these are non-negotiable, hardware-enforced requirements that applications
+    must implement without exception.
+
+references:
+  - citation: "NIST SP 800-63B Section 4.3 — Authentication Assurance Level 3"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "NIST SP 800-63B Section 5.1.9.1 — Requirements for Multi-Factor Cryptographic Hardware"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "FIPS 140-2 — Security Requirements for Cryptographic Modules"
+    url: "https://csrc.nist.gov/publications/detail/fips/140/2/final"
+  - citation: "FIPS 201-3 — Personal Identity Verification (PIV)"
+    url: "https://doi.org/10.6028/NIST.FIPS.201-3"
+
+related_controls:
+  - id: nist-63-aal2
+    relationship: extends
+    description: "AAL3 builds on AAL2 by requiring hardware-based and verifier impersonation-resistant authenticators."
+  - id: nist-63-authenticator-types
+    relationship: implements
+    description: "AAL3 restricts authenticator types to FIPS 140-2 Level 2+ hardware cryptographic devices."
+  - id: nist-63-verifier-requirements
+    relationship: implements
+    description: "Verifier impersonation resistance is a core requirement at AAL3."
+  - id: nist-63-reauthentication
+    relationship: implements
+    description: "AAL3 requires reauthentication after 15 minutes of idle time."
+  - id: nist-63-ial3
+    relationship: complements
+    description: "Systems requiring IAL3 typically also require AAL3 for subsequent authentication."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy FIDO2/WebAuthn authentication with mandatory user verification
+      (UV flag required) using hardware security keys certified to FIPS 140-2
+      Level 2. Configure the WebAuthn relying party to require attestation
+      verification so that only keys from approved hardware vendors are accepted.
+      Maintain an allowed-key attestation list (AAGUID allowlist) containing
+      only FIPS-certified hardware authenticators. For PIV/CAC environments,
+      configure the platform's certificate validation service to verify PIV
+      certificates against the Federal PKI (FPKI) trust anchor. Enforce the
+      15-minute idle timeout at the platform level using a binding mechanism
+      that cannot be overridden by individual applications (e.g., enforced
+      at the API gateway level). Issue short-lived access tokens (5-10 minute
+      lifetime) for AAL3 sessions and require re-authentication at the hardware
+      key for every refresh. Store hardware key registration records in
+      tamper-evident logs linked to the IAL3 enrollment record.
+    tools:
+      - yubico-yubikey
+      - google-titan-key
+      - keycloak
+      - okta
+      - vault
+      - federal-pki
+
+  devsecops:
+    prose: >-
+      Implement pipeline attestation checks that verify the CI/CD system
+      authenticates using AAL3 mechanisms for production deployments. Configure
+      GitLab to require FIDO2 hardware key authentication for users with
+      maintainer or owner roles in production namespaces. Use OIDC federation
+      (GitLab → cloud provider) with short-lived credentials for workload
+      identity, eliminating long-lived service account keys. Validate in
+      deployment pipelines that AAL3 acr claims are present in access tokens
+      before allowing production changes. Implement hardware key attestation
+      checks in the deployment approval workflow to ensure the approving
+      user authenticated with a FIPS-certified device.
+    tools:
+      - gitlab-ci
+      - vault
+      - aws-iam-oidc
+      - gcp-workload-identity
+      - cosign
+
+  secops:
+    prose: >-
+      Monitor AAL3 authentication events for attempts to downgrade to AAL2
+      or AAL1, which may indicate an attack targeting authentication
+      weaknesses. Alert on any AAL3 session that exceeds the 15-minute idle
+      timeout without triggering reauthentication — this may indicate a
+      session management misconfiguration. Implement continuous access
+      evaluation for AAL3 sessions: revoke sessions immediately upon
+      detection of risk signals (device posture change, impossible travel,
+      suspicious behavior) rather than waiting for the next reauthentication
+      event. Maintain a registry of issued hardware authenticators and
+      monitor for revocation events (reported lost/stolen keys). Conduct
+      quarterly hardware key inventory audits.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - microsoft-defender-for-identity

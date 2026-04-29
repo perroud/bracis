@@ -1,0 +1,104 @@
+id: v10.1.1
+family: v10
+title: "Code Integrity Controls"
+class: OWASP-ASVS
+
+baselines: [level-3]
+
+statement:
+  prose: >-
+    Verify that a code analysis tool is in use that can detect potentially malicious code,
+    such as time functions, unsafe file operations, and unusual network connections. The
+    application must implement integrity controls to verify that the deployed code has not
+    been tampered with. Source code repositories must enforce branch protection, code review
+    requirements, and signed commits for production branches.
+
+guidance:
+  prose: >-
+    Malicious code can be introduced through compromised dependencies (supply chain attacks),
+    insider threats, or compromised CI/CD pipelines. This control addresses the integrity
+    of the application code itself rather than the data it processes. Static analysis tools
+    must be configured to detect suspicious patterns: outbound network connections in
+    unexpected components, file system access outside designated directories, dynamic code
+    execution (eval, exec), and obfuscated code. Supply chain security requires verifying
+    the integrity and provenance of all dependencies. Code signing and deployment artifact
+    verification ensure that the code running in production is the same code that passed
+    security review and testing. This is a Level 3 control because it requires significant
+    infrastructure investment and process maturity.
+
+references:
+  - citation: "OWASP ASVS v4.0.3, V10.1.1"
+    url: "https://owasp.org/www-project-application-security-verification-standard/"
+  - citation: "SLSA Framework"
+    url: "https://slsa.dev/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a software supply chain security framework following SLSA (Supply-chain
+      Levels for Software Artifacts) guidelines. Sign all build artifacts using Sigstore
+      Cosign or equivalent. Verify signatures before deployment. Use reproducible builds
+      to enable independent verification of build outputs. Implement a private artifact
+      registry (Artifactory, Nexus, Harbor) with vulnerability scanning and provenance
+      tracking. Deploy admission controllers in Kubernetes that verify image signatures
+      before allowing container execution. Use Software Bill of Materials (SBOM) generation
+      in every build and track all transitive dependencies.
+    tools:
+      - cosign
+      - sigstore
+      - harbor
+      - artifactory
+      - kyverno
+      - opa-gatekeeper
+      - syft
+      - grype
+
+  devsecops:
+    prose: >-
+      Enforce branch protection rules on production branches: require pull request reviews,
+      status checks, and signed commits. Implement SAST scanning in every pipeline run with
+      rules targeting malicious code patterns (backdoors, data exfiltration, privilege
+      escalation). Use SCA (Software Composition Analysis) to detect known-vulnerable and
+      known-malicious dependencies. Generate and verify SBOMs as pipeline artifacts. Implement
+      dependency pinning with hash verification (lock files with integrity checksums).
+      Configure Dependabot or Renovate for automated dependency updates with security
+      advisory correlation.
+    tools:
+      - semgrep
+      - sonarqube
+      - snyk
+      - gitlab-ci
+      - dependabot
+      - renovate
+      - syft
+      - grype
+      - cosign
+
+  secops:
+    prose: >-
+      Monitor for unauthorized changes to production deployments by comparing running
+      artifacts against signed build outputs. Alert on container image changes that bypass
+      the CI/CD pipeline. Implement runtime application self-protection (RASP) to detect
+      malicious behavior in running applications. Monitor dependency advisory feeds for
+      newly disclosed vulnerabilities affecting deployed components. Track and investigate
+      any deployment that fails signature verification. Conduct periodic comparison of
+      deployed artifacts against build system outputs.
+    tools:
+      - falco
+      - splunk
+      - elastic-siem
+      - crowdstrike
+      - aqua-security
+      - datadog-security
+      - snyk
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-10", "SA-11", "SI-7"]
+    relationship: implements
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.26", "A8.32"]
+    relationship: supports
+  - framework_id: pci-dss-v4
+    articles: ["6.3.2", "6.5.4"]
+    relationship: supports

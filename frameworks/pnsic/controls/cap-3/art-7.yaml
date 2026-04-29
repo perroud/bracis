@@ -1,0 +1,111 @@
+id: art-7
+family: cap-3
+title: "Areas Prioritarias de Atuacao no Setor de Energia"
+class: PNSIC
+baselines: [critical-infrastructure]
+statement:
+  prose: |
+    Art. 7. No setor de energia, as áreas prioritárias de atuação da PNSIC
+    e da ENSIC (Decreto 10.569/2020) são:
+    I - segurança de sistemas de controle industrial (SCADA/ICS) de usinas
+    geradoras, linhas de transmissão e subestações de energia elétrica;
+    II - proteção de infraestruturas de refino, transporte e distribuição
+    de petróleo, gás natural e combustíveis renováveis;
+    III - resiliência de sistemas críticos de operação do setor elétrico,
+    incluindo o Operador Nacional do Sistema Elétrico (ONS) e o Sistema
+    Interligado Nacional (SIN);
+    IV - segurança de sistemas de medição, faturamento e gestão comercial
+    que suportam a continuidade da oferta de energia.
+guidance:
+  prose: |
+    O setor de energia e frequentemente citado como o setor de IC mais
+    critico por ser a base de funcionamento de todos os outros setores.
+
+    **Especificidade dos sistemas industriais (OT):**
+    O setor de energia opera predominantemente com tecnologia operacional (OT)
+    — sistemas SCADA/ICS projetados para controle de processos fisicos — que
+    possuem caracteristicas muito diferentes de sistemas de TI:
+    - Tempo real rigoroso: latencias de milissegundos
+    - Alta disponibilidade: sistemas que nao podem ser parados para patches
+    - Longevidade: equipamentos com vida util de 20-30 anos
+    - Protocolos proprietarios: Modbus, DNP3, IEC 61850, IEC 60870
+
+    **Convergencia IT/OT como risco:**
+    A modernizacao do setor eletrico (smart grid, medicao inteligente, IoT)
+    aumentou a conectividade de sistemas OT com redes IT, criando novos vetores
+    de ataque. O ataque a Ucraina (2015, 2016) e o caso Colonial Pipeline (2021)
+    demonstram que energia e alvo primario de atacantes sofisticados.
+
+    **ONS como ativo hipercritico:**
+    O Operador Nacional do Sistema Eletrico e o epicentro do sistema eletrico
+    brasileiro. Um incidente no ONS pode provocar blackout nacional em cascata,
+    impactando todos os outros setores de IC simultaneamente.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Arquitetura de seguranca para sistemas de energia:**
+      1. Segregacao fisica (air-gap) entre redes OT e IT para sistemas de
+         controle de geracao e transmissao de alta criticidade, com transferencia
+         de dados apenas por diodos de dados unidirecionais.
+      2. Implementacao de IEC 62443 como framework de seguranca especifico
+         para sistemas de automacao industrial no setor de energia.
+      3. Firewall industrial especializado (ex: Tofino, Claroty) com inspeção
+         profunda de pacotes para protocolos industriais (Modbus, DNP3, IEC 61850).
+      4. Redundancia geografica do centro de controle do ONS com failover
+         automatico para centro de backup em local distante.
+      5. Monitoramento passivo de trafico OT sem impacto no tempo real dos
+         sistemas de controle (solucoes como Claroty, Dragos, Nozomi).
+    tools:
+      - industrial-firewall
+      - ot-network-monitor
+      - data-diode
+      - iec-62443-compliance-scanner
+      - ot-asset-inventory
+  devsecops:
+    prose: |
+      **Desenvolvimento seguro para sistemas do setor eletrico:**
+      1. Ciclo de vida de desenvolvimento seguro (SDL) especifico para sistemas
+         embarcados e firmware de equipamentos de automacao industrial.
+      2. Testes de compatibilidade obrigatorios antes de qualquer atualizacao
+         em sistemas OT: validar que patches nao comprometem tempo real.
+      3. Gerenciamento de vulnerabilidades especifico para OT: CVEs de sistemas
+         SCADA/ICS (CISA ICS Advisories) como fonte primaria de inteligencia.
+      4. Processo de patch management adaptado para OT: janelas de manutencao
+         programadas com o ONS, validacao em ambiente de teste equivalente.
+      5. Inventario automatico de firmware e versoes de software em equipamentos
+         industriais para gestao de vulnerabilidades de ciclo de vida.
+    tools:
+      - ics-sdl-framework
+      - ot-patch-management
+      - cisa-ics-advisories-integration
+      - firmware-inventory-scanner
+  secops:
+    prose: |
+      **Operacao de seguranca no setor de energia:**
+      1. CERT Energia com analistas especializados em seguranca OT/ICS,
+         distinto do CERT convencional, com acesso a ferramentas de analise
+         de protocolos industriais.
+      2. Threat hunting proativo em redes OT de alta criticidade:
+         busca de TTPs especificos de grupos APT conhecidos por atacar energia
+         (Sandworm, Xenotime/Triton, Volt Typhoon).
+      3. Plano de resposta a incidentes especifico para blackout cibernetico,
+         com procedimentos de operacao manual como fallback.
+      4. Exercicio anual setorial (ANEEL + ONS + distribuidoras + transmissoras)
+         simulando ataque coordenado a multiplos pontos do sistema eletrico.
+      5. Cooperacao com CISA (EUA), ENISA (UE) e Interpol para inteligencia
+         sobre ameacas especificas ao setor eletrico global.
+    tools:
+      - ot-soc-platform
+      - apt-threat-hunting-tools
+      - manual-operations-fallback-procedures
+      - sector-exercise-coordinator
+legal_references:
+  - framework_id: aneel-964
+    articles: ["art-1", "art-2", "art-3"]
+    relationship: complements
+  - framework_id: nist-csf-v2
+    articles: ["PR.IR-01", "PR.IR-02", "PR.IR-03"]
+    relationship: mapped
+  - framework_id: pnsi
+    articles: ["art-5"]
+    relationship: complements

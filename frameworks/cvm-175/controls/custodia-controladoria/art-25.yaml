@@ -1,0 +1,103 @@
+id: art-25
+family: custodia-controladoria
+title: "Escrituracao de Cotas e Controle de Cotistas"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 25. A escrituração das cotas do fundo deve ser realizada por entidade
+    autorizada pela CVM para o exercício da atividade de escrituração de valores
+    mobiliários.
+
+    Parágrafo 1. O escriturador é responsável por: I - manter o registro
+    atualizado dos cotistas e de suas respectivas quantidades de cotas;
+    II - processar as aplicações e resgates de cotas; III - efetuar o
+    pagamento de rendimentos e amortizações aos cotistas; IV - fornecer
+    informações sobre a posição de cotas aos cotistas.
+
+    Parágrafo 2. O escriturador deve implementar procedimentos de identificação
+    e qualificação de cotistas compatíveis com as normas de prevenção à lavagem
+    de dinheiro e ao financiamento do terrorismo.
+guidance:
+  prose: |
+    O art. 25 regulamenta a escrituracao de cotas, funcao essencial para o
+    controle de titularidade e movimentacao de cotas do fundo.
+
+    **Escriturador qualificado:**
+    A escrituracao deve ser feita por entidade autorizada pela CVM. Nao e
+    permitido que o administrador faca escrituracao sem autorizacao especifica.
+
+    **Funcoes do escriturador:**
+    (i) Registro de cotistas (cadastro); (ii) Processamento de aplicacoes e
+    resgates; (iii) Pagamento de rendimentos; (iv) Informacoes de posicao.
+    O escriturador e o "cartorio" do fundo.
+
+    **KYC e PLD/FT:**
+    O paragrafo 2 conecta a escrituracao com as obrigacoes de PLD/FT (CVM 50).
+    O escriturador deve identificar e qualificar cotistas, mantendo cadastro
+    atualizado e reportando operacoes suspeitas.
+
+    **Impacto em TI:**
+    Sistemas de escrituracao devem integrar-se com sistemas de PLD/FT,
+    cadastro de clientes e processamento de pagamentos. Seguranca de dados
+    pessoais de cotistas (LGPD) e critica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Integracao com escriturador:**
+      1. API de integracao bidirecional com sistema do escriturador: envio
+         de aplicacoes/resgates, recebimento de confirmacoes e posicoes.
+      2. Cadastro de cotistas integrado com sistema de KYC/PLD (CVM 50).
+      3. Pipeline de processamento de aplicacoes e resgates com validacao
+         automatica de limites e horarios.
+
+      **Protecao de dados de cotistas:**
+      4. Criptografia de dados pessoais de cotistas em repouso e transito.
+      5. Controle de acesso granular a dados de cotistas (LGPD).
+      6. Anonimizacao de dados de cotistas em ambientes de desenvolvimento.
+    tools:
+      - vault
+      - terraform
+      - git
+      - gitlab-ci
+  devsecops:
+    prose: |
+      **Seguranca de dados de cotistas:**
+      1. Secret detection para credenciais de API do escriturador e dados
+         de cotistas em codigo.
+      2. SAST para detectar exposicao de dados pessoais em logs ou respostas.
+      3. Dependency scanning para bibliotecas de criptografia e processamento
+         de pagamentos.
+
+      **Testes de integracao:**
+      4. Testes automatizados de processamento de aplicacoes e resgates.
+      5. Testes de KYC: cenarios de cotistas com pendencias cadastrais.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - gitlab-dependency-scanning
+  secops:
+    prose: |
+      **Monitoramento de escrituracao:**
+      1. Reconciliacao diaria entre posicoes de cotas no administrador e no
+         escriturador.
+      2. Alertas para divergencias de posicao ou movimentacoes atipicas.
+      3. Dashboard de escrituracao: cotistas ativos, movimentacoes, pendencias
+         cadastrais.
+
+      **Conformidade PLD/FT:**
+      4. Monitoramento de operacoes suspeitas de cotistas (valores atipicos,
+         frequencia incomum, cotistas em listas restritivas).
+      5. Relatorios de PLD/FT integrados com escrituracao.
+    tools:
+      - siem
+      - grc-platform
+      - compliance-scanner
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-3", "art-5", "art-7"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-46"]
+    relationship: complements

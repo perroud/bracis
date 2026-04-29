@@ -1,0 +1,104 @@
+id: iec-4-1-3
+family: part-4
+title: "Secure by Design"
+class: IEC62443
+part: "62443-4-1"
+
+statement:
+  prose: >-
+    The product supplier shall apply secure-by-design principles throughout
+    the architecture and design of IACS components. The design shall
+    implement defense-in-depth, minimize the attack surface, apply the
+    principle of least privilege, and ensure that security mechanisms do not
+    compromise the safety or real-time performance requirements of the
+    industrial control system.
+
+guidance:
+  prose: >-
+    Secure-by-design for IACS components requires specific consideration
+    of industrial constraints that do not exist in traditional IT software.
+    Key principles include: performing threat modeling using STRIDE or
+    attack tree methodologies adapted for industrial environments;
+    minimizing the attack surface by disabling unnecessary services,
+    protocols, and ports by default; implementing least privilege in the
+    default configuration so that the component ships in a hardened state;
+    designing security mechanisms that degrade gracefully without impacting
+    safety functions; separating safety-critical functions from non-safety
+    functions in the architecture; implementing secure default settings
+    (no default passwords, secure protocol configurations, minimal services
+    enabled); designing for secure updates with rollback capability;
+    implementing memory protection and process isolation on embedded
+    platforms; using memory-safe programming practices or languages where
+    feasible for new development; designing communication protocols with
+    built-in authentication and integrity verification; and providing
+    security configuration guides that help customers deploy the product
+    at their target security level.
+
+references:
+  - citation: "IEC 62443-4-1:2018, Clause 7"
+    url: "https://webstore.iec.ch/en/publication/33615"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement secure architecture templates for IACS products that
+      enforce separation of concerns, least privilege defaults, and
+      defense-in-depth by design. Deploy container-based development
+      environments that mirror the constraints of target embedded
+      platforms. Implement automated attack surface analysis tools
+      that enumerate exposed services, open ports, and accessible
+      interfaces on each build. Maintain secure coding guidelines
+      specific to the target platforms (embedded Linux, real-time
+      operating systems, bare-metal). Deploy architectural review
+      checkpoints at key design milestones.
+    tools:
+      - threat-dragon
+      - microsoft-threat-modeling-tool
+      - docker
+      - buildroot
+      - yocto
+
+  devsecops:
+    prose: >-
+      Enforce secure-by-design requirements through automated pipeline
+      checks. Implement SAST rules that detect insecure design patterns
+      (hardcoded credentials, disabled authentication checks, overly
+      permissive access defaults). Scan for known vulnerable dependencies
+      and reject builds that include components with critical
+      vulnerabilities. Implement automated attack surface measurement
+      that tracks exposed services and ports across releases and alerts
+      on increases. Enforce threat model reviews as a mandatory gate
+      before major design changes. Run fuzz testing against all
+      protocol parsers and input handlers.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - codeql
+      - afl-fuzz
+      - syft
+      - grype
+
+  secops:
+    prose: >-
+      Conduct security architecture reviews at key design milestones.
+      Perform penetration testing against prototype builds to validate
+      that design security assumptions hold. Review the default
+      configuration for security weaknesses. Validate that the secure
+      hardening guide effectively reduces the attack surface to the
+      intended minimum. Test that security features function correctly
+      under degraded conditions (network failure, high load,
+      component failure) without compromising safety functions.
+    tools:
+      - burp-suite
+      - nmap
+      - metasploit
+      - wireshark
+      - scapy
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-8", "SA-17", "SC-3", "CM-7"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.25", "a8.27", "a8.28"]
+    relationship: supports

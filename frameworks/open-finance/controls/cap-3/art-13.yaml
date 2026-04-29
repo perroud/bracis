@@ -1,0 +1,95 @@
+id: art-13
+family: cap-3
+title: "Pagamentos Recorrentes e Agendados via ITP"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 13. O serviço de iniciação de transação de pagamento pode incluir
+    pagamentos recorrentes e agendados, observadas as seguintes condições:
+
+    I - o consentimento para pagamentos recorrentes deve especificar:
+    a) o valor máximo por transação e o valor máximo acumulado no período;
+    b) a periodicidade das transações (diária, semanal, mensal);
+    c) a data de início e a data de encerramento da recorrência;
+    d) o beneficiário específico das transações;
+
+    II - o cliente deve poder revogar o consentimento para pagamentos
+    recorrentes a qualquer momento, sem ônus;
+
+    III - a instituição detentora deve validar cada transação recorrente
+    individualmente quanto à disponibilidade de recursos e limites;
+
+    IV - o iniciador deve notificar o cliente antes de cada execução
+    de pagamento recorrente conforme prazo definido nas especificações.
+guidance:
+  prose: |
+    O art. 13 regula pagamentos recorrentes e agendados:
+
+    **Consentimento de longa duracao (long-lived consent):**
+    Diferente do consentimento pontual (art. 10), o consentimento para
+    recorrencia tem parametros adicionais obrigatorios:
+    - Valor maximo por transacao (teto individual)
+    - Valor maximo acumulado no periodo (teto agregado)
+    - Periodicidade e datas de vigencia
+    - Beneficiario fixo (nao pode mudar sem novo consentimento)
+
+    **Protecoes ao cliente:**
+    - Revogacao a qualquer momento, sem custo ou penalidade
+    - Notificacao previa antes de cada debito
+    - Validacao individual de cada transacao pela detentora
+    - Rejeicao automatica se parametros excedem o consentido
+
+    **Casos de uso:**
+    - Assinaturas de servicos (streaming, SaaS)
+    - Pagamento de contas recorrentes (aluguel, condominio)
+    - Investimentos programados (aportes mensais)
+    - Pagamento de emprestimos (parcelas)
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Motor de recorrencia:**
+      1. Implementar scheduler robusto para disparo de pagamentos
+         conforme periodicidade configurada.
+      2. Armazenar parametros de recorrencia vinculados ao consentimento
+         (valor max, periodo, beneficiario, datas).
+      3. Implementar validacao de limites agregados (sum de transacoes
+         no periodo vs. teto acumulado).
+      4. Enviar notificacao ao cliente N dias antes do debito programado.
+      5. Tratar cenarios de falha com retry e notificacao ao cliente.
+    tools:
+      - job-scheduler
+      - notification-service
+      - payment-engine
+      - message-queue
+  devsecops:
+    prose: |
+      **Testes de recorrencia:**
+      1. Testar cenarios de limite excedido (individual e acumulado).
+      2. Testar revogacao mid-cycle (no meio do periodo de recorrencia).
+      3. Validar que notificacao previa e enviada no prazo correto.
+      4. Testar retry apos falha de pagamento e comportamento de rollback.
+    tools:
+      - integration-tests
+      - scheduler-tests
+      - notification-tests
+      - gitlab-ci
+  secops:
+    prose: |
+      **Governanca de pagamentos recorrentes:**
+      1. Monitorar consentimentos de recorrencia ativos por cliente.
+      2. Alertar sobre padroes anomalos (muitos consentimentos para
+         mesmo beneficiario, valores incomuns).
+      3. Auditar que revogacoes sao processadas imediatamente.
+      4. Verificar que notificacoes previas sao enviadas conforme regra.
+    tools:
+      - consent-monitoring
+      - fraud-detection
+      - audit-trail
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-8", "art-15"]
+    relationship: complements
+  - framework_id: pix-security
+    articles: ["art-3"]
+    relationship: implements

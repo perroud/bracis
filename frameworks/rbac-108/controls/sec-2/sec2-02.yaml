@@ -1,0 +1,133 @@
+id: sec2-02
+family: sec-2
+title: "Protecao de Sistemas Criticos de Operacao Aerea e EFBs"
+class: RBAC-108
+baselines: [air-operators]
+statement:
+  prose: |
+    O operador aéreo deve implementar controles técnicos e procedimentais para proteger os
+    sistemas críticos de operação aérea, incluindo Electronic Flight Bags (EFBs), sistemas
+    de Departure Control System (DCS), sistemas de planejamento de voo, redes de comunicação
+    aeronáutica e sistemas de manutenção aeronáutica, contra acesso não autorizado, modificação
+    indevida, interrupção de serviço e comprometimento de integridade de dados que possam
+    afetar a segurança das operações de aviação civil.
+guidance:
+  prose: |
+    A protecao de sistemas criticos de operacao aerea requer abordagem em camadas que
+    combine controles tecnicos, processuais e humanos.
+
+    **Electronic Flight Bags (EFBs):**
+    EFBs sao dispositivos (tablets, laptops dedicados) usados na cabine de pilotagem para
+    substituir documentacao em papel (cartas de navegacao, QRH, performance calculations).
+    Riscos especificos: malware introducido via atualizacao de aplicativo, acesso fisico
+    nao autorizado, roubo do dispositivo, dados de performance manipulados.
+    Controles: MDM (Mobile Device Management), criptografia de disco, whitelist de apps,
+    canal seguro de atualizacao, autenticacao forte, procedimento de perda/roubo.
+
+    **Departure Control System (DCS):**
+    DCS gerencia check-in, boarding, load control e weight & balance. Uma falha de seguranca
+    pode resultar em manifesto de passageiros incorreto, distribuicao errada de carga ou
+    vulnerabilidade em documentos de viagem.
+    Controles: acesso baseado em funcao (RBAC), autenticacao multifator para operadores,
+    integridade de dados de peso e balanceamento, logs auditaveis de todas as operacoes.
+
+    **Redes de comunicacao aeronautica:**
+    ACARS (Aircraft Communications Addressing and Reporting System), VHF Data Link,
+    SATCOM, redes de data link para despacho operacional.
+    Controles: criptografia de mensagens, autenticacao de origem, monitoramento de
+    anomalias em mensagens recebidas, procedimentos para mensagens suspeitas.
+
+    **Sistemas de manutencao:**
+    Sistemas MRO (Maintenance, Repair & Overhaul) contem registros de aeronavegabilidade.
+    A adulteracao de registros de manutencao e uma ameaca de seguranca de voo.
+    Controles: controle de acesso estrito, assinatura digital de registros, auditoria de
+    todas as alteracoes, backups com integridade verificada.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Protecao de EFBs:**
+      1. Implantacao de solucao MDM (Mobile Device Management) cobrindo 100% dos EFBs
+         operacionais: enrollment, politicas de seguranca, remote wipe, inventario.
+      2. Criptografia de disco completa em todos os EFBs (BitLocker, FileVault ou
+         equivalente certificado).
+      3. Whitelist de aplicativos: apenas apps aprovados pelo operador aereo podem
+         ser instalados; bloqueio de sideloading.
+      4. Canal seguro e autenticado para distribuicao de atualizacoes de aplicativos
+         EFB, com verificacao de integridade (assinatura digital).
+      5. Rede separada para atualizacao de EFBs, isolada de redes de passageiros
+         e de redes corporativas nao-aeronauticas.
+
+      **Protecao de DCS:**
+      6. Segmentacao de rede do DCS em VLAN dedicada com firewall e IPS.
+      7. Autenticacao multifator para todos os operadores com acesso ao DCS.
+      8. Controle de acesso baseado em funcao (RBAC) granular no DCS.
+      9. Monitoramento de integridade de dados de peso e balanceamento com
+         alertas para valores fora de parametros operacionais.
+
+      **Redes aeronauticas:**
+      10. Segmentacao de redes de comunicacao aeronautica das redes corporativas
+          e de passageiros (guest Wi-Fi completamente isolado).
+      11. IDS/IPS com assinaturas especificas para protocolos aeronauticos.
+    tools:
+      - mdm-solution
+      - network-segmentation
+      - firewall
+      - ids-ips
+      - encryption-tools
+      - endpoint-protection
+  devsecops:
+    prose: |
+      **Seguranca no desenvolvimento de software EFB e DCS:**
+      1. SAST obrigatorio no pipeline de todos os aplicativos EFB antes de
+         autorizacao para deployment em dispositivos operacionais.
+      2. Analise de composicao de software (SCA/dependency scanning) para
+         identificar vulnerabilidades em bibliotecas usadas nos apps EFB e DCS.
+      3. Deteccao de secrets no codigo-fonte de aplicativos aeronauticos para
+         prevenir vazamento de credenciais hardcoded.
+      4. Processo de code signing para todos os binarios distribuidos para EFBs,
+         garantindo que apenas codigo autorizado seja executado.
+      5. Testes de integracao de seguranca simulando cenarios de ataque especificos
+         (dados de peso manipulados no DCS, app EFB com comportamento anomalo).
+      6. Janelas de manutencao coordenadas com operacoes para atualizacoes de
+         seguranca em sistemas criticos sem impacto operacional.
+    tools:
+      - sast-scanner
+      - dependency-scanning
+      - secret-detection
+      - code-signing
+      - gitlab-ci
+      - container-scanning
+  secops:
+    prose: |
+      **Operacao e monitoramento de sistemas criticos:**
+      1. Monitoramento continuo 24x7 de todos os sistemas classificados como nivel 1
+         (seguranca de voo) com alertas imediatos para anomalias.
+      2. Procedimento operacional para dispositivos EFB perdidos ou roubados:
+         remote wipe imediato, notificacao ao SGSA, registro do incidente.
+      3. Revisao mensal de logs de acesso ao DCS para identificar acessos
+         anomalos ou tentativas de acesso nao autorizado.
+      4. Gestao de vulnerabilidades com SLA de remediacao por nivel de criticidade:
+         critico (seguranca de voo): 24h; alto: 72h; medio: 30 dias.
+      5. Processo de aprovacao de mudancas em sistemas criticos com avaliacao de
+         impacto de seguranca, incluindo mudancas de fornecedores externos.
+      6. Testes periodicos de controles de seguranca de EFBs e DCS (penetration
+         testing anual minimo, coordenado com periodos de baixa operacional).
+      7. Procedimentos para operacao em modo degradado (fallback para documentacao
+         fisica) caso sistemas digitais sejam comprometidos.
+    tools:
+      - siem
+      - mdm-solution
+      - vulnerability-management
+      - change-management-tool
+      - endpoint-detection-response
+      - log-management
+legal_references:
+  - framework_id: rbac-107
+    articles: ["sec-2"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["A.8.1", "A.8.6", "A.8.20", "A.8.22"]
+    relationship: supports
+  - framework_id: gsi-in3
+    articles: ["art-6", "art-7"]
+    relationship: mapped

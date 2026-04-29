@@ -1,0 +1,160 @@
+id: art-12
+family: cap-4
+title: "Analise de Causa Raiz e Plano de Acao Corretiva"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 12. A análise de causa raiz do incidente de segurança cibernética,
+    exigida no art. 11, deve:
+
+    I - identificar a vulnerabilidade ou falha de controle que possibilitou
+    a ocorrência do incidente, distinguindo entre:
+    a) causas técnicas, incluindo vulnerabilidades de software, misconfiguração
+    de sistemas e falhas de arquitetura;
+    b) causas de processo, incluindo falhas em procedimentos, ausência de controles
+    e falhas em gestão de terceiros;
+    c) causas humanas, incluindo erros operacionais, falta de treinamento e
+    violações de política;
+
+    II - avaliar a adequação dos controles de segurança existentes para prevenir
+    ou detectar o tipo de incidente ocorrido;
+
+    III - identificar indicadores de comprometimento (IOCs) e táticas, técnicas
+    e procedimentos (TTPs) utilizados pelo agente da ameaça, quando aplicável;
+
+    IV - propor plano de ação corretiva com medidas específicas, prazos de
+    implementação e responsáveis designados para cada ação;
+
+    V - incluir avaliação de risco residual após implementação das medidas
+    corretivas propostas.
+
+    § 1. O plano de ação corretiva deve ser aprovado pela alta administração
+    da instituição e monitorado pelo órgão de compliance ou equivalente.
+
+    § 2. A instituição deve informar ao BCB, no prazo de 12 (doze) meses após
+    o envio do relatório final, o status de implementação das medidas corretivas
+    propostas.
+guidance:
+  prose: |
+    O art. 12 vai alem da narrativa do incidente e exige analise causal profunda
+    e plano de remediacao concreto. Este e o mecanismo pelo qual o BCB verifica
+    se a instituicao aprendeu com o incidente.
+
+    **Alınea a - Causas tecnicas:**
+    Exemplos especificos:
+    - CVE especifica explorada com numero e severidade CVSS
+    - Porta de rede desnecessariamente exposta
+    - Algoritmo criptografico obsoleto (MD5, SHA1, DES)
+    - Falta de segmentacao de rede
+    - Certificado expirado que foi ignorado
+
+    **Alinea b - Causas de processo:**
+    Exemplos especificos:
+    - Processo de patch management nao aplicou correcao em tempo habil
+    - Offboarding incompleto deixou conta de ex-funcionario ativa
+    - Fornecedor critico sem SLA de seguranca contratado
+    - Analise de risco de terceiros nao identificou a exposicao
+
+    **Alinea c - Causas humanas:**
+    Importante: a analise deve ser sistemica (por que o sistema permitiu o erro
+    humano?), nao punitiva (quem errou?). Exemplos:
+    - Falta de treinamento de phishing para colaboradores
+    - Sobrecarga do time de seguranca levou a negligencia de alertas
+    - Pressao por velocidade de deploy levou a bypasses de controles
+
+    **Inciso II - Adequacao de controles:**
+    A pergunta central: "se todos os controles estivessem funcionando como
+    projetados, o incidente teria ocorrido mesmo assim?" Se sim, o design do
+    controle e insuficiente. Se nao, o controle existente mas falhou na operacao.
+    Estas sao implicacoes muito diferentes para o plano de acao.
+
+    **Inciso III - IOCs e TTPs:**
+    IOCs devem ser compartilhados com a comunidade financeira (FS-ISAC,
+    CERT.br) para fortalecer defesas coletivas. TTPs mapeados para MITRE ATT&CK
+    permitem avaliacao sistematica de cobertura de deteccao.
+
+    **Follow-up de 12 meses (ss 2):**
+    O BCB fecha o ciclo de supervisao verificando se as medidas prometidas foram
+    de fato implementadas. Promessas nao cumpridas em incidentes anteriores
+    agravam significativamente a avaliacao regulatoria em incidentes futuros.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Plataforma de RCA e acao corretiva:**
+      1. Framework de RCA estruturado integrado ao sistema de gestao de incidentes:
+         - Template de 5 Whys com registro de evidencias para cada "por que"
+         - Diagrama de Ishikawa digital com categorias Tecnica/Processo/Humano
+         - Importacao automatica de IOCs e TTPs do SIEM/EDR
+         - Mapeamento automatico de TTPs para MITRE ATT&CK
+      2. Sistema de gestao de acoes corretivas (CAPA - Corrective and Preventive Actions):
+         - Cada acao com campo: descricao, responsavel, prazo, status, evidencia de conclusao
+         - Dashboard de progresso para a alta diretoria
+         - Alertas de prazo vencido para o compliance
+         - Integracao com ticketing system (Jira/GitLab Issues)
+      3. Avaliacao de risco residual automatizada:
+         apos indicar acoes corretivas, recalculo automatico do score de risco
+         do sistema com as melhorias hipoteticas implementadas.
+      4. Reminder automatico em 11 meses apos o relatorio final para
+         preparar o status update do ss 2.
+    tools:
+      - incident-management
+      - grc-platform
+      - threat-intelligence
+      - risk-management
+      - task-management
+  devsecops:
+    prose: |
+      **Dados tecnicos para RCA e acoes corretivas:**
+      1. Vulnerability management: ao identificar CVE explorada na RCA,
+         automaticamente abrir ticket de remediacao para todos os sistemas
+         com a mesma vulnerabilidade (patching sistemico, nao so do sistema afetado).
+      2. Analise de cobertura de deteccao pois-incidente:
+         verificar automaticamente se as regras de SIEM/EDR que deveriam ter
+         detectado o incidente mais cedo estavam ativas e tunadas.
+      3. Gaps de controle de pipeline identificados na RCA sao convertidos
+         automaticamente em issues no repositorio com label "security-remediation".
+      4. Analise de codigo para identificar se a vulnerabilidade tecnica e
+         sistemica (presente em mais de um sistema).
+      5. MITRE ATT&CK mapping integrado ao threat intelligence platform
+         para identificar gaps de deteccao sistematicamente.
+    tools:
+      - vulnerability-management
+      - siem
+      - threat-intelligence
+      - gitlab-ci
+      - sast
+  secops:
+    prose: |
+      **Processo de RCA e follow-up:**
+      1. RCA facilitada por analista independente (nao envolvido na resposta ao incidente)
+         para garantir objetividade e superar o vies de quem viveu o caos.
+      2. Revisao do plano de acao corretiva pelo CISO, CRO e compliance:
+         cada acao deve ser SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
+      3. Aprovacao formal do plano de acao corretiva pela diretoria, conforme ss 1.
+      4. Revisao mensal do progresso das acoes corretivas em comite de seguranca.
+      5. Compartilhamento anonimizado de IOCs/TTPs com FS-ISAC e CERT.br
+         para fortalecer defesas do setor financeiro.
+      6. Follow-up em 12 meses (ss 2):
+         - Relatorio de status de implementacao para o BCB
+         - Evidencias de conclusao para cada acao (screenshot, log, certificado)
+         - Justificativa para acoes nao concluidas com novo prazo
+    tools:
+      - grc-platform
+      - incident-management
+      - vulnerability-management
+      - risk-management
+      - threat-intelligence
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-4", "art-5"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-10", "art-11"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CA-5", "IR-4", "IR-8", "PM-4"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.27", "A.8.8", "10.1", "10.2"]
+    relationship: supports

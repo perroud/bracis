@@ -1,0 +1,106 @@
+id: basel-cap-leverage
+family: capital
+title: "Leverage Ratio"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain a minimum leverage ratio of 3% at all times, defined as Tier 1
+    capital divided by the total exposure measure. The total exposure measure is the sum
+    of on-balance-sheet exposures, derivative exposures calculated using the SA-CCR
+    replacement-cost method, securities financing transaction (SFT) exposures, and
+    off-balance-sheet items converted using a uniform 10% credit conversion factor
+    (subject to national discretion for unconditionally cancellable commitments). For
+    Global Systemically Important Banks (G-SIBs), a leverage ratio buffer equal to 50%
+    of the risk-based G-SIB surcharge applies, resulting in minimum leverage ratios
+    above 3%. The leverage ratio serves as a non-risk-based backstop to risk-weighted
+    capital requirements, preventing excessive balance sheet growth and ensuring a
+    minimum level of loss absorption capacity regardless of risk model assumptions.
+
+guidance:
+  prose: >-
+    The leverage ratio was introduced as part of the Basel III package to address two
+    weaknesses revealed in the 2007-2009 financial crisis: (1) the build-up of excessive
+    on- and off-balance-sheet leverage in the banking system and (2) the erosion of Tier 1
+    capital quality. Unlike risk-weighted capital requirements, the leverage ratio provides
+    a transparent, simple, non-model-based measure that limits the extent to which a bank
+    can leverage its equity base. Banks with large derivatives portfolios or SFT books need
+    to pay particular attention to the exposure measure calculation, as these items can
+    significantly increase the denominator without corresponding risk-weighted asset
+    increases. Banks should monitor their leverage ratio daily, establish internal minimum
+    thresholds above the regulatory floor, and include leverage ratio projections in their
+    ICAAP stress testing. The leverage ratio interacts with resolution planning: MREL and
+    TLAC requirements in the EU and FSB frameworks also impose leverage-based subordinated
+    debt floors.
+
+references:
+  - citation: "BCBS, Basel III leverage ratio framework and disclosure requirements, January 2014"
+    url: "https://www.bis.org/publ/bcbs270.htm"
+  - citation: "BCBS, Revisions to the Basel III leverage ratio framework, December 2017"
+    url: "https://www.bis.org/bcbs/publ/d424.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a leverage ratio monitoring service that aggregates total exposure measure
+      components — on-balance-sheet assets, derivative potential future exposure (PFE)
+      from SA-CCR, SFT gross exposure, and off-balance-sheet commitments — from source
+      systems in near real time. Expose leverage ratio as a metric in the firmwide risk
+      dashboard alongside risk-weighted capital ratios so that Treasury and Risk can
+      monitor the binding constraint. Implement proactive triggers: when the leverage
+      ratio approaches internal buffers (e.g., 3.5%), automatically generate a capital
+      plan review ticket and notify the CFO and CRO. Archive daily leverage ratio snapshots
+      in a time-series database for trend analysis and regulatory reporting.
+    tools:
+      - apache-kafka
+      - apache-flink
+      - prometheus
+      - grafana
+      - postgresql
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain leverage ratio calculation logic — including the SA-CCR replacement cost
+      and PFE algorithms and the SFT exposure netting rules — as versioned code with
+      comprehensive unit and integration tests. Validate that model changes do not produce
+      unexpected shifts in the leverage exposure measure by running automated regression
+      tests against a reference portfolio before any deployment. Tag every calculation
+      run with the model version, parameter version, and data snapshot timestamp so that
+      any regulatory examination can reproduce the exact output. Integrate leverage ratio
+      calculation into the COREP/LRR reporting pipeline with automated validation checks
+      against supervisory thresholds before report submission.
+    tools:
+      - gitlab-ci
+      - pytest
+      - dbt
+      - cyclonedx
+      - sonarqube
+      - opa-conftest
+
+  secops:
+    prose: >-
+      Protect leverage ratio data with role-based access controls: only authorised Finance
+      and Risk staff should be able to view or modify exposure measure parameters. Log and
+      alert on any changes to netting agreements or collateral arrangements that would
+      affect the SFT exposure measure. Conduct quarterly reconciliation between the leverage
+      ratio exposure measure and general ledger balances to detect discrepancies. Include
+      leverage ratio systems in the scope of the annual penetration testing programme and
+      business continuity testing.
+    tools:
+      - splunk
+      - cyberark
+      - hashicorp-vault
+      - qualys
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-6", "art-9"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-2", "AU-9", "SI-7"]
+    relationship: mapped
+  - framework_id: cobit-2019
+    articles: ["EDM03", "APO12"]
+    relationship: supports

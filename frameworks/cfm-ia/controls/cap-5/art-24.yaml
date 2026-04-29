@@ -1,0 +1,119 @@
+id: art-24
+family: cap-5
+title: "Representatividade de Datasets de Treinamento"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 24. Os datasets utilizados para treinamento de sistemas de IA
+    médica devem atender aos seguintes requisitos de representatividade:
+
+    I - refletir a diversidade demográfica da população-alvo do sistema,
+    incluindo distribuição etária, de sexo, étnica e geográfica compatível
+    com o contexto brasileiro de uso;
+
+    II - incluir representação adequada de subgrupos vulneráveis ou
+    historicamente sub-representados em pesquisas clínicas;
+
+    III - documentar a composição demográfica do dataset, incluindo
+    distribuição por subgrupo e eventuais lacunas de representatividade;
+
+    IV - quando o dataset de treinamento não for representativo da
+    população-alvo, as limitações devem ser explicitamente documentadas
+    e comunicadas ao médico usuário;
+
+    V - os dados utilizados para treinamento devem ser coletados em
+    conformidade com a legislação vigente de proteção de dados, com
+    base legal adequada conforme a LGPD.
+guidance:
+  prose: |
+    O art. 24 trata do problema de bias nos dados, que e a principal
+    fonte de injustica algoritmica em IA medica.
+
+    **Por que representatividade importa na medicina:**
+
+    - Modelos treinados predominantemente com dados de populacoes
+      caucasianas podem ter performance inferior para populacoes
+      afrodescendentes (ex: deteccao de lesoes de pele, oximetria).
+
+    - Modelos treinados com dados de hospitais terciarios podem
+      falhar em contextos de atencao primaria.
+
+    - Modelos treinados com dados de paises desenvolvidos podem
+      nao capturar doencas prevalentes no Brasil (ex: doenca de
+      Chagas, dengue, leishmaniose).
+
+    **Diversidade no contexto brasileiro (inciso I):**
+    O Brasil e um dos paises mais diversos do mundo. Datasets devem
+    refletir essa diversidade: brancos, pardos, pretos, indigenas,
+    amarelos; regiao Norte, Nordeste, Centro-Oeste, Sudeste, Sul;
+    rural e urbano; SUS e saude suplementar.
+
+    **Sub-representacao (inciso II):**
+    Populacoes historicamente sub-representadas em pesquisas clinicas
+    incluem: mulheres (historicamente excluidas de ensaios), idosos,
+    criancas, indigenas, populacao rural, pacientes do SUS.
+
+    **Transparencia sobre limitacoes (inciso IV):**
+    Se o dataset nao e representativo, o medico deve ser informado.
+    Ex: "Este modelo foi treinado com dados de 3 hospitais do
+    Sudeste. Performance para outras regioes nao foi validada."
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de gestao de datasets:**
+      1. Implementar plataforma de data governance para datasets de
+         treinamento: catalogacao, versionamento, documentacao de
+         composicao demografica e rastreabilidade de origem.
+      2. Automatizar analise de representatividade: calcular
+         distribuicao demografica do dataset e comparar com
+         distribuicao da populacao-alvo.
+      3. Implementar alertas quando datasets forem significativamente
+         nao representativos para subgrupos especificos.
+      4. Criar data lineage que rastreie cada dado de treinamento
+         ate sua origem, base legal e consentimento.
+    tools:
+      - data-governance
+      - dataset-catalog
+      - demographic-analysis
+      - data-lineage
+  devsecops:
+    prose: |
+      **Validacao de datasets no pipeline:**
+      1. Implementar checks automaticos de representatividade no
+         pipeline de treinamento: verificar distribuicao demografica
+         antes de iniciar treinamento.
+      2. Automatizar documentacao de composicao do dataset como
+         parte do pipeline, com report de distribuicao por subgrupo.
+      3. Bloquear treinamento quando dataset nao atender criterios
+         minimos de representatividade definidos pelo comite.
+      4. Implementar data card automatizada: documento que descreve
+         dataset utilizado, incluindo limitacoes de representatividade.
+    tools:
+      - gitlab-ci
+      - data-validation
+      - data-cards
+      - representation-checks
+  secops:
+    prose: |
+      **Governanca de dados de treinamento:**
+      1. Auditar base legal (LGPD) de todos os datasets de treinamento:
+         verificar consentimento, anonimizacao e finalidade.
+      2. Avaliar periodicamente se datasets mantidos estao atualizados
+         e representativos da populacao brasileira atual.
+      3. Coordenar com instituicoes de saude a obtencao de dados
+         representativos de populacoes sub-representadas.
+      4. Manter registro de limitacoes conhecidas de cada dataset
+         para informar medicos usuarios.
+    tools:
+      - data-governance
+      - lgpd-compliance
+      - dataset-audit
+      - limitation-registry
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-13"]
+    relationship: complements
+  - framework_id: eu-ai-act
+    articles: ["art-10"]
+    relationship: mapped

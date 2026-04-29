@@ -1,0 +1,100 @@
+id: tds-vuln-1
+family: tds-vuln
+title: "Vulnerability Scanning and Patch Management for 3DS Systems"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    All system components within the 3DS environment must be protected
+    against known vulnerabilities through a formal patch management process
+    and regular vulnerability scanning. Critical and high-severity security
+    patches must be applied within 30 days of release. Internal vulnerability
+    scans must be performed at least quarterly and after any significant
+    change. External vulnerability scans must be performed by a PCI-approved
+    scanning vendor (ASV) at least quarterly. All identified vulnerabilities
+    rated high or critical must be remediated and rescanned to confirm
+    resolution.
+
+guidance:
+  prose: >-
+    3DS system components are high-value targets for attackers due to their
+    role in payment authentication. Unpatched vulnerabilities provide
+    attack vectors that can be exploited to compromise authentication
+    processes, steal sensitive data, or disrupt payment services. A
+    structured patch management process ensures vulnerabilities are
+    addressed within defined timeframes. Regular scanning identifies both
+    missing patches and configuration weaknesses. The combination of
+    internal and external scanning provides comprehensive coverage from
+    both insider and outsider perspectives.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 3 — Maintain Secure Systems"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 3.1 — Vulnerability Management"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated patch management using OS-native tools or
+      configuration management platforms (Ansible, Puppet, Chef). Configure
+      container image scanning in container registries to identify
+      vulnerable base images and dependencies. Use infrastructure-as-code
+      to define and enforce minimum OS and software versions. Implement
+      automated patching pipelines that test patches in staging before
+      applying to production 3DS systems. Configure vulnerability scanners
+      to scan the 3DS environment on a defined schedule.
+    tools:
+      - ansible
+      - puppet
+      - aws-systems-manager
+      - azure-update-management
+      - trivy
+      - grype
+      - nessus
+      - qualys
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability scanning into CI/CD pipelines so that every
+      build is scanned for known vulnerabilities in dependencies and
+      container images. Implement pipeline gates that fail builds when
+      critical or high vulnerabilities are detected. Use dependency
+      scanning tools to identify vulnerable libraries before deployment.
+      Automate the generation of quarterly vulnerability scan reports.
+      Track vulnerability remediation SLAs and escalate overdue items.
+    tools:
+      - gitlab-ci
+      - trivy
+      - grype
+      - snyk
+      - dependabot
+      - sonarqube
+      - owasp-dependency-check
+
+  secops:
+    prose: >-
+      Coordinate quarterly ASV scans and ensure findings are remediated
+      within defined SLAs. Track vulnerability metrics including mean time
+      to remediate (MTTR) and vulnerability density. Prioritize
+      remediation based on exploitability and impact to the 3DS
+      environment. Maintain evidence of scan results and remediation
+      actions for audit purposes. Conduct risk-based prioritization when
+      patching timelines conflict with operational requirements.
+    tools:
+      - qualys
+      - rapid7-insightvm
+      - tenable
+      - nessus
+      - splunk
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6", "req-11"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5", "SI-2"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.8"]
+    relationship: mapped

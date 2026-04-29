@@ -1,0 +1,148 @@
+id: art-14
+family: cap-5
+title: "Acesso do BCB a Documentacao e Cooperacao com a Supervisao"
+class: BCB-IN291
+baselines: [todas-ifs-ips]
+statement:
+  prose: |
+    Art. 14. A instituição deve assegurar ao Banco Central do Brasil acesso
+    irrestrito a toda documentação, sistemas, logs e evidências relacionadas
+    a incidentes de segurança cibernética, incluindo:
+
+    I - acesso a sistemas de gestão de incidentes utilizados pela instituição,
+    mediante solicitação formal do BCB;
+    II - disponibilização de cópia de logs, relatórios forenses e evidências
+    digitais no formato e pela via indicados pelo BCB;
+    III - participação de representantes do BCB em reuniões de war room ou
+    crisis management durante incidentes ativos de alta severidade, mediante
+    solicitação do regulador;
+    IV - cooperação plena com investigações conduzidas pelo BCB ou por terceiros
+    por ele autorizados;
+    V - comunicação transparente, sem omissão ou distorção de informações,
+    sob pena das sanções previstas na legislação vigente.
+
+    § 1. O acesso previsto neste artigo não se restringe a incidentes notificados,
+    podendo o BCB solicitar informações sobre quaisquer eventos de segurança
+    ocorridos na instituição.
+
+    § 2. A instituição deve designar um ponto focal de contato com o BCB para
+    assuntos de supervisão de segurança cibernética, com capacidade técnica e
+    autoridade para fornecer as informações solicitadas.
+
+    § 3. Respostas incompletas, intempestivas ou que o BCB considere insuficientes
+    serão tratadas como infrações autônomas, independentemente do julgamento sobre
+    o incidente em si.
+guidance:
+  prose: |
+    O art. 14 e o dispositivo de enforcement que garante a capacidade supervisora
+    do BCB. Sua importancia pratica e alta: obrigacoes descumpridas aqui sao
+    infracoes autonomas (ss 3), independentemente do que ocorreu no incidente.
+
+    **Inciso I - Acesso a sistemas:**
+    O BCB pode solicitar acesso read-only ao sistema de incidentes da instituicao.
+    A instituicao deve ter:
+    - Conta criada previamente para o BCB no sistema de incidentes
+    - Procedimento de provisionamento de acesso temporario em < 24h
+    - Trilha de auditoria completa do acesso do BCB
+
+    **Inciso II - Formatos de entrega:**
+    O BCB especificara o formato. A instituicao deve ser capaz de exportar logs
+    em multiplos formatos (EVTX, CEF, syslog, JSON) e relatorios em PDF/docx.
+
+    **Inciso III - Participacao em war room:**
+    Em incidentes de alta severidade, o BCB pode enviar um supervisor para
+    participar das reunioes de crise. Isso e incomum mas ocorre. A instituicao
+    deve ter protocolo para acomodar um observador externo sem comprometer a
+    eficacia da gestao do incidente.
+
+    **Inciso V - Transparencia:**
+    A obrigacao de transparencia vai alem de responder perguntas: exige proatividade
+    na comunicacao de informacoes que o BCB presumivelmente quer saber. A instituicao
+    que omite informacoes "que nao foram especificamente perguntadas" viola este inciso.
+
+    **ss 1 - Eventos nao notificados:**
+    O BCB pode investigar eventos que a instituicao avaliou como abaixo do limiar
+    de materialidade. Por isso o inciso VI do art. 13 (documentar decisoes de
+    nao-notificacao) e tao importante: a justificativa precisa estar disponivel.
+
+    **ss 2 - Ponto focal:**
+    O ponto focal deve ser tecnicamente capaz de responder perguntas tecnicas do BCB.
+    Um ponto focal que repassa todas as perguntas sem responder prejudica a relacao
+    com o regulador.
+
+    **ss 3 - Infracoes autonomas:**
+    Uma resposta atrasada, incompleta ou tecnicamente evasiva ao BCB e uma infracao
+    por si so, independentemente do merito do incidente. As sancoes se acumulam.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de acesso para o BCB:**
+      1. Conta "bcb-supervisor" pre-provisionada nos sistemas de incidentes e SIEM
+         com permissoes read-only, MFA obrigatorio e auditoria completa.
+      2. Procedimento de ativacao/desativacao da conta BCB:
+         ativacao em < 2 horas mediante solicitacao formal, desativacao automatica
+         apos o periodo autorizado.
+      3. Portal de auditoria para o BCB:
+         view especializada com filtros por incidente, data e tipo, exportacao
+         facilitada em multiplos formatos.
+      4. Procedimento de entrega de evidencias:
+         script de exportacao que coleta todos os artefatos de um incidente em
+         formato padrao (ZIP estruturado com indice, hashes, e manifesto).
+    tools:
+      - incident-management
+      - siem
+      - access-management
+      - log-aggregator
+      - evidence-vault
+  devsecops:
+    prose: |
+      **Prontidao tecnica para supervisao:**
+      1. Auditoria de todos os acessos ao sistema de incidentes e ao SIEM,
+         incluindo acessos do BCB, com retencao conforme art. 13.
+      2. Ambiente de demonstracao/sandbox para o BCB:
+         copia do sistema de incidentes com dados anonimizados para treinamento
+         e para responder a solicitacoes de demonstracao do BCB.
+      3. API de exportacao de incidentes em formato estruturado (JSON/XML)
+         para facilitar integracao com sistemas do BCB.
+      4. Documentacao tecnica dos sistemas de seguranca disponivel para o BCB:
+         arquitetura de seguranca, playbooks, runbooks, em repositorio acessivel.
+    tools:
+      - access-management
+      - incident-management
+      - api-gateway
+      - document-management
+  secops:
+    prose: |
+      **Gestao do relacionamento com o BCB:**
+      1. Designacao formal do ponto focal de supervisao do BCB:
+         - CISO ou diretor com conhecimento tecnico de seguranca
+         - Substituto designado para cobertura 24/7
+         - Comunicacao ao BCB dos dados de contato
+      2. SLA interno para resposta ao BCB:
+         - Consultas tecnicas: < 24 horas
+         - Solicitacoes de evidencias: < 5 dias uteis
+         - Atualizacoes de incidentes ativos: conforme solicitado
+      3. Protocolo de cooperacao com investigacoes:
+         - Quem autoriza o acesso do BCB (CISO + compliance + juridico)
+         - Como documentar o acesso concedido
+         - Quem acompanha o supervisor do BCB durante sua presenca
+      4. Treinamento de comunicacao com o BCB:
+         como responder perguntas tecnicas de forma precisa, completa e transparente
+         sem expor informacoes desnecessariamente sensiveis.
+      5. Revisao juridica de qualquer comunicacao ao BCB que envolva reconhecimento
+         de responsabilidade ou potenciais sancoes.
+    tools:
+      - grc-platform
+      - incident-management
+      - document-management
+      - communication-tools
+legal_references:
+  - framework_id: bcb-conj-2
+    articles: ["art-6", "art-7"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-13"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["AU-6", "IR-7", "PM-7", "SI-4"]
+    relationship: supports

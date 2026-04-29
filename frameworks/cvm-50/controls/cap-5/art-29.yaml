@@ -1,0 +1,108 @@
+id: art-29
+family: cap-5
+title: "Listas de Pessoas Monitoradas e Sancoes"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 29. Os participantes devem consultar e monitorar periodicamente as
+    seguintes listas:
+
+    I - lista de pessoas e entidades sujeitas a medidas financeiras restritivas
+    publicada pelo Ministério da Fazenda;
+    II - listas de sanções do Conselho de Segurança das Nações Unidas;
+    III - lista de pessoas e entidades sujeitas a sanções de outros organismos
+    internacionais, incluindo as publicadas pelo Escritório de Controle de
+    Ativos Estrangeiros (OFAC) dos Estados Unidos;
+    IV - lista de países e territórios de alto risco publicada pelo GAFI.
+
+    Parágrafo único. Quando identificada coincidência de cliente ou contraparte
+    com pessoa ou entidade constante nas listas de que trata o caput, o
+    participante deve:
+    I - bloquear imediatamente qualquer operação pendente;
+    II - comunicar ao COAF no prazo previsto no art. 37; e
+    III - aguardar orientação das autoridades competentes para manutenção
+    ou encerramento da relação de negócios.
+guidance:
+  prose: |
+    O monitoramento de listas de sancoes e uma das poucas obrigacoes de PLD/FT
+    com bloqueio automatico — nao ha margem para analise ou julgamento quando
+    um cliente esta em lista de sancoes.
+
+    **As quatro listas:**
+    1. Lista brasileira (Ministerio da Fazenda): nomes designados pelo Brasil
+       como relacionados a terrorismo, financiamento de terrorismo ou
+       proliferacao de armas de destruicao em massa.
+    2. ONU (UNSC Consolidated List): sancoes do Conselho de Seguranca — tem
+       carater obrigatorio universal e prevalece sobre decisoes nacionais.
+    3. OFAC SDN: lista norte-americana — tecnicamente extraterritorial, mas
+       na pratica de cumprimento obrigatorio para participantes que operam
+       em dolares ou tem contrapartes americanas.
+    4. GAFI: lista de jurisdicoes com deficiencias em PLD/FT.
+
+    **Bloqueio imediato (paragrafo unico):**
+    Diferente de outros alertas que vao para fila de analise, o match em lista
+    de sancoes exige acao imediata: bloqueio de operacoes pendentes e comunicacao
+    ao COAF. Nao ha discricionariedade — a lei ordena o bloqueio.
+
+    **Atualizacao continua:**
+    Listas de sancoes mudam frequentemente (especialmente OFAC e ONU). O sistema
+    deve ter processo automatizado de atualizacao — um match perdido por lista
+    desatualizada pode resultar em violacao de sancoes internacionais, que tem
+    penalidades severas.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Gestao de listas de sancoes:**
+      1. Pipeline automatizado de importacao de todas as quatro listas com
+         frequencia diaria (ou em tempo real para OFAC e ONU).
+      2. Verificacao de integridade da importacao: validar que a lista foi
+         completamente importada sem truncamentos ou erros.
+      3. Rescreening automatico de toda a base de clientes sempre que uma
+         lista e atualizada — nao apenas no onboarding.
+      4. Matching fuzzy calibrado: suficientemente sensivel para pegar
+         variantes de nomes, mas especifico o suficiente para nao gerar
+         bloqueios por homonimos inocentes.
+
+      **Bloqueio automatico:**
+      5. Regra de negocio de bloqueio imediato: quando match de sancao e
+         confirmado, todas as ordens pendentes do cliente sao bloqueadas
+         automaticamente, sem aguardar aprovacao humana.
+      6. Alerta urgente simultaneo para compliance officer e diretoria.
+      7. Notificacao automatica para queue prioritaria de comunicacao ao COAF.
+    tools:
+      - sanctions-screening
+      - list-management
+      - aml-platform
+      - workflow-engine
+  devsecops:
+    prose: |
+      **Testes de sancoes:**
+      1. Testes de que match de sancao dispara bloqueio automatico.
+      2. Testes de importacao: listas importadas tem mesmo numero de entradas
+         da fonte oficial.
+      3. Testes de rescreening: novo nome adicionado a lista e detectado
+         em cliente existente.
+      4. Testes de false positive: cliente com nome similar a pessoa sancionada
+         deve passar pelo processo de resolucao manual.
+    tools:
+      - test-automation
+      - gitlab-ci
+      - sanctions-testing
+  secops:
+    prose: |
+      **Conformidade com sancoes:**
+      1. Auditoria mensal de que todas as quatro listas estao atualizadas
+         dentro do prazo esperado.
+      2. Relatorio de todos os matches encontrados no mes, com resultado
+         (confirmado vs. falso positivo).
+      3. Processo documentado de resolucao de falsos positivos: como distinguir
+         homonimo de pessoa realmente sancionada.
+    tools:
+      - sanctions-compliance
+      - audit-management
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-21", "art-25"]
+    relationship: equivalent-to

@@ -1,0 +1,107 @@
+id: iot-1
+family: auth
+title: "Prohibition of Default and Shared Credentials"
+class: ANATEL-IOT
+baselines: [equipamentos-telecom]
+statement:
+  prose: |
+    O equipamento para telecomunicações não deve possuir credenciais e senhas
+    iniciais para acesso iguais entre todos os dispositivos. As credenciais de
+    acesso não devem ser derivadas de informações de fácil obtenção por
+    escaneamento de tráfego de rede ou análise do próprio equipamento, como
+    endereço MAC ou número de série.
+
+    A senha de fábrica deve atender simultaneamente aos seguintes critérios:
+    possuir no mínimo 8 (oito) caracteres; incluir pelo menos uma letra
+    maiúscula, uma letra minúscula, um número e um caractere especial. As
+    senhas de fábrica não podem ser idênticas entre dispositivos do mesmo
+    modelo ou lote de fabricação.
+
+    (Ato 77/2021 §5.1.4, incisos I e II; Ato 2436/2023 §4)
+guidance:
+  prose: |
+    This control eliminates one of the most exploited attack vectors in IoT
+    devices: shared default credentials that enable mass compromise (e.g.,
+    Mirai botnet). ANATEL requires that each device ship with a unique,
+    cryptographically strong factory password.
+
+    **Key requirements:**
+    - Each device must have a unique factory credential — no two devices of
+      the same model may share the same default password.
+    - Factory passwords must meet complexity rules: minimum 8 characters,
+      including uppercase, lowercase, digit, and special character.
+    - Credentials must not be derivable from publicly observable device
+      attributes such as MAC address, serial number, IMEI, or any value
+      obtainable via network scanning.
+    - The requirement applies to all access interfaces: web UI, SSH, Telnet,
+      TR-069, SNMP, and any proprietary management protocol.
+
+    **Practical approaches for manufacturers:**
+    - Generate unique credentials per device during manufacturing using a
+      cryptographic random number generator (CSPRNG).
+    - Print the unique password on a physical label affixed to the device.
+    - Store a salted hash of the factory password in firmware — never the
+      plaintext.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement a device provisioning pipeline that generates unique
+         credentials per device using a CSPRNG during the manufacturing
+         or first-boot process.
+      2. Store only salted bcrypt/argon2 hashes in the device firmware
+         image — never plaintext passwords.
+      3. Integrate credential uniqueness validation into the factory QA
+         test suite: verify no two devices in a batch share the same
+         default password.
+      4. Automate firmware image signing so that each build embeds
+         per-device credential material securely.
+      5. Implement TR-069/CWMP or USP (TR-369) provisioning that replaces
+         factory credentials with operator-managed credentials on first
+         connection to the ACS.
+    tools:
+      - hardware-security-module
+      - secure-provisioning-system
+      - firmware-build-pipeline
+      - tr-069-acs
+  devsecops:
+    prose: |
+      1. Add static analysis rules to the CI/CD pipeline that detect
+         hardcoded credentials in firmware source code (strings matching
+         password patterns, default credential constants).
+      2. Implement secret scanning on all repositories containing device
+         firmware, embedded software, or provisioning scripts.
+      3. Create integration tests that verify: (a) factory passwords meet
+         the 8-character complexity requirement, (b) passwords differ
+         across device instances, (c) passwords are not derivable from
+         MAC/serial.
+      4. Include credential policy compliance as a release gate — builds
+         that fail credential uniqueness checks cannot be promoted.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - secret-detection
+      - integration-testing
+  secops:
+    prose: |
+      1. Conduct periodic audits of manufactured device batches to verify
+         credential uniqueness — sample devices from production and confirm
+         no shared passwords.
+      2. Monitor threat intelligence feeds for leaked default credentials
+         associated with your device models.
+      3. Maintain an incident response procedure for credential compromise:
+         if a factory credential generation flaw is discovered, trigger
+         forced password reset via remote management (TR-069/USP).
+      4. Document the credential generation methodology and retain evidence
+         for ANATEL homologation audits.
+    tools:
+      - vulnerability-scanner
+      - threat-intelligence-platform
+      - grc-platform
+      - audit-log-management
+legal_references:
+  - framework_id: r-ciber
+    articles: ["art-12"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

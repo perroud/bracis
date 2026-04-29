@@ -1,0 +1,92 @@
+id: ops-2
+family: ops
+title: "Logging and Monitoring"
+class: C5BSI
+baselines: [c5-basic]
+
+statement:
+  prose: >-
+    The cloud provider shall produce and retain event logs recording
+    user activities, exceptions, faults, and information security events.
+    The logging facilities and log information shall be protected against
+    tampering and unauthorised access. Activities of system administrators
+    and system operators shall be logged and the logs regularly reviewed.
+    Clocks of all relevant information processing systems shall be
+    synchronised to an agreed reference time source.
+
+guidance:
+  prose: >-
+    Comprehensive logging is essential for cloud providers to detect
+    security incidents, support forensic investigations, and demonstrate
+    compliance. Logs must capture sufficient detail to reconstruct the
+    sequence of events (who did what, when, from where, and with what
+    outcome). Log integrity must be protected through immutable storage,
+    cryptographic checksums, or write-once-read-many (WORM) storage.
+    Administrator activity logging is particularly important because
+    administrators have elevated privileges that could be abused.
+    Time synchronization via NTP ensures that log entries from different
+    systems can be correlated accurately.
+
+references:
+  - citation: "C5:2020, OPS-02"
+    url: "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy a centralized logging infrastructure that aggregates logs
+      from all platform components (Kubernetes audit logs, cloud provider
+      CloudTrail/Activity Log, application logs, network flow logs).
+      Implement immutable log storage using WORM-capable object storage
+      or append-only log streams. Enforce NTP synchronization across all
+      systems via infrastructure-as-code. Deploy log forwarding agents
+      as DaemonSets in Kubernetes clusters to ensure complete coverage.
+      Implement log retention policies aligned with regulatory requirements.
+    tools:
+      - elasticsearch
+      - fluentd
+      - vector
+      - aws-cloudtrail
+      - kubernetes-audit
+      - terraform
+
+  devsecops:
+    prose: >-
+      Integrate structured logging libraries into application code
+      standards and enforce their use through code review and linting.
+      Include log format validation in CI/CD pipelines to ensure
+      applications produce logs in the required format. Deploy audit
+      logging for all CI/CD pipeline activities including who triggered
+      builds, what was deployed, and approval decisions.
+    tools:
+      - gitlab-ci
+      - fluentd
+      - structured-logging
+      - semgrep
+
+  secops:
+    prose: >-
+      Implement real-time log analysis with correlation rules to detect
+      security events, including privilege escalation, unauthorized
+      access attempts, and anomalous administrator activity. Create
+      dashboards for log coverage metrics to identify gaps in logging.
+      Implement automated integrity checks on log storage to detect
+      tampering. Conduct periodic reviews of administrator activity
+      logs and document findings.
+    tools:
+      - splunk
+      - elastic-siem
+      - wazuh
+      - chronicle
+      - microsoft-sentinel
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["a8.15", "a8.17"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53
+    articles: ["AU-2", "AU-3", "AU-6", "AU-9"]
+    relationship: mapped
+  - framework_id: csa-ccm-v4
+    articles: ["LOG-01", "LOG-03", "LOG-05"]
+    relationship: mapped

@@ -1,0 +1,87 @@
+id: sc-3
+family: sc
+title: "Auto-Run and Auto-Play Disabled"
+class: UKCE
+baselines: [cyber-essentials, cyber-essentials-plus]
+
+statement:
+  prose: >-
+    Auto-run and auto-play must be disabled on all devices so that software and
+    media files do not execute automatically when external storage devices are
+    connected or media is inserted. This prevents malware from spreading through
+    removable media such as USB drives, CDs, or DVDs without requiring user
+    interaction.
+
+guidance:
+  prose: >-
+    Auto-run and auto-play were historically responsible for the rapid spread of
+    malware via USB drives (e.g., Conficker, Stuxnet initial propagation). While
+    modern operating systems have improved default behaviour, organisations must
+    still explicitly verify that auto-run is disabled across their estate. This
+    control should be enforced through centralised device management policies rather
+    than relying on individual device settings. In high-security environments,
+    consider blocking removable media entirely through device control policies.
+
+references:
+  - citation: "Cyber Essentials Requirements for IT Infrastructure, Section: Secure Configuration"
+    url: "https://www.ncsc.gov.uk/cyberessentials/overview"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy Group Policy Objects (Windows) or MDM configuration profiles (macOS, Linux)
+      that disable auto-run and auto-play across all managed endpoints. For Windows, set
+      the NoDriveTypeAutoRun registry key to 0xFF via GPO and disable the AutoPlay service.
+      For macOS, deploy configuration profiles that disable automatic media handling. In
+      containerised and cloud environments, ensure that volume mounts are explicitly defined
+      and do not auto-execute content. Implement device control policies through endpoint
+      management that restrict or audit removable media connections.
+    tools:
+      - intune
+      - jamf
+      - sccm
+      - group-policy
+      - ansible
+
+  devsecops:
+    prose: >-
+      Include auto-run/auto-play verification in golden image build pipelines. Use
+      InSpec, Ansible, or similar compliance-as-code tools to test that auto-run is
+      disabled in built images before publishing to the image registry. Integrate
+      endpoint compliance status into deployment pipelines — devices that fail the
+      auto-run check should be flagged and excluded from accessing development
+      environments or build agents.
+    tools:
+      - inspec
+      - ansible
+      - packer
+      - osquery
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Monitor endpoint compliance dashboards for devices with auto-run enabled.
+      Include auto-run status in periodic endpoint audits. Investigate any
+      removable media events in conjunction with malware alerts — auto-run exploitation
+      is a strong indicator of targeted attack via physical media. For Cyber Essentials
+      Plus assessments, ensure the Certification Body can verify auto-run is disabled
+      on sample devices during the technical review.
+    tools:
+      - crowdstrike-falcon
+      - microsoft-defender-for-endpoint
+      - osquery
+      - splunk
+
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A8.12", "A8.9"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-7", "CM-7"]
+    relationship: mapped
+  - framework_id: essential-eight
+    articles: ["e8-app-control"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["CIS 2.3", "CIS 10.3"]
+    relationship: mapped

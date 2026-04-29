@@ -1,0 +1,111 @@
+id: art-52
+family: distribuicao-suitability
+title: "Classificacao de Investidores e Restricoes de Acesso"
+class: CVM-175
+baselines: [fundos-investimento]
+statement:
+  prose: |
+    Art. 52. Os fundos de investimento podem ser destinados a investidores em
+    geral, a investidores qualificados ou a investidores profissionais, conforme
+    estabelecido no regulamento do fundo e na regulamentação da CVM.
+
+    Parágrafo 1. Investidores qualificados são aqueles que possuem investimentos
+    financeiros em valor superior a R$ 1.000.000,00 (um milhão de reais) e que
+    atestem essa condição por escrito.
+
+    Parágrafo 2. Investidores profissionais são aqueles que possuem investimentos
+    financeiros em valor superior a R$ 10.000.000,00 (dez milhões de reais)
+    e que atestem essa condição por escrito, além de instituições financeiras,
+    fundos de investimento e demais entidades reguladas.
+
+    Parágrafo 3. O distribuidor é responsável por verificar a condição de
+    investidor qualificado ou profissional previamente à aplicação, devendo
+    manter documentação comprobatória.
+guidance:
+  prose: |
+    O art. 52 estabelece a estratificacao de investidores, que determina quais
+    fundos cada investidor pode acessar.
+
+    **Tres categorias de investidores:**
+    (i) Investidor geral: qualquer pessoa fisica ou juridica, sem requisito
+    de patrimonio; (ii) Investidor qualificado: R$ 1 milhao em investimentos;
+    (iii) Investidor profissional: R$ 10 milhoes em investimentos.
+
+    **Impacto na distribuicao:**
+    Fundos mais complexos e arriscados (FIP, FIDC subordinado, fundos com
+    alavancagem, fundos de criptoativos > 5%) so podem ser distribuidos a
+    investidores qualificados ou profissionais. O distribuidor deve verificar
+    a condicao ANTES da aplicacao.
+
+    **Documentacao comprobatoria:**
+    O investidor deve atestar sua condicao por escrito e o distribuidor deve
+    manter documentacao. A CVM pode verificar se a classificacao foi feita
+    corretamente durante fiscalizacao.
+
+    **Self-certification + verificacao:**
+    O investidor atesta (self-certification), mas o distribuidor deve exercer
+    diligencia razoavel para verificar a veracidade. Aceitar auto-declaracao
+    sem nenhuma verificacao pode configurar negligencia.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de classificacao de investidores:**
+      1. Cadastro de investidores com classificacao automatica: dados
+         patrimoniais, auto-declaracao e verificacao documental.
+      2. Controle de acesso por nivel: fundos restritos so aparecem para
+         investidores com classificacao adequada.
+      3. Integracao com bases de verificacao patrimonial quando disponivel.
+
+      **Bloqueio automatico:**
+      4. Hard block para aplicacao em fundo restrito por investidor nao
+         qualificado: nao permite prosseguir sem classificacao validada.
+      5. Workflow de aprovacao para upgrade de classificacao: documentacao,
+         verificacao, aprovacao por compliance.
+    tools:
+      - vault
+      - terraform
+      - opa-gatekeeper
+      - git
+  devsecops:
+    prose: |
+      **Validacao de classificacao:**
+      1. Testes automatizados de controle de acesso: investidor geral nao
+         consegue aplicar em fundo qualificado.
+      2. Testes de workflow de classificacao: verificar completude de
+         documentacao exigida.
+      3. SAST para codigo de controle de acesso: falhas podem permitir
+         acesso indevido.
+
+      **Protecao de dados patrimoniais:**
+      4. Criptografia de dados patrimoniais de investidores.
+      5. Secret detection para dados pessoais e patrimoniais em logs/codigo.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - vault
+  secops:
+    prose: |
+      **Monitoramento de classificacao:**
+      1. Dashboard de investidores: distribuicao por categoria, classificacoes
+         pendentes, documentacoes expiradas.
+      2. Alertas para: investidores com classificacao expirada tentando
+         aplicar em fundo restrito.
+      3. Revisao periodica de classificacoes: verificar se investidores
+         ainda atendem aos requisitos patrimoniais.
+
+      **Auditoria de acesso:**
+      4. Amostragem de investidores qualificados/profissionais para verificar
+         documentacao comprobatoria.
+      5. Verificar que nenhum investidor geral detem cotas de fundo restrito.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - siem
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-3", "art-5"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

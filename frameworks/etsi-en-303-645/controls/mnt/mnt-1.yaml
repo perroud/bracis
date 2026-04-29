@@ -1,0 +1,87 @@
+id: mnt-1
+family: mnt
+title: "Make Installation and Maintenance of Devices Easy"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    Installation and maintenance of consumer IoT should involve minimal decisions by
+    the consumer and should follow security best practice on usability. The manufacturer
+    shall provide users with guidance on how to securely set up their device as well as
+    how to check that a device is securely set up. The setup and configuration process
+    shall be designed so that the default settings are secure, requiring the user to
+    actively choose less secure options if they wish to deviate.
+
+guidance:
+  prose: >-
+    Security usability is critical for consumer IoT — if secure configuration is difficult,
+    consumers will skip it or misconfigure their devices. This provision embodies the
+    "secure by default" principle: out of the box, the device should be in its most secure
+    configuration, and any relaxation of security must be a conscious choice by the user.
+    Setup procedures should minimize the number of security decisions users need to make.
+    Clear, step-by-step guidance must be provided for initial setup and ongoing maintenance.
+    The manufacturer must also provide a way for users to verify their device is correctly
+    and securely configured, such as a security status indicator or configuration checker in
+    the companion app.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.12-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Design a guided setup flow that walks users through initial configuration with secure
+      defaults pre-selected. Implement a security status dashboard in the companion app that
+      shows the current security posture: whether the password has been changed, firmware is
+      up to date, automatic updates are enabled, and unnecessary services are disabled.
+      Configure all settings to their most secure values by default — encryption enabled,
+      unused ports closed, automatic updates on. Require explicit user action to enable less
+      secure configurations with clear warnings about the security implications. Provide
+      plain-language setup documentation with visual guides.
+    tools:
+      - mobile-companion-app
+      - setup-wizard
+      - firmware-defaults
+      - security-dashboard
+
+  devsecops:
+    prose: >-
+      Test the complete setup flow in automated end-to-end tests to verify all defaults are
+      secure. Implement configuration baseline checks that scan the device after factory reset
+      to verify secure defaults. Validate that security warnings are displayed when users
+      attempt to enable less secure configurations. Include setup flow usability testing in the
+      QA process. Automate verification that documentation matches the actual setup
+      experience for each firmware release.
+    tools:
+      - selenium
+      - appium
+      - pytest
+      - gitlab-ci
+      - configuration-scanner
+
+  secops:
+    prose: >-
+      Monitor the deployed fleet for devices running with non-default, less secure
+      configurations and generate reports on the most common deviations. Track the
+      percentage of devices that complete the secure setup flow versus those that skip
+      steps. Analyze support tickets related to setup difficulties to identify UX
+      improvements that would increase security compliance. Include default configuration
+      auditing in periodic security assessments.
+    tools:
+      - grafana
+      - splunk
+      - servicenow
+      - analytics-platform
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-7.6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["CM-6", "CM-2", "SA-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.8.9", "A.5.37"]
+    relationship: mapped

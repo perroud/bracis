@@ -1,0 +1,540 @@
+id: slsa_to_nist-800-218
+title: "SLSA v1.0 to NIST SP 800-218 (SSDF) Control Mapping"
+source_framework: slsa
+target_framework: nist-800-218
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+description: >
+  Control-to-control mapping between SLSA v1.0 (Supply-chain Levels for Software
+  Artifacts) and NIST SP 800-218 (Secure Software Development Framework, SSDF v1.1).
+  SLSA defines a security framework for software supply chains across three tracks —
+  Build, Source, and Dependencies — while NIST 800-218 defines practices for secure
+  software development across four groups — Prepare the Organization (PO), Protect the
+  Software (PS), Produce Well-Secured Software (PW), and Respond to Vulnerabilities (RV).
+  This mapping identifies where SLSA requirements align with, implement, or complement
+  specific SSDF practices.
+
+mappings:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BUILD TRACK
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l1-provenance: Build L1 — Provenance Exists
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l1-provenance
+    target_controls:
+      - id: ps-2
+        relationship: implements
+        confidence: 0.93
+        rationale: >
+          SLSA Build L1 requires that provenance metadata exists for every software
+          artifact, describing how it was produced, the build system used, inputs
+          consumed, and the process invoked. PS-2 (Provide a Mechanism for Verifying
+          Software Release Integrity) mandates generating and publishing provenance
+          attestations for each release. Build L1 provenance directly implements the
+          provenance attestation requirement of PS-2.
+      - id: ps-1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          Build L1 provenance captures which source inputs were consumed during the
+          build, establishing a link between source code and produced artifacts.
+          PS-1 (Protect All Forms of Code from Unauthorized Access) requires storing
+          code in version-controlled repositories with integrity mechanisms. The
+          provenance record intersects by documenting the source reference, providing
+          evidence that the code used was under version control.
+      - id: po-3
+        relationship: complements
+        confidence: 0.82
+        rationale: >
+          Build L1 provenance generation requires toolchain integration — provenance
+          generators, attestation stores, and verification tools must be part of the
+          build pipeline. PO-3 (Implement Supporting Toolchains) mandates specifying
+          and implementing tools that generate security artifacts including provenance
+          data. SLSA L1 provenance complements PO-3 by defining a concrete provenance
+          artifact that the toolchain must produce.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l1-attestation: Build L1 — Attestation Format
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l1-attestation
+    target_controls:
+      - id: ps-2
+        relationship: implements
+        confidence: 0.91
+        rationale: >
+          SLSA Build L1 requires provenance to use the in-toto attestation framework
+          with the SLSA Provenance predicate type, including builder identity, build
+          configuration source, invocation parameters, and output digests. PS-2
+          mandates providing mechanisms for verifying software release integrity
+          through cryptographic signatures, checksums, and provenance attestations.
+          The standardized attestation format directly implements the verification
+          mechanism required by PS-2.
+      - id: po-3
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          Adopting the in-toto attestation format requires evaluating and configuring
+          tools that produce and consume this specific format. PO-3 requires
+          evaluating and selecting tools that generate security artifacts including
+          provenance data. The attestation format requirement intersects with PO-3
+          by constraining the toolchain to support a specific standard.
+      - id: po-1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          The requirement to use a recognized attestation format establishes a concrete
+          security requirement for the software development process. PO-1 (Define
+          Security Requirements for Software Development) requires identifying and
+          documenting security requirements for the development infrastructure. The
+          attestation format standard complements PO-1 by providing a specific,
+          measurable requirement for build provenance.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l2-hosted: Build L2 — Hosted Build Platform
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l2-hosted
+    target_controls:
+      - id: po-5
+        relationship: implements
+        confidence: 0.94
+        rationale: >
+          SLSA Build L2 requires builds to execute on a hosted platform managed by
+          the build platform provider, not on developer workstations, ensuring a
+          trust boundary between developer and build process. PO-5 (Implement and
+          Maintain Secure Environments for Software Development) requires separating
+          and protecting build environments, hardening CI/CD infrastructure, and
+          preventing unauthorized access and tampering. The hosted build platform
+          requirement directly implements PO-5's mandate for secure, controlled
+          build environments.
+      - id: po-3
+        relationship: intersects-with
+        confidence: 0.87
+        rationale: >
+          Requiring a hosted build platform is a toolchain decision that dictates
+          which build services are acceptable. PO-3 requires specifying tools for
+          each stage of the SDLC and configuring them to generate provenance data.
+          The hosted platform requirement intersects by constraining the build
+          toolchain to managed CI/CD services with provenance generation capability.
+      - id: ps-1
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          By restricting builds to hosted platforms, Build L2 ensures that artifact
+          registry push credentials are only held by CI/CD service accounts, not
+          developers. PS-1 requires applying least privilege to code and artifact
+          access. The hosted build requirement complements PS-1 by eliminating
+          developer-controlled build-to-publish paths.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l2-authenticated: Build L2 — Authenticated Provenance
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l2-authenticated
+    target_controls:
+      - id: ps-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          SLSA Build L2 requires provenance to be digitally signed by the hosted
+          build platform using a mechanism verifiable by consumers without trusting
+          the build tenant. PS-2 mandates cryptographically signing all software
+          releases and providing verification mechanisms for consumers to validate
+          authenticity and integrity. Authenticated provenance directly implements
+          the cryptographic signing and verification requirements of PS-2.
+      - id: po-5
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          Authenticated provenance requires the signing key or identity to belong
+          to the build platform, not the developer, which is a build environment
+          security concern. PO-5 requires securing and hardening build systems and
+          CI/CD infrastructure. The signing identity isolation intersects with PO-5's
+          mandate to protect build environments from tampering.
+      - id: po-3
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          Implementing keyless signing via Sigstore (Fulcio + Rekor) requires
+          specific toolchain configuration with signing infrastructure and
+          transparency logs. PO-3 requires implementing supporting toolchains that
+          generate security artifacts. Authenticated provenance complements PO-3 by
+          specifying the signing toolchain requirements.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l3-hardened: Build L3 — Hardened Build Platform
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l3-hardened
+    target_controls:
+      - id: po-5
+        relationship: implements
+        confidence: 0.96
+        rationale: >
+          SLSA Build L3 requires strong isolation between build tenants and between
+          individual build executions, with ephemeral sandboxed environments,
+          defense-in-depth against insider threats, and tamper-resistant provenance
+          generation. PO-5 mandates separating and protecting all development
+          environments, hardening build systems and CI/CD infrastructure, and
+          implementing logging and monitoring. Build L3 hardening directly implements
+          and exceeds PO-5's build environment protection requirements.
+      - id: po-3
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          Hardened build platforms require specific toolchain choices — ephemeral
+          VM-isolated runners, hardware-backed security, hermetic builds, and
+          platform-controlled provenance generation (Tekton Chains). PO-3 requires
+          specifying and implementing tools within each stage of the SDLC. The
+          hardening requirements intersect by constraining the acceptable build
+          toolchain to platforms meeting isolation requirements.
+      - id: pw-6
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          Build L3 hardening includes hermetic builds that cannot access the network
+          during execution (after dependency resolution), which directly overlaps with
+          build process configuration. PW-6 (Configure the Compilation, Interpreter,
+          and Build Processes) requires ensuring build processes are reproducible
+          and documented. Both controls address the integrity and security
+          characteristics of the build process itself.
+      - id: ps-3
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          Build L3 requires that the build platform implement protections against
+          insider threats with defense-in-depth, ensuring builds are auditable.
+          PS-3 (Archive and Protect Each Software Release) requires preserving
+          releases and associated artifacts for future investigation. Hardened
+          builds complement PS-3 by ensuring the build integrity that makes
+          archived artifacts trustworthy.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-build-l3-unforgeable: Build L3 — Unforgeable Provenance
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-build-l3-unforgeable
+    target_controls:
+      - id: ps-2
+        relationship: implements
+        confidence: 0.95
+        rationale: >
+          SLSA Build L3 requires provenance to be unforgeable — the signing mechanism
+          must be controlled by the build platform in a way tenants cannot access or
+          manipulate, and any forgery attempt must be detectable through transparency
+          mechanisms. PS-2 mandates providing cryptographic signatures, provenance
+          attestations, and verification mechanisms for consumers. Unforgeable
+          provenance implements the strongest form of PS-2's integrity verification
+          requirement.
+      - id: po-5
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          Unforgeable provenance requires provenance generation and signing to occur
+          in a security domain separate from the build execution environment, with
+          signing keys inaccessible to tenants. PO-5 requires securing build systems
+          and implementing separation between environments. The provenance signing
+          isolation is a specific instantiation of PO-5's environment separation
+          requirement.
+      - id: ps-1
+        relationship: complements
+        confidence: 0.77
+        rationale: >
+          Unforgeable provenance ensures that even a fully compromised build tenant
+          cannot produce provenance misrepresenting what was built, providing a
+          strong integrity guarantee for the code-to-artifact chain. PS-1 requires
+          helping prevent unauthorized changes to code. Unforgeable provenance
+          complements PS-1 by extending integrity protection from code to the
+          build-and-attestation layer.
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SOURCE TRACK
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-source-versioned: Source — Version Controlled
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-source-versioned
+    target_controls:
+      - id: ps-1
+        relationship: implements
+        confidence: 0.93
+        rationale: >
+          SLSA requires all source code to be maintained in a version control system
+          with every revision uniquely identifiable via content-addressable hash
+          (Git commit SHA), supporting immutable snapshots. PS-1 mandates storing
+          all forms of code in version-controlled repositories with access control,
+          authentication, and authorization mechanisms. SLSA source versioning
+          directly implements the version control and integrity aspects of PS-1.
+      - id: po-5
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          Version control with restricted force pushes and history rewriting on
+          protected branches contributes to the security of the development
+          environment. PO-5 requires securing and hardening code repositories.
+          Source versioning complements PO-5 by establishing the foundational
+          integrity mechanism (immutable revision history) for the code repository
+          environment.
+      - id: po-1
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          Requiring version control for all source code, build scripts, CI/CD
+          configurations, and infrastructure-as-code is a fundamental security
+          requirement for software development. PO-1 mandates defining security
+          requirements for the development infrastructure and processes. Source
+          versioning complements PO-1 by providing a specific, measurable
+          infrastructure requirement.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-source-verified-history: Source — Verified History
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-source-verified-history
+    target_controls:
+      - id: ps-1
+        relationship: implements
+        confidence: 0.94
+        rationale: >
+          SLSA requires every source change to have an authenticated identity
+          associated with it and a tamper-evident history recording the chain of
+          revisions. PS-1 mandates implementing branch protection rules, requiring
+          code reviews and approvals before merging, and enforcing commit signing
+          to ensure integrity and authenticity of code changes. Verified history
+          directly implements PS-1's commit signing and change authenticity
+          requirements.
+      - id: pw-7
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          Verified history with authenticated identities on every change enables
+          auditing the provenance of every line of code and detecting unauthorized
+          modifications. PW-7 (Review and/or Analyze Human-Readable Code) requires
+          performing peer code reviews with security-focused review for sensitive
+          components. Both controls ensure code changes are attributable and
+          reviewed, though from different angles — identity verification versus
+          content review.
+      - id: po-5
+        relationship: complements
+        confidence: 0.79
+        rationale: >
+          Implementing SSO-integrated authentication for Git access and maintaining
+          repository audit logs are part of securing the development environment.
+          PO-5 requires implementing logging and monitoring for all development
+          environments. Verified history complements PO-5 by establishing the
+          authentication and audit trail infrastructure for the source repository.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-source-retained: Source — Retained Indefinitely
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-source-retained
+    target_controls:
+      - id: ps-3
+        relationship: implements
+        confidence: 0.92
+        rationale: >
+          SLSA requires source code and its complete revision history to be retained
+          indefinitely, with any revision referenced by a build's provenance
+          remaining available for retrieval and verification. PS-3 (Archive and
+          Protect Each Software Release) mandates securely archiving each release
+          including source code, defining retention policies, and protecting
+          archives from unauthorized modification or deletion. Source retention
+          directly implements PS-3's source archival and retention requirements.
+      - id: ps-1
+        relationship: complements
+        confidence: 0.76
+        rationale: >
+          Source retention requires administrative controls to prevent repository
+          and branch deletion, with multi-party approval for destructive operations.
+          PS-1 requires protecting code from unauthorized access and applying least
+          privilege. Source retention complements PS-1 by adding deletion prevention
+          to the existing access control and integrity mechanisms.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-source-two-person: Source — Two-Person Reviewed
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-source-two-person
+    target_controls:
+      - id: pw-7
+        relationship: implements
+        confidence: 0.93
+        rationale: >
+          SLSA requires all changes to be reviewed and approved by at least one
+          person other than the author before being accepted, with the review
+          recorded and auditable. PW-7 mandates performing peer code reviews for
+          all changes with enhanced security-focused review for sensitive components.
+          The two-person review requirement directly implements PW-7's peer review
+          mandate.
+      - id: ps-1
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          SLSA two-person review requires branch protection rules that enforce
+          the review requirement at the platform level, blocking self-approvals
+          and direct pushes to protected branches. PS-1 mandates implementing
+          branch protection rules and requiring code reviews and approvals before
+          merging. The two-person rule directly implements these PS-1 requirements.
+      - id: po-2
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          The two-person review requirement implies defined reviewer roles (who is
+          qualified to approve), which connects to organizational role definitions.
+          PO-2 (Implement Roles and Responsibilities) requires defining roles
+          including code reviewers and ensuring personnel are qualified. The review
+          requirement intersects with PO-2 by necessitating defined reviewer roles
+          and qualifications.
+      - id: po-4
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          Two-person review is a security check criterion — a quality gate that
+          changes must pass before being accepted. PO-4 (Define and Use Criteria
+          for Software Security Checks) requires defining criteria and implementing
+          mechanisms to enforce them throughout the SDLC. The two-person rule
+          complements PO-4 as a specific, enforceable security gate criterion.
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DEPENDENCIES TRACK
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-dep-scanned: Dependencies — Scanned for Vulnerabilities
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-dep-scanned
+    target_controls:
+      - id: rv-1
+        relationship: implements
+        confidence: 0.93
+        rationale: >
+          SLSA requires all third-party dependencies to be scanned for known
+          vulnerabilities, covering both direct and transitive dependencies across
+          all package ecosystems, with results recorded and available for audit.
+          RV-1 (Identify and Confirm Vulnerabilities on an Ongoing Basis) mandates
+          gathering information from internal and external sources to identify
+          vulnerabilities, including vulnerability databases and security advisories.
+          Dependency vulnerability scanning directly implements RV-1's ongoing
+          vulnerability identification requirement for the dependency surface.
+      - id: pw-4
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          Scanning dependencies for vulnerabilities before promotion to production
+          is a core part of managing risks associated with reused software
+          components. PW-4 (Reuse Existing, Well-Secured Software When Feasible)
+          mandates monitoring all reused components for newly discovered
+          vulnerabilities and updating or replacing them promptly. Dependency
+          scanning directly implements PW-4's vulnerability monitoring requirement.
+      - id: rv-2
+        relationship: intersects-with
+        confidence: 0.83
+        rationale: >
+          SLSA requires critical and high-severity vulnerabilities in dependencies
+          to be addressed before artifacts are promoted to production, which is a
+          prioritization and remediation decision. RV-2 (Assess, Prioritize, and
+          Remediate Vulnerabilities) requires assessing severity and enforcing
+          remediation timelines. Dependency scanning intersects with RV-2 by feeding
+          vulnerability data into the prioritization and remediation workflow.
+      - id: po-4
+        relationship: complements
+        confidence: 0.77
+        rationale: >
+          Blocking artifacts with critical vulnerabilities from reaching production
+          is a security quality gate criterion. PO-4 requires defining criteria
+          for software security checks and implementing enforcement mechanisms.
+          Dependency scanning complements PO-4 by providing a concrete, automatable
+          security check criterion based on vulnerability severity thresholds.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-dep-pinned: Dependencies — Pinned to Specific Versions
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-dep-pinned
+    target_controls:
+      - id: pw-4
+        relationship: implements
+        confidence: 0.91
+        rationale: >
+          SLSA requires all dependencies to be pinned to specific, immutable
+          versions identified by cryptographic hash, with lock files committed to
+          version control and verified during builds. PW-4 mandates maintaining a
+          curated catalog of approved components and managing risks associated with
+          reused software. Pinning dependencies by hash directly implements the
+          risk management aspect of PW-4 by ensuring deterministic, verifiable
+          dependency resolution.
+      - id: ps-1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          Committing lock files to version control and verifying them during builds
+          is a form of protecting code integrity — the dependency specification is
+          configuration-as-code. PS-1 requires storing all forms of code including
+          configuration-as-code in version-controlled repositories with integrity
+          mechanisms. Dependency pinning intersects with PS-1 by treating dependency
+          declarations as protected code artifacts.
+      - id: pw-6
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          Pinned dependencies ensure that builds are reproducible — identical inputs
+          produce identical outputs — because dependency resolution is deterministic.
+          PW-6 (Configure the Compilation, Interpreter, and Build Processes) requires
+          ensuring build processes are reproducible and documented. Dependency
+          pinning intersects with PW-6's reproducibility requirement by eliminating
+          non-deterministic dependency resolution.
+      - id: po-3
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          Dependency pinning requires specific toolchain configuration — strict
+          install commands (npm ci, pip install --require-hashes), Dockerfile
+          linting (hadolint), and lock file management tools. PO-3 requires
+          specifying and implementing supporting toolchains. Pinning complements
+          PO-3 by defining concrete toolchain configuration requirements for
+          dependency management.
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # slsa-dep-complete: Dependencies — Complete Provenance Chain
+  # ───────────────────────────────────────────────────────────────────────────
+  - source_control: slsa-dep-complete
+    target_controls:
+      - id: pw-4
+        relationship: implements
+        confidence: 0.90
+        rationale: >
+          SLSA requires every dependency consumed by the build to itself have SLSA
+          provenance, establishing a recursive, verifiable chain from source to
+          final artifact. PW-4 mandates evaluating the security of third-party
+          components before adoption, including vulnerability history, maintenance
+          status, and community health. Complete provenance chains implement the
+          most rigorous form of PW-4's component security evaluation by requiring
+          verifiable build provenance for all dependencies.
+      - id: ps-2
+        relationship: intersects-with
+        confidence: 0.87
+        rationale: >
+          Complete provenance chains require generating SBOMs (CycloneDX or SPDX)
+          and attaching them as attestations alongside artifacts, enabling
+          end-to-end supply-chain verification. PS-2 mandates generating and
+          publishing provenance attestations and providing integrity verification
+          mechanisms. The complete provenance chain intersects with PS-2 by extending
+          the provenance and attestation requirement to the entire dependency graph.
+      - id: rv-1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          Complete provenance chains enable correlating newly disclosed CVEs against
+          the full dependency graph including transitive dependencies, improving
+          vulnerability identification coverage. RV-1 mandates identifying
+          vulnerabilities on an ongoing basis through multiple discovery channels.
+          The complete SBOM generated by provenance chains intersects with RV-1 by
+          providing the comprehensive inventory needed for effective vulnerability
+          identification.
+      - id: po-1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          Requiring SLSA provenance from upstream suppliers and open-source projects
+          is a supply chain security requirement that must be communicated to third
+          parties. PO-1 mandates communicating security requirements to third-party
+          software providers, including SBOM and secure development attestation
+          requirements. Complete provenance chains complement PO-1 by defining a
+          specific provenance requirement to include in supplier agreements.

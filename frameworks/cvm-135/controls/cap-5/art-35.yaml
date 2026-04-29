@@ -1,0 +1,108 @@
+id: art-35
+family: cap-5
+title: "Gestao de Garantias e Modelo de Margens"
+class: CVM-135
+baselines: [infraestruturas-mercado]
+statement:
+  prose: |
+    Art. 35. A câmara de compensação e liquidação deve implementar modelo de
+    margens e gestão de garantias que:
+    I - calcule margem inicial e de variação com frequência adequada ao risco
+    dos ativos compensados, incluindo cálculo intraday quando necessário;
+    II - aceite como garantia apenas ativos líquidos e de baixo risco de
+    crédito, com haircuts adequados à volatilidade e liquidez;
+    III - marque a mercado as garantias depositadas com frequência mínima
+    diária, realizando chamadas adicionais quando necessário;
+    IV - mantenha modelo de cálculo de margem validado periodicamente por
+    avaliação independente (backtesting e stress testing);
+    V - segregue garantias de clientes das garantias proprietárias dos
+    participantes, protegendo clientes em caso de inadimplência do
+    intermediário; e
+    VI - implemente cascata de inadimplência (default waterfall) com
+    ordem clara de utilização de recursos em caso de inadimplência.
+
+    Parágrafo único. A cascata de inadimplência deve incluir, nesta ordem:
+    a) garantias do participante inadimplente;
+    b) contribuição ao fundo garantidor do participante inadimplente;
+    c) recursos próprios da câmara (skin-in-the-game);
+    d) fundo garantidor mutualizado; e
+    e) outros mecanismos previstos no regulamento.
+guidance:
+  prose: |
+    O art. 35 detalha o sistema de margens e garantias, que e a principal
+    linha de defesa contra inadimplencia em uma CCP.
+
+    **Margem inicial vs. variacao:**
+    A margem inicial cobre a perda potencial em caso de inadimplencia
+    (estimada por modelos estatisticos). A margem de variacao cobre
+    as perdas e ganhos diarios pela variacao de preco dos ativos.
+
+    **Haircuts:**
+    Haircuts sao descontos aplicados ao valor de mercado das garantias
+    para refletir a possivel desvalorizacao entre o momento do deposito
+    e a eventual execucao. Titulos mais volateis ou iliquidos recebem
+    haircuts maiores.
+
+    **Segregacao de garantias:**
+    A segregacao protege clientes finais caso o intermediario (corretora)
+    quebre. As garantias do cliente nao podem ser usadas para cobrir
+    obrigacoes proprietarias do intermediario.
+
+    **Default waterfall:**
+    A cascata de inadimplencia define a ordem em que recursos sao
+    consumidos para cobrir perdas. O skin-in-the-game da camara (seus
+    proprios recursos antes do fundo mutualizado) e uma exigencia dos
+    principios PFMI que alinha incentivos.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de margens e garantias:**
+      1. Motor de calculo de margem com suporte a multiplos modelos
+         (SPAN, VaR historico, Monte Carlo) e parametrizacao por ativo.
+      2. Sistema de gestao de colateral com inventario em tempo real,
+         marcacao a mercado automatica e chamadas de margem intraday.
+      3. Segregacao logica e fisica de contas de garantia (cliente vs.
+         proprietaria) com controles de acesso rigorosos.
+
+      **Default waterfall:**
+      4. Implementar cascata de inadimplencia automatizada com consumo
+         sequencial de recursos conforme regulamento.
+    tools:
+      - margin-engine
+      - collateral-management
+      - account-segregation
+      - default-waterfall-engine
+  devsecops:
+    prose: |
+      **Validacao de modelos de margem:**
+      1. Backtesting automatizado diario que compare margem calculada
+         com perdas reais observadas.
+      2. Stress testing automatizado com cenarios historicos e hipoteticos
+         para validacao do modelo.
+      3. Pipeline de validacao de segregacao de garantias com testes
+         que verifiquem impossibilidade de uso cruzado.
+    tools:
+      - gitlab-ci
+      - backtesting-engine
+      - stress-testing
+      - segregation-testing
+  secops:
+    prose: |
+      **Supervisao de margens e garantias:**
+      1. Monitoramento em tempo real de adequacao de garantias por
+         participante com alertas para deficit de margem.
+      2. Revisao semestral do modelo de calculo de margem por validacao
+         independente (model validation).
+      3. Teste anual do default waterfall com simulacao completa de
+         inadimplencia e consumo sequencial de recursos.
+    tools:
+      - risk-monitoring
+      - model-validation
+      - default-simulation
+legal_references:
+  - framework_id: bcb-304
+    articles: ["art-1"]
+    relationship: complements
+  - framework_id: cvm-50
+    articles: ["art-26"]
+    relationship: complements

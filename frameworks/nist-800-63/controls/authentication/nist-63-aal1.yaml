@@ -1,0 +1,109 @@
+id: nist-63-aal1
+family: authentication
+title: "AAL1 — Authentication Assurance Level 1 (Single-Factor)"
+class: SP800-63B
+
+baselines: [aal1, aal2, aal3, fal1, fal2, fal3]
+
+statement:
+  prose: >-
+    AAL1 provides some assurance that the claimant controls an authenticator
+    bound to the subscriber's account. AAL1 requires single-factor authentication
+    using a wide range of available authentication technologies. Successful
+    authentication requires that the claimant prove possession and control of
+    the authenticator(s) through a secure authentication protocol. In order to
+    authenticate at AAL1, a claimant shall prove possession and control of a
+    single authentication factor to the verifier. Allowed authenticator types
+    at AAL1 include: memorized secrets, look-up secrets, out-of-band
+    authenticators, single-factor OTP devices, multi-factor OTP devices,
+    single-factor cryptographic software, single-factor cryptographic
+    hardware, multi-factor cryptographic software, and multi-factor
+    cryptographic hardware. Reauthentication shall occur at least once per
+    30 days regardless of user activity.
+
+guidance:
+  prose: >-
+    AAL1 is the baseline authentication requirement. It is appropriate for
+    applications where authentication failure would have limited adverse impact.
+    Password-only authentication meets AAL1 when implemented correctly (see
+    nist-63-memorized-secrets). However, NIST strongly recommends that
+    organizations implement at least AAL2 for any application handling PII,
+    financial data, or government benefits, and that organizations transition
+    away from password-only authentication even at AAL1 by offering better
+    authenticator options. AAL1 session management must enforce a maximum
+    session duration of 30 days with reauthentication required at expiry.
+    Applications should implement idle timeout policies alongside the
+    absolute session limit. The use of federated authentication at FAL1
+    or above satisfies AAL1 requirements when the federated assertion
+    contains the appropriate assurance level claim.
+
+references:
+  - citation: "NIST SP 800-63B Section 4.1 — Authentication Assurance Level 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+  - citation: "NIST SP 800-63B Section 7 — Session Management"
+    url: "https://doi.org/10.6028/NIST.SP.800-63b"
+
+related_controls:
+  - id: nist-63-memorized-secrets
+    relationship: complements
+    description: "Memorized secrets (passwords) are the most common AAL1 authenticator type."
+  - id: nist-63-aal2
+    relationship: derived-from
+    description: "AAL2 builds on AAL1 by adding a second authentication factor requirement."
+  - id: nist-63-reauthentication
+    relationship: implements
+    description: "AAL1 session management requires reauthentication after 30 days of inactivity."
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Configure the identity provider to issue tokens with the correct
+      Authentication Context Class Reference (acr) claim set to the AAL1
+      value (for OIDC, this is typically 'urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo'
+      or an equivalent defined in the platform's acr value registry). Enforce
+      session expiration at 30 days. Implement session tokens as short-lived
+      JWTs (15-60 minute lifetime) refreshed by a longer-lived refresh token
+      with an absolute expiry at the 30-day reauthentication boundary. Ensure
+      the authentication service rejects authentication requests that do not
+      specify a minimum acr value, defaulting to AAL1 if not specified by
+      the relying party. Log all authentication events including method used,
+      timestamp, and result.
+    tools:
+      - keycloak
+      - okta
+      - auth0
+      - dex
+      - vault
+
+  devsecops:
+    prose: >-
+      Validate in CI/CD that applications consuming OIDC tokens check the
+      acr claim before granting access to sensitive operations. Implement
+      pipeline checks that verify the identity provider configuration
+      enforces the minimum session duration policy. Include automated
+      security testing that validates session token expiration: expired
+      tokens must be rejected, and the application must not silently
+      continue using an expired session. Scan for hardcoded credentials
+      or API keys that bypass the AAL1 authentication requirement.
+    tools:
+      - gitlab-ci
+      - semgrep
+      - open-policy-agent
+      - gitleaks
+
+  secops:
+    prose: >-
+      Monitor authentication events for patterns indicating credential
+      compromise at AAL1: repeated failed attempts, successful authentication
+      from unusual geolocations, authentication at unusual times, and
+      suspicious user-agent strings. Implement anomaly detection on session
+      activity to identify sessions that exhibit behavior inconsistent with
+      the authenticated user. Alert on authentication from Tor exit nodes,
+      known VPN providers, or IP addresses flagged in threat intelligence
+      feeds. Review and enforce session revocation upon logout or account
+      compromise to prevent session hijacking.
+    tools:
+      - splunk
+      - crowdstrike
+      - azure-sentinel
+      - elastic-siem

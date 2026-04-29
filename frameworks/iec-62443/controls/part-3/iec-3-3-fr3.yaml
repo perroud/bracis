@@ -1,0 +1,99 @@
+id: iec-3-3-fr3
+family: part-3
+title: "FR3: System Integrity (SI)"
+class: IEC62443
+part: "62443-3-3"
+foundational_requirement: fr3
+
+statement:
+  prose: >-
+    The control system shall protect the integrity of the system and its
+    communications to ensure that it operates as intended. Integrity
+    mechanisms shall detect unauthorized modification of software, firmware,
+    configuration, and data, and shall validate the authenticity of
+    communications between components. The strength of integrity controls
+    shall be commensurate with the target security level of the zone.
+
+guidance:
+  prose: >-
+    System integrity in IACS environments is directly linked to safety, as
+    unauthorized modifications to control logic or process parameters can
+    cause physical harm. Key considerations include: implementing
+    cryptographic integrity verification for all software and firmware
+    updates; validating PLC program integrity by maintaining golden copies
+    and performing periodic comparisons; deploying file integrity monitoring
+    on IACS servers and workstations; implementing message authentication
+    for inter-zone communications using OT-aware protocols (OPC UA security
+    modes, secure DNP3, IEC 62351); protecting historian and log data from
+    tampering using append-only storage or blockchain-based integrity
+    verification; implementing anti-malware solutions designed for OT
+    environments that do not interfere with real-time operations; validating
+    input data from field devices to detect sensor spoofing; monitoring for
+    unauthorized modifications to safety instrumented systems (SIS);
+    implementing secure boot where supported by industrial hardware; and
+    maintaining signed firmware repositories for all programmable devices.
+
+references:
+  - citation: "IEC 62443-3-3:2013, SR 3.1 through SR 3.9"
+    url: "https://webstore.iec.ch/en/publication/7033"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy OT-specific file integrity monitoring on all IACS servers,
+      HMIs, and engineering workstations. Implement automated PLC program
+      backup and comparison tools that detect unauthorized changes to
+      control logic. Deploy anti-malware solutions rated for OT environments
+      with minimal performance impact on real-time systems. Implement secure
+      firmware update mechanisms with cryptographic signature verification.
+      Deploy industrial protocol security (OPC UA with security mode
+      Sign & Encrypt, IEC 62351 for power systems). Maintain a golden
+      image repository for all IACS software with integrity checksums.
+    tools:
+      - tripwire-industrial
+      - claroty
+      - verve-security
+      - nozomi-networks
+      - dragos
+
+  devsecops:
+    prose: >-
+      Implement software supply chain integrity verification in the build
+      pipeline. Sign all build artifacts destined for IACS environments.
+      Generate and verify Software Bills of Materials (SBOMs) for all
+      deployed components. Implement automated integrity checks as part
+      of the deployment process that compare deployed binaries against
+      signed build artifacts. Scan for code that could compromise system
+      integrity such as buffer overflows, injection vulnerabilities, and
+      insecure deserialization in IACS applications.
+    tools:
+      - cosign
+      - syft
+      - grype
+      - gitlab-ci
+      - sonarqube
+
+  secops:
+    prose: >-
+      Monitor for file integrity violations across all IACS endpoints.
+      Alert on unauthorized PLC program changes by comparing current
+      programs against approved baselines. Detect malware on OT endpoints
+      using both signature-based and behavioral detection. Monitor network
+      traffic for communication integrity violations such as unsigned
+      or tampered industrial protocol messages. Investigate all integrity
+      alerts as high-priority incidents given the safety implications
+      in industrial environments.
+    tools:
+      - tripwire
+      - ossec
+      - nozomi-guardian
+      - dragos-platform
+      - crowdstrike-falcon
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-3", "SI-4", "SI-7", "SC-8", "SC-13"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.7", "a8.9", "a8.12"]
+    relationship: supports

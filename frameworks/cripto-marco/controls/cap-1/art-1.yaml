@@ -1,0 +1,82 @@
+id: art-1
+family: cap-1
+title: "Scope and Purpose of the Law"
+class: CRIPTO-MARCO
+baselines: [vasps-reguladas]
+statement:
+  prose: |
+    Art. 1º Esta Lei dispõe sobre diretrizes a serem observadas na prestação de serviços
+    de ativos virtuais e na regulamentação das prestadoras de serviços de ativos virtuais.
+
+    Parágrafo único. O disposto nesta Lei não se aplica aos ativos representativos de
+    valores mobiliários sujeitos ao regime da Lei nº 6.385, de 7 de dezembro de 1976,
+    e não altera nenhuma competência da Comissão de Valores Mobiliários.
+guidance:
+  prose: |
+    Article 1 establishes the scope and purpose of Law 14.478/2022 (the Brazilian
+    Crypto-Assets Legal Framework). It sets the regulatory boundaries for virtual
+    asset services and their providers.
+
+    **Key scope boundaries:**
+    - The law governs the provision of virtual asset services and the regulation
+      of virtual asset service providers (VASPs).
+    - Securities represented as tokens that fall under Law 6.385/1976 are explicitly
+      excluded — these remain under the jurisdiction of the CVM (Brazilian SEC).
+    - The law does not alter any existing CVM competency, preserving the dual
+      regulatory structure between BCB and CVM.
+
+    **Regulatory overlap risk:**
+    Tokens with hybrid characteristics (e.g., utility tokens that also grant profit
+    rights) may trigger concurrent jurisdiction between BCB and CVM. The asset
+    classification determines which regulator has primary authority.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement an asset classification engine that categorizes tokens into
+         regulatory buckets: payment token, utility token, security token,
+         stablecoin, NFT, and hybrid.
+      2. Maintain a token registry with regulatory metadata including primary
+         regulator (BCB vs. CVM), FATF classification, and listing status.
+      3. Build an API that returns the regulatory classification of any asset
+         before allowing operations (listing, trading, custody).
+      4. Implement automated checks that block listing of assets classified as
+         securities (CVM jurisdiction) unless dual licensing is in place.
+    tools:
+      - asset-classification-engine
+      - token-registry-service
+      - blockchain-analytics-api
+  devsecops:
+    prose: |
+      1. Create a CI/CD pipeline gate that validates asset regulatory classification
+         before deploying any new token listing configuration.
+      2. Implement automated tests verifying that assets flagged as securities
+         are rejected from the VASP platform.
+      3. Codify the regulatory boundary rules as policy-as-code (OPA/Rego)
+         for enforcement in the deployment pipeline.
+      4. Add integration tests for the asset classification API covering
+         edge cases (hybrid tokens, stablecoins, wrapped securities).
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - compliance-pipeline
+  secops:
+    prose: |
+      1. Monitor regulatory publications from BCB and CVM regarding asset
+         classification changes and new guidance on token categorization.
+      2. Maintain an up-to-date inventory of all listed assets with their
+         current regulatory classification and applicable jurisdiction.
+      3. Establish an emergency delisting procedure for assets reclassified
+         as securities by CVM after initial listing.
+      4. Generate periodic compliance reports mapping listed assets to their
+         regulatory framework and any pending classification reviews.
+    tools:
+      - grc-platform
+      - regulatory-monitoring-service
+      - asset-inventory-system
+legal_references:
+  - framework_id: bcb-304
+    articles: ["art-1"]
+    relationship: implements
+  - framework_id: lgpd
+    articles: ["art-7"]
+    relationship: complements

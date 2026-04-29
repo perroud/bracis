@@ -1,0 +1,95 @@
+id: pii-f.2
+family: pii-f
+title: "PII portability and interoperability"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall support PII portability by providing
+    mechanisms for the cloud service customer to retrieve PII in a structured,
+    commonly used, and machine-readable format. The public cloud PII processor
+    should support the transfer of PII to another processor where technically
+    feasible. The public cloud PII processor should use open, non-proprietary
+    data formats where possible to facilitate interoperability and avoid vendor
+    lock-in that could impede PII principal rights.
+
+guidance:
+  prose: >-
+    Data portability prevents vendor lock-in from becoming a privacy issue. If a
+    customer cannot easily extract PII from a cloud service, the practical effect
+    is that PII principals cannot exercise their right to data portability and
+    the controller cannot freely change processors. This control requires the
+    processor to provide comprehensive export capabilities using standard,
+    documented formats. Proprietary formats that require the processor's tools to
+    read are insufficient. The processor should support both bulk export (for
+    migration scenarios) and individual-level export (for PII principal requests).
+    Where technically feasible, the processor should support direct transfer to
+    another processor (processor-to-processor portability) to reduce the risk
+    of data exposure during migration.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.6.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement comprehensive data export APIs that support multiple standard
+      formats: JSON, CSV, XML, and domain-specific standards where applicable.
+      Build bulk export pipelines that can extract all PII for a customer tenant
+      efficiently, with progress tracking and resumable downloads. Implement
+      processor-to-processor transfer APIs using standard protocols (SFTP, HTTPS)
+      with end-to-end encryption. Provide schema documentation for all exported
+      data so the receiving system can interpret the data without the exporting
+      processor's proprietary tools. Build export verification that allows the
+      customer to validate export completeness before initiating disposal.
+    tools:
+      - data-export-api
+      - bulk-export-pipeline
+      - processor-to-processor-transfer
+      - schema-documentation-generator
+      - export-verification-service
+      - standard-format-converters
+
+  devsecops:
+    prose: >-
+      Ensure all PII storage schemas have documented export mappings to standard
+      formats. CI pipeline validation should verify that new PII fields are
+      included in the export schema. Build integration tests that verify export
+      completeness by comparing exported data to the source. Test processor-to-
+      processor transfer scenarios end-to-end. Validate that exported data is
+      self-describing (includes schema definitions). Include portability review
+      in the design review checklist for any feature that introduces new PII
+      storage structures.
+    tools:
+      - gitlab-ci
+      - export-schema-validator
+      - completeness-tests
+      - transfer-integration-tests
+      - schema-self-description-linter
+      - design-review-checklist
+
+  secops:
+    prose: >-
+      Monitor data export and transfer activities for security concerns. Alert
+      on unusually large exports that could indicate data exfiltration. Verify
+      that exports are encrypted in transit and that transfer destinations are
+      authenticated. Track export request volumes and patterns for anomaly
+      detection. Audit the completeness of exports by sampling and comparing
+      record counts. Monitor for PII exposure during the transfer process,
+      including temporary files and staging areas.
+    tools:
+      - splunk
+      - elastic-siem
+      - export-monitoring
+      - transfer-encryption-verifier
+      - anomaly-detection
+      - staging-area-scanner
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-20"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.3.2"]
+    relationship: complements

@@ -1,0 +1,113 @@
+id: p2pe-app-1
+family: p2pe-app
+title: "P2PE Application Development Security"
+class: PCI-P2PE
+
+statement:
+  prose: >-
+    P2PE payment applications shall be developed using secure software
+    development practices in accordance with PCI Secure Software Standard
+    or equivalent. The application shall not store, process, or transmit
+    cleartext account data. Application code shall be reviewed for security
+    vulnerabilities prior to release, including static and dynamic analysis.
+    The solution provider shall maintain a software development lifecycle
+    (SDLC) that includes threat modeling, secure coding standards, peer
+    code review, and security testing at each release milestone.
+  parts:
+    - id: p2pe-app-1.a
+      label: "Domain 2, 2A"
+      prose: >-
+        P2PE applications are developed following a documented secure SDLC
+        that includes threat modeling, secure coding guidelines, and
+        mandatory security review before release.
+    - id: p2pe-app-1.b
+      label: "Domain 2, 2B"
+      prose: >-
+        Application code undergoes static analysis (SAST) and dynamic
+        analysis (DAST) to identify and remediate security vulnerabilities
+        before deployment.
+
+guidance:
+  prose: >-
+    P2PE applications are the software components that interact with the
+    POI device, handle the encrypted payload, and manage device
+    configuration. Even though these applications do not handle cleartext
+    account data in a properly functioning P2PE solution, a vulnerability
+    in the application could potentially bypass encryption controls or
+    expose encrypted data to unauthorized modification. The secure SDLC
+    must address OWASP Top 10, payment-specific threats (replay attacks,
+    payload manipulation), and supply chain risks. Code reviews should be
+    performed by personnel not involved in the original development. The
+    PCI Secure Software Standard (formerly PA-DSS successor) provides a
+    detailed framework for secure payment software development.
+
+references:
+  - citation: "PCI P2PE v3.1, Domain 2 — Application Security"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI Secure Software Standard v1.2"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a standardized build pipeline for all P2PE application
+      components with mandatory security gates. Enforce signed commits and
+      code review approvals before merging to release branches. Use
+      containerized build environments with pinned base images and
+      dependency lock files to ensure reproducible builds. Deploy artifact
+      signing (Sigstore/cosign) so that only pipeline-produced artifacts
+      can be deployed to production. Maintain separate environments for
+      development, staging, and production with promotion gates.
+    tools:
+      - gitlab-ci
+      - github-actions
+      - sigstore-cosign
+      - docker
+      - kubernetes
+      - argocd
+
+  devsecops:
+    prose: >-
+      Integrate SAST scanning at every merge request and block merges with
+      critical or high findings. Run DAST against staging deployments on
+      every release candidate. Perform software composition analysis (SCA)
+      to detect vulnerable dependencies. Enforce that no application
+      component imports cleartext cryptographic primitives for payment data
+      processing. Implement pre-commit hooks that prevent accidental
+      inclusion of test card data, API keys, or cryptographic material in
+      source code.
+    tools:
+      - gitlab-sast
+      - gitlab-dast
+      - semgrep
+      - sonarqube
+      - snyk
+      - trivy
+      - gitleaks
+
+  secops:
+    prose: >-
+      Monitor application deployment pipelines for unauthorized changes
+      or bypassed security gates. Track all application releases with
+      version, build hash, and security scan results. Alert on any
+      deployment that did not complete the full security gate process.
+      Conduct annual penetration testing of P2PE applications by qualified
+      assessors. Maintain a vulnerability management program with defined
+      SLAs for remediation of findings by severity.
+    tools:
+      - splunk
+      - elastic-siem
+      - defectdojo
+      - jira
+      - threadfix
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-6.1", "req-6.2", "req-6.3"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-15", "SA-17"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.25", "A8.26", "A8.28"]
+    relationship: supports

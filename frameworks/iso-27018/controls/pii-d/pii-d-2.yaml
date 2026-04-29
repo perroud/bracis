@@ -1,0 +1,98 @@
+id: pii-d.2
+family: pii-d
+title: "Retention limitation and PII disposal"
+class: ISO27018
+
+statement:
+  prose: >-
+    The public cloud PII processor shall not retain PII beyond the period required
+    by the cloud service customer's instructions or as required by applicable law.
+    Upon termination or expiry of the cloud service agreement, the public cloud PII
+    processor shall provide the cloud service customer with the ability to retrieve
+    its PII within a reasonable and specified period. After that period, the
+    processor shall securely delete or return all PII, including all copies, unless
+    retention is required by law. Where legally required retention exists, the
+    processor shall inform the cloud service customer and document the legal basis.
+
+guidance:
+  prose: >-
+    Retention limitation ensures PII does not persist in the cloud environment
+    beyond its useful life. This control has three phases: active retention
+    (during the contract), transition retention (the retrieval window after
+    contract termination), and disposal (permanent deletion after the retrieval
+    window). The processor must define and communicate clear timelines for each
+    phase. The retrieval window must be sufficient for the customer to export all
+    PII in a usable format. Disposal must cover all copies of PII across all
+    storage systems, including backups, replicas, caches, and derived data.
+    The processor must provide verifiable evidence of disposal. Legal retention
+    exceptions must be narrowly scoped and transparently communicated: the
+    processor cannot use a broad "legal requirements" justification to retain
+    PII indefinitely.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.4.1"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated retention policy enforcement at the storage layer.
+      Every PII record must have an associated retention period derived from the
+      customer's contract. Build retention countdown timers that trigger automated
+      deletion workflows when the retention period expires. Implement contract
+      termination workflows that initiate the PII retrieval window, notify the
+      customer, and schedule final disposal after the window closes. Build
+      disposal verification that confirms PII removal across all storage tiers
+      including backups and disaster recovery sites. Implement data export APIs
+      that allow customers to retrieve PII in standard, portable formats during
+      the retrieval window. Provide disposal certificates with cryptographic
+      proof of deletion.
+    tools:
+      - retention-policy-engine
+      - automated-disposal-workflow
+      - data-export-api
+      - backup-purge-orchestrator
+      - disposal-verification-service
+      - disposal-certificate-generator
+
+  devsecops:
+    prose: >-
+      Enforce retention awareness in the development lifecycle. All PII storage
+      schemas must include retention metadata fields. CI gates should validate
+      that new data stores have retention policies defined and registered with
+      the retention engine. Build tests that verify automated deletion triggers
+      correctly at retention period expiry. Implement data lifecycle testing
+      in staging environments: create PII, advance the clock, and verify
+      disposal. Code reviews must verify that new features do not create PII
+      copies that bypass the retention engine.
+    tools:
+      - gitlab-ci
+      - retention-schema-validator
+      - lifecycle-integration-tests
+      - time-travel-tests
+      - retention-coverage-reporter
+
+  secops:
+    prose: >-
+      Monitor retention policy compliance across all PII storage systems. Alert
+      on PII records that exceed their retention period. Track contract
+      termination workflows and verify disposal completes within the documented
+      timeframe. Audit backup systems to confirm PII is purged from backups
+      after the retention period. Monitor for PII re-creation after disposal
+      through backup restoration or data reconstruction. Generate retention
+      compliance reports and disposal audit trails for customer review.
+    tools:
+      - splunk
+      - retention-compliance-monitor
+      - backup-audit-scanner
+      - disposal-tracking-dashboard
+      - pii-persistence-detector
+      - compliance-reporting
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.e", "art-17", "art-28.3.g"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.4.5", "b-8.4.2"]
+    relationship: complements

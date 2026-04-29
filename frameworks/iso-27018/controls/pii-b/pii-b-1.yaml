@@ -1,0 +1,94 @@
+id: pii-b.1
+family: pii-b
+title: "Purpose limitation for cloud PII processing"
+class: ISO27018
+
+statement:
+  prose: >-
+    PII processed under a cloud service contract shall not be processed for any
+    purpose other than as documented in the cloud service customer's instructions.
+    The cloud service provider shall ensure that PII processed on behalf of the
+    cloud service customer is only processed for the purposes described in the
+    agreement, including any subsequent amendments agreed between the parties.
+    Contractual arrangements between the public cloud PII processor and the cloud
+    service customer shall specify the purposes, nature, and duration of the
+    processing, the types of PII, and the categories of PII principals.
+
+guidance:
+  prose: >-
+    Purpose limitation is the cornerstone of lawful PII processing. The cloud
+    processor must ensure that every processing activity is traceable to a
+    documented purpose in the service agreement. This goes beyond a general
+    statement of purpose: the contract must specify with sufficient granularity
+    what processing will be performed, on what categories of PII, for which
+    categories of PII principals, and for how long. The processor must implement
+    technical controls that make it impossible to process PII for undocumented
+    purposes. Any change in processing purposes requires a contractual amendment
+    before implementation. This control protects against scope creep, where
+    processors gradually expand their use of customer PII beyond the original
+    contractual scope.
+
+references:
+  - citation: "ISO/IEC 27018:2019, Clause A.2"
+    url: "https://www.iso.org/standard/76559.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a purpose registry service where each customer contract's permitted
+      processing purposes are codified as machine-readable policies. All data
+      processing pipelines must validate incoming PII against the purpose registry
+      before execution. Tag PII at rest and in transit with authorized purpose
+      identifiers. Build policy enforcement points at every data access layer
+      (API gateway, database proxy, message broker) that verify the requesting
+      service's purpose authorization. Implement contract-as-code: store processing
+      agreements in version-controlled configuration and propagate changes through
+      the purpose enforcement infrastructure. Reject any PII processing request
+      that cannot be matched to an active, authorized purpose.
+    tools:
+      - purpose-registry-service
+      - open-policy-agent
+      - api-gateway-policies
+      - database-proxy-controls
+      - contract-as-code-engine
+
+  devsecops:
+    prose: >-
+      Require purpose declarations in service manifests for all PII-processing
+      microservices. CI pipeline validation must verify that declared purposes
+      exist in the purpose registry and are authorized for the target customer
+      segment. Static analysis rules should flag PII processing code that does
+      not include purpose verification calls. Build purpose-coverage reports as
+      CI artifacts showing which processing paths are covered by which purposes.
+      Block deployments of services that introduce new PII processing without
+      corresponding purpose declarations.
+    tools:
+      - gitlab-ci
+      - purpose-manifest-validator
+      - semgrep
+      - purpose-coverage-reports
+      - deployment-gates
+
+  secops:
+    prose: >-
+      Monitor for PII processing outside documented purposes. Build correlation
+      rules that match data access patterns to authorized purposes and alert on
+      mismatches. Track purpose registry changes and audit that contractual
+      amendments precede any new processing activity. Detect shadow processing
+      by monitoring for PII access from services not registered in the purpose
+      registry. Generate purpose compliance reports per customer showing all
+      processing activities mapped to contractual purposes.
+    tools:
+      - splunk
+      - elastic-siem
+      - purpose-compliance-monitor
+      - data-access-audit
+      - shadow-processing-detector
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5.1.b", "art-28.3"]
+    relationship: supports
+  - framework_id: iso-27701
+    articles: ["a-7.2.1"]
+    relationship: complements

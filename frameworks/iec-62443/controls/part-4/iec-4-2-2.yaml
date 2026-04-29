@@ -1,0 +1,112 @@
+id: iec-4-2-2
+family: part-4
+title: "Component Security Testing"
+class: IEC62443
+part: "62443-4-2"
+
+statement:
+  prose: >-
+    The product supplier shall perform comprehensive security testing of
+    IACS components to verify that they meet the security requirements
+    for their target security level. Testing shall include functional
+    security testing, vulnerability testing, fuzz testing, and penetration
+    testing. Testing depth and rigor shall increase with higher target
+    security levels.
+
+guidance:
+  prose: >-
+    Component security testing for IACS products must cover both
+    traditional software vulnerabilities and industrial-specific attack
+    vectors. Key testing activities include: functional security testing
+    that validates all security features (authentication, authorization,
+    encryption, logging) work as specified; vulnerability scanning using
+    both automated tools and manual review; static application security
+    testing (SAST) covering the full codebase including embedded firmware;
+    fuzz testing of all industrial protocol parsers (Modbus TCP, OPC UA,
+    EtherNet/IP, BACnet, DNP3, IEC 61850, PROFINET) and all input
+    interfaces; dynamic application security testing (DAST) against
+    running systems in test environments; penetration testing performed
+    by qualified testers with IACS domain expertise; network protocol
+    testing that validates correct behavior under malformed packets,
+    replay attacks, and man-in-the-middle scenarios; testing of failure
+    modes to verify that security failures do not compromise safety;
+    testing at each declared security level to verify all requirements
+    and requirement enhancements are met; and regression testing after
+    every code change to ensure previously resolved vulnerabilities do
+    not reappear.
+
+references:
+  - citation: "IEC 62443-4-1:2018, Clause 10 (Security verification and validation testing)"
+    url: "https://webstore.iec.ch/en/publication/33615"
+  - citation: "IEC 62443-4-2:2019, Annex A (Conformance testing)"
+    url: "https://webstore.iec.ch/en/publication/34421"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build dedicated security testing environments that replicate
+      target deployment architectures including representative PLCs,
+      HMIs, and network configurations. Deploy fuzz testing
+      infrastructure capable of sustained testing against industrial
+      protocol parsers. Implement hardware-in-the-loop (HIL) test
+      rigs for testing firmware on actual target hardware. Deploy
+      vulnerability scanning infrastructure tuned for OT devices
+      that can safely scan without disrupting real-time operations.
+      Maintain a vulnerability management platform that tracks all
+      findings from discovery through remediation and verification.
+    tools:
+      - afl-fuzz
+      - boofuzz
+      - nessus
+      - openvas
+      - defectdojo
+
+  devsecops:
+    prose: >-
+      Integrate all security testing stages into the CI/CD pipeline
+      with clear pass/fail criteria for each security level. Run SAST
+      on every commit with industrial-specific rules for memory safety,
+      integer overflow, and input validation. Execute fuzz testing of
+      protocol parsers on nightly builds with coverage tracking.
+      Implement DAST against deployed test instances as part of the
+      release pipeline. Generate SBOM and scan for known vulnerabilities
+      in all dependencies on every build. Run penetration testing as
+      a release gate for major versions. Track vulnerability metrics
+      (defect density, time to fix, regression rate) in the pipeline
+      dashboard.
+    tools:
+      - gitlab-ci
+      - coverity
+      - semgrep
+      - boofuzz
+      - zap
+      - trivy
+      - syft
+
+  secops:
+    prose: >-
+      Conduct independent penetration testing of IACS components by
+      qualified testers with ICS expertise prior to major releases.
+      Implement a vulnerability disclosure program that allows external
+      security researchers to report findings. Monitor vulnerability
+      databases (NVD, ICS-CERT, vendor advisories) for newly disclosed
+      vulnerabilities that may affect the product. Maintain a PSIRT
+      process for triaging, patching, and communicating vulnerability
+      fixes to customers. Validate that security patches resolve
+      vulnerabilities without introducing regressions through
+      independent verification testing.
+    tools:
+      - metasploit
+      - burp-suite
+      - wireshark
+      - scapy
+      - hackerone
+      - bugcrowd
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-11", "SA-15", "CA-8", "RA-5"]
+    relationship: equivalent-to
+  - framework_id: iso-27001-2022
+    articles: ["a8.8", "a8.25", "a8.29"]
+    relationship: supports

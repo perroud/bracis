@@ -1,0 +1,122 @@
+id: epd-13
+family: art-13
+title: "Unsolicited Communications"
+class: ePrivacy
+statement:
+  prose: >-
+    1. The use of automated calling and communication systems without human intervention (automatic calling
+    machines), facsimile machines (fax) or electronic mail for the purposes of direct marketing may only
+    be allowed in respect of subscribers or users who have given their prior consent.
+
+    2. Notwithstanding paragraph 1, where a natural or legal person obtains from its customers their
+    electronic contact details for electronic mail, in the context of the sale of a product or a service,
+    in accordance with Directive 95/46/EC, the same natural or legal person may use these electronic contact
+    details for direct marketing of its own similar products or services provided that customers clearly and
+    distinctly are given the opportunity to object, free of charge and in an easy manner, to such use of
+    electronic contact details at the time of their collection and on the occasion of each message, where
+    the customer has not initially refused such use.
+
+    3. Member States shall take appropriate measures to ensure that unsolicited communications for the
+    purposes of direct marketing, in cases other than those referred to in paragraphs 1 and 2, are not
+    allowed either without the consent of the subscribers or users concerned or in respect of subscribers
+    or users who do not wish to receive these communications, the choice between these options to be
+    determined by national legislation, taking into account that both options must be free of charge for
+    the subscriber or user.
+
+    4. In any event, the practice of sending electronic mail for purposes of direct marketing disguising
+    or concealing the identity of the sender on whose behalf the communication is made, or without a valid
+    address to which the recipient may send a request that such communications cease shall be prohibited.
+
+    5. Paragraphs 1 and 3 shall apply to subscribers who are natural persons. Member States shall also
+    ensure, in the framework of Community law and applicable national legislation, that the legitimate
+    interests of subscribers other than natural persons with regard to unsolicited communications are
+    sufficiently protected.
+  parts:
+    - id: epd-13.1
+      label: "(1)"
+      prose: >-
+        Automated calling systems, fax, and electronic mail for direct marketing require prior consent
+        of subscribers or users (opt-in).
+    - id: epd-13.2
+      label: "(2)"
+      prose: >-
+        Soft opt-in exception: existing customers may receive direct marketing for similar products/services
+        via email if given a clear opt-out opportunity at collection time and in each subsequent message,
+        provided the customer has not initially refused.
+    - id: epd-13.3
+      label: "(3)"
+      prose: >-
+        For other forms of unsolicited direct marketing communications (e.g., telephone calls), member states
+        choose between opt-in or opt-out regimes, both of which must be free of charge.
+    - id: epd-13.4
+      label: "(4)"
+      prose: >-
+        Electronic mail for direct marketing must not disguise or conceal the sender identity and must
+        include a valid address for opt-out requests.
+    - id: epd-13.5
+      label: "(5)"
+      prose: >-
+        Paragraphs 1 and 3 apply to natural persons. Member states must also protect legitimate interests
+        of legal persons (businesses) regarding unsolicited communications.
+guidance:
+  prose: >-
+    Article 13 is the EU's anti-spam provision. The default rule for electronic marketing (email, SMS,
+    automated calls, fax) is opt-in: prior consent is required before sending. The "soft opt-in" exception
+    in paragraph 2 is narrow but important: an existing customer who provided their email during a sale
+    can receive marketing for "similar products or services" from the same company, provided they were
+    given a clear opt-out at the point of collection AND in every subsequent message, and they did not
+    refuse. "Similar products or services" is interpreted strictly: a company selling shoes cannot soft
+    opt-in customers into insurance marketing. For telephone calls, member states choose between opt-in
+    and opt-out (do-not-call registry). Paragraph 4 prohibits spoofing and requires a valid unsubscribe
+    mechanism in all marketing emails. This article applies to B2C communications directly and, depending
+    on member state implementation, may also apply to B2B. Violations can result in significant fines
+    under national implementations (e.g., PECR in the UK, with fines up to GBP 500,000 from the ICO).
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build a centralized marketing consent and preference management platform. Implement opt-in consent
+      collection with granular channel preferences (email, SMS, phone, push). Build soft opt-in logic
+      that tracks customer purchase context and limits marketing to similar products/services from the
+      same entity. Implement automated unsubscribe processing that takes effect immediately (not "within
+      10 business days"). Build suppression list management that is checked before every marketing send.
+      Implement sender identity verification to prevent spoofing in outbound marketing. Build audit trails
+      for all consent events (collection, withdrawal, soft opt-in qualification). Implement double opt-in
+      for electronic marketing consent to provide evidence of consent.
+    tools:
+      - "Marketing consent management platform with channel-level preferences"
+      - "Suppression list service checked pre-send for all marketing channels"
+      - "Soft opt-in eligibility engine (purchase context, similar product classification)"
+      - "Automated unsubscribe processing with real-time suppression list update"
+      - "Email authentication (SPF, DKIM, DMARC) for sender identity verification"
+      - "Consent audit trail with cryptographic proof"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must verify that marketing send systems check suppression lists and consent status
+      before every send. Code review must verify that new marketing features include proper consent
+      verification, unsubscribe mechanisms, and sender identification. SAST rules must detect marketing
+      send code paths that bypass consent checks. Automated tests must verify unsubscribe processing
+      effectiveness, suppression list accuracy, and soft opt-in eligibility logic. Pipeline gates must
+      verify that email templates include required sender identification and unsubscribe links.
+    tools:
+      - "SAST rules detecting consent bypass in marketing send paths"
+      - "Email template validation for required elements (sender ID, unsubscribe link)"
+      - "Suppression list integration testing"
+      - "Soft opt-in eligibility logic unit and integration tests"
+  secops:
+    prose: >-
+      Monitor marketing send volumes for anomalies that may indicate consent bypass. Track spam complaint
+      rates and unsubscribe rates as indicators of compliance health. Alert on marketing sends to
+      suppressed addresses. Audit soft opt-in usage to verify similar product/service criteria are met.
+      Monitor for sender identity spoofing in outbound marketing. Track consent-to-send ratios and alert
+      when marketing targets addresses without valid consent. Monitor do-not-call registry compliance
+      for telephone marketing campaigns.
+    tools:
+      - "Marketing compliance dashboard (consent rates, spam complaints, unsubscribe rates)"
+      - "Suppression list violation detection and alerting"
+      - "Soft opt-in audit tooling for similar product verification"
+      - "Sender authentication monitoring (SPF/DKIM/DMARC compliance rates)"
+      - "Do-not-call registry compliance checking for telemarketing"
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-6", "art-7", "art-21"]
+    relationship: complements

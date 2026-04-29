@@ -1,0 +1,118 @@
+id: bpf-18
+family: infra
+title: "Data Backup and Recovery"
+class: ANVISA-BPF
+baselines: [fabricantes-medicamentos]
+statement:
+  prose: |
+    O fabricante deve implementar procedimento documentado de backup e
+    recuperação de dados para todos os sistemas computadorizados de BPF,
+    assegurando a capacidade de restaurar dados, configurações e
+    funcionalidades do sistema em caso de falha, corrupção, desastre
+    ou incidente de segurança.
+
+    O procedimento de backup deve definir: escopo dos dados incluídos
+    (dados de aplicação, configurações, trilhas de auditoria, metadados),
+    frequência de backup (diária no mínimo para dados críticos),
+    método de backup (completo, incremental, diferencial), localização
+    de armazenamento (incluindo cópia offsite ou em nuvem), período de
+    retenção de backups, e responsabilidades de execução e verificação.
+
+    A integridade dos backups deve ser verificada regularmente por meio
+    de testes de restauração documentados. Testes de restauração
+    completa devem ser executados no mínimo semestralmente para sistemas
+    de alta criticidade, com evidência documentada de recuperação
+    bem-sucedida incluindo verificação de integridade dos dados
+    restaurados.
+guidance:
+  prose: |
+    Data backup and recovery is critical for ensuring the "Enduring"
+    and "Available" principles of ALCOA+ are maintained even in the
+    event of system failure, disaster, or data corruption.
+
+    Backup strategy requirements:
+    - Full backup: weekly minimum for all GMP systems
+    - Incremental/differential: daily minimum for GMP-critical data
+    - Transaction log backup: every 15-60 minutes for high-criticality
+      databases
+    - Backup scope must include: application data, audit trails,
+      configurations, electronic signatures, and system metadata
+    - Audit trail must be backed up together with application data
+
+    Recovery requirements:
+    - Recovery Time Objective (RTO): defined per system criticality
+    - Recovery Point Objective (RPO): maximum acceptable data loss
+    - Restoration must preserve data integrity (verify with checksums)
+    - Restored system must maintain validated state
+    - Partial restoration capability for individual records or tables
+
+    Testing requirements:
+    - Restoration tests: semi-annual minimum for high-risk systems
+    - Full disaster recovery test: annual minimum
+    - Tests must verify data integrity, not just successful restore
+    - Document: what was tested, results, issues, and remediation
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      1. Implement automated backup infrastructure with tiered strategy:
+         continuous transaction log replication for critical databases,
+         daily incremental backups, and weekly full backups for all
+         GMP systems.
+      2. Configure backup integrity verification: automated checksum
+         comparison of backup contents, backup completeness validation,
+         and alerting for failed or incomplete backups.
+      3. Deploy geographically redundant backup storage with encrypted
+         offsite or cloud replication ensuring business continuity for
+         regional disaster scenarios.
+      4. Implement automated restoration testing with scheduled
+         periodic restores to isolated environments, automated data
+         integrity verification, and documented evidence generation.
+    tools:
+      - backup-management
+      - replication-tools
+      - checksum-verification
+      - disaster-recovery
+  devsecops:
+    prose: |
+      1. Implement automated backup validation tests in CI pipelines
+         verifying backup completeness, integrity, and restorability
+         for each GMP system as part of regular system maintenance.
+      2. Build automated disaster recovery test procedures that can
+         be executed on demand, verifying end-to-end recovery within
+         defined RTO/RPO targets.
+      3. Test backup encryption and access controls: verify that
+         backup data is encrypted at rest and in transit, and that
+         only authorized personnel can perform restoration.
+      4. Validate that backup procedures capture audit trails,
+         electronic signatures, and metadata alongside application
+         data in every backup execution.
+    tools:
+      - gitlab-ci
+      - backup-testing
+      - recovery-testing
+      - encryption-validation
+  secops:
+    prose: |
+      1. Define backup and recovery SOP specifying backup scope,
+         schedule, retention, testing requirements, and responsibilities
+         for each GMP system by criticality classification.
+      2. Monitor backup execution daily: verify successful completion,
+         investigate failures, and maintain backup compliance dashboard
+         tracking coverage across all GMP systems.
+      3. Conduct semi-annual restoration tests for high-criticality
+         systems and annual tests for medium-criticality, with
+         documented evidence of data integrity verification.
+      4. Include backup and recovery status in quality management
+         review and regulatory inspection readiness assessments.
+    tools:
+      - backup-monitoring
+      - grc-platform
+      - quality-management-system
+      - reporting-dashboard
+legal_references:
+  - framework_id: anvisa-134
+    articles: ["art-27", "art-28"]
+    relationship: complements
+  - framework_id: iso-27001-2022
+    articles: ["controle-A-8-13", "controle-A-8-14"]
+    relationship: mapped

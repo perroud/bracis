@@ -1,0 +1,99 @@
+id: art-47
+family: rights
+title: "Right to correction and right to deletion"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 46: Where an individual discovers that his or her personal information is inaccurate or
+    incomplete, the individual has the right to request the personal information processor to correct
+    or supplement the personal information. Where an individual requests the correction or supplementation
+    of his or her personal information, the personal information processor shall verify the personal
+    information and correct or supplement it in a timely manner.
+    Article 47: The personal information processor shall proactively delete the personal information
+    under any of the following circumstances, and where the personal information processor has not
+    deleted it, the individual has the right to request deletion:
+    (1) The processing purpose has been achieved, cannot be achieved, or the personal information is
+    no longer necessary for achieving the processing purpose;
+    (2) The personal information processor has ceased to provide the product or service, or the
+    retention period has expired;
+    (3) The individual has withdrawn consent;
+    (4) The personal information processor has processed personal information in violation of laws,
+    administrative regulations, or the agreement;
+    (5) Other circumstances provided for by laws or administrative regulations.
+    Where the retention period provided for by laws or administrative regulations has not expired, or
+    the deletion of personal information is technically difficult to achieve, the personal information
+    processor shall cease processing activities other than storage and the adoption of necessary security
+    protection measures.
+
+guidance:
+  prose: >-
+    Article 46 establishes the right to correction and supplementation, comparable to GDPR Article 16.
+    Article 47 establishes the right to deletion with five specific triggers, several of which create
+    proactive deletion obligations (not just responsive to individual requests). The processor must
+    actively delete data when the processing purpose is achieved, services cease, retention expires,
+    consent is withdrawn, or processing was unlawful. This proactive obligation goes beyond GDPR
+    Article 17, which primarily frames erasure as a right exercised by the data subject. Where
+    deletion is technically difficult, the processor must cease all processing except storage and
+    security protection. This "freeze" approach provides a practical alternative to immediate
+    deletion while maintaining individual protection. Organizations must implement automated
+    lifecycle management to comply with proactive deletion obligations.
+
+references:
+  - citation: "PIPL, Articles 46–47"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement a data lifecycle management system that automatically triggers deletion when
+      processing purposes are achieved, retention periods expire, or services cease. Build
+      correction request workflows that verify submitted changes and propagate corrections
+      across all systems holding the affected data. Implement consent withdrawal listeners
+      that trigger automated deletion of data processed under the withdrawn consent. Build
+      a data freezing mechanism for cases where deletion is technically difficult: restrict
+      all processing to storage and security operations. Deploy retention period enforcement
+      with automated expiration tracking for every personal information record.
+    tools:
+      - "Data lifecycle management (custom or OneTrust Data Mapping)"
+      - "Automated deletion pipelines (custom ETL with cascading deletes)"
+      - "Correction request workflow (DSAR portal)"
+      - "Data freezing mechanism (access control with processing restriction)"
+      - "Retention period tracking (metadata tagging with TTL)"
+  devsecops:
+    prose: >-
+      Pipeline checks must verify that new data stores include retention policies and deletion
+      triggers. Automated tests must validate that deletion cascades correctly across all
+      replicas and backup systems. CI/CD must verify that correction propagation reaches all
+      dependent systems. Code reviews must ensure new processing activities include purpose
+      completion criteria that trigger deletion. Tests must verify the data freeze mechanism
+      restricts processing to storage-only operations.
+    tools:
+      - "Retention policy validation in CI"
+      - "Deletion cascade integration tests"
+      - "Correction propagation verification tests"
+      - "Data freeze mechanism validation"
+  secops:
+    prose: >-
+      Monitor retention periods and alert when data nears or exceeds expiration without
+      deletion. Track deletion request completion rates and response times. Verify that
+      frozen data is not accessed for processing beyond storage and security. Alert when
+      consent withdrawal events do not trigger corresponding deletion actions. Conduct
+      periodic audits to identify data retained beyond its stated purpose.
+    tools:
+      - "Retention expiration monitoring dashboards"
+      - "Deletion completion tracking"
+      - "Frozen data access monitoring"
+      - "Purpose completion audit tools"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-16", "art-17"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-18"]
+    relationship: equivalent-to
+  - framework_id: ccpa-cpra
+    articles: ["sec-1798.105"]
+    relationship: equivalent-to

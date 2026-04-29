@@ -1,0 +1,95 @@
+id: tds-data-2
+family: tds-data
+title: "Encryption of 3DS Data in Transit"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    All 3DS data transmitted between system components, and between the
+    3DS environment and external entities, must be encrypted using strong
+    cryptography. TLS 1.2 or later must be used for all data transmissions.
+    Only trusted keys and certificates must be used. Sensitive authentication
+    data must never be transmitted in cleartext over any network. Data
+    integrity mechanisms must be implemented to detect any unauthorized
+    modification of 3DS messages during transit.
+
+guidance:
+  prose: >-
+    Data in transit protection is essential for maintaining confidentiality
+    and integrity of 3DS transactions as they traverse multiple network
+    segments and organizational boundaries. The 3DS protocol involves
+    communication between the cardholder's device, the 3DS Server at the
+    merchant or acquirer, the EMVCo Directory Server, and the issuer's
+    Access Control Server. Each link in this chain must be secured. Message
+    integrity verification ensures that transaction data has not been
+    tampered with by a man-in-the-middle attacker. HMAC or digital
+    signatures should be used for integrity verification of critical
+    message fields.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 2 — Data Transmission Security"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 2.2 — Encryption in Transit"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Enforce TLS 1.2+ on all endpoints handling 3DS traffic through load
+      balancer and reverse proxy configuration. Implement mTLS between all
+      internal 3DS components using a service mesh or API gateway with
+      certificate-based authentication. Configure HSTS headers on all
+      web-facing 3DS endpoints. Implement message-level signing for API
+      payloads using JWS or XML Digital Signatures as required by the
+      3DS protocol. Automate certificate lifecycle management including
+      provisioning, renewal, and revocation.
+    tools:
+      - istio
+      - envoy
+      - cert-manager
+      - aws-acm
+      - azure-key-vault
+      - nginx
+      - kong
+
+  devsecops:
+    prose: >-
+      Validate TLS configurations in CI/CD pipelines using automated
+      scanning tools. Implement policy-as-code checks that reject
+      deployments with weak TLS configurations. Run DAST scans that verify
+      encryption is enforced on all 3DS endpoints and that cleartext
+      fallback is not possible. Include message integrity validation in
+      integration tests to verify signing and verification work correctly
+      end-to-end.
+    tools:
+      - gitlab-ci
+      - testssl
+      - sslyze
+      - zap
+      - burp-suite
+      - checkov
+
+  secops:
+    prose: >-
+      Monitor for cleartext transmission attempts and TLS downgrade attacks.
+      Alert on certificate errors, expired certificates, and failed
+      handshakes. Conduct periodic TLS configuration assessments across
+      all 3DS endpoints. Monitor for message integrity failures that may
+      indicate tampering attempts. Review and update approved cipher suite
+      lists quarterly.
+    tools:
+      - splunk
+      - elastic-siem
+      - qualys-ssl-labs
+      - venafi
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-4"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-13"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A8.24"]
+    relationship: mapped

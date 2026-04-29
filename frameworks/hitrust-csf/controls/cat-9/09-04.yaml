@@ -1,0 +1,81 @@
+id: 09-04
+family: cat-9
+title: "Protection Against Malicious Code"
+class: HITRUST-CSF
+baselines: [e1, i1, r2]
+statement:
+  prose: >-
+    The organization shall implement detection, prevention, and recovery controls to protect
+    against malicious code and shall implement appropriate user awareness procedures. Malicious
+    code protection mechanisms shall be installed and regularly updated on all systems. The
+    organization shall define procedures for handling malicious code attacks, including reporting,
+    system recovery, and evidence preservation. Anti-malware software shall be configured to
+    scan files and communications, block malicious content, and generate alerts. The organization
+    shall verify malicious code protection when obtaining files from external sources and
+    protect against malicious code introduced through web browsing and email.
+guidance:
+  prose: >-
+    Protection against malicious code requires a defense-in-depth approach combining preventive,
+    detective, and responsive controls across all layers of the technology stack. Traditional
+    signature-based antivirus is insufficient; organizations must implement next-generation
+    endpoint protection, behavioral analysis, sandboxing, and threat intelligence integration.
+    At the e1 level, basic anti-malware deployed on endpoints and servers is required. At i1,
+    centrally managed endpoint protection with behavioral detection and automated response is
+    expected. At r2, advanced threat protection including EDR/XDR, application control,
+    network-based malware detection, container runtime protection, and supply chain security
+    for software dependencies is required. Organizations must also address malware risks in
+    cloud workloads, containers, and serverless functions.
+references:
+  - citation: "NIST SP 800-53 Rev 5: SI-3, SI-8"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+  - citation: "ISO/IEC 27001:2022 A.8.7"
+    url: "https://www.iso.org/standard/27001"
+  - citation: "HIPAA Security Rule 45 CFR 164.308(a)(5)(ii)(B)"
+    url: "https://www.hhs.gov/hipaa/for-professionals/security/index.html"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement container image scanning in the CI/CD pipeline and enforce admission policies
+      that prevent deployment of images with known malware or critical vulnerabilities. Use
+      distroless or minimal base images to reduce attack surface. Implement Kubernetes
+      runtime security with Falco or similar tools to detect malicious behavior in running
+      containers. Enforce read-only root filesystems and drop all capabilities by default.
+      Implement network policies to prevent lateral movement and C2 communication. Use
+      cosign/sigstore for image signing and verification.
+    tools:
+      - "Trivy / Grype (image scanning)"
+      - "Falco (runtime security)"
+      - "Kyverno / OPA (admission policies)"
+      - "Cosign / Sigstore (image signing)"
+      - "Kubernetes SecurityContext (read-only, dropped capabilities)"
+      - "eBPF-based security (Cilium Tetragon, Tracee)"
+  devsecops:
+    prose: >-
+      Integrate malware scanning into CI/CD pipelines for all artifacts including source
+      code, dependencies, container images, and IaC templates. Implement SAST scanning to
+      detect code patterns associated with backdoors and malicious payloads. Use dependency
+      scanning to identify compromised packages in the software supply chain. Enforce
+      artifact signing and verification before deployment. Implement pre-commit hooks that
+      scan for secrets and potentially malicious patterns.
+    tools:
+      - "GitLab SAST / Secret Detection"
+      - "Trivy (vulnerability + malware scanning)"
+      - "Dependency Scanning (GitLab, Snyk)"
+      - "Container Scanning"
+      - "GitLab CI/CD pipeline gates"
+      - "Pre-commit hooks (detect-secrets, gitleaks)"
+  secops:
+    prose: >-
+      Deploy EDR/XDR solutions across all endpoints and servers with centralized
+      management. Implement automated threat response playbooks for common malware
+      scenarios. Monitor SIEM for indicators of compromise and integrate threat
+      intelligence feeds for proactive detection. Conduct periodic malware incident
+      response drills. Track malware detection metrics including detection rates,
+      response times, and false positive rates. Maintain forensic capabilities for
+      malware analysis and evidence preservation.
+    tools:
+      - "EDR/XDR (CrowdStrike Falcon, Microsoft Defender, SentinelOne)"
+      - "SIEM (Splunk, Elastic Security)"
+      - "SOAR (Cortex XSOAR, Splunk SOAR)"
+      - "Threat Intelligence (VirusTotal, Recorded Future)"
+      - "Sandbox (Cuckoo, Joe Sandbox, ANY.RUN)"

@@ -1,0 +1,126 @@
+id: glba-sfg-data-retention
+family: safeguards
+title: "Secure Data Disposal"
+class: GLBA
+
+statement:
+  prose: >-
+    Financial institutions shall implement policies, procedures, and controls for the
+    secure disposal of customer information no later than two years after the last date
+    the information is used in connection with the provision of a product or service to
+    the customer, unless retention is required by law, regulation, or legitimate business
+    purpose. Disposal methods shall render customer information unreadable and
+    unrecoverable.
+  parts:
+    - id: glba-sfg-data-retention.1
+      label: "(1)"
+      prose: >-
+        The institution shall establish data retention schedules that define the
+        maximum retention period for each category of customer information, based
+        on legal requirements, regulatory mandates, and legitimate business needs.
+    - id: glba-sfg-data-retention.2
+      label: "(2)"
+      prose: >-
+        Customer information that has exceeded its retention period and is no longer
+        required shall be securely disposed of using methods appropriate to the
+        media type: cryptographic erasure, physical destruction, or secure overwriting
+        that renders the information unreadable and unrecoverable.
+    - id: glba-sfg-data-retention.3
+      label: "(3)"
+      prose: >-
+        The institution shall maintain records of data disposal activities, including
+        the date of disposal, the method used, the categories of information disposed,
+        and the individual or service provider who performed the disposal.
+    - id: glba-sfg-data-retention.4
+      label: "(4)"
+      prose: >-
+        Third-party service providers who dispose of customer information on behalf
+        of the institution shall be contractually required to use approved disposal
+        methods and provide certificates of destruction.
+
+guidance:
+  prose: >-
+    The Safeguards Rule requires secure disposal as part of the overall information
+    security program. The FTC Disposal Rule (16 CFR Part 682) further reinforces
+    disposal requirements for consumer report information. Examiners evaluate whether
+    the institution has a systematic data disposal program rather than ad hoc deletion
+    practices. Common findings include: customer information retained indefinitely
+    without a defined retention schedule, disposal methods that do not render information
+    unrecoverable (e.g., simple file deletion without secure overwriting), backup media
+    containing expired customer information that is not included in the disposal program,
+    cloud storage containing customer information without automated lifecycle policies,
+    and third-party disposal vendors without contractual destruction requirements or
+    certificates of destruction. The two-year default disposal timeline under the
+    Safeguards Rule is a maximum — institutions may implement shorter retention periods
+    where appropriate.
+
+references:
+  - citation: "FTC Safeguards Rule — 16 CFR § 314.4(c)(6)"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+  - citation: "FTC Disposal Rule — 16 CFR Part 682"
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-H/part-682"
+  - citation: "NIST SP 800-88 Rev. 1 — Guidelines for Media Sanitization"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-88/rev-1/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement automated data lifecycle management that tags all customer information
+      with creation date, retention category, and expiration date at the time of
+      creation. Deploy database-level retention policies that automatically flag or
+      purge records that have exceeded their retention period. Implement cryptographic
+      erasure for encrypted data stores — destroying the encryption key renders the
+      data unrecoverable without the overhead of overwriting. Build automated disposal
+      pipelines that execute on a scheduled cadence, generating disposal logs with
+      cryptographic proof of completion. Implement cloud storage lifecycle policies
+      (S3 lifecycle rules, Azure Blob lifecycle management) that automatically transition
+      expired NPI to secure disposal. Deploy backup retention policies that ensure
+      backup media does not retain customer information beyond the defined retention
+      period. Implement data discovery and classification tools that identify customer
+      information in unstructured storage for inclusion in the disposal program.
+    tools:
+      - kubernetes
+      - terraform
+      - vault
+      - postgresql
+      - aws-s3-lifecycle
+      - azure-blob-lifecycle
+  devsecops:
+    prose: >-
+      Implement CI/CD pipeline checks that verify data retention policies are configured
+      on all storage resources handling customer information. Scan infrastructure-as-code
+      for storage resources without lifecycle policies. Implement automated tests that
+      verify disposal pipelines execute correctly and generate proper disposal records.
+      Add pipeline stages that validate retention configuration compliance when storage
+      resources are created or modified. Deploy data classification scanning in pipelines
+      that flags new NPI storage locations for retention policy assignment.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - open-policy-agent
+      - terraform
+  secops:
+    prose: >-
+      Monitor data disposal pipeline execution and alert on failures. Track retention
+      compliance metrics showing: data volumes by retention category, records approaching
+      expiration, disposal execution rates, and disposal failures requiring remediation.
+      Generate quarterly data retention reports for the qualified individual. Conduct
+      periodic audits to verify that disposed data is truly unrecoverable. Maintain
+      disposal certificates and logs for examination evidence. Monitor for customer
+      information in unauthorized storage locations that are not covered by retention
+      policies.
+    tools:
+      - splunk
+      - elastic-siem
+      - grc-platform
+      - servicenow
+      - dlp-platform
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["MP-6", "SI-12", "SR-12"]
+    relationship: supports
+  - framework_id: ccpa-cpra
+    articles: ["1798.105"]
+    relationship: complements

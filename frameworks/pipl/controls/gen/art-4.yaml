@@ -1,0 +1,81 @@
+id: art-4
+family: gen
+title: "Definition of personal information"
+class: PIPL
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 4: Personal information refers to all kinds of information related to identified or
+    identifiable natural persons recorded by electronic or other means, excluding information after
+    anonymization processing. The processing of personal information includes the collection, storage,
+    use, processing, transmission, provision, disclosure, and deletion of personal information.
+    Article 5: The processing of personal information shall follow the principles of lawfulness,
+    legitimacy, necessity, and good faith. Processing of personal information by means of misleading,
+    fraud, coercion, or other such methods is prohibited.
+    Article 6: The processing of personal information shall have a clear and reasonable purpose and
+    shall be directly related to the processing purpose. The collection of personal information shall
+    be limited to the minimum scope necessary to achieve the processing purpose. The excessive collection
+    of personal information is prohibited.
+
+guidance:
+  prose: >-
+    Article 4 provides the foundational definition of personal information under PIPL. The definition
+    is broad and technology-neutral, covering any information that can identify or be used to identify
+    a natural person regardless of the recording medium. Critically, anonymized data falls outside the
+    scope of PIPL, but pseudonymized data remains within scope (as the individual remains identifiable).
+    Articles 5 and 6 establish the core principles: lawfulness, legitimacy, necessity, good faith,
+    purpose limitation, and data minimization. The "necessity" principle under PIPL is interpreted more
+    strictly than GDPR's proportionality, requiring that data collection be limited to the minimum
+    scope necessary. The prohibition on excessive collection has been actively enforced by the
+    Cyberspace Administration of China (CAC) against mobile apps.
+
+references:
+  - citation: "PIPL, Articles 4–6"
+    url: "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build and maintain a data dictionary that classifies all data fields as personal information,
+      sensitive personal information, or anonymized data. Implement data minimization enforcement
+      at the API layer by rejecting requests that collect data fields not registered as necessary
+      for the declared purpose. Deploy automated anonymization pipelines that remove identifiability
+      from datasets used for analytics. Maintain schema governance that requires purpose justification
+      for every personal information field added to any data model.
+    tools:
+      - "Data catalog with PI classification (Apache Atlas, Collibra, BigID)"
+      - "API schema validation (JSON Schema, Protobuf with field annotations)"
+      - "Anonymization engines (ARX, Google DLP API, AWS Macie)"
+      - "Schema governance (SchemaRegistry, Backstage)"
+  devsecops:
+    prose: >-
+      CI/CD pipelines must validate that new data models include purpose annotations for every
+      personal information field. Static analysis should detect collection of data fields not
+      registered in the data dictionary. Automated tests must verify that anonymization routines
+      produce outputs that cannot be re-identified. Pull request templates must include a data
+      minimization checklist for features that handle personal information.
+    tools:
+      - "Static analysis for data field usage (Semgrep, custom rules)"
+      - "Automated anonymization verification tests"
+      - "PR templates with data minimization checklist"
+      - "Data dictionary sync validation in CI"
+  secops:
+    prose: >-
+      Monitor for data collection patterns that exceed registered purposes. Alert when new data
+      fields containing personal information appear in production databases without prior registration.
+      Conduct periodic data minimization audits to identify fields collected but never used. Track
+      anonymization effectiveness through re-identification risk assessments.
+    tools:
+      - "Database activity monitoring (Imperva, Satori)"
+      - "Data discovery and classification scanners (BigID, Securiti)"
+      - "Re-identification risk assessment tools"
+      - "SIEM rules for unauthorized data collection patterns"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-5"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-6"]
+    relationship: equivalent-to

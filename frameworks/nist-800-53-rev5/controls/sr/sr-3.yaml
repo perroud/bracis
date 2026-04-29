@@ -1,0 +1,129 @@
+id: sr-3
+family: sr
+title: "Supply Chain Controls and Processes"
+class: SP800-53
+baselines: [moderate, high]
+parameters:
+  - id: sr-03_odp.01
+    label: "supply chain controls"
+    guidance: "Organization-defined supply chain controls to protect against supply chain risks"
+  - id: sr-03_odp.02
+    label: "system or system component"
+    guidance: "Organization-defined system or system component"
+statement:
+  prose: >-
+    a. Establish a process or processes to identify and address weaknesses or deficiencies in the
+       supply chain elements and processes of [Assignment: organization-defined system or system component]
+       in coordination with [Assignment: organization-defined supply chain personnel];
+    b. Employ the following controls to protect against supply chain risks to the system, system
+       component, or system service and to limit the harm or consequences from supply chain-related
+       events: [Assignment: organization-defined supply chain controls]; and
+    c. Document the selected and implemented supply chain processes and controls in
+       [Selection: security and privacy plans; supply chain risk management plan;
+       [Assignment: organization-defined document]].
+  parts:
+    - id: sr-3_smt.a
+      label: "a."
+      prose: >-
+        Establish a process or processes to identify and address weaknesses or deficiencies in the
+        supply chain elements and processes of [Assignment: organization-defined system or system
+        component] in coordination with [Assignment: organization-defined supply chain personnel];
+    - id: sr-3_smt.b
+      label: "b."
+      prose: >-
+        Employ the following controls to protect against supply chain risks to the system, system
+        component, or system service and to limit the harm or consequences from supply chain-related
+        events: [Assignment: organization-defined supply chain controls]; and
+    - id: sr-3_smt.c
+      label: "c."
+      prose: >-
+        Document the selected and implemented supply chain processes and controls in
+        [Selection: security and privacy plans; supply chain risk management plan;
+        [Assignment: organization-defined document]].
+guidance:
+  prose: >-
+    Supply chain elements include organizations, entities, or tools employed for the research and
+    development, design, manufacturing, acquisition, delivery, integration, operations and
+    maintenance, and disposal of systems, system components, or system services. Supply chain
+    processes include hardware, software, and firmware development processes; shipping and handling
+    procedures; personnel security and physical security programs; configuration management tools,
+    techniques, and measures to maintain provenance; or other programs, processes, or procedures
+    associated with the development, acquisition, maintenance and disposal of systems, system
+    components, or system services. Supply chain elements and processes may be provided by
+    organizations, system integrators, or external providers. Weaknesses or deficiencies in supply
+    chain elements or processes represent potential vulnerabilities that can be exploited by threat
+    sources. Supply chain personnel are individuals with roles and responsibilities in the supply
+    chain. Adequate supply chain protections can help to minimize the risks of unauthorized
+    production, tampering, theft, insertion of counterfeits, insertion of malicious software or
+    backdoors, and poor development practices throughout the system development life cycle.
+    Organizations implement SCRM plans in alignment with NIST SP 800-161 to manage supply chain
+    risks. Organizations may use one or more documents to convey supply chain processes and controls.
+enhancements:
+  - id: sr-3.1
+    title: "Diverse Supply Base"
+    baselines: []
+  - id: sr-3.2
+    title: "Limitation of Harm"
+    baselines: []
+  - id: sr-3.3
+    title: "Sub-tier Flow Down"
+    baselines: []
+references:
+  - citation: "NIST SP 800-161 Rev. 1"
+    url: "https://doi.org/10.6028/NIST.SP.800-161r1"
+  - citation: "NIST SP 800-53A Rev. 5"
+    url: "https://doi.org/10.6028/NIST.SP.800-53Ar5"
+  - citation: "Executive Order 14028"
+    url: "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/"
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement software supply chain security through Software Bill of Materials (SBOM) generation
+      for all artifacts. Use signed container images with Sigstore (cosign) and verify signatures at
+      deployment time using admission controllers. Implement dependency pinning with hash verification
+      for all package managers. Deploy container registries with vulnerability scanning and image
+      signing (Harbor, GitLab Container Registry). Use SLSA framework practices: hermetic builds,
+      provenance generation, and build attestation. Implement private package registries to proxy
+      and cache upstream dependencies with vulnerability gates. Restrict base images to an
+      approved catalog maintained by the platform team.
+    tools:
+      - "Sigstore (cosign, Rekor, Fulcio)"
+      - "SLSA framework"
+      - "Syft / Trivy (SBOM generation)"
+      - "Harbor / GitLab Container Registry"
+      - "Kyverno / OPA (image verification)"
+      - "Renovate / Dependabot (dependency updates)"
+      - "in-toto (supply chain attestation)"
+  devsecops:
+    prose: >-
+      Integrate supply chain security checks into every CI/CD pipeline. Run dependency scanning
+      to detect vulnerable and malicious packages. Generate SBOMs for every build and store as
+      pipeline artifacts. Implement container image scanning before pushing to registries. Use
+      GitLab Dependency Scanning and Container Scanning. Verify the provenance and integrity of
+      third-party dependencies. Implement merge request policies that require security review for
+      dependency updates. Use lock files and hash-pinned dependencies to prevent dependency confusion
+      attacks. Sign all build artifacts and container images in the pipeline.
+    tools:
+      - "GitLab Dependency Scanning"
+      - "GitLab Container Scanning"
+      - "GitLab License Compliance"
+      - "SBOM generation (CycloneDX, SPDX)"
+      - "cosign (image signing in CI)"
+      - "Trivy"
+      - "Socket.dev / Snyk"
+  secops:
+    prose: >-
+      Monitor for supply chain compromise indicators: unexpected dependency changes, modified
+      package checksums, new maintainers on critical packages, and typosquatting. Track CVEs in
+      all deployed dependencies and prioritize remediation based on exploitability and exposure.
+      Maintain a software asset inventory tied to SBOMs for rapid impact assessment when new
+      supply chain vulnerabilities are disclosed. Subscribe to security advisories for all critical
+      dependencies. Implement processes for rapid response to supply chain incidents (Log4Shell-type
+      events).
+    tools:
+      - "Dependency-Track (SBOM management)"
+      - "GitLab Vulnerability Management"
+      - "OSV.dev / NVD (vulnerability databases)"
+      - "Socket.dev (malicious package detection)"
+      - "SIEM (supply chain anomaly detection)"
+      - "Threat intelligence (supply chain focused)"

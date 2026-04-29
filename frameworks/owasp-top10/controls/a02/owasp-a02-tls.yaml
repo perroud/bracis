@@ -1,0 +1,106 @@
+id: owasp-a02-tls
+family: a02
+title: "A02:2021 — Transport Layer Security Failures"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Transport Layer Security failures occur when sensitive data is transmitted over insecure or
+    improperly configured encrypted channels. This includes use of deprecated protocol versions
+    (SSLv2, SSLv3, TLS 1.0, TLS 1.1), weak cipher suites that provide insufficient protection
+    (RC4, DES, EXPORT ciphers, MD5-based MACs, anonymous Diffie-Hellman), failure to enforce
+    HTTPS for all sensitive communications, missing or improper validation of server certificates
+    (self-signed certificates accepted in production, certificate hostname not verified, expired
+    certificates tolerated), cleartext fallback enabled (STARTTLS downgrade attacks), missing
+    HTTP Strict Transport Security (HSTS) headers that prevent protocol downgrade attacks, and
+    insecure mixed content (HTTPS pages loading HTTP resources).
+
+guidance:
+  prose: >-
+    TLS configuration failures create channels where an active network attacker (man-in-the-middle)
+    can intercept, read, or modify sensitive data in transit even when encryption appears to be
+    in use. The key distinction is that proper TLS implementation requires both encryption and
+    authentication — verifying the server's identity through certificate chain validation.
+    Applications must enforce HTTPS with TLS 1.2 or higher, disable weak cipher suites in favor
+    of AEAD ciphers (AES-GCM, ChaCha20-Poly1305), configure certificate pinning for high-security
+    mobile and API clients, enable OCSP stapling for certificate revocation checking, and deploy
+    HSTS with a long max-age to prevent SSL stripping attacks. Mixed content vulnerabilities allow
+    attackers to inject malicious content via HTTP resources loaded on HTTPS pages.
+
+references:
+  - citation: "OWASP Transport Layer Security Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html"
+  - citation: "Mozilla SSL Configuration Generator"
+    url: "https://ssl-config.mozilla.org/"
+  - citation: "NIST SP 800-52 Rev 2: Guidelines for TLS Implementations"
+    url: "https://csrc.nist.gov/publications/detail/sp/800-52/rev-2/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy TLS termination at the ingress layer (load balancer, API gateway, ingress controller)
+      with a hardened configuration: TLS 1.2 minimum, TLS 1.3 preferred, AEAD cipher suites only
+      (TLS_AES_128_GCM_SHA256, TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256 for TLS 1.3;
+      ECDHE-ECDSA-AES128-GCM-SHA256, ECDHE-RSA-AES128-GCM-SHA256 for TLS 1.2). Disable all older
+      protocols and weak ciphers at the load balancer. Use cert-manager with Let's Encrypt or an
+      enterprise CA to automate certificate issuance, renewal, and rotation. Set HSTS max-age to
+      at least 31536000 (one year) with includeSubDomains and preload directives. Enforce mTLS
+      for all internal service-to-service communication using a service mesh (Istio, Linkerd).
+      Configure Content Security Policy (CSP) with upgrade-insecure-requests to mitigate mixed
+      content risks.
+    tools:
+      - cert-manager
+      - istio
+      - linkerd
+      - nginx
+      - traefik
+      - aws-acm
+      - cloudflare
+
+  devsecops:
+    prose: >-
+      Integrate TLS configuration testing into CI/CD: run testssl.sh or sslyze against staging
+      environments as a pipeline stage and fail the pipeline on detection of deprecated protocols,
+      weak ciphers, or certificate issues. Include infrastructure-as-code scanning (Checkov, Trivy)
+      rules that flag any cloud resource (load balancer, CloudFront distribution, RDS instance)
+      configured without TLS or with deprecated TLS versions. Add HTTP security header checks
+      (missing HSTS, missing CSP) as automated tests using security header scanning tools.
+      Validate certificate chains in automated deployment tests to prevent deploying with expired
+      or misconfigured certificates. Scan Kubernetes Ingress resources for TLS configuration.
+    tools:
+      - testssl
+      - sslyze
+      - checkov
+      - trivy
+      - securityheaders
+      - gitlab-ci
+
+  secops:
+    prose: >-
+      Continuously scan all internet-facing domains and IPs for TLS certificate expiration,
+      weak protocol support, and cipher suite weaknesses using automated scanners (Shodan, testssl.sh,
+      SSL Labs API) on a weekly or daily basis. Configure alerts for certificates expiring within
+      30 days to prevent outages. Monitor certificate transparency logs for your domains to detect
+      unauthorized certificate issuance. Implement network monitoring to detect cleartext sensitive
+      data patterns. Review TLS configurations after any infrastructure changes or dependency updates
+      that could affect cryptographic settings.
+    tools:
+      - testssl
+      - shodan
+      - aws-certificate-manager
+      - cloudflare
+      - splunk
+      - datadog
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SC-8", "SC-8(1)"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["4.2.1", "4.2.2"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V9.1.1", "V9.1.2", "V9.1.3"]
+    relationship: mapped

@@ -1,0 +1,85 @@
+id: ct-p.03
+family: ct-p
+title: "Disassociated Processing"
+class: NIST-PRIVACY
+
+statement:
+  prose: >-
+    Data processing solutions increase disassociability consistent with the
+    organization's risk strategy to protect individuals' privacy. Data actions are
+    performed with mechanisms to ensure that identifiers and PII are not associated
+    with individuals beyond operational necessity.
+
+guidance:
+  prose: >-
+    Disassociated processing focuses on severing or weakening the link between data
+    and identifiable individuals. Techniques include de-identification, anonymization,
+    pseudonymization, aggregation, and differential privacy. The goal is to enable
+    beneficial data processing (analytics, research, machine learning) while minimizing
+    privacy risks to individuals. Organizations should apply disassociation techniques
+    appropriate to the use case — pseudonymization for data that may need re-identification
+    for operational purposes, and anonymization or differential privacy for analytics
+    where individual identity is unnecessary. The strength of disassociation should be
+    proportional to the sensitivity of the data and the risk of re-identification.
+
+references:
+  - citation: "NIST Privacy Framework v1.0, CT.DP-P1 through CT.DP-P5"
+    url: "https://www.nist.gov/privacy-framework"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement disassociation mechanisms at the platform layer. Deploy
+      pseudonymization services that replace direct identifiers with tokens before data
+      reaches analytics pipelines. Build anonymization pipelines that apply k-anonymity,
+      l-diversity, or differential privacy techniques to datasets before they are made
+      available for analysis. Implement data clean rooms for cross-organization data
+      analysis without exposing individual records. Ensure tokenization keys are managed
+      in hardware security modules with strict access controls.
+    tools:
+      - vault
+      - data-anonymization-tools
+      - hsm
+      - kubernetes
+      - data-pipeline
+
+  devsecops:
+    prose: >-
+      Integrate disassociation requirements into the development workflow. Implement
+      pipeline checks that verify analytics code uses anonymized or pseudonymized data
+      rather than raw PII. Require code review for any logic that re-identifies
+      pseudonymized data. Build automated tests that validate disassociation
+      effectiveness — for example, verifying that anonymized datasets cannot be trivially
+      re-identified. Include disassociation impact assessments in PIAs for data
+      analytics features.
+    tools:
+      - gitlab-ci
+      - custom-policy-checks
+      - anonymization-testing
+      - sast
+      - data-validation
+
+  secops:
+    prose: >-
+      Monitor for re-identification risks and unauthorized attempts to link
+      disassociated data back to individuals. Audit access to pseudonymization keys
+      and re-identification capabilities. Conduct periodic re-identification risk
+      assessments on published or shared datasets. Track the effectiveness of
+      disassociation techniques through privacy metrics. Investigate and respond to
+      re-identification incidents.
+    tools:
+      - siem
+      - audit-logging
+      - re-identification-testing
+      - grc-platform
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-4", "art-25"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-19"]
+    relationship: derived-from
+  - framework_id: iso-27701
+    articles: ["A.7.4.5"]
+    relationship: mapped

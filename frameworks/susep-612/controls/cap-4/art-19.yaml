@@ -1,0 +1,125 @@
+id: art-19
+family: cap-4
+title: "Registro de Operacoes"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 19. As supervisionadas devem manter registro de todas as operações
+    realizadas, incluindo, no mínimo:
+    I - tipo de operação (contratação, alteração, cancelamento, sinistro, resgate,
+    portabilidade, transferência, cessão);
+    II - valor da operação;
+    III - data da operação;
+    IV - identificação do cliente e, quando aplicável, do beneficiário;
+    V - forma de pagamento utilizada;
+    VI - origem e destino dos recursos, quando aplicável.
+guidance:
+  prose: |
+    O art. 19 estabelece a obrigacao de registro detalhado de todas as operacoes,
+    criando a trilha de auditoria necessaria para monitoramento e investigacao
+    de PLD/FT.
+
+    **Operacoes que devem ser registradas (inciso I):**
+    Todas as operacoes do ciclo de vida de produtos securitarios:
+
+    1. Contratacao: emissao de apolice, adesao a plano, aquisicao de titulo
+    2. Alteracao: endosso, alteracao de beneficiario, mudanca de cobertura
+    3. Cancelamento: cancelamento de apolice com ou sem devolucao de premio
+    4. Sinistro: abertura, regulacao e pagamento de sinistro
+    5. Resgate: resgate de VGBL/PGBL, resgate de capitalizacao, resgate de
+       valor acumulado em seguro de vida
+    6. Portabilidade: transferencia de recursos entre planos de previdencia
+    7. Transferencia: cessao de apolice entre segurados
+    8. Cessao: cessao de direitos de resseguro
+
+    **Dados obrigatorios por operacao (incisos II-VI):**
+    - Valor: premio, capital segurado, valor de sinistro, valor de resgate
+    - Data: data da operacao com timestamp preciso
+    - Identificacao: CPF/CNPJ do cliente, CPF/CNPJ do beneficiario
+    - Forma de pagamento: boleto, debito, credito, PIX, TED, especie
+    - Origem/destino: conta bancaria de origem do premio, conta de destino
+      do sinistro/resgate
+
+    **Operacoes de risco elevado no registro:**
+    - Pagamento de premio em especie acima de R$ 10.000
+    - Cancelamento com devolucao de premio logo apos contratacao
+    - Resgate de VGBL/PGBL em conta de terceiro
+    - Sinistro com pagamento a beneficiario nao cadastrado originalmente
+    - Portabilidade seguida de resgate (churning)
+    - Transferencia de apolice entre partes nao relacionadas
+
+    **Retencao:**
+    Os registros devem ser mantidos por no minimo 10 anos contados da data
+    da operacao ou do encerramento do relacionamento (o que for maior).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Sistema de registro de operacoes:**
+      1. Event sourcing para todas as operacoes securitarias, garantindo
+         registro imutavel e completo de cada evento do ciclo de vida.
+      2. Schema padronizado de registro com todos os 6 campos obrigatorios
+         (tipo, valor, data, identificacao, forma pagamento, origem/destino).
+      3. Integracao com sistemas core: emissao (contratacao/alteracao),
+         sinistros (regulacao/pagamento), financeiro (pagamentos/resgates).
+      4. Timestamp preciso (UTC) com timezone do usuario para cada operacao.
+
+      **Retencao e busca:**
+      5. Storage de longo prazo (10 anos minimo) com politica de retencao
+         automatica e protecao contra exclusao.
+      6. Indexacao para busca rapida por cliente, tipo de operacao, periodo,
+         valor e forma de pagamento.
+      7. API de consulta para equipe de compliance e investigacao.
+      8. Exportacao de dados para SISCOAF quando comunicacao ao COAF e
+         necessaria.
+    tools:
+      - event-sourcing-platform
+      - data-lake
+      - search-engine
+      - long-term-storage
+  devsecops:
+    prose: |
+      **Testes de registro:**
+      1. Testes de completude: toda operacao deve gerar registro com todos os
+         campos obrigatorios preenchidos.
+      2. Testes de imutabilidade: registros nao podem ser alterados ou excluidos.
+      3. Testes de integracao: operacoes em sistemas core devem propagar
+         para sistema de registro.
+
+      **Qualidade de dados:**
+      4. Validacao de schema em tempo de escrita (campos obrigatorios, tipos,
+         formatos).
+      5. Reconciliacao periodica entre sistemas core e sistema de registro.
+      6. Testes de retencao: dados com mais de 10 anos podem ser expurgados,
+         dados com menos de 10 anos nao podem.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - data-quality-tests
+      - retention-tests
+  secops:
+    prose: |
+      **Monitoramento de registros:**
+      1. Dashboard de volumetria de operacoes por tipo, produto e periodo.
+      2. Alertas para operacoes sem registro completo (campos obrigatorios
+         faltantes).
+      3. Reconciliacao entre registros de operacoes e movimentacao financeira.
+
+      **Auditoria e retencao:**
+      4. Verificacao periodica de integridade dos registros (checksums,
+         assinaturas digitais).
+      5. Teste de restauracao de registros antigos para garantir legibilidade.
+      6. Politica de retencao documentada e aprovada pelo compliance officer.
+      7. Disponibilizacao de registros para SUSEP, COAF e Ministerio Publico
+         quando requisitados.
+    tools:
+      - operations-dashboard
+      - data-integrity-checks
+      - retention-management
+      - regulatory-reporting
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-19"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-16"]
+    relationship: complements

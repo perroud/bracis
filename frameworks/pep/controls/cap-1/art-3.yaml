@@ -1,0 +1,108 @@
+id: art-3
+family: cap-1
+title: "Definicoes -- Assinatura Digital e Niveis de Garantia"
+class: PEP
+baselines: [pep-all]
+statement:
+  prose: |
+    Art. 3. Definir os conceitos fundamentais para a aplicação desta
+    resolução:
+
+    I - Prontuário Eletrônico do Paciente (PEP): sistema informatizado
+    utilizado para registro, armazenamento e recuperação de informações
+    de saúde do paciente em formato eletrônico;
+
+    II - Nível de Garantia de Segurança 1 (NGS1): certificação que
+    atesta conformidade do sistema PEP com requisitos de segurança da
+    informação, incluindo controle de acesso, confidencialidade,
+    integridade e disponibilidade;
+
+    III - Nível de Garantia de Segurança 2 (NGS2): certificação que
+    atesta, além dos requisitos do NGS1, a utilização de assinatura
+    digital com certificado ICP-Brasil, permitindo a eliminação do
+    prontuário em papel;
+
+    IV - Assinatura digital: assinatura eletrônica qualificada emitida
+    por Autoridade Certificadora credenciada na Infraestrutura de
+    Chaves Públicas Brasileira (ICP-Brasil).
+guidance:
+  prose: |
+    O art. 3 estabelece a terminologia oficial e os dois niveis de
+    certificacao que determinam o que o sistema PEP pode ou nao fazer.
+
+    **NGS1 vs. NGS2 -- implicacao pratica:**
+    - NGS1: sistema PEP certificado pela SBIS/CFM com requisitos de
+      seguranca basicos. O prontuario em papel DEVE ser mantido como
+      backup legal. O sistema serve como ferramenta auxiliar.
+    - NGS2: sistema PEP certificado com assinatura digital ICP-Brasil.
+      O prontuario em papel PODE ser eliminado. O PEP assume plena
+      validade juridica como documento medico-legal.
+
+    **Consequencia pratica:**
+    Sem certificacao NGS2, a instituicao de saude e obrigada a manter
+    o prontuario em papel em paralelo ao eletronico, gerando custo
+    duplicado de armazenamento e risco de inconsistencia.
+
+    **ICP-Brasil como unica opcao:**
+    A resolucao nao aceita certificados autoassinados ou de autoridades
+    certificadoras nao credenciadas na ICP-Brasil para fins de
+    assinatura digital com validade juridica.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de certificacao digital:**
+      1. Integrar com Autoridade Certificadora (AC) credenciada
+         na ICP-Brasil para emissao e validacao de certificados
+         digitais de profissionais de saude (e-CPF A3 ou e-Saude).
+      2. Implementar modulo de assinatura digital no PEP com
+         suporte a certificados A1 (software) e A3 (token/smartcard).
+      3. Provisionar HSM (Hardware Security Module) para
+         armazenamento seguro de chaves privadas quando aplicavel.
+      4. Implementar verificacao automatica de validade e revogacao
+         de certificados (consulta a LCR/OCSP da ICP-Brasil).
+    tools:
+      - icp-brasil-sdk
+      - hsm
+      - certificate-management
+      - ocsp-validator
+  devsecops:
+    prose: |
+      **Validacao de assinatura digital no pipeline:**
+      1. Implementar testes automatizados que validem a cadeia de
+         confianca ICP-Brasil em assinaturas geradas pelo sistema.
+      2. Criar verificacao automatica de que documentos criticos
+         (prescricoes, laudos) sao assinados digitalmente antes
+         de serem persistidos.
+      3. Testar cenarios de certificado expirado, revogado e
+         invalido para garantir que o sistema rejeita corretamente.
+      4. Validar formato de assinatura (CAdES, XAdES ou PAdES)
+         conforme padrao ICP-Brasil.
+    tools:
+      - gitlab-ci
+      - digital-signature-tests
+      - certificate-chain-validator
+      - pades-validator
+  secops:
+    prose: |
+      **Gestao de certificados digitais:**
+      1. Manter inventario de todos os certificados digitais
+         emitidos para profissionais de saude da instituicao,
+         com datas de emissao e vencimento.
+      2. Implementar alerta automatico de vencimento de
+         certificados com antecedencia minima de 60 dias.
+      3. Definir processo formal de revogacao imediata de
+         certificados em caso de desligamento de profissional.
+      4. Avaliar nivel de certificacao SBIS/CFM do sistema PEP
+         e definir plano para atingir NGS2 se aplicavel.
+    tools:
+      - certificate-lifecycle
+      - grc-platform
+      - identity-management
+      - compliance-dashboard
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements
+  - framework_id: hipaa
+    articles: ["164.312-e"]
+    relationship: mapped

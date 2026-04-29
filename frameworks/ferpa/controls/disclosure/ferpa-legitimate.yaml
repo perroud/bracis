@@ -1,0 +1,122 @@
+id: ferpa-legitimate
+family: disclosure
+title: "Legitimate Educational Interest — School Officials Exception"
+class: FERPA
+
+statement:
+  prose: >-
+    An educational agency or institution may disclose personally identifiable
+    information from education records without consent to school officials whom
+    the institution has determined have a legitimate educational interest in the
+    records. The institution must define in its annual notification what it
+    considers to be a school official and what constitutes a legitimate educational
+    interest.
+  parts:
+    - id: ferpa-legitimate-1
+      label: "34 CFR § 99.31(a)(1)(i)(A)"
+      prose: >-
+        An educational agency or institution may disclose PII from education records
+        without consent if the disclosure is to other school officials, including
+        teachers, within the agency or institution whom the agency or institution has
+        determined to have legitimate educational interests.
+    - id: ferpa-legitimate-2
+      label: "34 CFR § 99.31(a)(1)(i)(B)"
+      prose: >-
+        A contractor, consultant, volunteer, or other party to whom an agency or
+        institution has outsourced institutional services or functions may be
+        considered a school official if the outside party performs an institutional
+        service or function for which the agency or institution would otherwise use
+        employees, is under the direct control of the agency or institution with
+        respect to the use and maintenance of education records, and is subject to
+        the same conditions governing the use and redisclosure of PII from
+        education records.
+    - id: ferpa-legitimate-3
+      label: "34 CFR § 99.7(a)(3)(iii)"
+      prose: >-
+        The institution's annual notification must include the criteria for
+        determining who constitutes a school official and what constitutes a
+        legitimate educational interest.
+
+guidance:
+  prose: >-
+    The school official exception is the most frequently used FERPA exception and
+    is critical for day-to-day institutional operations. The definition of "school
+    official" is broader than just employees — it extends to contractors, consultants,
+    volunteers, and outsourced service providers (including EdTech vendors) who meet
+    three criteria: (1) they perform an institutional service or function, (2) they
+    are under the institution's direct control regarding records use, and (3) they are
+    subject to the same use and redisclosure conditions as institutional employees.
+    Institutions must define "legitimate educational interest" in their annual
+    notification — this is typically defined as needing access to fulfill professional
+    responsibilities. The principle of minimum necessary access should be applied even
+    though FERPA does not explicitly require it: officials should access only the
+    records needed for their specific educational interest.
+
+references:
+  - citation: "34 CFR § 99.31(a)(1) - School officials exception"
+    url: "https://www.ecfr.gov/current/title-34/subtitle-A/part-99/subpart-D/section-99.31"
+  - citation: "FPCO Guidance on School Officials"
+    url: "https://studentprivacy.ed.gov/faq/who-school-official-under-ferpa"
+  - citation: "ED Guidance on Outsourced Services"
+    url: "https://studentprivacy.ed.gov/resources"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement role-based access control (RBAC) with granular permissions mapped
+      to legitimate educational interest definitions. Define school official roles
+      (faculty, advisor, registrar, financial aid, IT administrator, EdTech vendor)
+      with corresponding data access levels. Implement attribute-based access
+      control (ABAC) where access decisions consider the relationship between the
+      school official and the student (e.g., faculty can access records only for
+      students in their courses). Enforce minimum necessary access by limiting
+      data fields returned based on the official's role and purpose. Log all
+      access with the official's role and the educational interest justification.
+      Implement vendor access management with the same RBAC constraints applied
+      to institutional employees.
+    tools:
+      - keycloak
+      - okta
+      - azure-ad
+      - vault
+      - open-policy-agent
+
+  devsecops:
+    prose: >-
+      Test RBAC and ABAC policies to ensure school officials can only access
+      records for which they have a legitimate educational interest. Verify that
+      vendor accounts are subject to the same access restrictions as employee
+      accounts. Test for privilege escalation vulnerabilities that could allow
+      officials to access records beyond their defined role. Implement policy-
+      as-code tests that verify access control configurations match the
+      institution's legitimate educational interest definitions. Scan for
+      overly permissive access grants.
+    tools:
+      - gitlab-ci
+      - open-policy-agent
+      - checkov
+      - owasp-zap
+
+  secops:
+    prose: >-
+      Monitor access patterns to detect school officials accessing records
+      beyond their legitimate educational interest. Alert on unusual access
+      volumes or access outside normal working patterns. Audit vendor access
+      to ensure compliance with contractual access limitations. Track role
+      assignments and alert on privilege creep. Generate access reports by
+      role showing which records were accessed and the frequency of access.
+      Monitor for terminated employees or expired vendor contracts that still
+      have active access.
+    tools:
+      - splunk
+      - elastic-siem
+      - cyberark
+      - datadog
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-5", "AC-6", "AC-6(1)", "AC-6(5)"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.16", "A5.18", "A8.2", "A8.3"]
+    relationship: supports

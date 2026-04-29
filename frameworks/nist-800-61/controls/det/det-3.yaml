@@ -1,0 +1,85 @@
+id: det-3
+family: det
+title: "Incident Analysis"
+class: NIST-800-61
+
+statement:
+  prose: >-
+    When indicators suggest that an incident may have occurred, organizations should perform
+    analysis to determine whether an incident has actually taken place, assess the scope and
+    impact of the incident, and gather sufficient information to support response decisions.
+    Analysis activities include correlating events from multiple data sources, performing
+    network and host forensics, analyzing malware, reviewing logs, and consulting threat
+    intelligence. Incident analysis is often the most challenging aspect of incident response
+    due to the volume of data, the sophistication of attacks, and the need for timely
+    determination. Organizations should use structured analysis methodologies and ensure
+    that analysts have access to the data, tools, and expertise needed for effective analysis.
+
+guidance:
+  prose: >-
+    Incident analysis requires both technical skills and analytical judgment. Analysts must
+    distinguish between genuine incidents and false positives, determine the scope of
+    compromise, identify the attack vector, and assess potential impact. NIST SP 800-61 Rev 3
+    recommends using a combination of automated analysis tools and human expertise. Analysts
+    should document their findings thoroughly, as analysis results drive response decisions
+    and may be needed for legal proceedings. Organizations should establish analysis procedures
+    that ensure consistency and completeness. Threat intelligence context helps analysts
+    understand attacker tactics, techniques, and procedures (TTPs) and predict likely next
+    steps in an attack progression.
+
+references:
+  - citation: "NIST SP 800-61 Rev 3, Section 3.3"
+    url: "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement centralized logging with full-text search and correlation capabilities.
+      Deploy distributed tracing across microservices to enable request-level analysis of
+      suspicious activity. Maintain forensic-ready infrastructure with immutable logs stored
+      in write-once storage. Implement automated enrichment of security events with
+      infrastructure context (pod metadata, node information, namespace, labels). Deploy
+      network packet capture capabilities for deep analysis of suspicious traffic. Ensure
+      timestamp synchronization across all systems using NTP.
+    tools:
+      - "Elastic Stack / Splunk (log analysis)"
+      - "Jaeger / Tempo (distributed tracing)"
+      - "Wireshark / tcpdump (packet analysis)"
+      - "Velociraptor (endpoint forensics)"
+      - "S3 / GCS with object lock (immutable log storage)"
+  devsecops:
+    prose: >-
+      Implement structured logging in applications that captures security-relevant context
+      including user identity, session information, and request metadata. Ensure CI/CD
+      pipeline logs are retained and searchable for investigating supply chain incidents.
+      Implement audit logging for all code repository activities including pushes, merges,
+      and access changes. Maintain application dependency inventories that support rapid
+      impact assessment when vulnerabilities are discovered.
+    tools:
+      - "GitLab Audit Log"
+      - "Structured logging frameworks"
+      - "GitLab Security Dashboard (vulnerability analysis)"
+      - "Dependency-track (SBOM analysis)"
+  secops:
+    prose: >-
+      Establish structured analysis workflows in the SIEM and SOAR platforms. Implement
+      automated enrichment of alerts with threat intelligence, asset context, and
+      vulnerability data. Maintain malware analysis capabilities including sandbox
+      environments and reverse engineering tools. Develop analysis playbooks for common
+      incident types. Implement timeline analysis tools that reconstruct event sequences
+      across multiple data sources. Ensure chain of custody procedures are followed for
+      evidence that may be used in legal proceedings.
+    tools:
+      - "SIEM (Splunk, Elastic Security, Chronicle)"
+      - "SOAR (Cortex XSOAR, Tines)"
+      - "Malware sandbox (Any.Run, Joe Sandbox, Cuckoo)"
+      - "Forensics (Velociraptor, Autopsy, Volatility)"
+      - "Timeline tools (Timesketch, Plaso)"
+
+legal_references:
+  - framework_id: nist-csf-v2
+    articles: ["DE.AE-04", "DE.AE-07"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["IR-4", "AU-6"]
+    relationship: complements

@@ -1,0 +1,111 @@
+id: art-10
+family: cap-3
+title: "Certificate Policies and Technical Standards"
+class: ICP-BRASIL
+baselines: [all-sectors]
+statement:
+  prose: |
+    Art. 8º da MP 2.200-2/2001. Observados os critérios a serem
+    estabelecidos pelo Comitê Gestor da ICP-Brasil, poderão ser
+    credenciados como AC e AR os órgãos e as entidades públicos e as
+    pessoas jurídicas de direito privado.
+
+    Art. 9º da MP 2.200-2/2001. É vedado a qualquer AC certificar nível
+    diverso do imediatamente subsequente ao seu, exceto nos casos de
+    acordos de certificação lateral ou cruzada, previamente aprovados pelo
+    Comitê Gestor da ICP-Brasil.
+
+    Art. 12 da MP 2.200-2/2001. Considera-se documento público ou particular,
+    para todos os fins legais, o documento eletrônico de que trata esta
+    Medida Provisória.
+guidance:
+  prose: |
+    Articles 8, 9, and 12 of MP 2.200-2/2001 establish the accreditation
+    rules, hierarchy constraints, and legal recognition of electronic
+    documents within ICP-Brasil.
+
+    **CA/RA accreditation:**
+    Both public and private entities can be accredited as CAs or RAs,
+    provided they meet CG-ICP-Brasil criteria. This includes:
+    - Technical infrastructure requirements (HSM, secure facilities)
+    - Personnel qualification and background checks
+    - Operational procedures per DOC-ICP series
+    - Regular audits by ITI-accredited auditors
+    - Financial guarantees and insurance
+
+    **Hierarchy constraint:**
+    CAs can only certify the level immediately below them in the hierarchy.
+    Cross-certification (lateral agreements) requires explicit CG-ICP-Brasil
+    approval. This prevents unauthorized trust chain creation.
+
+    **DOC-ICP technical standards series:**
+    The CG-ICP-Brasil publishes normative documents that define:
+    - DOC-ICP-01: Certificate practices statement
+    - DOC-ICP-02: Certificate and CRL profiles
+    - DOC-ICP-03: Cryptographic algorithms and key sizes
+    - DOC-ICP-04: Time-stamping requirements
+    - DOC-ICP-05: Signature policies and formats
+
+    **Electronic document recognition:**
+    Article 12 provides blanket legal recognition for electronic documents
+    under ICP-Brasil, treating them equivalently to physical documents
+    for all legal purposes.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implement ICP-Brasil standards compliance:**
+      1. Configure cryptographic libraries to use only algorithms approved
+         in DOC-ICP-03: RSA (2048-bit minimum), ECDSA (P-256 minimum),
+         SHA-256 or stronger hash functions.
+      2. Implement certificate profile validation per DOC-ICP-02, checking
+         key usage, extended key usage, and policy OIDs.
+      3. Enforce hierarchy level validation: reject certificates that
+         bypass the hierarchical chain (e.g., AC Raiz directly issuing
+         end-entity certificates).
+      4. Implement document format standards per DOC-ICP-05 for signature
+         creation: CAdES (for binary), XAdES (for XML), PAdES (for PDF).
+      5. Deploy timestamp authority (TSA) integration per DOC-ICP-04 for
+         long-term signature validity.
+    tools:
+      - crypto-library
+      - certificate-validator
+      - signature-format
+      - tsa-integration
+      - compliance-engine
+  devsecops:
+    prose: |
+      **DOC-ICP standards compliance testing:**
+      1. Implement automated tests for cryptographic algorithm compliance
+         per DOC-ICP-03 (reject weak algorithms, enforce minimum key sizes).
+      2. Validate certificate profiles against DOC-ICP-02 templates in
+         integration testing pipeline.
+      3. Test signature format compliance (CAdES/XAdES/PAdES) against
+         ITI conformity assessment criteria.
+      4. Include timestamp validation tests ensuring TSA responses come
+         from ICP-Brasil accredited timestamp authorities.
+    tools:
+      - gitlab-ci
+      - crypto-compliance-testing
+      - signature-validation
+      - tsa-testing
+  secops:
+    prose: |
+      **Standards compliance governance:**
+      1. Track DOC-ICP standard updates published by CG-ICP-Brasil and
+         assess impact on organizational implementations.
+      2. Maintain mapping of cryptographic algorithms in use versus
+         DOC-ICP-03 approved algorithms, flagging any deviations.
+      3. Coordinate with CAs used by the organization to ensure their
+         accreditation status remains current with ITI.
+      4. If the organization seeks CA or RA accreditation, implement full
+         compliance program per DOC-ICP requirements including audit
+         readiness and ITI reporting.
+    tools:
+      - regulatory-tracking
+      - crypto-inventory
+      - compliance-dashboard
+      - audit-management
+legal_references:
+  - framework_id: gov-digital
+    articles: ["art-8"]
+    relationship: complements

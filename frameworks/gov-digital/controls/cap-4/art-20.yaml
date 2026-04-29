@@ -1,0 +1,110 @@
+id: art-20
+family: cap-4
+title: "Interoperability Between Government Agencies"
+class: GOV-DIGITAL
+baselines: [government-all]
+statement:
+  prose: |
+    Art. 20. Os órgãos e as entidades da administração pública deverão
+    promover a interoperabilidade de seus sistemas e de suas bases de
+    dados, observados os padrões de interoperabilidade definidos pelo
+    Poder Executivo federal.
+
+    § 1º A interoperabilidade de que trata o caput tem como objetivo
+    evitar a duplicação de esforços e de informações, promover a
+    eficiência e a qualidade dos serviços públicos e facilitar o
+    acesso do cidadão.
+
+    § 2º Os órgãos e as entidades da administração pública deverão
+    utilizar o número de inscrição no Cadastro de Pessoas Físicas (CPF)
+    como identificador único do cidadão para fins de interoperabilidade.
+guidance:
+  prose: |
+    Article 20 mandates interoperability between government systems and
+    databases, establishing CPF as the universal citizen identifier.
+
+    **Interoperability mandate:**
+    All government agencies must ensure their systems can exchange data
+    using federal interoperability standards. This is not optional — it
+    is a legal requirement.
+
+    **Purpose (paragraph 1):**
+    Interoperability serves three objectives:
+    1. Eliminate duplicate efforts and redundant data collection
+    2. Improve public service quality and efficiency
+    3. Simplify citizen access to services
+
+    **CPF as universal identifier (paragraph 2):**
+    The CPF (Cadastro de Pessoas Físicas) is mandated as the single
+    citizen identifier across all government systems. This is a critical
+    technical requirement with major implications:
+    - All systems must support CPF as a primary or foreign key
+    - Data matching between agencies must use CPF as the linking field
+    - Identity resolution must handle CPF format variations and validation
+
+    **Practical impact:**
+    The CPF mandate enables the "once-only" principle (art. 10) by
+    allowing services to query other agencies' databases using CPF
+    instead of asking citizens to provide information redundantly.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Interoperability middleware and CPF-based federation:**
+      1. Deploy an enterprise service bus (ESB) or API mesh that enables
+         standardized data exchange between government agencies using
+         e-PING protocols.
+      2. Implement CPF as the primary citizen identifier across all
+         databases and APIs, with standardized CPF validation and
+         formatting.
+      3. Create a data broker (barramento de dados) that routes
+         inter-agency data requests through a secure, audited, and
+         rate-limited middleware.
+      4. Deploy a master data management (MDM) system that maintains
+         a canonical citizen record indexed by CPF, reconciling data
+         from multiple sources.
+      5. Implement data deduplication services that identify and merge
+         duplicate records using CPF-based matching.
+    tools:
+      - esb-middleware
+      - cpf-validator
+      - data-broker
+      - master-data-management
+  devsecops:
+    prose: |
+      **Interoperability compliance testing:**
+      1. Implement automated e-PING interoperability conformance tests
+         for all inter-agency data exchange endpoints.
+      2. Validate CPF handling in all services: proper validation,
+         consistent formatting (with/without punctuation), and secure
+         storage.
+      3. Test inter-agency data exchange flows end-to-end including
+         authentication, authorization, data transformation, and
+         error handling.
+      4. Scan for CPF exposure in logs, error messages, and URLs to
+         prevent PII leakage.
+    tools:
+      - gitlab-ci
+      - cpf-validator
+      - interoperability-testing
+      - pii-scanner
+  secops:
+    prose: |
+      **Interoperability governance:**
+      1. Maintain an interoperability registry that maps all data
+         exchange flows between agencies with their protocols, formats,
+         and data elements.
+      2. Audit inter-agency data access to ensure only authorized
+         queries are executed and data is used within its stated purpose.
+      3. Monitor CPF-based queries for anomalous patterns that may
+         indicate unauthorized mass data collection.
+      4. Track interoperability adoption across agencies and report
+         progress to the digital governance committee.
+    tools:
+      - interoperability-registry
+      - access-audit
+      - anomaly-detection
+      - adoption-tracker
+legal_references:
+  - framework_id: lgpd
+    articles: ["art-26", "art-27"]
+    relationship: complements

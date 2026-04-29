@@ -1,0 +1,113 @@
+id: rec-1
+family: prescricao
+title: "Electronic Prescription Requirements and Mandatory Content"
+class: RECEITUARIO
+baselines: [prescritores-dispensadores]
+statement:
+  prose: |
+    Art. 1.º A prescrição eletrônica de medicamentos é o documento emitido e
+    assinado por meio eletrônico por profissional legalmente habilitado, contendo
+    a identificação do paciente, a denominação do medicamento pela Denominação
+    Comum Brasileira (DCB) ou Denominação Comum Internacional (DCI), a
+    concentração, a forma farmacêutica, a posologia, a quantidade e a duração
+    do tratamento.
+
+    § 1.º A prescrição eletrônica substitui integralmente a receita em papel,
+    tendo a mesma validade jurídica, desde que observados os requisitos de
+    assinatura digital estabelecidos nesta Resolução.
+
+    § 2.º É obrigatória a inclusão do número de registro do prescritor no
+    respectivo conselho profissional, o endereço do consultório ou
+    estabelecimento de saúde e a data de emissão da prescrição.
+guidance:
+  prose: |
+    Article 1 establishes the electronic prescription as a legally binding
+    document that fully replaces paper-based prescriptions. The regulation
+    mandates specific content elements that must be present in every
+    electronic prescription.
+
+    **Mandatory prescription fields:**
+    - Patient full identification (name, CPF, date of birth)
+    - Drug name using Brazilian Common Denomination (DCB) or International
+      Common Denomination (DCI)
+    - Concentration, pharmaceutical form, and dosage
+    - Quantity prescribed and treatment duration
+    - Prescriber professional registry number (CRM, CRO, CRMV, etc.)
+    - Healthcare facility or office address
+    - Date of issuance
+
+    **Legal equivalence:**
+    The electronic prescription holds the same legal weight as a paper
+    prescription, provided that ICP-Brasil digital signature requirements
+    are fully met. This enables paperless workflows across the entire
+    prescribing and dispensing chain.
+
+    **Scope of prescribers:**
+    The regulation applies to all legally authorized prescribers, including
+    physicians (CRM), dentists (CRO), veterinarians (CRMV), and other
+    professionals with prescriptive authority under Brazilian law.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Prescription content validation infrastructure:**
+      1. Implement a prescription schema registry enforcing all mandatory
+         fields (patient ID, DCB/DCI drug name, concentration, form,
+         dosage, quantity, duration, prescriber registry, facility, date).
+      2. Deploy API gateways with request validation to reject incomplete
+         prescriptions before they reach downstream systems.
+      3. Maintain a centralized DCB/DCI drug catalog service synchronized
+         with ANVISA's official drug database for name resolution.
+      4. Implement immutable storage (append-only) for all issued
+         prescriptions with cryptographic integrity verification.
+      5. Deploy event-driven architecture to publish prescription events
+         to the SNCR integration bus in real time.
+    tools:
+      - json-schema
+      - api-gateway
+      - kong
+      - postgresql
+      - event-bus
+      - kafka
+  devsecops:
+    prose: |
+      **Prescription validation pipeline:**
+      1. Create automated tests validating all mandatory prescription
+         fields against the regulatory schema on every code change.
+      2. Implement contract testing between prescription generation
+         and dispensing services to ensure field compatibility.
+      3. Add static analysis rules to detect hardcoded drug names or
+         bypassed validation logic in prescription modules.
+      4. Deploy canary releases with prescription field completeness
+         monitoring to catch regressions before full rollout.
+    tools:
+      - gitlab-ci
+      - pact
+      - sonarqube
+      - contract-testing
+      - canary-deploy
+  secops:
+    prose: |
+      **Prescription compliance monitoring:**
+      1. Audit all issued prescriptions monthly for field completeness
+         and regulatory conformity, flagging incomplete records.
+      2. Monitor prescriber registry validation rates and alert on
+         prescriptions issued with unverified professional credentials.
+      3. Maintain a compliance dashboard tracking prescription rejection
+         rates, incomplete fields, and resolution timelines.
+      4. Coordinate with ANVISA on regulatory updates to prescription
+         content requirements and update validation rules accordingly.
+    tools:
+      - grc-platform
+      - compliance-dashboard
+      - siem
+      - audit-logging
+legal_references:
+  - framework_id: pep
+    articles: ["art-19"]
+    relationship: complements
+  - framework_id: cfm-telemedicina
+    articles: ["art-7"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-7", "art-11"]
+    relationship: complements

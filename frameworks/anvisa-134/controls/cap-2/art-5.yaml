@@ -1,0 +1,102 @@
+id: art-5
+family: cap-2
+title: "Classificacao de Sistemas Computadorizados"
+class: ANVISA-134
+baselines: [pharma-computerized-systems]
+statement:
+  prose: |
+    Art. 5. Os sistemas computadorizados devem ser classificados conforme
+    sua criticidade para a qualidade do produto e segurança do paciente,
+    utilizando metodologia baseada em risco reconhecida internacionalmente.
+
+    Parágrafo 1. A classificação deve considerar, no mínimo:
+    I - a categoria do software conforme GAMP 5 (categorias 1, 3, 4 e 5);
+    II - o impacto do sistema nos atributos críticos de qualidade (CQA);
+    III - o impacto na segurança do paciente;
+    IV - o impacto na integridade dos dados regulatórios;
+    V - a complexidade das interfaces com outros sistemas.
+
+    Parágrafo 2. A classificação deve ser documentada e aprovada pela
+    unidade da qualidade antes do início das atividades de validação.
+guidance:
+  prose: |
+    O art. 5 exige classificacao formal de sistemas como pre-requisito
+    para definir o esforco e a estrategia de validacao.
+
+    **Categorias GAMP 5 e esforco de validacao:**
+    - Categoria 1 (Infraestrutura): validacao minima, verificacao de instalacao
+    - Categoria 3 (COTS nao configuravel): verificacao funcional basica
+    - Categoria 4 (Configuravel): validacao conforme configuracao aplicada
+    - Categoria 5 (Customizado): validacao completa do ciclo de vida
+
+    **Matriz de criticidade sugerida:**
+    - Critico: afeta diretamente CQA ou seguranca do paciente (ex: SCADA de
+      processo, sistema de liberacao de lote)
+    - Maior: afeta integridade de dados regulatorios (ex: LIMS, ERP GMP)
+    - Menor: suporte indireto a atividades GMP (ex: sistema de treinamento)
+
+    **Relacao com esforco de validacao:**
+    Quanto maior a categoria GAMP e a criticidade, mais extenso e rigoroso
+    deve ser o processo de validacao. Sistemas categoria 5 criticos exigem
+    validacao completa com IQ/OQ/PQ, enquanto sistemas categoria 1 menores
+    podem requerer apenas verificacao de instalacao.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Classificacao automatizada de sistemas em infraestrutura:**
+      1. Implementar schema de metadados obrigatorios em infraestrutura como
+         codigo para classificacao GAMP: gamp_category, criticality_level,
+         cqa_impact, patient_safety_impact, data_integrity_impact.
+      2. Configurar politicas de admissao (OPA/Kyverno) que impecam deploy
+         de sistemas GMP sem classificacao formal preenchida.
+      3. Gerar automaticamente requisitos de infraestrutura (redundancia,
+         backup, monitoramento) baseados na classificacao do sistema.
+      4. Manter catalogo de servicos de plataforma com requisitos minimos
+         por nivel de classificacao (ex: sistemas criticos exigem HA,
+         backup a cada 4h, monitoramento 24x7).
+    tools:
+      - terraform
+      - opa-gatekeeper
+      - kyverno
+      - service-catalog
+  devsecops:
+    prose: |
+      **Pipeline diferenciado por classificacao:**
+      1. Definir templates de pipeline CI/CD diferenciados por categoria
+         GAMP e nivel de criticidade (pipeline basico, padrao, rigoroso).
+      2. Exigir cobertura de testes proporcional a classificacao: cat-5
+         critico exige 90%+ cobertura, cat-3 menor aceita 60%.
+      3. Configurar gates de aprovacao proporcionais: sistemas criticos
+         exigem aprovacao de QA, CSV owner e gerente de producao.
+      4. Automatizar geracao de matriz de rastreabilidade requisitos-testes
+         com nivel de detalhe proporcional a classificacao.
+    tools:
+      - gitlab-ci
+      - pipeline-templates
+      - test-coverage
+      - traceability-matrix
+  secops:
+    prose: |
+      **Gestao de classificacao de sistemas:**
+      1. Manter registro centralizado de classificacao de todos os sistemas
+         computadorizados com aprovacao formal da unidade da qualidade.
+      2. Estabelecer criterios objetivos e documentados para classificacao,
+         com exemplos praticos para cada combinacao de categoria e criticidade.
+      3. Revisar classificacoes quando houver mudancas significativas no
+         sistema, processo ou requisitos regulatorios.
+      4. Reportar periodicamente a distribuicao de sistemas por categoria
+         e criticidade para a alta direcao.
+      5. Treinar equipes nos criterios de classificacao para garantir
+         consistencia entre diferentes avaliadores.
+    tools:
+      - grc-platform
+      - system-inventory
+      - quality-management-system
+      - training-management
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["clausula-8", "controle-A-5-9"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["security-levels"]
+    relationship: mapped

@@ -1,0 +1,500 @@
+id: receituario_to_cfm-telemedicina
+title: "Electronic Prescription (Receituario) to CFM Telemedicina Control Mapping"
+source_framework: receituario
+target_framework: cfm-telemedicina
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: structural
+description: >
+  Mapping between the Electronic Prescription Regulation (Receituario Eletronico) and CFM
+  Resolution 2.314/2022 (Telemedicina). Electronic prescriptions are a core output of
+  telemedicine consultations, creating direct regulatory overlap: prescriptions issued via
+  teleconsulta must comply with both the prescription regulation (content, signature, SNCR)
+  and the telemedicine regulation (consent, documentation, platform security). This mapping
+  identifies where requirements intersect, complement, or implement each other.
+
+mappings:
+  - source_control: rec-1
+    target_controls:
+      - id: art-7
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          rec-1 (Electronic Prescription Requirements and Mandatory Content) complements
+          art-7 (Telediagnostico) because electronic prescriptions generated during
+          telemedicine encounters must contain all mandatory fields defined in rec-1.
+          Telediagnostico-issued reports and prescriptions follow the same content rules.
+      - id: art-15
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          rec-1 mandates prescription content fields (patient ID, drug name, dosage,
+          prescriber registry, date), while art-15 mandates telemedicine encounter
+          documentation fields (physician ID, patient ID, date, modality, clinical summary).
+          Both require overlapping identification and documentation data for the same
+          clinical event.
+      - id: art-24
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          rec-1 establishes that electronic prescriptions must be signed digitally with
+          ICP-Brasil certificates for legal validity. art-24 requires the same ICP-Brasil
+          digital signature for prescriptions, attestados, and laudos issued via
+          telemedicine. The prescription content and signature requirements intersect
+          directly.
+
+  - source_control: rec-2
+    target_controls:
+      - id: art-24
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          rec-2 (Electronic Prescription of Controlled Substances) requires additional
+          controls for controlled substances (Portaria 344/1998 classification, sequential
+          SNCR number, quantity limits). art-24 requires qualified ICP-Brasil signature for
+          controlled substance prescriptions issued via telemedicine. rec-2 adds the
+          substance-specific constraints that complement art-24's signature requirements.
+      - id: art-5
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          rec-2's controlled substance prescription rules complement art-5 (Teleconsulta)
+          because physicians prescribing controlled substances during teleconsulta must
+          satisfy both teleconsulta procedural requirements (consent, documentation) and
+          the additional controlled substance requirements (classification, limits,
+          electronic Notificacao de Receita).
+
+  - source_control: rec-3
+    target_controls:
+      - id: art-4
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          rec-3 (Prescriber Identity Verification and Professional Registry) and art-4
+          (Ambito de Aplicacao e Restricoes Territoriais) both mandate real-time
+          verification of CRM registration, blocking of inactive/suspended professionals,
+          and validation of prescriber credentials before allowing practice. The core
+          requirement -- verify active professional registry before each clinical act --
+          is functionally equivalent across both regulations.
+      - id: art-27
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-3 requires prescriber credential verification before each prescription.
+          art-27 (Responsabilidade Medica em Telemedicina) establishes that institutions
+          are jointly responsible for ensuring physicians have valid CRM registration.
+          rec-3 provides the technical verification mechanism that fulfills art-27's
+          institutional responsibility requirement.
+
+  - source_control: rec-4
+    target_controls:
+      - id: art-5
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          rec-4 (Prescription Validity, Renewal, and Cancellation) defines prescription
+          validity periods and cancellation rules. art-5 (Teleconsulta) governs the
+          teleconsulta encounter where prescriptions are issued. Prescriptions issued
+          during teleconsulta inherit the validity and cancellation rules from rec-4,
+          creating a complementary relationship between encounter conduct and prescription
+          lifecycle.
+      - id: art-15
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          rec-4's prescription cancellation rules (recording reason, immutable audit trail)
+          complement art-15's requirement for complete electronic registration of
+          telemedicine encounters. The cancellation of a prescription issued during
+          telemedicine must be documented in both the prescription system and the
+          telemedicine encounter record.
+
+  - source_control: rec-5
+    target_controls:
+      - id: art-24
+        relationship: equivalent-to
+        confidence: 0.95
+        rationale: >
+          rec-5 (Mandatory ICP-Brasil Digital Signature for Prescriptions) and art-24
+          (Assinatura Digital e Certificacao ICP-Brasil) both mandate ICP-Brasil digital
+          signatures for medical documents. rec-5 requires ICP-Brasil certificates (A1, A3,
+          cloud) covering the full prescription content. art-24 requires the same for
+          prescriptions, attestados, and laudos issued via telemedicine. The digital
+          signature requirements are functionally equivalent.
+      - id: art-20
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          rec-5's ICP-Brasil signature requirement complements art-20 (Certificacao de
+          Sistemas de Telemedicina), which requires SBIS/CFM certification including
+          digital signature capabilities. The prescription system's ICP-Brasil
+          implementation contributes to the platform's overall certification compliance.
+
+  - source_control: rec-6
+    target_controls:
+      - id: art-24
+        relationship: complements
+        confidence: 0.85
+        rationale: >
+          rec-6 (Timestamp Authority and Long-Term Signature Validation) requires ICP-Brasil
+          timestamp authority and 20-year LTV signatures. art-24 requires timestamp
+          authority for telemedicine documents. rec-6 extends art-24 by specifying the
+          20-year LTV requirement with embedded certificate chains, OCSP responses, and
+          CRL snapshots for long-term prescription verification.
+      - id: art-25
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          rec-6's 20-year signature retention requirement intersects directly with art-25
+          (Guarda e Retencao de Dados Clinicos), which mandates 20-year retention of
+          clinical data. Both regulations converge on the same retention period and both
+          require that data remain verifiable throughout the retention period.
+
+  - source_control: rec-7
+    target_controls:
+      - id: art-17
+        relationship: complements
+        confidence: 0.76
+        rationale: >
+          rec-7 (Signature Verification at Dispensation Point) requires four-point
+          verification at pharmacy (signature validity, timestamp, SNCR status, content
+          integrity). art-17 (Requisitos de Plataforma de Telemedicina) requires platforms
+          to support digital signature verification. rec-7 specifies the downstream
+          verification requirements that telemedicine platform signatures must withstand.
+      - id: art-24
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          rec-7 mandates verification of ICP-Brasil signatures at dispensation. art-24
+          mandates ICP-Brasil signing at prescription creation in telemedicine. Together
+          they form the end-to-end signature lifecycle: art-24 governs signing, rec-7
+          governs verification.
+
+  - source_control: rec-8
+    target_controls:
+      - id: art-24
+        relationship: complements
+        confidence: 0.82
+        rationale: >
+          rec-8 (Certificate Lifecycle and Key Management for Prescribers) addresses
+          certificate expiration notifications, automatic blocking, renewal continuity,
+          audit trails, and emergency revocation. art-24 requires ICP-Brasil certificates
+          for telemedicine documents but does not detail lifecycle management. rec-8
+          complements art-24 by providing the operational certificate management
+          requirements that ensure art-24's signing capability remains available.
+      - id: art-27
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          rec-8's emergency revocation procedures complement art-27 (Responsabilidade
+          Medica), which holds institutions jointly responsible for ensuring valid
+          credentials. Compromised certificate handling directly affects the institution's
+          ability to fulfill its responsibility under art-27.
+
+  - source_control: rec-9
+    target_controls:
+      - id: art-17
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-9 (SNCR Integration and Prescription Registration) mandates real-time
+          registration of prescriptions with ANVISA's national registry. art-17 (Requisitos
+          de Plataforma de Telemedicina) lists platform requirements including integration
+          with external systems. Telemedicine platforms that generate prescriptions must
+          integrate with SNCR, making rec-9 a complementary integration requirement for
+          art-17-compliant platforms.
+      - id: art-19
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          rec-9 requires SNCR integration for prescription registration. art-19
+          (Interoperabilidade entre Sistemas de Saude) requires HL7 FHIR interoperability
+          and RNDS integration. Both require system-to-system integration with national
+          health infrastructure, and prescriptions registered in SNCR may also flow through
+          RNDS, creating an intersection of interoperability requirements.
+
+  - source_control: rec-10
+    target_controls:
+      - id: art-15
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          rec-10 (Prescription Traceability and Chain of Custody) requires full
+          traceability from prescribing through dispensation. art-15 (Registro Eletronico
+          de Atendimentos) requires complete encounter documentation. When a prescription
+          originates from a telemedicine encounter, the traceability chain must link back
+          to the encounter record, creating an intersection between prescription
+          traceability and encounter documentation.
+      - id: art-25
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          rec-10 mandates retention of traceability records (5 years for common medications,
+          20 years for controlled substances). art-25 mandates 20-year retention of clinical
+          data. Both establish long-term data retention obligations that intersect when
+          prescription traceability records are part of the clinical data retained under
+          art-25.
+
+  - source_control: rec-11
+    target_controls:
+      - id: art-28
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-11 (SNCR Fraud Detection and Alert System) mandates prescription fraud
+          detection patterns (duplicates, abnormal volumes, multi-dispensation, deceased
+          patients). art-28 (Auditoria de Servicos de Telemedicina) requires audit
+          capabilities and evidence maintenance. Fraud detection in prescriptions
+          originating from telemedicine encounters contributes to the audit evidence
+          required by art-28.
+      - id: art-16
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          rec-11's fraud detection mechanisms complement art-16 (Controle de Acesso e
+          Autenticacao), which requires anomaly detection in access patterns. Prescription
+          fraud patterns (doctor shopping, volume spikes) are a specific category of
+          anomalous behavior that enriches art-16's access monitoring scope.
+
+  - source_control: rec-12
+    target_controls:
+      - id: art-28
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          rec-12 (Digital Record-Keeping for Controlled Substances) mandates digital
+          inventory records for controlled substances. art-28 (Auditoria) requires
+          institutions to maintain audit evidence. The controlled substance inventory
+          records from rec-12 are part of the audit evidence portfolio that art-28
+          mandates for telemedicine services that generate controlled substance
+          prescriptions.
+      - id: art-25
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          rec-12 requires 5-year retention of digital record-keeping data. art-25 requires
+          20-year retention of clinical data. The retention requirements intersect when
+          controlled substance records are associated with telemedicine encounter clinical
+          data.
+
+  - source_control: rec-13
+    target_controls:
+      - id: art-11
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          rec-13 (Information Security Requirements for Prescription Systems) and art-11
+          (Criptografia e Protecao de Dados em Transito) both mandate TLS 1.2+ for data
+          in transit and end-to-end encryption. Both prohibit transmission of health data
+          over unencrypted channels. The encryption requirements are functionally equivalent.
+      - id: art-12
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          rec-13 mandates AES-256 encryption at rest and HSM-backed key management. art-12
+          (Armazenamento Seguro de Dados de Saude) mandates the same encryption at rest
+          with internationally recognized algorithms and backup/DR. The data-at-rest
+          security requirements are functionally equivalent.
+      - id: art-16
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          rec-13 requires MFA, RBAC with four roles (prescriber, pharmacist, admin,
+          auditor), and immutable audit trails. art-16 (Controle de Acesso e Autenticacao)
+          requires MFA preferably with ICP-Brasil, RBAC with least privilege, and
+          immutable audit logs. The access control and authentication requirements are
+          functionally equivalent.
+
+  - source_control: rec-14
+    target_controls:
+      - id: art-19
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          rec-14 (HL7 FHIR Interoperability Standards) and art-19 (Interoperabilidade
+          entre Sistemas de Saude) both mandate HL7 FHIR R4+ as the interoperability
+          standard, DICOM for diagnostic images, RNDS integration, and bidirectional data
+          exchange. The interoperability requirements are functionally equivalent.
+      - id: art-22
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-14 requires FHIR MedicationRequest and MedicationDispense resources for
+          prescription data exchange. art-22 (Prontuario Eletronico do Paciente) requires
+          telemedicine data integration with the electronic health record. rec-14's FHIR
+          resources are the technical mechanism through which prescription data from
+          telemedicine encounters flows into the unified patient record required by art-22.
+
+  - source_control: rec-15
+    target_controls:
+      - id: art-18
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          rec-15 (Business Continuity and Disaster Recovery) requires 99.5% availability,
+          4-hour RTO, 1-hour RPO, and geographic replication. art-18 (Disponibilidade e
+          Latencia de Plataformas) requires 99.5% availability with contingency plans.
+          The availability and DR requirements are functionally equivalent.
+      - id: art-12
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          rec-15's backup and geographic replication requirements intersect with art-12
+          (Armazenamento Seguro de Dados de Saude), which mandates backup and disaster
+          recovery for clinical data. Both require automated daily backups with geographic
+          redundancy.
+
+  - source_control: rec-16
+    target_controls:
+      - id: art-16
+        relationship: intersects-with
+        confidence: 0.88
+        rationale: >
+          rec-16 (Audit Trail and Regulatory Inspection Support) mandates immutable audit
+          trails covering all CRUD operations, dispensation, authentication attempts,
+          configuration changes, and SNCR events with 10-year retention. art-16 (Controle
+          de Acesso e Autenticacao) mandates immutable audit logs for all data access. Both
+          require immutable, append-only audit logging with comprehensive scope, creating
+          a direct intersection.
+      - id: art-28
+        relationship: implements
+        confidence: 0.87
+        rationale: >
+          rec-16's comprehensive audit trail with segregated storage, auditor-only access,
+          and 48-hour regulatory availability implements the audit evidence requirements
+          of art-28 (Auditoria de Servicos de Telemedicina), which mandates that
+          institutions maintain audit records accessible to CRM/CFM auditors.
+
+  - source_control: rec-17
+    target_controls:
+      - id: art-5
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          rec-17 (Electronic Dispensation Workflow and Pharmacist Verification) defines
+          the six-step dispensation workflow. art-5 (Teleconsulta) defines the teleconsulta
+          workflow where prescriptions originate. When a prescription from teleconsulta
+          reaches the pharmacy, both workflows intersect: the teleconsulta documentation
+          requirements feed into the dispensation verification process.
+      - id: art-24
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-17 requires signature verification as the first step of dispensation. art-24
+          requires ICP-Brasil signature on prescriptions issued via telemedicine. rec-17's
+          verification process validates the signatures that art-24 mandates, creating a
+          complementary end-to-end chain.
+
+  - source_control: rec-18
+    target_controls:
+      - id: art-28
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          rec-18 (Controlled Substance Inventory and Balance Reconciliation) mandates
+          electronic inventory control with real-time tracking and quarterly physical
+          audits. art-28 (Auditoria) requires institutions to maintain evidence of
+          compliance. Controlled substance inventory records from rec-18 are audit evidence
+          required by art-28 when telemedicine generates controlled substance prescriptions.
+      - id: art-12
+        relationship: complements
+        confidence: 0.70
+        rationale: >
+          rec-18's tamper-evident inventory storage requirements complement art-12
+          (Armazenamento Seguro) by extending secure storage requirements specifically to
+          controlled substance inventory data, which is a subset of health-related data
+          requiring protection.
+
+  - source_control: rec-19
+    target_controls:
+      - id: art-26
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          rec-19 (Patient Access to Prescription Data and Digital Receipt) and art-26
+          (Portabilidade e Acesso do Paciente aos Dados) both mandate patient access to
+          clinical data, data portability in interoperable formats (HL7 FHIR), consent-
+          based data sharing, and strong authentication (gov.br preferred). The patient
+          data rights requirements are functionally equivalent.
+      - id: art-13
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          rec-19's patient data access and portability rights intersect with art-13
+          (Conformidade com a LGPD para Dados de Saude), which requires implementation of
+          LGPD data subject rights including access, correction, portability, and
+          elimination. Both derive from LGPD articles 18 and 20.
+      - id: art-14
+        relationship: complements
+        confidence: 0.78
+        rationale: >
+          rec-19's patient consent mechanisms for sharing prescription data complement
+          art-14 (Consentimento Informado para Telemedicina), which requires consent for
+          telemedicine. Both address patient consent, but rec-19 focuses on data sharing
+          consent while art-14 focuses on treatment modality consent.
+
+  - source_control: rec-20
+    target_controls:
+      - id: art-20
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          rec-20 (System Credentialing and Periodic Compliance Assessment) and art-20
+          (Certificacao de Sistemas de Telemedicina) both mandate system certification/
+          credentialing with regulatory bodies, periodic recertification (rec-20: 2 years,
+          art-20: ongoing SBIS/CFM), independent security assessments (penetration testing),
+          and 72-hour incident notification. The system certification requirements are
+          functionally equivalent.
+      - id: art-21
+        relationship: complements
+        confidence: 0.80
+        rationale: >
+          rec-20's security assessment requirements (penetration testing by independent
+          accredited firms) complement art-21 (Seguranca de Rede e Infraestrutura), which
+          mandates periodic infrastructure security testing including penetration tests and
+          vulnerability scanning. Both require external security validation of the
+          platform.
+      - id: art-30
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          rec-20's ANVISA credentialing sanctions and art-30 (Sancoes e Regime Disciplinar)
+          both establish consequences for non-compliance. rec-20 addresses system
+          credentialing revocation by ANVISA, while art-30 addresses medical and
+          institutional sanctions by CRM/CFM. They intersect when a platform failure
+          triggers both ANVISA credentialing review and CRM disciplinary action.
+
+summary:
+  total_source_controls: 20
+  total_target_controls_referenced: 22
+  total_mappings: 42
+  relationship_distribution:
+    equivalent-to: 9
+    complements: 22
+    intersects-with: 11
+    implements: 1
+  coverage:
+    source_controls_mapped: 20
+    source_controls_unmapped: 0
+    target_controls_referenced:
+      - art-4
+      - art-5
+      - art-7
+      - art-11
+      - art-12
+      - art-13
+      - art-14
+      - art-15
+      - art-16
+      - art-17
+      - art-18
+      - art-19
+      - art-20
+      - art-21
+      - art-22
+      - art-24
+      - art-25
+      - art-26
+      - art-27
+      - art-28
+      - art-29
+      - art-30

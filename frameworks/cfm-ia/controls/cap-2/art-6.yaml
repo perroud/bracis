@@ -1,0 +1,124 @@
+id: art-6
+family: cap-2
+title: "Niveis de Risco de Sistemas de IA Medica"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 6. Os sistemas de inteligência artificial utilizados na medicina
+    devem ser classificados em um dos seguintes níveis de risco:
+
+    I - Risco Baixo: sistemas de IA que auxiliam em tarefas administrativas
+    ou de suporte clínico sem impacto direto na decisão diagnóstica ou
+    terapêutica, tais como agendamento inteligente, sumarização de
+    prontuários e codificação de procedimentos;
+
+    II - Risco Médio: sistemas de IA que fornecem informações ou sugestões
+    que influenciam indiretamente a decisão clínica, tais como alertas de
+    interação medicamentosa, sugestões de exames complementares e análise
+    de tendências de dados vitais;
+
+    III - Risco Alto: sistemas de IA que participam diretamente do processo
+    de diagnóstico ou planejamento terapêutico, tais como análise de imagens
+    médicas para detecção de lesões, recomendação de protocolo terapêutico
+    e cálculo de dosagem medicamentosa;
+
+    IV - Risco Muito Alto: sistemas de IA que operam em contextos de
+    urgência ou emergência, que atuam sobre pacientes vulneráveis (pediatria,
+    geriatria, psiquiatria) ou que influenciam decisões sobre procedimentos
+    invasivos, cirúrgicos ou potencialmente irreversíveis.
+guidance:
+  prose: |
+    O art. 6 cria framework de classificacao de risco especifico para IA
+    medica, inspirado no EU AI Act mas adaptado ao contexto clinico.
+
+    **Criterios de classificacao:**
+
+    - Risco Baixo: impacto clinico indireto ou nulo. Falha do sistema nao
+      afeta desfecho do paciente. Exemplos: chatbot de agendamento, sistema
+      de transcricao de consultas, organizacao de prontuario.
+
+    - Risco Medio: impacto clinico indireto mas potencialmente relevante.
+      O sistema influencia a decisao mas nao determina. Falha pode levar
+      a atrasos ou omissoes. Exemplos: alertas de drug-drug interaction,
+      sistemas de clinical decision support (CDS) de primeiro nivel.
+
+    - Risco Alto: impacto clinico direto e significativo. O sistema
+      participa ativamente da formacao da decisao diagnostica ou
+      terapeutica. Falha pode levar a diagnostico incorreto ou
+      tratamento inadequado. Exemplos: IA para deteccao de cancer em
+      mamografia, recomendacao de quimioterapia, planejamento de
+      radioterapia.
+
+    - Risco Muito Alto: impacto clinico direto com potencial de dano
+      grave ou irreversivel. Inclui contextos de urgencia (tempo
+      limitado para revisao humana) e populacoes vulneraveis.
+      Exemplos: triagem de AVC, dosagem de sedacao em UTI pediatrica,
+      planejamento cirurgico robotico.
+
+    **Regra de classificacao:** quando houver duvida entre dois niveis,
+    deve-se adotar o nivel mais alto (principio da precaucao).
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Framework de classificacao de risco na plataforma:**
+      1. Implementar campo obrigatorio de nivel de risco (baixo, medio,
+         alto, muito-alto) no model registry, vinculado ao art. 6.
+      2. Configurar politicas diferenciadas por nivel de risco:
+         - Baixo: deploy com aprovacao de tech lead
+         - Medio: deploy com aprovacao de tech lead + medico
+         - Alto: deploy com aprovacao de comite multidisciplinar
+         - Muito Alto: deploy com aprovacao de comite + diretoria clinica
+      3. Implementar monitoramento diferenciado por nivel: modelos de
+         risco alto e muito alto exigem monitoramento em tempo real;
+         modelos de risco baixo podem ter monitoramento diario.
+      4. Automatizar aplicacao de controles tecnicos proporcionais ao
+         nivel de risco via policy-as-code.
+    tools:
+      - ml-registry
+      - opa-gatekeeper
+      - workflow-engine
+      - model-monitoring
+  devsecops:
+    prose: |
+      **Pipeline diferenciado por nivel de risco:**
+      1. Implementar pipelines de CI/CD distintos por nivel de risco:
+         - Baixo: testes unitarios + integracao
+         - Medio: + testes de performance + revisao de model card
+         - Alto: + validacao clinica + testes de fairness + pen test
+         - Muito Alto: + red team + simulacao de falha + aprovacao dupla
+      2. Exigir metricas de validacao clinica mais rigorosas conforme
+         nivel de risco: AUC, sensibilidade, especificidade com intervalos
+         de confianca documentados.
+      3. Automatizar verificacao de que nivel de risco declarado e
+         consistente com classificacao funcional do art. 3.
+      4. Bloquear deploys de modelos de risco alto/muito alto sem
+         todas as evidencias de validacao obrigatorias.
+    tools:
+      - gitlab-ci
+      - ml-testing
+      - clinical-validation
+      - security-testing
+  secops:
+    prose: |
+      **Governanca de classificacao de risco:**
+      1. Criar comite de classificacao de risco de IA medica com medicos,
+         engenheiros e compliance para avaliar novos sistemas.
+      2. Implementar processo de classificacao com documentacao formal:
+         justificativa, criterios utilizados, aprovacao do comite.
+      3. Revisar classificacao de risco quando houver mudanca no escopo
+         de uso, populacao-alvo ou contexto clinico do sistema.
+      4. Manter dashboard de risco agregado com visao por nivel,
+         especialidade e instituicao para reporte ao CRM.
+    tools:
+      - grc-platform
+      - risk-dashboard
+      - committee-management
+      - regulatory-reporting
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-6", "art-7", "anexo-iii"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["map-1", "map-2"]
+    relationship: mapped

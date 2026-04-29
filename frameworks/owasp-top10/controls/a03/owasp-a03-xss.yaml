@@ -1,0 +1,110 @@
+id: owasp-a03-xss
+family: a03
+title: "A03:2021 — Cross-Site Scripting (XSS)"
+class: OWASP-Top10-2021
+
+baselines: [web-application]
+
+statement:
+  prose: >-
+    Cross-Site Scripting (XSS) occurs when an application includes untrusted data in a new web
+    page without proper validation or escaping, or updates an existing web page with user-supplied
+    data using a browser API that can create HTML or JavaScript. XSS allows attackers to execute
+    scripts in the victim's browser, which can hijack user sessions, deface websites, redirect
+    users to malicious sites, perform actions on behalf of the user, steal credentials via keylogging,
+    or exfiltrate sensitive data from the page. Three types of XSS exist: Reflected XSS, where the
+    malicious script is reflected off the web server in an immediate response; Stored (Persistent)
+    XSS, where the injected script is stored on the target server and served to all users who view
+    the affected page; and DOM-Based XSS, where the vulnerability exists in client-side code that
+    processes data from an attacker-controllable source and writes it to a dangerous sink.
+
+guidance:
+  prose: >-
+    XSS was previously a separate top-10 category and is now incorporated into the Injection
+    category (A03:2021). It remains the most prevalent web application vulnerability class.
+    Prevention of XSS requires context-aware output encoding: HTML entity encoding for HTML content
+    contexts, JavaScript string escaping for JavaScript contexts, CSS encoding for CSS contexts,
+    and URL encoding for URL parameter contexts. Modern JavaScript frameworks (React, Angular, Vue)
+    perform output encoding by default when using template syntax, but developers can bypass these
+    protections by using dangerous APIs (dangerouslySetInnerHTML, innerHTML, document.write, eval).
+    Content Security Policy (CSP) provides a critical defense-in-depth layer, preventing execution
+    of injected scripts even when XSS is present by restricting the sources from which scripts can
+    be loaded and executed. HTTPOnly cookies prevent session theft via XSS.
+
+references:
+  - citation: "OWASP XSS Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+  - citation: "OWASP DOM-based XSS Prevention Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+  - citation: "OWASP Content Security Policy Cheat Sheet"
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement Content Security Policy (CSP) headers at the web server or CDN level: restrict
+      script-src to specific trusted origins and hashes/nonces, disable unsafe-inline and unsafe-eval
+      for script sources, and enable report-uri to collect CSP violation reports for monitoring.
+      Configure security response headers including X-Content-Type-Options: nosniff, X-Frame-Options,
+      and Referrer-Policy. Set session cookies with HttpOnly (prevents JS access) and Secure
+      (HTTPS-only) attributes, and SameSite=Strict or Lax to mitigate CSRF alongside XSS.
+      Enable Trusted Types API enforcement for modern browsers to restrict dangerous DOM operations.
+      Use a CDN with WAF capabilities that includes XSS filtering rules in blocking mode. Review
+      and harden the CSP policy regularly as the application evolves.
+    tools:
+      - cloudflare
+      - nginx
+      - traefik
+      - aws-cloudfront
+      - helmet-js
+      - securityheaders
+
+  devsecops:
+    prose: >-
+      Mandate use of framework template syntax (React JSX, Angular templates, Vue templates) which
+      auto-escape output, and prohibit use of dangerous APIs (dangerouslySetInnerHTML, v-html,
+      bypassSecurityTrustHtml) without security review. Configure ESLint/SonarQube rules to flag
+      use of dangerous DOM APIs (innerHTML, document.write, eval, setTimeout with string argument).
+      Run DAST with XSS payloads against all user-input fields, URL parameters, HTTP headers used
+      in responses, and JSON API endpoints that return user-supplied data in HTML responses. Test
+      stored XSS by persisting payloads and verifying they do not execute when retrieved. Implement
+      CSP reporting and review violation reports regularly to identify gaps in the policy. Add
+      automated tests that verify XSS payloads are neutralized in output.
+    tools:
+      - semgrep
+      - eslint-security
+      - codeql
+      - owasp-zap
+      - burp-suite
+      - gitlab-dast
+      - nuclei
+
+  secops:
+    prose: >-
+      Monitor CSP violation reports for indicators of XSS exploitation attempts — a sudden spike in
+      violations from a specific page indicates attempted or successful injection. Configure WAF
+      rules for XSS patterns in blocking mode and review false positive rates regularly. Implement
+      subresource integrity (SRI) checks for all externally loaded scripts and stylesheets to
+      prevent supply chain XSS via compromised CDNs. Monitor for anomalous JavaScript execution
+      patterns using browser telemetry or endpoint detection. Hunt for stored XSS by scanning
+      user-generated content in the database against XSS payload patterns. Treat any confirmed
+      stored XSS as a critical incident requiring immediate remediation and user notification
+      if the payload was served to other users.
+    tools:
+      - cloudflare-waf
+      - aws-waf
+      - splunk
+      - elastic-siem
+      - datadog-rum
+      - crowdstrike
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-10", "SI-15", "SC-18"]
+    relationship: implements
+  - framework_id: pci-dss-v4
+    articles: ["6.2.4"]
+    relationship: implements
+  - framework_id: owasp-asvs
+    articles: ["V5.3.3", "V14.4.3", "V14.4.4"]
+    relationship: mapped

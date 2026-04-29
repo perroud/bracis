@@ -1,0 +1,111 @@
+id: art-16
+family: cap-4
+title: "Gestao de Vulnerabilidades e Atualizacoes de Seguranca"
+class: R-CIBER
+baselines: [telecom-all]
+statement:
+  prose: |
+    Art. 16. As prestadoras devem manter processo estruturado de gestão de
+    vulnerabilidades cibernéticas em redes e sistemas de telecomunicações,
+    incluindo:
+
+    I - identificação proativa de vulnerabilidades mediante varreduras
+    periódicas, monitoramento de alertas de fabricantes e fontes de
+    inteligência de ameaças;
+
+    II - avaliação do risco associado a cada vulnerabilidade identificada,
+    com priorização baseada em criticidade e exposição;
+
+    III - definição de prazos máximos para aplicação de corretivos
+    (patches), proporcional ao nível de risco da vulnerabilidade;
+
+    IV - processo de teste e homologação de atualizações antes da
+    aplicação em redes de produção, de forma a minimizar o risco de
+    interrupção de serviços;
+
+    V - gestão de vulnerabilidades em equipamentos de rede para os
+    quais não há corretivo disponível do fabricante, com implementação
+    de controles compensatórios.
+guidance:
+  prose: |
+    O art. 16 exige gestao estruturada de vulnerabilidades, especialmente
+    desafiadora para prestadoras de telecomunicacoes que operam
+    equipamentos de rede de diferentes fabricantes.
+
+    **Desafio de patching em telecom:**
+    Diferentemente de servidores de TI, equipamentos de rede de
+    telecomunicacoes (gNBs, MSCs, SBCs, roteadores de core) nao podem
+    ser reiniciados facilmente sem impacto aos usuarios. O processo de
+    atualizacao requer janelas de manutencao planejadas e rollback.
+
+    **Prazos recomendados de patching (inciso III):**
+    - Critico (CVSS >=9.0): 7 dias ou controles compensatorios imediatos
+    - Alto (CVSS 7.0-8.9): 30 dias
+    - Medio (CVSS 4.0-6.9): 90 dias
+    - Baixo (CVSS <4.0): 180 dias ou proximo ciclo de manutencao
+
+    **Vulnerabilidades sem corretivo (inciso V):**
+    Equipamentos EOL (End of Life) de fabricantes sem suporte sao
+    realidade em redes de telecomunicacoes. Controles compensatorios
+    incluem: segmentacao de rede mais restrita, monitoramento intensificado,
+    WAF/IPS dedicado, e plano de substituicao com prazo definido.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Automacao de gestao de vulnerabilidades em infraestrutura de rede:**
+      1. Implementar varreduras automatizadas de vulnerabilidades em
+         todos os sistemas OSS/BSS e equipamentos de rede acessiveis
+         (via scanner de rede compativel com equipamentos telecom).
+      2. Integrar feeds de CVEs especificos de fabricantes de equipamentos
+         de rede (Cisco PSIRT, Ericsson, Nokia, Huawei Security Advisories)
+         ao sistema de gestao de vulnerabilidades.
+      3. Automatizar correlacao entre vulnerabilidades identificadas e
+         inventario de equipamentos para priorizar por exposicao real.
+      4. Implementar pipeline de homologacao de patches em ambiente de
+         lab antes de aplicar em producao, com rollback automatico.
+    tools:
+      - vulnerability-scanner
+      - cvss-tracker
+      - patch-management
+      - lab-environment
+  devsecops:
+    prose: |
+      **Gestao de vulnerabilidades em software de telecomunicacoes:**
+      1. Implementar analise de composicao de software (SCA) em todos
+         os pipelines de sistemas OSS/BSS para identificar CVEs em
+         dependencias antes do deploy.
+      2. Definir politica de SLA de remediacao de vulnerabilidades por
+         severidade no pipeline CI/CD, bloqueando deploy com CVEs
+         criticos nao tratados.
+      3. Automatizar atualizacao de dependencias seguras com PRs
+         automaticos (Dependabot, Renovate) e revisao humana.
+      4. Manter registro de vulnerabilidades aceitas (accepted risks)
+         com aprovacao formal e data de reavaliacao.
+    tools:
+      - sca-scanning
+      - dependabot
+      - renovate
+      - vulnerability-management
+  secops:
+    prose: |
+      **Operacao do programa de vulnerabilidades:**
+      1. Operar processo de vulnerability operations center (VOC) ou
+         integrar ao SOC a funcao de gestao de vulnerabilidades.
+      2. Manter SLA de remediacao por severidade conforme inciso III,
+         com acompanhamento semanal de vulnerabilidades criticas abertas.
+      3. Implementar controles compensatorios documentados e aprovados
+         para equipamentos sem patch disponivel, com revisao trimestral.
+      4. Relatar metricas de gestao de vulnerabilidades mensalmente a
+         CISO: total aberto por severidade, idade media, SLA compliance.
+    tools:
+      - vulnerability-management
+      - patch-tracking
+      - compensating-controls
+      - security-metrics
+legal_references:
+  - framework_id: iso-27001-2022
+    articles: ["A-8-8", "A-8-9", "A-8-19"]
+    relationship: mapped
+  - framework_id: gsi-in3
+    articles: ["art-33", "art-34", "art-35", "art-36", "art-37"]
+    relationship: mapped

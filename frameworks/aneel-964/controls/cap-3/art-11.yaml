@@ -1,0 +1,129 @@
+id: art-11
+family: cap-3
+title: "Continuidade Operacional e Recuperacao Cibernetica"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 11. Os agentes do setor elétrico devem desenvolver e manter planos de
+    continuidade operacional e recuperação cibernética que contemplem:
+
+    I - procedimentos para operação em modo degradado ou manual quando sistemas
+    cibernéticos críticos forem comprometidos ou indisponibilizados;
+
+    II - rotinas de backup e recuperação de configurações, parâmetros operacionais
+    e dados de sistemas de controle industrial, com testes periódicos de restauração;
+
+    III - planos de recuperação de desastre específicos para sistemas de controle
+    industrial, com objetivos de tempo de recuperação (RTO) e ponto de recuperação
+    (RPO) definidos e alinhados com os requisitos operacionais do SIN;
+
+    IV - exercícios e testes periódicos dos planos de continuidade e recuperação,
+    simulando cenários de incidentes cibernéticos com impacto na operação elétrica.
+guidance:
+  prose: |
+    O art. 11 aborda a resiliencia cibernetica — a capacidade do agente de continuar
+    operando e de se recuperar rapidamente apos um incidente cibernetico.
+
+    **Operacao em modo degradado (inciso I):**
+    Sistemas eletricos criticos devem ser capazes de operar manualmente quando
+    os sistemas digitais falham. Operadores precisam ser treinados para:
+    - Controlar subestacoes manualmente quando o SCADA esta indisponivel
+    - Isolar segmentos da rede eletrica sem depender de sistemas automatizados
+    - Restabelecer o sistema usando procedimentos manuais documentados
+
+    O ataque a Ukraine Power Grid em 2015/2016 demonstrou que operadores foram
+    capazes de restabelecer o fornecimento de energia operando manualmente
+    — isso foi possivel porque tinham procedimentos documentados e treinamento.
+
+    **Backup de sistemas OT (inciso II):**
+    Backup em sistemas OT tem particularidades:
+    - Configuracoes de PLCs e RTUs devem ser exportadas e versionadas regularmente
+    - O backup deve incluir: configuracoes de rede, setpoints operacionais,
+      logica de controle, versoes de firmware
+    - Testes de restauracao devem ser realizados em ambiente de homologacao
+      que replica o ambiente de producao
+
+    **RTO/RPO para sistemas criticos do SIN (inciso III):**
+    Os objetivos de recuperacao devem ser alinhados com os requisitos do ONS:
+    - Sistemas de transmissao criticos: RTO < 4h, RPO < 1h
+    - Sistemas de geracao: RTO < 8h, RPO < 4h
+    - Sistemas de distribuicao: RTO < 24h, RPO < 8h
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar infraestrutura de backup e recuperacao especifica para OT:
+
+      1. Solucao de backup de configuracoes OT:
+         - Exportacao automatica de configuracoes de PLCs, RTUs, switches industriais
+         - Versionamento no Git (configuracoes como codigo)
+         - Testes automaticos de restauracao em ambiente de homologacao
+      2. Replicacao de historian: replicar dados do historian OT para ambiente
+         seguro off-site ou cloud airgapped para recuperacao de desastre
+      3. Ambiente de recuperacao OT: infraestrutura espelhada que pode assumir
+         operacoes criticas em caso de comprometimento do ambiente primario
+      4. Documentacao de modo degradado: runbooks digitais e impressos para
+         operacao manual de subestacoes e centros de controle
+
+      Automatizar o processo de backup com verificacao de integridade (checksum)
+      e alertas quando o backup falha ou fica desatualizado por mais de 24h.
+    tools:
+      - veeam
+      - commvault
+      - ansible
+      - gitlab
+      - aveva-pi
+  devsecops:
+    prose: |
+      Tratar planos de continuidade e recuperacao como artefatos de engenharia:
+
+      1. Runbooks de recuperacao como codigo (Markdown no Git):
+         versionados, aprovados, testados e publicados no portal interno
+      2. Pipeline de validacao de backup:
+         - Backup automatico de configuracoes OT (diario)
+         - Teste de restauracao automatizado em ambiente de homologacao (semanal)
+         - Alerta quando teste de restauracao falha
+      3. RTO/RPO tracking: dashboard que mostra o status atual de cada sistema
+         em relacao aos objetivos de recuperacao definidos
+      4. Exercicios de DR como pipeline automatizado: simular falha de sistema
+         critico e medir tempo de recuperacao vs. RTO definido
+      5. Documentacao de modo degradado versionada: instrucoes para operacao
+         manual aprovadas pelo gestor de operacoes e equipe de seguranca
+    tools:
+      - gitlab
+      - ansible
+      - backstage
+      - grafana
+      - mkdocs
+  secops:
+    prose: |
+      Gerenciar resiliencia cibernetica operacional:
+
+      1. Inventario de RTOs/RPOs: manter lista atualizada dos objetivos de
+         recuperacao para cada sistema critico, alinhado com requisitos do ONS
+      2. Testes periodicos de DR: exercicios semestrais simulando comprometimento
+         cibernetico de sistemas SCADA com medicao do tempo de recuperacao real
+      3. Exercicios de operacao manual: treinar operadores semestralmente em
+         procedimentos manuais de operacao de subestacoes e centros de controle
+      4. Revisao pos-incidente: apos qualquer incidente que afete disponibilidade,
+         avaliar se os planos de continuidade foram eficazes e atualizar conforme necessario
+      5. Rastreamento de backups: monitorar status de backups de todos os
+         sistemas criticos, com alertas para backups falhos ou desatualizados
+    tools:
+      - grc-platform
+      - servicenow-itsm
+      - grafana
+      - pagerduty
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-008-R1", "CIP-009-R1", "CIP-009-R2"]
+    relationship: mapped
+  - framework_id: iec-62443
+    articles: ["2-1-4.2.7", "3-3-SR-7.5", "3-3-SR-7.6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.29", "A.5.30", "A.8.13", "A.8.14"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-9", "CP-10"]
+    relationship: supports

@@ -1,0 +1,116 @@
+id: stig-cat3-training
+family: cat-iii
+title: "Security Awareness Training and Role-Based Security Training"
+class: DISA-STIG
+
+baselines: [cat-iii]
+
+statement:
+  prose: >-
+    All personnel with access to DoD information systems must complete annual
+    cybersecurity awareness training before being granted initial system access
+    and at least annually thereafter. Personnel with significant cybersecurity
+    responsibilities (system administrators, security control assessors, information
+    system security officers, developers) must complete role-based cybersecurity
+    training appropriate to their assigned security responsibilities before
+    assuming those responsibilities and annually thereafter. Training records
+    must be maintained documenting completion dates, training content covered,
+    and individual completion status. The system owner must verify training
+    completion before authorizing user accounts and must revoke access for users
+    who fail to complete required annual training. Training must cover social
+    engineering and phishing awareness, insider threat awareness, and system-
+    specific security procedures.
+
+guidance:
+  prose: >-
+    Security awareness training is a CAT III finding because it addresses the
+    human element of security — the most commonly exploited attack vector.
+    Training alone does not prevent all human errors, but it significantly
+    reduces susceptibility to phishing, social engineering, and inadvertent
+    policy violations.
+
+    STIG reviewers verify training program existence, content adequacy, and
+    individual completion records. A common finding is training programs that
+    are technically in place but not enforced — users who have not completed
+    training still have active accounts. The technical enforcement mechanism
+    (account suspension for training non-compliance) must be demonstrated,
+    not just described in policy.
+
+    Role-based training for developers and administrators is particularly
+    important because these users have elevated access and their security
+    decisions directly impact the system's security posture. Developers who
+    understand secure coding principles make fewer security errors; administrators
+    who understand the rationale behind STIG requirements are more likely to
+    implement them correctly.
+
+references:
+  - citation: "NIST SP 800-53 Rev 5, AT-2, AT-3, AT-4"
+    url: "https://doi.org/10.6028/NIST.SP.800-53r5"
+  - citation: "DoD Cyber Workforce Framework (DCWF)"
+    url: "https://public.cyber.mil/wid/dcwf/"
+  - citation: "DoDI 8500.01 — Cybersecurity"
+    url: "https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/850001p.pdf"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Integrate training completion verification with the identity management
+      system so that account provisioning workflows automatically check training
+      status before creating or re-enabling accounts. Implement automated
+      training completion reminders 30 and 14 days before expiration. Configure
+      automated account suspension workflows that trigger when training expires,
+      with notifications to supervisors and the ISSO. Maintain training records
+      in a format importable to eMASS for ATO evidence packages. Provide
+      developer-focused training tracks covering secure coding, STIG hardening
+      rationale, secrets management, and DevSecOps security practices.
+    tools:
+      - keycloak
+      - servicenow
+      - lms-platform
+      - backstage
+
+  devsecops:
+    prose: >-
+      Require developers to complete secure development training as a prerequisite
+      for repository access. Implement training content embedded in the developer
+      workflow: security champions program, code review checklists aligned with
+      DISA STIG Application Security requirements, and lunch-and-learn sessions
+      on secure coding patterns. Use GitLab project-level settings to track
+      developer training completion. Include security awareness metrics in
+      developer onboarding dashboards. Create internal training content using
+      real vulnerability findings from SAST/DAST scans to make training
+      relevant and practical.
+    tools:
+      - gitlab-ci
+      - confluence
+      - backstage
+      - lms-platform
+
+  secops:
+    prose: >-
+      Track training completion rates by role and organization in the governance
+      platform. Generate monthly reports of users with expired training for
+      supervisor notification. Conduct phishing simulation campaigns quarterly
+      and track click rates as a training effectiveness metric. Report training
+      compliance statistics to the AO as part of continuous monitoring. Verify
+      that role-based training content is updated annually to reflect new threat
+      categories and updated STIG requirements.
+    tools:
+      - knowbe4
+      - proofpoint-security-awareness
+      - servicenow-grc
+      - archer-grc
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["AT-2", "AT-3", "AT-4"]
+    relationship: derived-from
+  - framework_id: cmmc-v2
+    articles: ["AT.L2-3.2.1", "AT.L2-3.2.2"]
+    relationship: supports
+  - framework_id: fedramp
+    articles: ["at-2", "at-3"]
+    relationship: equivalent-to
+  - framework_id: nist-csf-v2
+    articles: ["PR.AT-01", "PR.AT-02"]
+    relationship: supports

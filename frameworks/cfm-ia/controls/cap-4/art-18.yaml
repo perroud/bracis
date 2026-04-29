@@ -1,0 +1,122 @@
+id: art-18
+family: cap-4
+title: "Supervisao Humana Obrigatoria"
+class: CFM-IA
+baselines: [ia-medicina-all]
+statement:
+  prose: |
+    Art. 18. A supervisão humana de sistemas de IA médica deve ser proporcional
+    ao nível de risco e incluir:
+
+    I - para sistemas de risco médio: revisão médica de toda recomendação
+    antes de sua aplicação na condução clínica;
+
+    II - para sistemas de risco alto: supervisão ativa por médico com
+    competência específica na área clínica do sistema, com capacidade de
+    interromper ou corrigir o sistema em tempo útil;
+
+    III - para sistemas de risco muito alto: supervisão em tempo real por
+    médico presente (presencial ou por telemedicina síncrona), com
+    capacidade de desativar imediatamente o sistema e assumir a condução
+    clínica;
+
+    IV - o médico supervisor deve ter acesso a todas as informações
+    necessárias para compreender e avaliar a recomendação do sistema de IA,
+    incluindo a explicação prevista no art. 11;
+
+    V - a instituição deve assegurar que a carga de trabalho do médico
+    supervisor permita supervisão efetiva, evitando automation complacency
+    por excesso de alertas ou volume de decisões.
+guidance:
+  prose: |
+    O art. 18 operacionaliza o principio de supervisao humana com
+    requisitos proporcionais ao risco.
+
+    **Niveis de supervisao:**
+
+    - Risco Medio (inciso I): supervisao como revisao. O medico revisa
+      a recomendacao antes de agir. Pode ser assincrono (revisao posterior
+      em minutos/horas), desde que antes da acao clinica.
+
+    - Risco Alto (inciso II): supervisao ativa. O medico deve ter
+      competencia especifica (ex: radiologista para IA de imagem,
+      oncologista para IA de tratamento). Deve poder corrigir ou
+      interromper em tempo util.
+
+    - Risco Muito Alto (inciso III): supervisao em tempo real. Medico
+      presente (fisicamente ou por telemedicina sincrona). Capacidade
+      de desativacao imediata. Aplicavel a UTI, centro cirurgico,
+      emergencia.
+
+    **Automation complacency (inciso V):**
+    Problema bem documentado na aviacao e na medicina: excesso de alertas
+    leva a dessensibilizacao. Se o medico recebe 200 alertas de IA por
+    dia, a supervisao se torna pro-forma. A instituicao deve dimensionar
+    a carga para que supervisao seja efetiva.
+
+    **Competencia do supervisor (inciso II):**
+    O medico que supervisiona IA de dermatologia deve ser dermatologista
+    ou ter treinamento especifico. Um medico generalista supervisionando
+    IA especializada nao atende o requisito.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de supervisao proporcional:**
+      1. Implementar niveis de supervisao configuravel por modelo:
+         risco medio (revisao assincrona), risco alto (supervisao
+         ativa com timeout), risco muito alto (supervisao sincrona).
+      2. Configurar mecanismo de desativacao imediata (kill switch)
+         para sistemas de risco muito alto, acessivel ao medico
+         supervisor com latencia maxima de segundos.
+      3. Implementar gestao de alertas inteligente: priorizacao,
+         agrupamento e supressao de alertas de baixa relevancia
+         para combater automation complacency.
+      4. Configurar integracao com escala medica para garantir que
+         medico supervisor qualificado esteja disponivel durante
+         operacao de sistemas de risco alto/muito alto.
+    tools:
+      - workflow-engine
+      - kill-switch
+      - alert-management
+      - scheduling-integration
+  devsecops:
+    prose: |
+      **Validacao de supervisao no pipeline:**
+      1. Implementar testes que verifiquem que nivel de supervisao
+         configurado e compativel com nivel de risco do modelo.
+      2. Testar funcionamento do kill switch: desativacao deve ser
+         efetiva em tempo real, sem dependencia de sistema externo.
+      3. Validar que medico supervisor recebe todas as informacoes
+         necessarias (explicacao, dados de entrada, grau de confianca)
+         na interface de supervisao.
+      4. Implementar testes de carga para verificar que volume de
+         alertas por supervisor esta dentro de limites seguros.
+    tools:
+      - gitlab-ci
+      - integration-tests
+      - load-tests
+      - ux-tests
+  secops:
+    prose: |
+      **Monitoramento de supervisao efetiva:**
+      1. Monitorar tempo medio de revisao por medico supervisor:
+         tempos muito curtos (<5s) podem indicar revisao pro-forma.
+      2. Monitorar volume de alertas por supervisor por turno,
+         com limiar de alerta para automation complacency.
+      3. Verificar que escala de supervisao medica esta sendo
+         cumprida: sem gaps de cobertura para sistemas de risco
+         alto/muito alto.
+      4. Reportar metricas de supervisao ao comite de governanca
+         mensalmente: tempo de revisao, taxa de intervencao, gaps.
+    tools:
+      - analytics-platform
+      - alert-monitoring
+      - scheduling-audit
+      - governance-reporting
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-14"]
+    relationship: mapped
+  - framework_id: nist-ai-rmf
+    articles: ["govern-6", "manage-4"]
+    relationship: mapped

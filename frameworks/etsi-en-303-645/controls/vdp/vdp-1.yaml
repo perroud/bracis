@@ -1,0 +1,97 @@
+id: vdp-1
+family: vdp
+title: "Vulnerability Disclosure Policy"
+class: ETSIEN303645
+baselines: [mandatory]
+
+statement:
+  prose: >-
+    The manufacturer shall make a vulnerability disclosure policy publicly available.
+    This policy shall include, as a minimum, contact information for the reporting of
+    issues, and timelines for acknowledgement of receipt and status updates. The reported
+    issues shall be acted on in a timely manner. The manufacturer shall continuously
+    monitor for, identify, and rectify security vulnerabilities within products and
+    services they sell, produce, have produced, and services they operate.
+
+guidance:
+  prose: >-
+    A vulnerability disclosure policy (VDP) is the foundation of responsible security
+    management for IoT products. It establishes a clear, public channel through which
+    security researchers, customers, and other parties can report vulnerabilities without
+    fear of legal reprisal. The policy must be easy to find (typically on the manufacturer's
+    website), define expected response timelines, and describe the process from initial
+    report to resolution. The standard expects manufacturers to maintain ongoing vulnerability
+    monitoring across their product portfolio, not just react to external reports. This
+    includes tracking CVE databases, vendor advisories for third-party components, and
+    running their own security testing programs.
+
+references:
+  - citation: "ETSI EN 303 645, Provision 5.2-1"
+    url: "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/en_303645v020101p.pdf"
+  - citation: "ISO/IEC 29147:2018 — Vulnerability disclosure"
+    url: "https://www.iso.org/standard/72311.html"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Publish a security.txt file at the well-known URI (/.well-known/security.txt) on
+      all product-related web properties, following RFC 9116. Set up a dedicated
+      security@<domain> email and a web-based vulnerability reporting form. Integrate
+      the reporting intake with a vulnerability tracking system that automatically assigns
+      tickets, sends acknowledgement emails within 72 hours, and tracks SLA compliance for
+      response times. Maintain a product security incident response team (PSIRT) with defined
+      roles and escalation paths. Publish the VDP on the company website with clear scope,
+      safe harbor language, and expected timelines.
+    tools:
+      - jira
+      - bugcrowd
+      - hackerone
+      - security-txt
+      - opsgenie
+      - pagerduty
+
+  devsecops:
+    prose: >-
+      Integrate vulnerability reports into the development workflow so reported issues feed
+      directly into the sprint backlog. Implement automated dependency scanning in CI/CD
+      pipelines to proactively identify known vulnerabilities before external reports arrive.
+      Track mean-time-to-fix (MTTF) for reported vulnerabilities as a key engineering metric.
+      Automate CVE monitoring for all third-party libraries and firmware components used in
+      the product. Configure alerts for new CVEs affecting the product's software bill of
+      materials (SBOM).
+    tools:
+      - gitlab-dependency-scanning
+      - dependabot
+      - snyk
+      - osv-scanner
+      - syft
+      - grype
+
+  secops:
+    prose: >-
+      Establish and drill the PSIRT playbook at least quarterly. Monitor public disclosure
+      channels (social media, full-disclosure mailing lists, CVE feeds) for mentions of the
+      product. Track all reported vulnerabilities through their lifecycle from initial report
+      to verified fix deployment. Generate periodic reports on vulnerability metrics including
+      time-to-acknowledge, time-to-fix, and fix deployment rate. Coordinate with legal on
+      safe harbor provisions for good-faith security researchers.
+    tools:
+      - splunk
+      - jira
+      - opsgenie
+      - misp
+      - cve-search
+
+legal_references:
+  - framework_id: iec-62443
+    articles: ["SR-3.4", "SR-7.6"]
+    relationship: complements
+  - framework_id: nist-800-53-rev5
+    articles: ["SI-2", "SI-5", "RA-5"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.24", "A.5.25", "A.8.8"]
+    relationship: mapped
+  - framework_id: owasp-asvs
+    articles: ["V1.14.6"]
+    relationship: complements

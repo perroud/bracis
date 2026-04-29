@@ -1,0 +1,97 @@
+id: tds-access-1
+family: tds-access
+title: "Access Control for 3DS System Components"
+class: PCI-3DS
+
+statement:
+  prose: >-
+    Access to 3DS system components and data must be restricted to only
+    those individuals and systems whose job function or operational role
+    requires such access. A role-based access control (RBAC) model must
+    be implemented that defines access privileges based on job
+    classification and function. Access rights must follow the principle
+    of least privilege, granting only the minimum access necessary to
+    perform assigned duties. All access must be formally authorized before
+    being granted, and access rights must be reviewed at least every six
+    months to verify continued appropriateness.
+
+guidance:
+  prose: >-
+    Access control is a critical defense layer for 3DS environments because
+    unauthorized access to 3DS components can enable fraud, data theft, or
+    service disruption. Role-based access control provides a structured
+    approach to managing permissions that scales with organizational
+    complexity. The principle of least privilege limits the blast radius
+    of any account compromise. Regular access reviews ensure that
+    permissions remain appropriate as personnel change roles, leave the
+    organization, or as system requirements evolve. Privileged accounts
+    (administrators, operators) require additional scrutiny and monitoring.
+
+references:
+  - citation: "PCI 3DS v2.0, Part 1, Section 4 — Implement Strong Access Control"
+    url: "https://www.pcisecuritystandards.org/"
+  - citation: "PCI 3DS v2.0, Part 2, Section 4.1 — Restrict Access by Business Need"
+    url: "https://www.pcisecuritystandards.org/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Implement RBAC using cloud IAM (AWS IAM, Azure RBAC, GCP IAM) with
+      custom roles aligned to 3DS operational functions. Define
+      infrastructure-as-code policies that enforce least-privilege
+      permissions for all service accounts and human users accessing 3DS
+      resources. Use Kubernetes RBAC and namespace-level access controls
+      to restrict access to 3DS workloads. Implement just-in-time (JIT)
+      access provisioning for privileged operations that require elevated
+      permissions temporarily.
+    tools:
+      - aws-iam
+      - azure-rbac
+      - gcp-iam
+      - kubernetes-rbac
+      - hashicorp-vault
+      - teleport
+
+  devsecops:
+    prose: >-
+      Scan IAM policies in CI/CD pipelines to detect overly permissive
+      access configurations. Implement policy-as-code checks that verify
+      all IAM roles follow least-privilege principles. Automate access
+      review reports by extracting current role assignments and comparing
+      against approved access matrices. Block deployments that create
+      wildcard permissions or overly broad access policies for 3DS
+      resources.
+    tools:
+      - gitlab-ci
+      - checkov
+      - tfsec
+      - opa
+      - cloudsplaining
+      - parliament
+
+  secops:
+    prose: >-
+      Monitor privileged access to 3DS systems in real time. Alert on
+      access from unusual locations, times, or patterns. Conduct bi-annual
+      access reviews comparing active permissions against approved access
+      matrices. Investigate and revoke any unauthorized or excessive
+      permissions. Maintain audit logs of all access provisioning and
+      de-provisioning actions. Monitor for dormant accounts that have not
+      been used within the expected timeframe.
+    tools:
+      - splunk
+      - elastic-siem
+      - sailpoint
+      - okta
+      - cyberark
+
+legal_references:
+  - framework_id: pci-dss-v4
+    articles: ["req-7"]
+    relationship: derived-from
+  - framework_id: nist-800-53-rev5
+    articles: ["AC-2", "AC-3", "AC-6"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A5.15", "A5.18", "A8.3"]
+    relationship: mapped

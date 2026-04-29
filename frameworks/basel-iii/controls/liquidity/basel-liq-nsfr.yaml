@@ -1,0 +1,103 @@
+id: basel-liq-nsfr
+family: liquidity
+title: "Net Stable Funding Ratio (NSFR)"
+class: BCBS
+baselines: [global]
+
+statement:
+  prose: >-
+    Banks must maintain a Net Stable Funding Ratio (NSFR) of at least 100% at all times.
+    The NSFR is defined as the amount of Available Stable Funding (ASF) divided by the
+    amount of Required Stable Funding (RSF): NSFR = Available Stable Funding / Required
+    Stable Funding ≥ 100%. ASF is the portion of capital and liabilities expected to be
+    reliable over a one-year time horizon, calculated by applying ASF factors (ranging from
+    0% to 100%) to each category of funding, with the highest factors applied to equity,
+    long-term liabilities, and stable retail deposits. RSF is the amount of stable funding
+    required by supervisors, determined by multiplying the carrying value of each asset
+    and off-balance-sheet exposure by an RSF factor (0% to 100%) that reflects how much
+    stable funding each category of asset requires over the one-year horizon. Assets with
+    higher liquidity receive lower RSF factors; long-term illiquid assets receive RSF
+    factors close to 100%.
+
+guidance:
+  prose: >-
+    The NSFR complements the LCR by addressing structural funding mismatches over a
+    one-year horizon, ensuring that banks do not fund long-term illiquid assets with
+    short-term unstable funding. While the LCR focuses on a 30-day acute stress scenario,
+    the NSFR targets sustainable funding profiles over a longer horizon. Banks with large
+    wholesale funding books, significant loan-to-deposit ratios above 100%, or large
+    portfolios of illiquid assets (real estate loans, infrastructure loans, illiquid
+    securities) are most likely to face binding NSFR constraints. Banks should integrate
+    NSFR optimisation into product pricing, balance sheet planning, and funding strategy.
+    Long-dated liabilities that improve ASF have a structural cost that should be reflected
+    in transfer pricing. NSFR reporting is typically monthly for most jurisdictions, but
+    internal monitoring should be more frequent. Interaction between the NSFR, LCR, and
+    leverage ratio can create capital and funding optimisation trade-offs that require
+    integrated balance sheet management.
+
+references:
+  - citation: "BCBS, Basel III: the net stable funding ratio, October 2014"
+    url: "https://www.bis.org/publ/bcbs295.htm"
+  - citation: "BCBS, Frequently asked questions on the net stable funding ratio, March 2016"
+    url: "https://www.bis.org/publ/bcbs364.htm"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build an integrated balance sheet platform that performs NSFR calculations alongside
+      LCR, linking balance sheet positions to their ASF and RSF factor assignments through
+      automated product-level mapping tables. The platform should support scenario analysis
+      for NSFR optimisation — e.g., modelling the impact of issuing 1bn in 3-year bonds
+      versus 6-month commercial paper on the NSFR ratio. Publish NSFR as a key metric in
+      the ALCO dashboard with trend charts, peer comparison data, and early warning
+      thresholds calibrated to trigger balance sheet actions before the regulatory minimum
+      is approached. Automate monthly NSFR regulatory reporting with reconciliation to the
+      general ledger.
+    tools:
+      - apache-kafka
+      - dbt
+      - postgresql
+      - grafana
+      - apache-airflow
+      - terraform
+
+  devsecops:
+    prose: >-
+      Maintain ASF and RSF factor lookup tables as configuration files under version
+      control, with validation tests that detect when supervisory factor changes (e.g.,
+      from EBA or Fed final rules) are not yet reflected in the system. Automate regression
+      testing of NSFR calculations against regulatory benchmark portfolios after every
+      update. Enforce immutable calculation runs by writing NSFR output files with
+      cryptographic hashes to a content-addressable store, ensuring that submitted reports
+      cannot be silently modified after submission.
+    tools:
+      - gitlab-ci
+      - dbt
+      - great-expectations
+      - pytest
+      - cyclonedx
+
+  secops:
+    prose: >-
+      Restrict modification of ASF/RSF factor tables to a dedicated model governance
+      team, requiring dual-control approval for any change. Retain all historical NSFR
+      calculation inputs and outputs for at least seven years in a tamper-evident archive
+      to support supervisory examination and internal audit. Include NSFR calculation
+      systems in the bank's cyber incident response plan, with defined escalation paths
+      if a system outage prevents timely NSFR reporting.
+    tools:
+      - hashicorp-vault
+      - cyberark
+      - splunk
+      - aws-s3-object-lock
+
+legal_references:
+  - framework_id: dora
+    articles: ["art-11", "art-12"]
+    relationship: complements
+  - framework_id: iso-22301
+    articles: ["cl-8.4", "cl-8.5"]
+    relationship: supports
+  - framework_id: nist-800-53-rev5
+    articles: ["CP-2", "CP-9", "SI-12"]
+    relationship: mapped

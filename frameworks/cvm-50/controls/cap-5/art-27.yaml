@@ -1,0 +1,109 @@
+id: art-27
+family: cap-5
+title: "Criterios de Selecao de Operacoes Suspeitas"
+class: CVM-50
+baselines: [todos-participantes]
+statement:
+  prose: |
+    Art. 27. Os procedimentos de seleção de operações suspeitas devem
+    considerar, entre outros, os seguintes critérios:
+
+    I - operações em valores não compatíveis com a situação econômico-financeira
+    do cliente;
+    II - operações realizadas sem propósito econômico aparente ou com
+    complexidade injustificada;
+    III - operações que apresentem indícios de fracionamento para evitar
+    limites de comunicação;
+    IV - operações com mudança atípica nos hábitos de investimento do cliente;
+    V - operações que sugiram a utilização do participante como mero intermediário
+    transitório de recursos;
+    VI - resistência do cliente a fornecer informações cadastrais ou documentos
+    solicitados; e
+    VII - inconsistência entre as informações fornecidas pelo cliente em
+    diferentes momentos da relação de negócios.
+guidance:
+  prose: |
+    Os criterios do art. 27 sao os "red flags" classicos de lavagem de dinheiro
+    aplicados ao mercado de capitais. Cada inciso representa um padrao comportamental
+    que, isolado, pode ter explicacao inocente, mas em combinacao com outros
+    fatores eleva a suspeita.
+
+    **Analise dos criterios principais:**
+
+    Inciso I (proporcionalidade): cliente PF com renda de R$ 3.000/mes que
+    aplica R$ 2 milhoes em acoes. A inconsistencia pode indicar que os recursos
+    tem origem ilicita.
+
+    Inciso II (proposito economico): operacao de compra e venda de acao no
+    mesmo dia sem ganho economico (wash trading). Pode ser manipulacao de
+    mercado e/ou lavagem.
+
+    Inciso III (fracionamento/smurfing): ao invés de uma transacao de R$ 1
+    milhao (que exigiria comunicacao), o cliente realiza 10 transacoes de
+    R$ 100.000 em dias consecutivos.
+
+    Inciso IV (mudanca de habito): cliente que sempre investiu em renda fixa
+    conservadora e de repente faz grandes operacoes em acoes de small caps.
+
+    Inciso V (mero transitorio): recursos entram na conta, sao imediatamente
+    aplicados e resgatados, e transferidos para outra instituicao — o
+    participante foi usado apenas para lavar o dinheiro.
+
+    Inciso VI (resistencia a KYC): cliente que se recusa a fornecer documentos
+    basicos ou que fornece documentos visivelmente falsificados.
+
+    Inciso VII (inconsistencias): em diferentes momentos, cliente declara
+    atividades economicas distintas ou valores de patrimonio contraditórios.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Implementacao dos red flags:**
+      1. Regra de proporcionalidade: comparar volume mensal de operacoes com
+         renda declarada, gerando alerta quando ratio supera threshold (ex: 10x).
+      2. Detector de fracionamento (smurfing): identificar multiplas transacoes
+         de valor similar de mesmo cliente em curto periodo que, somadas,
+         superam threshold de comunicacao.
+      3. Detector de wash trading: pares de operacoes de compra e venda do
+         mesmo ativo pelo mesmo cliente no mesmo dia sem variacao economica.
+      4. Analise de comportamento sequencial: identificar mudanças abruptas
+         no perfil de investimento usando baseline historico.
+      5. Detector de transitorio: ratio de entradas vs. saidas em curto periodo
+         (recursos que "passam" sem ficar).
+
+      **Scoring de suspeita:**
+      6. Cada alerta recebe um score composto baseado na combinacao de criterios
+         presentes — quanto mais criterios, maior o score e a prioridade de analise.
+    tools:
+      - transaction-monitoring
+      - behavioral-analytics
+      - rules-engine
+      - aml-platform
+  devsecops:
+    prose: |
+      **Testes de red flags:**
+      1. Caso de teste para cada inciso do art. 27: simular o padrao suspeito
+         e verificar que o alerta e gerado.
+      2. Testes de fracionamento: garantir que sequencias de transacoes
+         abaixo do threshold que somadas superam sao detectadas.
+      3. Testes de nao-deteccao de operacoes normais: garantir que operacoes
+         legitimas nao geram alertas excessivos.
+    tools:
+      - test-automation
+      - aml-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Calibracao dos criterios:**
+      1. Revisao semestral de efetividade de cada criterio do art. 27.
+      2. Analise de alertas gerados por cada criterio: qual gera mais
+         comunicacoes ao COAF (mais util) vs. mais falsos positivos (menos util).
+      3. Ajuste de thresholds baseado em feedback do COAF sobre qualidade
+         das comunicacoes recebidas.
+    tools:
+      - aml-platform
+      - analytics-platform
+      - reporting-dashboard
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-22", "art-23"]
+    relationship: equivalent-to

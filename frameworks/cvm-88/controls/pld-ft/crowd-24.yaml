@@ -1,0 +1,138 @@
+id: crowd-24
+family: pld-ft
+title: "Suspicious Transaction Monitoring and Reporting"
+class: CVM-88
+baselines: [plataformas-crowdfunding]
+statement:
+  prose: |
+    Art. 55. A plataforma deve implementar mecanismos de monitoramento
+    de operações para detecção de atividades suspeitas, incluindo:
+    I — operações que, por suas características, possam configurar
+    indícios de lavagem de dinheiro ou financiamento do terrorismo;
+    II — operações incompatíveis com o perfil econômico-financeiro,
+    a atividade ou a capacidade financeira presumida do investidor;
+    III — operações que evidenciem oscilação significativa em relação
+    ao histórico de operações do investidor; IV — tentativas de
+    fracionamento de operações com o objetivo de evadir os mecanismos
+    de identificação e monitoramento.
+
+    § 1º A plataforma deve comunicar ao COAF, no prazo de 24 (vinte e
+    quatro) horas, as operações que apresentem indícios de lavagem de
+    dinheiro ou financiamento do terrorismo.
+
+    § 2º A comunicação ao COAF deve conter as informações necessárias à
+    identificação da operação, das partes envolvidas e dos indícios que
+    motivaram a comunicação.
+
+    § 3º A plataforma deve manter registro das análises realizadas e
+    das comunicações efetuadas ao COAF pelo prazo mínimo de 5 (cinco)
+    anos.
+
+    § 4º É vedado à plataforma e a seus funcionários informar ao
+    investidor ou à sociedade empresária emissora sobre a realização
+    de comunicação ao COAF (tipping-off).
+guidance:
+  prose: |
+    Article 55 establishes the transaction monitoring and suspicious
+    activity reporting framework for crowdfunding platforms.
+
+    **Monitoring triggers:**
+    - Transactions with ML/FT characteristics
+    - Transactions inconsistent with investor's economic profile
+    - Significant deviations from investor's historical pattern
+    - Structuring attempts (splitting transactions to avoid detection)
+
+    **COAF reporting:**
+    Suspicious transactions must be reported to COAF (Brazil's Financial
+    Intelligence Unit) within 24 hours. Reports must include transaction
+    details, party identification, and suspicion indicators.
+
+    **Tipping-off prohibition:**
+    It is strictly prohibited to inform the investor or issuer that a
+    COAF report has been filed. This prohibition applies to all platform
+    employees and representatives.
+
+    **Record retention:**
+    All analyses and COAF communications must be retained for minimum
+    5 years.
+
+    **Crowdfunding-specific risks:**
+    - Structuring: multiple small investments below thresholds
+    - Shell issuers: companies created solely to launder money
+    - Nominee investors: straw persons investing on behalf of others
+    - Rapid investment/withdrawal cycles
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Transaction monitoring system:**
+      1. Deploy rule-based transaction monitoring engine with
+         crowdfunding-specific detection rules: structuring (multiple
+         investments below limits), profile inconsistency (low income
+         + large investments), velocity (rapid successive investments).
+      2. Implement behavioral analytics module that establishes
+         investor baselines and detects significant deviations.
+      3. Build COAF reporting module with automated SAR generation,
+         24-hour deadline tracking, and secure submission channel.
+
+      **Investigation support:**
+      4. Deploy case management system for suspicious activity
+         investigations with evidence collection, timeline
+         reconstruction, and decision documentation.
+      5. Implement network analysis tools to identify related parties
+         and transaction patterns across investors and issuers.
+    tools:
+      - transaction-monitoring
+      - elasticsearch
+      - postgresql
+      - graph-database
+      - case-management
+      - kubernetes
+  devsecops:
+    prose: |
+      **Monitoring system security:**
+      1. SAST scanning for monitoring code with focus on data
+         protection — COAF communications and suspicion indicators
+         are highly sensitive data.
+      2. Secret detection to prevent monitoring rules, thresholds,
+         and COAF communications from leaking.
+      3. Comprehensive testing of monitoring rules with known
+         typologies (structuring, layering, nominee patterns).
+
+      **Tipping-off prevention:**
+      4. Code review ensuring no user-facing interfaces or APIs expose
+         monitoring status or COAF reporting information.
+      5. Access control tests verifying that monitoring and SAR data
+         is restricted to authorized AML/CFT team members only.
+    tools:
+      - gitlab-ci
+      - gitlab-sast
+      - gitlab-secret-detection
+      - sonarqube
+  secops:
+    prose: |
+      **AML/CFT operations:**
+      1. 24/7 monitoring of high-priority AML alerts with defined
+         escalation paths and COAF reporting deadlines.
+      2. Daily review of medium-priority alerts and investigation
+         queue management.
+      3. Monitor for tipping-off risks: audit access logs for COAF
+         report data to detect unauthorized viewing.
+
+      **COAF compliance:**
+      4. Track all COAF reports: submission status, acknowledgment,
+         follow-up requests, and resolution.
+      5. Generate monthly AML/CFT metrics: alert volumes, investigation
+         outcomes, SAR filing statistics, false positive rates.
+      6. Annual AML/CFT effectiveness assessment with external review.
+    tools:
+      - siem
+      - case-management
+      - grc-platform
+      - transaction-monitoring
+legal_references:
+  - framework_id: cvm-50
+    articles: ["art-11", "art-13"]
+    relationship: implements
+  - framework_id: bcb-3978
+    articles: ["art-15", "art-20"]
+    relationship: complements

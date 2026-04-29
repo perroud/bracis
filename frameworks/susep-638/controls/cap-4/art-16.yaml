@@ -1,0 +1,139 @@
+id: art-16
+family: cap-4
+title: "Comunicacao Previa a SUSEP sobre Contratacao de Nuvem"
+class: SUSEP-638
+statement:
+  prose: |
+    Art. 16. A supervisionada deve comunicar previamente à SUSEP a contratação de
+    serviços relevantes de processamento e armazenamento de dados e de computação
+    em nuvem prestados no exterior.
+
+    § 1º A comunicação deve conter, no mínimo:
+    I - a denominação da empresa contratada e dos serviços a serem contratados;
+    II - a indicação dos países e das regiões em cada país onde os serviços poderão
+    ser prestados e os dados poderão ser armazenados, processados e gerenciados; e
+    III - a indicação dos dados que serão processados e/ou armazenados externamente.
+
+    § 2º A SUSEP poderá vetar ou impor restrições à contratação de serviços
+    mencionados no caput quando verificar deficiências na capacidade da supervisionada
+    de gerenciar os serviços contratados.
+guidance:
+  prose: |
+    O art. 16 exige comunicacao previa a SUSEP quando a contratacao envolver
+    servicos de nuvem prestados no exterior. E uma obrigacao formal que antecede
+    a contratacao.
+
+    **Comunicacao previa (nao autorizacao):**
+    A circular exige comunicacao previa, nao autorizacao. Porem, o ss 2 permite que
+    a SUSEP vete ou restrinja a contratacao. Na pratica, a supervisionada deve
+    comunicar com antecedencia suficiente para que a SUSEP possa se manifestar.
+
+    **Conteudo minimo (ss 1):**
+    I - Empresa contratada: razao social do provedor de nuvem (ex: Amazon Web
+        Services, Microsoft Azure, Google Cloud Platform)
+    II - Localizacao: paises e regioes especificas onde os dados serao processados
+         e armazenados (ex: US-East-1, EU-West-1). Importante: regiao de DR tambem
+    III - Dados envolvidos: quais dados serao enviados para o exterior:
+         - Dados de segurados (pessoais, financeiros, de saude)
+         - Dados atuariais e de provisoes
+         - Dados operacionais
+
+    **Poder de veto (ss 2):**
+    A SUSEP pode vetar a contratacao se identificar que a supervisionada:
+    - Nao tem equipe capacitada para gerenciar servicos no exterior
+    - Nao tem controles adequados para dados armazenados fora do Brasil
+    - Nao tem plano de contingencia para indisponibilidade do provedor
+    - Nao garante conformidade com LGPD para transferencia internacional
+
+    **Implicacoes praticas para seguradoras:**
+    - Dados de saude de segurados armazenados no exterior exigem conformidade
+      com LGPD (art. 33-36) para transferencia internacional
+    - Provisoes tecnicas e dados regulatorios devem estar acessiveis a SUSEP
+      independentemente da localizacao do armazenamento
+    - Latencia de acesso a dados no exterior pode afetar SLAs de operacao
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Controle de localizacao de dados:**
+      1. Data residency policies implementadas em todos os provedores de nuvem:
+         restricao de regioes permitidas por classificacao de dados.
+      2. Tagging automatico de recursos com localizacao e classificacao de dados.
+      3. Alertas quando recursos sao provisionados em regioes nao comunicadas a SUSEP.
+      4. Bloqueio de provisionamento em regioes nao autorizadas via policy-as-code.
+
+      **Inventario para comunicacao (ss 1):**
+      5. Inventario automatizado de todos os servicos de nuvem no exterior com:
+         provedor, regiao, tipo de dados, data de inicio.
+      6. Dashboard de data residency mostrando onde cada tipo de dado esta armazenado.
+      7. Mapeamento de fluxos de dados transfronteiricos.
+
+      **Contingencia para servicos no exterior:**
+      8. Replicacao de dados criticos de seguros para regiao no Brasil.
+      9. Failover automatico para regiao alternativa em caso de indisponibilidade.
+      10. Teste trimestral de recuperacao de dados do exterior.
+    tools:
+      - cloud-governance
+      - cspm
+      - data-residency-controls
+      - asset-inventory
+      - compliance-scanner
+  devsecops:
+    prose: |
+      **Enforcement de localizacao no pipeline:**
+      1. Policy-as-code que bloqueia deploy em regioes nao autorizadas.
+      2. IaC scanning que verifica se regioes de deploy estao na lista aprovada.
+      3. Alertas quando Terraform/Pulumi referencia regioes nao comunicadas a SUSEP.
+      4. Pre-deploy checks para validar conformidade de data residency.
+
+      **Rastreabilidade de dados no exterior:**
+      5. Logging de todas as transferencias de dados para regioes no exterior.
+      6. Data flow diagrams automatizados a partir de IaC e configuracoes.
+      7. Verificacao de que criptografia em transito esta ativa para dados
+         transferidos entre regioes.
+    tools:
+      - checkov
+      - opa-gatekeeper
+      - terraform
+      - gitlab-ci
+      - compliance-scanner
+  secops:
+    prose: |
+      **Processo de comunicacao a SUSEP:**
+      1. Processo formal de comunicacao previa com templates padronizados.
+      2. Checklist de informacoes obrigatorias dos incisos I-III.
+      3. Aprovacao interna (CISO, juridico, compliance, diretoria) antes do
+         envio a SUSEP.
+      4. Prazo minimo de antecedencia para comunicacao (definido internamente).
+      5. Registro e tracking de todas as comunicacoes enviadas a SUSEP.
+
+      **Monitoramento de conformidade:**
+      6. Verificacao mensal de que todos os servicos no exterior estao comunicados.
+      7. Auditoria de data residency para identificar dados em regioes nao aprovadas.
+      8. Verificacao de conformidade com LGPD para transferencia internacional.
+
+      **Gestao de risco de dados no exterior:**
+      9. Avaliacao de risco por pais/regiao: estabilidade politica, legislacao de
+         acesso governamental a dados, adequacao LGPD.
+      10. Plano de contingencia para cada regiao no exterior com dados de segurados.
+      11. Monitoramento de mudancas regulatorias nos paises onde dados sao armazenados.
+    tools:
+      - grc-platform
+      - compliance-scanner
+      - asset-inventory
+      - vendor-risk-management
+legal_references:
+  - framework_id: cnsp-381
+    articles: ["art-7", "art-8"]
+    relationship: implements
+  - framework_id: bacen-4893
+    articles: ["art-15", "art-16"]
+    relationship: equivalent-to
+  - framework_id: nist-800-53-rev5
+    articles: ["SA-9", "AC-20"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.19", "A.5.23"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-33", "art-34", "art-35", "art-36"]
+    relationship: complements

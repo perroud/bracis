@@ -1,0 +1,121 @@
+id: art-14
+family: cap-4
+title: "Compartilhamento de Informacoes sobre Incidentes e Ameacas"
+class: ANEEL-964
+baselines: [electric-sector]
+statement:
+  prose: |
+    Art. 14. Os agentes do setor elétrico devem participar de mecanismos de
+    compartilhamento de informações sobre incidentes cibernéticos e ameaças ao
+    setor elétrico, promovidos ou reconhecidos pela ANEEL e pelo ONS, com o
+    objetivo de fortalecer a resiliência cibernética coletiva do setor.
+
+    Parágrafo 1. As informações compartilhadas devem ser tratadas de forma
+    confidencial e utilizadas exclusivamente para fins de melhoria da segurança
+    cibernética do setor elétrico.
+
+    Parágrafo 2. O compartilhamento de informações não substitui a obrigação de
+    notificação prevista no art. 13 desta Resolução.
+guidance:
+  prose: |
+    O art. 14 introduz o principio de defesa coletiva no setor eletrico brasileiro.
+    O compartilhamento de informacoes sobre incidentes e ameacas e pratica
+    consolidada em infraestrutura critica internacionalmente.
+
+    **Por que compartilhar e essencial:**
+    - Ameacas ao setor eletrico geralmente sao direcionadas a multiplos alvos
+      simultaneamente (APTs atacam toda a cadeia, nao apenas um agente)
+    - Informacao de IOCs (Indicators of Compromise) compartilhada em horas
+      pode impedir que o mesmo ataque afete outros agentes
+    - Pequenas distribuidoras nao tem capacidade de threat intelligence propria —
+      compartilhamento e a unica forma de obterem informacao relevante
+
+    **Mecanismos de compartilhamento no setor eletrico:**
+    - ONS/ANEEL: plataforma governamental de compartilhamento (quando disponivel)
+    - E-ISAC (Electricity ISAC): plataforma norte-americana com alcance global,
+      relevante para ameacas de APTs internacionais
+    - ISAC Brasil: iniciativa brasileira de compartilhamento para infraestrutura critica
+    - CTIR.gov: Centro de Tratamento de Incidentes de Redes do Governo
+    - Grupos de trabalho setoriais: reunioes de CISO do setor eletrico
+
+    **Confidencialidade (Paragrafo 1):**
+    As informacoes compartilhadas (especialmente detalhes de incidentes proprios)
+    devem ser tratadas com TLP (Traffic Light Protocol):
+    - TLP:RED — apenas para destinatarios especificos, nao para compartilhamento adicional
+    - TLP:AMBER — compartilhamento restrito ao setor
+    - TLP:GREEN — compartilhamento amplo dentro da comunidade de seguranca do setor
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implementar infraestrutura de threat intelligence e compartilhamento:
+
+      1. Plataforma de Threat Intelligence (MISP, OpenCTI):
+         - Receber e processar feeds de IOCs de ICS-CERT, E-ISAC, ONS, CTIR.gov
+         - Compartilhar IOCs anonimizados com o setor (quando autorizado)
+         - Integracao automatica com SIEM para correlacao em tempo real
+      2. Integracao TAXII/STIX: receber indicadores de ameaca em formato padrao
+         de plataformas do setor eletrico (E-ISAC, ICS-CERT)
+      3. Feed de threat intelligence especifico para ICS/OT:
+         - Dragos WorldView
+         - Claroty Research
+         - Nozomi OT Intelligence
+      4. Automacao de enriquecimento: quando IOC relevante e recebido,
+         verificar automaticamente se ha correspondencia nos logs OT e IT
+    tools:
+      - misp
+      - opencti
+      - anomali
+      - recorded-future
+      - dragos-worldview
+  devsecops:
+    prose: |
+      Integrar threat intelligence no pipeline de seguranca:
+
+      1. Importacao automatica de IOCs de feeds do setor no SIEM e nas
+         regras de deteccao do firewall industrial
+      2. Pipeline de validacao de IOCs: verificar IOCs recebidos contra
+         baseline de trafego normal antes de criar alertas
+      3. Processo de anonimizacao para compartilhamento externo: remover
+         informacoes identificadoras antes de compartilhar IOCs com o setor
+      4. Rastreamento de contribuicoes de compartilhamento: medir quanto
+         o agente contribui vs. consome no ecossistema de compartilhamento
+      5. Integracao de TLP (Traffic Light Protocol) nos sistemas:
+         alertas com classificacao TLP automatica baseada na origem do IOC
+    tools:
+      - misp
+      - opencti
+      - gitlab-ci
+      - splunk
+      - elastic-siem
+  secops:
+    prose: |
+      Operacionalizar o programa de compartilhamento de informacoes:
+
+      1. Adesao formal a mecanismos de compartilhamento: E-ISAC, ISAC BR,
+         ONS (quando disponivel), CTIR.gov
+      2. Ponto focal para compartilhamento: designar analista responsavel
+         por receber, processar e contribuir com informacoes
+      3. Processo de triagem de IOCs recebidos: avaliar relevancia para
+         o perfil de sistemas do agente (OT, IT, protocolos utilizados)
+      4. Relatorio de participacao: documentar contribuicoes e recepcoes
+         para demonstrar participacao ativa em auditorias ANEEL
+      5. Processo de anonimizacao: antes de compartilhar detalhes de incidentes,
+         garantir que informacoes proprietarias ou sensitiveis foram removidas
+    tools:
+      - misp
+      - opencti
+      - servicenow-itsm
+      - splunk
+legal_references:
+  - framework_id: nerc-cip
+    articles: ["CIP-008-R4"]
+    relationship: mapped
+  - framework_id: iso-27001-2022
+    articles: ["A.5.6"]
+    relationship: supports
+  - framework_id: bacen-4893
+    articles: ["art-20"]
+    relationship: complements
+  - framework_id: gsi-in3
+    articles: ["art-5"]
+    relationship: complements

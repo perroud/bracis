@@ -1,0 +1,136 @@
+id: art-25
+family: cap-6
+title: "Monitoramento de Drift e Revalidacao de Modelos"
+class: ANVISA-SAMD
+baselines: [samd-all]
+statement:
+  prose: |
+    Art. 25. O fabricante de SaMD com IA/ML deve implementar processo
+    contínuo de monitoramento de desempenho do modelo em produção,
+    incluindo:
+
+    I - monitoramento de data drift: detecção de mudanças na distribuição
+    dos dados de entrada em relação aos dados de treinamento que possam
+    impactar o desempenho do modelo;
+    II - monitoramento de concept drift: detecção de mudanças na relação
+    entre dados de entrada e saída clínica esperada que possam
+    invalidar as premissas do modelo;
+    III - monitoramento de desempenho clínico: acompanhamento contínuo
+    de métricas de desempenho (acurácia, sensibilidade, especificidade,
+    AUC-ROC) em dados de produção, com comparação contra baseline
+    de validação;
+    IV - definição de limiares de alerta e ação para cada indicador
+    monitorado, com procedimento documentado de resposta a degradação;
+    V - processo de revalidação e retraining do modelo quando
+    degradação de desempenho é detectada, seguindo o predetermined
+    change control plan aprovado.
+
+    Parágrafo único. O fabricante deve manter registro de todos os
+    episódios de drift detectados, ações tomadas e resultados de
+    revalidação, como parte do arquivo de gestão de riscos e do
+    sistema de vigilância pós-mercado.
+guidance:
+  prose: |
+    O art. 25 aborda o desafio de manutencao de desempenho de modelos
+    de IA/ML ao longo do tempo, reconhecendo que modelos podem degradar
+    por mudancas nos dados e no contexto clinico.
+
+    **Tipos de drift em SaMD:**
+    1. Data drift (covariate shift): distribuicao de features muda
+       Ex: novo equipamento de imagem gera imagens com caracteristicas
+       diferentes das usadas no treino
+    2. Concept drift: relacao feature-outcome muda
+       Ex: nova variante de doenca altera apresentacao clinica
+    3. Prior probability shift: prevalencia de classes muda
+       Ex: nova epidemia altera prevalencia de condicao diagnosticada
+
+    **Metricas de deteccao de drift:**
+    - PSI (Population Stability Index): mede shift de distribuicao
+    - KL Divergence: divergencia entre distribuicoes
+    - KS Test (Kolmogorov-Smirnov): teste de igualdade de distribuicoes
+    - Wasserstein Distance: distancia entre distribuicoes
+    - Performance metrics trend: degradacao progressiva de metricas
+
+    **Resposta a drift:**
+    1. Alerta: detectar e notificar equipe responsavel
+    2. Investigacao: determinar causa e impacto clinico
+    3. Decisao: manter, revalidar ou desabilitar o modelo
+    4. Acao: retraining com dados atualizados, ajuste de parametros,
+       ou rollback para versao anterior
+    5. Validacao: verificar que modelo atualizado atende criterios
+
+    **Ciclo de vida do modelo:**
+    Modelos de IA/ML em SaMD nao sao estaticos. O fabricante deve
+    planejar para manutencao continua do desempenho, incluindo
+    orcamento de dados, infraestrutura de retraining e processo
+    regulatorio para atualizacoes dentro do PCCP.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Infraestrutura de monitoramento de drift:**
+      1. Implementar pipeline de monitoramento de drift em tempo real:
+         coleta de dados de producao -> calculo de metricas de drift
+         (PSI, KL, KS) -> comparacao com limiares -> alerta se excedido.
+      2. Configurar sistema de monitoramento de desempenho clinico
+         continuo: ground truth collection (quando disponivel),
+         proxy metrics, concordancia com profissional de saude.
+      3. Implementar infraestrutura de retraining automatizado com
+         validacao: pipeline que coleta dados novos, retreina modelo,
+         valida contra criterios PCCP e submete para aprovacao.
+      4. Manter dashboards de health do modelo em producao: metricas
+         de drift, metricas de desempenho, volume de predicoes,
+         distribuicao de saidas, alertas ativos.
+    tools:
+      - evidently-ai
+      - whylogs
+      - model-monitoring
+      - retraining-pipeline
+  devsecops:
+    prose: |
+      **Pipeline de monitoramento e resposta a drift:**
+      1. Implementar pipeline de deteccao de drift no CI/CD que executa
+         periodicamente (diario ou semanal): coleta metricas de
+         producao, calcula indicadores de drift, gera relatorio.
+      2. Criar pipeline de retraining controlado: triggered por alerta
+         de drift -> coleta de dados atualizados -> retraining ->
+         validacao automatica -> gate de PCCP -> aprovacao humana ->
+         deploy.
+      3. Automatizar comparacao de modelo retreinado vs. modelo em
+         producao: metricas globais, metricas por subgrupo, metricas
+         de explicabilidade, tudo contra envelope do PCCP.
+      4. Implementar pipeline de rollback automatico que reverte para
+         modelo anterior se modelo retreinado falha em validacao ou
+         degrada em producao apos deploy.
+    tools:
+      - gitlab-ci
+      - evidently-ai
+      - mlflow
+      - model-registry
+  secops:
+    prose: |
+      **Governanca de monitoramento de drift:**
+      1. Manter plano de monitoramento de modelo documentado: metricas
+         monitoradas, limiares de alerta, frequencia de avaliacao,
+         procedimento de resposta, responsaveis.
+      2. Registrar todos os episodios de drift detectados no risk
+         management file e no sistema de PMS, com analise de causa,
+         acao tomada e resultado.
+      3. Revisar e atualizar limiares de drift anualmente e apos
+         cada episodio significativo de drift, calibrando para
+         equilibrar sensibilidade (detectar drift real) e
+         especificidade (evitar falsos alarmes).
+      4. Incluir monitoramento de drift no PSUR (Periodic Safety
+         Update Report) como indicador de desempenho do SaMD com
+         IA/ML em producao.
+    tools:
+      - grc-platform
+      - model-monitoring
+      - risk-management
+      - pms-platform
+legal_references:
+  - framework_id: eu-ai-act
+    articles: ["art-9-7", "art-61"]
+    relationship: mapped
+  - framework_id: cfm-ia
+    articles: ["art-7"]
+    relationship: complements

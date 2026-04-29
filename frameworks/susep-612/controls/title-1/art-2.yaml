@@ -1,0 +1,122 @@
+id: art-2
+family: title-1
+title: "Definicoes"
+class: SUSEP-612
+statement:
+  prose: |
+    Art. 2. Para os fins desta Circular, consideram-se:
+    I - beneficiário final: a pessoa natural que, em última instância, de forma direta
+    ou indireta, possui, controla ou influencia significativamente a entidade ou a
+    pessoa natural em nome da qual uma operação está sendo conduzida;
+    II - cliente: qualquer pessoa natural ou jurídica com a qual se estabeleça relação
+    contratual ou comercial, incluindo segurado, proponente, estipulante, beneficiário,
+    participante, titular de título de capitalização e cedente de resseguro;
+    III - pessoa politicamente exposta (PEP): agente público que desempenha ou tenha
+    desempenhado, nos últimos cinco anos, cargo, emprego ou função pública relevante,
+    no Brasil ou em países, territórios e dependências estrangeiros, assim como seus
+    representantes, familiares e estreitos colaboradores.
+guidance:
+  prose: |
+    O art. 2 estabelece definicoes fundamentais que permeiam toda a Circular, sendo
+    criticas para a correta aplicacao dos procedimentos de PLD/FT.
+
+    **Beneficiario final (inciso I):**
+    Conceito central da abordagem baseada em risco do GAFI. No mercado de seguros,
+    a identificacao do beneficiario final e particularmente relevante em:
+    - Seguros de vida com beneficiarios designados pelo segurado
+    - PGBL/VGBL onde o titular pode nao ser o beneficiario efetivo dos recursos
+    - Titulos de capitalizacao adquiridos por terceiros
+    - Resseguro onde a cadeia de cedentes pode obscurecer o beneficiario final
+    O limiar de controle ou influencia significativa segue o padrao de 25% de
+    participacao societaria, conforme orientacao do COAF.
+
+    **Cliente (inciso II):**
+    Definicao ampla que abrange todos os papeis no mercado securitario:
+    - Segurado: titular da apolice
+    - Proponente: quem solicita a contratacao
+    - Estipulante: quem contrata em nome de grupo
+    - Beneficiario: quem recebe a indenizacao ou resgate
+    - Participante: membro de plano de previdencia
+    - Titular de capitalizacao: detentor do titulo
+    - Cedente de resseguro: seguradora que transfere risco
+    Cada papel exige nivel diferenciado de due diligence.
+
+    **PEP (inciso III):**
+    A definicao segue o padrao GAFI/FATF com periodo retroativo de 5 anos. No mercado
+    de seguros, PEPs representam risco elevado por:
+    - Possibilidade de utilizar seguros de vida com acumulacao para lavagem
+    - PGBL/VGBL como instrumento de ocultacao patrimonial
+    - Titulos de capitalizacao para fracionamento de valores
+
+    **Implicacao pratica:**
+    Os sistemas de cadastro e onboarding devem capturar informacoes suficientes para
+    classificar cada cliente em todas as categorias definidas neste artigo.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelo de dados de cliente:**
+      1. Schema de dados que suporte todos os papeis definidos no art. 2 (segurado,
+         proponente, estipulante, beneficiario, participante, titular, cedente).
+      2. Campo obrigatorio para identificacao de beneficiario final em operacoes acima
+         dos limites regulatorios.
+      3. Flag de PEP com campos para cargo, periodo, jurisdicao e relacionamento.
+      4. Historico de alteracoes de classificacao de cliente com audit trail completo.
+
+      **Integracao de dados:**
+      5. Integracao com bases de PEP nacionais e internacionais (listas da CGU,
+         Transparencia Internacional, World-Check, Dow Jones).
+      6. Integracao com bases de beneficiario final (Receita Federal, CNPJ, QSA).
+      7. API de enriquecimento de cadastro para validacao automatica de CPF/CNPJ.
+      8. Motor de resolucao de entidades para identificar duplicidades e relacionamentos
+         entre clientes com diferentes papeis.
+    tools:
+      - master-data-management
+      - entity-resolution
+      - pep-screening
+      - kyc-platform
+  devsecops:
+    prose: |
+      **Validacao de dados no pipeline:**
+      1. Testes unitarios para todas as regras de classificacao de clientes (PEP,
+         beneficiario final, tipo de relacionamento).
+      2. Testes de integracao para fluxos de onboarding que validam captura de dados
+         obrigatorios conforme papel do cliente.
+      3. Data quality checks automatizados no pipeline de dados para garantir
+         completude dos campos regulatorios.
+
+      **Seguranca dos dados de PLD/FT:**
+      4. Criptografia de dados sensiveis de PEP e beneficiario final em repouso e
+         em transito.
+      5. Controle de acesso granular (RBAC) para dados de classificacao de clientes.
+      6. Logs de acesso a dados de PEP com retencao de 10 anos.
+    tools:
+      - gitlab-ci
+      - data-quality-framework
+      - encryption-service
+      - rbac-engine
+  secops:
+    prose: |
+      **Gestao de listas e classificacoes:**
+      1. Atualizacao periodica de listas de PEP (minimo mensal) com registro de
+         data de atualizacao e fonte.
+      2. Processo de reclassificacao de clientes quando PEP deixa cargo (5 anos
+         de periodo de monitoramento continuado).
+      3. Revisao de beneficiarios finais quando ha alteracao societaria relevante.
+
+      **Monitoramento de integridade de dados:**
+      4. Dashboard de completude de dados regulatorios por carteira.
+      5. Alertas para cadastros incompletos em campos obrigatorios de PLD/FT.
+      6. Reconciliacao periodica entre base de clientes e listas de PEP/sancoes.
+      7. Relatorio de cobertura de screening por tipo de cliente e produto.
+    tools:
+      - pep-screening
+      - sanctions-screening
+      - data-quality-dashboard
+      - compliance-monitoring
+legal_references:
+  - framework_id: bcb-3978
+    articles: ["art-2"]
+    relationship: equivalent-to
+  - framework_id: lgpd
+    articles: ["art-5", "art-7"]
+    relationship: complements

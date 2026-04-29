@@ -1,0 +1,87 @@
+id: pip-1
+family: pip
+title: "Personal Information Processing and Retention"
+class: KISMSP
+baselines:
+  - k-isms-p
+
+statement:
+  prose: |
+    The organization shall process personal information only within the
+    scope of the purpose for which it was collected and the period for
+    which consent was given. When the retention period expires or the
+    purpose of processing has been fulfilled, the personal information
+    shall be destroyed without delay. Where retention is required by other
+    laws or regulations, the personal information shall be stored separately
+    from actively processed data and retained only for the legally required
+    period, after which it shall be destroyed.
+
+guidance:
+  prose: |
+    K-ISMS-P requires organizations to define specific retention periods
+    for each category of personal information and to demonstrate automated
+    or procedural mechanisms for enforcing destruction at the end of the
+    retention period. Korean law specifies mandatory retention periods for
+    certain types of records, such as five years for electronic commerce
+    transaction records. KISA auditors verify that personal information
+    past its retention period has been actually destroyed, not merely
+    marked for deletion. Separate storage of legally required retention
+    data must include access controls that prevent use for any purpose
+    other than the specific legal obligation.
+
+references:
+  - citation: "K-ISMS-P Certification Criteria, Section 3.2 — Personal Information Processing and Retention"
+    url: "https://isms.kisa.or.kr/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      Implement automated data lifecycle management that enforces retention
+      policies at the database and storage level. Deploy time-to-live (TTL)
+      configurations for data stores containing personal information.
+      Build separate, access-restricted storage tiers for data retained
+      under legal obligations. Implement data archival pipelines that move
+      expired data through proper destruction workflows.
+    tools:
+      - aws-data-lifecycle-manager
+      - terraform
+      - postgresql
+      - hashicorp-vault
+
+  devsecops:
+    prose: |
+      Enforce retention period declarations in database schema definitions
+      through CI/CD pipeline checks. Implement automated tests that verify
+      data destruction functions operate correctly. Scan application code
+      for personal information storage without associated retention metadata.
+      Block deployment of new data stores that lack retention policy
+      configurations.
+    tools:
+      - gitlab-ci
+      - conftest
+      - semgrep
+      - checkov
+
+  secops:
+    prose: |
+      Monitor data stores for personal information that has exceeded its
+      declared retention period. Audit destruction logs to verify that
+      data is being removed on schedule. Alert on access to data in
+      legal-hold storage outside approved purposes. Generate periodic
+      reports on retention policy compliance across all systems.
+    tools:
+      - splunk
+      - elastic-siem
+      - onetrust
+      - servicenow
+
+legal_references:
+  - framework_id: iso-27701
+    articles: ["clause-7.4.4", "clause-7.4.5"]
+    relationship: equivalent-to
+  - framework_id: gdpr
+    articles: ["art-5", "art-17"]
+    relationship: mapped
+  - framework_id: nist-800-53-rev5
+    articles: ["DM-2", "SI-12"]
+    relationship: mapped

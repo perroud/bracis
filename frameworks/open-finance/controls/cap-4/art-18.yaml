@@ -1,0 +1,96 @@
+id: art-18
+family: cap-4
+title: "Criptografia e Protecao de Dados em Transito e em Repouso"
+class: OPEN-FINANCE
+baselines: [participantes-obrigatorios]
+statement:
+  prose: |
+    Art. 18. As instituições participantes devem garantir a proteção dos
+    dados compartilhados no âmbito do Open Finance:
+
+    I - dados em trânsito devem ser protegidos por TLS versão 1.2 ou
+    superior, com cipher suites aprovadas nas especificações técnicas;
+
+    II - dados em repouso devem ser criptografados utilizando algoritmos
+    e tamanhos de chave conforme melhores práticas de mercado;
+
+    III - tokens de acesso devem ter tempo de vida limitado conforme
+    especificações técnicas (access token: máximo 900 segundos);
+
+    IV - refresh tokens, quando utilizados, devem ser vinculados ao
+    certificado mTLS do cliente (sender-constrained);
+
+    V - dados de consentimento e autorização devem ser protegidos contra
+    acesso não autorizado e adulteração.
+guidance:
+  prose: |
+    O art. 18 define requisitos de criptografia:
+
+    **TLS em transito:**
+    - Versao minima: TLS 1.2 (TLS 1.3 recomendado)
+    - Cipher suites: apenas forward secrecy (ECDHE)
+    - Proibidos: TLS 1.0, TLS 1.1, SSL, RC4, 3DES
+    - HSTS (HTTP Strict Transport Security) obrigatorio
+
+    **Dados em repouso:**
+    - AES-256 para dados estruturados
+    - Gerenciamento de chaves com rotacao periodica
+    - Envelope encryption para dados em nuvem
+
+    **Tokens OAuth:**
+    - Access token: vida maxima de 900 segundos (15 min)
+    - Refresh token: vinculado ao certificado mTLS (sender-constrained)
+    - Authorization code: vida maxima de 60 segundos, single-use
+    - ID token: vida curta, validado no momento do recebimento
+
+    **Protecao de consentimento:**
+    - Dados de consentimento sao criticos (quem, o que, quando, ate quando)
+    - Integridade: hash ou assinatura para detectar adulteracao
+    - Confidencialidade: criptografia em repouso
+    - Disponibilidade: backup e redundancia
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Configuracao de criptografia:**
+      1. Configurar TLS 1.2+ em todos os endpoints com cipher suites
+         ECDHE (desabilitar CBC, usar GCM).
+      2. Habilitar HSTS com max-age de pelo menos 1 ano.
+      3. Configurar access token lifetime para 300-900 segundos.
+      4. Implementar sender-constrained refresh tokens (mTLS binding).
+      5. Configurar encryption at rest para bancos de dados e storage.
+      6. Implementar key management com KMS (AWS KMS, HashiCorp Vault).
+    tools:
+      - tls-configuration
+      - vault
+      - kms
+      - oauth-server
+  devsecops:
+    prose: |
+      **Validacao de criptografia:**
+      1. Scan de configuracao TLS em cada deploy (Mozilla Observatory).
+      2. Verificar que tokens expiram conforme configurado.
+      3. Testar rejeicao de conexoes TLS < 1.2.
+      4. Validar que refresh tokens nao funcionam sem certificado correto.
+    tools:
+      - ssl-test
+      - mozilla-observatory
+      - security-testing
+      - gitlab-ci
+  secops:
+    prose: |
+      **Monitoramento de criptografia:**
+      1. Monitorar configuracao TLS periodicamente (SSL Labs).
+      2. Alertar sobre uso de cipher suites fracas.
+      3. Auditar rotacao de chaves de criptografia.
+      4. Monitorar tentativas de conexao com TLS antigo.
+    tools:
+      - ssl-monitoring
+      - key-rotation-audit
+      - siem
+legal_references:
+  - framework_id: bacen-4893
+    articles: ["art-3"]
+    relationship: complements
+  - framework_id: lgpd
+    articles: ["art-46"]
+    relationship: complements

@@ -1,0 +1,443 @@
+id: anatel-iot_to_etsi-en-303-645
+title: "ANATEL IoT to ETSI EN 303 645 Control Mapping"
+source_framework: anatel-iot
+target_framework: etsi-en-303-645
+version: "1.0.0"
+last_updated: "2026-04-06"
+methodology: semantic
+description: >
+  Mapping between ANATEL's IoT cybersecurity requirements for telecommunications
+  equipment (Ato 77/2021 and Ato 2436/2023) and the ETSI EN 303 645 consumer IoT
+  cybersecurity baseline. Both frameworks address consumer IoT device security but
+  from different regulatory perspectives: ANATEL is the Brazilian telecommunications
+  regulator enforcing homologation requirements, while ETSI provides a European
+  voluntary standard. ANATEL's requirements were heavily influenced by ETSI EN 303 645,
+  resulting in strong alignment across password security, secure updates, vulnerability
+  disclosure, secure communications, data protection, and attack surface reduction.
+  ANATEL adds Brazil-specific enforcement mechanisms (homologation certificate
+  suspension) and LGPD alignment requirements that ETSI does not cover. ETSI provides
+  broader provisions on input validation, telemetry monitoring, and system resilience
+  that ANATEL addresses more narrowly.
+
+mappings:
+  - source_control: iot-1
+    target_controls:
+      - id: pwd-1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          ANATEL iot-1 (Prohibition of Default and Shared Credentials) is functionally
+          equivalent to ETSI pwd-1 (No Universal Default Passwords). Both prohibit
+          shared default passwords across device units and require unique, cryptographically
+          generated per-device factory credentials. ANATEL adds explicit password complexity
+          rules (minimum 8 characters, mixed case, digit, special character) that ETSI
+          leaves to implementation, but the core prohibition is identical.
+      - id: pwd-2
+        relationship: intersects-with
+        confidence: 0.78
+        rationale: >
+          ANATEL iot-1 intersects with ETSI pwd-2 (No Easily Guessable Credential
+          Mechanisms) in its prohibition of credentials derived from publicly observable
+          device attributes (MAC address, serial number). Both frameworks forbid
+          predictable credential patterns, though pwd-2 focuses more broadly on
+          authentication mechanism usability and change capabilities.
+
+  - source_control: iot-2
+    target_controls:
+      - id: pwd-2
+        relationship: equivalent-to
+        confidence: 0.90
+        rationale: >
+          ANATEL iot-2 (Mandatory Password Change on First Use) is equivalent to the
+          credential change mechanism requirement in ETSI pwd-2 (No Easily Guessable
+          Credential Mechanisms). Both require the device to provide a mechanism for
+          users to change authentication values and enforce rejection of weak passwords.
+          ANATEL goes further by mandating the change on first use (forced flow) and
+          requiring dictionary-based validation, whereas ETSI requires the mechanism
+          to exist and follow best practice without mandating forced first-use change.
+      - id: pwd-1
+        relationship: complements
+        confidence: 0.75
+        rationale: >
+          ANATEL iot-2 complements ETSI pwd-1 by ensuring the unique per-device factory
+          password (required by pwd-1) is ephemeral — the user must replace it with a
+          strong personal password on first use, adding a second layer of protection
+          beyond the unique factory credential.
+
+  - source_control: iot-3
+    target_controls:
+      - id: pwd-2
+        relationship: intersects-with
+        confidence: 0.82
+        rationale: >
+          ANATEL iot-3 (Brute-Force Attack Protection) intersects with ETSI pwd-2
+          (No Easily Guessable Credential Mechanisms). ETSI pwd-2's implementation
+          guidance includes rate limiting and account lockout as part of authentication
+          best practice. ANATEL iot-3 elevates this to an explicit mandatory requirement
+          with specific mechanisms (exponential backoff, temporary lockout, rate limiting),
+          whereas ETSI treats it as part of the broader authentication mechanism guidance.
+      - id: eas-1
+        relationship: complements
+        confidence: 0.68
+        rationale: >
+          Brute-force protection in iot-3 complements ETSI eas-1 (Minimise Exposed
+          Attack Surfaces) by hardening authentication endpoints against automated
+          attacks, reducing the exploitability of exposed management interfaces.
+
+  - source_control: iot-4
+    target_controls:
+      - id: ssp-1
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          ANATEL iot-4 (Prohibition of Hardcoded Credentials in Source Code) is
+          functionally equivalent to ETSI ssp-1 (Securely Store Sensitive Security
+          Parameters). Both categorically prohibit hardcoded credentials in firmware
+          source code and require cryptographic protection of stored credentials using
+          internationally recognized standards. ETSI ssp-1 is broader in scope
+          (covering all sensitive security parameters, not just credentials), while
+          ANATEL iot-4 adds the explicit requirement that all credentials must be
+          changeable by the user or authorized management system.
+
+  - source_control: iot-5
+    target_controls:
+      - id: eas-1
+        relationship: intersects-with
+        confidence: 0.74
+        rationale: >
+          ANATEL iot-5 (Inactive Session Timeout) intersects with ETSI eas-1
+          (Minimise Exposed Attack Surfaces). Session timeout reduces the attack
+          surface by eliminating abandoned authenticated sessions. ETSI eas-1
+          addresses attack surface broadly (unused interfaces, services, privileges),
+          while ANATEL iot-5 targets the specific attack vector of unattended
+          management sessions with mandatory automatic termination and re-authentication.
+      - id: pwd-2
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          Session timeout in iot-5 complements ETSI pwd-2's authentication
+          mechanism requirements by ensuring that authenticated sessions do not
+          persist indefinitely, forcing periodic re-authentication and limiting
+          the window of opportunity for session hijacking.
+
+  - source_control: iot-6
+    target_controls:
+      - id: cse-1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          ANATEL iot-6 (Encrypted Remote Management) is functionally equivalent to
+          ETSI cse-1 (Communicate Securely). Both mandate encryption of management
+          and security-relevant communications using internationally standardized
+          cryptographic protocols (TLS 1.2+, SSH v2). Both prohibit deprecated
+          algorithms and require proper certificate validation. ANATEL adds a
+          source-based access control requirement (ACLs restricting management
+          access by IP/subnet) that is not explicitly present in ETSI cse-1.
+      - id: eas-1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          The source-based access control requirement in iot-6 (restricting management
+          access to specific IP ranges/subnets) complements ETSI eas-1's principle of
+          minimizing exposed attack surfaces by limiting who can reach the management
+          interfaces, not just how they communicate.
+
+  - source_control: iot-7
+    target_controls:
+      - id: eas-1
+        relationship: equivalent-to
+        confidence: 0.88
+        rationale: >
+          ANATEL iot-7 (Prohibition of Backdoors and Undocumented Communication) is
+          functionally equivalent to the core of ETSI eas-1 (Minimise Exposed Attack
+          Surfaces). Both require elimination of debug interfaces, test tools, and
+          undocumented services from production firmware. ETSI eas-1 is broader
+          (covering all unnecessary interfaces and privilege minimization), while
+          ANATEL iot-7 explicitly defines "backdoor" and requires comprehensive
+          documentation of all device communications.
+      - id: cse-1
+        relationship: complements
+        confidence: 0.65
+        rationale: >
+          The requirement in iot-7 that all device communications be documented
+          complements ETSI cse-1's secure communication mandate by ensuring
+          transparency about what communications exist, so that the encryption
+          requirements of cse-1 can be verified against a complete inventory.
+
+  - source_control: iot-8
+    target_controls:
+      - id: cse-1
+        relationship: implements
+        confidence: 0.88
+        rationale: >
+          ANATEL iot-8 (Encryption of Personal Data in Transit) implements a specific
+          subset of ETSI cse-1 (Communicate Securely). While cse-1 mandates secure
+          communications for all security-relevant data, iot-8 specifically targets
+          personal and sensitive data transmissions with the same cryptographic
+          requirements (TLS 1.2+, DTLS, certificate validation, forward secrecy).
+          ANATEL iot-8 adds explicit LGPD alignment by defining what constitutes
+          "personal data" per Brazilian law.
+      - id: dpd-1
+        relationship: intersects-with
+        confidence: 0.76
+        rationale: >
+          The encryption of personal data in transit required by iot-8 intersects
+          with ETSI dpd-1 (Ensure That Personal Data Is Secure), which requires
+          personal data to be processed and stored securely. Both address the
+          technical protection of personal data, with iot-8 focusing on transit
+          encryption and dpd-1 covering the broader processing lifecycle.
+
+  - source_control: iot-9
+    target_controls:
+      - id: upd-1
+        relationship: equivalent-to
+        confidence: 0.94
+        rationale: >
+          ANATEL iot-9 (Secure Software/Firmware Update Mechanism) is functionally
+          equivalent to ETSI upd-1 (Securely Updateable Software). Both require
+          cryptographically authenticated and integrity-verified firmware updates,
+          user-accessible update checking, and support for automatic updates. Both
+          mandate rejection of unsigned or tampered update packages. The alignment
+          is near-total, with minor differences: ANATEL explicitly requires
+          preservation of user configuration across updates and user notification
+          of security-relevant changes.
+      - id: swi-1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          ANATEL iot-9's requirement for cryptographic verification of update
+          packages (digital signature and integrity hash) directly intersects with
+          ETSI swi-1 (Ensure Software Integrity), which mandates code-signing
+          mechanisms to verify update integrity and authenticity before installation.
+
+  - source_control: iot-10
+    target_controls:
+      - id: upd-2
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          ANATEL iot-10 (Manufacturer Support and Update Policy) is functionally
+          equivalent to ETSI upd-2 (Support Period Publication for Software Updates).
+          Both require manufacturers to publicly disclose the security update support
+          period, communicate it clearly at the point of sale, and provide updates
+          at no additional cost. ANATEL specifies a minimum 2-year support period
+          and requires staged rollout, whereas ETSI requires publication without
+          specifying a minimum duration.
+
+  - source_control: iot-11
+    target_controls:
+      - id: swi-1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          ANATEL iot-11 (Firmware Integrity Verification at Boot) is functionally
+          equivalent to ETSI swi-1 (Ensure Software Integrity). Both require
+          secure boot with cryptographic verification of firmware integrity during
+          initialization, detection of unauthorized modifications, and defined
+          recovery behavior (alerting, preventing normal operation, or reverting
+          to a known-good image). Both require a hardware-rooted chain of trust
+          and code-signing verification.
+
+  - source_control: iot-12
+    target_controls:
+      - id: dpd-1
+        relationship: intersects-with
+        confidence: 0.85
+        rationale: >
+          ANATEL iot-12 (Personal Data Encryption at Rest and Deletion Capability)
+          intersects with ETSI dpd-1 (Ensure That Personal Data Is Secure). Both
+          require secure processing and storage of personal data. ANATEL iot-12
+          explicitly mandates encryption at rest using standardized algorithms
+          (AES-256) and a user-accessible data deletion mechanism (factory reset
+          with cryptographic erasure). ETSI dpd-1 addresses data security more
+          broadly, including consent management and legal compliance.
+      - id: del-1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          The data deletion capability in ANATEL iot-12 is functionally equivalent
+          to ETSI del-1 (Make It Easy for Users to Delete User Data). Both require
+          a simple, user-accessible mechanism to erase all personal data from the
+          device (factory reset), covering credentials, configurations, and usage
+          logs. Both expect cryptographic erasure or effective overwrite. ETSI del-1
+          adds the requirement for deletion confirmation and instructions for
+          deleting data from associated cloud services.
+
+  - source_control: iot-13
+    target_controls:
+      - id: dpd-2
+        relationship: equivalent-to
+        confidence: 0.92
+        rationale: >
+          ANATEL iot-13 (Data Collection Transparency and Documentation) is
+          functionally equivalent to ETSI dpd-2 (Transparency of Personal Data
+          Processing). Both require manufacturers to clearly document what personal
+          data is collected, how it is used, by whom, for what purposes, retention
+          periods, and whether data is shared with third parties. Both require the
+          information to be accessible to consumers. ETSI dpd-2 adds the explicit
+          data minimization requirement for telemetry, while ANATEL iot-13 requires
+          documentation in the product technical specification.
+      - id: dpd-1
+        relationship: complements
+        confidence: 0.74
+        rationale: >
+          The transparency requirements in iot-13 complement ETSI dpd-1's data
+          security requirements by ensuring consumers are informed about data
+          practices before consenting to processing — transparency is a prerequisite
+          for valid consent as required by dpd-1.
+
+  - source_control: iot-14
+    target_controls:
+      - id: vdp-1
+        relationship: equivalent-to
+        confidence: 0.93
+        rationale: >
+          ANATEL iot-14 (Vulnerability Reporting Channel) is functionally equivalent
+          to ETSI vdp-1 (Vulnerability Disclosure Policy). Both require manufacturers
+          to establish a publicly accessible vulnerability reporting channel with
+          secure communication mechanisms, define response timelines, and implement
+          coordinated vulnerability disclosure processes. Both reference ISO/IEC 29147
+          as the guiding standard. ANATEL adds the requirement for PGP/GPG encryption
+          support and specifies HTTPS as mandatory for the reporting channel.
+
+  - source_control: iot-15
+    target_controls:
+      - id: vdp-1
+        relationship: implements
+        confidence: 0.85
+        rationale: >
+          ANATEL iot-15 (Public Vulnerability Disclosure Portal) implements a specific
+          aspect of ETSI vdp-1 (Vulnerability Disclosure Policy). While vdp-1 requires
+          a vulnerability disclosure policy and ongoing vulnerability monitoring,
+          iot-15 goes further by mandating a public, Portuguese-language security
+          advisory portal with structured content (CVE ID, CVSS score, affected
+          products, mitigations, credits). ETSI vdp-1's requirement to "act on
+          reported issues in a timely manner" is operationalized by iot-15's
+          advisory publication requirement.
+
+  - source_control: iot-16
+    target_controls:
+      - id: vdp-1
+        relationship: derived-from
+        confidence: 0.78
+        rationale: >
+          ANATEL iot-16 (ANATEL Vulnerability Notification Compliance) is derived
+          from the vulnerability management principles in ETSI vdp-1 but extends
+          into regulatory enforcement territory that ETSI does not cover. While
+          vdp-1 requires manufacturers to monitor and rectify vulnerabilities,
+          iot-16 establishes ANATEL's authority to impose remediation deadlines
+          based on CVSS severity and penalize non-compliance with homologation
+          certificate suspension/cancellation. This is a uniquely Brazilian
+          regulatory enforcement mechanism with no direct ETSI equivalent.
+      - id: upd-1
+        relationship: complements
+        confidence: 0.72
+        rationale: >
+          ANATEL iot-16's requirement for timely vulnerability remediation
+          (emergency patching within CVSS-based deadlines) complements ETSI upd-1's
+          requirement for securely updateable software — the regulatory enforcement
+          in iot-16 depends on the technical update capability mandated by upd-1
+          to deliver the remediation patches.
+
+  - source_control: iot-17
+    target_controls:
+      - id: eas-1
+        relationship: equivalent-to
+        confidence: 0.94
+        rationale: >
+          ANATEL iot-17 (Minimal Attack Surface and Service Hardening) is
+          functionally equivalent to ETSI eas-1 (Minimise Exposed Attack Surfaces).
+          Both mandate disabling unused network and logical interfaces by default,
+          applying the principle of least privilege, removing debug interfaces from
+          production firmware, and enabling only services strictly necessary for
+          device operation. Both require user-accessible controls to disable
+          non-essential services. The alignment is near-total across all key
+          provisions: default-deny posture, minimal service set, debug interface
+          removal, and code minimization.
+
+  - source_control: iot-18
+    target_controls:
+      - id: res-1
+        relationship: intersects-with
+        confidence: 0.76
+        rationale: >
+          ANATEL iot-18 (DDoS Mitigation and Anti-Spoofing) intersects with ETSI
+          res-1 (Make Systems Resilient to Outages). Both address device resilience
+          under adverse network conditions. ETSI res-1 focuses on maintaining local
+          functionality during outages and clean recovery, while ANATEL iot-18
+          focuses on preventing the device from being weaponized as a DDoS vector
+          (outbound rate limiting, anti-spoofing) and maintaining basic operation
+          under attack. The DoS resilience requirement in iot-18 (management plane
+          protection) overlaps with res-1's resilience to outages.
+      - id: eas-1
+        relationship: complements
+        confidence: 0.73
+        rationale: >
+          The anti-spoofing and rate limiting requirements in iot-18 complement
+          ETSI eas-1's attack surface reduction by addressing outbound abuse
+          scenarios (the device as an attack tool) that eas-1 does not explicitly
+          cover. Reducing the device's potential as a DDoS amplifier is a form of
+          attack surface minimization from a network ecosystem perspective.
+
+  - source_control: iot-19
+    target_controls:
+      - id: mnt-1
+        relationship: equivalent-to
+        confidence: 0.91
+        rationale: >
+          ANATEL iot-19 (Secure Default Configuration and Restrictive Posture) is
+          functionally equivalent to ETSI mnt-1 (Make Installation and Maintenance
+          of Devices Easy). Both require secure-by-default configuration, simplified
+          setup procedures that prevent unintentional security failures, and
+          comprehensive technical documentation. Both mandate that the default
+          configuration be the most secure option, requiring active user choice to
+          relax security. ANATEL adds the explicit requirement for documentation
+          of all ports, services, and interfaces.
+      - id: eas-1
+        relationship: intersects-with
+        confidence: 0.80
+        rationale: >
+          The secure default configuration and least-privilege requirements in iot-19
+          intersect with ETSI eas-1's mandate to disable unused interfaces and apply
+          least privilege. Both establish the "restrictive over permissive" baseline
+          posture, though eas-1 focuses on the technical attack surface while iot-19
+          emphasizes the user-facing setup experience and documentation.
+
+  - source_control: iot-20
+    target_controls:
+      - id: tel-1
+        relationship: equivalent-to
+        confidence: 0.88
+        rationale: >
+          ANATEL iot-20 (Activity Logging and Anomaly Monitoring) is functionally
+          equivalent to ETSI tel-1 (Examine System Telemetry Data). Both require
+          the device to collect security-relevant operational data and monitor for
+          anomalies that may indicate compromise. ANATEL iot-20 is more prescriptive,
+          specifying required log event categories (authentication, configuration
+          changes, firmware updates, reboots, security events) and log management
+          requirements (persistence, rotation, syslog forwarding, NTP synchronization).
+          ETSI tel-1 is a recommendation (should) rather than a mandate (shall),
+          while ANATEL iot-20 is mandatory.
+      - id: eas-1
+        relationship: complements
+        confidence: 0.64
+        rationale: >
+          Activity logging in iot-20 complements ETSI eas-1's attack surface
+          minimization by providing visibility into the device's security state —
+          logging enables detection of attacks against the minimized attack surface
+          and anomalous behavior that may indicate a bypassed security control.
+
+statistics:
+  total_source_controls: 20
+  total_target_controls_referenced: 37
+  unique_target_controls_referenced: 15
+  relationship_distribution:
+    equivalent-to: 13
+    intersects-with: 9
+    complements: 10
+    implements: 2
+    derived-from: 1
+    subset-of: 0
+    superset-of: 0
+  average_confidence: 0.82
+  coverage: "20/20 source controls mapped (100%)"

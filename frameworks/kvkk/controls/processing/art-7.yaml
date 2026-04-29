@@ -1,0 +1,87 @@
+id: art-7
+family: processing
+title: "Erasure, Destruction, or Anonymization of Personal Data"
+class: KVKK
+baselines: [privacy-baseline]
+
+statement:
+  prose: >-
+    Article 7 — Erasure, Destruction, or Anonymization of Personal Data.
+    (1) Notwithstanding the fact that personal data have been processed in conformity
+    with the provisions of this Law and other relevant legislation, in the event that
+    the reasons necessitating the processing no longer exist, personal data shall be
+    erased, destroyed, or anonymized by the data controller ex officio or upon the
+    request of the data subject.
+    (2) The procedures and principles regarding the erasure, destruction, or
+    anonymization of personal data shall be regulated by a regulation.
+    (3) In the event that the data controller fails to accept the request by the data
+    subject for erasure, destruction, or anonymization of personal data, the data
+    subject may lodge a complaint with the Board.
+
+guidance:
+  prose: >-
+    Article 7 establishes the right to erasure/destruction and the obligation of
+    anonymization. Key points: (1) This is both a proactive obligation (ex officio)
+    and a reactive right (upon request) — controllers must delete data when the purpose
+    is fulfilled even without a request. (2) The three options (erasure, destruction,
+    anonymization) provide flexibility in implementation but each has specific technical
+    requirements defined by secondary regulation. (3) Anonymization must be irreversible
+    per Article 3's definition. (4) Data subjects can escalate to the KVKK Board if
+    the controller refuses their request. The Regulation on Erasure, Destruction, or
+    Anonymization of Personal Data (published 2017) provides detailed technical guidance
+    on acceptable methods for each option.
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Build automated data lifecycle management services. Implement retention policy
+      enforcement that automatically triggers erasure when purposes expire. Deploy
+      three distinct technical capabilities: (1) Erasure — logical deletion with
+      overwrite verification, (2) Destruction — physical deletion of storage media or
+      cryptographic erasure, (3) Anonymization — irreversible de-identification using
+      k-anonymity, l-diversity, or differential privacy. Build self-service deletion
+      request APIs that propagate across all systems holding the data subject's data.
+      Implement deletion verification that confirms data is removed from primary stores,
+      backups, caches, and logs.
+    tools:
+      - "Data lifecycle management platforms"
+      - "Cryptographic erasure tools (key destruction)"
+      - "Anonymization libraries (ARX, Google DP library)"
+      - "Data lineage tools for deletion propagation tracking"
+      - "Backup purge automation"
+      - "Cache invalidation services"
+  devsecops:
+    prose: >-
+      CI pipelines must verify that every data store has a deletion capability implemented.
+      Automated tests must verify that deletion requests propagate to all downstream systems.
+      Code review must verify that anonymization implementations meet irreversibility
+      requirements. Pipeline gates must ensure new data stores include erasure/destruction
+      procedures in their operational runbooks.
+    tools:
+      - "Integration tests for deletion propagation"
+      - "Anonymization quality verification tests"
+      - "Database migration linters for deletion procedure verification"
+      - "Data store inventory validators"
+  secops:
+    prose: >-
+      Monitor deletion request SLAs. Alert when deletion requests exceed the regulatory
+      response timeframe. Verify deletion completeness through periodic audits —
+      confirm data is removed from all systems including backups and archives. Test
+      anonymization irreversibility through re-identification risk assessments.
+      Track ex officio deletion compliance by monitoring data past retention periods.
+    tools:
+      - "Deletion request tracking and SLA monitoring"
+      - "Re-identification risk assessment tools"
+      - "Backup audit tools for deletion verification"
+      - "Retention period compliance scanners"
+
+legal_references:
+  - framework_id: gdpr
+    articles: ["art-17"]
+    relationship: derived-from
+  - framework_id: lgpd
+    articles: ["art-16"]
+    relationship: mapped
+  - framework_id: iso-27701
+    articles: ["A.7.4.4", "A.7.4.5"]
+    relationship: supports

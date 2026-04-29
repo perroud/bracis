@@ -1,0 +1,103 @@
+id: slsa-dep-scanned
+family: dependencies
+title: "Dependencies: Scanned for Vulnerabilities"
+class: SLSA
+
+baselines: [build-l1, build-l2, build-l3]
+
+statement:
+  prose: >-
+    All third-party dependencies consumed during the build must be scanned for known
+    vulnerabilities before or during the build process. The scanning must cover both
+    direct and transitive dependencies across all package ecosystems used by the project.
+    Vulnerability scan results must be recorded and available for audit. Critical and
+    high-severity vulnerabilities must be addressed before artifacts are promoted to
+    production.
+
+guidance:
+  prose: >-
+    Dependencies are the largest and most common attack surface in modern software
+    supply chains. Most applications contain far more third-party code than first-party
+    code, and vulnerabilities in dependencies are actively exploited. Scanning must be
+    continuous — not just at build time — because new vulnerabilities are discovered
+    daily in already-deployed dependencies. Organizations should use multiple vulnerability
+    databases (NVD, OSV, GitHub Advisory Database) and scanning tools (Trivy, Grype,
+    Snyk) to maximize detection coverage. Scan results should feed into a vulnerability
+    management workflow with defined SLAs for remediation based on severity.
+
+references:
+  - citation: "SLSA v1.0 — Dependencies"
+    url: "https://slsa.dev/spec/v1.0/requirements"
+  - citation: "OpenSSF Scorecard — Vulnerabilities Check"
+    url: "https://securityscorecards.dev/"
+
+implementation_guidance:
+  platform_engineering:
+    prose: >-
+      Deploy dependency scanning infrastructure that runs automatically on every build.
+      Integrate Trivy, Grype, or equivalent scanners into container image builds to scan
+      OS-level and application-level dependencies. Configure artifact registries (Harbor,
+      Artifactory) to perform automatic vulnerability scanning on upload and block
+      promotion of images with critical vulnerabilities. Deploy OSV-Scanner or deps.dev
+      integration for ecosystem-specific vulnerability detection. Implement centralized
+      vulnerability dashboards (Grafana, DefectDojo) for cross-project visibility.
+      Configure automated alerts for newly discovered vulnerabilities in production
+      dependencies.
+    tools:
+      - trivy
+      - grype
+      - osv-scanner
+      - harbor
+      - artifactory
+      - defectdojo
+      - grafana
+      - dependabot
+
+  devsecops:
+    prose: >-
+      Add dependency scanning as a mandatory CI/CD pipeline stage that runs before
+      artifact publishing. Configure Trivy or Grype to scan lock files and SBOMs for
+      known vulnerabilities. Implement pipeline policies that fail builds with critical
+      or high-severity vulnerabilities unless an explicit exception is documented. Enable
+      Dependabot, Renovate, or equivalent automated dependency update tools to create
+      pull requests for vulnerable dependencies. Include vulnerability scan results in
+      build provenance attestations to provide consumers with dependency risk visibility.
+      Configure merge-blocking checks for dependency vulnerability scans.
+    tools:
+      - trivy
+      - grype
+      - dependabot
+      - renovate
+      - github-actions
+      - gitlab-ci
+      - snyk
+      - osv-scanner
+
+  secops:
+    prose: >-
+      Monitor vulnerability feeds for new CVEs affecting the organization's dependency
+      portfolio. Implement SLA-based alerting for unpatched critical vulnerabilities
+      (e.g., 24 hours for critical, 7 days for high). Generate regular vulnerability
+      reports showing dependency risk posture across all projects. Track mean-time-to-
+      remediation metrics for dependency vulnerabilities. Integrate vulnerability scan
+      results into SIEM for correlation with threat intelligence. Include dependency
+      vulnerability status in incident response procedures.
+    tools:
+      - trivy
+      - grype
+      - defectdojo
+      - splunk
+      - elastic-siem
+      - grafana
+      - osv-scanner
+
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["RA-5", "SR-3", "SR-4", "SI-2"]
+    relationship: implements
+  - framework_id: nist-800-218
+    articles: ["PW.4.1", "PW.4.4", "RV.1.1"]
+    relationship: supports
+  - framework_id: cis-controls-v8
+    articles: ["7.4", "7.5", "16.4"]
+    relationship: supports

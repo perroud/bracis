@@ -1,0 +1,126 @@
+id: art-11
+family: cap-3
+title: "Informacoes de Identificacao de Pessoa Natural"
+class: BCB-3978
+statement:
+  prose: |
+    Art. 11. A coleta de informações de que trata o art. 10, § 1, no caso de clientes
+    pessoa natural, deve contemplar, no mínimo:
+    I - o nome completo;
+    II - o número de inscrição no Cadastro de Pessoas Físicas (CPF);
+    III - o número do documento de identificação, o nome do órgão expedidor e a data
+    de expedição;
+    IV - a data de nascimento;
+    V - o endereço residencial completo;
+    VI - o número de telefone e o endereço eletrônico (e-mail);
+    VII - a natureza e o propósito da relação de negócio; e
+    VIII - a capacidade econômico-financeira, incluindo a renda ou o faturamento.
+guidance:
+  prose: |
+    O art. 11 define os dados minimos obrigatorios para identificacao de pessoa natural.
+    E um checklist taxativo quanto ao minimo.
+
+    **Dados de identidade (I-IV):**
+    Informacoes basicas para identificar univocamente a pessoa natural:
+    - Nome completo: conforme documento oficial
+    - CPF: identificador unico no Brasil
+    - Documento de identificacao: RG, CNH, passaporte (com orgao e data)
+    - Data de nascimento: para verificacao de maioridade e consistencia
+
+    **Dados de contato e localizacao (V-VI):**
+    - Endereco residencial completo: logradouro, numero, complemento, bairro,
+      cidade, UF, CEP
+    - Telefone e e-mail: canais de comunicacao e verificacao
+
+    **Dados de relacao (VII):**
+    Natureza e proposito da relacao de negocio. Exemplos:
+    - Conta corrente para recebimento de salario
+    - Investimento de patrimonio pessoal
+    - Credito para aquisicao de imovel
+
+    **Dados financeiros (VIII):**
+    Capacidade economico-financeira e essencial para PLD/FT. Permite avaliar
+    se as movimentacoes sao compativeis com o perfil declarado. Operacoes
+    incompativeis sao o principal indicador de lavagem de dinheiro.
+implementation_guidance:
+  platform_engineering:
+    prose: |
+      **Modelo de dados de pessoa natural:**
+      1. Campos obrigatorios no banco de dados de clientes PF, todos com
+         validacao na camada de aplicacao:
+         - nome_completo: string, nao nulo, min 5 caracteres
+         - cpf: string formatada, validacao de digito verificador
+         - documento_id: numero, orgao, data_expedicao (struct)
+         - data_nascimento: date, validacao de maioridade
+         - endereco: logradouro, numero, complemento, bairro, cidade, uf, cep
+         - telefone: com DDD, validacao de formato
+         - email: validacao de formato e dominio
+         - proposito_relacao: enum ou texto livre
+         - renda_mensal: decimal, nao nulo
+      2. Validacao de CPF contra base da Receita Federal via API.
+      3. Validacao de endereco via CEP (Correios API).
+      4. Verificacao de e-mail (envio de codigo de confirmacao).
+      5. Verificacao de telefone (envio de SMS/WhatsApp de confirmacao).
+
+      **Enriquecimento automatico:**
+      6. Consulta a Receita Federal para validar nome e situacao cadastral.
+      7. Consulta a bureaus de credito para validar renda declarada.
+      8. Consulta a listas restritivas (OFAC, ONU, EU) com nome e CPF.
+      9. Verificacao de PEP contra base atualizada.
+    tools:
+      - kyc-system
+      - data-enrichment-api
+      - validation-engine
+      - sanctions-screening
+  devsecops:
+    prose: |
+      **Validacao de dados:**
+      1. Testes unitarios para validacao de cada campo (CPF, email, telefone,
+         CEP, data de nascimento).
+      2. Testes de integracao com APIs de verificacao (Receita, Correios).
+      3. Testes de cenarios de onboarding (dados validos, dados incompletos,
+         dados invalidos, dados inconsistentes).
+      4. Testes de performance de consultas a bases externas.
+
+      **Protecao de dados pessoais:**
+      5. Criptografia de CPF, renda e documentos em repouso.
+      6. Tokenizacao de dados sensiveis em logs e ambientes nao produtivos.
+      7. Audit trail de acesso a dados de identificacao.
+      8. Testes de seguranca (SQL injection, XSS) em formularios de cadastro.
+    tools:
+      - gitlab-ci
+      - test-automation
+      - vault
+      - gitlab-sast
+  secops:
+    prose: |
+      **Qualidade cadastral:**
+      1. Relatorio periodico de completude cadastral (percentual de campos
+         preenchidos por cliente).
+      2. Identificacao de registros com dados potencialmente falsos ou
+         inconsistentes.
+      3. Monitoramento de tentativas de cadastro com CPFs invalidos ou
+         cancelados.
+      4. Auditoria de atualizacoes cadastrais por amostragem.
+
+      **Privacidade e protecao de dados:**
+      5. Controle de acesso a dados de identificacao (need-to-know).
+      6. Processo de atendimento a direitos do titular (LGPD art. 18).
+      7. Retencao de dados cadastrais conforme prazos legais (10 anos
+         apos encerramento da relacao).
+      8. Descarte seguro de dados apos prazo de retencao.
+    tools:
+      - identity-governance
+      - grc-platform
+      - data-quality
+      - privacy-management
+legal_references:
+  - framework_id: nist-800-53-rev5
+    articles: ["IA-4", "IA-5", "IA-12"]
+    relationship: supports
+  - framework_id: iso-27001-2022
+    articles: ["A.5.16", "A.5.17", "A.5.33"]
+    relationship: supports
+  - framework_id: lgpd
+    articles: ["art-7", "art-11", "art-16", "art-18"]
+    relationship: complements
