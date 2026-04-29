@@ -1,22 +1,22 @@
 # Diagramas Legais
 
-Para os diagramas legais em portugues, consulte o documento dedicado ao ecossistema regulatorio brasileiro:
+Para os diagramas legais em português, consulte o documento dedicado ao ecossistema regulatório brasileiro:
 
-**[Panorama Regulatorio Brasileiro](diagrams-legal-brasil.md)**
+**[Panorama Regulatório Brasileiro](diagrams-legal-brasil.md)**
 
 Este documento cobre:
 
-- Ecossistema regulatorio brasileiro completo — 60 frameworks
+- Ecossistema regulatório brasileiro completo — 60 frameworks
 - LGPD — direitos dos titulares e bases legais
-- Setor financeiro — hierarquia regulatoria BCB, CVM, CNSP/SUSEP
-- Tres linhas de defesa na regulacao financeira brasileira
-- Governo federal — cadeia de comando de seguranca da informacao
+- Setor financeiro — hierarquia regulatória BCB, CVM, CNSP/SUSEP
+- Três linhas de defesa na regulação financeira brasileira
+- Governo federal — cadeia de comando de segurança da informação
 - Saude — ecossistema ANVISA, CFM e ANS
 - Infraestrutura critica — energia, telecom e aviacao
-- PLD/FT — cadeia de prevencao a lavagem de dinheiro
-- Notificacao de incidentes — fluxo obrigatorio por regulador
+- PLD/FT — cadeia de prevenção à lavagem de dinheiro
+- Notificação de incidentes — fluxo obrigatório por regulador
 - Penalidades por regulador
-- Linha do tempo — evolucao regulatoria brasileira
+- Linha do tempo — evolução regulatória brasileira
 
 ---
 

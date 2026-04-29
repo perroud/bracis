@@ -47,7 +47,7 @@ mindmap
 
 ---
 
-## 2. Cadeias de Derivacao de Frameworks -- Internacional
+## 2. Cadeias de Derivação de Frameworks -- Internacional
 
 Este diagrama mapeia as relacoes de derivacao e complementaridade entre padroes internacionais organizados por familia.
 
@@ -90,9 +90,9 @@ mindmap
 
 ---
 
-## 3. Cadeias de Derivacao de Frameworks -- Brasil
+## 3. Cadeias de Derivação de Frameworks -- Brasil
 
-O ecossistema regulatorio brasileiro e fortemente interconectado. Reguladores setoriais derivam requisitos de ciberseguranca e privacidade da LGPD e normas setoriais especificas.
+O ecossistema regulatório brasileiro é fortemente interconectado. Reguladores setoriais derivam requisitos de cibersegurança e privacidade da LGPD e normas setoriais específicas.
 
 ```mermaid
 mindmap
@@ -155,9 +155,9 @@ mindmap
 
 ---
 
-## 4. Estrutura do Repositorio
+## 4. Estrutura do Repositório
 
-O repositorio segue uma estrutura plana e previsivel. Cada um dos 136 frameworks vive em seu proprio diretorio em `frameworks/`, contendo os metadados, controles organizados por familia e traducoes opcionais.
+O repositório segue uma estrutura plana e previsível. Cada um dos 136 frameworks vive em seu próprio diretório em `frameworks/`, contendo os metadados, controles organizados por família e traduções opcionais.
 
 ```mermaid
 flowchart TD
@@ -209,7 +209,7 @@ flowchart TD
 
 ## 5. Fluxo de Trabalho do Engenheiro
 
-Este e o fluxo tipico de um engenheiro usando o BRACIS. Comece identificando quais frameworks se aplicam ao seu contexto, depois explore os controles para detalhes de implementacao no seu techstack.
+Este é o fluxo típico de um engenheiro usando o BRACIS. Comece identificando quais frameworks se aplicam ao seu contexto, depois explore os controles para detalhes de implementação no seu techstack.
 
 ```mermaid
 flowchart TD

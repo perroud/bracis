@@ -71,7 +71,6 @@ bracis/
 ├── legal/               # 8 legal matrices
 ├── industries/          # Industry taxonomies
 ├── regions/             # Regional taxonomies
-├── techstacks/          # DevSecOps, GitOps, Platform Engineering
 └── schema/              # JSON Schema for validation
 ```
 

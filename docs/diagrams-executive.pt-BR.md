@@ -4,13 +4,13 @@
 
 Visualizacoes estrategicas do panorama de compliance para executivos, conselhos e lideranca de GRC.
 
-Este documento apresenta 136 frameworks regulatorios e mais de 2.800 controles como ativos estrategicos. Cada diagrama responde a uma pergunta relevante para a lideranca: onde temos cobertura, onde estao as lacunas e o que priorizar.
+Este documento apresenta 136 frameworks regulatórios e mais de 2.800 controles como ativos estratégicos. Cada diagrama responde a uma pergunta relevante para a liderança: onde temos cobertura, onde estão as lacunas e o que priorizar.
 
 ---
 
-## 1. Cobertura Regulatoria Global
+## 1. Cobertura Regulatória Global
 
-Nossa biblioteca de frameworks abrange todas as principais regioes regulatorias. O grafico abaixo mostra a distribuicao por geografia.
+Nossa biblioteca de frameworks abrange todas as principais regiões regulatórias. O grafico abaixo mostra a distribuicao por geografia.
 
 ```mermaid
 pie title 136 Frameworks por Regiao
@@ -23,13 +23,13 @@ pie title 136 Frameworks por Regiao
     "Canada (1)" : 1
 ```
 
-**Conclusao:** Brasil e padroes globais juntos representam 74% da biblioteca. Qualquer empresa operando no Brasil com clientes internacionais obtem cobertura imediata e profunda.
+**Conclusão:** Brasil e padroes globais juntos representam 74% da biblioteca. Qualquer empresa operando no Brasil com clientes internacionais obtem cobertura imediata e profunda.
 
 ---
 
 ## 2. Seletor de Stack de Compliance
 
-Nem toda empresa precisa de todos os 136 frameworks. Esta arvore de decisao ajuda executivos a identificar o stack minimo de compliance com base em onde a empresa opera e qual setor atende.
+Nem toda empresa precisa de todos os 136 frameworks. Esta árvore de decisão ajuda executivos a identificar o stack mínimo de compliance com base em onde a empresa opera e qual setor atende.
 
 ```mermaid
 flowchart TD
@@ -104,13 +104,13 @@ flowchart TD
     style KR_STACK fill:#e8f5e9,stroke:#2e7d32
 ```
 
-**Conclusao:** Comece com o menor stack que cobre suas obrigacoes regulatorias. Voce sempre pode expandir depois. As caixas verdes sao os pontos de partida recomendados.
+**Conclusão:** Comece com o menor stack que cobre suas obrigacoes regulatorias. Voce sempre pode expandir depois. As caixas verdes sao os pontos de partida recomendados.
 
 ---
 
-## 3. Modelo das Tres Linhas de Defesa
+## 3. Modelo das Três Linhas de Defesa
 
-O compliance nao e responsabilidade de uma unica equipe. Este diagrama mostra como o BRACIS se mapeia a cada linha de defesa.
+O compliance não é responsabilidade de uma única equipe. Este diagrama mostra como o BRACIS se mapeia a cada linha de defesa.
 
 ```mermaid
 flowchart TD
@@ -139,13 +139,13 @@ flowchart TD
     style LINE3 fill:#fce4ec,stroke:#b71c1c,color:#000
 ```
 
-**Conclusao:** A 1a linha usa a implementation_guidance diariamente. A 2a linha usa mapeamentos cruzados e matrizes legais para monitoramento continuo. A 3a linha usa certificacoes e mapeamentos como evidencia de auditoria.
+**Conclusão:** A 1a linha usa a implementation_guidance diariamente. A 2a linha usa mapeamentos cruzados e matrizes legais para monitoramento continuo. A 3a linha usa certificacoes e mapeamentos como evidencia de auditoria.
 
 ---
 
-## 4. Mapa de Dependencia Regulatoria
+## 4. Mapa de Dependência Regulatória
 
-Regulacoes nao existem de forma isolada. Entender como as principais familias regulatorias se relacionam evita trabalho duplicado e revela controles compartilhados.
+Regulações não existem de forma isolada. Entender como as principais famílias regulatórias se relacionam evita trabalho duplicado e revela controles compartilhados.
 
 ```mermaid
 mindmap
@@ -188,13 +188,13 @@ mindmap
                 POPIA
 ```
 
-**Conclusao:** ISO 27001 e GDPR sao os dois centros gravitacionais. Implementar ISO 27001 cobre parcelas significativas do NIST, PCI e frameworks setoriais. Conformidade com GDPR cria uma baseline para quase toda outra lei de privacidade.
+**Conclusão:** ISO 27001 e GDPR sao os dois centros gravitacionais. Implementar ISO 27001 cobre parcelas significativas do NIST, PCI e frameworks setoriais. Conformidade com GDPR cria uma baseline para quase toda outra lei de privacidade.
 
 ---
 
 ## 5. Panorama de Risco de Penalidades
 
-Nem todas as regulacoes carregam o mesmo risco de enforcement. Este quadrante posiciona os principais frameworks por atividade de fiscalizacao e tamanho maximo de penalidade.
+Nem todas as regulações carregam o mesmo risco de enforcement. Este quadrante posiciona os principais frameworks por atividade de fiscalização e tamanho máximo de penalidade.
 
 ```mermaid
 quadrantChart
@@ -219,7 +219,7 @@ quadrantChart
     DPDP: [0.20, 0.50]
 ```
 
-**Conclusao:** GDPR, SOX e DORA estao no quadrante de risco critico. O EU AI Act e o PIPL carregam tetos de penalidade massivos mas enforcement ainda em maturacao.
+**Conclusão:** GDPR, SOX e DORA estao no quadrante de risco critico. O EU AI Act e o PIPL carregam tetos de penalidade massivos mas enforcement ainda em maturacao.
 
 ---
 
@@ -240,13 +240,13 @@ timeline
         Mapeamento cruzado completo -- 123 arquivos : Matrizes legais -- 8 jurisdicoes : Monitoramento continuo de compliance : Evidencia pronta para auditoria
 ```
 
-**Conclusao:** A Fase 1 sozinha cobre 60-70% da maioria dos requisitos de compliance. Cada fase subsequente adiciona profundidade e especificidade setorial.
+**Conclusão:** A Fase 1 sozinha cobre 60-70% da maioria dos requisitos de compliance. Cada fase subsequente adiciona profundidade e especificidade setorial.
 
 ---
 
-## 7. Ciclo de Vida de Dados e Pontos de Contato Regulatorio
+## 7. Ciclo de Vida de Dados e Pontos de Contato Regulatório
 
-Cada etapa do ciclo de vida de dados aciona obrigacoes regulatorias. Este diagrama mapeia esses pontos de contato para as matrizes legais especificas do BRACIS.
+Cada etapa do ciclo de vida de dados aciona obrigações regulatórias. Este diagrama mapeia esses pontos de contato para as matrizes legais específicas do BRACIS.
 
 ```mermaid
 flowchart TD
@@ -277,13 +277,13 @@ flowchart TD
     style B_REQ fill:#f5f5f5,stroke:#9e9e9e
 ```
 
-**Conclusao:** Nossas 8 matrizes legais cobrem cada etapa do ciclo de vida de dados em 17 jurisdicoes. Uma violacao de dados aciona 3 matrizes simultaneamente -- a preparacao aqui tem o maior ROI de reducao de risco.
+**Conclusão:** Nossas 8 matrizes legais cobrem cada etapa do ciclo de vida de dados em 17 jurisdicoes. Uma violacao de dados aciona 3 matrizes simultaneamente -- a preparacao aqui tem o maior ROI de reducao de risco.
 
 ---
 
-## 8. Ecossistema Regulatorio Brasileiro
+## 8. Ecossistema Regulatório Brasileiro
 
-O Brasil possui um dos panoramas regulatorios mais complexos para empresas de tecnologia, com 60 frameworks distribuidos entre mais de 10 reguladores. Este mapa mostra os principais orgaos reguladores organizados por setor, com a LGPD como fio condutor transversal.
+O Brasil possui um dos panoramas regulatórios mais complexos para empresas de tecnologia, com 60 frameworks distribuídos entre mais de 10 reguladores. Este mapa mostra os principais órgãos reguladores organizados por setor, com a LGPD como fio condutor transversal.
 
 ```mermaid
 mindmap
@@ -340,4 +340,4 @@ mindmap
             ANAC Ciber
 ```
 
-**Conclusao:** A LGPD e o fio que conecta todos os setores no Brasil. O setor financeiro e o mais regulado, com 22 frameworks distribuidos entre 4 reguladores. Qualquer empresa operando no setor financeiro brasileiro deve planejar investimento significativo em compliance.
+**Conclusão:** A LGPD e o fio que conecta todos os setores no Brasil. O setor financeiro e o mais regulado, com 22 frameworks distribuidos entre 4 reguladores. Qualquer empresa operando no setor financeiro brasileiro deve planejar investimento significativo em compliance.
